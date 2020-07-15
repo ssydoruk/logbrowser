@@ -1497,7 +1497,7 @@ public class inquirer {
         }
         saveObject(getSerFile(), queryDialogSettings);
 
-    }
+    } 
 
     public static String getSerFile() {
         return inquirer.getLogBrDir() + File.separator + serFile;
