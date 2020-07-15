@@ -5,6 +5,7 @@
 package com.myutils.logbrowser.indexer;
 
 import static Utils.Util.intOrDef;
+import static com.myutils.logbrowser.indexer.SingleThreadParser.ParserState.*;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
@@ -18,7 +19,6 @@ import java.util.regex.Pattern;
 import javax.swing.JOptionPane;
 import org.apache.commons.lang3.StringUtils;
 import org.json.JSONObject;
-import static com.myutils.logbrowser.indexer.SingleThreadParser.ParserState.*;
 
 /**
  *
@@ -120,6 +120,7 @@ public class SingleThreadParser extends Parser {
     }
     private FileInfo.FileType fileType = FileInfo.FileType.UNKNOWN;
 
+    @Override
     public int ParseFrom(BufferedReaderCrLf input, long offset, int line, FileInfo fi) {
         m_CurrentFilePos = offset;
         m_CurrentLine = line;
@@ -1546,7 +1547,7 @@ public class SingleThreadParser extends Parser {
         }
 
         public Map<String, String> getAttrs() {
-            HashMap<String, String> ret = new HashMap<String, String>();
+            HashMap<String, String> ret = new HashMap<>();
             for (String m_MessageLine : m_MessageLines) {
                 String[] split = StringUtils.split(m_MessageLine, "=", 2);
                 if (split != null && split.length >= 2) {
@@ -1654,7 +1655,7 @@ public class SingleThreadParser extends Parser {
 
     private class SIP1536TrunkStatistics extends Message {
 
-        HashMap<String, String> attrs = new HashMap<String, String>();
+        HashMap<String, String> attrs = new HashMap<>();
         private String trunk = null;
 
         private SIP1536TrunkStatistics(String string) throws Exception {
@@ -1782,7 +1783,7 @@ public class SingleThreadParser extends Parser {
         private boolean request;
         private String msg;
         private String amount;
-        HashMap<String, String> attrs = new HashMap<String, String>();
+        HashMap<String, String> attrs = new HashMap<>();
 
         private SIP1536RequestResponse(String string, boolean request) throws Exception {
             super(TableType.SIP1536ReqResp);

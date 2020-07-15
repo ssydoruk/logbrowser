@@ -76,7 +76,7 @@ public abstract class Parser {
                     final int idx = pair.indexOf('=');
                     final String key = idx > 0 ? URLDecoder.decode(pair.substring(0, idx), "UTF-8") : pair;
                     if (!query_pairs.containsKey(key)) {
-                        query_pairs.put(key, new LinkedList<String>());
+                        query_pairs.put(key, new LinkedList<>());
                     }
                     final String value = idx > 0 && pair.length() > idx + 1 ? URLDecoder.decode(pair.substring(idx + 1), "UTF-8") : null;
                     query_pairs.get(key).add(value);
@@ -149,7 +149,7 @@ public abstract class Parser {
         super();
         cal = Calendar.getInstance();
 
-        m_MessageContents = new ArrayList<String>();
+        m_MessageContents = new ArrayList<>();
         m_tables = tables;
         m_type = type;
         m_StringType = FileInfoType.getFileType(type);
@@ -232,7 +232,7 @@ public abstract class Parser {
         return Main.clr.isParseTDiff() | parseTimeDiff;
     }
 
-    public DateParsed getLastTimeStamp() {
+    protected DateParsed getLastTimeStamp() {
         return m_LastTimeStamp;
 
     }
@@ -1108,6 +1108,7 @@ public abstract class Parser {
             }
         }
 
+        @Override
         public String toString() {
             return "pattern: [" + pattern.pattern() + "] fmt: [" + fmt + "] fmt: ["
                     + ((formatter == null) ? "(null)" : formatter.toString()

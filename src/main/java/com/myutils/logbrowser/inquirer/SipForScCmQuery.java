@@ -4,13 +4,13 @@
  */
 package com.myutils.logbrowser.inquirer;
 
+import com.myutils.logbrowser.indexer.FileInfoType;
+import com.myutils.logbrowser.indexer.ReferenceType;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.Hashtable;
 import org.apache.commons.lang3.StringUtils;
-import com.myutils.logbrowser.indexer.FileInfoType;
-import com.myutils.logbrowser.indexer.ReferenceType;
 
 /**
  *
@@ -69,6 +69,7 @@ public class SipForScCmQuery extends IQuery {
         this.collectHandlers = collectHandlers;
     }
 
+    @Override
     public void Execute() throws SQLException {
         inquirer.logger.debug("**Execute in  " + this.getClass().toString());
         m_connector = DatabaseConnector.getDatabaseConnector(this);
@@ -100,6 +101,7 @@ public class SipForScCmQuery extends IQuery {
 //    public Hashtable getSipRecords() {
 //        return sipRecords;
 //    }
+    @Override
     public ILogRecord GetNext() throws SQLException {
         on_error:
         if (m_resultSet.next()) {
@@ -132,6 +134,7 @@ public class SipForScCmQuery extends IQuery {
         }
     }
 
+    @Override
     public void Reset() throws SQLException {
         if (m_resultSet != null) {
             m_resultSet.close();

@@ -5,6 +5,7 @@
  */
 package com.myutils.logbrowser.indexer;
 
+import static com.myutils.logbrowser.indexer.Main.getSQLiteaccessor;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -13,7 +14,6 @@ import java.util.HashSet;
 import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
-import static com.myutils.logbrowser.indexer.Main.getSQLiteaccessor;
 
 /**
  *
@@ -45,6 +45,7 @@ class TableReference {
             this.s = s;
         }
 
+        @Override
         public boolean equals(Object o) {
             if (o instanceof CIString) {
                 CIString o1 = (CIString) o;
@@ -57,6 +58,7 @@ class TableReference {
 
         private int hashCode = 0;
 
+        @Override
         public int hashCode() {
             if (hashCode == 0) {
                 hashCode = s.toUpperCase().hashCode();
@@ -65,6 +67,7 @@ class TableReference {
             return hashCode;
         }
 
+        @Override
         public String toString() {
             return s;
         }

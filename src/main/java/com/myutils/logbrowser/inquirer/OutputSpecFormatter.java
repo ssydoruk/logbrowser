@@ -682,6 +682,7 @@ public abstract class OutputSpecFormatter extends DefaultFormatter {
             return fileLink;
         }
 
+        @Override
         public String GetValue(ILogRecord record) throws Exception {
             String value = null;
 
@@ -836,6 +837,7 @@ public abstract class OutputSpecFormatter extends DefaultFormatter {
             m_id = id;
         }
 
+        @Override
         public String GetValue(ILogRecord record) throws SQLException {
             String value = record.GetField(m_id);
 
@@ -861,6 +863,7 @@ public abstract class OutputSpecFormatter extends DefaultFormatter {
             ParseParam(e);
         }
 
+        @Override
         public String GetValue(ILogRecord record) throws Exception {
 
             return GetValueFilter(GetFileBytes(record), record);
@@ -910,6 +913,7 @@ public abstract class OutputSpecFormatter extends DefaultFormatter {
         }
     }
 
+    @Override
     public void ProcessLayout() {
         for (RecordLayout lo : outSpec.values()) {
             lo.UpdateFormatString();

@@ -87,6 +87,7 @@ public class AggregatesPanel extends javax.swing.JPanel {
             JReferencingButton btn = new JReferencingButton<>(query.getName(), (IAggregateQuery) query);
             btn.addActionListener(new ActionListener() {
 
+                @Override
                 public void actionPerformed(ActionEvent e) {
                     btnAction(e);
                 }

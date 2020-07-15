@@ -4,12 +4,12 @@
  */
 package com.myutils.logbrowser.inquirer;
 
+import com.myutils.logbrowser.indexer.FileInfoType;
+import com.myutils.logbrowser.indexer.ReferenceType;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Hashtable;
 import org.apache.commons.lang3.StringUtils;
-import com.myutils.logbrowser.indexer.FileInfoType;
-import com.myutils.logbrowser.indexer.ReferenceType;
 
 /**
  *
@@ -66,6 +66,7 @@ public class SIPEPQuery extends IQuery {
         this.tabName = tabName;
     }
 
+    @Override
     public void Execute() throws SQLException {
         inquirer.logger.debug("**Execute in  " + this.getClass().toString());
         m_connector = DatabaseConnector.getDatabaseConnector(this);
@@ -99,6 +100,7 @@ public class SIPEPQuery extends IQuery {
         return sipRecords;
     }
 
+    @Override
     public ILogRecord GetNext() throws SQLException {
         on_error:
         if (m_resultSet.next()) {
@@ -119,6 +121,7 @@ public class SIPEPQuery extends IQuery {
         return null;
     }
 
+    @Override
     public void Reset() throws SQLException {
         if (m_resultSet != null) {
             m_resultSet.close();

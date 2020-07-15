@@ -6,6 +6,7 @@
 package com.myutils.logbrowser.inquirer.gui;
 
 import com.myutils.logbrowser.inquirer.LogFile;
+import com.myutils.logbrowser.inquirer.inquirer;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -17,7 +18,6 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
-import com.myutils.logbrowser.inquirer.inquirer;
 
 /**
  *

@@ -427,6 +427,7 @@ class DbRecordComparator implements Comparator {
         return -1;
     }
 
+    @Override
     public int compare(Object o1, Object o2) {
         if (Thread.currentThread().isInterrupted()) {
             throw new RuntimeInterruptException();

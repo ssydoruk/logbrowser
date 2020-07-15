@@ -31,7 +31,7 @@ import javax.swing.table.TableModel;
 public final class TableSorter extends TableMap {
 
     int indexes[];
-    List<Integer> sortingColumns = new ArrayList<Integer>();
+    List<Integer> sortingColumns = new ArrayList<>();
     boolean ascending = true;
     int compares;
 

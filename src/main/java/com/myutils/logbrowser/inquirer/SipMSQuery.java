@@ -4,12 +4,12 @@
  */
 package com.myutils.logbrowser.inquirer;
 
+import com.myutils.logbrowser.indexer.ReferenceType;
 import static com.myutils.logbrowser.inquirer.DatabaseConnector.TableExist;
 import static com.myutils.logbrowser.inquirer.QueryTools.isChecked;
 import java.sql.SQLException;
 import java.util.Hashtable;
 import org.apache.commons.lang3.StringUtils;
-import com.myutils.logbrowser.indexer.ReferenceType;
 
 /**
  *
@@ -104,6 +104,7 @@ public class SipMSQuery extends IQuery {
         return sipRecords;
     }
 
+    @Override
     public ILogRecord GetNext() throws SQLException {
         on_error:
         if (m_resultSet.next()) {

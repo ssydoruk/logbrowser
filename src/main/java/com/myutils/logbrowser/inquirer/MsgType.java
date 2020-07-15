@@ -88,6 +88,7 @@ public enum MsgType {
         return (otherName == null) ? false : name.toLowerCase().equals(otherName.toLowerCase());
     }
 
+    @Override
     public String toString() {
         return this.name.toLowerCase();
     }

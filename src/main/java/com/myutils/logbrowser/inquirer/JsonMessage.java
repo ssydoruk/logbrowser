@@ -27,6 +27,7 @@ public class JsonMessage extends ILogRecord {
         m_fields.put("anchorid", 0);
     }
 
+    @Override
     public boolean IsInbound() {
         return m_isInbound;
     }

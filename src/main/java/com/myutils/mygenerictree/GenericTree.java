@@ -93,7 +93,7 @@ public class GenericTree<T> {
     }
 
     public List<GenericTreeNode<T>> build(GenericTreeNode<T> node, GenericTreeTraversalOrderEnum traversalOrder) {
-        List<GenericTreeNode<T>> traversalResult = new ArrayList<GenericTreeNode<T>>();
+        List<GenericTreeNode<T>> traversalResult = new ArrayList<>();
 
         if (traversalOrder == GenericTreeTraversalOrderEnum.PRE_ORDER) {
             buildPreOrder(node, traversalResult);
@@ -131,7 +131,7 @@ public class GenericTree<T> {
     }
 
     public Map<GenericTreeNode<T>, Integer> buildWithDepth(GenericTreeNode<T> node, GenericTreeTraversalOrderEnum traversalOrder) {
-        Map<GenericTreeNode<T>, Integer> traversalResult = new LinkedHashMap<GenericTreeNode<T>, Integer>();
+        Map<GenericTreeNode<T>, Integer> traversalResult = new LinkedHashMap<>();
 
         if (traversalOrder == GenericTreeTraversalOrderEnum.PRE_ORDER) {
             buildPreOrderWithDepth(node, traversalResult, 0);
@@ -158,6 +158,7 @@ public class GenericTree<T> {
         traversalResult.put(node, depth);
     }
 
+    @Override
     public String toString() {
         /*
          We're going to assume a pre-order traversal by default

@@ -457,6 +457,7 @@ public class MyCheckBoxList extends CheckBoxList {
             jmCopyValue = new javax.swing.JMenuItem();
             jmCopyValue.setText("Copy selected (Ctrl-C)");
             jmCopyValue.addActionListener(new java.awt.event.ActionListener() {
+                @Override
                 public void actionPerformed(java.awt.event.ActionEvent evt) {
                     copySelected(evt);
                 }
@@ -482,6 +483,7 @@ public class MyCheckBoxList extends CheckBoxList {
 
             jmFind.setText("Find (Ctrl-F)");
             jmFind.addActionListener(new java.awt.event.ActionListener() {
+                @Override
                 public void actionPerformed(java.awt.event.ActionEvent evt) {
                     doSearch(true, true);
                 }
@@ -490,6 +492,7 @@ public class MyCheckBoxList extends CheckBoxList {
             add(jmFind);
             jmFindNext.setText("Find next (F3)");
             jmFindNext.addActionListener(new java.awt.event.ActionListener() {
+                @Override
                 public void actionPerformed(java.awt.event.ActionEvent evt) {
                     doSearch(false, true);
                 }
@@ -498,6 +501,7 @@ public class MyCheckBoxList extends CheckBoxList {
             add(jmFindNext);
             jmFindPrev.setText("Find previous (Shift-F3)");
             jmFindPrev.addActionListener(new java.awt.event.ActionListener() {
+                @Override
                 public void actionPerformed(java.awt.event.ActionEvent evt) {
                     doSearch(false, false);
                 }
@@ -510,6 +514,7 @@ public class MyCheckBoxList extends CheckBoxList {
             jmCheckAll.setText("Check all");
             jmCheckAll.addActionListener(new ActionListener() {
 
+                @Override
                 public void actionPerformed(ActionEvent e) {
                     SetChecked(true);
 //                    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
@@ -518,6 +523,7 @@ public class MyCheckBoxList extends CheckBoxList {
             }
             );
             jmCheckAll.addActionListener(new java.awt.event.ActionListener() {
+                @Override
                 public void actionPerformed(java.awt.event.ActionEvent evt) {
 //                    jmCheckAllActionPerformed(evt);
                 }
@@ -526,6 +532,7 @@ public class MyCheckBoxList extends CheckBoxList {
 
             jmCheckByRegex.setText("Find and check");
             jmCheckByRegex.addActionListener(new java.awt.event.ActionListener() {
+                @Override
                 public void actionPerformed(java.awt.event.ActionEvent evt) {
                     findAndCheck(evt, true);
                 }
@@ -536,6 +543,7 @@ public class MyCheckBoxList extends CheckBoxList {
 
             jmUncheckAll.setText("Uncheck all");
             jmUncheckAll.addActionListener(new java.awt.event.ActionListener() {
+                @Override
                 public void actionPerformed(java.awt.event.ActionEvent evt) {
                     SetChecked(false);
                 }
@@ -545,6 +553,7 @@ public class MyCheckBoxList extends CheckBoxList {
             jmUncheckByRegex.setText("Find and uncheck");
             add(jmUncheckByRegex);
             jmUncheckByRegex.addActionListener(new java.awt.event.ActionListener() {
+                @Override
                 public void actionPerformed(java.awt.event.ActionEvent evt) {
                     findAndCheck(evt, false);
                 }
@@ -554,6 +563,7 @@ public class MyCheckBoxList extends CheckBoxList {
             add(new javax.swing.JPopupMenu.Separator());
             jmShowStat.setText("Show stat");
             jmShowStat.addActionListener(new java.awt.event.ActionListener() {
+                @Override
                 public void actionPerformed(java.awt.event.ActionEvent evt) {
                     showStat(evt);
                 }
@@ -585,6 +595,7 @@ public class MyCheckBoxList extends CheckBoxList {
             this.w = w;
             addPopupMenuListener(new PopupMenuListener() {
 
+                @Override
                 public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
                     CheckBoxListSelectionModel checkBoxListSelectionModel = list.getCheckBoxListSelectionModel();
                     ListModel model = list.getModel();
@@ -599,10 +610,12 @@ public class MyCheckBoxList extends CheckBoxList {
                     jmShowStat.setEnabled(!listEmpty);
                 }
 
+                @Override
                 public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
 
                 }
 
+                @Override
                 public void popupMenuCanceled(PopupMenuEvent e) {
                 }
 
@@ -634,12 +647,14 @@ public class MyCheckBoxList extends CheckBoxList {
             this.menu = menu;
         }
 
+        @Override
         public void mousePressed(MouseEvent e) {
             if (e.isPopupTrigger()) {
                 doPop(e);
             }
         }
 
+        @Override
         public void mouseReleased(MouseEvent e) {
             if (e.isPopupTrigger()) {
                 doPop(e);

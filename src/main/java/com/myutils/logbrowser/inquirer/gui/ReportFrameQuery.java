@@ -5,6 +5,7 @@
  */
 package com.myutils.logbrowser.inquirer.gui;
 
+import Utils.ScreenInfo;
 import com.myutils.logbrowser.inquirer.IQueryResults;
 import com.myutils.logbrowser.inquirer.InquirerCfg;
 import com.myutils.logbrowser.inquirer.PrintStreams;
@@ -13,20 +14,18 @@ import com.myutils.logbrowser.inquirer.SelectionType;
 import com.myutils.logbrowser.inquirer.inquirer;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
-import javax.swing.JToggleButton;
-import Utils.ScreenInfo;
-import java.awt.Dimension;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import javax.swing.JCheckBox;
+import javax.swing.JToggleButton;
 
 /**
  *

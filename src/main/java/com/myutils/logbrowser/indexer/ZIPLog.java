@@ -12,10 +12,10 @@ import java.io.InputStream;
 import java.util.Enumeration;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.apache.logging.log4j.LogManager;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import org.apache.commons.io.IOUtils;
+import org.apache.logging.log4j.LogManager;
 
 /**
  *

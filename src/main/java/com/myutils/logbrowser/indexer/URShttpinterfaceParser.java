@@ -7,25 +7,16 @@ package com.myutils.logbrowser.indexer;
 import Utils.Util;
 import static Utils.Util.intOrDef;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import org.apache.logging.log4j.LogManager;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
-import org.json.JSONException;
-import org.json.JSONObject;
-import static com.myutils.logbrowser.indexer.Message.getRx;
-import static com.myutils.logbrowser.indexer.Parser.getQueryKey;
-import static com.myutils.logbrowser.indexer.Parser.splitQuery;
+import org.apache.logging.log4j.LogManager;
 
 /**
  *

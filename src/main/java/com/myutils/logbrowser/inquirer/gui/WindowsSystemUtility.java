@@ -7,6 +7,7 @@ package com.myutils.logbrowser.inquirer.gui;
 
 import com.jacob.com.ComThread;
 import com.jacob.com.LibraryLoader;
+import com.myutils.logbrowser.inquirer.inquirer;
 import com.sun.jna.Native;
 import com.sun.jna.NativeLong;
 import com.sun.jna.platform.win32.WinDef;
@@ -16,7 +17,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import org.apache.logging.log4j.LogManager;
-import com.myutils.logbrowser.inquirer.inquirer;
 
 /**
  *

@@ -1,6 +1,9 @@
 package com.myutils.logbrowser.inquirer;
 
 import Utils.UTCTimeRange;
+import com.myutils.logbrowser.indexer.FileInfoType;
+import com.myutils.logbrowser.indexer.ReferenceType;
+import com.myutils.logbrowser.indexer.TableType;
 import com.myutils.logbrowser.inquirer.IQuery.FieldType;
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
@@ -8,9 +11,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Properties;
 import org.apache.logging.log4j.LogManager;
-import com.myutils.logbrowser.indexer.FileInfoType;
-import com.myutils.logbrowser.indexer.ReferenceType;
-import com.myutils.logbrowser.indexer.TableType;
 
 public class SCServerResults extends IQueryResults {
 
@@ -132,6 +132,7 @@ public class SCServerResults extends IQueryResults {
 
     }
 
+    @Override
     public ArrayList<NameID> getApps() throws SQLException {
         if (appType == null) {
             appType = getAppsType(FileInfoType.type_SCS);

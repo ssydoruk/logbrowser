@@ -1,11 +1,11 @@
 package com.myutils.logbrowser.inquirer;
 
+import com.myutils.logbrowser.indexer.TableType;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import org.apache.logging.log4j.LogManager;
-import com.myutils.logbrowser.indexer.TableType;
 
 public class TableQuery extends IQuery {
 
@@ -136,6 +136,7 @@ public class TableQuery extends IQuery {
         return ret.toString();
     }
 
+    @Override
     public void Execute() throws SQLException {
         StringBuilder qString = new StringBuilder(512);
 
@@ -224,6 +225,7 @@ public class TableQuery extends IQuery {
         return null;
     }
 
+    @Override
     public ILogRecord GetNext() throws SQLException {
         ICalculatedFields calcFields = getCalcFields();
         ResultSet GetNextRS = GetNextRS();
@@ -264,6 +266,7 @@ public class TableQuery extends IQuery {
         return null;
     }
 
+    @Override
     public void Reset() throws SQLException {
         if (m_resultSet != null) {
             m_resultSet.close();
@@ -291,6 +294,7 @@ public class TableQuery extends IQuery {
         this.idsSubQuery = idsSubQuery;
     }
 
+    @Override
     public String getQuery() {
         return query;
     }

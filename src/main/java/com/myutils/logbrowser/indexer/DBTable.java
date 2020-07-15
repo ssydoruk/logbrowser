@@ -39,13 +39,13 @@ public abstract class DBTable {
     }
 
     protected void addIndex(String name) {
-        ArrayList<String> arrayList = new ArrayList<String>();
+        ArrayList<String> arrayList = new ArrayList<>();
         arrayList.add(name);
         idxFields.add(arrayList);
     }
 
     protected void addIndex(String[] name) {
-        idxFields.add(new ArrayList<String>(Arrays.asList(name)));
+        idxFields.add(new ArrayList<>(Arrays.asList(name)));
     }
 
     private String idxName(String tab, ArrayList<String> fields) {

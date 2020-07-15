@@ -21,6 +21,7 @@ public class StSTEventTable extends DBTable {
         createIndexes();
     }
 
+    @Override
     public void InitDB() {
         setTabName("STSTEVENT_" + getM_dbAccessor().getM_alias());
         addIndex("time");
@@ -63,6 +64,7 @@ public class StSTEventTable extends DBTable {
                 + ",?,?,?,?,?,?,?);");
     }
 
+    @Override
     public void AddToDB(Record aRec) {
         StSTEventMessage theRec = (StSTEventMessage) aRec;
 

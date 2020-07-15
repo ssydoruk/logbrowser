@@ -2,10 +2,16 @@ package com.myutils.logbrowser.inquirer;
 
 import Utils.Pair;
 import Utils.UTCTimeRange;
+import com.myutils.logbrowser.indexer.FileInfoType;
+import com.myutils.logbrowser.indexer.Parser;
+import static com.myutils.logbrowser.indexer.Parser.MAX_CUSTOM_FIELDS;
+import com.myutils.logbrowser.indexer.ReferenceType;
+import com.myutils.logbrowser.indexer.TableType;
 import com.myutils.logbrowser.inquirer.DynamicTreeNode.ILoadChildrenProc;
 import com.myutils.logbrowser.inquirer.IQuery.FieldType;
 import com.myutils.logbrowser.inquirer.OutputSpecFormatter.Parameter;
 import static com.myutils.logbrowser.inquirer.QueryTools.FindNode;
+import com.myutils.mygenerictree.GenericTree;
 import java.awt.Toolkit;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeListener;
@@ -24,14 +30,8 @@ import java.util.regex.Pattern;
 import javax.swing.JTextArea;
 import javax.swing.ProgressMonitor;
 import javax.swing.SwingWorker;
-import com.myutils.mygenerictree.GenericTree;
 import org.apache.logging.log4j.LogManager;
 import static org.sqlite.SQLiteErrorCode.SQLITE_INTERRUPT;
-import com.myutils.logbrowser.indexer.FileInfoType;
-import com.myutils.logbrowser.indexer.Parser;
-import static com.myutils.logbrowser.indexer.Parser.MAX_CUSTOM_FIELDS;
-import com.myutils.logbrowser.indexer.ReferenceType;
-import com.myutils.logbrowser.indexer.TableType;
 
 /**
  * IQueryResults To store and manipulate query result rows
@@ -365,6 +365,7 @@ public abstract class IQueryResults extends QueryTools
         //Schedule a job for the event-dispatching thread:
         //creating and showing this application's GUI.
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
+            @Override
             public void run() {
                 createAndShowGUI();
             }
@@ -1005,7 +1006,7 @@ public abstract class IQueryResults extends QueryTools
             private String fieldName = null;
 
             private CustomComponent(Integer valueID) {
-                this.keyValues = new HashMap<String, KeyValues>();
+                this.keyValues = new HashMap<>();
                 id = valueID;
             }
 
@@ -1176,7 +1177,7 @@ public abstract class IQueryResults extends QueryTools
     protected void addParameter(MsgType msgType, OutputSpecFormatter.Parameter prm) {
         ArrayList<Parameter> get = addOutParams.get(msgType);
         if (get == null) {
-            get = new ArrayList<Parameter>();
+            get = new ArrayList<>();
             addOutParams.put(msgType, get);
         }
         get.add(prm);

@@ -4,6 +4,7 @@
  */
 package com.myutils.logbrowser.indexer;
 
+import static com.myutils.logbrowser.indexer.MCPParser.ParserState.*;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
@@ -14,7 +15,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
-import static com.myutils.logbrowser.indexer.MCPParser.ParserState.*;
 
 /**
  *
@@ -66,6 +66,7 @@ public class MCPParser extends Parser {
         }
     }
 
+    @Override
     public int ParseFrom(BufferedReaderCrLf input, long offset, int line, FileInfo fi) {
         m_CurrentFilePos = offset;
         m_CurrentLine = line;

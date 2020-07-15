@@ -7,6 +7,8 @@ package com.myutils.logbrowser.inquirer;
 
 import com.jidesoft.swing.CheckBoxListSelectionModel;
 import com.jidesoft.swing.SearchableUtils;
+import com.myutils.logbrowser.indexer.FileInfoType;
+import com.myutils.logbrowser.indexer.ReferenceType;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -22,8 +24,6 @@ import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import com.myutils.logbrowser.indexer.FileInfoType;
-import com.myutils.logbrowser.indexer.ReferenceType;
 
 /**
  *
@@ -183,6 +183,7 @@ public class TLibSIPRetransmitsConfig extends javax.swing.JPanel {
             this.listChild = listChild;
         }
 
+        @Override
         public void valueChanged(ListSelectionEvent e) {
             ReportItemChecked(e, list, listChild);
         }
@@ -199,6 +200,7 @@ public class TLibSIPRetransmitsConfig extends javax.swing.JPanel {
             this.listChild = listChild;
         }
 
+        @Override
         public void valueChanged(ListSelectionEvent e) {
             ReportItemChanged(e, list, listChild);
         }
@@ -207,10 +209,12 @@ public class TLibSIPRetransmitsConfig extends javax.swing.JPanel {
 
     class myFocusListener implements FocusListener {
 
+        @Override
         public void focusGained(FocusEvent e) {
             inquirer.logger.debug("focusGained", e);
         }
 
+        @Override
         public void focusLost(FocusEvent e) {
             inquirer.logger.debug("focusLost", e);
         }
@@ -399,6 +403,7 @@ public class TLibSIPRetransmitsConfig extends javax.swing.JPanel {
         JRadioButton btn = new JRadioButton(btTitle);
         btn.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 ft = fileInfoType;
             }

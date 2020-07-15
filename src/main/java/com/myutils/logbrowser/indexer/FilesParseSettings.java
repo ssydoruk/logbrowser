@@ -295,6 +295,6 @@ public class FilesParseSettings {
 
     }
 
-    private HashMap<String, FileParseSettings> fileSettings = new HashMap<String, FileParseSettings>();
+    private HashMap<String, FileParseSettings> fileSettings = new HashMap<>();
 
 }

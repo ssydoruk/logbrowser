@@ -42,13 +42,16 @@ public class PseudoLogFormatter implements ILogRecordFormatter {
         m_fileWriter = new FileWriter(fileName);
     }
 
+    @Override
     public boolean IsLayoutRequired() {
         return false;
     }
 
+    @Override
     public void Layout(ILogRecord loggedEvent) {
     }
 
+    @Override
     public void ProcessLayout() {
     }
 
@@ -108,6 +111,7 @@ public class PseudoLogFormatter implements ILogRecordFormatter {
 
     }
 
+    @Override
     public void Close() throws Exception {
         if (m_markedLine == -1) {
             inquirer.logger.debug(m_outputFileName + "(1): Pseudo-Log Created");

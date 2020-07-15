@@ -1,7 +1,10 @@
 package com.myutils.logbrowser.inquirer;
 
-import Utils.UTCTimeRange;
 import Utils.Pair;
+import Utils.UTCTimeRange;
+import com.myutils.logbrowser.indexer.FileInfoType;
+import com.myutils.logbrowser.indexer.ReferenceType;
+import com.myutils.logbrowser.indexer.TableType;
 import com.myutils.logbrowser.inquirer.IQuery.FieldType;
 import static com.myutils.logbrowser.inquirer.QueryTools.getWhere;
 import static com.myutils.logbrowser.inquirer.QueryTools.isChecked;
@@ -10,11 +13,8 @@ import java.beans.PropertyChangeEvent;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Properties;
-import org.apache.logging.log4j.LogManager;
 import javax.swing.JOptionPane;
-import com.myutils.logbrowser.indexer.FileInfoType;
-import com.myutils.logbrowser.indexer.ReferenceType;
-import com.myutils.logbrowser.indexer.TableType;
+import org.apache.logging.log4j.LogManager;
 
 public class ApacheWebResults extends IQueryResults {
 
@@ -171,6 +171,7 @@ public class ApacheWebResults extends IQueryResults {
 
     ArrayList<NameID> appsType = null;
 
+    @Override
     public ArrayList<NameID> getApps() throws Exception {
         if (appsType == null) {
             appsType = getAppsType(FileInfoType.type_ApacheWeb);

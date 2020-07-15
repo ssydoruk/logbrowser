@@ -49,6 +49,7 @@ public enum SelectionType {
         return (otherName == null) ? false : name.toLowerCase().equals(otherName.toLowerCase());
     }
 
+    @Override
     public String toString() {
         return this.name;
     }

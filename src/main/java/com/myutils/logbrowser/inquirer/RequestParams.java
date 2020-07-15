@@ -23,7 +23,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Hashtable;
-import org.apache.logging.log4j.LogManager;
 import javax.swing.AbstractAction;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListModel;
@@ -36,6 +35,7 @@ import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import org.apache.logging.log4j.LogManager;
 
 /**
  *
@@ -216,6 +216,7 @@ public class RequestParams extends javax.swing.JPanel {
             this.listChild = listChild;
         }
 
+        @Override
         public void valueChanged(ListSelectionEvent e) {
             ReportItemChanged(e, list, listChild);
         }
@@ -232,6 +233,7 @@ public class RequestParams extends javax.swing.JPanel {
             this.listChild = listChild;
         }
 
+        @Override
         public void valueChanged(ListSelectionEvent e) {
             ReportItemChecked(e, list, listChild);
         }
@@ -650,6 +652,7 @@ public class RequestParams extends javax.swing.JPanel {
             Integer level = (Integer) l.getClientProperty(LEVEL);
             enableBoxes(level, false);
             SwingUtilities.invokeLater(new Runnable() {
+                @Override
                 public void run() {
 //                    inquirer.logger.info("changing item 1");
                     if (lsm.isSelectionEmpty()) {

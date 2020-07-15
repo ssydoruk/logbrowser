@@ -4,17 +4,17 @@
  */
 package com.myutils.logbrowser.indexer;
 
-import static Utils.Util.intOrDef;
 import Utils.Pair;
+import static Utils.Util.intOrDef;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
-import org.apache.logging.log4j.LogManager;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.apache.logging.log4j.LogManager;
 
 public class WWECloudParser extends Parser {
 
@@ -53,6 +53,7 @@ public class WWECloudParser extends Parser {
         super(FileInfoType.type_WWECloud, m_tables);
     }
 
+    @Override
     public int ParseFrom(BufferedReaderCrLf input, long offset, int line, FileInfo fi) {
         m_CurrentFilePos = offset;
         m_CurrentLine = line;

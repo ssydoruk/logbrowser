@@ -5,6 +5,8 @@
  */
 package com.myutils.logbrowser.inquirer.gui;
 
+import com.myutils.logbrowser.indexer.FileInfoType;
+import com.myutils.logbrowser.inquirer.IQueryResults;
 import com.myutils.logbrowser.inquirer.NameID;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -12,8 +14,6 @@ import java.awt.event.ItemListener;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import javax.swing.DefaultComboBoxModel;
-import com.myutils.logbrowser.indexer.FileInfoType;
-import com.myutils.logbrowser.inquirer.IQueryResults;
 
 /**
  *

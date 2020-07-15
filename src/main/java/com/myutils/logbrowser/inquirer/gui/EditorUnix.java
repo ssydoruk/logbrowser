@@ -16,7 +16,6 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.JOptionPane;
 import org.apache.logging.log4j.LogManager;
 
 /**
@@ -24,18 +23,18 @@ import org.apache.logging.log4j.LogManager;
  * @author Stepan
  */
 public class EditorUnix extends ExternalEditor {
-    
+
     private static final org.apache.logging.log4j.Logger logger = LogManager.getLogger();
-    
+
     private void show() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
-    
+
     @Override
     void ediFile(LogFile lf) throws IOException {
         loadFile(lf.getFileName(), lf.getFileName());
     }
-    
+
     protected boolean loadFile(String fileName, String fileModified) throws IOException {
 //        runServer();
         Integer bufNumber = getBufNumber(fileName, fileModified);
@@ -49,12 +48,12 @@ public class EditorUnix extends ExternalEditor {
                 "--remote-tab-silent",
                 fileModified,}), false);
             confirmServer();
-            
+
             long startTime = System.currentTimeMillis();
             long endTime;
             bufNumber = null;
             while (bufNumber == null) {
-                
+
                 bufNumber = getBufNumber(fileName, fileModified);
                 if (bufNumber != null && bufNumber > 0) {
                     logger.debug("Loaded: " + bufNumber.toString());
@@ -63,12 +62,12 @@ public class EditorUnix extends ExternalEditor {
                     bufNumber = null;
                     logger.debug("Not loaded yet: " + ((errBuf != null) ? errBuf : ""));
                 }
-                
+
                 try {
                     Thread.sleep(100);
                 } catch (InterruptedException ex) {
                 }
-                
+
                 logger.debug("Waiting for file to load: [" + fileName + "]");
                 endTime = System.currentTimeMillis();
                 if (endTime - startTime > 10000) //  300 seconds hardcoded time to load file
@@ -90,11 +89,11 @@ public class EditorUnix extends ExternalEditor {
 //                logger.debug("Not loaded?: ");
 //            }
             sendInitCommands();
-            
+
         }
         return true;
     }
-    
+
     @Override
     public boolean jumpToFile(String fileName, String fModified, int line, boolean makeActive, boolean modifiable) throws IOException {
         if (loadFile(fileName, fModified)) {
@@ -114,45 +113,7 @@ public class EditorUnix extends ExternalEditor {
         }
         return false;
     }
-    
-    public static void main(String[] argv) throws IOException {
-        EditorUnix ed = new EditorUnix();
-//        ed.runServer();
-        String f = "/Users/stepan_sydoruk/GCTI/Work/Feb07PPE_SIP/edn1_sip_agent_1_p/edn1_sip_agent_1_p.20200202_101726_246.log";
-        ed.jumpToFile(f,
-                f,
-                20, true, false);
-        
-        if (JOptionPane.showConfirmDialog(null, "hit OK to close") == JOptionPane.CANCEL_OPTION) {
-            ed.jumpToFile(f,
-                    f,
-                    50, true, false);
-        }
-        if (JOptionPane.showConfirmDialog(null, "hit OK to close") == JOptionPane.CANCEL_OPTION) {
-            ed.jumpToFile(f,
-                    f,
-                    80, true, false);
-        }
-//            execCommands(new String[]{
-//                gvim,
-//                "--remote-send",
-//                "\"<ESC>:50<CR>\"",});
-//        }
-//            execCommand(new String[]{
-//                gvim,
-//                "--servername",
-//                "VIM",
-//                "--remote-expr",
-//                "bufloaded('eu_scs_p.20181101_003306_907.log')",});
-//            execCommand(new String[]{
-//                gvim,
-//                "--servername",
-//                "VIM",
-//                "--remote-expr",
-//                "bufnr('eu_scs_p.20181101_003306_907.dlog')",});
 
-    }
-    
     private static ArrayList<String> errBuf;
 
     /**
@@ -170,7 +131,7 @@ public class EditorUnix extends ExternalEditor {
         LogManager.getLogger("").debug("results: " + execOuts);
         return execOuts;
     }
-    
+
     private static List<String> makeExecCmd(List cmd) {
         ArrayList<String> params = new ArrayList<>(3 + ((cmd == null) ? 0 : cmd.size()));
         params.addAll(Arrays.asList(new String[]{
@@ -195,7 +156,7 @@ public class EditorUnix extends ExternalEditor {
     private static List<String> execWaitSTDOut(List<String> cmd) throws IOException {
         return execGetStdOut(makeExecCmd(cmd));
     }
-    
+
     private static void execReturn(List<String> cmd, boolean waitForEnd) throws IOException {
         ExtProcess ep = new ExtProcess(makeExecCmd(cmd));
 //        if (startInThread) {
@@ -231,24 +192,24 @@ public class EditorUnix extends ExternalEditor {
         }
         return null;
     }
-    
+
     private static void remoteSend(String expr) throws IOException {
         ArrayList<String> params = new ArrayList<>(2);
         params.add("--remote-send");
         params.add(expr);
         execReturn(params, true);
     }
-    
+
     private static final String gvim = "/usr/local/bin/gvim";
     private static final String gvimServer = "LOGBROWSER";
-    
+
     private void sendCommand(String cmd) throws IOException {
         execReturn(Arrays.asList(new String[]{
             "--remote-send",
             cmd
         }), true);
     }
-    
+
     private Integer getBufNumber(String fileName, String fileModified) throws IOException {
         Integer ret = remoteExprInt("bufnr('" + fileName + "')");
         if (ret != null && ret > 0) {
@@ -257,11 +218,11 @@ public class EditorUnix extends ExternalEditor {
             return null;
         }
     }
-    
+
     private void setActive(int bufN) throws IOException {
         remoteSend("<ESC>:b" + bufN + "<CR>");
     }
-    
+
     private void confirmServer() throws IOException {
         while (true) {
             List<String> execWaitSTDOut = execGetStdOut(Arrays.asList(new String[]{
@@ -278,10 +239,10 @@ public class EditorUnix extends ExternalEditor {
                     LogManager.getLogger("").trace("Sleeping 20 ");
                 }
             }
-            
+
         }
     }
-    
+
     private void sendInitCommands() throws IOException {
         sendCommand("<C-\\><C-N>:set nomodifiable<CR>"
                 + "<C-\\><C-N>:set ic<CR>"
@@ -293,9 +254,9 @@ public class EditorUnix extends ExternalEditor {
         //                + "<C-\\><C-N>:set noswapfile<CR>"       
         );
     }
-    
+
     HashMap<String, Character> lastBookmark = new HashMap<>();
-    
+
     private char getNextLowerCaseBookmark(String fileName) {
         Character get = lastBookmark.get(fileName);
         if (get == null) {
@@ -305,7 +266,7 @@ public class EditorUnix extends ExternalEditor {
         }
         lastBookmark.put(fileName, get);
         return get;
-        
+
     }
-    
+
 }

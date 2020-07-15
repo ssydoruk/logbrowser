@@ -73,7 +73,7 @@ public class JsonTable extends DBTable {
             stmt.setInt(11, JsonMessage.m_sipId);
             stmt.setInt(12, theRec.m_line);
             stmt.setInt(13, theRec.getHanglerID());
-            theRec.SetJsonId(getCurrentID());
+            JsonMessage.SetJsonId(getCurrentID());
 
             getM_dbAccessor().SubmitStatement(m_InsertStatementId);
         } catch (SQLException e) {

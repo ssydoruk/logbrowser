@@ -4,6 +4,7 @@
  */
 package com.myutils.logbrowser.indexer;
 
+import static com.myutils.logbrowser.indexer.SIPEPParser.ParserState.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -12,7 +13,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.swing.JOptionPane;
 import org.apache.commons.lang3.StringUtils;
-import static com.myutils.logbrowser.indexer.SIPEPParser.ParserState.*;
 
 /**
  *
@@ -97,6 +97,7 @@ public class SIPEPParser extends Parser {
 
     }
 
+    @Override
     public int ParseFrom(BufferedReaderCrLf input, long offset, int line, FileInfo fi) {
         m_CurrentFilePos = offset;
         m_CurrentLine = line;

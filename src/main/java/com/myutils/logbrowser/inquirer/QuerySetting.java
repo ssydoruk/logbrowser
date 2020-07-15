@@ -5,17 +5,18 @@
  */
 package com.myutils.logbrowser.inquirer;
 
+import Utils.TableColumnAdjuster;
 import com.jidesoft.swing.CheckBoxListSelectionModel;
 import com.jidesoft.swing.SearchableUtils;
+import com.myutils.logbrowser.indexer.ReferenceType;
+import com.myutils.logbrowser.indexer.TableType;
 import com.myutils.logbrowser.inquirer.InquirerCfg.GenesysConstant;
-import Utils.TableColumnAdjuster;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.ArrayList;
 import java.util.HashMap;
-import org.apache.logging.log4j.LogManager;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 import javax.swing.DefaultListModel;
@@ -27,8 +28,7 @@ import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.AbstractTableModel;
-import com.myutils.logbrowser.indexer.ReferenceType;
-import com.myutils.logbrowser.indexer.TableType;
+import org.apache.logging.log4j.LogManager;
 
 /**
  *
@@ -108,14 +108,14 @@ public class QuerySetting extends javax.swing.JDialog {
 
     private void retrieveLogMessages(HashMap<TableType, ArrayList<OptionNode>> msgs) {
         if (msgs != null && msgs.size() > 0) {
-            savedLogMessages = new HashMap<TableType, ArrayList<OptionNode>>();
+            savedLogMessages = new HashMap<>();
             savedLogMessages.putAll(msgs);
         }
     }
 
     private void retrieveRefs(HashMap<ReferenceType, ArrayList<OptionNode>> msgs) {
         if (msgs != null && msgs.size() > 0) {
-            savedRefs = new HashMap<ReferenceType, ArrayList<OptionNode>>();
+            savedRefs = new HashMap<>();
             savedRefs.putAll(msgs);
         }
 

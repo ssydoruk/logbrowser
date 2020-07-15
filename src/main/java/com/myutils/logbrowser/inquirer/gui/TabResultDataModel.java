@@ -8,6 +8,7 @@ import com.myutils.logbrowser.inquirer.MsgType;
 import com.myutils.logbrowser.inquirer.OutputSpecFormatter;
 import com.myutils.logbrowser.inquirer.SearchExtract;
 import static com.myutils.logbrowser.inquirer.gui.TabResultDataModel.TableRow.colPrefix;
+import com.myutils.logbrowser.inquirer.inquirer;
 import java.awt.Color;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -21,7 +22,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
-import org.apache.logging.log4j.LogManager;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.swing.JTable;
@@ -29,7 +29,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.table.AbstractTableModel;
 import org.apache.commons.io.output.StringBuilderWriter;
 import org.apache.commons.lang3.StringUtils;
-import com.myutils.logbrowser.inquirer.inquirer;
+import org.apache.logging.log4j.LogManager;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -49,7 +49,7 @@ public class TabResultDataModel extends AbstractTableModel {
         this.columnIdxAdjusterType = new HashMap<>();
 
         this.columnsWithDataType = new HashMap(srcModel.columnsWithDataType);
-        this.tableData = new ArrayList<TableRow>();
+        this.tableData = new ArrayList<>();
         copyData(tableData, srcModel.tableData);
 
         this.columnTitle = new HashMap<>(srcModel.columnTitle);
@@ -118,7 +118,7 @@ public class TabResultDataModel extends AbstractTableModel {
         this.columnsWithDataType = new HashMap();
 //        this.columnIdxAdjuster = new HashMap<>();
         this.emptyColumns = -1;
-        this.tableData = new ArrayList<TableRow>();
+        this.tableData = new ArrayList<>();
         this.columnTitle = new HashMap<>();
 //        columnsWithData = new HashSet<Integer>();
         maxColumnIdx = 0;
@@ -139,6 +139,7 @@ public class TabResultDataModel extends AbstractTableModel {
     /*order of columns by default*/
     private static final String[] fixedColumns = new String[]{"Type", "timestamp", "app", "direction", "name", "connid", "sid", "thisdn", "otherdn"};
 
+    @Override
     public int getColumnCount() {
         if (isAggregate) {
             return columnTitle.size();
@@ -229,6 +230,7 @@ public class TabResultDataModel extends AbstractTableModel {
         return totalColumns;
     }
 
+    @Override
     public int getRowCount() {
         return tableData.size();
     }
@@ -242,6 +244,7 @@ public class TabResultDataModel extends AbstractTableModel {
         return null;
     }
 
+    @Override
     public Object getValueAt(int rowIdx, int colIdx) {
         TableRow row = getRow(rowIdx);
 
@@ -962,7 +965,7 @@ public class TabResultDataModel extends AbstractTableModel {
         }
 
         public TableRow() {
-            this.rowData = new HashMap<Integer, Object>();
+            this.rowData = new HashMap<>();
             columntIdx = 0;
         }
 

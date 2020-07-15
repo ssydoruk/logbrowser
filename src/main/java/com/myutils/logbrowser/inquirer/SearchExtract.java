@@ -12,11 +12,8 @@ import java.awt.Point;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -34,8 +31,6 @@ import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
@@ -116,6 +111,7 @@ public class SearchExtract extends javax.swing.JDialog {
         inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), cancelName);
         ActionMap actionMap = getRootPane().getActionMap();
         actionMap.put(cancelName, new AbstractAction() {
+            @Override
             public void actionPerformed(ActionEvent e) {
                 cancelPressed();
             }
@@ -124,6 +120,7 @@ public class SearchExtract extends javax.swing.JDialog {
         String okName = "OK";
         inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), okName);
         actionMap.put(okName, new AbstractAction() {
+            @Override
             public void actionPerformed(ActionEvent e) {
                 OKPressed();
             }
@@ -392,7 +389,7 @@ public class SearchExtract extends javax.swing.JDialog {
                 String[] split = StringUtils.split(bytes, "\r\n");
                 String text = retValue;
                 Matcher m1 = rxVar.matcher(text);
-                ArrayList<Repl> repl = new ArrayList<Repl>();
+                ArrayList<Repl> repl = new ArrayList<>();
                 while (m1.find()) {
                     repl.add(new Repl(m1.start(0), m1.end(0), Integer.parseInt(m1.group(1))));
                 };
@@ -427,7 +424,7 @@ public class SearchExtract extends javax.swing.JDialog {
                 String[] split = StringUtils.split(bytes, "\r\n");
                 String text = retValue;
                 Matcher m1 = rxVar.matcher(text);
-                ArrayList<Repl> repl = new ArrayList<Repl>();
+                ArrayList<Repl> repl = new ArrayList<>();
                 while (m1.find()) {
                     repl.add(new Repl(m1.start(0), m1.end(0), Integer.parseInt(m1.group(1))));
                 };
@@ -444,7 +441,7 @@ public class SearchExtract extends javax.swing.JDialog {
         }
     }
 
-    ArrayList<SearchParams> searchParams = new ArrayList<SearchParams>();
+    ArrayList<SearchParams> searchParams = new ArrayList<>();
 
     private void setSearchParams(String search, String replace, boolean wholeWorld, boolean matchCase) {
         searchParams.clear();
@@ -1022,51 +1019,6 @@ public class SearchExtract extends javax.swing.JDialog {
 
     }
 
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            logger.log(org.apache.logging.log4j.Level.FATAL, ex);
-        } catch (InstantiationException ex) {
-            logger.log(org.apache.logging.log4j.Level.FATAL, ex);
-        } catch (IllegalAccessException ex) {
-            logger.log(org.apache.logging.log4j.Level.FATAL, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            logger.log(org.apache.logging.log4j.Level.FATAL, ex);
-        }
-        //</editor-fold>
-
-        /* Create and display the dialog */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                SearchExtract dialog = new SearchExtract(null, true);
-                dialog.setDebug(true);
-                dialog.addWindowListener(new java.awt.event.WindowAdapter() {
-                    @Override
-                    public void windowClosing(java.awt.event.WindowEvent e) {
-                        System.exit(0);
-                    }
-                });
-                SearchExtract doShow = dialog.doShow(null, true, MsgType.TLIB);
-                if (doShow != null) {
-                    System.out.println(doShow.toString());
-                }
-            }
-        });
-    }
 
     private boolean debug = false;
 

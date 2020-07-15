@@ -6,6 +6,7 @@
 package com.myutils.logbrowser.inquirer.gui;
 
 import Utils.Pair;
+import com.myutils.logbrowser.indexer.Main;
 import com.myutils.logbrowser.inquirer.InquirerFileIo;
 import com.myutils.logbrowser.inquirer.MsgType;
 import com.myutils.logbrowser.inquirer.SearchExtract;
@@ -22,7 +23,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.util.ArrayList;
-import org.apache.logging.log4j.LogManager;
 import javax.swing.AbstractAction;
 import javax.swing.DefaultListSelectionModel;
 import javax.swing.JMenu;
@@ -39,7 +39,7 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
-import com.myutils.logbrowser.indexer.Main;
+import org.apache.logging.log4j.LogManager;
 
 /**
  *

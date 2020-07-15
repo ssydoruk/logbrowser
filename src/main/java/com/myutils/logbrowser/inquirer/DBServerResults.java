@@ -1,15 +1,15 @@
 package com.myutils.logbrowser.inquirer;
 
 import Utils.UTCTimeRange;
+import com.myutils.logbrowser.indexer.FileInfoType;
+import com.myutils.logbrowser.indexer.ReferenceType;
+import com.myutils.logbrowser.indexer.TableType;
 import com.myutils.logbrowser.inquirer.IQuery.FieldType;
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Properties;
-import com.myutils.logbrowser.indexer.FileInfoType;
-import com.myutils.logbrowser.indexer.ReferenceType;
-import com.myutils.logbrowser.indexer.TableType;
 
 public class DBServerResults extends IQueryResults {
 
@@ -112,6 +112,7 @@ public class DBServerResults extends IQueryResults {
 
     }
 
+    @Override
     public ArrayList<NameID> getApps() throws Exception {
         if (appsType == null) {
             appsType = getAppsType(FileInfoType.type_DBServer);

@@ -42,7 +42,7 @@ enum GenesysConstants {
     // Build an immutable map of String name to enum pairs.
     // Any Map impl can be used.
     static {
-        Map<String, GenesysConstants> map = new ConcurrentHashMap<String, GenesysConstants>();
+        Map<String, GenesysConstants> map = new ConcurrentHashMap<>();
         for (GenesysConstants instance : GenesysConstants.values()) {
             map.put(instance.getName(), instance);
         }

@@ -4,12 +4,12 @@
  */
 package com.myutils.logbrowser.inquirer;
 
+import com.myutils.mygenerictree.GenericTreeTraversalOrderEnum;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.*;
-import com.myutils.mygenerictree.GenericTreeTraversalOrderEnum;
 
 public class DynamicTree<OptionNode> implements Serializable {
 
@@ -165,6 +165,7 @@ public class DynamicTree<OptionNode> implements Serializable {
         traversalResult.put(node, depth);
     }
 
+    @Override
     public String toString() {
         /*
          We're going to assume a pre-order traversal by default

@@ -233,6 +233,7 @@ public class OptionNode implements Serializable, TClonable, Comparable {
         this.dialogItem = dialogItem;
     }
 
+    @Override
     public TClonable copy() {
         OptionNode optionNode = new OptionNode(checked, name);
         optionNode.setDialogItem(dialogItem);

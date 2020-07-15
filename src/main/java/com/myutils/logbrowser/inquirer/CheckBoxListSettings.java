@@ -50,7 +50,7 @@ public class CheckBoxListSettings extends MyCheckBoxList {
 
         DefaultListModel model = (DefaultListModel) getModel();
         DefaultListModel newModel = new DefaultListModel();
-        CheckBoxListSelectionModel newSelectionModel = new CheckBoxListSelectionModel();
+        CheckBoxListSelectionModel newSelectionModel;
         ArrayList<Integer> checkedArr = new ArrayList<>(checkBoxListSelectedIndices.length);
 
         for (int i = 0; i < model.size(); i++) {

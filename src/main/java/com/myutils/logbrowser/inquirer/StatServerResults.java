@@ -1,6 +1,9 @@
 package com.myutils.logbrowser.inquirer;
 
 import Utils.UTCTimeRange;
+import com.myutils.logbrowser.indexer.FileInfoType;
+import com.myutils.logbrowser.indexer.ReferenceType;
+import com.myutils.logbrowser.indexer.TableType;
 import com.myutils.logbrowser.inquirer.IQuery.FieldType;
 import static com.myutils.logbrowser.inquirer.QueryTools.FindNode;
 import java.awt.event.ActionEvent;
@@ -8,11 +11,8 @@ import java.beans.PropertyChangeEvent;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Properties;
-import org.apache.logging.log4j.LogManager;
 import javax.swing.JOptionPane;
-import com.myutils.logbrowser.indexer.FileInfoType;
-import com.myutils.logbrowser.indexer.ReferenceType;
-import com.myutils.logbrowser.indexer.TableType;
+import org.apache.logging.log4j.LogManager;
 
 public class StatServerResults extends IQueryResults {
 
@@ -29,6 +29,7 @@ public class StatServerResults extends IQueryResults {
     private int m_componentFilter;
     private ArrayList<NameID> appType = null;
 
+    @Override
     public String getName() {
         return "StatServer";
     }
@@ -200,6 +201,7 @@ public class StatServerResults extends IQueryResults {
         DoneSTDOptions();
     }
 
+    @Override
     public ArrayList<NameID> getApps() throws Exception {
         if (appType == null) {
             appType = getAppsType(FileInfoType.type_StatServer);

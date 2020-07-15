@@ -5,9 +5,9 @@
  */
 package com.myutils.logbrowser.inquirer;
 
+import com.myutils.logbrowser.indexer.FileInfoType;
 import com.myutils.logbrowser.inquirer.gui.JPSecSelect;
 import javax.swing.ButtonGroup;
-import com.myutils.logbrowser.indexer.FileInfoType;
 
 /**
  *

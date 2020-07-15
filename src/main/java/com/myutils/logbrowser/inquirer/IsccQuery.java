@@ -4,10 +4,10 @@
  */
 package com.myutils.logbrowser.inquirer;
 
+import com.myutils.logbrowser.indexer.ReferenceType;
 import static com.myutils.logbrowser.inquirer.IQueryResults.addUnique;
 import java.sql.SQLException;
 import java.util.HashSet;
-import com.myutils.logbrowser.indexer.ReferenceType;
 
 /**
  *
@@ -57,6 +57,7 @@ public class IsccQuery extends IQuery {
         this.refIDs = refIDs;
     }
 
+    @Override
     public void Execute() throws SQLException {
         inquirer.logger.debug("Execute");
         m_connector = DatabaseConnector.getDatabaseConnector(this);
@@ -84,6 +85,7 @@ public class IsccQuery extends IQuery {
 
     }
 
+    @Override
     public ILogRecord GetNext() throws SQLException {
         if (m_resultSet != null && m_resultSet.next()) {
             recCnt++;
@@ -96,6 +98,7 @@ public class IsccQuery extends IQuery {
         return null;
     }
 
+    @Override
     public void Reset() throws SQLException {
         if (m_resultSet != null) {
             m_resultSet.close();

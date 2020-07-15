@@ -552,6 +552,7 @@ public class Main {
             handleException(Thread.currentThread().getName(), thrown);
         }
 
+        @Override
         public void uncaughtException(Thread thread, Throwable thrown) {
             // for other uncaught exceptions
             handleException(thread.getName(), thrown);

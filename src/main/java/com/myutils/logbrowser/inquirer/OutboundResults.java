@@ -6,6 +6,9 @@
 package com.myutils.logbrowser.inquirer;
 
 import Utils.UTCTimeRange;
+import com.myutils.logbrowser.indexer.FileInfoType;
+import com.myutils.logbrowser.indexer.ReferenceType;
+import com.myutils.logbrowser.indexer.TableType;
 import static com.myutils.logbrowser.inquirer.DatabaseConnector.CampaignDBIDtoName;
 import static com.myutils.logbrowser.inquirer.DatabaseConnector.GroupDBIDtoName;
 import com.myutils.logbrowser.inquirer.IQuery.FieldType;
@@ -16,9 +19,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import javax.swing.JOptionPane;
-import com.myutils.logbrowser.indexer.FileInfoType;
-import com.myutils.logbrowser.indexer.ReferenceType;
-import com.myutils.logbrowser.indexer.TableType;
 
 /**
  *
@@ -297,6 +297,7 @@ final class OutboundResults extends IQueryResults {
 //        LookupMark();
     }
 
+    @Override
     public void ApplyMark(String mark) {
     }
 
@@ -441,10 +442,12 @@ final class OutboundResults extends IQueryResults {
         return "Outbound";
     }
 
+    @Override
     public void actionPerformed(ActionEvent e) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
+    @Override
     public void propertyChange(PropertyChangeEvent evt) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
@@ -456,6 +459,7 @@ final class OutboundResults extends IQueryResults {
 
     IDsFinder cidFinder;
 
+    @Override
     public void Retrieve(QueryDialog dlg) throws SQLException {
         SelectionType selectionType = dlg.getSelectionType();
         cidFinder = null;
@@ -1323,7 +1327,7 @@ final class OutboundResults extends IQueryResults {
 
     @Override
     protected ArrayList<IAggregateQuery> loadReportAggregates() throws SQLException {
-        ArrayList<IAggregateQuery> ret = new ArrayList<IAggregateQuery>();
+        ArrayList<IAggregateQuery> ret = new ArrayList<>();
         ret.add(new AggrOCSDBServerDelays());
         ret.add(new AggrTimestampDelays());
         ret.add(new AggrSIPServerCallsPerSecond(false));

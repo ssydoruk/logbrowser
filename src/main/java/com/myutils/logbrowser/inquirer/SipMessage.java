@@ -82,10 +82,12 @@ public class SipMessage extends ILogRecord {
         return callId;
     }
 
+    @Override
     public int GetAnchorId() {
         return m_anchorid;
     }
 
+    @Override
     public boolean IsInbound() {
         return m_isInbound;
     }

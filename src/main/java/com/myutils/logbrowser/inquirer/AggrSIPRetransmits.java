@@ -6,12 +6,12 @@
 package com.myutils.logbrowser.inquirer;
 
 import Utils.UTCTimeRange;
+import com.myutils.logbrowser.indexer.ReferenceType;
 import static com.myutils.logbrowser.inquirer.inquirer.checkIntr;
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import com.myutils.logbrowser.indexer.ReferenceType;
 
 /**
  *
@@ -28,10 +28,12 @@ public class AggrSIPRetransmits extends IAggregateQuery {
         return "SIP retransmits";
     }
 
+    @Override
     public void actionPerformed(ActionEvent e) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
+    @Override
     public void propertyChange(PropertyChangeEvent evt) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }

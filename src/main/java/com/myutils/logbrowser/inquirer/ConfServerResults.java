@@ -1,8 +1,11 @@
 package com.myutils.logbrowser.inquirer;
 
-import Utils.UTCTimeRange;
 import Utils.Pair;
+import Utils.UTCTimeRange;
 import Utils.Util;
+import com.myutils.logbrowser.indexer.FileInfoType;
+import com.myutils.logbrowser.indexer.ReferenceType;
+import com.myutils.logbrowser.indexer.TableType;
 import com.myutils.logbrowser.inquirer.IQuery.FieldType;
 import com.myutils.logbrowser.inquirer.IQuery.IRecordLoadedProc;
 import java.awt.event.ActionEvent;
@@ -11,9 +14,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Properties;
-import com.myutils.logbrowser.indexer.FileInfoType;
-import com.myutils.logbrowser.indexer.ReferenceType;
-import com.myutils.logbrowser.indexer.TableType;
 
 public class ConfServerResults extends IQueryResults {
 
@@ -159,6 +159,7 @@ public class ConfServerResults extends IQueryResults {
 
     }
 
+    @Override
     public ArrayList<NameID> getApps() throws Exception {
         if (appsType == null) {
             appsType = getAppsType(FileInfoType.type_ConfServer);

@@ -10,6 +10,7 @@ import com.github.lgooddatepicker.components.DateTimePicker;
 import com.github.lgooddatepicker.components.TimePickerSettings;
 import com.github.lgooddatepicker.optionalusertools.PickerUtilities;
 import com.myutils.logbrowser.inquirer.UTCTimeRange;
+import com.myutils.logbrowser.inquirer.inquirer;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
@@ -19,13 +20,12 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import org.apache.logging.log4j.LogManager;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import static javax.swing.JFrame.EXIT_ON_CLOSE;
 import javax.swing.JLabel;
 import javax.swing.UIManager;
-import com.myutils.logbrowser.inquirer.inquirer;
+import org.apache.logging.log4j.LogManager;
 
 /**
  *
@@ -135,29 +135,6 @@ public class TDateRange extends javax.swing.JPanel {
             .addGap(0, 154, Short.MAX_VALUE)
         );
     }// </editor-fold>//GEN-END:initComponents
-
-    public static void main(String[] args) {
-        // Trying to set Nimbus look and feel
-        try {
-            for (UIManager.LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (Exception ex) {
-            logger.log(org.apache.logging.log4j.Level.FATAL, ex);
-            logger.log(org.apache.logging.log4j.Level.FATAL, "Failed to apply Nimbus look and feel", ex);
-
-        }
-        TDateRange tDateRange = new TDateRange();
-        JFrame jf = new JFrame();
-        jf.setLayout(new FlowLayout());
-        jf.setSize(new Dimension(640, 480));
-        jf.add(tDateRange);
-        jf.setVisible(true);
-        jf.setDefaultCloseOperation(EXIT_ON_CLOSE);
-    }
 
     public UTCTimeRange getTimeRange() throws SQLException {
         if (dtFrom.isEnabled() && dtTo.isEnabled()) {

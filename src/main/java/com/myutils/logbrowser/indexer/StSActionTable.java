@@ -20,6 +20,7 @@ public class StSActionTable extends DBTable {
 
     }
 
+    @Override
     public void InitDB() {
         setTabName("STSACTION_" + getM_dbAccessor().getM_alias());
         addIndex("time");
@@ -44,6 +45,7 @@ public class StSActionTable extends DBTable {
         m_InsertStatementId = getM_dbAccessor().PrepareStatement("INSERT INTO STSACTION_" + getM_dbAccessor().getM_alias() + " VALUES(NULL,?,?,?,?,?,?,?,?,?);");
     }
 
+    @Override
     public void AddToDB(Record aRec) {
         StSActionMessage theRec = (StSActionMessage) aRec;
         PreparedStatement stmt = getM_dbAccessor().GetStatement(m_InsertStatementId);

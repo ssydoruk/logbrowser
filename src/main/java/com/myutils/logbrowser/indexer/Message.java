@@ -4,20 +4,20 @@
  */
 package com.myutils.logbrowser.indexer;
 
-import static Utils.Util.intOrDef;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import org.apache.commons.lang3.StringUtils;
-import org.json.JSONException;
-import org.json.JSONObject;
 import Utils.Pair;
 import static Utils.Util.StripQuotes;
+import static Utils.Util.intOrDef;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 /**
  *
@@ -396,7 +396,7 @@ public abstract class Message extends Record {
     protected void setMessageLines(ArrayList<String> mls) {
         if (mls != null) {
             if (m_MessageLines == null) {
-                this.m_MessageLines = new ArrayList<String>();
+                this.m_MessageLines = new ArrayList<>();
             }
             for (String m_MessageLine : mls) {
                 this.m_MessageLines.add(m_MessageLine);
@@ -406,7 +406,7 @@ public abstract class Message extends Record {
     }
 
     protected void addMessageLines(ArrayList<String> m_MessageLines) {
-        this.m_MessageLines = new ArrayList<String>();
+        this.m_MessageLines = new ArrayList<>();
         for (String m_MessageLine : m_MessageLines) {
             this.m_MessageLines.add(m_MessageLine);
         }
@@ -983,7 +983,7 @@ public abstract class Message extends Record {
     }
 
     private ArrayList<String> getListKey(String key) {
-        ArrayList<String> ret = new ArrayList<String>();
+        ArrayList<String> ret = new ArrayList<>();
         String s = checkTab(key);
         boolean keyFound = false;
 

@@ -5,11 +5,11 @@
  */
 package com.myutils.logbrowser.inquirer;
 
+import com.myutils.logbrowser.indexer.ReferenceType;
 import static com.myutils.logbrowser.inquirer.QueryTools.getRefNames;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Set;
-import com.myutils.logbrowser.indexer.ReferenceType;
 
 /**
  *
@@ -17,7 +17,7 @@ import com.myutils.logbrowser.indexer.ReferenceType;
  */
 public class InquirerCfgNonSerial {
 
-    private HashMap<ReferenceType, ArrayList<OptionNode>> refsChecked = new HashMap<>(20);
+    private final HashMap<ReferenceType, ArrayList<OptionNode>> refsChecked = new HashMap<>(20);
 
     public Set<ReferenceType> getRefTypes() {
         return refsChecked.keySet();
@@ -44,7 +44,7 @@ public class InquirerCfgNonSerial {
         return refsChecked.get(refType);
     }
 
-    public void LoadRefs() {
+    public final void LoadRefs() {
         LoadRef(ReferenceType.TEvent);
         LoadRef(ReferenceType.METRIC);
         LoadRef(ReferenceType.SIPMETHOD);

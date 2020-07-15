@@ -4,9 +4,9 @@
  */
 package com.myutils.logbrowser.inquirer;
 
+import com.myutils.logbrowser.indexer.FileInfoType;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import com.myutils.logbrowser.indexer.FileInfoType;
 
 /**
  *
@@ -23,6 +23,7 @@ public class StSByConnIdQuery extends IQuery {
         m_ConnIds = connIds;
     }
 
+    @Override
     public void Execute() throws SQLException {
         inquirer.logger.debug("Execute");
         m_connector = DatabaseConnector.getDatabaseConnector(this);
@@ -101,6 +102,7 @@ public class StSByConnIdQuery extends IQuery {
         recCnt = 0;
     }
 
+    @Override
     public ILogRecord GetNext() throws SQLException {
         if (m_resultSet.next()) {
             recCnt++;
@@ -113,6 +115,7 @@ public class StSByConnIdQuery extends IQuery {
         return null;
     }
 
+    @Override
     public void Reset() throws SQLException {
         if (m_resultSet != null) {
             m_resultSet.close();

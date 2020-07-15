@@ -51,10 +51,12 @@ public class IxnSS extends Ixn {
         return ret;
     }
 
+    @Override
     String GetMessageName() {
         return messageName;
     }
 
+    @Override
     String GetConnID() {
         if (!customEvent) {
             return FindByRx(regConnID, 1, "");
@@ -63,6 +65,7 @@ public class IxnSS extends Ixn {
         }
     }
 
+    @Override
     String GetClient() {
         if (!customEvent) {
             return super.GetClient();
@@ -71,6 +74,7 @@ public class IxnSS extends Ixn {
         }
     }
 
+    @Override
     String GetAgent() {
         if (!customEvent) {
             return super.GetAgent();
@@ -80,6 +84,7 @@ public class IxnSS extends Ixn {
         }
     }
 
+    @Override
     String GetPlace() {
         if (!customEvent) {
             return super.GetPlace();

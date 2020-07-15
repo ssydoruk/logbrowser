@@ -213,6 +213,7 @@ public class ReportFrame extends javax.swing.JFrame implements Cloneable {
 
     class ToolBarPanel extends JPanel implements ContainerListener {
 
+        @Override
         public boolean contains(int x, int y) {
             Component c = getParent();
             if (c != null) {
@@ -223,6 +224,7 @@ public class ReportFrame extends javax.swing.JFrame implements Cloneable {
             }
         }
 
+        @Override
         public void componentAdded(ContainerEvent e) {
             Container c = e.getContainer().getParent();
             if (c != null) {
@@ -231,6 +233,7 @@ public class ReportFrame extends javax.swing.JFrame implements Cloneable {
             }
         }
 
+        @Override
         public void componentRemoved(ContainerEvent e) {
             Container c = e.getContainer().getParent();
             if (c != null) {

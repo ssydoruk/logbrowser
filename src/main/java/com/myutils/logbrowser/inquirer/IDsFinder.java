@@ -1,6 +1,8 @@
 package com.myutils.logbrowser.inquirer;
 
 import Utils.UTCTimeRange;
+import com.myutils.logbrowser.indexer.ReferenceType;
+import com.myutils.logbrowser.indexer.TableType;
 import static com.myutils.logbrowser.inquirer.QueryTools.getWhere;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -11,8 +13,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
-import com.myutils.logbrowser.indexer.ReferenceType;
-import com.myutils.logbrowser.indexer.TableType;
 
 public final class IDsFinder extends QueryTools {
 
@@ -3196,6 +3196,7 @@ public final class IDsFinder extends QueryTools {
             return (otherName == null) ? false : name.equals(otherName);
         }
 
+        @Override
         public String toString() {
             return this.name.toLowerCase();
         }

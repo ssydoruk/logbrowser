@@ -19,6 +19,7 @@ public class OrsUrsTable extends DBTable {
         super(dbaccessor, t);
     }
 
+    @Override
     public void InitDB() {
         setTabName("ORSURS_" + getM_dbAccessor().getM_alias());
         addIndex("time");
@@ -62,6 +63,7 @@ public class OrsUrsTable extends DBTable {
                 + ");");
     }
 
+    @Override
     public void AddToDB(Record aRec) {
         OrsUrsMessage theRec = (OrsUrsMessage) aRec;
 

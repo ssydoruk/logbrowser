@@ -1,9 +1,9 @@
 package com.myutils.logbrowser.inquirer;
 
+import com.myutils.logbrowser.indexer.FileInfoType;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import org.apache.commons.lang3.StringUtils;
-import com.myutils.logbrowser.indexer.FileInfoType;
 
 public class TLibEvent extends ILogRecord {
 
@@ -150,6 +150,7 @@ public class TLibEvent extends ILogRecord {
         return m_referenceId;
     }
 
+    @Override
     public boolean IsInbound() {
         return m_isInbound;
     }
@@ -158,6 +159,7 @@ public class TLibEvent extends ILogRecord {
         return m_triggerFileId;
     }
 
+    @Override
     public int GetAnchorId() {
         return m_anchorid;
     }

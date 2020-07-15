@@ -4,12 +4,12 @@
  */
 package com.myutils.logbrowser.indexer;
 
+import static com.myutils.logbrowser.indexer.RMParser.ParserState.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import static com.myutils.logbrowser.indexer.RMParser.ParserState.*;
 
 /**
  *
@@ -66,6 +66,7 @@ public class RMParser extends Parser {
 
     }
 
+    @Override
     public int ParseFrom(BufferedReaderCrLf input, long offset, int line, FileInfo fi) {
         m_CurrentFilePos = offset;
         m_CurrentLine = line;

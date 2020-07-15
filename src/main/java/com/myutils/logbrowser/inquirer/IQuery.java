@@ -1,6 +1,7 @@
 package com.myutils.logbrowser.inquirer;
 
 import Utils.UTCTimeRange;
+import com.myutils.logbrowser.indexer.ReferenceType;
 import static com.myutils.logbrowser.inquirer.QueryTools.getRefSubQuery;
 import static com.myutils.logbrowser.inquirer.QueryTools.isChecked;
 import com.myutils.logbrowser.inquirer.Wheres.Where;
@@ -14,8 +15,6 @@ import java.util.HashSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.commons.lang3.StringUtils;
-//import com.myutils.logbrowser.indexer.ReferenceType;
-import com.myutils.logbrowser.indexer.ReferenceType;
 
 public abstract class IQuery extends QueryTools {
 
@@ -63,6 +62,7 @@ public abstract class IQuery extends QueryTools {
             return (otherName == null) ? false : name.toLowerCase().equals(otherName.toLowerCase());
         }
 
+        @Override
         public String toString() {
             return this.name;
         }
@@ -129,14 +129,17 @@ public abstract class IQuery extends QueryTools {
         this.searchApps = searchApps;
     }
 
+    @Override
     public boolean isLimitQueryResults() {
         return limitQueryResults;
     }
 
+    @Override
     public int getMaxQueryLines() {
         return maxQueryLines;
     }
 
+    @Override
     void setQueryLimit(boolean _limitQueryResults, int _maxQueryLines) {
         this.limitQueryResults = _limitQueryResults;
         this.maxQueryLines = _maxQueryLines;
@@ -806,10 +809,6 @@ public abstract class IQuery extends QueryTools {
         }
     }
 
-    public static void main(String args[]) {
-        String s = getWhere("field", new Integer[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 11, 12, 13, 14}, true);
-        System.out.println(s);
-    }
 
     private ArrayList<refTab> TabRefs;
     private ArrayList<JoinTab> joinTabs;

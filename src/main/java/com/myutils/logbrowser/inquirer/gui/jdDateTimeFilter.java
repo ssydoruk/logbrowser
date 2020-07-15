@@ -5,13 +5,13 @@
  */
 package com.myutils.logbrowser.inquirer.gui;
 
+import Utils.ScreenInfo;
 import Utils.TDateRange;
 import Utils.UTCTimeRange;
 import com.github.lgooddatepicker.components.DateTimePicker;
 import com.github.lgooddatepicker.components.TimePickerSettings;
 import com.github.lgooddatepicker.optionalusertools.PickerUtilities;
 import com.myutils.logbrowser.inquirer.DatabaseConnector;
-import Utils.ScreenInfo;
 import com.myutils.logbrowser.inquirer.gui.AColumnFilter.DateFilter;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
@@ -24,7 +24,6 @@ import javax.swing.JOptionPane;
 import javax.swing.KeyStroke;
 import static javax.swing.WindowConstants.DISPOSE_ON_CLOSE;
 import org.apache.logging.log4j.LogManager;
-import com.myutils.logbrowser.inquirer.inquirer;
 
 /**
  *
@@ -59,6 +58,7 @@ public class jdDateTimeFilter extends javax.swing.JDialog {
         getRootPane().getActionMap().put("ESCAPE_KEY", new AbstractAction() {
             private static final long serialVersionUID = 1L;
 
+            @Override
             public void actionPerformed(ActionEvent ae) {
                 dispose();
             }
@@ -462,47 +462,7 @@ public class jdDateTimeFilter extends javax.swing.JDialog {
         pack();
     }//GEN-LAST:event_formWindowActivated
 
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            logger.log(org.apache.logging.log4j.Level.FATAL, ex);
-        } catch (InstantiationException ex) {
-            logger.log(org.apache.logging.log4j.Level.FATAL, ex);
-        } catch (IllegalAccessException ex) {
-            logger.log(org.apache.logging.log4j.Level.FATAL, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            logger.log(org.apache.logging.log4j.Level.FATAL, ex);
-        }
-        //</editor-fold>
 
-        /* Create and display the dialog */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                jdDateTimeFilter dialog = new jdDateTimeFilter(new javax.swing.JFrame(), true);
-                dialog.addWindowListener(new java.awt.event.WindowAdapter() {
-                    @Override
-                    public void windowClosing(java.awt.event.WindowEvent e) {
-                        System.exit(0);
-                    }
-                });
-                dialog.setVisible(true);
-            }
-        });
-    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btEarlyFirst;

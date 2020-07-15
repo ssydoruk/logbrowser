@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Configuration status="error" strict="true" name="XMLConfigTest">
   <Properties>
-    <Property name="InquirerFilename">${sys:logPath}/.sipspan3_inquirer</Property>
-    <Property name="filename">.sipspan3_sipspan3</Property>
+    <Property name="InquirerFilename">${sys:logPath}/inquirer</Property>
+    <Property name="filename">.logbr</Property>
   </Properties>
   <Filter type="ThresholdFilter" level="trace"/>
 

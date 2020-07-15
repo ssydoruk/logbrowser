@@ -5,8 +5,9 @@
  */
 package com.myutils.logbrowser.inquirer.gui;
 
-import Utils.TableColumnAdjuster;
 import Utils.Pair;
+import Utils.TableColumnAdjuster;
+import com.myutils.logbrowser.indexer.FileInfoType;
 import com.myutils.logbrowser.inquirer.FullTableColors;
 import com.myutils.logbrowser.inquirer.IQueryResults;
 import com.myutils.logbrowser.inquirer.SelectionType;
@@ -26,7 +27,6 @@ import javax.swing.JTable;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
-import com.myutils.logbrowser.indexer.FileInfoType;
 
 /**
  *

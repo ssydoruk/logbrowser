@@ -9,8 +9,6 @@ import Utils.ScreenInfo;
 import com.myutils.logbrowser.inquirer.gui.AColumnFilter.FilterComboboxModel;
 import com.myutils.logbrowser.inquirer.gui.AColumnFilter.NumberFilter;
 import static com.myutils.logbrowser.inquirer.gui.AColumnFilter.convertDouble;
-import java.awt.GraphicsDevice;
-import java.awt.GraphicsEnvironment;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -26,7 +24,7 @@ import org.apache.logging.log4j.LogManager;
  *
  * @author ssydoruk
  */
-public class jdNumberFilter extends javax.swing.JDialog {
+public final class jdNumberFilter extends javax.swing.JDialog {
 
     public NumberFilter getNumberSelection() {
         return numberSelection;
@@ -55,6 +53,7 @@ public class jdNumberFilter extends javax.swing.JDialog {
         getRootPane().getActionMap().put("ESCAPE_KEY", new AbstractAction() {
             private static final long serialVersionUID = 1L;
 
+            @Override
             public void actionPerformed(ActionEvent ae) {
                 dispose();
             }
@@ -287,61 +286,6 @@ public class jdNumberFilter extends javax.swing.JDialog {
 
     }//GEN-LAST:event_formWindowActivated
 
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            logger.log(org.apache.logging.log4j.Level.FATAL, ex);
-
-        } catch (InstantiationException ex) {
-            logger.log(org.apache.logging.log4j.Level.FATAL, ex);
-        } catch (IllegalAccessException ex) {
-            logger.log(org.apache.logging.log4j.Level.FATAL, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            logger.log(org.apache.logging.log4j.Level.FATAL, ex);
-        }
-        //</editor-fold>
-
-        /* Create and display the dialog */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                jdNumberFilter dialog = new jdNumberFilter(new javax.swing.JFrame(), true);
-                dialog.addWindowListener(new java.awt.event.WindowAdapter() {
-                    @Override
-                    public void windowClosing(java.awt.event.WindowEvent e) {
-                        System.exit(0);
-                    }
-                });
-                dialog.pack();
-                dialog.setVisible(true);
-
-                GraphicsDevice myDevice = dialog.getGraphicsConfiguration().getDevice();
-                System.out.println("myDevice:" + myDevice);
-                for (GraphicsDevice gd : GraphicsEnvironment.getLocalGraphicsEnvironment().getScreenDevices()) {
-                    if (dialog.getLocation().getX() >= gd.getDefaultConfiguration().getBounds().getMinX()
-                            && dialog.getLocation().getX() < gd.getDefaultConfiguration().getBounds().getMaxX()
-                            && dialog.getLocation().getY() >= gd.getDefaultConfiguration().getBounds().getMinY()
-                            && dialog.getLocation().getY() < gd.getDefaultConfiguration().getBounds().getMaxY()) {
-                        myDevice = gd;
-                        System.out.println("myDevice:" + myDevice);
-                    }
-                }
-            }
-        });
-    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel jLabel1;
@@ -366,7 +310,7 @@ public class jdNumberFilter extends javax.swing.JDialog {
     void setCurrentNumber(Object valueAt) {
         if (valueAt != null) {
             try {
-                jtfFirstNumber.setText(new Double(convertDouble(valueAt)).toString());
+                jtfFirstNumber.setText(Double.toString(convertDouble(valueAt)));
             } catch (NumberFormatException numberFormatException) {
                 jtfFirstNumber.setText("");
             }

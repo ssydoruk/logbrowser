@@ -5,13 +5,13 @@
  */
 package com.myutils.logbrowser.inquirer.gui;
 
-import com.jacob.activeX.ActiveXComponent;
-import com.jacob.com.Variant;
-import com.sun.jna.platform.win32.WinDef;
-import com.myutils.logbrowser.inquirer.LogFile;
 import static Utils.ScreenInfo.getScreenHeight;
 import static Utils.ScreenInfo.getScreenWidth;
+import com.jacob.activeX.ActiveXComponent;
+import com.jacob.com.Variant;
+import com.myutils.logbrowser.inquirer.LogFile;
 import com.myutils.logbrowser.inquirer.inquirer;
+import com.sun.jna.platform.win32.WinDef;
 import java.io.IOException;
 import org.apache.commons.io.FilenameUtils;
 
@@ -205,6 +205,7 @@ public class EditorWindows extends ExternalEditor {
         }
     }
 
+    @Override
     public boolean jumpToFile(String fileName, String fModified, int line, boolean makeActive, boolean modifiable) throws IOException {
         if (loadFile(fileName, fModified)) {
             //            :set nomodifiable #this will open files in read-only mode

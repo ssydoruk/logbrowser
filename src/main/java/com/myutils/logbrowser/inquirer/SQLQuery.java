@@ -24,6 +24,7 @@ public class SQLQuery extends IQuery {
         query = sql;
     }
 
+    @Override
     public void Execute() throws SQLException {
         inquirer.logger.debug("Execute");
 
@@ -32,6 +33,7 @@ public class SQLQuery extends IQuery {
         recCnt = 0;
     }
 
+    @Override
     public ILogRecord GetNext() throws SQLException {
         on_error:
         if (m_resultSet.next()) {
@@ -50,6 +52,7 @@ public class SQLQuery extends IQuery {
         return null;
     }
 
+    @Override
     public void Reset() throws SQLException {
         if (m_resultSet != null) {
             m_resultSet.close();
@@ -58,6 +61,7 @@ public class SQLQuery extends IQuery {
         m_connector = null;
     }
 
+    @Override
     public String getQuery() {
         return query;
     }

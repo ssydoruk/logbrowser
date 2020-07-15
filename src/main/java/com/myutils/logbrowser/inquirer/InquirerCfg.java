@@ -6,6 +6,8 @@
 package com.myutils.logbrowser.inquirer;
 
 import Utils.Pair;
+import com.myutils.logbrowser.indexer.ReferenceType;
+import com.myutils.logbrowser.indexer.TableType;
 import static com.myutils.logbrowser.inquirer.QueryTools.getRefNames;
 import com.myutils.logbrowser.inquirer.gui.MyJTable;
 import java.io.File;
@@ -20,8 +22,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import org.apache.commons.io.FilenameUtils;
-import com.myutils.logbrowser.indexer.ReferenceType;
-import com.myutils.logbrowser.indexer.TableType;
 
 /**
  *
@@ -495,14 +495,14 @@ public class InquirerCfg implements Serializable {
 
     private HashMap<TableType, ArrayList<OptionNode>> getLogMessages() {
         if (logMessages == null) {
-            logMessages = new HashMap<TableType, ArrayList<OptionNode>>();
+            logMessages = new HashMap<>();
         }
         return logMessages;
     }
 
     private HashMap<ReferenceType, ArrayList<OptionNode>> getRefsChecked() {
         if (refsChecked == null) {
-            refsChecked = new HashMap<ReferenceType, ArrayList<OptionNode>>();
+            refsChecked = new HashMap<>();
         }
         return refsChecked;
     }
@@ -614,14 +614,14 @@ public class InquirerCfg implements Serializable {
 //        return regexFieldSettings;
 //    }
     public void setRegexSearches(Object[] toArray) {
-        regexFieldsSettings = new HashSet<RegexFieldSettings>(toArray.length);
+        regexFieldsSettings = new HashSet<>(toArray.length);
         for (Object object : toArray) {
             regexFieldsSettings.add((RegexFieldSettings) object);
         }
     }
 
     public void setRegexSearches(MsgType t, Object[] toArray) {
-        ArrayList<RegexFieldSettings> l = new ArrayList<RegexFieldSettings>(toArray.length);
+        ArrayList<RegexFieldSettings> l = new ArrayList<>(toArray.length);
         for (Object object : toArray) {
             l.add((RegexFieldSettings) object);
         }
@@ -992,9 +992,9 @@ public class InquirerCfg implements Serializable {
 
     public ArrayList<RegexFieldSettings> getRegexFieldsSettings(MsgType t) {
         if (rxFieldsSettings == null) {
-            rxFieldsSettings = new HashMap<MsgType, ArrayList<RegexFieldSettings>>();
+            rxFieldsSettings = new HashMap<>();
             if (inquirer.isDbg()) {
-                ArrayList<RegexFieldSettings> lst = new ArrayList<RegexFieldSettings>();
+                ArrayList<RegexFieldSettings> lst = new ArrayList<>();
                 lst.add(new RegexFieldSettings("TypeName1", "TypeSearch1", "retValue1", false, false));
                 lst.add(new RegexFieldSettings("TypeName2", "TypeSearch2", "retValue2", true, false));
                 rxFieldsSettings.put(t, lst);
@@ -1005,7 +1005,7 @@ public class InquirerCfg implements Serializable {
 
     public HashSet<RegexFieldSettings> getRegexFieldsSettings() {
         if (regexFieldsSettings == null) {
-            regexFieldsSettings = new HashSet<RegexFieldSettings>();
+            regexFieldsSettings = new HashSet<>();
             if (inquirer.isDbg()) {
                 regexFieldsSettings.add(new RegexFieldSettings("TypeName1", "TypeSearch1", "retValue1", false, false));
                 regexFieldsSettings.add(new RegexFieldSettings("TypeName2", "TypeSearch2", "retValue2", true, false));

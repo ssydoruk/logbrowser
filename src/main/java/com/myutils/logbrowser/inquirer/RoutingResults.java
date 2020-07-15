@@ -4,9 +4,12 @@
  */
 package com.myutils.logbrowser.inquirer;
 
-import Utils.UTCTimeRange;
 import Utils.Pair;
+import Utils.UTCTimeRange;
 import Utils.Util;
+import com.myutils.logbrowser.indexer.FileInfoType;
+import com.myutils.logbrowser.indexer.ReferenceType;
+import com.myutils.logbrowser.indexer.TableType;
 import static com.myutils.logbrowser.inquirer.DatabaseConnector.TableExist;
 import com.myutils.logbrowser.inquirer.IQuery.IRecordLoadedProc;
 import static com.myutils.logbrowser.inquirer.IQuery.getCheckedWhere;
@@ -17,11 +20,8 @@ import java.beans.PropertyChangeEvent;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashSet;
-import org.apache.logging.log4j.LogManager;
 import static org.apache.commons.lang3.ArrayUtils.isEmpty;
-import com.myutils.logbrowser.indexer.FileInfoType;
-import com.myutils.logbrowser.indexer.ReferenceType;
-import com.myutils.logbrowser.indexer.TableType;
+import org.apache.logging.log4j.LogManager;
 
 /**
  *
@@ -808,7 +808,7 @@ public class RoutingResults extends IQueryResults {
 
                     if (cidFinder != null && callRelatedSearch(cidFinder) && !refIDs.isEmpty()) {
                         inquirer.logger.debug("TLib requests");
-                        ursByConnIdQuery = new UrsByConnIdQuery(refIDs, ids, new ArrayList<Long>(idDNs));
+                        ursByConnIdQuery = new UrsByConnIdQuery(refIDs, ids, new ArrayList<>(idDNs));
                         ursByConnIdQuery.setNode(ursEventNode);
                         ursByConnIdQuery.setCommonParams(this, dlg);
                         getRecords(ursByConnIdQuery);
@@ -1572,7 +1572,7 @@ public class RoutingResults extends IQueryResults {
 
     @Override
     protected ArrayList<IAggregateQuery> loadReportAggregates() {
-        ArrayList<IAggregateQuery> ret = new ArrayList<IAggregateQuery>();
+        ArrayList<IAggregateQuery> ret = new ArrayList<>();
         try {
             ret.add(new AggrTimestampDelays());
             ret.add(new AggrSIPServerCallsPerSecond(false));

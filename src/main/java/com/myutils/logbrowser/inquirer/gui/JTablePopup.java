@@ -6,10 +6,9 @@
 package com.myutils.logbrowser.inquirer.gui;
 
 import Utils.Pair;
+import Utils.ScreenInfo;
 import com.myutils.logbrowser.inquirer.EnterRegexDialog;
 import static com.myutils.logbrowser.inquirer.EnterRegexDialog.RET_OK;
-import Utils.ScreenInfo;
-import com.myutils.logbrowser.inquirer.InquirerCfg;
 import com.myutils.logbrowser.inquirer.MsgType;
 import com.myutils.logbrowser.inquirer.SearchExtract;
 import com.myutils.logbrowser.inquirer.inquirer;
@@ -116,10 +115,12 @@ public abstract class JTablePopup extends JTable {
 
     class MyMouseAdapter extends MouseAdapter {
 
+        @Override
         public void mousePressed(MouseEvent e) {
             theMousePressed1(e);
         }
 
+        @Override
         public void mouseReleased(MouseEvent e) {
 
             theMouseRelesed(e);

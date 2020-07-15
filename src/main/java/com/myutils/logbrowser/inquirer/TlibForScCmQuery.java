@@ -4,11 +4,11 @@
  */
 package com.myutils.logbrowser.inquirer;
 
+import com.myutils.logbrowser.indexer.FileInfoType;
+import com.myutils.logbrowser.indexer.ReferenceType;
 import java.sql.SQLException;
 import java.util.Collection;
 import java.util.HashSet;
-import com.myutils.logbrowser.indexer.FileInfoType;
-import com.myutils.logbrowser.indexer.ReferenceType;
 
 /**
  *
@@ -89,6 +89,7 @@ public class TlibForScCmQuery extends IQuery {
         }
     }
 
+    @Override
     public void Execute() throws SQLException {
         inquirer.logger.debug("Execute");
         m_connector = DatabaseConnector.getDatabaseConnector(this);
@@ -183,6 +184,7 @@ public class TlibForScCmQuery extends IQuery {
         recCnt = 0;
     }
 
+    @Override
     public ILogRecord GetNext() throws SQLException {
         if (m_resultSet.next()) {
             recCnt++;
@@ -201,6 +203,7 @@ public class TlibForScCmQuery extends IQuery {
         return null;
     }
 
+    @Override
     public void Reset() throws SQLException {
         if (m_resultSet != null) {
             m_resultSet.close();

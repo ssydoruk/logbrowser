@@ -9,6 +9,8 @@ import Utils.TDateRange;
 import Utils.UTCTimeRange;
 import com.jidesoft.swing.CheckBoxListSelectionModel;
 import com.jidesoft.swing.SearchableUtils;
+import com.myutils.logbrowser.indexer.FileInfoType;
+import com.myutils.logbrowser.indexer.ReferenceType;
 import com.myutils.logbrowser.inquirer.gui.JPAppSelect;
 import com.myutils.logbrowser.inquirer.gui.JPSecSelect;
 import java.awt.BorderLayout;
@@ -21,7 +23,6 @@ import java.awt.event.ItemListener;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import org.apache.logging.log4j.LogManager;
 import javax.swing.ButtonGroup;
 import javax.swing.DefaultListModel;
 import javax.swing.JPanel;
@@ -30,8 +31,7 @@ import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import com.myutils.logbrowser.indexer.FileInfoType;
-import com.myutils.logbrowser.indexer.ReferenceType;
+import org.apache.logging.log4j.LogManager;
 
 /**
  *
@@ -197,6 +197,7 @@ public class AggrORSDurationConfig extends javax.swing.JPanel {
             this.listChild = listChild;
         }
 
+        @Override
         public void valueChanged(ListSelectionEvent e) {
             ReportItemChecked(e, list, listChild);
         }
@@ -213,6 +214,7 @@ public class AggrORSDurationConfig extends javax.swing.JPanel {
             this.listChild = listChild;
         }
 
+        @Override
         public void valueChanged(ListSelectionEvent e) {
             ReportItemChanged(e, list, listChild);
         }
@@ -221,10 +223,12 @@ public class AggrORSDurationConfig extends javax.swing.JPanel {
 
     class myFocusListener implements FocusListener {
 
+        @Override
         public void focusGained(FocusEvent e) {
             inquirer.logger.debug("focusGained", e);
         }
 
+        @Override
         public void focusLost(FocusEvent e) {
             inquirer.logger.debug("focusLost", e);
         }
@@ -378,6 +382,7 @@ public class AggrORSDurationConfig extends javax.swing.JPanel {
         JRadioButton btn = new JRadioButton(btTitle);
         btn.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 ft = fileInfoType;
             }

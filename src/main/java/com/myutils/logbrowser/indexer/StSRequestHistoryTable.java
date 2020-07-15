@@ -14,6 +14,7 @@ public class StSRequestHistoryTable extends DBTable {
         super(dbaccessor, t);
     }
 
+    @Override
     public void InitDB() {
         setTabName("STSREQHISTORY_" + getM_dbAccessor().getM_alias());
         addIndex("time");
@@ -41,6 +42,7 @@ public class StSRequestHistoryTable extends DBTable {
         m_InsertStatementId = getM_dbAccessor().PrepareStatement("INSERT INTO STSREQHISTORY_" + getM_dbAccessor().getM_alias() + " VALUES(NULL,?,?,?,?,?,?,?,?,?,?,?,?);");
     }
 
+    @Override
     public void AddToDB(Record aRec) {
         StSRequestHistoryMessage theRec = (StSRequestHistoryMessage) aRec;
         PreparedStatement stmt = getM_dbAccessor().GetStatement(m_InsertStatementId);

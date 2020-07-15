@@ -36,6 +36,7 @@ public class AnyQuery extends IQuery {
         query = _query;
     }
 
+    @Override
     public void Execute() throws SQLException {
         inquirer.logger.debug("execute");
         m_connector = DatabaseConnector.getDatabaseConnector(this);
@@ -75,6 +76,7 @@ public class AnyQuery extends IQuery {
         return null;
     }
 
+    @Override
     public void Reset() throws SQLException {
         if (m_resultSet != null) {
             m_resultSet.close();

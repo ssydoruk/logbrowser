@@ -43,10 +43,12 @@ public class DefaultFormatter implements ILogRecordFormatter {
         m_components = components;
     }
 
+    @Override
     public boolean IsLayoutRequired() {
         return true;
     }
 
+    @Override
     public void Layout(ILogRecord loggedEvent) throws SQLException {
         if (loggedEvent.GetType() == MsgType.SIP) {
             String callId = loggedEvent.GetField("callid");
@@ -68,6 +70,7 @@ public class DefaultFormatter implements ILogRecordFormatter {
 //        }
     }
 
+    @Override
     public void ProcessLayout() {
     }
 
@@ -133,6 +136,7 @@ public class DefaultFormatter implements ILogRecordFormatter {
 
     }
 
+    @Override
     public void Close() {
     }
 

@@ -146,6 +146,7 @@ public enum TableType {
         return (otherName == null) ? false : name.equals(otherName);
     }
 
+    @Override
     public String toString() {
         return this.name.toLowerCase();
     }

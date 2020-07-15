@@ -5,8 +5,8 @@
  */
 package com.myutils.logbrowser.inquirer.gui;
 
-import Utils.TableColumnAdjuster;
 import Utils.Pair;
+import Utils.TableColumnAdjuster;
 import Utils.UTCTimeRange;
 import com.jidesoft.dialog.ButtonPanel;
 import com.jidesoft.dialog.StandardDialog;
@@ -109,6 +109,7 @@ abstract class JTableCommon extends JTablePopup {
 
     }
 
+    @Override
     protected void paintComponent(Graphics g) {
 //        inquirer.logger.debug("paintComponent");
         super.paintComponent(g);
@@ -843,6 +844,7 @@ abstract class JTableCommon extends JTablePopup {
             buttonPanel.addButton(cancelButton);
 
             cancelButton.setAction(new AbstractAction() {
+                @Override
                 public void actionPerformed(ActionEvent e) {
                     setDialogResult(RESULT_CANCELLED);
                     setCloseCause(JOptionPane.CANCEL_OPTION);
@@ -894,7 +896,7 @@ abstract class JTableCommon extends JTablePopup {
 
     private void applyFilter() {
 
-        ArrayList<RowSetFilter> andFilters = new ArrayList<RowSetFilter>();
+        ArrayList<RowSetFilter> andFilters = new ArrayList<>();
         DefaultTableCellRenderer headerRenderer = new DefaultTableCellRenderer();
         headerRenderer.setBackground(Color.RED);
 //        headerRenderer.setForeground(Color.RED);
@@ -922,10 +924,11 @@ abstract class JTableCommon extends JTablePopup {
 
     }
 
+    @Override
     public void setModel(TableModel dataModel) {
         setRowSorter(null);
         super.setModel(dataModel); //To change body of generated methods, choose Tools | Templates.
-        sorter = new TableRowSorter<TableModel>(dataModel);
+        sorter = new TableRowSorter<>(dataModel);
 //        if (tca != null) {
 //            tca.adjustColumns();
 //        }

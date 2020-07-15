@@ -5,6 +5,9 @@ import com.google.gson.Gson;
 import com.google.gson.stream.JsonReader;
 import com.jidesoft.dialog.ButtonPanel;
 import com.jidesoft.dialog.StandardDialog;
+import com.myutils.logbrowser.indexer.FileInfoType;
+import com.myutils.logbrowser.indexer.Main;
+import static com.myutils.logbrowser.indexer.Main.setCurrentDirectory;
 import com.myutils.logbrowser.inquirer.gui.LogFileManager;
 import com.myutils.logbrowser.inquirer.gui.MySwingWorker;
 import com.myutils.logbrowser.inquirer.gui.RequestProgress;
@@ -19,6 +22,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
@@ -65,10 +69,6 @@ import static org.apache.commons.io.FilenameUtils.getFullPath;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import com.myutils.logbrowser.indexer.FileInfoType;
-import com.myutils.logbrowser.indexer.Main;
-import static com.myutils.logbrowser.indexer.Main.setCurrentDirectory;
-import java.io.InputStreamReader;
 
 public class inquirer {
 
@@ -258,6 +258,7 @@ public class inquirer {
                     buttonPanel.addButton(cancelButton);
 
                     cancelButton.setAction(new AbstractAction() {
+                        @Override
                         public void actionPerformed(ActionEvent e) {
                             setDialogResult(RESULT_CANCELLED);
                             setVisible(false);
@@ -277,6 +278,7 @@ public class inquirer {
                     buttonPanel.addButton(yesButton);
 
                     yesButton.setAction(new AbstractAction("Yes") {
+                        @Override
                         public void actionPerformed(ActionEvent e) {
                             setDialogResult(JOptionPane.YES_OPTION);
                             setVisible(false);
@@ -288,6 +290,7 @@ public class inquirer {
                     buttonPanel.addButton(noButton);
 
                     noButton.setAction(new AbstractAction("No") {
+                        @Override
                         public void actionPerformed(ActionEvent e) {
                             setDialogResult(JOptionPane.NO_OPTION);
                             setVisible(false);
@@ -299,6 +302,7 @@ public class inquirer {
                     buttonPanel.addButton(cancelButton);
 
                     cancelButton.setAction(new AbstractAction("Cancel") {
+                        @Override
                         public void actionPerformed(ActionEvent e) {
                             setDialogResult(JOptionPane.CANCEL_OPTION);
                             setVisible(false);
@@ -316,6 +320,7 @@ public class inquirer {
                     buttonPanel.addButton(yesButton);
 
                     yesButton.setAction(new AbstractAction("Yes") {
+                        @Override
                         public void actionPerformed(ActionEvent e) {
                             setDialogResult(JOptionPane.YES_OPTION);
                             setVisible(false);
@@ -327,6 +332,7 @@ public class inquirer {
                     buttonPanel.addButton(noButton);
 
                     noButton.setAction(new AbstractAction("No") {
+                        @Override
                         public void actionPerformed(ActionEvent e) {
                             setDialogResult(JOptionPane.NO_OPTION);
                             setVisible(false);
@@ -342,6 +348,7 @@ public class inquirer {
                     buttonPanel.addButton(yesButton);
 
                     yesButton.setAction(new AbstractAction("OK") {
+                        @Override
                         public void actionPerformed(ActionEvent e) {
                             setDialogResult(JOptionPane.OK_OPTION);
                             setVisible(false);
@@ -353,6 +360,7 @@ public class inquirer {
                     buttonPanel.addButton(noButton);
 
                     noButton.setAction(new AbstractAction("Cancel") {
+                        @Override
                         public void actionPerformed(ActionEvent e) {
                             setDialogResult(JOptionPane.CANCEL_OPTION);
                             setVisible(false);
@@ -508,9 +516,9 @@ public class inquirer {
         try {
             fos = new FileOutputStream(config);
             if (useXMLSerializer) {
-                XMLEncoder encoder = new XMLEncoder(new BufferedOutputStream(fos));
-                encoder.writeObject(cr);
-                encoder.close();
+                try (XMLEncoder encoder = new XMLEncoder(new BufferedOutputStream(fos))) {
+                    encoder.writeObject(cr);
+                }
             } else {
                 GZIPOutputStream gz = new GZIPOutputStream(fos);
                 out = new ObjectOutputStream(gz);
@@ -537,19 +545,19 @@ public class inquirer {
             ArrayList<Integer> ret = new ArrayList();
             DatabaseConnector connector = DatabaseConnector.getDatabaseConnector(inquirer.class);
 
-            ResultSet resultSet = connector.executeQuery(inquirer.class,
+            try (ResultSet resultSet = connector.executeQuery(inquirer.class,
                     "select f.id, a.name from file_logbr f\n"
-                    + " inner join apptype a on a.id=f.apptypeid");
-            ResultSetMetaData rsmd = resultSet.getMetaData();
-
-            int cnt = 0;
-            while (resultSet.next()) {
-                fileidType.put(resultSet.getInt(1), resultSet.getString(2));
-                QueryTools.DebugRec(resultSet);
-                cnt++;
+                            + " inner join apptype a on a.id=f.apptypeid")) {
+                ResultSetMetaData rsmd = resultSet.getMetaData();
+                
+                int cnt = 0;
+                while (resultSet.next()) {
+                    fileidType.put(resultSet.getInt(1), resultSet.getString(2));
+                    QueryTools.DebugRec(resultSet);
+                    cnt++;
+                }
+                inquirer.logger.debug("\tRetrieved " + cnt + " records");
             }
-            inquirer.logger.debug("\tRetrieved " + cnt + " records");
-            resultSet.close();
 
             if (getCr().isApplyFullFilter()) {
                 HashMap<String, String> printFilters = getCr().getPrintFilters();
@@ -695,8 +703,8 @@ public class inquirer {
             return cl.getArgList();
         }
 
-        private Options options = null;
-        private CommandLine cl = null;
+        private final Options options = null;
+        private final CommandLine cl = null;
 
         public void printHelp() {
             HelpFormatter hf = new HelpFormatter();
@@ -711,12 +719,12 @@ public class inquirer {
 
     private static class ExecutionEnvironment {
 
-        private Option optOutSpec;
-        private Option optAlias;
-        private Option optDBName;
-        private Option optDisableRefSync;
-        private Option optLogsBaseDir;
-        private Option optAppConfigFile;
+        private final Option optOutSpec;
+        private final Option optAlias;
+        private final Option optDBName;
+        private final Option optDisableRefSync;
+        private final Option optLogsBaseDir;
+        private final Option optAppConfigFile;
         private CommandLine cmd;
         private final CommandLineParser parser;
         private final Option optIgnoreFileAccessErrors;
@@ -730,7 +738,7 @@ public class inquirer {
         }
 
         private Options options = null;
-        private CommandLine cl = null;
+        private final CommandLine cl = null;
 
         Option optHelp;
 
@@ -913,15 +921,15 @@ public class inquirer {
 
     private void ParseArgs(String[] args) throws IOException {
 
-        ExecutionEnvironment clr = new ExecutionEnvironment(args);
+        ExecutionEnvironment theClr = new ExecutionEnvironment(args);
 
-        alias = clr.getAlias();
-        dbname = clr.getDBName();
-        outputSpecFile = clr.getXmlCfg();
-        config = clr.getAppConfigFile();
-        baseDir = clr.getBaseDir();
-        refSyncDisabled = clr.isDisableRefSync();
-        ignoreFileAccessErrors = clr.isIgnoreFileAccessErrors();
+        alias = theClr.getAlias();
+        dbname = theClr.getDBName();
+        outputSpecFile = theClr.getXmlCfg();
+        config = theClr.getAppConfigFile();
+        baseDir = theClr.getBaseDir();
+        refSyncDisabled = theClr.isDisableRefSync();
+        ignoreFileAccessErrors = theClr.isIgnoreFileAccessErrors();
 
 //
 //        
@@ -1358,6 +1366,7 @@ public class inquirer {
             handleException(Thread.currentThread().getName(), thrown);
         }
 
+        @Override
         public void uncaughtException(Thread thread, Throwable thrown) {
             // for other uncaught exceptions
             handleException(thread.getName(), thrown);

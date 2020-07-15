@@ -1,8 +1,8 @@
 package com.myutils.logbrowser.inquirer;
 
+import com.myutils.logbrowser.indexer.ReferenceType;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import com.myutils.logbrowser.indexer.ReferenceType;
 
 public class ORSMetricByCallIdQuery extends IQuery {
 
@@ -45,6 +45,7 @@ public class ORSMetricByCallIdQuery extends IQuery {
 
     }
 
+    @Override
     public void Execute() throws SQLException {
         inquirer.logger.debug("Execute");
         m_connector = DatabaseConnector.getDatabaseConnector(this);
@@ -67,6 +68,7 @@ public class ORSMetricByCallIdQuery extends IQuery {
         recCnt = 0;
     }
 
+    @Override
     public ILogRecord GetNext() throws SQLException {
         on_error:
         if (m_resultSet.next()) {
@@ -80,6 +82,7 @@ public class ORSMetricByCallIdQuery extends IQuery {
         return null;
     }
 
+    @Override
     public void Reset() throws SQLException {
         if (m_resultSet != null) {
             m_resultSet.close();

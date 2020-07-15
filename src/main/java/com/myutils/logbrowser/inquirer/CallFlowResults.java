@@ -1,7 +1,10 @@
 package com.myutils.logbrowser.inquirer;
 
-import Utils.UTCTimeRange;
 import Utils.Pair;
+import Utils.UTCTimeRange;
+import com.myutils.logbrowser.indexer.FileInfoType;
+import com.myutils.logbrowser.indexer.ReferenceType;
+import com.myutils.logbrowser.indexer.TableType;
 import com.myutils.logbrowser.inquirer.IQuery.FieldType;
 import com.myutils.logbrowser.inquirer.IQuery.IRecordLoadedProc;
 import static com.myutils.logbrowser.inquirer.IQueryResults.addUnique;
@@ -16,9 +19,6 @@ import java.util.HashSet;
 import java.util.Properties;
 import javax.swing.JOptionPane;
 import static org.apache.commons.lang3.ArrayUtils.isEmpty;
-import com.myutils.logbrowser.indexer.FileInfoType;
-import com.myutils.logbrowser.indexer.ReferenceType;
-import com.myutils.logbrowser.indexer.TableType;
 
 public class CallFlowResults extends IQueryResults {
 
@@ -486,6 +486,7 @@ public class CallFlowResults extends IQueryResults {
 
     ArrayList<NameID> appsType;
 
+    @Override
     public ArrayList<NameID> getApps() throws SQLException {
         if (appsType == null) {
 //            appsType = getAppsType(FileInfoType.type_TransportLayer, new String[]{"tlib_logbr", "fileid", "sip_logbr", "fileid"});
@@ -952,7 +953,7 @@ public class CallFlowResults extends IQueryResults {
 
     @Override
     protected ArrayList<IAggregateQuery> loadReportAggregates() {
-        ArrayList<IAggregateQuery> ret = new ArrayList<IAggregateQuery>();
+        ArrayList<IAggregateQuery> ret = new ArrayList<>();
         ret.add(new AggrTimestampDelays());
         ret.add(new AggrSIPRetransmits());
         ret.add(new AggrJSONDuration());

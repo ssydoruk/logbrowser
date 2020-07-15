@@ -11,6 +11,7 @@ import static com.jidesoft.dialog.StandardDialog.RESULT_CANCELLED;
 import com.jidesoft.plaf.LookAndFeelFactory;
 import com.jidesoft.swing.JideTabbedPane;
 import com.jidesoft.swing.TabEditingValidator;
+import com.myutils.logbrowser.indexer.FileInfoType;
 import com.myutils.logbrowser.inquirer.IDsFinder.RequestLevel;
 import com.myutils.logbrowser.inquirer.IQueryResults.ProgressNotifications;
 import com.myutils.logbrowser.inquirer.gui.ExternalEditor;
@@ -30,7 +31,6 @@ import java.awt.event.MouseEvent;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import org.apache.logging.log4j.LogManager;
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -50,7 +50,7 @@ import javax.swing.border.BevelBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import org.apache.commons.lang3.StringUtils;
-import com.myutils.logbrowser.indexer.FileInfoType;
+import org.apache.logging.log4j.LogManager;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -824,6 +824,7 @@ public class QueryDialog extends javax.swing.JFrame {
         public ButtonPanel createButtonPanel() {
             ButtonPanel buttonPanel = new ButtonPanel();
             JButton cancelButton = new JButton(new AbstractAction("Close") {
+                @Override
                 public void actionPerformed(ActionEvent e) {
                     cancelButtonAction(e);
                 }
@@ -831,6 +832,7 @@ public class QueryDialog extends javax.swing.JFrame {
             buttonPanel.addButton(cancelButton);
 
             JButton jbRun = new JButton(new AbstractAction("Select") {
+                @Override
                 public void actionPerformed(ActionEvent e) {
                     runButtonAction(e);
                 }
@@ -928,6 +930,7 @@ public class QueryDialog extends javax.swing.JFrame {
         public ButtonPanel createButtonPanel() {
             ButtonPanel buttonPanel = new ButtonPanel();
             JButton cancelButton = new JButton(new AbstractAction("Close") {
+                @Override
                 public void actionPerformed(ActionEvent e) {
                     cancelButtonAction(e);
                 }
@@ -935,6 +938,7 @@ public class QueryDialog extends javax.swing.JFrame {
             buttonPanel.addButton(cancelButton);
 
             JButton jbRun = new JButton(new AbstractAction("Execute") {
+                @Override
                 public void actionPerformed(ActionEvent e) {
                     runButtonAction(e);
                 }
@@ -1077,7 +1081,7 @@ public class QueryDialog extends javax.swing.JFrame {
                 qry.setQueryLimit(fileOutSetting.isLimitQueryResults(), fileOutSetting.getMaxQueryLines());
 
 //                    DefaultFormatter fmt = new DefaultFormatter(false, null);
-                ArrayList<ILogRecordFormatter> fmt = new ArrayList<ILogRecordFormatter>(1);
+                ArrayList<ILogRecordFormatter> fmt = new ArrayList<>(1);
                 if (fileOutSetting.isFull()) {
                     FullMessagesFormatter formatter = new FullMessagesFormatter();
                     fmt.add(formatter);
@@ -1159,6 +1163,7 @@ public class QueryDialog extends javax.swing.JFrame {
 
         tabbedPane.addChangeListener(new ChangeListener() {
 
+            @Override
             public void stateChanged(ChangeEvent e) {
                 try {
                     tabChanged(e);
@@ -1170,6 +1175,7 @@ public class QueryDialog extends javax.swing.JFrame {
         });
 
         tabbedPane.setTabEditingValidator(new TabEditingValidator() {
+            @Override
             public boolean alertIfInvalid(int tabIndex, String tabText) {
                 if (tabText.trim().length() == 0) {
                     JideOptionPane.showMessageDialog(SwingUtilities.getWindowAncestor(tabbedPane), "'" + tabText + "' is an invalid name for a tab title.", "Invalid Tab Title", JideOptionPane.ERROR_MESSAGE, null);
@@ -1185,6 +1191,7 @@ public class QueryDialog extends javax.swing.JFrame {
                 return true;
             }
 
+            @Override
             public boolean isValid(int tabIndex, String tabText) {
                 if (tabText.trim().length() == 0) {
                     return false;
@@ -1198,6 +1205,7 @@ public class QueryDialog extends javax.swing.JFrame {
                 return true;
             }
 
+            @Override
             public boolean shouldStartEdit(int tabIndex, MouseEvent event) {
                 return true;
             }

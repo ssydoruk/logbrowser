@@ -29,6 +29,7 @@ public class DBServerParser extends Parser {
 //TARGETS: OBN_IP_Skill1_Group@OBN_StatServerRouting.GA
     }
 
+    @Override
     public int ParseFrom(BufferedReaderCrLf input, long offset, int line, FileInfo fi) {
         m_CurrentFilePos = offset;
         m_CurrentLine = line;

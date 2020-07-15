@@ -5,10 +5,6 @@
  */
 package com.myutils.logbrowser.indexer;
 
-import Utils.Pair;
-import static Utils.Util.intOrDef;
-import java.util.ArrayList;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class IxnNonIxn extends Message {

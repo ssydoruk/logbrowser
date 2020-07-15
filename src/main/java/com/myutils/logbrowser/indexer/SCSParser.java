@@ -53,6 +53,7 @@ public class SCSParser extends Parser {
 
     }
 
+    @Override
     public int ParseFrom(BufferedReaderCrLf input, long offset, int line, FileInfo fi) {
         m_CurrentFilePos = offset;
         m_CurrentLine = line;
@@ -765,6 +766,7 @@ public class SCSParser extends Parser {
             return (otherName == null) ? false : name.toLowerCase().equals(otherName.toLowerCase());
         }
 
+        @Override
         public String toString() {
             return this.name.toLowerCase();
         }

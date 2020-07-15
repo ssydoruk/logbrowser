@@ -1,7 +1,10 @@
 package com.myutils.logbrowser.inquirer;
 
-import Utils.UTCTimeRange;
 import Utils.Pair;
+import Utils.UTCTimeRange;
+import com.myutils.logbrowser.indexer.FileInfoType;
+import com.myutils.logbrowser.indexer.ReferenceType;
+import com.myutils.logbrowser.indexer.TableType;
 import static com.myutils.logbrowser.inquirer.DatabaseConnector.TableExist;
 import com.myutils.logbrowser.inquirer.IQuery.FieldType;
 import static com.myutils.logbrowser.inquirer.QueryTools.FindNode;
@@ -10,9 +13,6 @@ import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import com.myutils.logbrowser.indexer.FileInfoType;
-import com.myutils.logbrowser.indexer.ReferenceType;
-import com.myutils.logbrowser.indexer.TableType;
 
 public class MediaServerResults extends IQueryResults {
 
@@ -217,6 +217,7 @@ public class MediaServerResults extends IQueryResults {
 
     ArrayList<NameID> appsType = null;
 
+    @Override
     public ArrayList<NameID> getApps() throws SQLException {
         if (appsType == null) {
             appsType = getAppsType(FileInfoType.type_MCP);

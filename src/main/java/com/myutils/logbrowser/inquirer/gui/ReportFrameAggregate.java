@@ -7,13 +7,13 @@ package com.myutils.logbrowser.inquirer.gui;
 
 import com.myutils.logbrowser.inquirer.IAggregateQuery;
 import com.myutils.logbrowser.inquirer.PrintStreams;
+import com.myutils.logbrowser.inquirer.inquirer;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.io.IOException;
 import javax.swing.JButton;
-import com.myutils.logbrowser.inquirer.inquirer;
 
 /**
  *

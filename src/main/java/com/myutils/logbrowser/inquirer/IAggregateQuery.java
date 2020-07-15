@@ -73,6 +73,7 @@ public abstract class IAggregateQuery extends IQueryResults {
 
     abstract void runQuery() throws SQLException;
 
+    @Override
     protected void Sort() {
         try {
             DbRecordComparator comparator = new DbRecordComparator();

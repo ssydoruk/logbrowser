@@ -19,7 +19,7 @@ public class GenericTreeNode<T> implements Serializable{
     public GenericTreeNode() {
         super();
 //        System.out.println(" GenericTreeNode()");
-        children = new ArrayList<GenericTreeNode<T>>();
+        children = new ArrayList<>();
     }
     
     public GenericTreeNode(TClonable dataSrc) {
@@ -80,7 +80,7 @@ public class GenericTreeNode<T> implements Serializable{
     }
     
     public void removeChildren() {
-        this.children = new ArrayList<GenericTreeNode<T>>();
+        this.children = new ArrayList<>();
     }
     
     public void removeChildAt(int index) throws IndexOutOfBoundsException {
@@ -99,6 +99,7 @@ public class GenericTreeNode<T> implements Serializable{
         this.data = data;
     }
     
+    @Override
     public String toString() {
         return getData().toString();
     }

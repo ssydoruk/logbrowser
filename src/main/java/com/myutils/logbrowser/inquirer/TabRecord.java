@@ -26,6 +26,7 @@ public class TabRecord extends ILogRecord {
 
     }
 
+    @Override
     public int GetAnchorId() {
         return m_anchorid;
     }

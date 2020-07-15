@@ -6,7 +6,11 @@
 package com.myutils.logbrowser.inquirer;
 
 import Utils.Pair;
+import com.myutils.logbrowser.indexer.ReferenceType;
+import com.myutils.logbrowser.indexer.TableType;
 import static com.myutils.logbrowser.inquirer.inquirer.getFirstWord;
+import com.myutils.mygenerictree.GenericTreeNode;
+import com.myutils.mygenerictree.TClonable;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectInputStream;
@@ -17,11 +21,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import com.myutils.logbrowser.indexer.ReferenceType;
-import com.myutils.logbrowser.indexer.TableType;
-import com.myutils.mygenerictree.GenericTreeNode;
-import com.myutils.mygenerictree.TClonable;
 
 /**
  *
@@ -105,6 +104,7 @@ public class DynamicTreeNode<T> extends GenericTreeNode implements Serializable 
             final String CheckIDField1, final String CheckIDField2, final boolean alwaysCheck) {
         AttrDynamic.setRefType(referenceType);
         AttrDynamic.setLoadChildrenProc(new DynamicTreeNode.ILoadChildrenProc() {
+            @Override
             public ArrayList<NameID> LoadChidlren(DynamicTreeNode node) {
                 try {
 
@@ -181,6 +181,7 @@ public class DynamicTreeNode<T> extends GenericTreeNode implements Serializable 
         AttrDynamic.tableType = tableType;
         AttrDynamic.refType = ReferenceType.LOGMESSAGE;
         AttrDynamic.setLoadChildrenProc(new DynamicTreeNode.ILoadChildrenProc() {
+            @Override
             public ArrayList<NameID> LoadChidlren(DynamicTreeNode node) {
                 try {
 //                    return DatabaseConnector.getRefNameIDs(this, ReferenceType.LOGMESSAGE.toString(), null);

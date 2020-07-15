@@ -31,6 +31,7 @@ public class IconParser extends Parser {
         super(FileInfoType.type_ICON, m_tables);
     }
 
+    @Override
     public int ParseFrom(BufferedReaderCrLf input, long offset, int line, FileInfo fi) {
         m_CurrentFilePos = offset;
         m_CurrentLine = line;

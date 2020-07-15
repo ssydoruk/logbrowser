@@ -5,8 +5,10 @@
  */
 package com.myutils.logbrowser.inquirer;
 
-import com.myutils.logbrowser.inquirer.IQuery.FieldType;
 import Utils.UTCTimeRange;
+import com.myutils.logbrowser.indexer.ReferenceType;
+import com.myutils.logbrowser.indexer.TableType;
+import com.myutils.logbrowser.inquirer.IQuery.FieldType;
 import static com.myutils.logbrowser.inquirer.inquirer.getCr;
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
@@ -16,8 +18,6 @@ import java.io.PrintStream;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import org.apache.commons.lang3.StringUtils;
-import com.myutils.logbrowser.indexer.ReferenceType;
-import com.myutils.logbrowser.indexer.TableType;
 
 /**
  *
@@ -36,10 +36,12 @@ public class AggrApacheRequests extends IAggregateAggregate {
         return "Apache requests per period";
     }
 
+    @Override
     public void actionPerformed(ActionEvent e) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
+    @Override
     public void propertyChange(PropertyChangeEvent evt) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }

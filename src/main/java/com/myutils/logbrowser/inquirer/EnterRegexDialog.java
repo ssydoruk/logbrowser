@@ -62,6 +62,7 @@ public class EnterRegexDialog extends javax.swing.JDialog {
         inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), cancelName);
         ActionMap actionMap = getRootPane().getActionMap();
         actionMap.put(cancelName, new AbstractAction() {
+            @Override
             public void actionPerformed(ActionEvent e) {
                 cancelPressed();
             }
@@ -70,6 +71,7 @@ public class EnterRegexDialog extends javax.swing.JDialog {
         String okName = "OK";
         inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), okName);
         actionMap.put(okName, new AbstractAction() {
+            @Override
             public void actionPerformed(ActionEvent e) {
                 OKPressed();
             }
@@ -317,6 +319,7 @@ public class EnterRegexDialog extends javax.swing.JDialog {
         dispose();
     }
 
+    @Override
     public AccessibleContext getAccessibleContext() {
         return jcbIsRegex.getAccessibleContext();
     }

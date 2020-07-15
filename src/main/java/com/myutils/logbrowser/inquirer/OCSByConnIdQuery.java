@@ -4,10 +4,10 @@
  */
 package com.myutils.logbrowser.inquirer;
 
+import com.myutils.logbrowser.indexer.ReferenceType;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collection;
-import com.myutils.logbrowser.indexer.ReferenceType;
 
 /**
  *
@@ -65,6 +65,7 @@ public class OCSByConnIdQuery extends IQuery {
         this.dnIDs = dnIDs;
     }
 
+    @Override
     public void Execute() throws SQLException {
         inquirer.logger.debug("**Execute in  " + this.getClass().toString());
         m_connector = DatabaseConnector.getDatabaseConnector(this);
@@ -88,6 +89,7 @@ public class OCSByConnIdQuery extends IQuery {
         recCnt = 0;
     }
 
+    @Override
     public ILogRecord GetNext() throws SQLException {
         if (m_resultSet.next()) {
             recCnt++;
@@ -100,6 +102,7 @@ public class OCSByConnIdQuery extends IQuery {
         return null;
     }
 
+    @Override
     public void Reset() throws SQLException {
         if (m_resultSet != null) {
             m_resultSet.close();

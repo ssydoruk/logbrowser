@@ -17,6 +17,7 @@ public class AllProxyQuery extends IQuery {
     private DatabaseConnector m_connector;
     private int recCnt;
 
+    @Override
     public void Execute() throws SQLException {
         inquirer.logger.debug("Execute");
         m_connector = DatabaseConnector.getDatabaseConnector(this);
@@ -35,6 +36,7 @@ public class AllProxyQuery extends IQuery {
 
     }
 
+    @Override
     public ILogRecord GetNext() throws SQLException {
         if (m_resultSet.next()) {
             recCnt++;
@@ -49,6 +51,7 @@ public class AllProxyQuery extends IQuery {
         return null;
     }
 
+    @Override
     public void Reset() throws SQLException {
         if (m_resultSet != null) {
             m_resultSet.close();

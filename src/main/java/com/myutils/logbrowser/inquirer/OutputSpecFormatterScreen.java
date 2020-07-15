@@ -21,6 +21,7 @@ public class OutputSpecFormatterScreen extends OutputSpecFormatter {
         super(cfg, isLongFileNameEnabled, components);
     }
 
+    @Override
     public void Print(ILogRecord record, PrintStreams ps, IQueryResults qr) {
 
         RecordLayout lo = getLayout(record.GetType());

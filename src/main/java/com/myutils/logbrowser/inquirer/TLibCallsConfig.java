@@ -7,10 +7,11 @@ package com.myutils.logbrowser.inquirer;
 
 import com.jidesoft.swing.CheckBoxList;
 import com.jidesoft.swing.SearchableUtils;
+import com.myutils.logbrowser.indexer.FileInfoType;
+import com.myutils.logbrowser.indexer.ReferenceType;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import org.apache.logging.log4j.LogManager;
 import javax.swing.AbstractButton;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
@@ -20,8 +21,7 @@ import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.AncestorEvent;
 import javax.swing.event.AncestorListener;
-import com.myutils.logbrowser.indexer.FileInfoType;
-import com.myutils.logbrowser.indexer.ReferenceType;
+import org.apache.logging.log4j.LogManager;
 
 /**
  *
@@ -41,6 +41,7 @@ public class TLibCallsConfig extends javax.swing.JPanel {
         initComponents();
         addAncestorListener(new AncestorListener() {
 
+            @Override
             public void ancestorAdded(AncestorEvent event) {
 //                                        javax.swing.JOptionPane.showMessageDialog(_list, "ancestorAdded!", "ancestorAdded", JOptionPane.ERROR_MESSAGE);
                 if (_model.isEmpty()) {
@@ -57,10 +58,12 @@ public class TLibCallsConfig extends javax.swing.JPanel {
 //                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
             }
 
+            @Override
             public void ancestorRemoved(AncestorEvent event) {
 //                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
             }
 
+            @Override
             public void ancestorMoved(AncestorEvent event) {
 //                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
             }
@@ -310,6 +313,7 @@ public class TLibCallsConfig extends javax.swing.JPanel {
         JRadioButton btn = new JRadioButton(btTitle);
         btn.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 ft = fileInfoType;
             }

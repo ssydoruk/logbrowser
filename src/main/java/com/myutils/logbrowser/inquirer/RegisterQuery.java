@@ -22,6 +22,7 @@ public class RegisterQuery extends IQuery {
         m_dn = dn;
     }
 
+    @Override
     public void Execute() throws SQLException {
         inquirer.logger.debug("Execute");
         m_connector = DatabaseConnector.getDatabaseConnector(this);
@@ -38,6 +39,7 @@ public class RegisterQuery extends IQuery {
         recCnt = 0;
     }
 
+    @Override
     public ILogRecord GetNext() throws SQLException {
         if (m_resultSet.next()) {
             recCnt++;
@@ -50,6 +52,7 @@ public class RegisterQuery extends IQuery {
         return null;
     }
 
+    @Override
     public void Reset() throws SQLException {
         if (m_resultSet != null) {
             m_resultSet.close();

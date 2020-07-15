@@ -6,13 +6,13 @@
 package com.myutils.logbrowser.indexer;
 
 import static Utils.Util.intOrDef;
+import static com.myutils.logbrowser.indexer.Parser.getQueryKey;
+import static com.myutils.logbrowser.indexer.Parser.splitQuery;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 import org.json.JSONException;
 import org.json.JSONObject;
-import static com.myutils.logbrowser.indexer.Parser.getQueryKey;
-import static com.myutils.logbrowser.indexer.Parser.splitQuery;
 
 public class OrsHTTP extends Message {
 

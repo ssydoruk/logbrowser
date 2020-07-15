@@ -4,16 +4,15 @@
  */
 package com.myutils.logbrowser.inquirer;
 
-import java.sql.ResultSet;
+import com.myutils.logbrowser.indexer.ReferenceType;
 import java.sql.SQLException;
 import org.apache.commons.lang3.StringUtils;
-import com.myutils.logbrowser.indexer.ReferenceType;
 
 /**
  *
  * @author kvoroshi
  */
-public class IxnServerQuery extends IQuery {
+public final class IxnServerQuery extends IQuery {
 
     private DatabaseConnector m_connector;
     private int recCnt;
@@ -48,6 +47,7 @@ public class IxnServerQuery extends IQuery {
         }
     }
 
+    @Override
     public void Execute() throws SQLException {
         inquirer.logger.debug("Execute");
         m_connector = DatabaseConnector.getDatabaseConnector(this);
@@ -71,6 +71,7 @@ public class IxnServerQuery extends IQuery {
         recCnt = 0;
     }
 
+    @Override
     public ILogRecord GetNext() throws SQLException {
         if (m_resultSet.next()) {
 //            doCollectIDs(m_resultSet);
@@ -84,6 +85,7 @@ public class IxnServerQuery extends IQuery {
         return null;
     }
 
+    @Override
     public void Reset() throws SQLException {
         if (m_resultSet != null) {
             m_resultSet.close();

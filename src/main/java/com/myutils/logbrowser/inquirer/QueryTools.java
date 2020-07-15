@@ -6,6 +6,8 @@
 package com.myutils.logbrowser.inquirer;
 
 import com.jidesoft.swing.MultilineLabel;
+import com.myutils.logbrowser.indexer.FileInfoType;
+import com.myutils.logbrowser.indexer.ReferenceType;
 import static com.myutils.logbrowser.inquirer.QueryTools.getRefIDs;
 import static com.myutils.logbrowser.inquirer.QueryTools.getWhere;
 import static com.myutils.logbrowser.inquirer.QueryTools.uniqueInts;
@@ -25,8 +27,6 @@ import java.util.Set;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import org.apache.commons.lang3.StringUtils;
-import com.myutils.logbrowser.indexer.FileInfoType;
-import com.myutils.logbrowser.indexer.ReferenceType;
 
 /**
  *

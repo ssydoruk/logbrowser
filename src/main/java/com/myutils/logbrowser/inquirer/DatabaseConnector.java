@@ -2,6 +2,10 @@ package com.myutils.logbrowser.inquirer;
 
 import Utils.UTCTimeRange;
 import static Utils.Util.pDuration;
+import com.myutils.logbrowser.indexer.FileInfoType;
+import com.myutils.logbrowser.indexer.Main;
+import com.myutils.logbrowser.indexer.ReferenceType;
+import com.myutils.logbrowser.indexer.TableType;
 import static com.myutils.logbrowser.inquirer.QueryTools.getWhere;
 import java.io.File;
 import java.nio.file.Files;
@@ -26,16 +30,12 @@ import java.util.Hashtable;
 import java.util.IllegalFormatException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.apache.logging.log4j.LogManager;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.logging.log4j.LogManager;
 import org.sqlite.Function;
 import static org.sqlite.SQLiteErrorCode.SQLITE_INTERRUPT;
-import com.myutils.logbrowser.indexer.FileInfoType;
-import com.myutils.logbrowser.indexer.Main;
-import com.myutils.logbrowser.indexer.ReferenceType;
-import com.myutils.logbrowser.indexer.TableType;
 
 public class DatabaseConnector {
 
@@ -314,6 +314,7 @@ public class DatabaseConnector {
 
         m_conn = DriverManager.getConnection("jdbc:sqlite:" + name);
         Function.create(m_conn, "REGEXP", new Function() {
+            @Override
             protected void xFunc() throws SQLException {
                 String regex = value_text(0);
                 String compareString = value_text(1);
@@ -329,6 +330,7 @@ public class DatabaseConnector {
         });
 
         Function.create(m_conn, "filesize", new Function() {
+            @Override
             protected void xFunc() throws SQLException {
                 try {
                     String sizeText = value_text(0);
@@ -346,6 +348,7 @@ public class DatabaseConnector {
         });
 
         Function.create(m_conn, "connectedName", new Function() {
+            @Override
             protected void xFunc() throws SQLException {
                 try {
                     String sizeText = value_text(0);
@@ -367,6 +370,7 @@ public class DatabaseConnector {
         });
 
         Function.create(m_conn, "UTCtoDateTime", new Function() {
+            @Override
             protected void xFunc() throws SQLException {
                 String fieldValue = value_text(0);
                 String dtFormat = value_text(1);
@@ -378,6 +382,7 @@ public class DatabaseConnector {
         });
 
         Function.create(m_conn, "jduration", new Function() {
+            @Override
             protected void xFunc() throws SQLException {
                 try {
                     String sizeText = value_text(0);
@@ -398,6 +403,7 @@ public class DatabaseConnector {
         });
 
         Function.create(m_conn, "constToStr", new Function() {
+            @Override
             protected void xFunc() throws SQLException {
                 try {
                     if (args() != 2 || value_text(1) == null) {
@@ -455,6 +461,7 @@ public class DatabaseConnector {
         });
 
         Function.create(m_conn, CampaignGroupDBIDtoName, new Function() {
+            @Override
             protected void xFunc() throws SQLException {
                 try {
                     if (args() != 1 || value_text(0) == null) {
@@ -500,6 +507,7 @@ public class DatabaseConnector {
             }
         });
         Function.create(m_conn, CampaignDBIDtoName, new Function() {
+            @Override
             protected void xFunc() throws SQLException {
                 try {
                     if (args() != 1 || value_text(0) == null) {
@@ -544,6 +552,7 @@ public class DatabaseConnector {
             }
         });
         Function.create(m_conn, GroupDBIDtoName, new Function() {
+            @Override
             protected void xFunc() throws SQLException {
                 try {
                     if (args() != 1 || value_text(0) == null) {
@@ -588,6 +597,7 @@ public class DatabaseConnector {
             }
         });
         Function.create(m_conn, ListDBIDtoName, new Function() {
+            @Override
             protected void xFunc() throws SQLException {
                 try {
                     if (args() != 1 || value_text(0) == null) {
@@ -613,6 +623,7 @@ public class DatabaseConnector {
 
         Function.create(m_conn, "REGEXP_group", new Function() {
 
+            @Override
             protected void xFunc() throws SQLException {
                 String regex = value_text(0);
                 String compareString = value_text(1);

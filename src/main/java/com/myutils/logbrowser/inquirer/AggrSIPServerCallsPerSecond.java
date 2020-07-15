@@ -5,8 +5,9 @@
  */
 package com.myutils.logbrowser.inquirer;
 
-import com.myutils.logbrowser.inquirer.IQuery.FieldType;
 import Utils.UTCTimeRange;
+import com.myutils.logbrowser.indexer.ReferenceType;
+import com.myutils.logbrowser.inquirer.IQuery.FieldType;
 import static com.myutils.logbrowser.inquirer.inquirer.getCr;
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
@@ -17,7 +18,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import javax.swing.JOptionPane;
 import org.apache.commons.lang3.StringUtils;
-import com.myutils.logbrowser.indexer.ReferenceType;
 
 /**
  *
@@ -36,10 +36,12 @@ public class AggrSIPServerCallsPerSecond extends IAggregateAggregate {
         return "Messages per period";
     }
 
+    @Override
     public void actionPerformed(ActionEvent e) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
+    @Override
     public void propertyChange(PropertyChangeEvent evt) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }

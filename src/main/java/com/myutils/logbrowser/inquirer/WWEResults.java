@@ -1,7 +1,10 @@
 package com.myutils.logbrowser.inquirer;
 
-import Utils.UTCTimeRange;
 import Utils.Pair;
+import Utils.UTCTimeRange;
+import com.myutils.logbrowser.indexer.FileInfoType;
+import com.myutils.logbrowser.indexer.ReferenceType;
+import com.myutils.logbrowser.indexer.TableType;
 import com.myutils.logbrowser.inquirer.IQuery.FieldType;
 import static com.myutils.logbrowser.inquirer.QueryTools.getWhere;
 import static com.myutils.logbrowser.inquirer.QueryTools.isChecked;
@@ -12,12 +15,9 @@ import java.util.ArrayList;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.apache.logging.log4j.LogManager;
 import javax.swing.JOptionPane;
 import static org.apache.commons.lang3.ArrayUtils.isEmpty;
-import com.myutils.logbrowser.indexer.FileInfoType;
-import com.myutils.logbrowser.indexer.ReferenceType;
-import com.myutils.logbrowser.indexer.TableType;
+import org.apache.logging.log4j.LogManager;
 
 public class WWEResults extends IQueryResults {
 
@@ -302,6 +302,7 @@ public class WWEResults extends IQueryResults {
 
     ArrayList<NameID> appsType = null;
 
+    @Override
     public ArrayList<NameID> getApps() throws Exception {
         if (appsType == null) {
             appsType = getAppsType(FileInfoType.type_WWE);
@@ -557,7 +558,7 @@ public class WWEResults extends IQueryResults {
 
     @Override
     protected ArrayList<IAggregateQuery> loadReportAggregates() {
-        ArrayList<IAggregateQuery> ret = new ArrayList<IAggregateQuery>();
+        ArrayList<IAggregateQuery> ret = new ArrayList<>();
         ret.add(new AggrTimestampDelays());
         try {
             if (!(DatabaseConnector.TableEmpty(TableType.ApacheWeb.toString()))) {
