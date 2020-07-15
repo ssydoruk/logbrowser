@@ -1,0 +1,138 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package com.myutils.logbrowser.indexer;
+
+import java.util.ArrayList;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import org.w3c.dom.Document;
+
+/**
+ *
+ * @author ssydoruk
+ */
+
+/*It extends TServer message, however there is now TServer message attributes*/
+public class ORSMetricExtension extends Message {
+
+    private static Pattern regTMessageStart = Pattern.compile("^<([\\w~]+) sid='([\\w~]+)");
+//    private static Pattern regReqID = Pattern.compile("^\\s*<eval_expr .+expression='system.LastSubmitRequestId;.+result='(\\d+)' />");
+
+    public String sid = "";
+    public String Method = "";
+    private String param1 = null;
+    private String param2 = null;
+
+    public ORSMetricExtension(String line) {
+        super(TableType.ORSMetricExtension, line);
+        FindSID();
+    }
+
+    ORSMetricExtension(ArrayList m_MessageContents) {
+        super(TableType.ORSMetricExtension, m_MessageContents);
+        FindSID();
+    }
+
+    ORSMetricExtension(String line, String _Method, String _sid) {
+        super(TableType.ORSMetricExtension, line);
+        Method = _Method;
+        sid = _sid;
+    }
+
+    private void FindSID() {
+        Matcher m;
+        String s = (String) m_MessageLines.get(0);
+
+        if (s != null && (m = regTMessageStart.matcher(s)).find()) {
+            Method = m.group(1);
+            sid = m.group(2);
+        }
+    }
+
+    public String getXMLProperty(Document doc, String propertyName) {
+        String ret = null;//doc.getElementsByTagName(propertyName);
+
+        if (ret != null) {
+            return ret;
+        } else {
+            return "";
+        }
+    }
+
+    int getcgdbid() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    int getrecHandle() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    int getchID() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    String getSessID() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    private static Pattern regFunc = Pattern.compile("(?:function|name)='([^']+)'");
+
+    String getMethodFunc() {
+        String line = m_MessageLines.get(0);
+        Matcher m;
+        String func = "";
+        if ((m = regFunc.matcher(line)).find()) {
+            func = m.group(1);
+        } else {
+            func = line;
+        }
+        return func;
+    }
+
+    private static Pattern regNS = Pattern.compile("namespace='.+\\/([^']+)'");
+
+    String getNameSpace() {
+        if (ns == null) {
+            String line = m_MessageLines.get(0);
+            Matcher m;
+            if (line != null && (m = regNS.matcher(line)).find()) {
+                ns = m.group(1);
+            }
+        }
+        return ns;
+    }
+
+    void setFetchMethod(String group) {
+        this.param1 = group;
+    }
+
+    void setFetchURI(String group) {
+        this.param2 = group;
+    }
+
+    String getParam1() {
+        return param1;
+
+    }
+
+    String getParam2() {
+        return param2;
+    }
+
+    private static final Pattern regNamespace = Pattern.compile("namespace='[^']/([^\\/]+)'");
+
+    private String ns = null;
+
+    void parseNS(String rest) {
+        Main.logger.trace("r: " + rest);
+        if (rest != null) {
+            Matcher m1;
+            if ((m1 = regNamespace.matcher(rest)).find()) {
+                ns = m1.group(1);
+            }
+        }
+    }
+
+}

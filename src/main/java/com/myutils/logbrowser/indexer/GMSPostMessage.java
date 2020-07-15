@@ -1,0 +1,115 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package com.myutils.logbrowser.indexer;
+
+import Utils.Pair;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+/**
+ *
+ * @author terry The class Replicates TLibMessage
+ */
+public class GMSPostMessage extends Message {
+
+    String m_MessageName;
+
+    private boolean isTServerReq = false;
+    private String clientIP;
+    private boolean POSTParsed = false;
+
+    GMSPostMessage(ArrayList<String> m_MessageContents) {
+        super(TableType.GMSPOST, m_MessageContents);
+    }
+
+    public boolean isIsTServerReq() {
+        return isTServerReq;
+    }
+
+    public String GetMessageName() {
+        return m_MessageName;
+    }
+
+    String getTransferConnID() {
+        return null;
+    }
+
+    String getEventName() {
+        String ret = getGMSAttributeString("EventName");
+//        if(ret==null || ret.isEmpty()){
+//                    ret= FindByRx(regService, 1, (String)null);
+//
+//        }
+        return ret;
+    }
+
+    String getIxnID() {
+        return null;
+    }
+
+    String getServerID() {
+        return null;
+    }
+
+    String getOtherDN() {
+        return getIxnAttributeString("AttributeOtherDN");
+    }
+
+    String CallBackType() {
+        return getGMSAttributeString(new String[]{"callback_type", "serviceType"});
+    }
+
+    final private static Pattern regService = Pattern.compile("/service/callback/([^,\\s]+)");
+
+    String GMSService() {
+        String ret = getGMSAttributeString("service_id");
+
+        return ret;
+    }
+
+    final private static Pattern regPOSTMessage = Pattern.compile("^\\(POST\\) Client IP Address: ([0-9\\.]+),.+(http[^,]+)");
+
+    String ORSSessionID() {
+        parsePOST();
+        if (parseORSURI != null) {
+            return parseORSURI.getKey();
+        } else {
+            return null;
+        }
+    }
+
+    String ORSURI() {
+        parsePOST();
+        if (parseORSURI != null) {
+            return parseORSURI.getValue();
+        } else {
+            return null;
+        }
+    }
+
+    private Pair<String, String> parseORSURI = null;
+
+    private void parsePOST() {
+        if (!this.POSTParsed) {
+            Matcher m;
+            if ((m = regPOSTMessage.matcher(m_MessageLines.get(0))).find()) {
+                this.clientIP = m.group(1);
+                parseORSURI = parseORSURI(m.group(2));
+            }
+            POSTParsed = true;
+        }
+
+    }
+
+    String getPhone() {
+        return getGMSAttributeString(new String[]{"phone_number", "_customer_number"});
+    }
+
+    String getSourceIP() {
+        return clientIP;
+    }
+
+}

@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<actions>
+        <action>
+            <actionName>run</actionName>
+            <packagings>
+                <packaging>jar</packaging>
+            </packagings>
+            <goals>
+                <goal>process-classes</goal>
+                <goal>org.codehaus.mojo:exec-maven-plugin:1.5.0:exec</goal>
+            </goals>
+            <properties>
+                <exec.args>-Dlog4j.configurationFile="file:///Users/stepan_sydoruk/GCTI/etc/logbrowser/sipspan3.log4j2.inquirer-dev.xml" -Dsipspan3.dir=.sipspan3 -Dall=1 -Dsun.java2d.d3d=false -Dcallflowresults.newtlibrequests=true -classpath %classpath com.myutils.logbrowser.inquirer.inquirer --alias=sipspan01 --dbname=/Users/stepan_sydoruk/GCTI/Work/Jul14_MakeCall/sipspan03 --config=/Users/stepan_sydoruk/GCTI/etc/logbrowser/inquirer.cfg.json --basedir=/Users/stepan_sydoruk/GCTI/Work/Jul14_MakeCall --outputspec=/Users/stepan_sydoruk/GCTI/etc/logbrowser/outputspec3.xml</exec.args>
+                <exec.executable>java</exec.executable>
+                <exec.workingdir>/Users/stepan_sydoruk/GCTI/Work/Jul14_MakeCall</exec.workingdir>
+            </properties>
+        </action>
+        <action>
+            <actionName>debug</actionName>
+            <packagings>
+                <packaging>jar</packaging>
+            </packagings>
+            <goals>
+                <goal>process-classes</goal>
+                <goal>org.codehaus.mojo:exec-maven-plugin:1.5.0:exec</goal>
+            </goals>
+            <properties>
+                <exec.args>-agentlib:jdwp=transport=dt_socket,server=n,address=${jpda.address} -Dlog4j.configurationFile="file:///Users/stepan_sydoruk/GCTI/etc/logbrowser/sipspan3.log4j2.inquirer-dev.xml" -Dsipspan3.dir=.sipspan3 -Dall=1 -Dsun.java2d.d3d=false -Dcallflowresults.newtlibrequests=true -classpath %classpath com.myutils.logbrowser.inquirer.inquirer --alias=sipspan01 --dbname=/Users/stepan_sydoruk/GCTI/Work/Jul14_MakeCall/sipspan03 --config=/Users/stepan_sydoruk/GCTI/etc/logbrowser/inquirer.cfg.json --basedir=/Users/stepan_sydoruk/GCTI/Work/Jul14_MakeCall --outputspec=/Users/stepan_sydoruk/GCTI/etc/logbrowser/outputspec3.xml</exec.args>
+                <exec.executable>java</exec.executable>
+                <jpda.listen>true</jpda.listen>
+                <exec.workingdir>/Users/stepan_sydoruk/GCTI/Work/Jul14_MakeCall</exec.workingdir>
+            </properties>
+        </action>
+        <action>
+            <actionName>profile</actionName>
+            <packagings>
+                <packaging>jar</packaging>
+            </packagings>
+            <goals>
+                <goal>process-classes</goal>
+                <goal>org.codehaus.mojo:exec-maven-plugin:1.5.0:exec</goal>
+            </goals>
+            <properties>
+                <exec.args>-Dlog4j.configurationFile="file:///Users/stepan_sydoruk/GCTI/etc/logbrowser/sipspan3.log4j2.inquirer-dev.xml" -Dsipspan3.dir=.sipspan3 -Dall=1 -Dsun.java2d.d3d=false -Dcallflowresults.newtlibrequests=true -classpath %classpath com.myutils.logbrowser.inquirer.inquirer --alias=sipspan01 --dbname=/Users/stepan_sydoruk/GCTI/Work/Jul14_MakeCall/sipspan03 --config=/Users/stepan_sydoruk/GCTI/etc/logbrowser/inquirer.cfg.json --basedir=/Users/stepan_sydoruk/GCTI/Work/Jul14_MakeCall --outputspec=/Users/stepan_sydoruk/GCTI/etc/logbrowser/outputspec3.xml</exec.args>
+                <exec.executable>java</exec.executable>
+                <exec.workingdir>/Users/stepan_sydoruk/GCTI/Work/Jul14_MakeCall</exec.workingdir>
+            </properties>
+        </action>
+    </actions>
