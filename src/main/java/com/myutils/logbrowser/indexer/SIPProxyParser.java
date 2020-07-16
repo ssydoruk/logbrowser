@@ -20,7 +20,6 @@ import org.apache.commons.lang3.StringUtils;
  */
 public class SIPProxyParser extends Parser {
 
-
     static final String[] BlockNamesToIgnoreArray = {
         "NET:TCO:EventResourceInfo:",
         "NET:IPR:EventResourceInfo:",
@@ -171,7 +170,7 @@ public class SIPProxyParser extends Parser {
     }
 
     void ContinueParsing(String initial) {
-        String str ;
+        String str;
         BufferedReaderCrLf input = Main.getMain().GetNextFile();
         if (input == null) {
             return;
@@ -210,7 +209,6 @@ public class SIPProxyParser extends Parser {
             Main.logger.error(e);
         }
     }
-
 
     String ParseLine(BufferedReaderCrLf input, String str) throws Exception {
         Matcher m;
@@ -435,7 +433,7 @@ public class SIPProxyParser extends Parser {
             case STATE_SIP_BODY: {
                 m_PacketLength -= s.length() + 2;
 
-                if (( SIPHeaderContinue.matcher(str)).find()) {
+                if ((SIPHeaderContinue.matcher(str)).find()) {
                     m_MessageContents.add(s);
 
                 } else {
@@ -562,7 +560,7 @@ public class SIPProxyParser extends Parser {
         Matcher m;
 
         // Populate our class representation of the message
-        SipMessage msg ;
+        SipMessage msg;
 
 //        if (contents.isEmpty()) {
 //            Main.logger.error("Could not find message itself!");
@@ -771,7 +769,6 @@ public class SIPProxyParser extends Parser {
         }
     }
 
-
     protected void AddCireqMessage(ArrayList contents, String header) throws Exception {
         Matcher m;
         CIFaceRequest req = new CIFaceRequest();
@@ -792,11 +789,9 @@ public class SIPProxyParser extends Parser {
         SetStdFieldsAndAdd(req);
     }
 
-
     private boolean FullSIPMsg() {
         return true;
     }
-
 
     private void AddConfigMessage(ArrayList<String> m_MessageContents) {
         ConfigUpdateRecord msg = new ConfigUpdateRecord(m_MessageContents);
@@ -819,7 +814,6 @@ public class SIPProxyParser extends Parser {
 
         }
     }
-
 
     private boolean newSeqNo(TLibMessage msg) {
         Long seqNo = msg.getSeqNo();

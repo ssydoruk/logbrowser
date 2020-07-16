@@ -21,7 +21,6 @@ public class WWECloudParser extends Parser {
 
     private static final org.apache.logging.log4j.Logger logger = LogManager.getLogger();
 
-
     private static final HashMap<Pattern, String> IGNORE_LOG_WORDS = new HashMap<Pattern, String>() {
         {
             put(Pattern.compile("place \\[[^\\]]+\\]"), "place \\[...\\]");
@@ -64,9 +63,11 @@ public class WWECloudParser extends Parser {
     private String m_msgName;
     private String m_msg1;
     private Object msg;
+
     public WWECloudParser(HashMap<TableType, DBTable> m_tables) {
         super(FileInfoType.type_WWECloud, m_tables);
     }
+
     @Override
     public int ParseFrom(BufferedReaderCrLf input, long offset, int line, FileInfo fi) {
         m_CurrentFilePos = offset;
@@ -90,12 +91,12 @@ public class WWECloudParser extends Parser {
                 try {
                     int l = input.getLastBytesConsumed();
 //                    SetBytesConsumed(input.getLastBytesConsumed());
-setEndFilePos(getFilePos() + l); // to calculate file bytes
+                    setEndFilePos(getFilePos() + l); // to calculate file bytes
 
-while (str != null) {
-    str = ParseLine(str);
-}
-setFilePos(getFilePos() + l);
+                    while (str != null) {
+                        str = ParseLine(str);
+                    }
+                    setFilePos(getFilePos() + l);
 
                 } catch (Exception e) {
                     Main.logger.error("Failure parsing line " + m_CurrentLine + ":"
@@ -134,7 +135,7 @@ setFilePos(getFilePos() + l);
 
                 String s = ParseGenesys(str, TableType.MsgWWECloud, regNotParseMessage, regLineSkip);
 
-                if (( regMsgStart.matcher(s)).find()) {
+                if ((regMsgStart.matcher(s)).find()) {
                     m_HeaderOffset = m_CurrentFilePos;
                     m_ParserState = ParserState.STATE_TMESSAGE_EVENT;
                     setSavedFilePos(getFilePos());
@@ -157,7 +158,7 @@ setFilePos(getFilePos() + l);
                 } else if ((m = regLogMessage.matcher(s)).find()) {
                     m_msgName = m.group(1);
                     String rest = s.substring(m.end());
-                    String msgText ;
+                    String msgText;
                     if ((m = regLogMessageMsg.matcher(rest)).find()) {
                         msgText = m.group(1);
                     } else {
@@ -187,7 +188,7 @@ setFilePos(getFilePos() + l);
                 break;
 
             case STATE_AUTHRESULT: {
-                if (( regAuthAttributesContinue.matcher(str)).find()) {
+                if ((regAuthAttributesContinue.matcher(str)).find()) {
                     m_MessageContents.add(str);
                 } else {
                     addAuthResponse();
@@ -200,7 +201,7 @@ setFilePos(getFilePos() + l);
             }
 
             case STATE_EXCEPTION: {
-                if (( regExceptionContinue.matcher(str)).find()) {
+                if ((regExceptionContinue.matcher(str)).find()) {
                     m_MessageContents.add(str);
                 } else {
                     if (msg instanceof WWECloudExeptionMsg) {
@@ -510,7 +511,7 @@ setFilePos(getFilePos() + l);
 
         @Override
         public void InitDB() {
-            StringBuilder buf = new StringBuilder();;
+            StringBuilder buf = new StringBuilder();
             addIndex("time");
             addIndex("FileId");
             addIndex("successID");
@@ -575,10 +576,12 @@ setFilePos(getFilePos() + l);
 
     }
 //</editor-fold>
+
     private class WWECloudLogMsg extends Message {
 
         private final String msg;
         private final String msgText;
+
         private WWECloudLogMsg(String m_msgName, String msgText) {
             super(TableType.WWECloudLog);
             this.msg = m_msgName;
@@ -592,7 +595,6 @@ setFilePos(getFilePos() + l);
         public String getMsgText() {
             return msgText;
         }
-
 
         private String optimizeText(String msgText) {
             String ret = msgText;
@@ -615,9 +617,11 @@ setFilePos(getFilePos() + l);
             this.exceptionName = exName;
             this.msg = msg;
         }
+
         public String getExceptionName() {
             return exceptionName;
         }
+
         public String getMsg() {
             return msg;
         }

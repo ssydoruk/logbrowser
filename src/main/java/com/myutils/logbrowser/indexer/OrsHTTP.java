@@ -72,7 +72,6 @@ public class OrsHTTP extends Message {
         return ip;
     }
 
-
     String getSID() {
         if (sid == null) {
             sid = FindByRx(regSIDCookie, 1, null);
@@ -132,7 +131,6 @@ public class OrsHTTP extends Message {
         return true;
 
     }
-
 
     /**
      * returns httpMessageBody of HTTP message
@@ -219,7 +217,6 @@ public class OrsHTTP extends Message {
 
     }
 
-
     JSONObject getJsonBody(String body) {
         if (_jsonBody == null) {
             if (body != null && !body.isEmpty()) {
@@ -245,7 +242,7 @@ public class OrsHTTP extends Message {
                         if (obj != null) {
                             gmsService = obj.getString("_id");
                         }
-                    } catch (Exception e) {
+                    } catch (JSONException e) {
                         Main.logger.trace("error reading JSON", e);
                     }
 
@@ -258,7 +255,6 @@ public class OrsHTTP extends Message {
     String getHTTPRequest() {
         return getURL();
     }
-
 
     private String getURL() {
         if (url == null) {

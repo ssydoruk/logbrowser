@@ -15,6 +15,7 @@ public class LCAServerResults extends IQueryResults {
     private int m_componentFilter;
     private ArrayList<NameID> appType = null;
     private IDsFinder cidFinder = null;
+
     /**
      *
      */
@@ -26,6 +27,7 @@ public class LCAServerResults extends IQueryResults {
         addSelectionType(SelectionType.NO_SELECTION);
 //        addSelectionType(SelectionType.GUESS_SELECTION);
     }
+
     public LCAServerResults() throws SQLException {
         super();
         loadStdOptions();
@@ -60,7 +62,6 @@ public class LCAServerResults extends IQueryResults {
     public String getName() {
         return "LCAServer";
     }
-
 
     public void AddComponent(int filter) {
         m_componentFilter = m_componentFilter | filter;

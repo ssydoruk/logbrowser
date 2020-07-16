@@ -46,7 +46,7 @@ public final class FileInfo extends Record {
     accessor.ExecuteQuery(query);
     return "INSERT INTO file_" + m_alias + " VALUES(NULL,?,?,?,?,?,?);";
     }
-    */
+     */
     private static final byte[] WS_BYTES = new byte[]{(byte) 0xef, (byte) 0xbb, (byte) 0xbf};
     private static final Pattern patternLocalTime = Pattern.compile("^Local\\s+time:\\s+(\\S+)\\s*$", Pattern.CASE_INSENSITIVE);
     private static final Pattern startTimePattern = Pattern.compile("^Start\\s+time\\s+\\(UTC\\):\\s+(\\S+)\\s*$");
@@ -82,7 +82,6 @@ public final class FileInfo extends Record {
     private String m_host;
     private int appID = 0;
 
-
     FileInfoType m_fileFilterId;
     boolean m_ServerStartTimeSet;
     private String appType = "";
@@ -97,6 +96,7 @@ public final class FileInfo extends Record {
     private boolean ignoring = false;
     private byte buf[] = null;
     private int bufRead = 0;
+
     FileInfo(File file, LogFileWrapper wrapper) throws IOException {
         this(file);
         filePath = FilenameUtils.normalize(file.getAbsolutePath());
@@ -104,6 +104,7 @@ public final class FileInfo extends Record {
         this.logFile = wrapper;
 
     }
+
     FileInfo(ZipFile logArchive, ZipEntry entry, ZIPLog aThis) throws IOException {
         this();
         m_path = entry.getName();
@@ -126,6 +127,7 @@ public final class FileInfo extends Record {
         setFileFilter(m_component);
         Main.logger.trace(this.toString());
     }
+
     public FileInfo() {
         super();
         m_nodeId = "";
@@ -136,9 +138,11 @@ public final class FileInfo extends Record {
         m_runIds = new HashMap();
         dateParsers = new DateParsers();
     }
+
     public String getArchiveName() {
         return archiveName;
     }
+
     public boolean fileEqual(FileInfo otherFile) throws IOException {
 
         if (getM_componentType() != otherFile.getM_componentType()) {
@@ -185,15 +189,18 @@ public final class FileInfo extends Record {
 
         return false;
     }
+
     int readBytes(byte[] cbuf, int len) throws FileNotFoundException, IOException {
         BufferedReaderCrLf input = new BufferedReaderCrLf(logFile.getInputStream(this));
         int read = input.read(cbuf, 0, len);
         input.close();
         return read;
     }
+
     protected DateParsed getFileEndTime() {
         return fileEndTime;
     }
+
     protected void setFileEndTime(DateParsed fileEndTime) {
         this.fileEndTime = fileEndTime;
     }
@@ -277,7 +284,6 @@ public final class FileInfo extends Record {
         return appType;
     }
 
-
     private boolean CheckCM(String filename) {
         return filename.contains("-001.")
                 || filename.contains("-002.")
@@ -297,7 +303,6 @@ public final class FileInfo extends Record {
                 || filename.contains("-016.")
                 || filename.contains("-512.");
     }
-
 
     FileType getFileType() {
 
@@ -331,7 +336,6 @@ public final class FileInfo extends Record {
         logFile.doneParsing();
     }
 
-
     boolean getIgnoring() {
         return ignoring;
 
@@ -340,7 +344,6 @@ public final class FileInfo extends Record {
     void setIgnoring() {
         ignoring = true;
     }
-
 
     public FileInfoType CheckLog(BufferedReaderCrLf input) {
         m_handlerInProgress = false;
@@ -460,7 +463,7 @@ public final class FileInfo extends Record {
                             } catch (Exception ex) {
                                 logger.log(org.apache.logging.log4j.Level.FATAL, ex);
                             }
-                        } else if ((m = startTimePatternGMS.matcher(str)).find()) {
+                        } else if ((startTimePatternGMS.matcher(str)).find()) {
                             numParamsToRead++;
                             try {
                                 fileStartTime = dateParsers.parseFormatDate(str);
@@ -515,7 +518,7 @@ public final class FileInfo extends Record {
 //                    if (m_fileFilterId == FileInfoType.type_SessionController || m_fileFilterId == FileInfoType.type_Unknown) {
                             m_componentType = FileInfoType.type_SessionController;
 //                    }
-                        } else if ((m = regGWS.matcher(str)).find()) {
+                        } else if ((regGWS.matcher(str)).find()) {
                             m_componentType = FileInfoType.type_WWE;
                         } else if ((m = regGWSPIDHost.matcher(str)).find()) {
                             m_host = m.group(2);
@@ -529,7 +532,7 @@ public final class FileInfo extends Record {
                             if (str.startsWith("+++++++++++++++++++++++++++++++++++++++++")) {
                                 parserState = ParserState.WWE_DATE;
                             }
-                        } else if ((m = ApacheWebLogsParser.getENTRY_BEGIN_PATTERN().matcher(str)).find()) {
+                        } else if ((ApacheWebLogsParser.getENTRY_BEGIN_PATTERN().matcher(str)).find()) {
                             parserState = ParserState.APACHE_LOG_SUSPECT;
                         } else if (m_componentType == FileInfoType.type_Unknown) {
                             if (suspectedWWECloudLines > 5) {
@@ -575,7 +578,7 @@ public final class FileInfo extends Record {
 
 //                            m_app=
                             doBreak = true;
-                        } else if (!( ApacheWebLogsParser.getENTRY_BEGIN_PATTERN().matcher(str)).find()) {
+                        } else if (!(ApacheWebLogsParser.getENTRY_BEGIN_PATTERN().matcher(str)).find()) {
                             parserState = ParserState.STATE_HEADER;
                             doBreak = true;
                         }
@@ -784,7 +787,6 @@ public final class FileInfo extends Record {
 
     }
 
-
     private FileInfoType checkWorkSpace(BufferedReaderCrLf input) {
         logFileName = m_name;
         logFileNo = "";
@@ -811,16 +813,18 @@ public final class FileInfo extends Record {
 //        }
         return m_componentType;
     }
+
     static protected enum FileType {
         SIP_1536,
         UNKNOWN
     }
+
     private enum ParserState {
-        
+
         STATE_HEADER,
         WWE_DATE,
         APACHE_LOG_SUSPECT
-        
+
     }
 
 }

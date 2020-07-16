@@ -17,7 +17,7 @@ import javax.swing.JScrollPane;
  *
  * @author ssydoruk
  */
-class AllCallsFrame extends JFrame {
+final class AllCallsFrame extends JFrame {
 
     public AllCallsFrame(QueryAllJTable tab) throws HeadlessException {
 

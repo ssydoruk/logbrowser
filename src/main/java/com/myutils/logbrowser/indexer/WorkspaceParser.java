@@ -28,9 +28,7 @@ public class WorkspaceParser extends Parser {
     private static final Pattern regTMessageInFinal = Pattern.compile("^\\. Processing with  state");
     private static final Pattern regTMessageRequestFinal = Pattern.compile("^(ReferenceId|AttributeReferenceID|attr_ref_id|$)");
 
-
     private static final Pattern regCfgUpdate = Pattern.compile("^\\s+PopCfg");
-
 
     // keys: multiline function spec, value: pattern that ML is still on
     static HashMap<String, Pattern> regMultiLine = new HashMap<String, Pattern>();
@@ -51,33 +49,33 @@ public class WorkspaceParser extends Parser {
     //[14:33] strategy: **ORS (1085200831) is attached to the call
     private final static HashSet<String> eventsStatServer = new HashSet<String>(
             Arrays.asList(new String[]{
-                "EventInfo",
-                "EventStatisticOpened",
-                "EventCurrentTargetStateSnapshot",
-                "RequestCloseStatistic",
-                "EventStatisticClosed",
-                "RequestGetStatisticEx",
-                "EventCurrentTargetStateTargetUpdated",
-                "RequestOpenStatistic",
-                "RequestGetStatistic",
-                "RequestSuspendNotification",
-                "RequestOpenStatisticEx"}));
+        "EventInfo",
+        "EventStatisticOpened",
+        "EventCurrentTargetStateSnapshot",
+        "RequestCloseStatistic",
+        "EventStatisticClosed",
+        "RequestGetStatisticEx",
+        "EventCurrentTargetStateTargetUpdated",
+        "RequestOpenStatistic",
+        "RequestGetStatistic",
+        "RequestSuspendNotification",
+        "RequestOpenStatisticEx"}));
     private final static HashSet<String> eventsEServices = new HashSet<String>(
             Arrays.asList(new String[]{
-                "EventCurrentAgentStatus",
-                "Event3rdServerResponse",
-                "EventCurrentAgentStatus",
-                "RequestRemoveMedia",
-                "RequestNotReadyForMedia",
-                "RequestCancelNotReadyForMedia",
-                "Request3rdServer"}));
+        "EventCurrentAgentStatus",
+        "Event3rdServerResponse",
+        "EventCurrentAgentStatus",
+        "RequestRemoveMedia",
+        "RequestNotReadyForMedia",
+        "RequestCancelNotReadyForMedia",
+        "Request3rdServer"}));
     private final static HashSet<String> eventsConfig = new HashSet<String>(
             Arrays.asList(new String[]{
-                "EventObjectsRead",
-                "EventObjectsSent",
-                "RequestUnregisterNotification",
-                "EventNotificationUnregistered",
-                "RequestReadObjects"}));
+        "EventObjectsRead",
+        "EventObjectsSent",
+        "RequestUnregisterNotification",
+        "EventNotificationUnregistered",
+        "RequestReadObjects"}));
     private static final Pattern regCfgObjectName = Pattern.compile("(?:name|userName|number|loginCode)='([^']+)'");
     private static final Pattern regCfgObjectType = Pattern.compile("^Cfg([^=]+)=.*\\{DBID=(\\d+)");
     //    private static final Pattern regCfgAGType = Pattern.compile("^Cfg([^=]+)=\\{DBID=(\\d+)");
@@ -114,12 +112,11 @@ public class WorkspaceParser extends Parser {
         }
     }
 
-
     //17:42:51.895_I_I_00d202972e8c2ebc [01:08] call (252087-104e77cd0) deleting truly
 //                addStep("01:08", null, "call deleting truly");
     private void AddStrategyMessageLine(String line, String FileLine) {
         Matcher m;
-        Message msg ;
+        Message msg;
         if ((FileLine.equals("14:33") || FileLine.equals("1B:01")) && (m = regStrategy.matcher(line)).find()) {
             msg = new URSStrategyInit(line, ConnID, m.group(1), "strategy is attached to the call");
         } else if (FileLine.equals("01:08")) {
@@ -399,7 +396,7 @@ public class WorkspaceParser extends Parser {
                             event = m.group(2);
                         }
                         isInbound = false;
-                    } else if (( regSendingTo.matcher(theDP.rest)).find()) {
+                    } else if ((regSendingTo.matcher(theDP.rest)).find()) {
                         if ((m = regReqTo.matcher((CharSequence) contents.get(0))).find()) {
                             fileHandle = m.group(1);
                             event = m.group(2);
@@ -446,7 +443,6 @@ public class WorkspaceParser extends Parser {
             Main.logger.error("Exception creating record line:" + m_CurrentLine + " header[" + header + "]", e);
         }
     }
-
 
     private void AddConfigMessage(ArrayList<String> m_MessageContents) {
         ConfigUpdateRecord msg = new ConfigUpdateRecord(m_MessageContents);

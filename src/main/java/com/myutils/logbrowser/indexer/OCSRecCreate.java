@@ -28,7 +28,6 @@ public class OCSRecCreate extends Message {
     private String tabName;
     private boolean isCreate = true;
 
-
     public OCSRecCreate(ArrayList newMessageLines) {
         this();
         m_MessageLines = newMessageLines;
@@ -45,6 +44,7 @@ public class OCSRecCreate extends Message {
     OCSRecCreate() {
         super(TableType.OCSRecCreate);
     }
+
     public void setIsCreate(boolean isCreate) {
         this.isCreate = isCreate;
     }
@@ -73,7 +73,6 @@ public class OCSRecCreate extends Message {
         return -1;
     }
 
-
     String getCallingList() {
         findListTab();
         return this.listName;
@@ -98,7 +97,6 @@ public class OCSRecCreate extends Message {
 //            System.exit(0);
         }
     }
-
 
     String getDN() {
         return FindByRx(regPhone, 1, null);

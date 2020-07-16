@@ -549,11 +549,11 @@ public class BufferedReaderCrLf {
     }
 
     /**
-     * Tells whether this stream is ready to be read.A buffered character
- stream is ready if the buffer is not empty, or if the underlying
- character stream is ready.
+     * Tells whether this stream is ready to be read.A buffered character stream
+     * is ready if the buffer is not empty, or if the underlying character
+     * stream is ready.
      *
-     * @return 
+     * @return
      * @exception IOException If an I/O error occurs
      */
     public boolean ready() throws IOException {
@@ -585,7 +585,8 @@ public class BufferedReaderCrLf {
 
     /**
      * Tells whether this stream supports the mark() operation, which it does.
-     * @return 
+     *
+     * @return
      */
     public boolean markSupported() {
         return true;

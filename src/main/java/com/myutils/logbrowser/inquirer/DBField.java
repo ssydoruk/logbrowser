@@ -11,10 +11,11 @@ package com.myutils.logbrowser.inquirer;
  */
 public class DBField {
 
-    private String screenLabel;
-    private String dbField;
-    private String dbOutField;
-    private String refTable;
+    private final String screenLabel;
+    private final String dbField;
+    private final String dbOutField;
+    private final String refTable;
+
     public DBField(String screenLabel, String dbField, String dbOutField, String refTable) {
         this.screenLabel = screenLabel;
         this.dbField = dbField;
@@ -37,6 +38,5 @@ public class DBField {
     public String getRefTable() {
         return refTable;
     }
-
 
 }

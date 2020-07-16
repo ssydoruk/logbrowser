@@ -82,7 +82,6 @@ public class LogFileManager {
         }
     }
 
-
     /**
      * Used to contain uniqueness of LogFile objects for application, because
      * this object is used as index in the hash of opened archives

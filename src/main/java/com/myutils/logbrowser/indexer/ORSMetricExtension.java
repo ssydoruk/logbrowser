@@ -81,11 +81,10 @@ public class ORSMetricExtension extends Message {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
-
     String getMethodFunc() {
         String line = m_MessageLines.get(0);
         Matcher m;
-        String func = "";
+        String func;
         if ((m = regFunc.matcher(line)).find()) {
             func = m.group(1);
         } else {
@@ -93,7 +92,6 @@ public class ORSMetricExtension extends Message {
         }
         return func;
     }
-
 
     String getNameSpace() {
         if (ns == null) {
@@ -122,7 +120,6 @@ public class ORSMetricExtension extends Message {
     String getParam2() {
         return param2;
     }
-
 
     void parseNS(String rest) {
         Main.logger.trace("r: " + rest);

@@ -106,11 +106,9 @@ public class ORSSessionStartMessage extends Message {
         }
     }
 
-
     String getPhone() {
         return getGMSAttributeString(new String[]{"phone_number", "_customer_number"});
     }
-
 
     void addParam(String str) {
         params.add(str);

@@ -167,7 +167,6 @@ public final class URSRlib extends Message {
         return result;
     }
 
-
     String getParam() {
         return FindByRx(prnParam, 1, "");
     }

@@ -95,8 +95,8 @@ public class OrsParser extends Parser {
     private static final Pattern regNotParseMessage = Pattern.compile(
             //07:47:39.182 Trc 09900  [qtp747464370-17] >>> /1/service/callback/RCC_CORK_CallBack - CCID [null]
             "^(04543"
-                    + "|04541"
-                    + ")");
+            + "|04541"
+            + ")");
     //    10:38:29.173  -State[102-56433-0-100] processing is ... 10:38:29.173  skipped.
     private static final Pattern regStateProcessing = Pattern.compile("-State\\[[^\\]]+\\] processing is \\.{3}\\s*");
     private static final Pattern regMetricMessage = Pattern.compile("^<([\\w~]+) sid='([\\w~]+)'");
@@ -262,18 +262,16 @@ public class OrsParser extends Parser {
             }
 //            ParseLine("", null); // to complete the parsing of the last line/last message
         } catch (IOException e) {
-            Main.logger.error(e);;
+            Main.logger.error(e);
             return m_CurrentLine - line;
         }
 
         return m_CurrentLine - line;
     }
 
-
     private String parseGenesys(String str) throws Exception {
         return ParseGenesys(str, TableType.MsgORServer, regNotParseMessage);
     }
-
 
     private String ParseLine(String str, BufferedReaderCrLf in) throws Exception {
         String s = str;
@@ -324,13 +322,13 @@ public class OrsParser extends Parser {
                 } else if ((m = regNewCallID.matcher(s)).find()) {
                     addCallID(m.group(1), m.group(2));
                 } else if ((m = regConfigUpdate.matcher(s)).find()) {
-                    ConfigUpdateRecord msg = new ConfigUpdateRecord(m_MessageContents);
-                    msg.setObjName(m.group(4));
-                    msg.setOp(m.group(2));
-                    msg.setObjectDBID(m.group(3));
-                    msg.setObjectType(m.group(1));
+                    ConfigUpdateRecord theMsg = new ConfigUpdateRecord(m_MessageContents);
+                    theMsg.setObjName(m.group(4));
+                    theMsg.setOp(m.group(2));
+                    theMsg.setObjectDBID(m.group(3));
+                    theMsg.setObjectType(m.group(1));
 
-                    SetStdFieldsAndAdd(msg);
+                    SetStdFieldsAndAdd(theMsg);
 
                 } else if ((m = m_strCTITM.matcher(s)).find()) {
                     AddORSCTIMessage(m.group(1));
@@ -354,7 +352,7 @@ public class OrsParser extends Parser {
                         this.URL = sTMP;
                     }
                     //m_ParserState=STATE_CLUSTER;
-                } else if ((m = regORSURS.matcher(s)).find()) {
+                } else if ((regORSURS.matcher(s)).find()) {
                     m_MessageContents.add(s);
                     m_ParserState = ParserState.STATE_ORSUS;
                     setSavedFilePos(getFilePos());
@@ -490,30 +488,30 @@ public class OrsParser extends Parser {
     }
 
     private void AddMMMessage(String m_msgName, String m_TserverSRC, boolean isInbound) throws Exception {
-        ORSMM msg = new ORSMM(m_msgName, m_TserverSRC, m_MessageContents, isInbound);
+        ORSMM theMsg = new ORSMM(m_msgName, m_TserverSRC, m_MessageContents, isInbound);
 
-        msg.setM_Timestamp(getLastTimeStamp());
-        msg.SetOffset(getSavedFilePos());
-        msg.SetFileBytes(getFilePos() - getSavedFilePos());
-        msg.SetLine(m_LineStarted);
-        msg.setM_isInbound(isInbound);
-        msg.AddToDB(m_tables);
+        theMsg.setM_Timestamp(getLastTimeStamp());
+        theMsg.SetOffset(getSavedFilePos());
+        theMsg.SetFileBytes(getFilePos() - getSavedFilePos());
+        theMsg.SetLine(m_LineStarted);
+        theMsg.setM_isInbound(isInbound);
+        theMsg.AddToDB(m_tables);
 
 //        prevSeqno.put(msg.getM_TserverSRC(), msg.getAttributeTrim("AttributeEventSequenceNumber"));
         m_MessageContents.clear(); // clear messages
     }
 
     private void AddORSMessage(String msgName, String TServerSRC) throws Exception {
-        ORSMessage msg = new ORSMessage(msgName, TServerSRC, m_MessageContents, false);
+        ORSMessage themsg = new ORSMessage(msgName, TServerSRC, m_MessageContents, false);
 
-        msg.setM_Timestamp(getLastTimeStamp());
-        msg.SetOffset(getSavedFilePos());
-        msg.SetFileBytes(getFilePos() - getSavedFilePos());
-        msg.SetLine(m_LineStarted);
-        msg.setM_isInbound(isInbound);
-        msg.AddToDB(m_tables);
+        themsg.setM_Timestamp(getLastTimeStamp());
+        themsg.SetOffset(getSavedFilePos());
+        themsg.SetFileBytes(getFilePos() - getSavedFilePos());
+        themsg.SetLine(m_LineStarted);
+        themsg.setM_isInbound(isInbound);
+        themsg.AddToDB(m_tables);
 
-        prevSeqno.put(msg.getM_TserverSRC(), msg.getAttributeTrim("AttributeEventSequenceNumber"));
+        prevSeqno.put(themsg.getM_TserverSRC(), themsg.getAttributeTrim("AttributeEventSequenceNumber"));
         m_MessageContents.clear(); // clear messages
     }
 
@@ -537,20 +535,20 @@ public class OrsParser extends Parser {
             if (bytesRead != msgBytes) {
                 throw new Exception("error reading");
             }
-            ORSClusterMessage msg = new ORSClusterMessage(new String(m_CharBuf, 0, bytesRead));
-            msg.setM_Timestamp(getLastTimeStamp());
-            msg.SetOffset(getFilePos());
-            msg.SetFileBytes(getEndFilePos() - getFilePos());
+            ORSClusterMessage themsg = new ORSClusterMessage(new String(m_CharBuf, 0, bytesRead));
+            themsg.setM_Timestamp(getLastTimeStamp());
+            themsg.SetOffset(getFilePos());
+            themsg.SetFileBytes(getEndFilePos() - getFilePos());
 
-            msg.SetLine(m_LineStarted);
-            msg.setDirection("from".equals(m.group(4)));
-            msg.setSrcNodeID(Integer.parseInt(m.group(2)));
-            msg.setSrcNodeType(m.group(1));
-            msg.setDstNodeID(Integer.parseInt(m.group(5)));
+            themsg.SetLine(m_LineStarted);
+            themsg.setDirection("from".equals(m.group(4)));
+            themsg.setSrcNodeID(Integer.parseInt(m.group(2)));
+            themsg.setSrcNodeType(m.group(1));
+            themsg.setDstNodeID(Integer.parseInt(m.group(5)));
             m_CurrentFilePos += bytesRead;
 //            msg.setM_Bytes(startLen+bytesRead+1); // add 1 for new line added by ORS
             //msg.setDstNodeType(m.group(2));
-            msg.AddToDB(m_accessor);
+            themsg.AddToDB(m_accessor);
 
         } catch (Exception e) {
             throw e;
@@ -641,17 +639,17 @@ public class OrsParser extends Parser {
         switch (UUID.length()) {
             case 32: {
                 //uuid
-                OrsSidUuid msg = new OrsSidUuid(UUID, GID);
-                msg.setURI(URL);
-                msg.setApp(app);
-                SetStdFieldsAndAdd(msg);
+                OrsSidUuid themsg = new OrsSidUuid(UUID, GID);
+                themsg.setURI(URL);
+                themsg.setApp(app);
+                SetStdFieldsAndAdd(themsg);
                 break;
             }
             case 16: {
-                OrsSidIxnID msg = new OrsSidIxnID(UUID, GID);
-                msg.setURI(URL);
-                msg.setApp(app);
-                SetStdFieldsAndAdd(msg);
+                OrsSidIxnID themsg = new OrsSidIxnID(UUID, GID);
+                themsg.setURI(URL);
+                themsg.setApp(app);
+                SetStdFieldsAndAdd(themsg);
                 break;
             }
             default:
@@ -665,17 +663,17 @@ public class OrsParser extends Parser {
         Matcher m;
         Main.logger.trace("AddORSCTIMessage [" + str + "]");
         if ((m = regCTITMReq.matcher(str)).find()) {
-            ORSMessage msg = new ORSMessage(m.group(2), null, null, true);
-            msg.setM_refID(m.group(1));
-            msg.setCallID(m.group(3));
-            msg.setM_ThisDN(m.group(4));
-            msg.setM_isInbound(false);
+            ORSMessage themsg = new ORSMessage(m.group(2), null, null, true);
+            themsg.setM_refID(m.group(1));
+            themsg.setCallID(m.group(3));
+            themsg.setM_ThisDN(m.group(4));
+            themsg.setM_isInbound(false);
 
-            msg.setM_Timestamp(getLastTimeStamp());
-            msg.SetOffset(getFilePos());
-            msg.SetFileBytes(getEndFilePos() - getFilePos());
-            msg.SetLine(m_LineStarted);
-            msg.AddToDB(m_tables);
+            themsg.setM_Timestamp(getLastTimeStamp());
+            themsg.SetOffset(getFilePos());
+            themsg.SetFileBytes(getEndFilePos() - getFilePos());
+            themsg.SetLine(m_LineStarted);
+            themsg.AddToDB(m_tables);
 
             //m_ParserState=STATE_CLUSTER;
         }
@@ -759,28 +757,28 @@ public class OrsParser extends Parser {
     }
 
     private void AddMetricMessage() throws Exception {
-        ORSMetric msg = new ORSMetric(m_MessageContents);
+        ORSMetric themsg = new ORSMetric(m_MessageContents);
 
-        msg.setM_Timestamp(getLastTimeStamp());
-        msg.SetOffset(getFilePos());
-        msg.SetFileBytes(getEndFilePos() - getFilePos());
-        msg.SetLine(m_LineStarted);
+        themsg.setM_Timestamp(getLastTimeStamp());
+        themsg.SetOffset(getFilePos());
+        themsg.SetFileBytes(getEndFilePos() - getFilePos());
+        themsg.SetLine(m_LineStarted);
 
-        msg.AddToDB(m_tables);
+        themsg.AddToDB(m_tables);
         m_MessageContents.clear(); // clear messages
     }
 
     private void AddORSURSMessage() throws Exception {
-        OrsUrsMessage msg;
+        OrsUrsMessage themsg;
         if (m_MessageContents.size() > 0) {
             Matcher m;
             if ((m = regORSURS.matcher((String) m_MessageContents.get(0))).find()) {
-                msg = new OrsUrsMessage(m.group(1), m_MessageContents);
+                themsg = new OrsUrsMessage(m.group(1), m_MessageContents);
             } else {
-                msg = new OrsUrsMessage("", m_MessageContents);
+                themsg = new OrsUrsMessage("", m_MessageContents);
             }
 
-            SetStdFieldsAndAdd(msg);
+            SetStdFieldsAndAdd(themsg);
         }
 
     }
@@ -853,7 +851,7 @@ public class OrsParser extends Parser {
 
                     ptpsThreadProcessor.addThreadState(thread, tps);
                 }
-            } else if ((m = regHTTPignore.matcher(dp.rest)).find()) {
+            } else if ((regHTTPignore.matcher(dp.rest)).find()) {
                 Main.logger.debug("Ignored HTTP: [" + dp.orig + "]");
                 return null;
             } else {
@@ -869,7 +867,7 @@ public class OrsParser extends Parser {
 
     private int ParseHTTP(StringBuilder buf) {
         int linesRead = 0;
-        int i = 0, start = 0, newLine = 0;
+        int i = 0, start = 0, newLine;
 
         m_MessageContents.clear();
         while (i < buf.length()) {
@@ -931,21 +929,21 @@ public class OrsParser extends Parser {
     }
 
     private void addCallID(String UUID, String callID) {
-        ORSCallID msg = new ORSCallID(UUID, callID);
-        msg.AddToDB(m_tables);
+        (new ORSCallID(UUID, callID)).AddToDB(m_tables);
 
     }
+
     private static class TransitionFetch implements ParserThreadsProcessor.StateTransition {
-        
+
         private static final Pattern regFetchMethod = Pattern.compile("Fetch Method '([^']*)'$");
         private static final Pattern regFetchURI = Pattern.compile("Fetch URI '([^']*)'$");
-        
+
         @Override
         public ParserThreadsProcessor.StateTransitionResult stateTransition(ParserThreadState threadState,
                 String sOrig, String sParsedAndTruncated, String threadID, Parser parser) {
             Matcher m;
             Message msg1 = threadState.getMsg();
-            
+
             switch (threadState.getParserState()) {
                 case STATE_EXTENSION_FETCH1: {
                     if ((m = regFetchURI.matcher(sParsedAndTruncated)).find()) {
@@ -957,26 +955,27 @@ public class OrsParser extends Parser {
                             ((ORSMetricExtension) msg1).setFetchURI("<EMPTY>");
                         } else {
                             ((ORSMetricExtension) msg1).setFetchURI(m.group(1));
+                            if (uri.toLowerCase().startsWith("http")) {
+                                commitFetchExtention(msg1, parser);
+                                return ParserThreadsProcessor.StateTransitionResult.FINAL_REACHED;
+                            } else {
+                                threadState.setParserState(ParserThreadsProcessor.ParserState.STATE_EXTENSION_FETCH2);
+                                return ParserThreadsProcessor.StateTransitionResult.STATE_CHANGED;
+                            }
                         }
-                        if (uri.toLowerCase().startsWith("http")) {
-                            commitFetchExtention(msg1, parser);
-                            return ParserThreadsProcessor.StateTransitionResult.FINAL_REACHED;
-                        } else {
-                            threadState.setParserState(ParserThreadsProcessor.ParserState.STATE_EXTENSION_FETCH2);
-                            return ParserThreadsProcessor.StateTransitionResult.STATE_CHANGED;
-                        }
+
                     } else {
                         Main.logger.debug("l:" + parser.getM_CurrentLine() + " 1 - Unexpected thread message: " + sParsedAndTruncated);
                         commitFetchExtention(msg1, parser);
                         return ParserThreadsProcessor.StateTransitionResult.ERROR_STATE;
                     }
                 }
-                
+
                 case STATE_EXTENSION_FETCH2:
                     //07:23:25.200 [T:47294533855552] {ORSInternal:3} ~OrsEvent[0x80566090]:name=start
                     // this seem to signify end of paremeters for HTTP request
                     if (!sParsedAndTruncated.endsWith("name=start")) {
-                        
+
                         if ((m = regFetchMethod.matcher(sParsedAndTruncated)).find()) {
                             ((ORSMetricExtension) msg1).setFetchMethod(m.group(1));
                         } else {
@@ -985,14 +984,14 @@ public class OrsParser extends Parser {
                     }
                     commitFetchExtention(msg1, parser);
                     return ParserThreadsProcessor.StateTransitionResult.FINAL_REACHED;
-                    
+
                 default:
                     Main.logger.error("l:" + parser.getM_CurrentLine() + " unexpected state " + threadState.getParserState() + " s[" + sOrig + "]");
-                    
+
             }
             return ParserThreadsProcessor.StateTransitionResult.ERROR_STATE;
         }
-        
+
         private void commitFetchExtention(Message msg, Parser parser) {
             if (msg instanceof ORSMetricExtension) {
                 msg.SetStdFieldsAndAdd(parser);
@@ -1001,30 +1000,31 @@ public class OrsParser extends Parser {
             }
         }
     }
+
     private static class TransitionSessionStartExt implements ParserThreadsProcessor.StateTransition {
-        
+
         private static final Pattern regSessionStartParam = Pattern.compile("Session start param");
         private static final Pattern regSessionStartMessage = Pattern.compile("HandleDataFromThread: Starting new session. SessionID=([\\w~]+)$");
         private static final Pattern regFMSession = Pattern.compile("\\{FMSession:");
-        
+
         @Override
         public ParserThreadsProcessor.StateTransitionResult stateTransition(ParserThreadState threadState,
                 String sOrig, String sParsedAndTruncated, String threadID, Parser parser) {
             Matcher m;
             ORSSessionStartMessage msg = (ORSSessionStartMessage) threadState.getMsg();
-            
+
             switch (threadState.getParserState()) {
                 case STATE_SESSION_START: {
                     if ((m = regSessionStartParam.matcher(sParsedAndTruncated)).find()) {
 //                        threadState.addString(sParsedAndTruncated.substring(m.end()));
-msg.addParam(sParsedAndTruncated.substring(m.end()));
-return ParserThreadsProcessor.StateTransitionResult.STATE_CHANGED;
+                        msg.addParam(sParsedAndTruncated.substring(m.end()));
+                        return ParserThreadsProcessor.StateTransitionResult.STATE_CHANGED;
                     } else {
                         threadState.setParserState(ParserThreadsProcessor.ParserState.STATE_WAITING_PARENT_SID);
                         return ParserThreadsProcessor.StateTransitionResult.NON_STATE_LINE_WAITED_NOT_CONSUMED;
                     }
                 }
-                
+
                 case STATE_WAITING_PARENT_SID: {
                     if ((m = regFMSession.matcher(sOrig)).find()) {
                         String rest = sOrig.substring(m.end());
@@ -1041,59 +1041,61 @@ return ParserThreadsProcessor.StateTransitionResult.STATE_CHANGED;
                 }
                 default:
                     Main.logger.error("l:" + parser.getM_CurrentLine() + " unexpected state " + threadState.getParserState() + " s[" + sOrig + "]");
-                    
+
             }
             Main.logger.trace("SessionStartExtTransition "
                     + "sOrig[" + sOrig + "] "
-                            + "threadID[" + threadID + "]"
-                                    + "parser[" + parser + "]"
+                    + "threadID[" + threadID + "]"
+                    + "parser[" + parser + "]"
             );
             return ParserThreadsProcessor.StateTransitionResult.ERROR_STATE;
         }
-        
+
     }
+
     private static class TransitionHTTPIn implements ParserThreadsProcessor.StateTransition {
-        
+
 //        private static final Pattern regSessionStartParam = Pattern.compile("Session start param");
 //        private static final Pattern regSessionStartMessage = Pattern.compile("HandleDataFromThread: Starting new session. SessionID=(\\w+)$");
 //        private static final Pattern regFMSession = Pattern.compile("\\{FMSession:");
         private static final Pattern regHTTPINSessionCreate = Pattern.compile("\\s*OnRequestStart: Creating session. SessionID=([\\w~]+)$");
-        
+
         @Override
         public ParserThreadsProcessor.StateTransitionResult stateTransition(ParserThreadState threadState,
                 String sOrig, String sParsedAndTruncated, String threadID, Parser parser) {
             Matcher m;
             OrsHTTP msg = (OrsHTTP) threadState.getMsg();
-            
+
             switch (threadState.getParserState()) {
                 case STATE_HTTPIN:
-                    
+
                     if ((m = regSTATE_HTTPIN1.matcher(sOrig)).find()) {
                         msg.setHTTPResponseID(m.group(1));
                         return ParserThreadsProcessor.StateTransitionResult.NON_STATE_LINE_WAITED;
-                    } else if ((m = regSTATE_HTTPIN.matcher(sOrig)).find()) {
+                    } else if ((regSTATE_HTTPIN.matcher(sOrig)).find()) {
                         return ParserThreadsProcessor.StateTransitionResult.NON_STATE_LINE_WAITED;
                     } else if ((m = regHTTPINSessionCreate.matcher(sParsedAndTruncated)).find()) {
                         msg.setSID(m.group(1));
                     }
                     msg.SetStdFieldsAndAdd(parser);
                     return ParserThreadsProcessor.StateTransitionResult.FINAL_REACHED_CONTINUE;
-                    
+
                 default:
                     Main.logger.error("l:" + parser.getM_CurrentLine() + " unexpected state " + threadState.getParserState() + " s[" + sOrig + "]");
-                    
+
             }
             Main.logger.trace("SessionStartExtTransition "
                     + "sOrig[" + sOrig + "] "
-                            + "threadID[" + threadID + "]"
-                                    + "parser[" + parser + "]"
+                    + "threadID[" + threadID + "]"
+                    + "parser[" + parser + "]"
             );
             return ParserThreadsProcessor.StateTransitionResult.ERROR_STATE;
         }
-        
+
     }
+
     private static class TransitionHTTPOut implements ParserThreadsProcessor.StateTransition {
-        
+
 //        private static final Pattern regSessionStartParam = Pattern.compile("Session start param");
 //        private static final Pattern regSessionStartMessage = Pattern.compile("HandleDataFromThread: Starting new session. SessionID=(\\w+)$");
 //        private static final Pattern regFMSession = Pattern.compile("\\{FMSession:");
@@ -1102,10 +1104,10 @@ return ParserThreadsProcessor.StateTransitionResult.STATE_CHANGED;
                 String sOrig, String sParsedAndTruncated, String threadID, Parser parser) {
             Matcher m;
             OrsHTTP msg = (OrsHTTP) threadState.getMsg();
-            
+
             switch (threadState.getParserState()) {
                 case STATE_HTTPOUT:
-                    
+
                     if (sOrig == null || sOrig.isEmpty()) {
                         return ParserThreadsProcessor.StateTransitionResult.NON_STATE_LINE_WAITED;
                     } else if ((m = regSTATE_HTTPOUT.matcher(sOrig)).find()) {
@@ -1116,25 +1118,25 @@ return ParserThreadsProcessor.StateTransitionResult.STATE_CHANGED;
                         msg.SetStdFieldsAndAdd(parser);
                         return ParserThreadsProcessor.StateTransitionResult.FINAL_REACHED_CONTINUE;
                     }
-                    //error by default
-                    
+                //error by default
+
                 default:
                     Main.logger.error("l:" + parser.getM_CurrentLine() + " unexpected state " + threadState.getParserState() + " s[" + sOrig + "]");
-                    
+
             }
             Main.logger.trace("SessionStartExtTransition "
                     + "sOrig[" + sOrig + "] "
-                            + "threadID[" + threadID + "]"
-                                    + "parser[" + parser + "]"
+                    + "threadID[" + threadID + "]"
+                    + "parser[" + parser + "]"
             );
             return ParserThreadsProcessor.StateTransitionResult.ERROR_STATE;
         }
-        
+
     }
 
     private class ORSCallID extends Message {
 
-        private String UUID;
+        private final String UUID;
         private final Integer callID;
 
         private ORSCallID(String UUID, String callID) {
@@ -1212,7 +1214,8 @@ return ParserThreadsProcessor.StateTransitionResult.STATE_CHANGED;
     }
 
     private class ORSAlarm extends Message {
-        private ArrayList<AlarmInstance> allAlarms;
+
+        private final ArrayList<AlarmInstance> allAlarms;
 
         private ORSAlarm() {
             super(TableType.ORSAlarm);
@@ -1222,7 +1225,6 @@ return ParserThreadsProcessor.StateTransitionResult.STATE_CHANGED;
         private void addAlarm(String name, String limit, String rest) {
             allAlarms.add(new AlarmInstance(name, limit, rest));
         }
-
 
         public ArrayList<AlarmInstance> getAllAlarms() {
             return allAlarms;
@@ -1266,7 +1268,7 @@ return ParserThreadsProcessor.StateTransitionResult.STATE_CHANGED;
 
         @Override
         public void InitDB() {
-            StringBuilder buf = new StringBuilder();;
+            StringBuilder buf = new StringBuilder();
             addIndex("time");
             addIndex("FileId");
             for (int i = 1; i <= MAX_ALARMS; i++) {
@@ -1276,7 +1278,6 @@ return ParserThreadsProcessor.StateTransitionResult.STATE_CHANGED;
 
             dropIndexes();
 
-            buf = new StringBuilder();
             for (int i = 1; i <= MAX_ALARMS; i++) {
                 buf.append(",alarm").append(i).append("id int");
                 buf.append(",values").append(i).append("id int");

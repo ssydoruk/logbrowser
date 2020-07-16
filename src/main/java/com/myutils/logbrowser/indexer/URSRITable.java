@@ -36,13 +36,10 @@ public class URSRITable extends DBTable {
         addIndex("ref");
         addIndex("UUIDID");
         addIndex("URLID");
-        
+
         URSRI.addIndexes(this);
 
-
         dropIndexes();
-
-  
 
         String query = "create table if not exists  " + getTabName() + "  (id INTEGER PRIMARY KEY ASC"
                 + ",time timestamp"
@@ -64,7 +61,6 @@ public class URSRITable extends DBTable {
                 + URSRI.getTableFields()
                 + ");";
         getM_dbAccessor().runQuery(query);
-        
 
         m_InsertStatementId = getM_dbAccessor().PrepareStatement("INSERT INTO  " + getTabName() + "  VALUES(NULL,?,?,?,?,?"
                 /*standard first*/

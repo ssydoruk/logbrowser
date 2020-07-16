@@ -20,18 +20,21 @@ public class TLibEvent extends ILogRecord {
 
     private long seqNo;
 
-
     int handlerId;
+
     public TLibEvent(ResultSet rs) throws SQLException {
         this(rs, MsgType.TLIB);
     }
+
     public TLibEvent(ResultSet rs, MsgType msgType) throws SQLException {
         super(rs, msgType);
         initRecord(rs, msgType);
     }
+
     public String getApp() {
         return app;
     }
+
     public long getSeqNo() {
         return seqNo;
     }
@@ -143,7 +146,6 @@ public class TLibEvent extends ILogRecord {
     public String getOtherDn() {
         return otherDn;
     }
-
 
     public long GetReferenceId() {
         return m_referenceId;

@@ -159,7 +159,7 @@ public class SIPEPParser extends Parser {
     }
 
     void ContinueParsing(String initial) {
-        String str ;
+        String str;
         BufferedReaderCrLf input = Main.getMain().GetNextFile();
         if (input == null) {
             return;
@@ -417,7 +417,7 @@ public class SIPEPParser extends Parser {
         Matcher m;
 
         // Populate our class representation of the message
-        SipMessage msg ;
+        SipMessage msg;
 
         msg = new SipMessage(contents, TableType.SIPEP);
 

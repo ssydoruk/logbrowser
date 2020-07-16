@@ -15,6 +15,7 @@ import java.util.regex.Pattern;
  * @author terry The class Replicates TLibMessage
  */
 public class GMSStartMessage extends Message {
+
     final private static Pattern regPOSTMessage = Pattern.compile("^\\(POST\\) Client IP Address: ([0-9\\.]+),\\s*");
 
     String m_MessageName;
@@ -90,7 +91,6 @@ public class GMSStartMessage extends Message {
         return getGMSAttributeString(new String[]{"_service_id", "service_id"});
     }
 
-
     String ORSSessionID() {
         parsePOST();
         if (parseORSURI != null) {
@@ -108,7 +108,6 @@ public class GMSStartMessage extends Message {
             return null;
         }
     }
-
 
     private void parsePOST() {
         if (!this.POSTParsed) {

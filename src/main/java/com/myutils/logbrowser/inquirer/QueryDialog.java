@@ -321,14 +321,11 @@ public class QueryDialog extends javax.swing.JFrame {
 
         private String outFile;
 
-
         private boolean displayForm;
-
 
         private QueryDialog queryDialog;
         private RequestProgress rp = null;
         IQueryResults qry = null;
-
 
         PrintStreams ps = null;
 
@@ -336,28 +333,35 @@ public class QueryDialog extends javax.swing.JFrame {
 
         String theTitle = "";
         ReportFrame frm = null;
+
         private QueryTask(QueryDialog frm, IAggregateQuery selected) {
             this.queryDialog = frm;
             setQuery(selected);
         }
+
         public QueryTask(QueryDialog frm, IQueryResults theQuery, boolean displayForm) {
             this.queryDialog = frm;
             setQuery(theQuery);
             this.displayForm = displayForm;
         }
+
         public void setDisplayForm(boolean displayForm) {
             this.displayForm = displayForm;
         }
+
         @Override
         protected void process(List<String> chunks) {
             rp.addProgress(chunks);
         }
+
         public void setRp(RequestProgress rp) {
             this.rp = rp;
         }
+
         public void setFormatters(ArrayList<ILogRecordFormatter> formatters) {
             this.formatters = formatters;
         }
+
         public void setPs(PrintStreams ps) {
             this.ps = ps;
         }
@@ -615,7 +619,6 @@ public class QueryDialog extends javax.swing.JFrame {
 //<editor-fold defaultstate="collapsed" desc="Thread class">
                 class QueryAllTask extends MySwingWorker<Void, String> {
 
-
                     private final QueryDialog frm;
                     private final IQueryResults qry;
                     private QueryAllJTable allCalls;
@@ -632,6 +635,7 @@ public class QueryDialog extends javax.swing.JFrame {
                             }
                         });
                     }
+
                     @Override
                     protected void process(List<String> chunks) {
                         rp.addProgress(chunks);
@@ -680,7 +684,7 @@ public class QueryDialog extends javax.swing.JFrame {
                     }
 
                 }
-;
+                ;
 //</editor-fold>
                 QueryTools.queryMessagesClear();
                 QueryAllTask tsk = new QueryAllTask(this, qry);
@@ -712,46 +716,49 @@ public class QueryDialog extends javax.swing.JFrame {
         protected JPanel bannerPanel;
         protected JLabel lbl;
         JPanel listPane;
+
         DoneFileDialog(Window parent) {
             super(parent);
-            
+
             setTitle("Report complete");
-            
+
             listPane = new JPanel(new GridLayout(0, 1));
-            
+
             vimButton = new JRadioButton("Open in VIM");
 //            vimButton.addActionListener(this);
-texpadButton = new JRadioButton("Open in TextPad");
+            texpadButton = new JRadioButton("Open in TextPad");
 //            texpadButton.addActionListener(this);
-notepadButton = new JRadioButton("Open in NotePad++");
+            notepadButton = new JRadioButton("Open in NotePad++");
 //            excelButton = new JRadioButton("Open in Excel");
 //            notepadButton.addActionListener(this);
-doneButton = new JRadioButton("Done");
+            doneButton = new JRadioButton("Done");
 //            doneButton.addActionListener(this);
 
 //Group the radio buttons.
-ButtonGroup group = new ButtonGroup();
-group.add(vimButton);
-group.add(texpadButton);
-group.add(notepadButton);
-group.add(doneButton);
+            ButtonGroup group = new ButtonGroup();
+            group.add(vimButton);
+            group.add(texpadButton);
+            group.add(notepadButton);
+            group.add(doneButton);
 //             group.add(excelButton);
-listPane.add(vimButton);
-listPane.add(texpadButton);
-listPane.add(notepadButton);
-listPane.add(doneButton);
+            listPane.add(vimButton);
+            listPane.add(texpadButton);
+            listPane.add(notepadButton);
+            listPane.add(doneButton);
 //            listPane.add(excelButton);
 
-bannerPanel = new JPanel();
-bannerPanel.setLayout(new GridLayout(0, 1));
-lbl = new JLabel();
-lblFile = new JLabel();
-bannerPanel.add(lblFile);
-bannerPanel.add(lbl);
+            bannerPanel = new JPanel();
+            bannerPanel.setLayout(new GridLayout(0, 1));
+            lbl = new JLabel();
+            lblFile = new JLabel();
+            bannerPanel.add(lblFile);
+            bannerPanel.add(lbl);
         }
+
         public int getCloseCause() {
             return closeCause;
         }
+
         public void setCloseCause(int closeCause) {
             this.closeCause = closeCause;
         }
@@ -786,12 +793,10 @@ bannerPanel.add(lbl);
                     true);
         }
 
-
         @Override
         public JComponent createBannerPanel() {
             return bannerPanel;
         }
-
 
         @Override
         public JComponent createContentPanel() {
@@ -869,6 +874,7 @@ bannerPanel.add(lbl);
 
         protected JPanel aggregatesPanel;
         JPanel listPane;
+
         CancelRunDialog(Window parent) {
             super(parent);
             listPane = new JPanel(new BorderLayout(10, 10));
@@ -881,7 +887,6 @@ bannerPanel.add(lbl);
         public void setCloseCause(int closeCause) {
             this.closeCause = closeCause;
         }
-
 
         public void doShow() {
             setModal(true);
@@ -897,7 +902,6 @@ bannerPanel.add(lbl);
         public JComponent createBannerPanel() {
             return null;
         }
-
 
         @Override
         public JComponent createContentPanel() {
@@ -966,18 +970,19 @@ bannerPanel.add(lbl);
     class AggregateDialog extends CancelRunDialog {
 
         private final JPanel bannerPanel;
+
         AggregateDialog(Window parent) {
             super(parent);
             this.bannerPanel = new JPanel(new BorderLayout(20, 20));
             bannerPanel.setBorder(new BevelBorder(BevelBorder.RAISED));
             JLabel ta = new JLabel();
 //            ta.setEditable(false);
-ta.setFocusable(false);
-ta.setHorizontalAlignment(SwingConstants.CENTER);
-ta.setVerticalAlignment(SwingConstants.CENTER);
-ta.setText("<html><b>On main window select application(s) and time range</b></html>");
+            ta.setFocusable(false);
+            ta.setHorizontalAlignment(SwingConstants.CENTER);
+            ta.setVerticalAlignment(SwingConstants.CENTER);
+            ta.setText("<html><b>On main window select application(s) and time range</b></html>");
 
-bannerPanel.add(ta);
+            bannerPanel.add(ta);
         }
 
         @Override
@@ -992,7 +997,6 @@ bannerPanel.add(ta);
         public boolean isPrintToScreen() {
             return ((AggregatesPanel) aggregatesPanel).isPrintToScreen();
         }
-
 
         @Override
         public void doShow(String theTitle) {

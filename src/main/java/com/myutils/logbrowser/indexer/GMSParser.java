@@ -106,7 +106,7 @@ public class GMSParser extends Parser {
     private static final Pattern regNotParseMessage = Pattern.compile(
             //07:47:39.182 Trc 09900  [qtp747464370-17] >>> /1/service/callback/RCC_CORK_CallBack - CCID [null]
             "^(09900"
-                    + ")");
+            + ")");
     private static final Pattern regStatisticMessage = Pattern.compile(
             "^StatisticService: ");
     private static final Pattern regOpenMediaInteraction = Pattern.compile(
@@ -169,11 +169,12 @@ public class GMSParser extends Parser {
     private final ParserThreadsProcessor ptpsThreadProcessor;
     Message msg = null;
     HashMap<String, GMSORSMessage> threadReqs = new HashMap<>();
+
     GMSParser(HashMap<TableType, DBTable> m_tables) {
         super(FileInfoType.type_GMS, m_tables);
         m_MessageContents = new ArrayList();
         ThreadAlias.put("ORSInternal", "FMWeb");
-        
+
         ptpsThreadProcessor = new ParserThreadsProcessor();
         //<editor-fold defaultstate="collapsed" desc="processing of fetch per thread">
         ptpsThreadProcessor.addStateTransition(new StartSessionTransition());
@@ -191,7 +192,6 @@ public class GMSParser extends Parser {
         GMSWebClientMsg msg = new GMSWebClientMsg(webReqID, isResponse, URL, rest);
         msg.SetStdFieldsAndAdd(this);
     }
-
 
     private OrsHTTP getFullHTTP(OrsHTTP orsHTTP) {
         OrsHTTP tmpOrsHTTP = partHTTP.get(orsHTTP.getSocket());
@@ -305,7 +305,6 @@ public class GMSParser extends Parser {
         return m_CurrentLine - line;
     }
 
-
     private String ParseLine(String str, BufferedReaderCrLf in) throws Exception {
         Matcher m;
         String s = str;
@@ -357,7 +356,7 @@ public class GMSParser extends Parser {
                     m_ParserState = ParserState.STATE_EXCEPTION;
                     setSavedFilePos(getFilePos());
                     break;
-                } else if (( regPOST.matcher(s)).find()) {
+                } else if ((regPOST.matcher(s)).find()) {
                     m_HeaderOffset = m_CurrentFilePos;
                     m_MessageContents.add(s);
                     m_TotalLen = str.length() + in.charsSkippedOnReadLine;
@@ -536,7 +535,6 @@ public class GMSParser extends Parser {
 
     }
 
-
     private void addORSRequest(String threadID, DateParsed d) {
         Main.logger.trace("l:" + m_CurrentLine + " - threadID:[" + threadID + "] saving ORS request, [" + d.orig + "]");
 //        if (d.rest.endsWith("/scxml/session/start")) {
@@ -626,15 +624,16 @@ public class GMSParser extends Parser {
         m_tables.put(TableType.IxnGMS, new IxnGMSTable(Main.getM_accessor(), TableType.IxnGMS));
 
     }
+
     private static class StartSessionTransition implements ParserThreadsProcessor.StateTransition {
-        
+
         private final static Pattern regParams = Pattern.compile("^\\s*Params:");
-        
+
         @Override
         public ParserThreadsProcessor.StateTransitionResult stateTransition(ParserThreadState threadState,
                 String sOrig, String sParsedAndTruncated, String threadID, Parser parser) {
             Matcher m;
-            
+
             switch (threadState.getParserState()) {
                 case STATE_START_SESSION: {
                     if (regParams.matcher(sParsedAndTruncated).find()) {
@@ -646,7 +645,7 @@ public class GMSParser extends Parser {
                         return ParserThreadsProcessor.StateTransitionResult.ERROR_STATE;
                     }
                 }
-                
+
                 case STATE_START_SESSION1:
                     if ((m = regKVList.matcher(sParsedAndTruncated)).find()) {
                         threadState.addString(sOrig);
@@ -655,13 +654,13 @@ public class GMSParser extends Parser {
                         GMSStartMessage msg = new GMSStartMessage(threadState.getMsgLines());
                         msg.SetStdFieldsAndAdd(parser);
                         return ParserThreadsProcessor.StateTransitionResult.FINAL_REACHED;
-                        
+
                     }
-                    
+
             }
             return ParserThreadsProcessor.StateTransitionResult.ERROR_STATE;
         }
-        
+
     }
 
     enum ParserState {
@@ -686,7 +685,6 @@ public class GMSParser extends Parser {
         MSG_TLIB
     }
 
-
     private class GMSStatServerMsg extends Message {
 
         private String ssApp;
@@ -696,7 +694,6 @@ public class GMSParser extends Parser {
         private String reqID;
         private String stringValue;
         private boolean corruptMessage = false;
-
 
         private GMSStatServerMsg(String substring) {
             this();
@@ -720,12 +717,15 @@ public class GMSParser extends Parser {
                 this.corruptMessage = true;
             }
         }
+
         private GMSStatServerMsg(TableType t) {
             super(t);
         }
+
         private GMSStatServerMsg() {
             this(TableType.GMSStatServerMessage);
         }
+
         public boolean isCorruptMessage() {
             return corruptMessage;
         }
@@ -753,7 +753,6 @@ public class GMSParser extends Parser {
         public String getStringValue() {
             return stringValue;
         }
-
 
     }
 
@@ -844,12 +843,14 @@ public class GMSParser extends Parser {
 
     }
 //</editor-fold> 
+
     private class GMSWebClientMsg extends Message {
 
         private String webReqID;
         private boolean response;
         private String URL;
         private List<Pair<String, String>> allParams;
+
         private GMSWebClientMsg(String webReqID, boolean response, String URL, String rest) {
             this();
             this.webReqID = webReqID;
@@ -873,6 +874,7 @@ public class GMSParser extends Parser {
 
             }
         }
+
         private GMSWebClientMsg() {
             super(TableType.GMSWebClientMessage);
         }
@@ -888,7 +890,6 @@ public class GMSParser extends Parser {
         public String getURL() {
             return URL;
         }
-
 
         private List<Pair<String, String>> getAllParams() {
             return allParams;
@@ -914,7 +915,6 @@ public class GMSParser extends Parser {
         }
 
     }
-
 
     private class GMSWebClientMsgTable extends DBTable {
 

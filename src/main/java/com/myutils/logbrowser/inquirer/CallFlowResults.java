@@ -21,18 +21,20 @@ import javax.swing.JOptionPane;
 import static org.apache.commons.lang3.ArrayUtils.isEmpty;
 
 public class CallFlowResults extends IQueryResults {
+
     public static final int TLIB = 0x01;
     public static final int ISCC = 0x02;
     public static final int TC = 0x04;
     public static final int SIP = 0x08;
     public static final int PROXY = 0x10;
-    private static String[] RequestsToShow = {"RequestMakePredictiveCall", "RequestMakeCall", "RequestMonitorNextCall"};
-    private static String[] EventsToShow = {"EventDialing", "EventNetworkReached", "EventMonitoringNextCall"};
+//    private static final String[] RequestsToShow = {"RequestMakePredictiveCall", "RequestMakeCall", "RequestMonitorNextCall"};
+//    private static final String[] EventsToShow = {"EventDialing", "EventNetworkReached", "EventMonitoringNextCall"};
     private IDsFinder cidFinder;
-    private String m_tlibFilter;
-    private int m_componentFilter;
+//    private String m_tlibFilter;
+//    private int m_componentFilter;
     ArrayList<NameID> appsType;
-    private Handlers handlerIDs = new Handlers();
+    private final Handlers handlerIDs = new Handlers();
+
     public CallFlowResults(QueryDialogSettings qdSettings) throws SQLException {
         super(qdSettings);
         if (repComponents.isEmpty()) {
@@ -62,7 +64,6 @@ public class CallFlowResults extends IQueryResults {
     protected void showAllResults() {
         showAllResults(getAllResults); //To change body of generated methods, choose Tools | Templates.
     }
-
 
     @Override
     public void Retrieve(QueryDialog dlg, SelectionType key, String searchID) throws SQLException {
@@ -297,7 +298,6 @@ public class CallFlowResults extends IQueryResults {
         return refreshTimeRange(null);
     }
 
-
     @Override
     public String getReportSummary() {
         return "TServer/SIP Server\n\t" + ((cidFinder != null) ? cidFinder.toString() : "<not specified>");
@@ -354,13 +354,11 @@ public class CallFlowResults extends IQueryResults {
 
     }
 
-
     public void SetConfig(Properties config) {
         if (config != null && !config.isEmpty()) {
-            m_tlibFilter = config.getProperty("TlibFilter");
+//            m_tlibFilter = config.getProperty("TlibFilter");
         }
     }
-
 
     private void addSIPReportType(DynamicTreeNode<OptionNode> root) {
         DynamicTreeNode<OptionNode> nd = new DynamicTreeNode<>(new OptionNode(true, DialogItem.TLIB_CALLS_SIP));
@@ -484,7 +482,6 @@ public class CallFlowResults extends IQueryResults {
         DoneSTDOptions();
     }
 
-
     @Override
     public ArrayList<NameID> getApps() throws SQLException {
         if (appsType == null) {
@@ -534,7 +531,6 @@ public class CallFlowResults extends IQueryResults {
 
         return TLibReq;
     }
-
 
     private void RetrieveSIP(QueryDialog dlg, DynamicTreeNode<OptionNode> reportSettings, IDsFinder cidFinder) throws SQLException {
         if (isChecked(reportSettings) && DatabaseConnector.TableExist("sip_logbr")) {
@@ -651,28 +647,28 @@ public class CallFlowResults extends IQueryResults {
     }
 
     private void RetrieveTLibTimer(QueryDialog dlg, DynamicTreeNode<OptionNode> eventsSettings, IDsFinder cidFinder) throws SQLException {
-        Integer[] connIDs = null;
+        Integer[] connIDs;
         if (cidFinder == null) {
 
         } else {
             connIDs = cidFinder.getIDs(IDType.ConnID);
-        }
-        if (isChecked(eventsSettings) && DatabaseConnector.TableExist(TableType.TLIBTimerRedirect.toString())) {
-            TableQuery TLibTimer = null;
-            if (DatabaseConnector.TableExist(TableType.TLIBTimerRedirect.toString())) {
-                if (cidFinder.getSearchType() == SelectionType.NO_SELECTION
-                        || !isEmpty(connIDs)) {
-                    TLibTimer = new TableQuery(MsgType.TLIBTimer, TableType.TLIBTimerRedirect.toString());
-                    if (connIDs != null) {
-                        TLibTimer.addWhere(getWhere("connIDID", connIDs, false), "AND");
+            if (isChecked(eventsSettings) && DatabaseConnector.TableExist(TableType.TLIBTimerRedirect.toString())) {
+                TableQuery TLibTimer;
+                if (DatabaseConnector.TableExist(TableType.TLIBTimerRedirect.toString())) {
+                    if (cidFinder.getSearchType() == SelectionType.NO_SELECTION
+                            || !isEmpty(connIDs)) {
+                        TLibTimer = new TableQuery(MsgType.TLIBTimer, TableType.TLIBTimerRedirect.toString());
+                        if (connIDs != null) {
+                            TLibTimer.addWhere(getWhere("connIDID", connIDs, false), "AND");
+                        }
+
+                        TLibTimer.addRef("msgid", "message", ReferenceType.TEvent.toString(), IQuery.FieldType.Mandatory);
+                        TLibTimer.addRef("connIDID", "connID", ReferenceType.ConnID.toString(), IQuery.FieldType.Optional);
+                        TLibTimer.addRef("causeID", "cause", ReferenceType.TEventRedirectCause.toString(), IQuery.FieldType.Optional);
+                        TLibTimer.setCommonParams(this, dlg);
+
+                        getRecords(TLibTimer);
                     }
-
-                    TLibTimer.addRef("msgid", "message", ReferenceType.TEvent.toString(), IQuery.FieldType.Mandatory);
-                    TLibTimer.addRef("connIDID", "connID", ReferenceType.ConnID.toString(), IQuery.FieldType.Optional);
-                    TLibTimer.addRef("causeID", "cause", ReferenceType.TEventRedirectCause.toString(), IQuery.FieldType.Optional);
-                    TLibTimer.setCommonParams(this, dlg);
-
-                    getRecords(TLibTimer);
                 }
             }
         }
@@ -682,7 +678,7 @@ public class CallFlowResults extends IQueryResults {
         if (isChecked(eventsSettings) && DatabaseConnector.TableExist("connid_logbr")) {
             TableQuery tscpCall = new TableQuery(MsgType.TSCPCALL, "connid_logbr");
             String where = "";
-            Integer[] connIDs = null;
+            Integer[] connIDs;
             if (cidFinder != null) {
                 if (inquirer.getCr().isNewTLibSearch()) {
                     connIDs = cidFinder.getIDs(IDType.ConnID);
@@ -732,8 +728,8 @@ public class CallFlowResults extends IQueryResults {
 
     private void RetrieveSIPDiagnostics(QueryDialog dlg, DynamicTreeNode<OptionNode> eventsSettings, IDsFinder cidFinder) throws SQLException {
         if (isChecked(eventsSettings) && DatabaseConnector.TableExist(TableType.SIP1536Other.toString())) {
-            DynamicTreeNode<OptionNode> node = null;
-            TableQuery sip1536Table = null;
+            DynamicTreeNode<OptionNode> node;
+            TableQuery sip1536Table;
             tellProgress("Retrieve SIP Diagnostics");
 
             node = FindNode(eventsSettings, DialogItem.SIP1536_MISC, null, null);
@@ -949,8 +945,9 @@ public class CallFlowResults extends IQueryResults {
         }
         return true;
     }
+
     private class Handlers extends HashSet {
-        
+
         @Override
         public boolean addAll(Collection c) {
             if (c != null) {
@@ -959,13 +956,13 @@ public class CallFlowResults extends IQueryResults {
                 return false;
             }
         }
-        
+
         private void addAll(Integer[] hID) {
             if (hID != null && hID.length > 0) {
                 handlerIDs.addAll(Arrays.asList(hID));
             }
         }
-        
+
     }
 
 }

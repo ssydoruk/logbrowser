@@ -18,18 +18,19 @@ import java.util.HashSet;
  */
 public class FullTable {
 
-    private ArrayList<ArrayList<Object>> data;
-
+    private final ArrayList<ArrayList<Object>> data;
 
     private HashMap<String, Pair<Integer, Integer>> columnNames = null;
 //    private ArrayList<Integer> columnTypes = null;
-    private HashSet<String> hiddenFields = new HashSet<>();
+    private final HashSet<String> hiddenFields = new HashSet<>();
+
     //    public ArrayList<String> getColumnNames() {
 //        return columnNames;
 //    }
     public FullTable() {
         data = new ArrayList<>();
     }
+
     public ArrayList<ArrayList<Object>> getData() {
         return data;
     }
@@ -62,7 +63,6 @@ public class FullTable {
         }
         return -1;
     }
-
 
     void setHiddenField(String rowType) {
         hiddenFields.add(rowType);

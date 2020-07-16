@@ -27,7 +27,7 @@ import org.apache.logging.log4j.LogManager;
  *
  * @author ssydoruk
  */
-public class RoutingResults extends IQueryResults {
+final public class RoutingResults extends IQueryResults {
 
     private static final org.apache.logging.log4j.Logger logger = LogManager.getLogger();
     static private final String URS_LOG_MSG = "URS log messages";
@@ -38,23 +38,23 @@ public class RoutingResults extends IQueryResults {
     private DynamicTreeNode<OptionNode> msgOrsConfig;
     IDsFinder cidFinder = null;
     ArrayList<NameID> appsType = null;
+
     public RoutingResults() throws SQLException {
         super();
         boolean isORS = true;
         boolean isURS = true;
         try {
             isORS = (DatabaseConnector.fileExits(new FileInfoType[]{FileInfoType.type_ORS}));
-        } catch (Exception e) {
+        } catch (SQLException e) {
             logger.log(org.apache.logging.log4j.Level.FATAL, e);
-            
+
         }
-        
         try {
             isURS = (DatabaseConnector.fileExits(new FileInfoType[]{FileInfoType.type_URS, FileInfoType.type_URSHTTP}));
-        } catch (Exception e) {
+        } catch (SQLException e) {
             logger.log(org.apache.logging.log4j.Level.FATAL, e);
         }
-        
+
         addSelectionType(SelectionType.NO_SELECTION);
         addSelectionType(SelectionType.GUESS_SELECTION);
         addSelectionType(SelectionType.CONNID);
@@ -66,20 +66,20 @@ public class RoutingResults extends IQueryResults {
         addSelectionType(SelectionType.UUID);
         addSelectionType(SelectionType.IXN);
         addSelectionType(SelectionType.REFERENCEID);
-        
+
         DynamicTreeNode<OptionNode> rootA = new DynamicTreeNode<>(null);
         repComponents.setRoot(rootA);
-        
+
         if (isURS) {
             addURSReportType(rootA);
         }
-        
+
         if (isORS) {
             addORSReportType(rootA);
         }
-        
+
         addConfigUpdates(rootA);
-        
+
         try {
             if (isURS) {
                 addCustom(rootA, FileInfoType.type_ORS);
@@ -87,7 +87,7 @@ public class RoutingResults extends IQueryResults {
             if (isORS) {
                 addCustom(rootA, FileInfoType.type_URS);
             }
-        } catch (Exception ex) {
+        } catch (SQLException ex) {
             logger.log(org.apache.logging.log4j.Level.FATAL, ex);
         }
         if (isURS) {
@@ -97,17 +97,17 @@ public class RoutingResults extends IQueryResults {
         if (isORS) {
             msgOrsConfig = rootA.getLogMessagesReportType(TableType.MsgORServer, ORS_LOG_MSG);
             rootA.addChild(msgOrsConfig);
-            
+
             if (DatabaseConnector.TableExist(TableType.ORSAlarm.toString())) {
                 DynamicTreeNode<Object> tEventsNode = new DynamicTreeNode<>(new OptionNode(false, DialogItem.ORSALARM));
                 rootA.addChild(tEventsNode);
 //            tEventsNode.addDynamicRef(DialogItem.ORS_IXN_NAME, ReferenceType.TEvent, "orsmm", "nameid");
 //        tEventsNode.addDynamicRef(DialogItem.ORS_TEVENTS_DN, ReferenceType.DN, "orsmm", "thisdnid", "otherdnid");
             }
-            
+
         }
         DoneSTDOptions();
-        
+
     }
 
     @Override
@@ -135,7 +135,7 @@ public class RoutingResults extends IQueryResults {
         return IDsFinder.RequestLevel.Level2;
     }
 
-    public void addURSReportType(DynamicTreeNode<OptionNode> root) {
+    final public void addURSReportType(DynamicTreeNode<OptionNode> root) {
         DynamicTreeNode<OptionNode> reportTypeURSStrategy = new DynamicTreeNode<>(new OptionNode(true, DialogItem.URS));
         root.addChild(reportTypeURSStrategy);
 
@@ -155,7 +155,7 @@ public class RoutingResults extends IQueryResults {
                 tEventsNode.addDynamicRef(DialogItem.TLIB_CALLS_TEVENT_DNIS, ReferenceType.DN, "urs_logbr", "dnisid");
 
             }
-        } catch (Exception ex) {
+        } catch (SQLException ex) {
             logger.log(org.apache.logging.log4j.Level.FATAL, ex);
         }
         try {
@@ -166,7 +166,7 @@ public class RoutingResults extends IQueryResults {
                 tEventsNode.addDynamicRef(DialogItem.URS_AGENTDN_STATSWITCH, ReferenceType.Switch, "ursstat", "VoiceSwitchID");
                 tEventsNode.addDynamicRef(DialogItem.URS_AGENTDN_AGENT, ReferenceType.Agent, "ursstat", "AgentNameID");
             }
-        } catch (Exception ex) {
+        } catch (SQLException ex) {
             logger.log(org.apache.logging.log4j.Level.FATAL, ex);
         }
         tEventsNode = new DynamicTreeNode<>(new OptionNode(true, DialogItem.URS_STRATEGY));
@@ -180,10 +180,9 @@ public class RoutingResults extends IQueryResults {
                 reportTypeURSStrategy.addChild(tEventsNode);
                 tEventsNode.addDynamicRef(DialogItem.URS_RLIB_METHOD, ReferenceType.ORSMETHOD);
             }
-        } catch (Exception ex) {
+        } catch (SQLException ex) {
             logger.log(org.apache.logging.log4j.Level.FATAL, ex);
         }
-
         try {
             if (DatabaseConnector.TableExist("ursri")) {
                 tEventsNode = new DynamicTreeNode<>(new OptionNode(true, DialogItem.URS_RI));
@@ -197,10 +196,9 @@ public class RoutingResults extends IQueryResults {
 
 //                tEventsNode.addDynamicRef(DialogItem.URS_RI_SUBFUNCTION, ReferenceType.URSMETHOD, "ursri", "subfuncID");
             }
-        } catch (Exception ex) {
+        } catch (SQLException ex) {
             logger.log(org.apache.logging.log4j.Level.FATAL, ex);
         }
-
         try {
             if (DatabaseConnector.TableExist(TableType.URSHTTP)) {
                 tEventsNode = new DynamicTreeNode<>(new OptionNode(true, DialogItem.URS_HTTP));
@@ -215,7 +213,7 @@ public class RoutingResults extends IQueryResults {
 
 //                tEventsNode.addDynamicRef(DialogItem.URS_RI_SUBFUNCTION, ReferenceType.URSMETHOD, "ursri", "subfuncID");
             }
-        } catch (Exception ex) {
+        } catch (SQLException ex) {
             logger.log(org.apache.logging.log4j.Level.FATAL, ex);
         }
 
@@ -225,7 +223,7 @@ public class RoutingResults extends IQueryResults {
     }
 
 //    private static final String URS_RLIB = "RLIB";
-    public void addORSReportType(DynamicTreeNode<OptionNode> root) throws SQLException {
+    final public void addORSReportType(DynamicTreeNode<OptionNode> root) throws SQLException {
         DynamicTreeNode<OptionNode> Attr;
         DynamicTreeNode<OptionNode> tEventsNode;
 
@@ -270,7 +268,6 @@ public class RoutingResults extends IQueryResults {
         }
 
     }
-
 
     @Override
     FullTableColors getAll(QueryDialog qd) throws SQLException {
@@ -747,7 +744,6 @@ public class RoutingResults extends IQueryResults {
 
     }
 
-
 //    }
     @Override
     public String getName() {
@@ -785,37 +781,34 @@ public class RoutingResults extends IQueryResults {
                 ArrayList<Long> ids = new ArrayList<>();
                 HashSet<Long> idDNs = new HashSet<>();
 
-                if (ursByConnIdQuery != null) {
-                    tellProgress("Retrieving URS TLib messages");
-                    ursByConnIdQuery.setNode(ursEventNode);
-                    ursByConnIdQuery.setSearchSettings(ursEventNode);
-                    ursByConnIdQuery.setCommonParams(this, dlg);
-                    ursByConnIdQuery.setRecLoadedProc(new IQuery.IRecordLoadedProc() {
-                        @Override
-                        public void recordLoaded(ILogRecord rec) {
-                            if (rec instanceof TLibEvent) {
-                                addUnique(refIDs, ((TLibEvent) rec).GetReferenceId());
+                tellProgress("Retrieving URS TLib messages");
+                ursByConnIdQuery.setNode(ursEventNode);
+                ursByConnIdQuery.setSearchSettings(ursEventNode);
+                ursByConnIdQuery.setCommonParams(this, dlg);
+                ursByConnIdQuery.setRecLoadedProc(new IQuery.IRecordLoadedProc() {
+                    @Override
+                    public void recordLoaded(ILogRecord rec) {
+                        if (rec instanceof TLibEvent) {
+                            addUnique(refIDs, ((TLibEvent) rec).GetReferenceId());
 
-                                long id = ((TLibEvent) rec).getID();
-                                if (id > 0) {
-                                    ids.add(id);
-                                }
-                                addUnique(idDNs, ((TLibEvent) rec).getThisDNID(), ((TLibEvent) rec).getOtherDNID());
+                            long id = ((TLibEvent) rec).getID();
+                            if (id > 0) {
+                                ids.add(id);
                             }
+                            addUnique(idDNs, ((TLibEvent) rec).getThisDNID(), ((TLibEvent) rec).getOtherDNID());
                         }
-                    });
-                    getRecords(ursByConnIdQuery);
-
-                    if (cidFinder != null && callRelatedSearch(cidFinder) && !refIDs.isEmpty()) {
-                        inquirer.logger.debug("TLib requests");
-                        ursByConnIdQuery = new UrsByConnIdQuery(refIDs, ids, new ArrayList<>(idDNs));
-                        ursByConnIdQuery.setNode(ursEventNode);
-                        ursByConnIdQuery.setCommonParams(this, dlg);
-                        getRecords(ursByConnIdQuery);
                     }
+                });
+                getRecords(ursByConnIdQuery);
+                if (cidFinder != null && callRelatedSearch(cidFinder) && !refIDs.isEmpty()) {
+                    inquirer.logger.debug("TLib requests");
+                    ursByConnIdQuery = new UrsByConnIdQuery(refIDs, ids, new ArrayList<>(idDNs));
+                    ursByConnIdQuery.setNode(ursEventNode);
+                    ursByConnIdQuery.setCommonParams(this, dlg);
+                    getRecords(ursByConnIdQuery);
+                }
 
 //            getURSTLibRequests(dlg, ursReportSettings, cidFinder);
-                }
             }
 
         }
@@ -828,7 +821,7 @@ public class RoutingResults extends IQueryResults {
             if (cidFinder == null
                     || cidFinder.getSearchType() == SelectionType.NO_SELECTION
                     || !isEmpty(agentIDs)) {
-                TableQuery URSAgentPlace = null;
+                TableQuery URSAgentPlace;
                 URSAgentPlace = new TableQuery(MsgType.URSSTAT, "ursstat");
 
                 tellProgress("Retrieving URS agent/place messages");
@@ -876,7 +869,7 @@ public class RoutingResults extends IQueryResults {
 
         if (isChecked(FindNode(ursReportSettings, DialogItem.URS_STRATEGY, null, null))
                 && DatabaseConnector.TableExist("ursstr_logbr")) {
-            TableQuery UrsStrategy = null;
+            TableQuery UrsStrategy;
 
             if (cidFinder == null || cidFinder.getSearchType() == SelectionType.NO_SELECTION
                     || !isEmpty(CONNID)
@@ -1284,47 +1277,40 @@ public class RoutingResults extends IQueryResults {
                     || cidFinder.getSearchType() == SelectionType.NO_SELECTION
                     || !isEmpty(CONNID)
                     || !isEmpty(UUID)) {
-                OrsByConnIdQuery orsByConnIdQuery = new OrsByConnIdQuery();;
+                OrsByConnIdQuery orsByConnIdQuery = new OrsByConnIdQuery();
 
                 if (cidFinder != null) {
                     orsByConnIdQuery.setIDFinder(cidFinder);
                 }
-                if (orsByConnIdQuery != null) {
-                    tellProgress("Retrieving ORS TLib messages");
-                    orsByConnIdQuery.setReportSettings(FindNode(orsReportSettings, DialogItem.ORS_TEVENTS, null, null));
-                    orsByConnIdQuery.setCommonParams(this, dlg);
-
-                    HashSet<Long> refIDs = new HashSet<>();
-                    ArrayList<Long> ids = new ArrayList<>();
-                    HashSet<Long> idDNs = new HashSet<>();
-
-                    tellProgress("Retrieve TLIb messages");
-
-                    inquirer.logger.debug("TLib report");
-                    orsByConnIdQuery.setRecLoadedProc(new IRecordLoadedProc() {
-                        @Override
-                        public void recordLoaded(ILogRecord rec) {
-                            if (rec instanceof TLibEvent) {
-                                addUnique(refIDs, ((TLibEvent) rec).GetReferenceId());
-                                long id = ((TLibEvent) rec).getID();
-                                if (id > 0) {
-                                    ids.add(id);
-                                }
-                                addUnique(idDNs, ((TLibEvent) rec).getThisDNID(), ((TLibEvent) rec).getOtherDNID());
+                tellProgress("Retrieving ORS TLib messages");
+                orsByConnIdQuery.setReportSettings(FindNode(orsReportSettings, DialogItem.ORS_TEVENTS, null, null));
+                orsByConnIdQuery.setCommonParams(this, dlg);
+                HashSet<Long> refIDs = new HashSet<>();
+                ArrayList<Long> ids = new ArrayList<>();
+                HashSet<Long> idDNs = new HashSet<>();
+                tellProgress("Retrieve TLIb messages");
+                inquirer.logger.debug("TLib report");
+                orsByConnIdQuery.setRecLoadedProc(new IRecordLoadedProc() {
+                    @Override
+                    public void recordLoaded(ILogRecord rec) {
+                        if (rec instanceof TLibEvent) {
+                            addUnique(refIDs, ((TLibEvent) rec).GetReferenceId());
+                            long id = ((TLibEvent) rec).getID();
+                            if (id > 0) {
+                                ids.add(id);
                             }
+                            addUnique(idDNs, ((TLibEvent) rec).getThisDNID(), ((TLibEvent) rec).getOtherDNID());
                         }
+                    }
 
-                    });
-
+                });
+                getRecords(orsByConnIdQuery);
+                if (cidFinder != null && callRelatedSearch(cidFinder) && !refIDs.isEmpty()) {
+                    inquirer.logger.debug("TLib requests");
+                    orsByConnIdQuery = new OrsByConnIdQuery(refIDs, ids, idDNs);
+                    orsByConnIdQuery.setCommonParams(this, dlg);
                     getRecords(orsByConnIdQuery);
 
-                    if (cidFinder != null && callRelatedSearch(cidFinder) && !refIDs.isEmpty()) {
-                        inquirer.logger.debug("TLib requests");
-                        orsByConnIdQuery = new OrsByConnIdQuery(refIDs, ids, idDNs);
-                        orsByConnIdQuery.setCommonParams(this, dlg);
-                        getRecords(orsByConnIdQuery);
-
-                    }
                 }
             }
         }
@@ -1414,7 +1400,7 @@ public class RoutingResults extends IQueryResults {
         }
 
         if (isChecked(FindNode(orsReportSettings, DialogItem.ORS_SESSION, null, null))) {
-            TableQuery OrsSess = null;
+            TableQuery OrsSess ;
             if (DatabaseConnector.TableExist("orssess_logbr")) {
                 if (cidFinder == null
                         || cidFinder.getSearchType() == SelectionType.NO_SELECTION
@@ -1458,14 +1444,12 @@ public class RoutingResults extends IQueryResults {
         if (isChecked(FindNode(orsReportSettings, DialogItem.ORS_HTTP, null, null))) {
             if (DatabaseConnector.TableExist("orshttp")) {
                 Integer[] GMSIDs = cidFinder.getIDs(IDType.GMSSESSION);
-                if (cidFinder == null
-                        || cidFinder.getSearchType() == SelectionType.NO_SELECTION
+                if ( cidFinder.getSearchType() == SelectionType.NO_SELECTION
                         || !isEmpty(SIDID)
                         || !isEmpty(GMSIDs)) {
                     TableQuery OrsHTTP = new TableQuery(MsgType.ORSHTTP, "orshttp");
 
                     Wheres wh = new Wheres();
-                    Wheres whHTTPResponse = new Wheres();
                     if (SIDID != null) {
                         wh.addWhere(getWhere("sidid", SIDID, false), "OR");
                         wh.addWhere(
@@ -1556,7 +1540,6 @@ public class RoutingResults extends IQueryResults {
     private void retrieveNoSelection(QueryDialog dlg) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
-
 
     @Override
     public ArrayList<NameID> getApps() throws SQLException {

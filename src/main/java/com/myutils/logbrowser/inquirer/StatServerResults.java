@@ -29,6 +29,7 @@ public class StatServerResults extends IQueryResults {
     private int m_componentFilter;
     private ArrayList<NameID> appType = null;
     IDsFinder cidFinder = null;
+
     public StatServerResults(QueryDialogSettings qdSettings) throws SQLException {
         super(qdSettings);
         if (repComponents.isEmpty()) {
@@ -87,7 +88,6 @@ public class StatServerResults extends IQueryResults {
         }
 
     }
-
 
     @Override
     public UTCTimeRange refreshTimeRange(ArrayList<Integer> searchApps) throws SQLException {
@@ -194,7 +194,7 @@ public class StatServerResults extends IQueryResults {
 
         try {
             addCustom(rootA, FileInfoType.type_StatServer);
-        } catch (Exception ex) {
+        } catch (SQLException ex) {
             logger.log(org.apache.logging.log4j.Level.FATAL, ex);
         }
         addConfigUpdates(rootA);

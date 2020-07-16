@@ -5,18 +5,14 @@
 package com.myutils.logbrowser.inquirer;
 
 import com.myutils.logbrowser.indexer.ReferenceType;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 
 /**
  *
  * @author ssydoruk
  */
-public class TlibStatServerQuery extends IQuery {
+public final class TlibStatServerQuery extends IQuery {
 
-    private ResultSet m_resultSet;
-    private DatabaseConnector m_connector;
-    private int recCnt;
     private DynamicTreeNode<OptionNode> node;
     private boolean regex = false;
     private String selection = null;
@@ -113,8 +109,8 @@ public class TlibStatServerQuery extends IQuery {
         String ret = "";
 
         if (cif != null) {
-            Integer[] dnID = null;
-            Integer[] dnConnIDs = null;
+            Integer[] dnID;
+            Integer[] dnConnIDs;
             switch (cif.getSearchType()) {
                 case DN:
                     dnID = cif.getDNs();

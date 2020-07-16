@@ -13,11 +13,10 @@ import java.util.regex.Pattern;
  */
 public class ProxiedMessage extends Message {
 
-
-    private static Pattern regAttributeReferenceID = Pattern.compile("AttributeReferenceID[\\s\\[]+(\\w+)");
-    private static Pattern regAttributeThisDN = Pattern.compile("AttributeThisDN[\\s\\[]+(\\w+)");
-    private static Pattern regFrom = Pattern.compile("from[\\s\\(]+\\([\\w]+\\s([^\\s]+)");
-    private static Pattern regTo = Pattern.compile("to[\\s\\(]+\\([\\w]+\\s([^\\s]+)");
+    private static final Pattern regAttributeReferenceID = Pattern.compile("AttributeReferenceID[\\s\\[]+(\\w+)");
+    private static final Pattern regAttributeThisDN = Pattern.compile("AttributeThisDN[\\s\\[]+(\\w+)");
+    private static final Pattern regFrom = Pattern.compile("from[\\s\\(]+\\([\\w]+\\s([^\\s]+)");
+    private static final Pattern regTo = Pattern.compile("to[\\s\\(]+\\([\\w]+\\s([^\\s]+)");
     private final String event;
     private final String contents;
 
@@ -27,6 +26,7 @@ public class ProxiedMessage extends Message {
         this.contents = contents;
 
     }
+
     public String getEvent() {
         return event;
     }

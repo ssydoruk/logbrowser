@@ -6,6 +6,7 @@
 package com.myutils.logbrowser.inquirer.gui;
 
 import Utils.Util;
+import com.jacob.com.ComFailException;
 import com.myutils.logbrowser.inquirer.LogFile;
 import com.myutils.logbrowser.inquirer.inquirer;
 import java.io.IOException;
@@ -31,14 +32,16 @@ public abstract class ExternalEditor {
                 getEditor().ediFile(new LogFile(name, null));
             } catch (IOException ex) {
                 inquirer.ExceptionHandler.handleException("", ex);
-            } catch (Exception ex) {
+            } catch (ComFailException ex) {
                 inquirer.ExceptionHandler.handleException("", ex);
             }
         }
     }
+
     static public boolean editorOpened() {
         return editor == null;
     }
+
     static public ExternalEditor getEditor() throws IOException, com.jacob.com.ComFailException {
         if (editor == null) {
 
@@ -52,6 +55,7 @@ public abstract class ExternalEditor {
         }
         return editor;
     }
+
     static public void openTextpad(String fileName, int line) {
         String[] cmd = {
             "C:\\Program Files\\TextPad 7\\TextPad.exe",
@@ -66,6 +70,7 @@ public abstract class ExternalEditor {
             inquirer.ExceptionHandler.handleException("cannot run notepad", ex);
         }
     }
+
     static public void execCMD(String[] cmd) {
         try {
             if (logger.isDebugEnabled()) {
@@ -85,6 +90,7 @@ public abstract class ExternalEditor {
         }
 
     }
+
     static public void openNotepad(String fileName, int line) {
 
         String[] cmd = {
@@ -98,7 +104,7 @@ public abstract class ExternalEditor {
             logger.log(org.apache.logging.log4j.Level.FATAL, ex);
             inquirer.ExceptionHandler.handleException("cannot run notepad", ex);
         }
-        
+
     }
     HashMap<String, Integer> loadedFiles = new HashMap<>();
 
@@ -131,7 +137,6 @@ public abstract class ExternalEditor {
         }
     }
 
-
     protected int getIntFromArray(String s, int idx, int errValue) {
         if (s != null && !s.isEmpty()) {
             String[] split = StringUtils.split(s);
@@ -145,6 +150,5 @@ public abstract class ExternalEditor {
         }
         return errValue;
     }
-
 
 }

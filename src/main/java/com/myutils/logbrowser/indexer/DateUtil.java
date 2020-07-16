@@ -224,13 +224,13 @@ public class DateUtil {
     // Changers -----------------------------------------------------------------------------------
     /**
      * Add the given amount of years to the given date.It actually converts the
- date to Calendar and calls {@link CalendarUtil#addYears(Calendar, int)}
- and then converts back to date.
+     * date to Calendar and calls {@link CalendarUtil#addYears(Calendar, int)}
+     * and then converts back to date.
      *
      * @param date The date to add the given amount of years to.
      * @param years The amount of years to be added to the given date. Negative
      * values are also allowed, it will just go back in time.
-     * @return 
+     * @return
      */
     public static Date addYears(Date date, int years) {
         Calendar calendar = toCalendar(date);
@@ -239,15 +239,14 @@ public class DateUtil {
     }
 
     /**
-     * Add the given amount of months to the given date.It actually converts
- the date to Calendar and calls
-    {@link CalendarUtil#addMonths(Calendar, int)} and then converts back to
- date.
+     * Add the given amount of months to the given date.It actually converts the
+     * date to Calendar and calls {@link CalendarUtil#addMonths(Calendar, int)}
+     * and then converts back to date.
      *
      * @param date The date to add the given amount of months to.
      * @param months The amount of months to be added to the given date.
      * Negative values are also allowed, it will just go back in time.
-     * @return 
+     * @return
      */
     public static Date addMonths(Date date, int months) {
         Calendar calendar = toCalendar(date);
@@ -257,13 +256,13 @@ public class DateUtil {
 
     /**
      * Add the given amount of days to the given date.It actually converts the
- date to Calendar and calls {@link CalendarUtil#addDays(Calendar, int)}
- and then converts back to date.
+     * date to Calendar and calls {@link CalendarUtil#addDays(Calendar, int)}
+     * and then converts back to date.
      *
      * @param date The date to add the given amount of days to.
      * @param days The amount of days to be added to the given date. Negative
      * values are also allowed, it will just go back in time.
-     * @return 
+     * @return
      */
     public static Date addDays(Date date, int days) {
         Calendar calendar = toCalendar(date);
@@ -273,13 +272,13 @@ public class DateUtil {
 
     /**
      * Add the given amount of hours to the given date.It actually converts the
- date to Calendar and calls {@link CalendarUtil#addHours(Calendar, int)}
- and then converts back to date.
+     * date to Calendar and calls {@link CalendarUtil#addHours(Calendar, int)}
+     * and then converts back to date.
      *
      * @param date The date to add the given amount of hours to.
      * @param hours The amount of hours to be added to the given date. Negative
      * values are also allowed, it will just go back in time.
-     * @return 
+     * @return
      */
     public static Date addHours(Date date, int hours) {
         Calendar calendar = toCalendar(date);
@@ -289,14 +288,14 @@ public class DateUtil {
 
     /**
      * Add the given amount of minutes to the given date.It actually converts
- the date to Calendar and calls
-    {@link CalendarUtil#addMinutes(Calendar, int)} and then converts back to
- date.
+     * the date to Calendar and calls
+     * {@link CalendarUtil#addMinutes(Calendar, int)} and then converts back to
+     * date.
      *
      * @param date The date to add the given amount of minutes to.
      * @param minutes The amount of minutes to be added to the given date.
      * Negative values are also allowed, it will just go back in time.
-     * @return 
+     * @return
      */
     public static Date addMinutes(Date date, int minutes) {
         Calendar calendar = toCalendar(date);
@@ -306,14 +305,14 @@ public class DateUtil {
 
     /**
      * Add the given amount of seconds to the given date.It actually converts
- the date to Calendar and calls
-    {@link CalendarUtil#addSeconds(Calendar, int)} and then converts back to
- date.
+     * the date to Calendar and calls
+     * {@link CalendarUtil#addSeconds(Calendar, int)} and then converts back to
+     * date.
      *
      * @param date The date to add the given amount of seconds to.
      * @param seconds The amount of seconds to be added to the given date.
      * Negative values are also allowed, it will just go back in time.
-     * @return 
+     * @return
      */
     public static Date addSeconds(Date date, int seconds) {
         Calendar calendar = toCalendar(date);
@@ -322,15 +321,14 @@ public class DateUtil {
     }
 
     /**
-     * Add the given amount of millis to the given date.It actually converts
- the date to Calendar and calls
-    {@link CalendarUtil#addMillis(Calendar, int)} and then converts back to
- date.
+     * Add the given amount of millis to the given date.It actually converts the
+     * date to Calendar and calls {@link CalendarUtil#addMillis(Calendar, int)}
+     * and then converts back to date.
      *
      * @param date The date to add the given amount of millis to.
      * @param millis The amount of millis to be added to the given date.
      * Negative values are also allowed, it will just go back in time.
-     * @return 
+     * @return
      */
     public static Date addMillis(Date date, int millis) {
         Calendar calendar = toCalendar(date);

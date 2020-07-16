@@ -147,7 +147,6 @@ public class ReportFrame extends javax.swing.JFrame implements Cloneable {
 
     protected class ToggleButtonToolBar extends JToolBar {
 
-
         public ToggleButtonToolBar() {
             super();
 //            JButton bt = addButton("Console", "Print this report on console for navigation in Notepad++");
@@ -176,6 +175,7 @@ public class ReportFrame extends javax.swing.JFrame implements Cloneable {
 //
 //            });
         }
+
         private JButton addButton(String title, String hint0, ActionListener act) {
             JButton tb = new JButton(title);
             tb.setToolTipText(hint0);

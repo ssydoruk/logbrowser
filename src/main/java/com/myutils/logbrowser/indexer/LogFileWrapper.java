@@ -17,6 +17,7 @@ import java.util.Set;
  * @author Stepan
  */
 public abstract class LogFileWrapper {
+
     public static LogFileWrapper getContainer(File file) {
         LogFileWrapper ret = null;
         try {
@@ -33,7 +34,7 @@ public abstract class LogFileWrapper {
         if (ret != null && !ret.isIgnoreLog()) {
             return ret;
         }
-        
+
         return null;
     }
 
@@ -45,6 +46,7 @@ public abstract class LogFileWrapper {
     LogFileWrapper(File file) throws IOException {
         this.file = file;
     }
+
     public File getFile() {
         return file;
     }
@@ -52,7 +54,6 @@ public abstract class LogFileWrapper {
     public abstract void close();
 
     public abstract void open() throws IOException;
-
 
     public boolean isIgnoreLog() {
         return ignoreLog;
@@ -66,11 +67,9 @@ public abstract class LogFileWrapper {
         fileInfoFileMap.put(fi, file);
     }
 
-
     public Set<FileInfo> getFileInfos() {
         return fileInfoFileMap.keySet();
     }
-
 
     abstract InputStream getInputStream(FileInfo aThis) throws FileNotFoundException;
 

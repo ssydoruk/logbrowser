@@ -21,13 +21,13 @@ public class QueryDialogSettings implements Serializable {
     private static final long serialVersionUID = 1L;
 
 //        private ArrayList<IQueryResults> queries;
-    private HashMap<String, DynamicTree> qParams;
+    private final HashMap<String, DynamicTree> qParams;
 //        private HashMap<String , DynamicTreeNode> qParams1;
 //
 //        public ArrayList<IQueryResults> getQueries() {
 //            return queries;
 //        }
-    private ArrayList<String> savedSearches = new ArrayList<>();
+    private final ArrayList<String> savedSearches = new ArrayList<>();
     private ArrayList<String> savedFilters = new ArrayList<>();
 
     public QueryDialogSettings() {
@@ -82,7 +82,6 @@ public class QueryDialogSettings implements Serializable {
     public ArrayList<String> getSavedSearches() {
         return savedSearches;
     }
-
 
     public ArrayList<String> getSavedFilters() {
         return savedFilters;

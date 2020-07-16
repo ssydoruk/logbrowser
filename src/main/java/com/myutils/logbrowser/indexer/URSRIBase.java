@@ -49,20 +49,21 @@ public abstract class URSRIBase extends Message {
     }
 
     static void setTableValues(int baseRecNo, PreparedStatement stmt, URSRIBase rec, DBTable tab) throws SQLException {
-            ArrayList<Pair<String, String>> arr = rec.getAttrs();
-            for (int i = 0; i < URSRIBase.MAX_WEB_PARAMS; i++) {
-                if (arr != null && i < arr.size()) {
-                    tab.setFieldInt(stmt, baseRecNo + i * 2, Main.getRef(ReferenceType.Misc, arr.get(i).getKey()));
-                    tab.setFieldInt(stmt, baseRecNo + i * 2 + 1, Main.getRef(ReferenceType.Misc, arr.get(i).getValue()));
+        ArrayList<Pair<String, String>> arr = rec.getAttrs();
+        for (int i = 0; i < URSRIBase.MAX_WEB_PARAMS; i++) {
+            if (arr != null && i < arr.size()) {
+                tab.setFieldInt(stmt, baseRecNo + i * 2, Main.getRef(ReferenceType.Misc, arr.get(i).getKey()));
+                tab.setFieldInt(stmt, baseRecNo + i * 2 + 1, Main.getRef(ReferenceType.Misc, arr.get(i).getValue()));
 
-                } else {
-                    tab.setFieldInt(stmt, baseRecNo + i * 2, null);
-                    tab.setFieldInt(stmt, baseRecNo + i * 2 + 1, null);
+            } else {
+                tab.setFieldInt(stmt, baseRecNo + i * 2, null);
+                tab.setFieldInt(stmt, baseRecNo + i * 2 + 1, null);
 
-                }
             }
+        }
 
     }
+
     public static Map<String, List<String>> splitQuery(String url) throws UnsupportedEncodingException {
         if (StringUtils.isNotBlank(url)) {
             final Map<String, List<String>> query_pairs = new LinkedHashMap<>();
@@ -82,7 +83,6 @@ public abstract class URSRIBase extends Message {
         }
     }
     private List<Pair<String, String>> allParams;
-
 
     private String ConnID;
     private String clientApp;
@@ -196,7 +196,6 @@ public abstract class URSRIBase extends Message {
         }
     }
 
-
     void setURIParams(String uriParams) {
 //        try {
         if (uriParams != null && !uriParams.isEmpty()) {
@@ -243,8 +242,8 @@ public abstract class URSRIBase extends Message {
                 //ConnID specified
                 setConnID(split[2]);
                 setFunc(split[3]);
-                split[2]="<ConnID>";
-                this.url=StringUtils.join(split, "/");
+                split[2] = "<ConnID>";
+                this.url = StringUtils.join(split, "/");
                 break;
             case 3:
                 setFunc(split[2]);

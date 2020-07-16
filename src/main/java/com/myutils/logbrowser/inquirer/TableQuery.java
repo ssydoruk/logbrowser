@@ -46,17 +46,17 @@ public class TableQuery extends IQuery {
     }
 
     TableQuery(MsgType msgType, TableType tableType, String connidid, String where) {
-        this(msgType,  tableType.toString(),  connidid,  where);
+        this(msgType, tableType.toString(), connidid, where);
     }
 
     TableQuery(MsgType msgType, TableType tableType) {
         this(msgType, tableType.toString());
     }
 
-
     TableQuery(String tmpTable) {
         this(MsgType.UNKNOWN, tmpTable);
     }
+
     public String fldName(String fld) {
         return getTabAlias() + "." + fld;
     }
@@ -64,7 +64,6 @@ public class TableQuery extends IQuery {
     public String getTabAlias() {
         return tabName.substring(0, 2) + "01";
     }
-
 
     public void setWhereType(WhereType whereType) {
         this.whereType = whereType;
@@ -111,7 +110,6 @@ public class TableQuery extends IQuery {
     void setResultClass(Class<TLibEvent> aClass) {
         this.myClass = aClass;
     }
-
 
     public void addWhereField(String field) {
         whereFields.add(field);
@@ -162,7 +160,7 @@ public class TableQuery extends IQuery {
         int emptyLen = qString.length();
 
         if (addAll) {
-            qString.append(getTabAlias() + ".*");
+            qString.append(getTabAlias()).append(".*");
         }
 
         qString.append(addedFieldString(qString.length() > emptyLen, false));
@@ -292,8 +290,9 @@ public class TableQuery extends IQuery {
     public String getQuery() {
         return query;
     }
+
     enum WhereType {
-        
+
         WhereNone,
         WhereExists;
     }

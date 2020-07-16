@@ -22,7 +22,7 @@ public class OCSStatEvent extends Message {
     private static final Pattern statTypeTargetUpdated = Pattern.compile("AGENT_VOICE_MEDIA_STATUS.+\\s(\\w+)$");
     private static final Pattern statTypeEventInfo = Pattern.compile("^\\s*Status:\\s*(\\w+)");
 
-    private OCSParser.StatEventType statEventType;
+    private final OCSParser.StatEventType statEventType;
 
     OCSStatEvent(OCSParser.StatEventType statEventType, ArrayList m_MessageContents) {
         super(TableType.OCSStatEvent, m_MessageContents);

@@ -2,7 +2,6 @@ package com.myutils.logbrowser.indexer;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -121,7 +120,7 @@ public class StSParser extends Parser {
             ParseLine("", null); // to complete the parsing of the last line/last message
 
         } catch (Exception e) {
-            Main.logger.error(e);  
+            Main.logger.error(e);
             return m_CurrentLine - line;
         }
 
@@ -279,12 +278,12 @@ public class StSParser extends Parser {
                     m_Header = s;
                     m_ParserState = ParserState.STATE_ACTION_MESSAGE;
                     break;
-                } else if (( regJavaStart.matcher(s)).find()) {
+                } else if ((regJavaStart.matcher(s)).find()) {
                     Main.logger.debug("Java");
                     setSavedFilePos(getFilePos());
                     m_Header = s;
                     m_MessageContents.add(s);
-                    if (( regJavaOnData.matcher(s)).find()) {
+                    if ((regJavaOnData.matcher(s)).find()) {
                         m_ParserState = ParserState.STATE_JAVA_ON_DATA1;
                     } else {
                         AddJavaMessage();
@@ -307,7 +306,7 @@ public class StSParser extends Parser {
 //<editor-fold defaultstate="collapsed" desc="STATE_CAPACITY">
             case STATE_CAPACITY:
                 if (str.length() > 0
-                        && (( regCapacityContinue.matcher(str)).find())) {
+                        && ((regCapacityContinue.matcher(str)).find())) {
                     m_MessageContents.add(str);
                 } else {
                     AddCapacityMessage(m_Header, m_MessageContents);
@@ -320,7 +319,7 @@ public class StSParser extends Parser {
 
 //<editor-fold defaultstate="collapsed" desc="STATE_JAVA_ON_DATA1">
             case STATE_JAVA_ON_DATA1:
-                if (( regJava1.matcher(str)).find()) {
+                if ((regJava1.matcher(str)).find()) {
                     m_ParserState = ParserState.STATE_JAVA_ON_DATA2;
                 } else {
                     Main.logger.debug("strange in state " + m_ParserState + "]: " + str);
@@ -368,7 +367,7 @@ public class StSParser extends Parser {
 //<editor-fold defaultstate="collapsed" desc="STATE_SERVER_MESSAGE">
             case STATE_SERVER_MESSAGE: {
                 if (str.length() > 0
-                        && (( regServerContinue.matcher(str)).find())) {
+                        && ((regServerContinue.matcher(str)).find())) {
                     m_MessageContents.add(str);
                 } else {
                     AddServerMessage();
@@ -417,7 +416,6 @@ public class StSParser extends Parser {
         return null;
     }
 
-
     protected void ParseServerName(String str) {
 
         Matcher matcher = ptServerName.matcher(str);
@@ -432,7 +430,7 @@ public class StSParser extends Parser {
 
     protected void AddClientMessage(ArrayList contents, String header) throws Exception {
         String[] headerList = header.split(" ");
-        StSRequestHistoryMessage msg ;
+        StSRequestHistoryMessage msg;
 
         if ((headerList.length == 6) && headerList[3].startsWith("Creating")) {
             String event = headerList[3];
@@ -444,7 +442,7 @@ public class StSParser extends Parser {
             return;
         }
 
-        if ( (msg.GetMessageName().equals("OpenStat")
+        if ((msg.GetMessageName().equals("OpenStat")
                 || msg.GetMessageName().equals("GetStat")
                 || msg.GetMessageName().equals("PeekStat")
                 || msg.GetMessageName().equals("Current")
@@ -484,7 +482,6 @@ public class StSParser extends Parser {
         StSActionMessage msg = new StSActionMessage(header, contents);
         SetStdFieldsAndAdd(msg);
     }
-
 
     private void AddConfigMessage(String substring) {
         ConfigUpdateRecord msg = new ConfigUpdateRecord(substring);

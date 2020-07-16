@@ -41,11 +41,13 @@ import static org.sqlite.SQLiteErrorCode.SQLITE_INTERRUPT;
 public abstract class IQueryResults extends QueryTools
         implements ActionListener,
         PropertyChangeListener {
+
     private static final org.apache.logging.log4j.Logger logger = LogManager.getLogger();
     final private static Pattern regFileName = Pattern.compile("([^\\\\/]+)$");
     private static final String FILENO = "fileno";
     private static final String APPSTARTTIME = "app_starttime";
     public final static String KEY_ID_FIELD = "keyid";
+
     public static ArrayList<NameID> getAllApps(Object owner, FileInfoType fileInfoType) throws SQLException {
         if (fileInfoType == null) {
             return getRefNameIDs(owner, ReferenceType.App, "id in (select distinct appnameid from file_logbr)", true);
@@ -56,29 +58,34 @@ public abstract class IQueryResults extends QueryTools
                     + FileInfoType.getFileType(fileInfoType) + "\"))", true);
         }
     }
+
     static public ArrayList<NameID> getAllApps(Object owner) throws Exception {
         return getAllApps(owner, null);
     }
+
     static public void addUnique(HashSet<Long> idDNs, long thisDNID, long otherDNID) {
         addUnique(idDNs, thisDNID);
         addUnique(idDNs, otherDNID);
-        
+
     }
+
     static public void addUnique(HashSet<Long> ids, Long id) {
         if (id != null && id > 0 && !ids.contains(id)) {
             ids.add(id);
-            
+
         }
     }
+
     static public void addUnique(HashSet<Integer> ids, int id1, int id2) {
         addUnique(ids, id1);
         addUnique(ids, id2);
-        
+
     }
+
     static public void addUnique(HashSet<Integer> ids, Integer id) {
         if (id != null && id > 0 && !ids.contains(id)) {
             ids.add(id);
-            
+
         }
     }
 
@@ -101,6 +108,7 @@ public abstract class IQueryResults extends QueryTools
     //</editor-fold>
     CustomStorage cs;
     HashMap<MsgType, ArrayList<OutputSpecFormatter.Parameter>> addOutParams = new HashMap<>();
+
     //    public void getGenesysMessages(TableType t, UTCTimeRange timeRange) throws SQLException {
 //        getGenesysMessages(t, null, timeRange, null);
 //    }
@@ -115,11 +123,11 @@ public abstract class IQueryResults extends QueryTools
                 DynamicTreeNode<OptionNode> rootA = tree.getRoot();
                 if (rootA != null) {
                     repComponents.setRoot(rootA);
-                    return;
                 }
             }
         }
     }
+
     public IQueryResults() {
         repComponents = new DynamicTree<>();
     }
@@ -127,7 +135,6 @@ public abstract class IQueryResults extends QueryTools
     public int getObjectsFound() {
         return objectsFound;
     }
-
 
     protected DynamicTreeNode<Object> getNode(DialogItem dialogItem, String tabName) throws SQLException {
         if (DatabaseConnector.TableExist(tabName)) {
@@ -140,7 +147,6 @@ public abstract class IQueryResults extends QueryTools
     abstract public String getReportSummary();
 
     protected abstract ArrayList<IAggregateQuery> loadReportAggregates() throws SQLException;
-
 
     public AggregatesPanel getAggregatesPanel() throws SQLException {
         if (aggregateParams == null) {
@@ -204,7 +210,6 @@ public abstract class IQueryResults extends QueryTools
                 + ReferenceType.AppType.toString() + " where name =\""
                 + FileInfoType.getFileType(fileInfoType) + "\"))", true);
     }
-
 
     public void printDBRecords(PrintStreams ps) throws Exception {
         this.Print(ps);
@@ -303,9 +308,8 @@ public abstract class IQueryResults extends QueryTools
         }
         query.Execute();
         int cnt = 0;
-        ILogRecord record = null;
         try {
-            for (record = query.GetNext();
+            for (ILogRecord record = query.GetNext();
                     record != null;
                     record = query.GetNext()) {
                 if (Thread.currentThread().isInterrupted()) {
@@ -343,8 +347,7 @@ public abstract class IQueryResults extends QueryTools
     public void getRecords(IQuery query, HashMap ids) throws Exception {
         query.Execute();
 
-        ILogRecord record = null;
-        for (record = query.GetNext();
+        for (ILogRecord record = query.GetNext();
                 record != null;
                 record = query.GetNext()) {
             long id = record.getID();
@@ -356,7 +359,6 @@ public abstract class IQueryResults extends QueryTools
         }
         query.Reset();
     }
-
 
     protected void DoneSTDOptions() {
         DynamicTreeNode.setBlockLoad(true);
@@ -403,7 +405,6 @@ public abstract class IQueryResults extends QueryTools
         });
     }
 
-
     public void setObjectsFound(int objectsFound) {
         this.objectsFound = objectsFound;
     }
@@ -445,67 +446,66 @@ public abstract class IQueryResults extends QueryTools
         int fileNoIdx = 0;
         int fileStartTimeIdx = 0;
 
-        ResultSet rs = DatabaseConnector.executeQuery(query);
-
-        ResultSetMetaData rsmd = rs.getMetaData();
+        try (ResultSet rs = DatabaseConnector.executeQuery(query)) {
+            ResultSetMetaData rsmd = rs.getMetaData();
 
 // The column count starts from 1
-        for (int i = 1; i <= rsmd.getColumnCount(); i++) {
-            if (FILENO.equals(rsmd.getColumnName(i))) {
-                fileNoIdx = i;
-            } else if (APPSTARTTIME.equals(rsmd.getColumnName(i))) {
-                fileStartTimeIdx = i;
-            }
-            // Do stuff with name
-        }
-
-        ret = new FullTableColors();
-        ret.setMetaData(rsmd);
-        ret.setFieldColorChange(APPSTARTTIME);
-
-        int columnCount = rsmd.getColumnCount();
-
-        int cnt = 0;
-        int curFileNo = 0;
-        String curFileStart = null;
-        while (rs.next()) {
-            if (fileNoIdx > 0 && fileStartTimeIdx > 0) {
-                String theFileStart = rs.getString(fileStartTimeIdx);
-                int curNo = rs.getInt(fileNoIdx);
-                if (curFileStart == null || !curFileStart.equals(theFileStart)) {
-                    curFileNo = curNo;
-                    curFileStart = theFileStart;
-                } else if (curNo == curFileNo + 1) {
-                    curFileNo++;
-                } else if (curNo - curFileNo > 0) {
-                    ArrayList<Object> row = new ArrayList<>(columnCount);
-                    for (int i = 1; i <= columnCount; i++) {
-                        row.add("");
-                    }
-                    row.set(columnCount - 2, "Missing: ");
-                    row.set(columnCount - 1, curNo - curFileNo);
-                    ret.addRow(row);
-                    curFileNo = curNo;
+            for (int i = 1; i <= rsmd.getColumnCount(); i++) {
+                if (FILENO.equals(rsmd.getColumnName(i))) {
+                    fileNoIdx = i;
+                } else if (APPSTARTTIME.equals(rsmd.getColumnName(i))) {
+                    fileStartTimeIdx = i;
                 }
+                // Do stuff with name
             }
-            ArrayList<Object> row = new ArrayList<>(columnCount);
-            for (int i = 1; i <= columnCount; i++) {
-                row.add(rs.getObject(i));
+
+            ret = new FullTableColors();
+            ret.setMetaData(rsmd);
+            ret.setFieldColorChange(APPSTARTTIME);
+
+            int columnCount = rsmd.getColumnCount();
+
+            int cnt = 0;
+            int curFileNo = 0;
+            String curFileStart = null;
+            while (rs.next()) {
+                if (fileNoIdx > 0 && fileStartTimeIdx > 0) {
+                    String theFileStart = rs.getString(fileStartTimeIdx);
+                    int curNo = rs.getInt(fileNoIdx);
+                    if (curFileStart == null || !curFileStart.equals(theFileStart)) {
+                        curFileNo = curNo;
+                        curFileStart = theFileStart;
+                    } else if (curNo == curFileNo + 1) {
+                        curFileNo++;
+                    } else if (curNo - curFileNo > 0) {
+                        ArrayList<Object> row = new ArrayList<>(columnCount);
+                        for (int i = 1; i <= columnCount; i++) {
+                            row.add("");
+                        }
+                        row.set(columnCount - 2, "Missing: ");
+                        row.set(columnCount - 1, curNo - curFileNo);
+                        ret.addRow(row);
+                        curFileNo = curNo;
+                    }
+                }
+                ArrayList<Object> row = new ArrayList<>(columnCount);
+                for (int i = 1; i <= columnCount; i++) {
+                    row.add(rs.getObject(i));
+                }
+                QueryTools.DebugRec(rs);
+                ret.addRow(row);
+                cnt++;
             }
-            QueryTools.DebugRec(rs);
-            ret.addRow(row);
-            cnt++;
+            inquirer.logger.debug("\tRetrieved " + cnt + " records");
+            rs.getStatement().close();
         }
-        inquirer.logger.debug("\tRetrieved " + cnt + " records");
-        rs.getStatement().close();
-        rs.close();
 
         return ret;
 
     }
 
     public FullTableColors getFileFields(ArrayList<Integer> searchApps) throws Exception {
-        FullTableColors currTable = null;
+        FullTableColors currTable;
         FullTableColors retTable = null;
         for (int i = 0; i < searchApps.size(); i++) {
             currTable = getFileTable("select "
@@ -563,9 +563,7 @@ public abstract class IQueryResults extends QueryTools
         return IDsFinder.RequestLevel.Level3;
     }
 
-
     abstract SearchFields getSearchField();
-
 
     public boolean isSuppressConfirms() {
         return suppressConfirms;
@@ -581,7 +579,6 @@ public abstract class IQueryResults extends QueryTools
         long time4 = new Date().getTime();
         inquirer.logger.info("Retrieved " + m_results.size() + " records. Took " + Utils.Util.pDuration(time4 - time3));
     }
-
 
     private void createAndShowGUI() {
         progressMonitor = new ProgressMonitor(null,
@@ -642,8 +639,8 @@ public abstract class IQueryResults extends QueryTools
     public void getGenesysMessagesApp(TableType tableType,
             DynamicTreeNode<OptionNode> root,
             QueryDialog dlg, IQueryResults qry) throws SQLException {
-        boolean shouldRunQuery = false;
-        DynamicTreeNode<OptionNode> logMsgType = null;
+        boolean shouldRunQuery;
+        DynamicTreeNode<OptionNode> logMsgType;
         if (root != null) {
             if (((OptionNode) root.getData()).isChecked()) {
                 logMsgType = getChildByName(root, DialogItem.APP_LOG_MESSAGES_TYPE);
@@ -704,7 +701,6 @@ public abstract class IQueryResults extends QueryTools
         inquirer.logger.info("Printing took " + Utils.Util.pDuration(timePrintEnd - timePrintStart));
     }
 
-
     protected void showAllResults(ArrayList<Pair<String, Integer>> allResults) {
 //        DefaultTableModel infoTableModel = new DefaultTableModel();
 //        infoTableModel.addColumn("Report");
@@ -731,7 +727,6 @@ public abstract class IQueryResults extends QueryTools
 //        inquirer.showInfoPanel(null, "Title", jScrollPane, true);
 
     }
-
 
     protected void addCustom(DynamicTreeNode<OptionNode> node, FileInfoType fileInfoType) throws SQLException {
         if (!DatabaseConnector.TableExist(Parser.getCustomTab(fileInfoType))) {
@@ -798,7 +793,7 @@ public abstract class IQueryResults extends QueryTools
                                             attrName.addChild(attrValue);
 
                                         }
-                                    } catch (Exception exception) {
+                                    } catch (SQLException exception) {
                                         inquirer.logger.error(exception);
                                     }
                                 }
@@ -890,7 +885,6 @@ public abstract class IQueryResults extends QueryTools
 //</editor-fold>      
     }
 
-
     private void fillCustom(FileInfoType fileType) {
         try {
             ResultSet rs = DatabaseConnector.executeQuery("PRAGMA table_info ('" + Parser.getCustomTab(fileType) + "')");
@@ -913,7 +907,7 @@ public abstract class IQueryResults extends QueryTools
             }
             inquirer.logger.debug("\tRetrieved " + cnt + " records");
             rs.close();
-            q.append(" from " + Parser.getCustomTab(fileType));
+            q.append(" from ").append(Parser.getCustomTab(fileType));
 
             FullTable fullTable = DatabaseConnector.getFullTable(q.toString());
             cs = new CustomStorage(fullTable);
@@ -946,7 +940,6 @@ public abstract class IQueryResults extends QueryTools
         }
     }
 
-
     protected void addParameter(MsgType msgType, OutputSpecFormatter.Parameter prm) {
         ArrayList<Parameter> get = addOutParams.get(msgType);
         if (get == null) {
@@ -959,7 +952,7 @@ public abstract class IQueryResults extends QueryTools
     abstract boolean callRelatedSearch(IDsFinder cidFinder) throws SQLException;
 
     public static abstract class ProgressNotifications {
-        
+
         abstract void sayProgress(String s);
     }
 
@@ -1029,8 +1022,9 @@ public abstract class IQueryResults extends QueryTools
             throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
         }
     }
+
     class Task extends SwingWorker<Void, Void> {
-        
+
         @Override
         public Void doInBackground() {
             try {
@@ -1041,7 +1035,7 @@ public abstract class IQueryResults extends QueryTools
             }
             return null;
         }
-        
+
         @Override
         public void done() {
             Toolkit.getDefaultToolkit().beep();
@@ -1135,17 +1129,17 @@ public abstract class IQueryResults extends QueryTools
 //                            ReferenceType.CUSTKKEY,
 //                            (Integer) row.get(fullTable.getColumnIdx(keyFieldName))
 //                    );
-String valueFieldName = Parser.valName(i);
-Integer valueID = (Integer) row.get(fullTable.getColumnIdx(valueFieldName));
+                    String valueFieldName = Parser.valName(i);
+                    Integer valueID = (Integer) row.get(fullTable.getColumnIdx(valueFieldName));
 
 //                    String value = DatabaseConnector.getDatabaseConnector(null).persistentRef(
 //                            ReferenceType.CUSTVALUE,
 //                            valueID
 //                    );
-if (keyID != null && keyID > 0 && valueID != null && valueID > 0) {
-    //using valueFieldName to be used later for search parameter
-    putKeyValue(valueFieldName, keyID, valueID);
-}
+                    if (keyID != null && keyID > 0 && valueID != null && valueID > 0) {
+                        //using valueFieldName to be used later for search parameter
+                        putKeyValue(valueFieldName, keyID, valueID);
+                    }
                 }
 
 //                for (int i = 1; i <= MAX_CUSTOM_FIELDS; i++) {
@@ -1184,7 +1178,7 @@ if (keyID != null && keyID > 0 && valueID != null && valueID > 0) {
             }
 
             class KeyValues extends HashMap<Integer, HashSet<Integer>> {
-                
+
                 private void putKeyValue(Integer keyID, Integer valueID) {
                     HashSet<Integer> hsValues = get(keyID);
                     if (hsValues == null) {

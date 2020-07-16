@@ -18,8 +18,8 @@ public class PseudoLogFormatter implements ILogRecordFormatter {
     private int m_markedLine;
     private int m_actualLogMarkLine;
     private String m_actualLogFileName;
-    private boolean m_navigate;
-    private HashSet<String> m_components;
+    private final boolean m_navigate;
+    private final HashSet<String> m_components;
 
     public PseudoLogFormatter(String fileName, boolean navigate, HashSet<String> components) throws Exception {
         m_lineCount = 0;
@@ -105,7 +105,7 @@ public class PseudoLogFormatter implements ILogRecordFormatter {
             m_fileWriter.write("\n\n");
             m_lineCount += 2;
         } catch (Exception e) {
-            inquirer.logger.error(e);;
+            inquirer.logger.error(e);
             // ignore exceptions for now
         }
 

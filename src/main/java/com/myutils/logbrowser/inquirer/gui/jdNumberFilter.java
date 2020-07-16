@@ -286,7 +286,6 @@ public final class jdNumberFilter extends javax.swing.JDialog {
 
     }//GEN-LAST:event_formWindowActivated
 
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;

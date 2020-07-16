@@ -21,44 +21,45 @@ public class Excel {
 
     private static final org.apache.logging.log4j.Logger logger = LogManager.getLogger();
 
-
 //        https://msdn.microsoft.com/en-us/library/office/aa221100(v=office.11).aspx
     private static final int xlWindows = 2;
     private static final int xlDelimited = 1;
     private static final int xlTextQualifierNone = -4142;
     private static Excel excelInstance = null;
+
     private static Dispatch openExcel(String fileName) throws IOException {
         ActiveXComponent xl = getExcel().excel;
 
 //get "Workbooks" 1 property from "Application" object
-Dispatch workbooks = xl.getProperty("Workbooks").toDispatch();
+        Dispatch workbooks = xl.getProperty("Workbooks").toDispatch();
 //call method "Open" with filepath param on "Workbooks" object and save "Workbook" object
 
-inquirer.logger.info("Opening in excel [" + fileName + "]");
+        inquirer.logger.info("Opening in excel [" + fileName + "]");
 
-Variant t = new Variant(true);
-Variant f = new Variant(false);
+        Variant t = new Variant(true);
+        Variant f = new Variant(false);
 
-Variant workbook = Dispatch.call(workbooks, "OpenText", new Variant(fileName), new Variant(xlWindows),
-        new Variant(1),
-        new Variant(xlDelimited),
-        new Variant(xlTextQualifierNone),
-        t,
-        f,
-        f,
-        t
-);
-access(workbook);
+        Variant workbook = Dispatch.call(workbooks, "OpenText", new Variant(fileName), new Variant(xlWindows),
+                new Variant(1),
+                new Variant(xlDelimited),
+                new Variant(xlTextQualifierNone),
+                t,
+                f,
+                f,
+                t
+        );
+        access(workbook);
 //        inquirer.logger.info("wb" + workbook.toString());
 
-Dispatch actWorkbook = xl.getProperty("ActiveWorkbook").toDispatch();
-access(actWorkbook);
+        Dispatch actWorkbook = xl.getProperty("ActiveWorkbook").toDispatch();
+        access(actWorkbook);
 
 //        Dispatch wb = workbook.getDispatch();
 //get "Worksheets" property from "Workbook" object
-return Dispatch.get(actWorkbook, "Worksheets").toDispatch();
+        return Dispatch.get(actWorkbook, "Worksheets").toDispatch();
 
     }
+
     static void aggregateEdit(ArrayList<String> shortFileNames) throws IOException {
         Dispatch sheets = openExcel(shortFileNames.get(0));
         Dispatch sheet = Dispatch.call(sheets, "Item", new Variant(1)).toDispatch();
@@ -72,9 +73,9 @@ return Dispatch.get(actWorkbook, "Worksheets").toDispatch();
 
 //        range1.s
 //     r = Dispatch.call(range1, "NumberFormat",  new Variant("mm/dd/yyyy hh:mm:ss"));
-getExcel().excel.setProperty("Visible", true);
+        getExcel().excel.setProperty("Visible", true);
 
-inquirer.logger.info("Loaded excel");
+        inquirer.logger.info("Loaded excel");
     }
 
     static void close() {
@@ -144,6 +145,7 @@ If you need help with a strategy to make Excel work reliably without user input,
     private static void access(Variant r) {
         inquirer.logger.info((r == null) ? "[NULL]" : r.toString());
     }
+
     static public Excel getExcel() throws IOException {
         if (excelInstance == null) {
             excelInstance = new Excel();
@@ -156,7 +158,6 @@ If you need help with a strategy to make Excel work reliably without user input,
     public Excel() throws IOException {
         InitDLL();
     }
-
 
     private void InitDLL() throws IOException {
         WindowsSystemUtility.InitDLLActiveX();

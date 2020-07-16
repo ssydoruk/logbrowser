@@ -17,6 +17,7 @@ import javax.swing.JPanel;
  * @author ssydoruk
  */
 public abstract class IAggregateQuery extends IQueryResults {
+
     private static final String TMP_TABLE_PREFIX = "tmp";
     private static int tmpTableIdx = 0;
     protected QueryDialog qd = null;
@@ -38,7 +39,6 @@ public abstract class IAggregateQuery extends IQueryResults {
     public void propertyChange(PropertyChangeEvent evt) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
-
 
     @Override
     protected ArrayList<IAggregateQuery> loadReportAggregates() {
@@ -65,7 +65,6 @@ public abstract class IAggregateQuery extends IQueryResults {
         return null;
     }
 
-
     public JPanel getJpConfig() {
         return jpConfig;
     }
@@ -91,12 +90,11 @@ public abstract class IAggregateQuery extends IQueryResults {
 
     abstract public boolean needPrint();
 
-
     public String resetTempTable() {
         String ret = TMP_TABLE_PREFIX + (tmpTableIdx++);
         try {
             DatabaseConnector.dropTable(ret);
-        } catch (Exception ex) {
+        } catch (SQLException ex) {
             inquirer.logger.error("Unable to drop table " + ret, ex);
         }
 
@@ -107,7 +105,7 @@ public abstract class IAggregateQuery extends IQueryResults {
 
     public String getExcelName() {
         String shortName = getShortName();
-        if (shortName == null && shortName.isEmpty()) {
+        if (shortName == null || shortName.isEmpty()) {
             shortName = "aggr";
         }
         return InquirerCfg.getFileUnique(shortName);

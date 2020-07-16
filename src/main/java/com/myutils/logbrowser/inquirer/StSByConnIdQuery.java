@@ -14,7 +14,7 @@ import java.sql.SQLException;
  */
 public class StSByConnIdQuery extends IQuery {
 
-    private Integer[] m_ConnIds;
+    private final Integer[] m_ConnIds;
     private ResultSet m_resultSet;
     private DatabaseConnector m_connector;
     private int recCnt;

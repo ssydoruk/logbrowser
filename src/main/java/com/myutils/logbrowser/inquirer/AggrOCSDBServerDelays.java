@@ -13,7 +13,6 @@ import java.beans.PropertyChangeEvent;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
-
 /**
  *
  * @author ssydoruk

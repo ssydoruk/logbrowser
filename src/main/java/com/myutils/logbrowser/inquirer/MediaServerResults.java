@@ -15,6 +15,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 public class MediaServerResults extends IQueryResults {
+
     public static final int TLIB = 0x01;
     public static final int ISCC = 0x02;
     public static final int TC = 0x04;
@@ -24,6 +25,7 @@ public class MediaServerResults extends IQueryResults {
     private Object cidFinder;
     ArrayList<NameID> appsType = null;
     private UTCTimeRange timeRange = null;
+
     /**
      *
      */
@@ -41,6 +43,7 @@ public class MediaServerResults extends IQueryResults {
         addSelectionType(SelectionType.AGENTID);
         addSelectionType(SelectionType.UUID);
     }
+
     public MediaServerResults() throws SQLException {
         super();
         loadStdOptions();
@@ -84,7 +87,7 @@ public class MediaServerResults extends IQueryResults {
             wh.addWhere(IQuery.getDateTimeFilters(tab, "time", qd.getTimeRange()), "AND");
 //            wh.addWhere(IQuery.getCheckedWhere("sipms.nameID", ReferenceType.SIPMETHOD,
 //                    FindNode(repComponents.getRoot(), DialogItem.TLIB_CALLS, DialogItem.TLIB_CALLS_SIP, DialogItem.TLIB_CALLS_SIP_NAME)), "AND");
-            wh.addWhere(getWhere("sipms.nameID", ReferenceType.SIPMETHOD, new String[]{"OPTIONS", "200 OK OPTIONS", 
+            wh.addWhere(getWhere("sipms.nameID", ReferenceType.SIPMETHOD, new String[]{"OPTIONS", "200 OK OPTIONS",
                 "NOTIFY", "200 OK NOTIFY", "503 Service Unavailable OPTIONS"}, false, false, true), "AND");
 
             DatabaseConnector.runQuery("insert into " + tmpTable + " (callidid, started, ended)"
@@ -147,7 +150,6 @@ public class MediaServerResults extends IQueryResults {
         return refreshTimeRange(null);
     }
 
-
     @Override
     public String getReportSummary() {
         return getName() + "\n\t" + "search: " + ((cidFinder != null) ? cidFinder.toString() : "<not specified>");
@@ -157,7 +159,6 @@ public class MediaServerResults extends IQueryResults {
     public String getName() {
         return "Media Server";
     }
-
 
     private void addSIPReportType(DynamicTreeNode<OptionNode> root) {
         DynamicTreeNode<OptionNode> nd = new DynamicTreeNode<>(new OptionNode(true, DialogItem.TLIB_CALLS_SIP));
@@ -216,7 +217,6 @@ public class MediaServerResults extends IQueryResults {
         DoneSTDOptions();
     }
 
-
     @Override
     public ArrayList<NameID> getApps() throws SQLException {
         if (appsType == null) {
@@ -226,7 +226,6 @@ public class MediaServerResults extends IQueryResults {
         }
         return appsType;
     }
-
 
     @Override
     public void Retrieve(QueryDialog dlg) throws SQLException {
@@ -243,69 +242,6 @@ public class MediaServerResults extends IQueryResults {
 //        getGenesysMessages(TableType.MsgMCP, repComponents.getRoot(), dlg, this);
     }
 
-//    private void retrieveSIP
-    private void doRetrieve(QueryDialog dlg, SelectionType selectionType, String selection, boolean isRegex) throws SQLException {
-        ILogRecord record = null;
-        IDsFinder cidFinder = null;
-
-        if (selection != null && (selectionType == SelectionType.CONNID
-                || selectionType == SelectionType.CALLID)) {
-            cidFinder = new IDsFinder();
-            if (!cidFinder.initMediaServer()) {
-                inquirer.logger.info("No call ID found; returning");
-                return;
-            }
-        }
-//        RetrieveSIP(dlg,
-//                FindNode(repComponents.getRoot(), DialogItem.TLIB_CALLS, DialogItem.TLIB_CALLS_SIP, null),
-//                selectionType,
-//                selection,
-//                isRegex);
-//
-//        RetrieveTLib(dlg,
-//                FindNode(repComponents.getRoot(), DialogItem.TLIB_CALLS, DialogItem.TLIB_CALLS_TEVENT, null),
-//                selectionType,
-//                selection,
-//                isRegex);
-
-    }
-
-//    private void RetrieveSIP(QueryDialog dlg, DynamicTreeNode<OptionNode> reportSettings,
-//            SelectionType st, String selection, boolean isRegex) throws SQLException {
-//        if (isChecked(reportSettings)) {
-//            inquirer.logger.debug("SIP report");
-//            SipForScCmQuery sipMsgsByCallid = new SipForScCmQuery(reportSettings);
-//            if (selection != null) {
-////                sipMsgsByCallid.setRegexSearch(isRegex);
-////                sipMsgsByCallid.setSearch(selection);
-////                sipMsgsByCallid.setSearchType(st);
-//            }
-//            sipMsgsByCallid.setCommonParams(this, dlg);
-//            getRecords(sipMsgsByCallid);
-//        }
-//    }
-//    private void RetrieveTLib(QueryDialog dlg,
-//            DynamicTreeNode<OptionNode> eventsSettings,
-//            SelectionType selectionType,
-//            String selection,
-//            boolean isRegex)  throws SQLException {
-//
-//        if (isChecked(eventsSettings)) {
-//            inquirer.logger.debug("TLib report");
-//            TlibForScCmQuery tlibQuery = new TlibForScCmQuery(eventsSettings);
-//            if (selection != null) {
-//                tlibQuery.setRegexSearch(isRegex);
-//                tlibQuery.setSearch(selection);
-//                tlibQuery.setSearchType(selectionType);
-//            }
-//            getRecords(tlibQuery);
-//        }
-////        if (isChecked(eventsSettings)) {
-////            TableQuery TLibReq = MakeTLibReq();
-////            TLibReq.AddCheckedWhere(TLibReq.getTabAlias() + ".nameID", ReferenceType.TEvent, eventsSettings, "and", DialogItem.TLIB_CALLS_TEVENT_NAME);
-////            getRecords(TLibReq);
-////        }
-//    }
     private void RetrieveSIP(QueryDialog dlg, DynamicTreeNode<OptionNode> reportSettings, IDsFinder cidFinder) throws SQLException {
         SipMSQuery sipMsgsByCallid = new SipMSQuery(reportSettings, cidFinder, dlg, this);
         if (sipMsgsByCallid.isShouldRun()) {
@@ -389,8 +325,7 @@ public class MediaServerResults extends IQueryResults {
         if (isChecked(strategyStepsSettings) && TableExist(TableType.VXMLIntStepsTable.toString())) {
             Integer[] mcpCallID = null;
             if (((dlg.getSelectionType() != SelectionType.NO_SELECTION) ? (mcpCallID = cidFinder.getIDs(IDType.MCPCallID)) != null : true)) {
-                TableQuery strategySteps = null;
-                strategySteps = new TableQuery(MsgType.VXMLStrategySteps, TableType.VXMLIntStepsTable.toString());
+                TableQuery strategySteps = new TableQuery(MsgType.VXMLStrategySteps, TableType.VXMLIntStepsTable.toString());
                 tellProgress("Retrieving VXMLStrategy steps");
                 strategySteps.addRef("commandId", "command", ReferenceType.VXMLCommand.toString(), IQuery.FieldType.Mandatory);
                 strategySteps.addRef("paramsID", "params", ReferenceType.VXMLCommandParams.toString(), IQuery.FieldType.Optional);

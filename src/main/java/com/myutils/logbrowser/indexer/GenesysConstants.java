@@ -13,8 +13,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author ssydoruk
  */
 enum GenesysConstants {
-    TSERVER("TServer"),
-;
+    TSERVER("TServer"),;
 
     static String showAll() {
         StringBuilder ret = new StringBuilder();

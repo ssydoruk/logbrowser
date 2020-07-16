@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 
 public class DefaultFormatter implements ILogRecordFormatter {
+
     static protected HashMap<String, Integer> m_callIdHash = new HashMap<>();
     static protected int m_callIdCount = 0;
 
@@ -33,12 +34,15 @@ public class DefaultFormatter implements ILogRecordFormatter {
         m_maxFileNameLength = 0;
         m_components = components;
     }
+
     public boolean isShouldPrintRecordType() {
         return shouldPrintRecordType;
     }
+
     public boolean isPrintFileLine() {
         return printFileLine;
     }
+
     public boolean isShouldAccessFiles() {
         return shouldAccessFiles;
     }
@@ -73,7 +77,6 @@ public class DefaultFormatter implements ILogRecordFormatter {
     @Override
     public void ProcessLayout() {
     }
-
 
     /**
      *

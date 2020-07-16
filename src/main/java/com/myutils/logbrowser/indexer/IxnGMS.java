@@ -16,7 +16,6 @@ public final class IxnGMS extends Message {
     final private static Pattern regIxnActor = Pattern.compile("^\\s*attr_actor_router_id .+ \"([^\"]+)\"$");
     final private static Pattern regIxnSubmitted = Pattern.compile("^\\s*attr_itx_submitted_by .+ \"([^\"]+)\"$");
 
-
     private static final Regexs AgentIDs = new Regexs(new Pair[]{
         new Pair("^\\s*attr_agent_id.+ \"([^\"]+)\"$", 1),
         new Pair("^\\s*attr_actor_agent_id.+ \"([^\"]+)\"$", 1),
@@ -86,30 +85,30 @@ public final class IxnGMS extends Message {
     MessageAttributes attrs = new MessageAttributes();
     Attribute ixnID = new Attribute() {
         @Override
-                String getValue() {
-                    return FindByRx(IxnIDs);
-                }
+        String getValue() {
+            return FindByRx(IxnIDs);
+        }
     };
     Attribute attr1 = new Attribute() {
         @Override
-                String getValue() {
-                    String retService = FindByRx(regService, 1, null);
-                    String retMethod = FindByRx(regMethod, 1, null);
-                    StringBuilder ret = new StringBuilder(50);
-                    if (retService != null) {
-                        ret.append(retService);
-                    }
-                    if (retMethod != null) {
-                        if (ret.length() > 0) {
-                            ret.append("|");
-                        }
-                        ret.append(retMethod);
-                    }
-                    if (ret.length() > 0) {
-                        return ret.toString();
-                    }
-                    return null;
+        String getValue() {
+            String retService = FindByRx(regService, 1, null);
+            String retMethod = FindByRx(regMethod, 1, null);
+            StringBuilder ret = new StringBuilder(50);
+            if (retService != null) {
+                ret.append(retService);
+            }
+            if (retMethod != null) {
+                if (ret.length() > 0) {
+                    ret.append("|");
                 }
+                ret.append(retMethod);
+            }
+            if (ret.length() > 0) {
+                return ret.toString();
+            }
+            return null;
+        }
     };
 
     public IxnGMS(TableType t) {
@@ -150,7 +149,6 @@ public final class IxnGMS extends Message {
         return null;
 
     }
-
 
     String GetIxnID() {
         return ixnID.toString();
@@ -199,11 +197,9 @@ public final class IxnGMS extends Message {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
-
     String getAttr1() {
         return attr1.toString();
     }
-
 
     String getAttr2() {
         String msgName = GetMessageName();

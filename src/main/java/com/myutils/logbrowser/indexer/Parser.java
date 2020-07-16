@@ -28,6 +28,7 @@ import org.w3c.dom.NodeList;
  * @author ssydoruk
  */
 public abstract class Parser {
+
     private static final boolean parseTimeDiff = "true".equalsIgnoreCase(System.getProperty("timediff.parse"));
 
     public static final int MAX_CUSTOM_FIELDS = 3;
@@ -107,9 +108,11 @@ public abstract class Parser {
     public static String valNameFull(int i) {
         return "value" + i;
     }
+
     public static boolean isParseTimeDiff() {
         return Main.clr.isParseTDiff() | parseTimeDiff;
     }
+
     static public boolean isSessionID(String resp) {
         return (resp != null && !resp.isEmpty())
                 ? regORSSessionID.matcher(resp).find()
@@ -128,7 +131,6 @@ public abstract class Parser {
     private final String m_StringType;
     private boolean foundBodyDates;
 
-
     protected int m_LineStarted; // line where expression (TMessage) started
     private long bytesConsumed;
 
@@ -143,7 +145,6 @@ public abstract class Parser {
     private Date lastKnownDate = null;
     Calendar cal;
 
-
     private FilesParseSettings.FileParseSettings fileParseSettings;
     private int lastChangeValue = 0;
     private String lastMatch;
@@ -157,6 +158,7 @@ public abstract class Parser {
     //</editor-fold>
     private CustomAttributeTable custAttrTab = null;
     private CustomLineTable custLineTab = null;
+
     public Parser(FileInfoType type, HashMap<TableType, DBTable> tables) {
         super();
         cal = Calendar.getInstance();
@@ -168,7 +170,7 @@ public abstract class Parser {
 
         /*
         adding default formats for date
-        */
+         */
         fileParseSettings = Main.getMain().xmlCfg.getFileParseSettings(type);
         if (fileParseSettings != null) {
             ArrayList<Parser.DateFmt> formats = fileParseSettings.getAllFormats();
@@ -186,12 +188,15 @@ public abstract class Parser {
             dateDiff = new DateDiff(type);
         }
     }
+
     protected void logError(String s) {
         Main.logger.error("l" + m_CurrentLine + ": " + s);
     }
+
     public int getM_CurrentLine() {
         return m_CurrentLine;
     }
+
     public DateParsed getCurrentTimestamp() {
         if (dp == null) {
             return m_LastTimeStamp;
@@ -243,7 +248,6 @@ public abstract class Parser {
         }
         return true;
     }
-
 
     protected DateParsed getLastTimeStamp() {
         return m_LastTimeStamp;
@@ -332,7 +336,6 @@ public abstract class Parser {
             return str;
         }
     }
-
 
     public GenesysMsg getLastLogMsg() {
         return lastLogMsg;
@@ -588,7 +591,6 @@ public abstract class Parser {
         }
     }
 
-
     void setFileInfo(FileInfo _fileInfo) {
         this.fileInfo = _fileInfo;
         setM_LastTimeStamp(fileInfo.getFileLocalTime());
@@ -635,7 +637,6 @@ public abstract class Parser {
             this.m_LastTimeStamp = m_LastTimeStamp;
         }
     }
-
 
     private DateParsed adjustDay(DateParsed parseDate, DateParsed fileLocalDate) {
         if (parseDate != null) {
@@ -697,7 +698,6 @@ public abstract class Parser {
 
     abstract void init(HashMap<TableType, DBTable> m_tables);
 
-
     void doneParsingFile() {
         if (!foundBodyDates) {
             Main.logger.error("Not parsed single date; check your parser");
@@ -707,6 +707,7 @@ public abstract class Parser {
     protected void pError(org.apache.logging.log4j.Logger logger, String string) {
         logger.error("l:" + m_CurrentLine + " " + string);
     }
+
     private void insertIntoCustom(Matcher m, String key, ArrayList<FilesParseSettings.FileParseCustomSearch.SearchComponent> value, int changeValue,
             FilesParseSettings.FileParseCustomSearch fileParseCustomSearch) throws Exception {
         if (custLineTab == null) {
@@ -718,12 +719,12 @@ public abstract class Parser {
 //        int lastPrintedIdx = cl.lastPrintedIdx(fileParseCustomSearch);
 //        Main.logger.info("insertIntoCustom custom [" + lastPrintedIdx + "]");
 //        if (lastPrintedIdx < 0) {
-SaveTime(cl);
-cl.SetOffset(getFilePos());
-cl.SetFileBytes(getEndFilePos() - getFilePos());
-cl.SetLine(m_LineStarted);
-cl.handlerID(changeValue);
-custLineTab.AddToDB(cl);
+        SaveTime(cl);
+        cl.SetOffset(getFilePos());
+        cl.SetFileBytes(getEndFilePos() - getFilePos());
+        cl.SetLine(m_LineStarted);
+        cl.handlerID(changeValue);
+        custLineTab.AddToDB(cl);
 //        }
 //        cl.setPrinted(lastPrintedIdx);
 //        for (Pair<String, Integer> pair : value) {
@@ -741,6 +742,7 @@ custLineTab.AddToDB(cl);
         String fmt;
         private SimpleDateFormat formatter = null;
         ArrayList<Pair<String, String>> repl = null;
+
         public DateFmt(String p, String fmt) {
             this.pattern = Pattern.compile(p);
             this.fmt = fmt;
@@ -752,45 +754,52 @@ custLineTab.AddToDB(cl);
                 formatter.set2DigitYearStart(cal.getTime());
             }
         }
+
         DateFmt(String p, String fmt, Element el) {
             this(p, fmt);
-            
+
             NodeList nl = el.getChildNodes();
             if (nl != null && nl.getLength() > 0) {
                 for (int i = 0; i < nl.getLength(); i++) {
                     if (nl.item(i).getNodeType() == Node.ELEMENT_NODE) {
                         Element spec = (Element) nl.item(i);
 //                        Main.logger.info("Type: " + type + " attr[" + spec.getNodeName() + "]");
-if (spec.getNodeName().equalsIgnoreCase("replace")) {
-    String from = spec.getAttribute("from");
-    String to = spec.getAttribute("to");
-    addReplace(from, to);
-}
+                        if (spec.getNodeName().equalsIgnoreCase("replace")) {
+                            String from = spec.getAttribute("from");
+                            String to = spec.getAttribute("to");
+                            addReplace(from, to);
+                        }
                     }
                 }
             }
         }
+
         public int getFmtLength() {
             return fmt.length();
         }
+
         @Override
         public String toString() {
             return "pattern: [" + pattern.pattern() + "] fmt: [" + fmt + "] fmt: ["
                     + ((formatter == null) ? "(null)" : formatter.toString()
-                    + "] ");
+                            + "] ");
         }
+
         private void addReplace(String from, String to) {
             if (repl == null) {
                 repl = new ArrayList<>();
             }
             repl.add(new Pair(from, to));
         }
+
         public boolean isReplNull() {
             return repl == null;
         }
+
         public Date parseDate(String d) throws ParseException {
             return formatter.parse(d);
         }
+
         Date parseDate(String d, Matcher m) throws ParseException {
             if (repl == null) {
                 return parseDate(d);
@@ -806,7 +815,6 @@ if (spec.getNodeName().equalsIgnoreCase("replace")) {
                 return parseDate(s.toString());
             }
         }
-
 
     }
 
@@ -837,19 +845,19 @@ if (spec.getNodeName().equalsIgnoreCase("replace")) {
                     FilesParseSettings.FileParseCustomSearch.SearchComponent savedSearch = crl.getValue().get(i);
                     FilesParseSettings.FileParseCustomSearch.SearchComponent curSearch = value.get(i);
 //                    Main.logger.info("compare "+savedSearch.toString()+" | "+curSearch.toString());
-String value1 = crl.getValue(i);
-String value2 = getValue(i);
-if (savedSearch.isMustChange() && curSearch.isMustChange()) {
-    if (value1 != null && value2 != null && !value1.equalsIgnoreCase(value2)) {
-        valueEqual = false;
-    }
-    
-} else {
-    if (value1 != null && value2 != null && !value1.equalsIgnoreCase(value2)) {
-        // unrelated keys
-        otherEqual = false;
-    }
-}
+                    String value1 = crl.getValue(i);
+                    String value2 = getValue(i);
+                    if (savedSearch.isMustChange() && curSearch.isMustChange()) {
+                        if (value1 != null && value2 != null && !value1.equalsIgnoreCase(value2)) {
+                            valueEqual = false;
+                        }
+
+                    } else {
+                        if (value1 != null && value2 != null && !value1.equalsIgnoreCase(value2)) {
+                            // unrelated keys
+                            otherEqual = false;
+                        }
+                    }
                 }
                 if (j > 0 && otherEqual) {
                     return (valueEqual) ? j : -1;

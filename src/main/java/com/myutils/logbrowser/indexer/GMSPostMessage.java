@@ -14,6 +14,7 @@ import java.util.regex.Pattern;
  * @author terry The class Replicates TLibMessage
  */
 public class GMSPostMessage extends Message {
+
     final private static Pattern regService = Pattern.compile("/service/callback/([^,\\s]+)");
     final private static Pattern regPOSTMessage = Pattern.compile("^\\(POST\\) Client IP Address: ([0-9\\.]+),.+(http[^,]+)");
 
@@ -65,13 +66,11 @@ public class GMSPostMessage extends Message {
         return getGMSAttributeString(new String[]{"callback_type", "serviceType"});
     }
 
-
     String GMSService() {
         String ret = getGMSAttributeString("service_id");
 
         return ret;
     }
-
 
     String ORSSessionID() {
         parsePOST();
@@ -90,7 +89,6 @@ public class GMSPostMessage extends Message {
             return null;
         }
     }
-
 
     private void parsePOST() {
         if (!this.POSTParsed) {

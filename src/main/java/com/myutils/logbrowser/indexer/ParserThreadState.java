@@ -13,7 +13,7 @@ import java.util.ArrayList;
  */
 public class ParserThreadState {
 
-    private ParserThreadsProcessor.StateTransition transition;
+    private final ParserThreadsProcessor.StateTransition transition;
     private boolean waitNonthread;
     private Message msg;
     private ArrayList<String> msgLines;
@@ -42,7 +42,6 @@ public class ParserThreadState {
     public String toString() {
         return "ParserThreadState{" + "waitNonthread=" + waitNonthread + ", msg=" + msg + ", msgLines=" + msgLines + ", filePos=" + filePos + ", bytes=" + bytes + ", parserState=" + parserState + ", headerOffset=" + headerOffset + '}';
     }
-
 
     public void setWaitNonthread(boolean waitNonthread) {
         this.waitNonthread = waitNonthread;
@@ -81,7 +80,6 @@ public class ParserThreadState {
     public void setBytes(long bytes) {
         this.bytes = bytes;
     }
-
 
     public long getHeaderOffset() {
         return headerOffset;

@@ -6,6 +6,7 @@
 package com.myutils.logbrowser.inquirer.gui;
 
 import Utils.Pair;
+import com.jacob.com.ComFailException;
 import com.myutils.logbrowser.indexer.Main;
 import com.myutils.logbrowser.inquirer.InquirerFileIo;
 import com.myutils.logbrowser.inquirer.MsgType;
@@ -63,15 +64,16 @@ public class MyJTable extends JTableCommon {
     ArrayList<AbstractAction> filterMenus = new ArrayList();
     JMenu jmAddFields;
     JMenu jmOpenIn;
+
     public MyJTable() {
         super();
-        
+
 //       sorter = new TableRowSorter<TabResultDataModel>((TabResultDataModel) getModel());
 //        setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 //        setTableHeader(null);
-setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 //        setCellSelectionEnabled(true);
-setRowSelectionAllowed(true);
+        setRowSelectionAllowed(true);
 
 //        deleteItem = new JMenuItem("Delete");
 //
@@ -96,49 +98,49 @@ setRowSelectionAllowed(true);
 ////        });
 //        popupMenu.add(followSource);
 //        setComponentPopupMenu(popupMenu);
-Font font = this.getFont();
+        Font font = this.getFont();
 
-setDefaultRenderer(Object.class, new CustomTableCellRenderer(new Font(font.getName(), Font.BOLD, font.getSize())));
+        setDefaultRenderer(Object.class, new CustomTableCellRenderer(new Font(font.getName(), Font.BOLD, font.getSize())));
 //        showMessage = new ShowMessage();
 //        popupMenu.insert(showMessage, copyItemsIdx);
 
 //        popupMenu.insert(new SearchCell(this), copyItemsIdx);
-popupMenu.insert(new RegexField(this), copyItemsIdx);
+        popupMenu.insert(new RegexField(this), copyItemsIdx);
 
-jmAddFields = new JMenu();
-popupMenu.insert(jmAddFields, copyItemsIdx);
-showAllColumns = new ShowAllColumns();
-popupMenu.insert(showAllColumns, copyItemsIdx);
-hideColumn = new HideColumn();
-popupMenu.insert(hideColumn, copyItemsIdx);
-hideColumnRTMenu = new JMenuItem(new HideColumnRecordType());
-popupMenu.insert(hideColumnRTMenu, copyItemsIdx);
-changeHiddenState(false);
+        jmAddFields = new JMenu();
+        popupMenu.insert(jmAddFields, copyItemsIdx);
+        showAllColumns = new ShowAllColumns();
+        popupMenu.insert(showAllColumns, copyItemsIdx);
+        hideColumn = new HideColumn();
+        popupMenu.insert(hideColumn, copyItemsIdx);
+        hideColumnRTMenu = new JMenuItem(new HideColumnRecordType());
+        popupMenu.insert(hideColumnRTMenu, copyItemsIdx);
+        changeHiddenState(false);
 
-copyMenus.add(new CopyRecord());
-copyMenus.add(new AppendRecord());
-copyMenus.add(new CopyAllRecords());
-copyMenus.add(new CopyAllShortRecords());
-copyMenus.add(new CopyAllJiraRecords());
+        copyMenus.add(new CopyRecord());
+        copyMenus.add(new AppendRecord());
+        copyMenus.add(new CopyAllRecords());
+        copyMenus.add(new CopyAllShortRecords());
+        copyMenus.add(new CopyAllJiraRecords());
 
-popupMenu.insert(new JPopupMenu.Separator(), copyItemsIdx);
-for (int i = copyMenus.size() - 1; i >= 0; i--) {
-    popupMenu.insert(copyMenus.get(i), copyItemsIdx);
-    
-}
+        popupMenu.insert(new JPopupMenu.Separator(), copyItemsIdx);
+        for (int i = copyMenus.size() - 1; i >= 0; i--) {
+            popupMenu.insert(copyMenus.get(i), copyItemsIdx);
+
+        }
 
 //        popupMenu.add(new CopyRecord());
 //        popupMenu.add(new AppendRecord());
 //        popupMenu.add(new CopyAllRecords());
 //        popupMenu.add(new CopyAllShortRecords());
-popupMenu.addSeparator();
-infoAction = new ShowInfo();
-popupMenu.add(infoAction);
+        popupMenu.addSeparator();
+        infoAction = new ShowInfo();
+        popupMenu.add(infoAction);
 
-jmOpenIn = new JMenu("Open record in...");
-popupMenu.add(jmOpenIn);
-jmOpenIn.add(new OpenNotepad());
-jmOpenIn.add(new OpenTextPad());
+        jmOpenIn = new JMenu("Open record in...");
+        popupMenu.add(jmOpenIn);
+        jmOpenIn.add(new OpenNotepad());
+        jmOpenIn.add(new OpenTextPad());
     }
 
     public ShowInfo getInfoAction() {
@@ -294,17 +296,21 @@ jmOpenIn.add(new OpenTextPad());
     void copyData(MyJTable tableView) {
         setModel(new TabResultDataModel((TabResultDataModel) tableView.getModel()));
     }
+
     public ShowFullMessage getFullMsg() {
         return fullMsg;
     }
+
     public void setFullMsg(ShowFullMessage fullMsg) {
         this.fullMsg = fullMsg;
         getSelectionModel().addListSelectionListener(new ListSelectionChanged());
-        
+
     }
+
     public boolean isFollowLog() {
         return followLog;
     }
+
     public void setFollowLog(boolean followLog) {
         this.followLog = followLog;
     }
@@ -544,7 +550,7 @@ jmOpenIn.add(new OpenTextPad());
                         if (followLog) {
                             ExternalEditor.getEditor().jumpToFile(tableRow.getFileName(), tableRow.getLine(), false);
                         }
-                    } catch (Exception ex) {
+                    } catch (ComFailException | IOException ex) {
                         inquirer.ExceptionHandler.handleException(this.getClass().toString(), ex);
 //                    }
                     }
@@ -552,7 +558,6 @@ jmOpenIn.add(new OpenTextPad());
             }
         }
     }
-
 
 //    @Override
 //    public Component prepareRenderer(TableCellRenderer renderer, int row, int column) {
@@ -573,7 +578,7 @@ jmOpenIn.add(new OpenTextPad());
 //    }
     class RegexField extends AbstractAction {
 
-        private MyJTable tab;
+        private final MyJTable tab;
 
         private RegexField(MyJTable aThis) {
             super("Regex field");
@@ -665,7 +670,7 @@ jmOpenIn.add(new OpenTextPad());
 
     class SearchCell extends AbstractAction {
 
-        private MyJTable tab;
+        private final MyJTable tab;
 
         private SearchCell(MyJTable aThis) {
             super("Copy current cell into search");

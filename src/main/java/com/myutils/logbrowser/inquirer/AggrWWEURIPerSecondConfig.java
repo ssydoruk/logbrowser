@@ -40,7 +40,7 @@ public class AggrWWEURIPerSecondConfig extends javax.swing.JPanel {
     /**
      * Creates new form TLibDelaysConfig
      */
-    private DynamicTreeNode<OptionNode> root = null;
+    private final DynamicTreeNode<OptionNode> root = null;
     private MyCheckBoxList clbOrderBy;
     private DefaultListModel lmAttrTLib;
     private MyCheckBoxList cblAttrTLib;
@@ -49,7 +49,7 @@ public class AggrWWEURIPerSecondConfig extends javax.swing.JPanel {
     private DynamicTreeNode<OptionNode> rootTLib;
     private GroupByPanel gpOrderByTLib;
     private GroupByPanel gpGroupByTLib;
-    private JPSecSelect jpSecSelect;
+    private final JPSecSelect jpSecSelect;
     private final JPSecSelect jpHavingSelect;
 
     public AggrWWEURIPerSecondConfig() {
@@ -154,8 +154,9 @@ public class AggrWWEURIPerSecondConfig extends javax.swing.JPanel {
 
     class OrderField {
 
-        private String fieldName;
-        private String displayName;
+        private final String fieldName;
+        private final String displayName;
+
         public OrderField(String fieldName, String displayName) {
             this.fieldName = fieldName;
             this.displayName = displayName;
@@ -173,7 +174,6 @@ public class AggrWWEURIPerSecondConfig extends javax.swing.JPanel {
         public String toString() {
             return displayName;
         }
-
 
     }
 
@@ -240,7 +240,7 @@ public class AggrWWEURIPerSecondConfig extends javax.swing.JPanel {
 
     }
 
-    private ButtonGroup group = new ButtonGroup();
+    private final ButtonGroup group = new ButtonGroup();
     private FileInfoType ft = FileInfoType.type_Unknown;
 
     /**

@@ -7,7 +7,6 @@ package com.myutils.logbrowser.indexer;
 import static com.myutils.logbrowser.indexer.RMParser.ParserState.*;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -17,17 +16,16 @@ import java.util.regex.Pattern;
  */
 public class RMParser extends Parser {
 
-
     static final String[] BlockNamesToIgnoreArray = {"SIP:CTI:callSync::0",
         "SIP:CTI:sipStackSync:0"};
     private static final Pattern ptSkip = Pattern.compile("^[:\\s]*");
     private final static Pattern regProxy = Pattern.compile("^Proxy\\((\\w+):");
     private final static Pattern regConnidChangeEnd = Pattern.compile("^\\S");
-    static private boolean ifSIPLines = false;
+    private static final boolean ifSIPLines = false;
     private final static Pattern SIPHeaderContinue = Pattern.compile("^\\S");
     private final static Pattern SIPContentLength = Pattern.compile("^\\s");
     private static boolean ifSIPLinesForce = false;
-    private static boolean gaveWarning = false;
+    private static final boolean gaveWarning = false;
     private static final Pattern regSIPHeader = Pattern.compile(" SIP Message ");
 //    15:22:50.980: Sending  [0,UDP] 3384 bytes to 10.82.10.146:5060 >>>>>
     private static final Pattern regNotParseMessage = Pattern.compile("^(0454[1-5]"
@@ -63,7 +61,7 @@ public class RMParser extends Parser {
     private String msgName;
     private boolean inbound;
     private DateParsed dpHeader;
-    private ArrayList<String> extraBuff;
+    private final ArrayList<String> extraBuff;
 
     public RMParser(HashMap<TableType, DBTable> m_tables) {
         super(FileInfoType.type_RM, m_tables);
@@ -138,7 +136,7 @@ public class RMParser extends Parser {
 
             ParseLine(input, ""); // to complete the parsing of the last line/last message
         } catch (Exception e) {
-            Main.logger.error(e);;
+            Main.logger.error(e);
             return m_CurrentLine - line;
         }
 
@@ -146,7 +144,7 @@ public class RMParser extends Parser {
     }
 
     void ContinueParsing(String initial) {
-        String str = "";
+        String str;
         BufferedReaderCrLf input = Main.getMain().GetNextFile();
         if (input == null) {
             return;
@@ -163,11 +161,9 @@ public class RMParser extends Parser {
             if (notFound) {
                 return;
             }
-            notFound = true;
             while ((str = input.readLine()) != null) {
                 Main.logger.trace("l: " + m_CurrentLine + " [" + str + "]");
                 if (str.trim().isEmpty()) {
-                    notFound = false;
                     break;
                 }
             }
@@ -184,10 +180,9 @@ public class RMParser extends Parser {
                 }
             }
         } catch (Exception e) {
-            Main.logger.error(e);;
+            Main.logger.error(e);
         }
     }
-
 
     String ParseLine(BufferedReaderCrLf input, String str) throws Exception {
         String s = str;
@@ -225,7 +220,7 @@ public class RMParser extends Parser {
 
                     return null;
                 } //<editor-fold defaultstate="collapsed" desc="reading sip">
-                else if ((m = regSIPHeader.matcher(s)).find()) {
+                else if ((regSIPHeader.matcher(s)).find()) {
                     m_Header = s;
 
                     dpHeader = dp; // so time of the message correctly set in AddSipMessage
@@ -266,7 +261,7 @@ public class RMParser extends Parser {
 
 //<editor-fold defaultstate="collapsed" desc="state_SIP_HEADER">
             case STATE_SIP_HEADER: {
-                if ((m = SIPHeaderContinue.matcher(str)).find()) {
+                if ((SIPHeaderContinue.matcher(str)).find()) {
                     m_MessageContents.add(str);
                     String contentL = Message.GetSIPHeader(str, "content-length", "l");
                     if (contentL != null) {
@@ -300,7 +295,7 @@ public class RMParser extends Parser {
                 if (str.trim().isEmpty()) {
                     endFound = true;
                 } else {
-                    s = ParseGenesys(str, TableType.MsgRM, regNotParseMessage, ptSkip);
+                    ParseGenesys(str, TableType.MsgRM, regNotParseMessage, ptSkip);
                     if (getDP() != null) {
                         endFound = true;
                     }
@@ -426,18 +421,17 @@ public class RMParser extends Parser {
         return null;
     }
 
-
     protected void AddSipMessage(ArrayList contents, String header) throws Exception {
         String str;
         Matcher m;
 
         // Populate our class representation of the message
-        SipMessage msg = null;
+        SipMessage msg;
 
         boolean isInbound = true;
         String peerIP = "";
         String peerPort = "";
-        String SIPmsg = "";
+        String SIPmsg;
         if ((m = regSIPHeaderMsg.matcher(header)).find()) {
             String s = m.group(1);
             if (s != null) {
@@ -473,7 +467,6 @@ public class RMParser extends Parser {
             PrintMsg(contents);
         }
     }
-
 
     private void AddConfigMessage(ArrayList<String> m_MessageContents) {
         ConfigUpdateRecord msg = new ConfigUpdateRecord(m_MessageContents);

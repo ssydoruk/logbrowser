@@ -22,6 +22,7 @@ public class ConfServerResults extends IQueryResults {
     private int m_componentFilter;
     private ArrayList<NameID> appsType;
     private IDsFinder cidFinder = null;
+
     /**
      *
      */
@@ -33,8 +34,9 @@ public class ConfServerResults extends IQueryResults {
         addSelectionType(SelectionType.NO_SELECTION);
         addSelectionType(SelectionType.GUESS_SELECTION);
         addSelectionType(SelectionType.AGENT);
-        
+
     }
+
     public ConfServerResults() throws SQLException {
         super();
         loadStdOptions();
@@ -64,7 +66,6 @@ public class ConfServerResults extends IQueryResults {
     public String getName() {
         return "ConfServer";
     }
-
 
     public void AddComponent(int filter) {
         m_componentFilter = m_componentFilter | filter;

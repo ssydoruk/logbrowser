@@ -20,6 +20,7 @@ import org.apache.logging.log4j.LogManager;
 public abstract class DBTable {
 
     private static final org.apache.logging.log4j.Logger logger = LogManager.getLogger();
+
     static public void setFieldString(PreparedStatement stmt, int i, String ref) throws SQLException {
         if (ref != null) {
             stmt.setString(i, ref);
@@ -39,12 +40,14 @@ public abstract class DBTable {
     private String fileIDField;
     private int currentID; // primary key on the table. Implies that each table has to have field named
     //ID
+
     public DBTable(DBAccessor dbaccessor, TableType type) {
         m_dbAccessor = (SqliteAccessor) dbaccessor;
         m_type = type;
         setTabName(type.toString());
         idxFields = new ArrayList();
     }
+
     public DBTable(DBAccessor dbaccessor) {
         this(dbaccessor, TableType.UNKNOWN);
     }
@@ -79,7 +82,6 @@ public abstract class DBTable {
     protected void dropIndex(String fld, ArrayList<String> idxField) {
         getM_dbAccessor().runQuery("drop index if exists " + idxName(tabName, idxField) + ";");
     }
-
 
     /**
      * Get the value of fileIDField
@@ -138,7 +140,6 @@ public abstract class DBTable {
         return tabName;
     }
 
-
     public TableType getM_type() {
         return m_type;
     }
@@ -170,7 +171,6 @@ public abstract class DBTable {
     public boolean isTabCreated() {
         return tabCreated;
     }
-
 
     void checkInit() {
         if (!tabCreated) {
@@ -208,7 +208,6 @@ public abstract class DBTable {
             stmt.setNull(i, java.sql.Types.BIGINT);
         }
     }
-
 
     protected void generateID(PreparedStatement stmt, int i, Record _rec) throws SQLException {
         currentID++;

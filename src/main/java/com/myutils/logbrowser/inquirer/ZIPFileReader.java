@@ -25,6 +25,7 @@ public class ZIPFileReader extends RandomFileReader {
     private BufferedInputStream curStream;
 
     long currentPos;
+
     public ZIPFileReader(LogFile fileName) throws FileNotFoundException, IOException {
         this.logFile = fileName;
         inquirer.logger.debug("ZIPFileReader: " + logFile);
@@ -37,9 +38,10 @@ public class ZIPFileReader extends RandomFileReader {
             logArchive = null;
         }
     }
+
     private void openZIPStream() throws IOException {
         curStream = IOUtils.buffer(logArchive.getInputStream(entry));
-        
+
     }
 
     @Override

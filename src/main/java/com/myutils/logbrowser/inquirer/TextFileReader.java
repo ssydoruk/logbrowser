@@ -21,10 +21,10 @@ public class TextFileReader extends RandomFileReader {
 
     String fileName;
 
-
     long currentPos;
     FileInputStream reader;
     File file;
+
     public TextFileReader(String fileName) throws FileNotFoundException {
         try {
             file = new File(fileName);

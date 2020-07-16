@@ -14,7 +14,6 @@ import java.util.regex.Matcher;
 import java.util.regex.PatternSyntaxException;
 import org.apache.commons.lang3.StringUtils;
 
-
 /**
  *
  * @author ssydoruk
@@ -51,10 +50,12 @@ final class DateParsers {
         AddFormat("^\\w{3} \\w{3} \\d{2} \\d{2}:\\d{2}:\\d{2} \\w{3} \\d{4}", "EEE MMM y HH:mm:ss zzz yyyy");
 
     }
+
     public void setCheckRegex(boolean checkRegex) {
         this.checkRegex = checkRegex;
         Main.logger.trace("checkRegex " + checkRegex);
     }
+
     public void setPrefferedFormats(ArrayList<Parser.DateFmt> _prefferedFormats) {
         // if null passed, it will clear prefferedFormats and so parser will use default set of formats
         // null to fix bug with multiple SIP Server files
@@ -183,6 +184,7 @@ final class DateParsers {
 }
 
 final class DateParsed {
+
     private static final DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
 
     String date;
@@ -196,7 +198,6 @@ final class DateParsed {
         orig = d.orig;
         fmtDate = d.fmtDate;
     }
-    
 
     DateParsed(String orig, String date, String rest) {
         this.date = date;
@@ -211,6 +212,7 @@ final class DateParsed {
         this.fmtDate = f;
         Main.logger.trace(toString());
     }
+
     @Override
     public String toString() {
         return "DateParsed{" + "date=" + date + ", rest=" + rest + ", fmtDate=" + dateFormat.format(fmtDate) + '}';

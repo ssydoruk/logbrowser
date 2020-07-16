@@ -17,6 +17,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -30,12 +31,13 @@ public class DynamicTreeNode<T> extends GenericTreeNode implements Serializable 
 
     private static final long serialVersionUID = 1L;
 
-
     private static boolean blockLoad = false;
     private static boolean noRefNoLoad = false;
+
     public static boolean isBlockLoad() {
         return blockLoad;
     }
+
     public static void setBlockLoad(boolean aBlockLoad) {
         blockLoad = aBlockLoad;
     }
@@ -80,12 +82,13 @@ public class DynamicTreeNode<T> extends GenericTreeNode implements Serializable 
             inquirer.logger.debug("Duplicating from null!!");
         }
     }
+
     public DynamicTreeNode(Object data) {
         this();
         setData((OptionNode) data);
     }
 
-    protected void NodeCopy(DynamicTreeNode<T> src) {
+    final protected void NodeCopy(DynamicTreeNode<T> src) {
         if (src != null) {
             TClonable d = src.getData();
             if (d != null) {
@@ -121,7 +124,7 @@ public class DynamicTreeNode<T> extends GenericTreeNode implements Serializable 
                     }
 //                    }
 
-                } catch (Exception ex) {
+                } catch (SQLException ex) {
                     inquirer.ExceptionHandler.handleException(this.getClass().toString(), ex);
                 }
                 return null;
@@ -194,7 +197,7 @@ public class DynamicTreeNode<T> extends GenericTreeNode implements Serializable 
                     return DatabaseConnector.getRefNamesNameID(null,
                             AttrDynamic.refType.toString(),
                             tableType.toString(), "MSGID", null);
-                } catch (Exception ex) {
+                } catch (SQLException ex) {
                     inquirer.ExceptionHandler.handleException(this.getClass().toString(), ex);
                 }
                 return null;
@@ -225,7 +228,6 @@ public class DynamicTreeNode<T> extends GenericTreeNode implements Serializable 
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
-
 
     private void setRefType(ReferenceType referenceType) {
         refType = referenceType;
@@ -340,7 +342,7 @@ public class DynamicTreeNode<T> extends GenericTreeNode implements Serializable 
      * @return
      */
     private Boolean checkSelected(String name, HashMap<String, Boolean> refsHash) {
-        if (name == null || refsHash == null || name.isEmpty() || refsHash.size() == 0) {
+        if (name == null || refsHash == null || name.isEmpty() || refsHash.isEmpty()) {
             return null;
         }
         String search = getFirstWord(name);
@@ -351,7 +353,6 @@ public class DynamicTreeNode<T> extends GenericTreeNode implements Serializable 
         }
         return null;
     }
-
 
     public ILoadChildrenProc getLoadChildrenProc() {
         return loadChildrenProc;
@@ -421,7 +422,6 @@ public class DynamicTreeNode<T> extends GenericTreeNode implements Serializable 
         dynamicChildren = true;
         ChildrenLoaded = false;
     }
-
 
     @Override
     public DynamicTreeNode getChildAt(int index) throws IndexOutOfBoundsException {

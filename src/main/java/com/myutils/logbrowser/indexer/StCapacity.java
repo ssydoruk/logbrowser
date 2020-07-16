@@ -25,7 +25,6 @@ public class StCapacity extends Message {
     private String NewStatus = null;
     private String capacityRule = null;
 
-
     private String dn = null;
 
     public StCapacity(String name, ArrayList messageLines) {
@@ -48,6 +47,7 @@ public class StCapacity extends Message {
             Main.logger.debug("Not matched for [" + name + "]");
         }
     }
+
     public String getCapacityRule() {
         return capacityRule;
     }
@@ -75,7 +75,6 @@ public class StCapacity extends Message {
     String NewStatus() {
         return NewStatus;
     }
-
 
     ArrayList<MediaStatuses> getMediaStatuses() {
         Matcher m;

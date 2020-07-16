@@ -11,7 +11,6 @@ import java.util.Properties;
 
 public abstract class ILogRecord {
 
-
     private static long totalBytes = 0;
     private static final HashSet<String> stdFields = new HashSet<String>(Arrays.asList(
             new String[]{"id", "time",
@@ -26,7 +25,6 @@ public abstract class ILogRecord {
     private int m_appid;
     private int appnameid;
     private int id;
-
 
     public Properties m_fields;
     public Properties m_fieldsAll;
@@ -45,10 +43,12 @@ public abstract class ILogRecord {
     private ICalculatedFields calcFields;
     private Date dateTime = null;
     private LogFile logFile = null;
+
     public ILogRecord() {
         m_fields = new Properties();
         m_fieldsAll = new Properties();
     }
+
     public ILogRecord(ResultSet rs, MsgType type) throws SQLException {
         this();
         if (Thread.currentThread().isInterrupted()) {
@@ -56,6 +56,7 @@ public abstract class ILogRecord {
         }
         initRecord(rs, type);
     }
+
     @Override
     public String toString() {
         return "ILogRecord{" + "m_fields=" + m_fields + ", m_fieldsAll=" + m_fieldsAll + ", m_isMarked=" + m_isMarked + ", m_id=" + getID() + ", m_unixtime=" + m_unixtime + ", m_fileOffset=" + m_fileOffset + ", m_fileBytes=" + m_fileBytes + ", m_fileId=" + GetFileId() + ", m_line=" + GetLine() + ", m_fileName=" + GetFileName() + ", m_time=" + m_time + ", m_appName=" + getM_appName() + ", m_type=" + m_type + ", m_component=" + m_component + '}';
@@ -78,7 +79,6 @@ public abstract class ILogRecord {
 
     }
 
-
     private boolean IsStdField(String name) {
         return stdFields.contains(name.toLowerCase());
     }
@@ -91,7 +91,6 @@ public abstract class ILogRecord {
         this.calcFields = calcFields;
         m_fieldsAll.putAll(calcFields.calc(m_fieldsAll));
     }
-
 
     public void initRecord(ResultSet rs, MsgType type) throws SQLException {
         try {
@@ -146,7 +145,6 @@ public abstract class ILogRecord {
         return id;
     }
 
-
     public int getAppnameid() {
         return appnameid;
     }
@@ -154,7 +152,6 @@ public abstract class ILogRecord {
     public int getM_appid() {
         return m_appid;
     }
-
 
     public Date getDateTime() {
         return dateTime;
@@ -204,7 +201,6 @@ public abstract class ILogRecord {
         return m_line;
     }
 
-
     public LogFile GetFileName() {
         if (logFile == null) {
             logFile = inquirer.getInq().getLfm().getLogFile(GetField("filename", ""), GetField("arcname", null));
@@ -239,7 +235,7 @@ public abstract class ILogRecord {
             if (value != null && value.length() > 0) {
                 return Integer.parseInt(value);
             }
-        } catch (Exception ex) {
+        } catch (NumberFormatException ex) {
             inquirer.ExceptionHandler.handleException("cannot get field", ex);
             return def;
         }
@@ -295,7 +291,6 @@ public abstract class ILogRecord {
     public int GetAnchorId() {
         return 0;
     }
-
 
     private boolean getBool(Object obj) {
         try {

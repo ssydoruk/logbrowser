@@ -23,11 +23,12 @@ import org.apache.logging.log4j.LogManager;
  *
  * @author ssydoruk
  */
-public class QueryAllJTable extends QueryJTable {
+public final class QueryAllJTable extends QueryJTable {
+
     private static final org.apache.logging.log4j.Logger logger = LogManager.getLogger();
 
     private final IQueryResults qry;
-    private IQueryResults.SearchFields searchField;
+    private final IQueryResults.SearchFields searchField;
     private final QueryDialog qd;
     private boolean followLog = false;
 
@@ -79,7 +80,6 @@ public class QueryAllJTable extends QueryJTable {
         }
     }
 
-
     /**
      *
      * @param row - row id. Row is from table, so needs adjustment for usage in
@@ -116,24 +116,25 @@ public class QueryAllJTable extends QueryJTable {
             }
         }
     }
+
     class MyMouseAdapter extends MouseAdapter {
-        
+
         @Override
         public void mousePressed(MouseEvent e) {
 //            inquirer.logger.trace("pressed");
-if (e.getClickCount() == 2) { // on doubleclick open in editor
-    
-    QueryAllJTable source = (QueryAllJTable) e.getSource();
-    
-//                source.showCall(source.convertRowIndexToModel(source.rowAtPoint(e.getPoint())), true);
-int rowAtPoint = source.rowAtPoint(e.getPoint());
-int convertRowIndexToModel = source.convertRowIndexToModel(source.rowAtPoint(e.getPoint()));
-source.showCall(source.rowAtPoint(e.getPoint()), true, false);
+            if (e.getClickCount() == 2) { // on doubleclick open in editor
 
-} else {
-}
+                QueryAllJTable source = (QueryAllJTable) e.getSource();
+
+//                source.showCall(source.convertRowIndexToModel(source.rowAtPoint(e.getPoint())), true);
+                int rowAtPoint = source.rowAtPoint(e.getPoint());
+                int convertRowIndexToModel = source.convertRowIndexToModel(source.rowAtPoint(e.getPoint()));
+                source.showCall(source.rowAtPoint(e.getPoint()), true, false);
+
+            } else {
+            }
         }
-        
+
     }
 
     class ListSelectionChanged implements ListSelectionListener {

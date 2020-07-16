@@ -13,10 +13,10 @@ import Utils.Pair;
  */
 public class MenuItem extends Pair<String, Object> {
 
-
     public MenuItem(String key, Object value) {
         super(key, value);
     }
+
     @Override
     public String toString() {
         return getKey();

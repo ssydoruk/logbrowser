@@ -43,10 +43,10 @@ class IxnIDs {
 
 class SearchIDs {
 
-
     final static int m_maxDepth = 5;
 
     private static final HashMap<Integer, Integer> tmpConnIDs = new HashMap();
+
     private static Integer[] getCallIDs(Integer[] ids) throws SQLException {
         tmpConnIDs.clear();
         for (String tab : new String[]{"tlib_logbr", "ocs_logbr", "ors_logbr", "urs_logbr"}) {
@@ -55,6 +55,7 @@ class SearchIDs {
         }
         return tmpConnIDs.keySet().toArray(new Integer[tmpConnIDs.size()]);
     }
+
     private static Integer[] getIxnIDs(Integer[] ids) throws SQLException {
         tmpConnIDs.clear();
         for (String tab : new String[]{"orsmm"}) {
@@ -115,7 +116,6 @@ class SearchIDs {
 
         return null;
     }
-
 
     public static SearchIDs getRoutingIDs(String[] ids) {
         return null;
@@ -402,7 +402,8 @@ class SearchIDs {
 
         return null;
     }
-    private HashMap<IDType, Integer[]> CallIDs = new HashMap<>();
+    private final HashMap<IDType, Integer[]> CallIDs = new HashMap<>();
+
     public Integer[] getIDs(IDType idType) {
         Integer[] ret = CallIDs.get(idType);
         if (ret != null && ret.length > 0) {
@@ -479,10 +480,11 @@ enum IDType {
 }
 
 abstract public class QueryTools {
-    private static ArrayList<String> queryMessages = new ArrayList<String>();private static final int SPLIT_ON = 300;
+
+    private static final ArrayList<String> queryMessages = new ArrayList<String>();
+    private static final int SPLIT_ON = 300;
     private static final HashMap<String, String> tableTypeByFileType = initTabTypes();
     private static final HashMap<String, FileInfoType> timeDiffByFileType = initTimeDiffTypes();
-
 
     public static ArrayList<Integer> sortedArray(Integer[] ids) {
         ArrayList<Integer> idsh = new ArrayList<>(Arrays.asList(ids));
@@ -539,7 +541,6 @@ abstract public class QueryTools {
 
     }
 
-
     static public boolean queryMessagesAdd(String e) {
         return queryMessages.add(e);
     }
@@ -568,7 +569,7 @@ abstract public class QueryTools {
                 ResultSetMetaData metadata = m_resultSet.getMetaData();
                 StringBuilder s = new StringBuilder(256);
                 for (int i = 1; i <= metadata.getColumnCount(); i++) {
-                    s.append(" [" + metadata.getColumnName(i) + "]: " + m_resultSet.getString(i));
+                    s.append(" [").append(metadata.getColumnName(i)).append("]: ").append(m_resultSet.getString(i));
                 }
                 if (Thread.currentThread().isInterrupted()) {
                     throw new RuntimeInterruptException();
@@ -639,7 +640,6 @@ abstract public class QueryTools {
         return "";
     }
 
-
     public static String getWhere(String Field, String[] ids) {
         return getWhere(Field, ids, false, false);
     }
@@ -647,7 +647,6 @@ abstract public class QueryTools {
     public static String getWhereRx(String Field, String[] ids, boolean addWhere) {
         return getWhere(Field, ids, addWhere, true);
     }
-
 
     public static String getWhere(String Field, String[] ids, boolean addWhere, boolean isRegex) {
         return IQuery.getWhere(Field, ids, addWhere, isRegex);
@@ -697,7 +696,6 @@ abstract public class QueryTools {
         }
         return ret.toString();
     }
-
 
     public static String TLibTableByFileType(String t) {
         return tableTypeByFileType.get(t);
@@ -804,7 +802,7 @@ abstract public class QueryTools {
 
     public static Integer[] getRefIDs(ReferenceType rt, String[] names, boolean isRegEx) throws SQLException {
         if (DatabaseConnector.refTableExist(rt)) {
-            String wh ;
+            String wh;
             if (!isRegEx) {
                 wh = getWhere("name", names, true);
             } else {
@@ -894,7 +892,6 @@ abstract public class QueryTools {
         return " ( select id from " + rt.toString() + getWhere("name", names.toArray((new String[0])), true) + " ) ";
     }
 
-
     public static <T> T[] concatAll(T[] first, T[]... rest) {
         int totalLength = first.length;
         for (T[] array : rest) {
@@ -955,7 +952,6 @@ abstract public class QueryTools {
     protected static boolean isChecked(DynamicTreeNode<OptionNode> node) {
         return node != null && ((OptionNode) node.getData()).isChecked();
     }
-
 
     protected static DynamicTreeNode<OptionNode> FindNode(DynamicTreeNode<OptionNode> root, String rootCh, String rootChCh, String rootChChCh) {
         if (root != null && rootCh != null) {
@@ -1039,44 +1035,54 @@ abstract public class QueryTools {
     private int maxQueryLines;
     protected PrintStreams ps = null;
     private IQueryResults.ProgressNotifications progressCallback;
+
     public boolean isLimitQueryResults() {
         return limitQueryResults;
     }
+
     public int getMaxQueryLines() {
         return maxQueryLines;
     }
+
     void setQueryLimit(boolean limitQueryResults, int maxQueryLines) {
         this.limitQueryResults = limitQueryResults;
         this.maxQueryLines = maxQueryLines;
     }
+
     public void setPrintAlone(boolean printAlone) {
         this.printAlone = printAlone;
     }
+
     public void setProgressCallback(IQueryResults.ProgressNotifications progressCallback) {
         this.progressCallback = progressCallback;
     }
+
     protected void tellProgress(String s) {
         inquirer.logger.debug("Progress: " + s);
         if (progressCallback != null) {
             progressCallback.sayProgress(s);
         }
     }
+
     int LowestID(HashMap m_callIdHash) {
         List sortedKeys = new ArrayList(m_callIdHash.keySet());
         Collections.sort(sortedKeys);
         return (Integer) sortedKeys.get(0);
     }
+
     public Integer[] getRecHandles(IxnIDs ConnIDs) throws SQLException {
         return DatabaseConnector.getDatabaseConnector(this).getIDs(this, "ocs_logbr", "recHandle", getWhere("ConnectionIDID", ConnIDs.ids, true));
     }
+
     boolean allChildrenChecked(DynamicTreeNode<OptionNode> node, DialogItem di) {
         return allChildrenChecked(FindNode(node, di, null, null));
     }
+
     boolean allChildrenChecked(DynamicTreeNode<OptionNode> node) {
         boolean ret = true;
         if (isChecked(node)) {
             return OptionNode.AllChildrenChecked(node);
-            
+
         }
         return ret;
     }

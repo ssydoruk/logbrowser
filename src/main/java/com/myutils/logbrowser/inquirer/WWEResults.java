@@ -22,13 +22,14 @@ import org.apache.logging.log4j.LogManager;
 public class WWEResults extends IQueryResults {
 
     private static final org.apache.logging.log4j.Logger logger = LogManager.getLogger();
-    private static String[] RequestsToShow = {"RequestMakePredictiveCall", "RequestMakeCall"};
-    private static String[] EventsToShow = {"EventDialing", "EventNetworkReached"};
+    private static final String[] RequestsToShow = {"RequestMakePredictiveCall", "RequestMakeCall"};
+    private static final String[] EventsToShow = {"EventDialing", "EventNetworkReached"};
 
     private Object cidFinder;
     private String m_tlibFilter;
     ArrayList<NameID> appsType = null;
-    private UTCTimeRange timeRange = null;
+    private final UTCTimeRange timeRange = null;
+
     /**
      *
      */
@@ -48,7 +49,7 @@ public class WWEResults extends IQueryResults {
         addSelectionType(SelectionType.IXN);
         addSelectionType(SelectionType.GWS_DEVICEID);
         addSelectionType(SelectionType.GWS_USERID);
-        
+
     }
 
     @Override
@@ -107,7 +108,7 @@ public class WWEResults extends IQueryResults {
             FullTableColors currTable = tabReport.getFullTable();
 
             return currTable; //To change body of generated methods, choose Tools | Templates.
-        } catch (Exception ex) {
+        } catch (SQLException ex) {
             inquirer.ExceptionHandler.handleException(this.getClass().toString(), ex);
         } finally {
             DynamicTreeNode.setNoRefNoLoad(false);
@@ -133,7 +134,6 @@ public class WWEResults extends IQueryResults {
         return refreshTimeRange(null);
     }
 
-
     @Override
     public String getReportSummary() {
         return getName() + "\n\t" + "search: " + ((cidFinder != null) ? cidFinder.toString() : "<not specified>");
@@ -144,13 +144,11 @@ public class WWEResults extends IQueryResults {
         return "WS Web";
     }
 
-
     public void SetConfig(Properties config) {
         if (config != null && !config.isEmpty()) {
             m_tlibFilter = config.getProperty("TlibFilter");
         }
     }
-
 
     public void addTLibReportType(DynamicTreeNode<OptionNode> root) {
         DynamicTreeNode<OptionNode> nd = new DynamicTreeNode<>(new OptionNode(DialogItem.TLIB_CALLS_TEVENT));
@@ -228,7 +226,7 @@ public class WWEResults extends IQueryResults {
                 ndParams.addDynamicRef(DialogItem.APACHEMSG_PARAMS_HTTPMETHOD, ReferenceType.HTTPMethod, TableType.ApacheWeb.toString(), "methodID");
                 ndParams.addDynamicRef(DialogItem.APACHEMSG_PARAMS_HTTPURL, ReferenceType.HTTPURL, TableType.ApacheWeb.toString(), "urlID");
             }
-        } catch (Exception e) {
+        } catch (SQLException e) {
             inquirer.logger.error("Error while adding menu", e);
         }
 //</editor-fold>
@@ -278,14 +276,14 @@ public class WWEResults extends IQueryResults {
                     ndParams.addDynamicRef(DialogItem.WWEBAYEUXMESSAGE_PARAM2_NAME, ReferenceType.Misc, TableType.WWEBayeuxMessage.toString(), "param2ID");
                 }
             }
-        } catch (Exception e) {
+        } catch (SQLException e) {
             inquirer.logger.error("Error while adding menu", e);
         }
 //</editor-fold>
 
         try {
             addCustom(rootA, FileInfoType.type_ApacheWeb);
-        } catch (Exception ex) {
+        } catch (SQLException ex) {
             logger.log(org.apache.logging.log4j.Level.FATAL, ex);
         }
 
@@ -295,13 +293,12 @@ public class WWEResults extends IQueryResults {
         addConfigUpdates(rootA);
         try {
             addCustom(rootA, FileInfoType.type_WWE);
-        } catch (Exception ex) {
+        } catch (SQLException ex) {
             logger.log(org.apache.logging.log4j.Level.FATAL, ex);
         }
         rootA.addLogMessagesReportType(TableType.MsgWWE);
         DoneSTDOptions();
     }
-
 
     @Override
     public ArrayList<NameID> getApps() throws Exception {
@@ -584,7 +581,7 @@ public class WWEResults extends IQueryResults {
         if (cidFinder != null) {
             try {
                 return cidFinder.AnythingTLibRelated();
-            } catch (Exception ex) {
+            } catch (SQLException ex) {
                 logger.log(org.apache.logging.log4j.Level.FATAL, ex);
             }
         }

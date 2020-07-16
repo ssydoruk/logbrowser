@@ -50,7 +50,7 @@ public class AggrSIPServerCallsPerSecondConfig extends javax.swing.JPanel {
     private DynamicTreeNode<OptionNode> rootTLib;
     private GroupByPanel gpOrderByTLib;
     private GroupByPanel gpGroupByTLib;
-    private JPSecSelect jpSecSelect;
+    private final JPSecSelect jpSecSelect;
     private final JPSecSelect jpHavingSelect;
 
     public DynamicTreeNode<OptionNode> getAttrRoot() {
@@ -216,8 +216,9 @@ public class AggrSIPServerCallsPerSecondConfig extends javax.swing.JPanel {
 
     class OrderField {
 
-        private String fieldName;
-        private String displayName;
+        private final String fieldName;
+        private final String displayName;
+
         public OrderField(String fieldName, String displayName) {
             this.fieldName = fieldName;
             this.displayName = displayName;
@@ -235,7 +236,6 @@ public class AggrSIPServerCallsPerSecondConfig extends javax.swing.JPanel {
         public String toString() {
             return displayName;
         }
-
 
     }
 
@@ -349,7 +349,7 @@ public class AggrSIPServerCallsPerSecondConfig extends javax.swing.JPanel {
 
     }
 
-    private ButtonGroup group = new ButtonGroup();
+    private final ButtonGroup group = new ButtonGroup();
     private FileInfoType ft = FileInfoType.type_Unknown;
 
     /**

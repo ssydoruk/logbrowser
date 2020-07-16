@@ -23,11 +23,12 @@ public class EditorWindows extends ExternalEditor {
 
     protected ActiveXComponent vim;
 
-
     private WinDef.HWND hwnd;
+
     public EditorWindows() throws IOException {
         InitDLL();
     }
+
     private int getTabNo(int fileBufNo) {
         Variant invoke;
         int parseInt = 0;
@@ -113,7 +114,6 @@ public class EditorWindows extends ExternalEditor {
 //        vim.invoke("SendKeys", ":set switchbuf=usetab<Enter>");
 
     }
-
 
     private int getFileBufNo(String fileName) throws IOException {
         Variant invoke;

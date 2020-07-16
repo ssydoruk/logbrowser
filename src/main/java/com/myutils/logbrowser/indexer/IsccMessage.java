@@ -45,7 +45,6 @@ public class IsccMessage extends Message {
         return GetAttribute(new String[]{"ISCCAttributeDestinationDN", "SDAttributeDestinationDN", "ISCCAttributeCallDataXferResource"});
     }
 
-
     public String GetConnID() {
         if (connID == null) {
             connID = GetAttribute(new String[]{"ISCCAttributeConnID", "SDAttributeConnID"});
@@ -58,7 +57,6 @@ public class IsccMessage extends Message {
 
 //        theRec.getAttributeLong("ISCCAttributeReferenceID")
     }
-
 
     String GetSrcApp() {
         parseSrcSwitch();

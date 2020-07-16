@@ -123,7 +123,7 @@ public class URShttpinterfaceParser extends WebParser {
             }
 //            ParseLine("", null); // to complete the parsing of the last line/last message
         } catch (IOException e) {
-            Main.logger.error(e);;
+            Main.logger.error(e);
             return m_CurrentLine - line;
         }
 
@@ -140,7 +140,6 @@ public class URShttpinterfaceParser extends WebParser {
         requestHandler.remove(ursReqID);
 
     }
-
 
     private Object ParseLine(Object objToParse, BufferedReaderCrLf in) throws Exception {
         if (objToParse == null) {
@@ -339,7 +338,6 @@ public class URShttpinterfaceParser extends WebParser {
 
     }
 
-
     private ursHTTPMsg getFullHTTP(ursHTTPMsg ursHTTP) {
         ursHTTPMsg tmpUrsHTTP = partHTTP.get(ursHTTP.getSocket());
         if (tmpUrsHTTP != null) { // pending HTTP request
@@ -359,7 +357,6 @@ public class URShttpinterfaceParser extends WebParser {
         return null;
 
     }
-
 
     private int ParseHTTP(StringBuilder buf) {
         int linesRead = 0;
@@ -416,7 +413,7 @@ public class URShttpinterfaceParser extends WebParser {
     }
 
     class RequestHandler extends HashMap<Long, Long> {
-        
+
         private void store(Long httpReqID, Long handlerID) throws Exception {
             if (httpReqID == null || handlerID == null || containsKey(httpReqID)) {
                 throw new Exception("Request "
@@ -424,9 +421,9 @@ public class URShttpinterfaceParser extends WebParser {
                         + " already mapped to handler " + String.format("%x", handlerID));
             }
             put(handlerID, handlerID);
-            
+
         }
-        
+
         private Long getURSReqID(Long httpReqID) {
             for (Entry<Long, Long> entry : this.entrySet()) {
                 Long key = entry.getKey();
@@ -437,8 +434,9 @@ public class URShttpinterfaceParser extends WebParser {
             }
             return null;
         }
-        
+
     }
+
     enum ParserState {
         STATE_HEADER,
         STATE_TMESSAGE_REQUEST,
@@ -448,7 +446,7 @@ public class URShttpinterfaceParser extends WebParser {
         STATE_HTTP_HEADER,
         STATE_HTTP_HEADER1,
         STATE_HTTP_BODY, STATE_WAITING_HANDLER, STATE_RESPONSE_WAITING_HANDLER
-        
+
     }
 
     public class ursHTTPMsg extends URSRIBase {
@@ -541,9 +539,9 @@ public class URShttpinterfaceParser extends WebParser {
 //                    if (s1.length() > 0) {
 //                        s1.append("\n");
 //                    }
-if (!string.isEmpty()) {
-    s1.append(string);
-}
+                        if (!string.isEmpty()) {
+                            s1.append(string);
+                        }
                     }
                     if (s1.length() > 0) {
                         httpMessageBody = s1.toString();

@@ -21,6 +21,7 @@ public class ConnIdRecord extends Message {
         this.newID = newId;
 //        Main.logger.info("ConnIdRecord: ["+oldId+"] new["+newId+"]");
     }
+
     public ConnIdRecord(String connId, boolean created) {
         super(TableType.ConnID);
         this.isTemp = false;
@@ -35,7 +36,6 @@ public class ConnIdRecord extends Message {
     public boolean isIsTemp() {
         return isTemp;
     }
-
 
     @Override
     public String toString() {

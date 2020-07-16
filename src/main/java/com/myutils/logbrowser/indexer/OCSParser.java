@@ -272,7 +272,7 @@ public class OCSParser extends Parser {
             }
             ParseLine("", null); // to complete the parsing of the last line/last message
         } catch (Exception e) {
-            Main.logger.error(e);;
+            Main.logger.error(e);
             return m_CurrentLine - line;
         }
 
@@ -651,7 +651,7 @@ public class OCSParser extends Parser {
             OCSStatEvent msg = new OCSStatEvent(statEventType, m_MessageContents);
             SetStdFieldsAndAdd(msg);
         } catch (Exception e) {
-            Main.logger.error(e);;
+            Main.logger.error(e);
             throw e;
         }
     }
@@ -667,6 +667,7 @@ public class OCSParser extends Parser {
     void init(HashMap<TableType, DBTable> m_tables) {
         m_tables.put(TableType.OCSPredInfo, new OCSPredInfoTable(Main.getM_accessor(), TableType.OCSPredInfo));
     }
+
     private void AddConfigMessage(String s) {
         ConfigUpdateRecord msg = new ConfigUpdateRecord(s);
         try {
@@ -681,7 +682,7 @@ public class OCSParser extends Parser {
 //                msg.setObjectDBID(m.group(2));
 //            }
 
-SetStdFieldsAndAdd(msg);
+            SetStdFieldsAndAdd(msg);
         } catch (Exception e) {
             Main.logger.error("Not added \"" + msg.getM_type() + "\" record:" + e.getMessage(), e);
         }
@@ -744,7 +745,6 @@ SetStdFieldsAndAdd(msg);
         }
 
     }
-
 
     private class OCSPredInfo extends Message {
 

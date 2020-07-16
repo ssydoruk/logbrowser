@@ -35,8 +35,8 @@ public class TLibDelaysConfig extends javax.swing.JPanel {
         return jpTimeDiff.getSeconds();
     }
 
-    private ButtonGroup group = new ButtonGroup();
-    private FileInfoType ft = FileInfoType.type_Unknown;
+    private final ButtonGroup group = new ButtonGroup();
+    private final FileInfoType ft = FileInfoType.type_Unknown;
 
     /**
      * This method is called from within the constructor to initialize the form.

@@ -4,6 +4,7 @@
  */
 package com.myutils.logbrowser.indexer;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.sql.PreparedStatement;
@@ -80,14 +81,13 @@ public class ApacheWebLogsParser extends WebParser {
                 }
 
             }
-        } catch (Exception e) {
-            Main.logger.error(e);;
+        } catch (IOException e) {
+            Main.logger.error(e);
             return m_CurrentLine - line;
         }
 
         return m_CurrentLine - line;
     }
-
 
     String ParseLine(String str) throws Exception {
         Matcher m;
@@ -157,6 +157,7 @@ public class ApacheWebLogsParser extends WebParser {
         STATE_HTTPHANDLEREQUEST,
         STATE_TMESSAGE_ATTRIBUTES, STATE_EXCEPTION, STATE_AUTHRESULT
     }
+
     private class ApacheWebMsg extends Message {
 
         private String ip;
@@ -173,6 +174,7 @@ public class ApacheWebLogsParser extends WebParser {
         private Integer executionTime = null;
         private String UUID;
         private String ixnID;
+
         private ApacheWebMsg() {
             super(TableType.ApacheWeb);
         }
@@ -195,7 +197,6 @@ public class ApacheWebLogsParser extends WebParser {
             this.deviceID = deviceID;
         }
 
-
         /**
          * Get the value of UUID
          *
@@ -216,7 +217,6 @@ public class ApacheWebLogsParser extends WebParser {
             }
         }
 
-
         /**
          * Get the value of ixnID
          *
@@ -234,7 +234,6 @@ public class ApacheWebLogsParser extends WebParser {
         public void setIxnID(String ixnID) {
             this.ixnID = ixnID;
         }
-
 
         public String getHttpCode() {
 

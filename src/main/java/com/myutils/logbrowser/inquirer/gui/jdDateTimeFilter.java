@@ -462,8 +462,6 @@ public class jdDateTimeFilter extends javax.swing.JDialog {
         pack();
     }//GEN-LAST:event_formWindowActivated
 
-
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btEarlyFirst;
     private javax.swing.JButton btEarlySecond;

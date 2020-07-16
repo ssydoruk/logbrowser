@@ -20,7 +20,6 @@ public class SIPEPQuery extends IQuery {
     private String[] orderBy;
     private String tabName;
 
-
     private Integer[] m_CallIds;
     private boolean m_useProxy = true;
     private ResultSet m_resultSet;
@@ -63,6 +62,7 @@ public class SIPEPQuery extends IQuery {
         this.cidFinder = cidFinder;
         this.tabName = tabName;
     }
+
     public String getTabAlias() {
         return "sip";
     }
@@ -94,7 +94,6 @@ public class SIPEPQuery extends IQuery {
         m_resultSet = m_connector.executeQuery(this, query);
         recCnt = 0;
     }
-
 
     public HashMap getSipRecords() {
         return sipRecords;

@@ -10,7 +10,6 @@ public class SipMessage extends ILogRecord {
     int handlerId;
     private String callId;
 
-
     public SipMessage(ResultSet rs) throws SQLException {
         super(rs, MsgType.SIP);
         String s;
@@ -74,6 +73,7 @@ public class SipMessage extends ILogRecord {
             throw new SQLException("Missing parameters");
         }
     }
+
     public int getHandlerId() {
         return handlerId;
     }

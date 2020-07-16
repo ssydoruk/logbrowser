@@ -34,6 +34,7 @@ public class TLibMessage extends Message {
         super(TableType.TLib);
         this.lastLogMsg = lastLogMsg;
     }
+
     TLibMessage(TLibMessage msg, GenesysMsg lastLogMsg) {
         super(TableType.TLib);
         this.m_MessageName = msg.GetMessageName();
@@ -42,7 +43,7 @@ public class TLibMessage extends Message {
         for (String m_MessageLine : msg.m_MessageLines) {
             m_MessageLines.add(m_MessageLine);
         }
-        
+
     }
 
     public String getConnID() {
@@ -115,7 +116,6 @@ public class TLibMessage extends Message {
         return lastLogMsg;
     }
 
-
     @Override
     public String toString() {
         return "TLibMessage{" + "m_MessageName=" + m_MessageName + ", m_source=" + m_source + '}' + super.toString();
@@ -146,7 +146,6 @@ public class TLibMessage extends Message {
         return ret;
     }
 
-
     Long getRefID() {
         Long ret = getAttributeLong("AttributeReferenceID");
         if (ret != null) {
@@ -176,7 +175,6 @@ public class TLibMessage extends Message {
         return null;
     }
 
-
     Long getSeqNo() {
         if (_seqNo == null) {
             _seqNo = getAttributeHex("AttributeEventSequenceNumber");
@@ -184,14 +182,12 @@ public class TLibMessage extends Message {
         return _seqNo;
     }
 
-
     String getThisDN() {
         if (thisDN == null) {
             thisDN = getAttributeTrim("AttributeThisDN");
         }
         return thisDN;
     }
-
 
     Long getErrorCode() {
         if (_errorCode == null) {

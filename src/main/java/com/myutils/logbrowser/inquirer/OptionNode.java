@@ -14,7 +14,6 @@ public class OptionNode implements Serializable, TClonable, Comparable {
 
     private static final long serialVersionUID = 2L;
 
-
     static ArrayList<String> getChecked(DynamicTreeNode<OptionNode> nameSettings) {
         ArrayList<String> ret = new ArrayList<>();
         for (DynamicTreeNode<OptionNode> col : nameSettings.getChildren()) {
@@ -68,6 +67,7 @@ public class OptionNode implements Serializable, TClonable, Comparable {
         Collections.sort(ret);
         return IQuery.getIDsList(Field, ret, false, false);
     }
+
     static ChildrenChecked getChildrenChecked(DynamicTreeNode<OptionNode> nameSettings) {
         List<DynamicTreeNode<OptionNode>> children = nameSettings.getChildren();
         int checked = 0, unchecked = 0;
@@ -91,6 +91,7 @@ public class OptionNode implements Serializable, TClonable, Comparable {
 //        return (checked > 0) ? ChildrenChecked.ALL_CHECKED : ChildrenChecked.NONE_CHECKED;
 
     }
+
     static boolean AllChildrenChecked(DynamicTreeNode<OptionNode> nameSettings) {
         for (DynamicTreeNode<OptionNode> col : nameSettings.getChildren()) {
             OptionNode data = (OptionNode) col.getData();
@@ -121,7 +122,6 @@ public class OptionNode implements Serializable, TClonable, Comparable {
         this.id = ch1.getId();
     }
 
-
     public OptionNode(boolean b, DialogItem dialogItem) {
         this(b, dialogItem.toString());
         this.dialogItem = dialogItem;
@@ -138,43 +138,52 @@ public class OptionNode implements Serializable, TClonable, Comparable {
             setName(itemName);
         }
     }
+
     public OptionNode(boolean checked, String name) {
         this.checked = checked;
         this.name = name;
 //        inquirer.logger.debug("OptionNode constructor item [" + name + "] checked:" + checked );
     }
+
     public OptionNode(boolean checked, boolean isEmpty, String name) {
         this.checked = checked;
         this.name = name;
         this.isEmpty = isEmpty;
 //        inquirer.logger.debug("OptionNode constructor item [" + name + "] checked:" + checked );
     }
+
     public OptionNode(String name) {
         this(true, name);
     }
+
     public OptionNode(DialogItem item) {
         this(true, item);
     }
+
     public Object getData() {
         return data;
     }
+
     public void setData(Object data) {
         this.data = data;
     }
+
     public boolean logCheckAndUpdate(String Name) {
         if (Name == null || Name.isEmpty()) {
             return false;
         }
-        
+
         if (inquirer.getFirstWord(Name).equals(inquirer.getFirstWord(getName()))) {
             this.name = inquirer.commonString(Name, getName());
             return true;
         }
         return false;
     }
+
     public boolean isIsEmpty() {
         return isEmpty;
     }
+
     public String nameIfChecked() {
         if (isChecked()) {
             return getName();
@@ -187,7 +196,6 @@ public class OptionNode implements Serializable, TClonable, Comparable {
     protected Object clone() throws CloneNotSupportedException {
         return super.clone(); //To change body of generated methods, choose Tools | Templates.
     }
-
 
     public DialogItem getDialogItem() {
         return dialogItem;
@@ -212,7 +220,6 @@ public class OptionNode implements Serializable, TClonable, Comparable {
     public void setName(String name) {
         this.name = name;
     }
-
 
     @Override
     public String toString() {

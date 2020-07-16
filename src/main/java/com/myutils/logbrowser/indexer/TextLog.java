@@ -60,7 +60,6 @@ public final class TextLog extends LogFileWrapper {
         return stream;
     }
 
-
     @Override
     void startParsing() throws Exception {
         try {

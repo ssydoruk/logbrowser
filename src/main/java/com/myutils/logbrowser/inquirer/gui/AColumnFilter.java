@@ -17,6 +17,7 @@ import javax.swing.event.ListDataListener;
  * @author ssydoruk
  */
 abstract class AColumnFilter {
+
     static public double convertDouble(Object val) throws NumberFormatException {
         double l;
         if (val instanceof Integer) {
@@ -76,19 +77,19 @@ abstract class AColumnFilter {
         }
     }
 
-
     public static abstract class DateFilter extends AColumnFilter {
-
 
         private String name;
         private boolean needsSecond;
         private long firstDate;
         private long secondDate;
         private boolean showNonDate = false;
+
         public DateFilter(String name, boolean needsSecond) {
             this.name = name;
             this.needsSecond = needsSecond;
         }
+
         public long convertToTime(Object val) {
             return DatabaseConnector.convertToTime(val);
         }
@@ -139,7 +140,6 @@ abstract class AColumnFilter {
             return (long) ((double) convertToTime / 1000) * 1000;
         }
 
-
         @Override
         public String toString() {
             return name;
@@ -153,6 +153,7 @@ abstract class AColumnFilter {
         private double firstNum;
         private double secondNum;
         private boolean showNonNumbers = false;
+
         public NumberFilter(String name, boolean needsSecond) {
             this.name = name;
             this.needsSecond = needsSecond;
@@ -206,7 +207,6 @@ abstract class AColumnFilter {
         public String toString() {
             return name;
         }
-
 
         public void setShowNonNumbers(boolean selected) {
             this.showNonNumbers = selected;

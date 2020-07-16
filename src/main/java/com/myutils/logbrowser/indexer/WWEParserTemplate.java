@@ -28,7 +28,6 @@ public class WWEParserTemplate extends WebParser {
 
     private static final Pattern regMsgStart = Pattern.compile("Handling update message:$");
 
-
     private ParserState m_ParserState;
 
     private final HashMap<String, ParserState> threadParserState = new HashMap<>();
@@ -112,7 +111,7 @@ public class WWEParserTemplate extends WebParser {
             }
 //            ParseLine("", null); // to complete the parsing of the last line/last message
         } catch (IOException e) {
-            Main.logger.error(e);;
+            Main.logger.error(e);
             return m_CurrentLine - line;
         }
 
@@ -234,12 +233,15 @@ public class WWEParserTemplate extends WebParser {
         private String sessionID;
         private String UUID;
         private String ixnID;
+
         private WWEDebugMsg(TableType t) {
             super(t);
         }
+
         private WWEDebugMsg() {
             this(TableType.WWEMessage);
         }
+
         private WWEDebugMsg(TableType t, WWEDebugMsg orig) {
             this(t);
             this.setClassName(orig.getClassName());
@@ -277,7 +279,6 @@ public class WWEParserTemplate extends WebParser {
             this.deviceID = deviceID;
         }
 
-
         /**
          * Get the value of UUID
          *
@@ -298,7 +299,6 @@ public class WWEParserTemplate extends WebParser {
             this.UUID = UUID;
         }
 
-
         /**
          * Get the value of ixnID
          *
@@ -318,7 +318,6 @@ public class WWEParserTemplate extends WebParser {
 
             this.ixnID = ixnID;
         }
-
 
         public String getHttpCode() {
 

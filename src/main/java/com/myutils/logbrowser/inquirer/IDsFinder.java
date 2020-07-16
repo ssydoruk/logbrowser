@@ -15,7 +15,9 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 
 public final class IDsFinder extends QueryTools {
+
     private static final Pattern regCampName = Pattern.compile("^([^@]+)@");
+
     private static int arrLen(Object[] arr) {
         if (arr != null) {
             return arr.length;
@@ -27,7 +29,6 @@ public final class IDsFinder extends QueryTools {
     private Integer[] refIDs;
     private int queryLevel;
     private boolean maxLevelSet = false;
-
 
     private HashSet<Integer> m_callIdHash = new HashSet<>();
 
@@ -71,18 +72,23 @@ public final class IDsFinder extends QueryTools {
         timeRange = dlg.getTimeRange();
         setQueryLevel(dlg.getRequestLevel());
     }
+
     public IDsFinder() {
     }
+
     //    private Object m_callIdHash;
     public String getSelection() {
         return selection;
     }
+
     public Integer[] getAgentIDs() {
         return agentIDs;
     }
+
     public Integer[] getSearchApps() {
         return (Integer[]) searchApps.toArray(new Integer[searchApps.size()]);
     }
+
     public int getObjectsFound() {
         int ret = 0;
         if (!m_connIdHash.isEmpty()) {
@@ -111,7 +117,6 @@ public final class IDsFinder extends QueryTools {
     public UTCTimeRange getTimeRange() throws SQLException {
         return timeRange;
     }
-
 
     private boolean getOutboundIDType() throws SQLException {
         String[] sIDs = {selection};
@@ -191,11 +196,11 @@ public final class IDsFinder extends QueryTools {
         }
 
         if (selectionType == SelectionType.AGENT || selectionType == SelectionType.GUESS_SELECTION) {
-            Integer[] refIDs = getRefIDs(ReferenceType.Agent, sIDs, regex);
-            AddIDs(IDType.AGENT, refIDs);
+            Integer[] _refIDs = getRefIDs(ReferenceType.Agent, sIDs, regex);
+            AddIDs(IDType.AGENT, _refIDs);
 
-            if (refIDs != null && refIDs.length > 0) {
-                AddIDs(IDType.DN, DatabaseConnector.getIDs("ocsstatev_logbr", "DNID", getWhere("agentNameID", refIDs, true)));
+            if (_refIDs != null && _refIDs.length > 0) {
+                AddIDs(IDType.DN, DatabaseConnector.getIDs("ocsstatev_logbr", "DNID", getWhere("agentNameID", _refIDs, true)));
                 return true;
             }
 
@@ -300,11 +305,11 @@ public final class IDsFinder extends QueryTools {
         }
 
         if (selectionType == SelectionType.AGENT || selectionType == SelectionType.GUESS_SELECTION) {
-            Integer[] refIDs = getRefIDs(ReferenceType.Agent, sIDs, regex);
-            AddIDs(IDType.AGENT, refIDs);
+            Integer[] _refIDs = getRefIDs(ReferenceType.Agent, sIDs, regex);
+            AddIDs(IDType.AGENT, _refIDs);
 
-            if (refIDs != null && refIDs.length > 0) {
-                AddIDs(IDType.DN, DatabaseConnector.getIDs("ocsstatev_logbr", "DNID", getWhere("agentNameID", refIDs, true)));
+            if (_refIDs != null && _refIDs.length > 0) {
+                AddIDs(IDType.DN, DatabaseConnector.getIDs("ocsstatev_logbr", "DNID", getWhere("agentNameID", _refIDs, true)));
                 return true;
             }
 
@@ -315,7 +320,6 @@ public final class IDsFinder extends QueryTools {
 
         return false;
     }
-
 
     public Integer[] findIDs(IDType idType) {
         if (CallIDs.containsKey(idType)) {
@@ -582,11 +586,7 @@ public final class IDsFinder extends QueryTools {
 
     boolean anythingApacheWebRelated() throws SQLException {
         Integer[] ids = getIDs(IDType.JSessionID);
-        if (ids != null && ids.length > 0) {
-            return true;
-        }
-
-        return false;
+        return ids != null && ids.length > 0;
     }
 
     private boolean isNewCallRelated() throws SQLException {
@@ -595,10 +595,7 @@ public final class IDsFinder extends QueryTools {
             return true;
         }
         ids = getIDs(IDType.UUID);
-        if (ids != null && ids.length > 0) {
-            return true;
-        }
-        return false;
+        return ids != null && ids.length > 0;
     }
 
     boolean AnythingTLibRelated() throws SQLException {
@@ -633,70 +630,23 @@ public final class IDsFinder extends QueryTools {
 
     boolean ConnIDFound() {
         Integer[] ConnIDs = getConnIDs();
-        if (ConnIDs != null && ConnIDs.length > 0) {
-            return true;
-        }
-        return false;
+        return ConnIDs != null && ConnIDs.length > 0;
     }
 
     public boolean initStatServer() throws SQLException {
         searchType = SearchType.STATSERVER;
 
-        if (!getStatServerIDType()) {
-            return false;
-        }
-
-//        switch (idFound.idType) {
-//            case OCSChainID: {
-//                Integer[] chainIDs = idFound.ids;
-//                AddIDs(IDType.ConnID, getIDs(IDType.ConnID, IDType.OCSChainID, chainIDs));
-//                AddIDs(IDType.OCSRecordHandle, getIDs(IDType.OCSRecordHandle, IDType.OCSChainID, chainIDs));
-//                AddIDs(IDType.OCSSID, getIDs(IDType.OCSSID, IDType.OCSChainID, chainIDs));
-//                AddIDs(IDType.OCSSID, getIDs(IDType.OCSSID, IDType.OCSRecordHandle, getIDs(IDType.OCSRecordHandle)));
-//                break;
-//            }
-//
-//            case OCSRecordHandle: {
-//                Integer[] HIDs = idFound.ids;
-//                AddIDs(IDType.OCSChainID, getIDs(IDType.OCSChainID, IDType.OCSRecordHandle, HIDs));
-//                AddIDs(IDType.OCSRecordHandle, getIDs(IDType.OCSRecordHandle, IDType.OCSChainID, getIDs(IDType.OCSChainID)));
-//                AddIDs(IDType.ConnID, getIDs(IDType.ConnID, IDType.OCSChainID, getIDs(IDType.OCSChainID)));
-//                AddIDs(IDType.OCSSID, getIDs(IDType.OCSSID, IDType.OCSRecordHandle, getIDs(IDType.OCSRecordHandle)));
-//                AddIDs(IDType.OCSSID, getIDs(IDType.OCSSID, IDType.OCSChainID, getIDs(IDType.OCSChainID)));
-//                break;
-//            }
-//
-//            case ConnID: {
-//                Integer[] chainIDs = getIDs(IDType.OCSChainID, IDType.ConnID, idFound.ids);
-//                AddIDs(IDType.OCSChainID, chainIDs);
-//                AddIDs(IDType.OCSRecordHandle, getIDs(IDType.OCSRecordHandle, IDType.OCSChainID, chainIDs));
-//                AddIDs(IDType.ConnID, getIDs(IDType.ConnID, IDType.OCSChainID, chainIDs));
-//                AddIDs(IDType.OCSSID, getIDs(IDType.OCSSID, IDType.OCSChainID, getIDs(IDType.OCSChainID)));
-//                AddIDs(IDType.OCSSID, getIDs(IDType.OCSSID, IDType.OCSRecordHandle, getIDs(IDType.OCSRecordHandle)));
-//                break;
-//            }
-//
-//            default:
-//                throw new Exception("Not implemented search by type " + idFound.idType);
-//        }
-        return true;
+        return getStatServerIDType();
     }
 
     boolean AnythingStatServerRelated() {
-        if (IDsFound(IDType.ConnID) || IDsFound(IDType.DN) || IDsFound(IDType.PLACE) || IDsFound(IDType.AGENT)) {
-            return true;
-        }
-        return false;
+        return IDsFound(IDType.ConnID) || IDsFound(IDType.DN) || IDsFound(IDType.PLACE) || IDsFound(IDType.AGENT);
     }
 
     boolean initIxn() throws SQLException {
         searchType = SearchType.INTERACTION;
 
-        if (!getIxnServerIDType()) {
-            return false;
-        }
-
-        return true;
+        return getIxnServerIDType();
     }
 
     private boolean getApacheWebIDType() throws SQLException {
@@ -906,8 +856,8 @@ public final class IDsFinder extends QueryTools {
             }
         }
         if (selectionType == SelectionType.MCP_CALLID || selectionType == SelectionType.GUESS_SELECTION) {
-            Integer[] refIDs = getRefIDs(ReferenceType.VXMLMCPCallID, sIDs, regex);
-            AddIDs(IDType.MCPCallID, refIDs);
+            Integer[] _refIDs = getRefIDs(ReferenceType.VXMLMCPCallID, sIDs, regex);
+            AddIDs(IDType.MCPCallID, _refIDs);
 
             if (IDsFound(IDType.MCPCallID)) {
                 return true;
@@ -935,8 +885,8 @@ public final class IDsFinder extends QueryTools {
         }
 
         if (selectionType == SelectionType.DN || selectionType == SelectionType.GUESS_SELECTION) {
-            Integer[] refIDs = getRefIDs(ReferenceType.DN, sIDs, regex);
-            AddIDs(IDType.DN, refIDs);
+            Integer[] _refIDs = getRefIDs(ReferenceType.DN, sIDs, regex);
+            AddIDs(IDType.DN, _refIDs);
 
             if (IDsFound(IDType.DN)) {
                 return true;
@@ -948,8 +898,8 @@ public final class IDsFinder extends QueryTools {
         }
 
         if (selectionType == SelectionType.AGENT || selectionType == SelectionType.GUESS_SELECTION) {
-            Integer[] refIDs = getRefIDs(ReferenceType.Agent, sIDs, regex);
-            AddIDs(IDType.AGENT, refIDs);
+            Integer[] _refIDs = getRefIDs(ReferenceType.Agent, sIDs, regex);
+            AddIDs(IDType.AGENT, _refIDs);
 
             if (IDsFound(IDType.AGENT)) {
                 return true;
@@ -961,8 +911,8 @@ public final class IDsFinder extends QueryTools {
         }
 
         if (selectionType == SelectionType.SESSION || selectionType == SelectionType.GUESS_SELECTION) {
-            Integer[] refIDs = getRefIDs(ReferenceType.ORSSID, sIDs, regex);
-            AddIDs(IDType.ORSSID, refIDs);
+            Integer[] _refIDs = getRefIDs(ReferenceType.ORSSID, sIDs, regex);
+            AddIDs(IDType.ORSSID, _refIDs);
 
             if (IDsFound(IDType.ORSSID)) {
                 return true;
@@ -974,8 +924,8 @@ public final class IDsFinder extends QueryTools {
         }
 
         if (selectionType == SelectionType.UUID || selectionType == SelectionType.GUESS_SELECTION) {
-            Integer[] refIDs = getRefIDs(ReferenceType.UUID, sIDs, regex);
-            AddIDs(IDType.UUID, refIDs);
+            Integer[] _refIDs = getRefIDs(ReferenceType.UUID, sIDs, regex);
+            AddIDs(IDType.UUID, _refIDs);
 
             if (IDsFound(IDType.UUID)) {
                 return true;
@@ -986,8 +936,8 @@ public final class IDsFinder extends QueryTools {
             }
         }
         if (selectionType == SelectionType.IXN || selectionType == SelectionType.GUESS_SELECTION) {
-            Integer[] refIDs = getRefIDs(ReferenceType.IxnID, sIDs, regex);
-            AddIDs(IDType.IxnID, refIDs);
+            Integer[] _refIDs = getRefIDs(ReferenceType.IxnID, sIDs, regex);
+            AddIDs(IDType.IxnID, _refIDs);
 
             if (IDsFound(IDType.IxnID)) {
                 return true;
@@ -1752,7 +1702,7 @@ public final class IDsFinder extends QueryTools {
                                 + ")");
 
 //                        String[] names = DatabaseConnector.getNames(this, "URSSTR_logbr", "ref2id", getWhere("connidid", searchIDs, true));
-                        Integer[] refIDs = DatabaseConnector.getRefIDs(ReferenceType.Agent, names);
+                        Integer[] _refIDs = DatabaseConnector.getRefIDs(ReferenceType.Agent, names);
                         return DatabaseConnector.getRefIDs(ReferenceType.Agent, names);
                     }
                 }
@@ -2260,7 +2210,7 @@ public final class IDsFinder extends QueryTools {
         }
         StringBuilder buf = new StringBuilder(120);
         for (Integer callid : sortedArray(value)) {
-            buf.append(" " + callid);
+            buf.append(" ").append(callid);
         }
         return buf.toString();
 
@@ -2320,7 +2270,6 @@ public final class IDsFinder extends QueryTools {
         }
     }
 
-
     boolean initRouting() throws SQLException {
         searchType = SearchType.ROUTING;
 
@@ -2345,42 +2294,26 @@ public final class IDsFinder extends QueryTools {
     boolean initWWE() throws SQLException {
         searchType = SearchType.WWE;
 
-        if (!getWWEIDType()) {
-            return false;
-        }
-
-        return true;
+        return getWWEIDType();
     }
 
     boolean initCS() throws SQLException {
         searchType = SearchType.CONFSERV;
 
-        if (!getConfServIDType()) {
-            return false;
-        }
-
-        return true;
+        return getConfServIDType();
     }
 
     boolean initMediaServer() throws SQLException {
         searchType = SearchType.MediaServer;
 
-        if (!getMediaServerIDType()) {
-            return false;
-        }
-
-        return true;
+        return getMediaServerIDType();
 
     }
 
     boolean initGMS() throws SQLException {
         searchType = SearchType.GMS;
 
-        if (!getGMSIDType()) {
-            return false;
-        }
-
-        return true;
+        return getGMSIDType();
 
     }
 
@@ -2451,44 +2384,7 @@ public final class IDsFinder extends QueryTools {
     public boolean initOutbound() throws SQLException {
         searchType = SearchType.OUTBOUND;
 
-        if (!getOutboundIDType()) {
-            return false;
-        }
-
-//        switch (idFound.idType) {
-//            case OCSChainID: {
-//                Integer[] chainIDs = idFound.ids;
-//                AddIDs(IDType.ConnID, getIDs(IDType.ConnID, IDType.OCSChainID, chainIDs));
-//                AddIDs(IDType.OCSRecordHandle, getIDs(IDType.OCSRecordHandle, IDType.OCSChainID, chainIDs));
-//                AddIDs(IDType.OCSSID, getIDs(IDType.OCSSID, IDType.OCSChainID, chainIDs));
-//                AddIDs(IDType.OCSSID, getIDs(IDType.OCSSID, IDType.OCSRecordHandle, getIDs(IDType.OCSRecordHandle)));
-//                break;
-//            }
-//
-//            case OCSRecordHandle: {
-//                Integer[] HIDs = idFound.ids;
-//                AddIDs(IDType.OCSChainID, getIDs(IDType.OCSChainID, IDType.OCSRecordHandle, HIDs));
-//                AddIDs(IDType.OCSRecordHandle, getIDs(IDType.OCSRecordHandle, IDType.OCSChainID, getIDs(IDType.OCSChainID)));
-//                AddIDs(IDType.ConnID, getIDs(IDType.ConnID, IDType.OCSChainID, getIDs(IDType.OCSChainID)));
-//                AddIDs(IDType.OCSSID, getIDs(IDType.OCSSID, IDType.OCSRecordHandle, getIDs(IDType.OCSRecordHandle)));
-//                AddIDs(IDType.OCSSID, getIDs(IDType.OCSSID, IDType.OCSChainID, getIDs(IDType.OCSChainID)));
-//                break;
-//            }
-//
-//            case ConnID: {
-//                Integer[] chainIDs = getIDs(IDType.OCSChainID, IDType.ConnID, idFound.ids);
-//                AddIDs(IDType.OCSChainID, chainIDs);
-//                AddIDs(IDType.OCSRecordHandle, getIDs(IDType.OCSRecordHandle, IDType.OCSChainID, chainIDs));
-//                AddIDs(IDType.ConnID, getIDs(IDType.ConnID, IDType.OCSChainID, chainIDs));
-//                AddIDs(IDType.OCSSID, getIDs(IDType.OCSSID, IDType.OCSChainID, getIDs(IDType.OCSChainID)));
-//                AddIDs(IDType.OCSSID, getIDs(IDType.OCSSID, IDType.OCSRecordHandle, getIDs(IDType.OCSRecordHandle)));
-//                break;
-//            }
-//
-//            default:
-//                throw new Exception("Not implemented search by type " + idFound.idType);
-//        }
-        return true;
+        return getOutboundIDType();
     }
 
     Integer[] getIDs(IDType retIDType, IDType searchIDType, Integer[] searchIDs) throws SQLException {
@@ -2585,7 +2481,6 @@ public final class IDsFinder extends QueryTools {
 
     }
 
-
     public HashSet<Integer> getCallIds() {
         return m_callIdHash;
     }
@@ -2593,7 +2488,6 @@ public final class IDsFinder extends QueryTools {
     public HashSet<Integer> getConnIds() {
         return m_connIdHash;
     }
-
 
     private boolean GuessCallIDs() throws SQLException {
         Integer[] ConnIDs = null;
@@ -2634,13 +2528,13 @@ public final class IDsFinder extends QueryTools {
         }
 
         if (selectionType == SelectionType.CALLID || selectionType == SelectionType.GUESS_SELECTION) {// is it AttributeCallUUID?            
-            Integer[] CallIDs = getRefIDs(ReferenceType.SIPCALLID, new String[]{selection}, regex);
-            if (CallIDs.length == 0) {
-                CallIDs = getRefIDsLike(this, ReferenceType.SIPCALLID, new String[]{selection});
+            Integer[] _CallIDs = getRefIDs(ReferenceType.SIPCALLID, new String[]{selection}, regex);
+            if (_CallIDs.length == 0) {
+                _CallIDs = getRefIDsLike(this, ReferenceType.SIPCALLID, new String[]{selection});
             }
-            if (ConnIDs != null && CallIDs.length > 0) {
-                AddIDs(IDType.SIPCallID, CallIDs);
-                for (Integer CallID : CallIDs) {
+            if (ConnIDs != null && _CallIDs.length > 0) {
+                AddIDs(IDType.SIPCallID, _CallIDs);
+                for (Integer CallID : _CallIDs) {
                     if (!m_callIdHash.contains(CallID)) {
                         m_callIdHash.add(CallID);
                     }
@@ -2693,7 +2587,6 @@ public final class IDsFinder extends QueryTools {
         return false;
 
     }
-
 
     protected void Loop(ArrayList<Integer> newConnIds,
             ArrayList<Integer> newCallIds,
@@ -2966,7 +2859,7 @@ public final class IDsFinder extends QueryTools {
                             connid != null;
                             connid = connIdQuery.GetNext()) {
                         if (connid > 0 && !m_connIdHash.contains(connid)) {
-                            m_connIdHash.add(connid.intValue());
+                            m_connIdHash.add(connid);
                             newConnIdsFound = true;
                             RetrieveParentTransfers(connid, 1);
                             RetrieveChildTransfers(connid, 1);
@@ -3062,6 +2955,7 @@ public final class IDsFinder extends QueryTools {
         }
         return ret;
     }
+
     private static enum SearchType {
         UNKNOWN,
         ROUTING,
@@ -3075,26 +2969,27 @@ public final class IDsFinder extends QueryTools {
         ApacheWeb,
         CONFSERV
     }
+
     private static class WhereBuilder {
-        
-        private ArrayList<String> components;
-        
+
+        private final ArrayList<String> components;
+
         public WhereBuilder() {
             this.components = new ArrayList<>();
         }
-        
+
         private WhereBuilder addOpenBracket() {
             components.add("(");
             return this;
         }
-        
+
         private WhereBuilder addCond(String where) {
             if (StringUtils.isNoneEmpty(where)) {
                 components.add(where);
             }
             return this;
         }
-        
+
         private WhereBuilder addCond(boolean cond, String AndOr, String where) {
             if (cond) {
                 if (!components.isEmpty()) {
@@ -3104,20 +2999,20 @@ public final class IDsFinder extends QueryTools {
             }
             return this;
         }
-        
+
         private WhereBuilder addAnd() {
             if (!components.isEmpty()) {
                 components.add("AND");
             }
             return this;
-            
+
         }
-        
+
         private WhereBuilder addCloseBracket() {
             components.add(")");
             return this;
         }
-        
+
         private String build(boolean addWhere) {
             StringBuilder ret = new StringBuilder();
             if (addWhere) {
@@ -3167,7 +3062,8 @@ public final class IDsFinder extends QueryTools {
             this.ids = _ids;
         }
     }
-    protected enum LoopState {
+
+    private enum LoopState {
         NEW_CONNIDS,
         NEW_CALLIDS_FROM_CONNIDS,
         NEW_CONNIDS_FROM_CONNIDS,

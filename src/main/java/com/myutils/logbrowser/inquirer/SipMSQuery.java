@@ -19,16 +19,15 @@ public class SipMSQuery extends IQuery {
 
     private String[] orderBy;
 
-
     private Integer[] m_CallIds;
     private boolean m_useProxy = true;
 
     private DynamicTreeNode<OptionNode> node = null;
     private IDsFinder cidFinder;
 
-
     private boolean shouldRun = false;
     private HashMap sipRecords = new HashMap();
+
     public SipMSQuery() throws SQLException {
         addRef("ToUriID", "ToUri", ReferenceType.SIPURI.toString(), FieldType.Optional);
         addRef("FromUriID", "FromUri", ReferenceType.SIPURI.toString(), FieldType.Optional);
@@ -47,6 +46,7 @@ public class SipMSQuery extends IQuery {
 
         setOrderBy(new String[]{"time"});
     }
+
     SipMSQuery(DynamicTreeNode<OptionNode> reportSettings, IDsFinder cidFinder, QueryDialog dlg, IQueryResults qr) throws SQLException {
         this();
         this.node = reportSettings;
@@ -60,6 +60,7 @@ public class SipMSQuery extends IQuery {
             }
         }
     }
+
     public String getTabAlias() {
         return "sip";
     }
@@ -71,7 +72,6 @@ public class SipMSQuery extends IQuery {
     private boolean shouldRun() {
         return true;
     }
-
 
     @Override
     public void Execute() throws SQLException {
@@ -98,7 +98,6 @@ public class SipMSQuery extends IQuery {
         m_resultSet = m_connector.executeQuery(this, query);
         recCnt = 0;
     }
-
 
     public HashMap getSipRecords() {
         return sipRecords;

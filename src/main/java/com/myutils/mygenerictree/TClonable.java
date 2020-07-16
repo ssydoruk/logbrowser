@@ -9,8 +9,8 @@ package com.myutils.mygenerictree;
  *
  * @author ssydoruk
  */
-public interface TClonable  {
+public interface TClonable {
 
     TClonable copy();
-    
+
 }

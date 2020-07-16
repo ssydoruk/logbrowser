@@ -38,7 +38,7 @@ public class WindowHandleGetter {
 
             return hwnd;
 
-        } catch (Exception ex) {
+        } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
             inquirer.ExceptionHandler.handleException("Error getting window handle", ex);
 
         }

@@ -34,9 +34,9 @@ import javax.swing.table.DefaultTableCellRenderer;
  */
 public class QueryJTable extends JTableCommon {
 
-
     static ZoneId zoneId = ZoneId.systemDefault();
     private static final DefaultTableCellRenderer DEFAULT_RENDERER = new DefaultTableCellRenderer();
+
     public static void setResize(JTable table) {
 //        for (int column = 0; column < table.getColumnCount(); column++) {
 //            TableColumn tableColumn = table.getColumnModel().getColumn(column);
@@ -59,18 +59,19 @@ public class QueryJTable extends JTableCommon {
 //            tableColumn.setPreferredWidth(preferredWidth + 5);
 //        }
     }
+
     public QueryJTable(FullTableColors tabs) throws Exception {
         super();
 
         this.setModel(new DataModel(tabs));
 //        setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
 
-Font font = this.getFont();
+        Font font = this.getFont();
 
-setDefaultRenderer(Object.class, new QueryJTableCellRenderer(new Font(font.getName(), Font.BOLD, font.getSize())));
-TableColumnAdjuster tca = getTca();
-tca.setColumnHeaderIncluded(true);
-tca.adjustColumns();
+        setDefaultRenderer(Object.class, new QueryJTableCellRenderer(new Font(font.getName(), Font.BOLD, font.getSize())));
+        TableColumnAdjuster tca = getTca();
+        tca.setColumnHeaderIncluded(true);
+        tca.adjustColumns();
 
     }
 
@@ -94,12 +95,12 @@ tca.adjustColumns();
 
     protected class DataModel extends AbstractTableModel {
 
-
-        private FullTableColors tabData;
+        private final FullTableColors tabData;
 
         private DataModel(FullTableColors tabs) {
             this.tabData = tabs;
         }
+
         public ArrayList<String> exportToExcel() throws FileNotFoundException {
             String fileNameExcel = inquirer.getCr().getFileNameExcel();
             File f = new File(fileNameExcel);
@@ -227,7 +228,6 @@ tca.adjustColumns();
         }
 
     }
-
 
     class QueryJTableCellRenderer extends DefaultTableCellRenderer {
 

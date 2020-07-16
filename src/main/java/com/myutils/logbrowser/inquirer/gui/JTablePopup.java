@@ -34,6 +34,7 @@ import org.apache.logging.log4j.Logger;
  * @author ssydoruk
  */
 public abstract class JTablePopup extends JTable {
+
     private static final Logger logger = LogManager.getLogger();
 
     protected final JPopupMenu popupMenu;
@@ -41,10 +42,11 @@ public abstract class JTablePopup extends JTable {
     protected int popupCol;
     private EnterRegexDialog findDlg = null;
     private SearchExtract searchExtract = null;
+
     public JTablePopup() {
         super();
         popupMenu = new JPopupMenu();
-        
+
         addMouseListener(new JTableCommon.MyMouseAdapter() {
         });
 //        setComponentPopupMenu(popupMenu);
@@ -69,7 +71,6 @@ public abstract class JTablePopup extends JTable {
     public int getPopupCol() {
         return popupCol;
     }
-
 
     void copyAll() {
         StringBuilder out = new StringBuilder(getRowCount() * 120);
@@ -116,7 +117,6 @@ public abstract class JTablePopup extends JTable {
             selectionModel1.setValueIsAdjusting(false);
         }
     }
-
 
     private void theMousePressed1(MouseEvent e) {
 //        logger.debug("click at " + e.getPoint() + (e.isPopupTrigger() ? " popup!" : ""));
@@ -182,7 +182,6 @@ public abstract class JTablePopup extends JTable {
 
     abstract void callingPopup();
 
-
     void showFindDialog() {
         if (findDlg == null) {
             findDlg = new EnterRegexDialog(null, true);
@@ -224,7 +223,6 @@ public abstract class JTablePopup extends JTable {
         }
 
     }
-
 
     protected EnterRegexDialog showFind() {
         if (findDlg == null) {
@@ -327,19 +325,20 @@ public abstract class JTablePopup extends JTable {
         rect.setLocation(rect.x - pt.x, rect.y - pt.y);
         viewport.scrollRectToVisible(rect);
     }
+
     class MyMouseAdapter extends MouseAdapter {
-        
+
         @Override
         public void mousePressed(MouseEvent e) {
             theMousePressed1(e);
         }
-        
+
         @Override
         public void mouseReleased(MouseEvent e) {
-            
+
             theMouseRelesed(e);
         }
-        
+
     }
 
 }

@@ -24,6 +24,7 @@ import org.apache.commons.lang3.StringUtils;
  * @author ssydoruk
  */
 public class AggrORSPerSecond extends IAggregateAggregate {
+
     private static final String TMP_TABLE = "tmp1";
 
     private boolean isTLibReport;
@@ -84,7 +85,6 @@ public class AggrORSPerSecond extends IAggregateAggregate {
     public ArrayList<NameID> getApps() throws Exception {
         return null;
     }
-
 
     private void runTLibReport(AggrSIPServerCallsPerSecondConfig cfg, Integer[] appIDs, String tabName) throws SQLException {
         isTLibReport = true;

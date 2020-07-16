@@ -74,11 +74,9 @@ public final class URSStrategy extends Message {
         return StrategySteps.get(FileLine, rest);
     }
 
-
     String getUUID() {
         return FindByRx(uuidPattern, rest, 1, "");
     }
-
 
     String getStrategyRef1() {
         return ref1;

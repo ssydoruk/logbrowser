@@ -20,6 +20,7 @@ public class IxnServerResults extends IQueryResults {
     private int m_componentFilter;
     private ArrayList<NameID> appType = null;
     private IDsFinder cidFinder = null;
+
     public IxnServerResults(QueryDialogSettings qdSettings) throws SQLException {
         super(qdSettings);
         if (repComponents.isEmpty()) {
@@ -99,7 +100,6 @@ public class IxnServerResults extends IQueryResults {
         Attr.addChild(AttrValue);
 
     }
-
 
     public void SetConfig(Properties config) {
         if (config != null && !config.isEmpty()) {

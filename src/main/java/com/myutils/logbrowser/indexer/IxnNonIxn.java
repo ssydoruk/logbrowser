@@ -15,6 +15,7 @@ public class IxnNonIxn extends Message {
 
     MessageAttributes attrs = new MessageAttributes();
     private final Ixn parentMsg;
+
     IxnNonIxn(TableType tableType, Ixn msg) {
         super(tableType);
         parentMsg = msg;
@@ -81,7 +82,6 @@ public class IxnNonIxn extends Message {
     String getAttr2() {
         return parentMsg.getAttr2();
     }
-
 
     String getUserEvent() {
         return Main.lookupConstant(GenesysConstants.TSERVER,

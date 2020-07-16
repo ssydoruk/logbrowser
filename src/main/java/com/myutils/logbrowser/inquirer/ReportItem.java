@@ -33,10 +33,10 @@ public class ReportItem extends IReportConfigItem {
 
         ArrayList<ComponentAttribute> attrs = new ArrayList<>();
 
-
         public ReportComponent(IReportConfigItem _parent, String name) {
             super(_parent, name);
         }
+
         public ArrayList<ComponentAttribute> getAttrs() {
             return attrs;
         }

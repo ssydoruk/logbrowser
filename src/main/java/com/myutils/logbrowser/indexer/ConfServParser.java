@@ -142,7 +142,7 @@ public class ConfServParser extends Parser {
 
                 if (lastGenesysMsgID != null) {
                     if (lastGenesysMsgID.equals("04541")) {
-                        if ((m = regChangeRequest.matcher(s)).find()) {
+                        if ((regChangeRequest.matcher(s)).find()) {
                             setSavedFilePos(getFilePos());
                             m_MessageContents.add(s);
                             m_ParserState = ParserState.STATE_UPDATE;
@@ -363,6 +363,7 @@ public class ConfServParser extends Parser {
             this.clientType = appType;
             this.appName = appName;
         }
+
         private CSClientRequest1(ArrayList<String> m_MessageContents) {
             super(TableType.CSUpdate, m_MessageContents);
         }
@@ -398,7 +399,6 @@ public class ConfServParser extends Parser {
             }
             return userName;
         }
-
 
         private void setObjType(String group) {
             this.ObjType = group;
@@ -552,9 +552,11 @@ public class ConfServParser extends Parser {
         private String appName;
         private Integer objectsNumber;
         private int socket;
+
         private CSConfToClient() {
             super(TableType.CSClientConf);
         }
+
         private CSConfToClient(ArrayList<String> m_MessageContents) {
             super(TableType.CSClientConf, m_MessageContents);
         }
@@ -570,7 +572,6 @@ public class ConfServParser extends Parser {
         public String getAppName() {
             return appName;
         }
-
 
         private void setObjType(String group) {
             this.ObjType = group;
@@ -688,6 +689,7 @@ public class ConfServParser extends Parser {
         private String userName;
         private String clientAddr;
         private Integer socket;
+
         private CSClientConnect() {
             super(TableType.CSClientConnect);
         }
@@ -699,7 +701,6 @@ public class ConfServParser extends Parser {
         public String getAppName() {
             return appName;
         }
-
 
         private void setClientType(String group) {
             this.clientType = group;

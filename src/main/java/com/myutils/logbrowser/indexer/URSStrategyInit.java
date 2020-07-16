@@ -8,6 +8,7 @@ package com.myutils.logbrowser.indexer;
 import java.util.regex.Pattern;
 
 public final class URSStrategyInit extends Message {
+
     private static final Pattern uuidPattern = Pattern.compile("^calluuid ([\\w~]+) is bound");
 
     private String FileLine;
@@ -39,7 +40,6 @@ public final class URSStrategyInit extends Message {
     String getStrategyMsg() {
         return strategyMsg;
     }
-
 
     String getUUID() {
         return FindByRx(uuidPattern, strategyMsg, 1, "");

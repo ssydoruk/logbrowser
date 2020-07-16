@@ -5,7 +5,6 @@
 package com.myutils.logbrowser.inquirer;
 
 import com.myutils.logbrowser.indexer.ReferenceType;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collection;
 
@@ -13,12 +12,8 @@ import java.util.Collection;
  *
  * @author ssydoruk
  */
-public class UrsByConnIdQuery extends IQuery {
+public final class UrsByConnIdQuery extends IQuery {
 
-    private Integer[] m_ConnIds = null;
-    private ResultSet m_resultSet;
-    private DatabaseConnector m_connector;
-    private int recCnt;
     private DynamicTreeNode<OptionNode> node = null;
     private Collection<Long> refIDs;
     private Collection<Long> existingIDs;
@@ -51,7 +46,6 @@ public class UrsByConnIdQuery extends IQuery {
 
     public UrsByConnIdQuery(Integer[] connIds) throws SQLException {
         this();
-        m_ConnIds = connIds;
     }
 
     public UrsByConnIdQuery(Integer connId) throws SQLException {
@@ -104,7 +98,6 @@ public class UrsByConnIdQuery extends IQuery {
         recCnt = 0;
     }
 
-
     private String getMyWhere() throws SQLException {
         String ret = "";
 
@@ -113,7 +106,7 @@ public class UrsByConnIdQuery extends IQuery {
 
         } else {
             if (cif != null) {
-                Integer[] ids = null;
+                Integer[] ids;
                 Wheres wh = new Wheres();
                 if ((ids = cif.getIDs(IDType.ConnID)) != null) {
                     wh.addWhere(getWhere("urs.ConnectionIdid", ids, false));

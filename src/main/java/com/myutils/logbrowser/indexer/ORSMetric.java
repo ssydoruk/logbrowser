@@ -73,7 +73,7 @@ public class ORSMetric extends Message {
             try {
                 return Integer.parseInt(m.group(1));
             } catch (NumberFormatException e) {
-                Main.logger.error(e);;
+                Main.logger.error(e);
                 return -1;
             }
         }

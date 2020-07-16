@@ -10,7 +10,6 @@ import java.util.ArrayList;
 
 public class OCSIcon extends Message {
 
-
     private String newMode;
     private int appDBID;
     private String appName;
@@ -26,6 +25,7 @@ public class OCSIcon extends Message {
     OCSIcon(ArrayList<String> m_MessageContents) {
         super(TableType.OCSIcon, m_MessageContents);
     }
+
     public String getHost() {
         return host;
     }

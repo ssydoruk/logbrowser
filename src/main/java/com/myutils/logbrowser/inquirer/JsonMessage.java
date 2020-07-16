@@ -13,7 +13,7 @@ import java.sql.SQLException;
  */
 public class JsonMessage extends ILogRecord {
 
-    private boolean m_isInbound;
+    private final boolean m_isInbound;
 
     public JsonMessage(ResultSet rs) throws SQLException {
         super(rs, MsgType.JSON);

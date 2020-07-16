@@ -10,6 +10,7 @@ import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 
 public final class URSVQ extends Message {
+
     //    _M_I_018a02adfd64324f [17:0f] VQ 7f00218acf00 [at all 71 0/0 0] 1 Target(s), flag=700000408a, guid: 0Resources|BH_SalesGeneral_VQ_multimediaswitch||1|m38|1|00|0|0|---|||||||01StatAgentLoading|00{}{}{}[]?BH_SalesInbound_AG:Chat_SK>0@hc1_statsrvr_urs_p.GA
     private static final Pattern ptGuid = Pattern.compile("^VQ\\s+(\\S+).+ guid:(.+)$");
 
@@ -23,12 +24,15 @@ public final class URSVQ extends Message {
     public URSVQ() {
         super(TableType.URSVQ);
     }
+
     public String getVQID() {
         return VQID;
     }
+
     public String getVqName() {
         return vqName;
     }
+
     public String getTarget() {
         return target;
     }
@@ -49,7 +53,6 @@ public final class URSVQ extends Message {
     void setConnID(String lastConnID) {
         this.ConnID = lastConnID;
     }
-
 
     void setGUIDMsg(String GUIDMsg) {
         Matcher m;

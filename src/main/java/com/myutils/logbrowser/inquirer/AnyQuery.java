@@ -6,7 +6,6 @@
 package com.myutils.logbrowser.inquirer;
 
 import Utils.Pair;
-import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -18,7 +17,6 @@ public class AnyQuery extends IQuery {
     private String queryTable;
     private ArrayList<Pair> selectFields;
 
-
     public AnyQuery() {
         query = null;
         selectFields = new ArrayList<>();
@@ -28,6 +26,7 @@ public class AnyQuery extends IQuery {
         this();
         query = _query;
     }
+
     public ResultSetMetaData getRsmd() {
         return rsmd;
     }

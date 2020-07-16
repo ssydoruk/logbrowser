@@ -27,9 +27,7 @@ public abstract class Message extends Record {
 
     private static final Pattern ptAttrInBrackets = Pattern.compile("\\[(.+)\\]$");
 
-
 //    private static final Pattern regQuotes = Pattern.compile("^['\"]*(.+)['\"\\s]*$");
-
     // keeping track of current date
     // looking for hour reset at midnight
     static String m_CurrentDate;
@@ -46,10 +44,11 @@ public abstract class Message extends Record {
     private final static Pattern SIPHeaderVal = Pattern.compile("^\\s*:\\s*(.+)");
     private static final Pattern regSIPDN = Pattern.compile("^([^@]+)");
     //    private static final Pattern regSIPURI = Pattern.compile("^(?:\\\")?(?:[^<\\\"]*)(?:\\\")?[ ]*(?:<)?(?:sip(?:s)?|tel):([^@>]+)(?:@([^;>]+)(?:>)?)?");
-    public static final String USER_PART="userpart";
+    public static final String USER_PART = "userpart";
     private static final Pattern regSIPURI = Pattern.compile("^(?:\\\")?(?:[^<\\\"]*)(?:\\\")?[ ]*(?:<)?(?:sip(?:s)?|tel):(?<userpart>[^@>]+)(?:@(?<host>[^;>]+)(?:>)?)?");
     private static final Pattern regSIPURIMediaService = Pattern.compile("media-service=(\\w+)");
     final private static Pattern regErrorMessage = Pattern.compile("^\\s+\\((\\w.+)\\)$");
+
     public static JSONObject jsonOrDef(JSONObject _jsonBody, String name) throws JSONException {
         if (_jsonBody.has(name)) {
             return (JSONObject) _jsonBody.get(name);
@@ -57,6 +56,7 @@ public abstract class Message extends Record {
             return null;
         }
     }
+
     public static String jsonStringOrDef(JSONObject _jsonBody, String name, Object def) throws JSONException {
         if (_jsonBody.has(name)) {
             String ret = _jsonBody.getString(name);
@@ -68,6 +68,7 @@ public abstract class Message extends Record {
         }
         return (String) def;
     }
+
     static protected String getGroup2Or3(Matcher m) {
         String ret = m.group(2);
         if (ret == null) {
@@ -75,7 +76,6 @@ public abstract class Message extends Record {
         }
         return ret;
     }
-
 
     public static void AdjustTimestamps(long time) {
         Date dateTime = new Date();
@@ -151,6 +151,7 @@ public abstract class Message extends Record {
         }
         return ret;
     }
+
     public static double parseOrDef(String s, Double def) {
         if (s != null) {
             try {
@@ -159,14 +160,16 @@ public abstract class Message extends Record {
             }
         }
         return def;
-        
+
     }
+
     public static Integer FindByRx(ArrayList<String> msgLines, Pattern rx, int groupId, Integer def) {
         return intOrDef(FindByRx(msgLines, rx, groupId, (String) null), def);
     }
+
     public static String FindByRx(ArrayList<String> msgLines, Pattern rx, int groupId, String def) {
         Matcher m;
-        
+
         if (msgLines != null) {
             for (String s : msgLines) {
                 if (s != null && (m = rx.matcher(s)).find()) {
@@ -176,9 +179,10 @@ public abstract class Message extends Record {
         }
         return def;
     }
+
     public static Matcher FindMatcher(ArrayList<String> msgLines, Pattern rx) {
         Matcher m;
-        
+
         if (msgLines != null) {
             for (String s : msgLines) {
                 if (s != null && (m = rx.matcher(s)).find()) {
@@ -188,9 +192,10 @@ public abstract class Message extends Record {
         }
         return null;
     }
+
     public static String FindByRx(ArrayList<String> msgLines, ArrayList<Pair<Pattern, Integer>> ixnIDs) {
         Matcher m;
-        
+
         if (msgLines != null) {
             for (String s : msgLines) {
                 if (s != null && !s.isEmpty()) {
@@ -204,25 +209,27 @@ public abstract class Message extends Record {
         }
         return null;
     }
+
     public static String GetSIPHeader(String header, String headerLong, String headerShort) {
         String ret = null;
-        
-//        Main.logger.trace("GetSIPeader h[" + header + "] headerLong[" + headerLong + "] headerShort[" + headerShort + "]");
-if (headerLong != null && headerLong.length() > 0) {
-    ret = getVal(header, headerLong.length(), headerLong);
-    if (ret != null) {
-        return ret;
-    }
-}
-if (headerShort != null && headerShort.length() > 0) {
-    ret = getVal(header, headerShort.length(), headerShort);
-    if (ret != null) {
-        return ret;
-    }
-}
 
-return ret;
+//        Main.logger.trace("GetSIPeader h[" + header + "] headerLong[" + headerLong + "] headerShort[" + headerShort + "]");
+        if (headerLong != null && headerLong.length() > 0) {
+            ret = getVal(header, headerLong.length(), headerLong);
+            if (ret != null) {
+                return ret;
+            }
+        }
+        if (headerShort != null && headerShort.length() > 0) {
+            ret = getVal(header, headerShort.length(), headerShort);
+            if (ret != null) {
+                return ret;
+            }
+        }
+
+        return ret;
     }
+
     /**
      * getVal. Header names should come without colon!!!
      *
@@ -233,7 +240,7 @@ return ret;
      */
     static private String getVal(String header, int hlLen, String hl) {
         Main.logger.trace("\tgetVal h[" + header + "] len[" + hlLen + "] hl[" + hl + "]");
-        
+
         if (header.length() > hlLen && header.substring(0, hlLen).equalsIgnoreCase(hl)) {
             Matcher m;
             if ((m = SIPHeaderVal.matcher(header.substring(hlLen))).find()) {
@@ -244,6 +251,7 @@ return ret;
         Main.logger.trace("\t\tret[NULL]");
         return null;
     }
+
     static public String transformDN(String u) {
         if (u != null && !u.isEmpty()) {
             if (u.startsWith("msml=")) {
@@ -256,10 +264,11 @@ return ret;
             if (m.find()) {
                 return m.group();
             }
-            
+
         }
         return u;
     }
+
     static public String transformSIPURL(String u) {
         if (u != null && !u.isEmpty()) {
 //            if (regSIPMSML.matcher(u).find()) {
@@ -268,28 +277,29 @@ return ret;
 //            if (regSIPRecord.matcher(u).find()) {
 //                return "sip:record";
 //            }
-Matcher m;
-if ((m = regSIPURI.matcher(u)).find()) {
-    if (m.group(2) == null) { // no user part in URI
-        return "@" + m.group(1);
-    }
-    StringBuilder s = new StringBuilder(m.end());
-    String DN = m.group(1);
-    if (DN.startsWith("msml")) {
-        s.append("msml");
-        Matcher m1 = regSIPURIMediaService.matcher(u);
-        if (m1.find()) {
-            s.append("(").append(m1.group(1)).append(")");
-        }
-    } else {
-        s.append(DN);
-    }
-    s.append("@").append(m.group(2));
-    return s.toString();
-}
+            Matcher m;
+            if ((m = regSIPURI.matcher(u)).find()) {
+                if (m.group(2) == null) { // no user part in URI
+                    return "@" + m.group(1);
+                }
+                StringBuilder s = new StringBuilder(m.end());
+                String DN = m.group(1);
+                if (DN.startsWith("msml")) {
+                    s.append("msml");
+                    Matcher m1 = regSIPURIMediaService.matcher(u);
+                    if (m1.find()) {
+                        s.append("(").append(m1.group(1)).append(")");
+                    }
+                } else {
+                    s.append(DN);
+                }
+                s.append("@").append(m.group(2));
+                return s.toString();
+            }
         }
         return u;
     }
+
     static public String GetHeaderValue(String s, Character Sep, ArrayList<String> m_MessageLines) {
         if (m_MessageLines != null && s != null && !"".equals(s)) {
             s = s.toLowerCase();
@@ -298,8 +308,8 @@ if ((m = regSIPURI.matcher(u)).find()) {
                 if (header != null && header.toLowerCase().startsWith(s)
                         && header.length() > iSLen //removing = changes order in reports!!!
                         && ((Sep == null)
-                        ? Character.isWhitespace(header.charAt(iSLen))
-                        : Sep.equals(header.charAt(iSLen)))) {
+                                ? Character.isWhitespace(header.charAt(iSLen))
+                                : Sep.equals(header.charAt(iSLen)))) {
                     String ret = header.substring(iSLen + 1).trim();
                     if (ret.length() == 0) {
                         return null;
@@ -311,6 +321,7 @@ if ((m = regSIPURI.matcher(u)).find()) {
         }
         return null;
     }
+
     static int lookupAttributeIdx(String sTmp, ArrayList<String> lst) {
         String s = '\t' + sTmp;
         if (s != null && s.length() > 0 && lst != null && lst.size() > 0) {
@@ -319,11 +330,12 @@ if ((m = regSIPURI.matcher(u)).find()) {
                 if (m_MessageLine != null && m_MessageLine.startsWith(s)) {
                     return i;
                 }
-                
+
             }
         }
         return -1;
     }
+
     /**
      *
      * @param uri
@@ -339,12 +351,13 @@ if ((m = regSIPURI.matcher(u)).find()) {
         if ((idx = getKeysIdx(split, new String[]{"genesys", "1"})) >= 0) {
             return new Pair<>(null, glueArray(split, idx + 1));
         }
-        if (( getKeysIdx(split, new String[]{"scxml", "session", "start"})) >= 0) {
+        if ((getKeysIdx(split, new String[]{"scxml", "session", "start"})) >= 0) {
             return new Pair<>(null, "scxml/session/start");
         }
         Main.logger.info("Not parsed URI: [" + uri + "]");
         return null;
     }
+
     private static int getKeysIdx(String[] split, String[] keys) {
         int j = 0;
         for (int i = 0; i < split.length; i++) {
@@ -358,8 +371,9 @@ if ((m = regSIPURI.matcher(u)).find()) {
             }
         }
         return -1;
-        
+
     }
+
     static private String glueArray(String[] split, int idx) {
         StringBuilder ret = new StringBuilder();
         for (int i = idx; i < split.length; i++) {
@@ -367,10 +381,11 @@ if ((m = regSIPURI.matcher(u)).find()) {
                 ret.append('/');
             }
             ret.append(split[i]);
-            
+
         }
         return ret.toString();
     }
+
     private static int getSessionIdx(String[] split) {
         int i = getKeysIdx(split, new String[]{"scxml", "session"});
         if (i >= 0 && split.length > i + 1 && Parser.isSessionID(split[i + 1])) {
@@ -385,6 +400,7 @@ if ((m = regSIPURI.matcher(u)).find()) {
     protected ArrayList<String> m_MessageLines = null;
     private ArrayList<String> m_MMUserData = null;
     private ArrayList<String> m_MMEnvelope = null;
+
     public Message() {
         super();
     }
@@ -399,10 +415,12 @@ if ((m = regSIPURI.matcher(u)).find()) {
         m_MessageLines = new ArrayList<>(1); // by default store only one line
         m_MessageLines.add(line);
     }
+
     public Message(TableType type, ArrayList<String> m_MessageLines) {
         super(type);
         setMessageLines(m_MessageLines);
     }
+
     protected void checkDiffer(String oldS, String newS, String prop, int line) {
         if ((oldS == null || oldS.isEmpty())
                 || (oldS != null && newS != null && oldS.equals(newS))) {
@@ -414,6 +432,7 @@ if ((m = regSIPURI.matcher(u)).find()) {
             Main.logger.debug("l:" + line + " " + getM_type() + " " + prop + " old[" + ((oldS == null) ? "null" : oldS) + "] new[" + ((newS == null) ? "null" : newS) + "]");
         }
     }
+
     public String cfgGetAttrObjType(String cfgAttrName) {
         String ret = cfgGetAttr(cfgAttrName);
         if (ret != null) {
@@ -424,11 +443,12 @@ if ((m = regSIPURI.matcher(u)).find()) {
         }
         return null;
     }
+
     public String cfgGetAttr(String cfgAttrName) {
         Pattern attrNameRX = cfgAttrNames.get(cfgAttrName);
         if (attrNameRX == null) {
             attrNameRX = Pattern.compile("\\s+attr:\\s+" + cfgAttrName + "\\s+value:\\s+(.+)$");
-            
+
         }
         for (String s : m_MessageLines) {
             if (s != null && !s.isEmpty()) {
@@ -440,9 +460,11 @@ if ((m = regSIPURI.matcher(u)).find()) {
         }
         return null;
     }
+
     public String FindByRx(Regexs parentIxnID) {
         return FindByRx(parentIxnID.getRegs());
     }
+
     private String getIxnAttribute(String[] attrs, Pattern valuePattern) {
         for (String str : m_MessageLines) {
             for (String attr : attrs) {
@@ -454,6 +476,7 @@ if ((m = regSIPURI.matcher(u)).find()) {
         }
         return null;
     }
+
     /**
      * strStartRX will check if the line starts with start and then apply rx to
      * the end of the line if it matches, then return groupIdx from match
@@ -477,6 +500,7 @@ if ((m = regSIPURI.matcher(u)).find()) {
         }
         return null;
     }
+
     private String getIxnAttribute(String attr, Pattern valuePattern) {
         for (String str : m_MessageLines) {
             String ret = strStartRX(str, attr, valuePattern, 1);
@@ -486,9 +510,11 @@ if ((m = regSIPURI.matcher(u)).find()) {
         }
         return null;
     }
+
     protected String getIxnAttributeLong(String attr) {
         return getIxnAttribute(attr, regLongAttribute);
     }
+
     protected String getIxnAttributeHex(String[] attrs) {
         for (String attr : attrs) {
             String ixnAttributeHex = getIxnAttributeHex(attr);
@@ -498,12 +524,15 @@ if ((m = regSIPURI.matcher(u)).find()) {
         }
         return null;
     }
+
     protected String getIxnAttributeHex(String attr) {
         return getIxnAttribute(attr, regHexAttribute);
     }
+
     protected String getIxnAttributeString(String attr) {
         return getIxnAttribute(attr, regStringAttribute);
     }
+
     protected String getGMSAttributeString(String[] attrs) {
         String[] bufAttr = new String[attrs.length];
         for (int i = 0; i < attrs.length; i++) {
@@ -511,11 +540,13 @@ if ((m = regSIPURI.matcher(u)).find()) {
         }
         return getIxnAttribute(bufAttr, regStringAttribute);
     }
+
     private String adjustGMSString(String attr) {
         StringBuilder s1 = new StringBuilder(attr.length() + 3);
         s1.append('\t').append('\'').append(attr).append('\'');
         return s1.toString();
     }
+
     protected String getGMSAttributeString(String attr) {
         return getIxnAttribute(adjustGMSString(attr), regStringAttribute);
     }
@@ -539,7 +570,6 @@ if ((m = regSIPURI.matcher(u)).find()) {
         }
 
     }
-
 
     @Override
     public String toString() {
@@ -578,7 +608,6 @@ if ((m = regSIPURI.matcher(u)).find()) {
         }
     }
 
-
     public Integer FindByRx(Pattern rx, int groupId, int def) {
         return intOrDef(FindByRx(rx, groupId, null), def);
     }
@@ -602,7 +631,6 @@ if ((m = regSIPURI.matcher(u)).find()) {
         }
         return def;
     }
-
 
     public String FindByRx(ArrayList<Pair<Pattern, Integer>> ixnIDs) {
         return FindByRx(m_MessageLines, ixnIDs);
@@ -643,8 +671,6 @@ if ((m = regSIPURI.matcher(u)).find()) {
         return getM_FileBytes();
     }
 
-
-    
     /**
      *
      * @param s - string with SIP URI
@@ -660,10 +686,6 @@ if ((m = regSIPURI.matcher(u)).find()) {
             return null;
         }
     }
-    
-    
-    
-
 
     public String GetSIPHeaderURL(String headerLong, String headerShort) {
         return transformSIPURL(GetSIPHeader(headerLong, headerShort));
@@ -719,7 +741,6 @@ if ((m = regSIPURI.matcher(u)).find()) {
     public String GetHeaderValue(String s, Character Sep) {
         return GetHeaderValue(s, Sep, m_MessageLines);
     }
-
 
     public String GetHeaderValue(String[] lst) {
         for (String s : lst) {
@@ -792,7 +813,6 @@ if ((m = regSIPURI.matcher(u)).find()) {
         return null;
     }
 
-
     public String GetAttribute(String[] lst) {
         for (String s : lst) {
             String ret = getAttribute(s);
@@ -827,7 +847,7 @@ if ((m = regSIPURI.matcher(u)).find()) {
     }
 
     String getUData(String key, String def) {
-        String ret ;
+        String ret;
 
         if (key.startsWith(udPref)) {
             ret = lookupAttribute(CheckQuotes(key));
@@ -848,7 +868,7 @@ if ((m = regSIPURI.matcher(u)).find()) {
     This is for stupid OCS clients that may put integer GSW_RECORD_HANDLE as string
      */
     long getUData(String key, long def, boolean CanHaveQuote) {
-        String ret ;
+        String ret;
         if (key.startsWith(udPref)) {
             ret = lookupAttribute(CheckQuotes(key));
         } else {
@@ -996,7 +1016,7 @@ if ((m = regSIPURI.matcher(u)).find()) {
     }
 
     public int getAttributeInt(String attr) {
-        String s ;
+        String s;
         s = getAttribute(attr);
 
         try {
@@ -1023,7 +1043,7 @@ if ((m = regSIPURI.matcher(u)).find()) {
     }
 
     public int getHeaderHex(String attr) {
-        String s ;
+        String s;
         s = GetHeaderValue(attr);
         Main.logger.info("getHeaderHex [" + attr + "]: " + s);
 
@@ -1036,7 +1056,7 @@ if ((m = regSIPURI.matcher(u)).find()) {
     }
 
     public long getHeaderLong(String attr) {
-        String s ;
+        String s;
         s = GetHeaderValue(attr);
 
         try {
@@ -1106,7 +1126,6 @@ if ((m = regSIPURI.matcher(u)).find()) {
         }
     }
 
-
     /**
      * @return the m_FileBytes
      */
@@ -1153,7 +1172,6 @@ if ((m = regSIPURI.matcher(u)).find()) {
         return null;
     }
 
-
     String getErrorMessage(String TEventName) {
         if (TEventName != null && TEventName.equals("EventError")) {
             String attribute = getAttributeTrimQuotes("AttributeErrorMessage");
@@ -1190,15 +1208,16 @@ if ((m = regSIPURI.matcher(u)).find()) {
             return regs;
         }
     }
+
     public static abstract class RegExAttribute1 extends Attribute {
-        
+
         abstract String getValue(Regexs rx);
-        
+
         @Override
-                String getValue() {
-                    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-                }
-                
+        String getValue() {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+
     }
 
     public static abstract class Attribute {
@@ -1217,21 +1236,22 @@ if ((m = regSIPURI.matcher(u)).find()) {
             return value;
         }
     }
+
     public class RegExAttribute {
-        
+
         private final Regexs re;
         private boolean matched;
         String attrValue = null;
-        
+
         public RegExAttribute(Regexs re) {
             this.re = re;
             matched = false;
         }
-        
+
         private boolean matched() {
             return this.matched;
         }
-        
+
         private void tryMatch(String s) {
             for (Pair<Pattern, Integer> ixnID : re.getRegs()) {
                 Matcher m;
@@ -1246,10 +1266,11 @@ if ((m = regSIPURI.matcher(u)).find()) {
         public String toString() {
             return attrValue;
         }
-        
+
     }
+
     public class MessageAttributes extends ArrayList<RegExAttribute> {
-        
+
         public void parseAttributes() {
             if (m_MessageLines != null && !m_MessageLines.isEmpty()) {
                 for (String s : m_MessageLines) {
@@ -1262,7 +1283,7 @@ if ((m = regSIPURI.matcher(u)).find()) {
                     }
                 }
             }
-            
+
         }
     }
 }

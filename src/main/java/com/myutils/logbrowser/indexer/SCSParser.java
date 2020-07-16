@@ -269,7 +269,7 @@ public class SCSParser extends Parser {
             break;
 
             case STATE_ALARM_PARAMS_CLEARED: {
-                if ( !str.isEmpty() && Character.isSpaceChar(str.charAt(0))) {
+                if (!str.isEmpty() && Character.isSpaceChar(str.charAt(0))) {
                     m_MessageContents.add(str);
                     String[] split = StringUtils.split(str.substring(1), ":");
                     if (split != null) {
@@ -289,7 +289,7 @@ public class SCSParser extends Parser {
             break;
 
             case STATE_ALARM_PARAMS_CREATED: {
-                if ( !str.isEmpty() && Character.isSpaceChar(str.charAt(0))) {
+                if (!str.isEmpty() && Character.isSpaceChar(str.charAt(0))) {
                     m_MessageContents.add(str);
                     String[] split = StringUtils.split(str.substring(1), ":");
                     if (split != null) {
@@ -340,7 +340,6 @@ public class SCSParser extends Parser {
         }
         return null;
     }
-
 
     protected void ParseServerName(String str) {
 
@@ -448,6 +447,7 @@ public class SCSParser extends Parser {
         /* message about updated Status */
 
     }
+
     private class SCSClientLogMessage extends Message {
 
         private int msgID;
@@ -456,9 +456,10 @@ public class SCSParser extends Parser {
         SCSClientLogMessage(TableType t) {
             super(t);
         }
+
         private SCSClientLogMessage(String msgID, String msgText) {
             this(TableType.SCSClientLogMessage);
-            
+
             setMsgID(msgID);
             setMsgText(msgText);
         }
@@ -475,7 +476,6 @@ public class SCSParser extends Parser {
         final public void setMsgText(String msgText) {
             this.msgText = msgText;
         }
-
 
         public int getMsgID() {
             return msgID;

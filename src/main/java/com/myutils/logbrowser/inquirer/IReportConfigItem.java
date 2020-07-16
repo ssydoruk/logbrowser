@@ -15,7 +15,8 @@ public abstract class IReportConfigItem {
 
     private IReportConfigItem parent = null;
     private String name;
-    private ArrayList<IReportConfigItem> children = new ArrayList<>();
+    private final ArrayList<IReportConfigItem> children = new ArrayList<>();
+
     public IReportConfigItem(IReportConfigItem _parent, String name) {
         parent = _parent;
         this.name = name;

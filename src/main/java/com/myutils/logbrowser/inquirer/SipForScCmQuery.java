@@ -8,8 +8,8 @@ import com.myutils.logbrowser.indexer.FileInfoType;
 import com.myutils.logbrowser.indexer.ReferenceType;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.HashSet;
 import java.util.HashMap;
+import java.util.HashSet;
 import org.apache.commons.lang3.StringUtils;
 
 /**
@@ -21,7 +21,6 @@ public class SipForScCmQuery extends IQuery {
     private String[] orderBy;
     private HashSet handlerIDs = new HashSet();
     private boolean collectHandlers = false;
-
 
     private Integer[] m_CallIds;
     private boolean m_useProxy = true;
@@ -65,6 +64,7 @@ public class SipForScCmQuery extends IQuery {
         this.cidFinder = cidFinder;
         this.collectHandlers = collectHandlers;
     }
+
     public String getTabAlias() {
         return "sip";
     }
@@ -118,7 +118,7 @@ public class SipForScCmQuery extends IQuery {
                 }
                 recLoaded(rec);
                 return rec;
-            } catch (Exception e) {
+            } catch (SQLException e) {
                 break on_error;
             }
         }

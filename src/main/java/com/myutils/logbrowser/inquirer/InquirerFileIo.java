@@ -6,8 +6,8 @@ import java.util.HashMap;
 
 public class InquirerFileIo {
 
-
     static HashMap<LogFile, InqFile> logReaderHash = null;
+
     public static void doneIO() throws IOException {
         if (logReaderHash != null) {
             for (InqFile obj : logReaderHash.values()) {
@@ -91,7 +91,7 @@ public class InquirerFileIo {
 
         private long lastOffset = 0;
         private int lastBytes = 0;
-        private RandomFileReader rfr;
+        private final RandomFileReader rfr;
         byte pseudoLogBuffer[];
         int pseudoLogBufferSize = 0;
 
@@ -119,7 +119,7 @@ public class InquirerFileIo {
                 lastOffset = offset;
                 lastBytes = i;
                 return pseudoLogBuffer;
-                
+
 //                if (i == bytes) {
 //                    return pseudoLogBuffer;
 //                } else {

@@ -7,6 +7,7 @@ package com.myutils.logbrowser.inquirer;
 
 import com.myutils.logbrowser.indexer.ReferenceType;
 import static com.myutils.logbrowser.inquirer.QueryTools.getRefNames;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Set;
@@ -19,10 +20,10 @@ public class InquirerCfgNonSerial {
 
     private final HashMap<ReferenceType, ArrayList<OptionNode>> refsChecked = new HashMap<>(20);
 
-
     public InquirerCfgNonSerial() {
         LoadRefs();
     }
+
     public Set<ReferenceType> getRefTypes() {
         return refsChecked.keySet();
     }
@@ -62,7 +63,7 @@ public class InquirerCfgNonSerial {
             } else {
                 AddRefs(refType, refNames, refs);
             }
-        } catch (Exception ex) {
+        } catch (SQLException ex) {
             inquirer.ExceptionHandler.handleException(this.getClass().toString(), ex);
         }
     }

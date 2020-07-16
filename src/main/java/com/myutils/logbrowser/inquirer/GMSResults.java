@@ -25,7 +25,7 @@ public class GMSResults extends IQueryResults {
 
     private IDsFinder _cidFinder;
     ArrayList<NameID> appsType = null;
-    private UTCTimeRange timeRange = null;
+
     /**
      *
      */
@@ -100,7 +100,7 @@ public class GMSResults extends IQueryResults {
             FullTableColors currTable = tabReport.getFullTable();
 
             return currTable; //To change body of generated methods, choose Tools | Templates.
-        } catch (Exception ex) {
+        } catch (SQLException ex) {
             inquirer.ExceptionHandler.handleException(this.getClass().toString(), ex);
         } finally {
             DynamicTreeNode.setNoRefNoLoad(false);
@@ -135,7 +135,6 @@ public class GMSResults extends IQueryResults {
     public String getName() {
         return "GMS";
     }
-
 
     private void addGMStoURS(DynamicTreeNode<OptionNode> root) {
         DynamicTreeNode<OptionNode> nd = new DynamicTreeNode<>(new OptionNode(DialogItem.GMStoURS));
@@ -254,13 +253,12 @@ public class GMSResults extends IQueryResults {
         addConfigUpdates(rootA);
         try {
             addCustom(rootA, FileInfoType.type_GMS);
-        } catch (Exception ex) {
+        } catch (SQLException ex) {
             logger.log(org.apache.logging.log4j.Level.FATAL, ex);
         }
         rootA.addLogMessagesReportType(TableType.MsgGMS);
         DoneSTDOptions();
     }
-
 
     @Override
     public ArrayList<NameID> getApps() throws SQLException {
@@ -295,14 +293,13 @@ public class GMSResults extends IQueryResults {
 //    private void retrieveSIP
     private void doRetrieve(QueryDialog dlg, SelectionType selectionType, String selection, boolean isRegex) throws SQLException {
         ILogRecord record = null;
-        IDsFinder cidFinder = null;
+        IDsFinder cidFinder ;
 
         if (selection != null && (selectionType == SelectionType.CONNID
                 || selectionType == SelectionType.CALLID)) {
             cidFinder = new IDsFinder();
             if (!cidFinder.initSearch()) {
                 inquirer.logger.info("No call ID found; returning");
-                return;
             }
         }
 //        RetrieveSIP(dlg,
@@ -372,7 +369,6 @@ public class GMSResults extends IQueryResults {
                 cidFinder);
 
     }
-
 
     private void retrieveGMSWEBRequests(QueryDialog dlg, DynamicTreeNode<OptionNode> eventsSettings, IDsFinder cidFinder) throws SQLException {
         if (isChecked(eventsSettings) && DatabaseConnector.TableExist(TableType.GMSWebClientMessage.toString())) {
@@ -730,7 +726,6 @@ public class GMSResults extends IQueryResults {
         Attr.addChild(AttrValue);
 
     }
-
 
     private void retrieveGMSIxn(QueryDialog dlg, DynamicTreeNode<OptionNode> eventsSettings, IDsFinder cidFinder) throws SQLException {
         Integer[] iDs = null;

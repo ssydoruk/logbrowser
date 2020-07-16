@@ -13,6 +13,7 @@ import org.apache.commons.lang3.StringUtils;
  * @author ssydoruk
  */
 public final class IxnServerQuery extends IQuery {
+
     public static String FIELD_REFID = "refid";
     public static String FIELD_ID = "id";
 
@@ -45,6 +46,7 @@ public final class IxnServerQuery extends IQuery {
             this.searchApps = cif.searchApps;
         }
     }
+
     public int getRecCnt() {
         return recCnt;
     }
@@ -95,7 +97,6 @@ public final class IxnServerQuery extends IQuery {
         m_connector.releaseConnector(this);
         m_connector = null;
     }
-
 
     private String getMyWhere() throws SQLException {
         String ret = "";

@@ -251,7 +251,7 @@ public class SingleThreadParser extends Parser {
                 }
             }
         } catch (Exception e) {
-            Main.logger.error(e);;
+            Main.logger.error(e);
         }
     }
 
@@ -547,7 +547,7 @@ public class SingleThreadParser extends Parser {
 
             case STATE_SIP_HEADER1: {
                 boolean doneParsing = false;
-                if ((m = SIPHeaderFound.matcher(str)).find()) {
+                if ((SIPHeaderFound.matcher(str)).find()) {
                     ParseTimestamp(str);
                     if (dp != null) { // protection against stupid converters that remove empty line at the end of SIP message
                         doneParsing = true;
@@ -838,7 +838,7 @@ public class SingleThreadParser extends Parser {
         Matcher m;
 
         // Populate our class representation of the message
-        SipMessage msg ;
+        SipMessage msg;
 
 //        if (contents.isEmpty()) {
 //            Main.logger.error("Could not find message itself!");
@@ -1279,7 +1279,7 @@ public class SingleThreadParser extends Parser {
     }
 
     protected void HandleConnId(String str) throws Exception {
-        String connId ;
+        String connId;
         int start = str.indexOf("connection-id ");
         if (start < 0) {
             return;

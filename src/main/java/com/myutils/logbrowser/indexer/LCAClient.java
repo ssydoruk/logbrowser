@@ -11,6 +11,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class LCAClient extends Message {
+
     private static final Pattern reqCreateApplication = Pattern.compile("CREATE Application <(\\w+), ([^,]+), pid=(\\w+),");
     private static final Pattern reqRequestor = Pattern.compile("^([^:]+):"); // implying that timestamp for first line is cut out
     private static final Pattern reqModeChange = Pattern.compile("to (\\w+) for App<(\\w+), (.+), pid=(\\w+), ([^,]+), (\\w+)>$");
@@ -30,7 +31,6 @@ public class LCAClient extends Message {
     private int FD;
     private boolean connected = true;
 
-
     private String newMode;
     private int appDBID;
     private String appName;
@@ -38,6 +38,7 @@ public class LCAClient extends Message {
     private String OldMode;
     private String status;
     private String host;
+
     LCAClient(String s) {
         super(TableType.LCAClient, s);
     }
@@ -49,6 +50,7 @@ public class LCAClient extends Message {
     LCAClient(ArrayList<String> m_MessageContents) {
         super(TableType.LCAClient, m_MessageContents);
     }
+
     public String getHost() {
         return host;
     }
@@ -116,7 +118,6 @@ public class LCAClient extends Message {
         event = request_change_RUNMODE;
     }
 
-
     void parseStart() {
         requestor = FindByRx(reqRequestor, m_MessageLines.get(0), 1, null);
         Matcher m = FindRx(reqCreateApplication);
@@ -127,7 +128,6 @@ public class LCAClient extends Message {
         }
         setEvent("RequestStartApplication");
     }
-
 
     void parseChangeRunMode() {
         requestor = FindByRx(reqRequestor, m_MessageLines.get(0), 1, null);
@@ -143,7 +143,6 @@ public class LCAClient extends Message {
         setEvent("RequestChangeAppRunMode");
     }
 
-
     void parseOtherRequest() {
         requestor = FindByRx(reqRequestor, m_MessageLines.get(0), 1, null);
         Matcher m = FindRx(reqApp);
@@ -158,7 +157,6 @@ public class LCAClient extends Message {
     String getRequestor() {
         return requestor;
     }
-
 
     void parseConnect() {
         FD = intOrDef(FindByRx(reqFD, 1, null), 0);
@@ -191,7 +189,6 @@ public class LCAClient extends Message {
     int getFD() {
         return this.FD;
     }
-
 
     void parseDisconnect() {
         Matcher m = FindRx(reqDisconnectApp);

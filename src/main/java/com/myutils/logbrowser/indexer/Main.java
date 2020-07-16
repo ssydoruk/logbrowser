@@ -59,7 +59,6 @@ public class Main {
 
     static Main theParser = null;
 
-
     private static final Constants constants = new Constants();
     public static SqliteAccessor m_accessor;
     static String m_component = "all";
@@ -69,7 +68,7 @@ public class Main {
     private static boolean ignoreZIP = false;
     public static ExecutionEnvironment clr;
     static long totalBytes = 0;
-    private static Pattern regFilesNotGood = Pattern.compile("(^\\.logbr|logbr.db)");
+    private static final Pattern regFilesNotGood = Pattern.compile("(^\\.logbr|logbr.db)");
     static Boolean isAll = null;
 
     static String lookupConstant(GenesysConstants constName, Integer intOrDef) {
@@ -90,23 +89,25 @@ public class Main {
         return theParser;
     }
 
-
     public static SqliteAccessor getM_accessor() {
         return m_accessor;
     }
+
     public static SqliteAccessor getSQLiteaccessor() {
         return m_accessor;
     }
+
     public static void PrintUsage() {
         System.out.print("Usage: " + m_executableName
                 + " -DbName name"
-                        + " [-Alias alias]"
-                        + " [-Regexp regexp]"
-                        + " [-Logdb name]"
-                        + " [-component sc | tc | sip | all ]"
-                        + " [-config config]"
-                        + " file1|dir1 [file2|dir2 ...]\n");
+                + " [-Alias alias]"
+                + " [-Regexp regexp]"
+                + " [-Logdb name]"
+                + " [-component sc | tc | sip | all ]"
+                + " [-config config]"
+                + " file1|dir1 [file2|dir2 ...]\n");
     }
+
     public static String getVersion() throws IOException {
 //        try {
 //            String name = Main.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath().substring(1);
@@ -116,10 +117,11 @@ public class Main {
 //            return attr.getValue("version");
 //        } catch (Exception e) {
 //            System.out.println("Error: "+e);
-//            Main.logger.error(e);;
+//            Main.logger.error(e);
 //        }
-return "";
+        return "";
     }
+
     static void theTest() {
         String s = "20/02/2018 11:41:03 a.m..557_I_I_017302afa531b580 [09:06] >>>>>>>>>>>>start interp()";
         Pattern p = Pattern.compile("^\\d{2}/\\d{2}/\\d{4} \\d{2}:\\d{2}:\\d{2} ([am\\.]+)\\.\\d{3}");
@@ -133,9 +135,9 @@ return "";
 
         System.exit(0);
     }
+
     public static void main(String[] args) throws IOException, ParserConfigurationException, SAXException, Exception {
-        
-        
+
         /*
         //<editor-fold defaultstate="collapsed" desc="standard log parsing">
         for (int i = 0; i < args.length;) {
@@ -250,7 +252,7 @@ return "";
         logdb = "logdb"; //default value
         }
         //</editor-fold>
-        */
+         */
         Thread.setDefaultUncaughtExceptionHandler(new ExceptionHandler());
         System.setProperty("sun.awt.exception.handler",
                 ExceptionHandler.class.getName());
@@ -285,9 +287,11 @@ return "";
         theParser.parseAll(baseDir, dbname, alias);
 //        Thread.sleep(3000);
     }
+
     public static String getLogBrDir() {
         return logBrDir;
     }
+
     public static String formatSize(long v) {
         if (v < 1024) {
             return v + " B";
@@ -295,30 +299,36 @@ return "";
         int z = (63 - Long.numberOfLeadingZeros(v)) / 10;
         return String.format("%.1f %sB", (double) v / (1L << (z * 10)), " KMGTPE".charAt(z));
     }
+
     public static Integer getRef(ReferenceType type, String name) {
         Integer ret = getMain().tabRefs.getRef(type, name);
         Main.logger.trace("getRef for [" + type + "] key:[" + name + "]" + " ret=" + ret);
-        
+
         return ret;
     }
+
     public static Integer getRef(ReferenceType type, String name, int wordsToCompare) {
         Integer ret = getMain().tabRefs.getRef(type, name, wordsToCompare);
         Main.logger.trace("getRefLog key:[" + name + "]" + " ret=" + ret);
-        
+
         return ret;
     }
+
     static boolean IgnoreTable(Message msg) {
         return theParser.checkIgnoreTable(msg);
     }
+
     static int getRefQuotes(ReferenceType referenceType, String m_ThisDN) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
+
     private static boolean fileOK(File fileInfo) {
         if (regFilesNotGood.matcher(fileInfo.getName()).find()) {
             return false;
         }
         return true;
     }
+
     private static void extendFilesList(ArrayList<FileInfo> filesToProcess, LogFileWrapper newLog) throws IOException {
         if (newLog != null) {
             for (FileInfo fileInfo : newLog.getFileInfos()) {
@@ -344,14 +354,17 @@ return "";
             }
         }
     }
+
     private static boolean myEqual(String logFileName, String logFileName0) {
         return logFileName != null && !logFileName.isEmpty()
                 && logFileName0 != null && !logFileName0.isEmpty()
                 && logFileName.equals(logFileName0);
     }
+
     static public boolean isDbExisted() {
         return Main.getMain().dbExisted;
     }
+
     private static void initStatic(SqliteAccessor m_accessor) throws Exception {
         Record.setFileId(m_accessor.getID("select max(id) from file_logbr;", 0));
         Record.m_handlerId = m_accessor.getID("select max(HandlerId) from sip_" + m_accessor.getM_alias() + ";", "sip_" + m_accessor.getM_alias(), 0);
@@ -362,17 +375,19 @@ return "";
         Record.m_tlibId = m_accessor.getID("select max(TlibId) from trigger_" + m_accessor.getM_alias() + ";", "trigger_" + m_accessor.getM_alias(), 0) + 1;
         Record.m_jsonId = m_accessor.getID("select max(JsonId) from trigger_" + m_accessor.getM_alias() + ";", "trigger_" + m_accessor.getM_alias(), 0) + 1;
     }
+
     public static boolean setCurrentDirectory(String directory_name) {
         boolean result = false;  // Boolean indicating whether directory was set
         File directory;       // Desired current working directory
-        
+
         directory = new File(directory_name).getAbsoluteFile();
         if (directory.exists() || directory.mkdirs()) {
             result = (System.setProperty("user.dir", directory.getAbsolutePath()) != null);
         }
-        
+
         return result;
     }
+
     public static boolean ifSIPLines() {
         String isAll = (String) System.getProperties().get("SIPLINES");
         if (isAll == null || isAll.length() == 0 || !isAll.equals("1")) {
@@ -380,9 +395,11 @@ return "";
         }
         return true;
     }
+
     public static boolean isIgnoreZIP() {
         return ignoreZIP;
     }
+
     public static boolean ifAll() {
         if (isAll == null) {
             String sIsAll = (String) System.getProperties().get("all");
@@ -390,6 +407,7 @@ return "";
         }
         return isAll;
     }
+
     private static void ParseZip(File file) {
         try {
             ZipFile logArchive = new ZipFile(file, ZipFile.OPEN_READ);
@@ -457,9 +475,9 @@ return "";
                 System.out.println("Parsed " + lines + " lines in " + entry.getName());
                 
                 input.close();
-                */
+                 */
             }
-        } catch (Exception e) {
+        } catch (IOException e) {
             System.out.println("ERROR parsing zip archive: " + e);
             return;
         }
@@ -468,14 +486,12 @@ return "";
     private int totalFiles = 0;
     private boolean dbExisted = false;
 
-
     HashMap<FileInfoType, Parser> m_parsers = new HashMap<>();
 //    static SqliteAccessor m_accessor; 
 
     private FileInfoTable m_FileInfoTable;
 
-
-    private ArrayList<File> m_files = new ArrayList();
+    private final ArrayList<File> m_files = new ArrayList();
     int m_current;
     private HashMap<TableType, DBTable> m_tables;
 
@@ -486,38 +502,35 @@ return "";
 
     TableReferences tabRefs;
     ArrayList<FileInfo> filesToAccess = new ArrayList();
+
     public Main(String dbname, String xmlCFG) throws IOException, Exception {
         setXMLCfg(xmlCFG);
         this.dbname = dbname;
     }
 
-
     private void ScanDir(File file) throws IOException {
         logger.info("Processing directory " + file.getAbsolutePath());
         File[] filesInDir = file.listFiles();
-        for (int j = 0; j < filesInDir.length; j++) {
+        for (File filesInDir1 : filesInDir) {
 //            String fileType = Files.probeContentType(filesInDir[j].toPath());
 //
 //            logger.info(filesInDir[j].getName() + "- type:" + fileType);
-            if (filesInDir[j].isFile()) {
+            if (filesInDir1.isFile()) {
 //                FileInfo fileInfo = getFileInfo(filesInDir[j]);
 //                extendFilesList(filesToAccess, fileInfo);
-                LogFileWrapper logFile = LogFileWrapper.getContainer(filesInDir[j]);
+                LogFileWrapper logFile = LogFileWrapper.getContainer(filesInDir1);
                 if (logFile != null) {
                     extendFilesList(filesToAccess, logFile);
                 }
-
-            } else if (filesInDir[j].isDirectory() && m_scanDir && !isLogBRDir(filesInDir[j])) {
-                ScanDir(filesInDir[j]);
+            } else if (filesInDir1.isDirectory() && m_scanDir && !isLogBRDir(filesInDir1)) {
+                ScanDir(filesInDir1);
             }
         }
     }
 
-
-
     private void Parse(FileInfo fileInfo) {
         Date fileStart = new Date();
-        Parser parser = null;
+        Parser parser;
         DBTable tab = null;
         FileInfoType componentType = fileInfo.getM_componentType();
         if (componentType == FileInfoType.type_SessionController
@@ -561,7 +574,6 @@ return "";
 
         }
     }
-
 
     public BufferedReaderCrLf GetNextFile() {
         try {
@@ -723,7 +735,7 @@ return "";
         }
     }
 
-
+    @SuppressWarnings("UseOfSystemOutOrSystemErr")
     private void parseAll(String scanDir, String dbname, String alias) throws SQLException, Exception {
         if (!setCurrentDirectory(scanDir)) {
             logger.error("Cannot cd to directory [" + scanDir + "]. Exiting");
@@ -733,8 +745,7 @@ return "";
 
         Date start = new Date();
 
-        File f = null;
-        f = new File(startDir);
+        File f = new File(startDir);
         if (f.isDirectory()) {
             ScanDir(f);
         } else {
@@ -819,7 +830,7 @@ return "";
                 }
             }
             m_accessor = new SqliteAccessor(dbname, alias);
-        } else if (filesToProcess.size() == 0) {
+        } else if (filesToProcess.isEmpty()) {
             logger.info("No new log files found; parser exit");
             return;
         } else {
@@ -902,11 +913,9 @@ return "";
         }
     }
 
-
     private void setDBExisted(boolean b) {
         dbExisted = b;
     }
-
 
     void finalizeTable(TableType tableType) throws Exception {
         DBTable tab = m_tables.get(tableType);
@@ -1048,7 +1057,6 @@ return "";
 
     }
 
-
     private void setXMLCfg(String xmlCFG) throws SAXException, IOException, Exception {
         xmlCfg = new XmlCfg((xmlCFG));
     }
@@ -1065,16 +1073,17 @@ return "";
         return FilenameUtils.normalizeNoEndSeparator(file.getAbsolutePath())
                 .equalsIgnoreCase(logBrDir);
     }
+
     static class Constants extends HashMap<GenesysConstants, HashMap<Integer, String>> {
-        
+
         public Constants() {
             super();
             put(GenesysConstants.TSERVER, initTServerConstants());
         }
-        
+
         private HashMap<Integer, String> initTServerConstants() {
             HashMap<Integer, String> ret = new HashMap<>();
-            
+
             String txt
                     = "RequestRegisterClient, 0\n"
                     + "RequestQueryServer, 1\n"
@@ -1266,7 +1275,7 @@ return "";
             }
             return ret;
         }
-        
+
     }
 
     public static class ExceptionHandler implements Thread.UncaughtExceptionHandler {
@@ -1281,12 +1290,12 @@ return "";
             if (errs != null) {
                 sw.append("\n").append(errs).append("\n");
             }
-            
+
             JTextArea jt = new JTextArea(sw.toString(), 40, 100);
             jt.setEditable(false);
             JScrollPane jsp = new JScrollPane(jt);
 //            JTextArea.setl
-JOptionPane.showMessageDialog(null, jsp, "Exception", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null, jsp, "Exception", JOptionPane.ERROR_MESSAGE);
         }
 
         static public void handleException(String t, Throwable e) {
@@ -1511,19 +1520,17 @@ JOptionPane.showMessageDialog(null, jsp, "Exception", JOptionPane.ERROR_MESSAGE)
 
     }
 
-
     public static class ExecutionEnvironment {
 
-        private Option optXMLCfg;
-        private Option optAlias;
-        private Option optDBName;
-        private Option optLogsBaseDir;
-        private Option optIgnoreZIP;
+        private final Option optXMLCfg;
+        private final Option optAlias;
+        private final Option optDBName;
+        private final Option optLogsBaseDir;
+        private final Option optIgnoreZIP;
         private CommandLine cmd;
         private final CommandLineParser parser;
         private final Option optTDiffParse;
         private boolean parseTDiff = false;
-
 
         private Options options = null;
 
@@ -1601,9 +1608,11 @@ JOptionPane.showMessageDialog(null, jsp, "Exception", JOptionPane.ERROR_MESSAGE)
             System.setProperty("log4j2.saveDirectory", "true");
 
         }
+
         public String[] getArgs() {
             return cmd.getArgs();
         }
+
         public List<String> getArgList() {
             return cmd.getArgList();
         }
@@ -1675,6 +1684,5 @@ JOptionPane.showMessageDialog(null, jsp, "Exception", JOptionPane.ERROR_MESSAGE)
         }
 
     }
-
 
 }

@@ -77,7 +77,6 @@ public final class OCSHTTP extends Message {
         return ret;
     }
 
-
     String GetCampaignName() {
         return FindByRx(regGSW_CAMPAIGN, 1, (String) null);
     }

@@ -167,8 +167,6 @@ public class RequestProgress extends javax.swing.JDialog {
         }
     }//GEN-LAST:event_formWindowClosed
 
-
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;

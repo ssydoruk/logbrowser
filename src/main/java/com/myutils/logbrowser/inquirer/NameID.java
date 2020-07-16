@@ -11,8 +11,9 @@ package com.myutils.logbrowser.inquirer;
  */
 public class NameID {
 
-    private String name;
-    private int id;
+    private final String name;
+    private final int id;
+
     public NameID(String name, int id) {
         this.name = name;
         this.id = id;
@@ -25,7 +26,6 @@ public class NameID {
     public int getId() {
         return id;
     }
-
 
     @Override
     public String toString() {

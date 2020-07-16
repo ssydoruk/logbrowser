@@ -43,7 +43,7 @@ public class SQLQuery extends IQuery {
                 ILogRecord rec = new TabRecord(msgType, m_resultSet);
                 recLoaded(rec);
                 return rec;
-            } catch (Exception e) {
+            } catch (SQLException e) {
                 inquirer.logger.error("Failed to load rec for type [" + msgType.toString() + "] GetNext:" + e.getMessage(), e);
                 break on_error;
             }

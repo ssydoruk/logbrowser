@@ -25,6 +25,7 @@ import org.apache.logging.log4j.Logger;
  * @author ssydoruk
  */
 public final class SqliteAccessor extends Thread implements DBAccessor {
+
     private static final Logger logger = LogManager.getLogger("indexer");
     /**
      *
@@ -38,7 +39,6 @@ public final class SqliteAccessor extends Thread implements DBAccessor {
 
     Connection m_conn;
 
-
     boolean m_exit;
 //    ArrayList<PreparedStatement> m_statements;
 //    ArrayList<Integer> m_queueLength;
@@ -46,7 +46,6 @@ public final class SqliteAccessor extends Thread implements DBAccessor {
     Stats stats;
 
     private ArrayList<Long> filesToDelete;
-
 
     public SqliteAccessor(String dbname, String alias) throws Exception {
         m_alias = alias;
@@ -91,6 +90,7 @@ public final class SqliteAccessor extends Thread implements DBAccessor {
             throw e;
         }
     }
+
     public ArrayList<Long> getFilesToDelete() {
         return filesToDelete;
     }
@@ -242,7 +242,7 @@ public final class SqliteAccessor extends Thread implements DBAccessor {
                 + "order by time";
 
         String ORSURSUpd = "update orsurs_logbr set sidid=? where id=?";
-        PreparedStatement stmtORSURS ;
+        PreparedStatement stmtORSURS;
         ResultSet ORSURSrecs = GetRecords(ORSURSReq);
 
         Connection conn = getM_conn();
@@ -490,7 +490,6 @@ public final class SqliteAccessor extends Thread implements DBAccessor {
         }
     }
 
-
     public boolean TableExist(String tab) throws Exception {
         return TableExist(tab, false);
     }
@@ -540,20 +539,20 @@ public final class SqliteAccessor extends Thread implements DBAccessor {
 
         try (Statement stmt = getM_conn().createStatement()) {
             Main.logger.debug("[" + query + "]");
-            
+
             try (ResultSet rs = stmt.executeQuery(query)) {
                 long timeEnd = new Date().getTime();
                 Main.logger.debug("\t Execution took " + pDuration(timeEnd - timeStart));
-                
+
                 ResultSetMetaData rsmd = rs.getMetaData();
-                
+
                 if (rsmd.getColumnCount() != 1) {
                     throw new Exception("getIDs: there are " + rsmd.getColumnCount() + " output columns; has to be only 1");
                 }
                 int cnt = 0;
                 while (rs.next()) {
                     Integer res = rs.getInt(1);
-                    if ( res > 0) {
+                    if (res > 0) {
                         ret.add(res);
                         cnt++;
                     }
@@ -583,30 +582,32 @@ public final class SqliteAccessor extends Thread implements DBAccessor {
                 }
                 ret.add(row);
                 cnt++;
-            }   Main.logger.debug("\tRetrieved " + cnt + " records");
+            }
+            Main.logger.debug("\tRetrieved " + cnt + " records");
             rs.getStatement().close();
         }
 
         return ret;
 
     }
+
     class Stat {
-        
+
         PreparedStatement stat;
         int cnt;
-        
+
         Stat(PreparedStatement stat) {
             this.stat = stat;
             cnt = 0;
         }
-        
+
         public void Submit() throws SQLException {
             synchronized (this) {
                 stat.addBatch();
                 cnt++;
             }
         }
-        
+
         private void DoneInserts() throws SQLException {
             try {
                 flush();
@@ -615,7 +616,7 @@ public final class SqliteAccessor extends Thread implements DBAccessor {
 //                throw new SQLException("Exception finalizing "+stat.toString());
             }
         }
-        
+
         private void flush() throws SQLException {
             int[] ret = stat.executeBatch();
             if (ret.length > 0) {
@@ -631,33 +632,34 @@ public final class SqliteAccessor extends Thread implements DBAccessor {
             }
         }
     }
+
     class Stats {
-        
+
         ArrayList<Stat> stats;
-        
+
         Stats() {
             stats = new ArrayList<>();
         }
-        
+
         public int addStat(PreparedStatement st) {
             stats.add(new Stat(st));
             return stats.size() - 1;
         }
-        
+
         public PreparedStatement get(int statementId) {
             return stats.get(statementId).stat;
         }
-        
+
         public void Submit(int statementId) throws SQLException {
             Stat st = stats.get(statementId);
             st.Submit();
             if (st.cnt >= 10_000) {
 //                Main.m_accessor.flush(st);
-st.flush();
-st.cnt = 0;
+                st.flush();
+                st.cnt = 0;
             }
         }
-        
+
         private void DoneInserts() throws SQLException {
             for (Stat st : stats) {
                 try {

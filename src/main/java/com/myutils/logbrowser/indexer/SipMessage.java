@@ -34,9 +34,9 @@ public class SipMessage extends Message {
     private String peerPort = null;
     private String via;
 
-
     private String sipURI = null;
     String peerIp = null;
+
     public SipMessage(ArrayList contents, TableType t) {
         super(t);
         m_MessageLines.clear();
@@ -73,6 +73,7 @@ public class SipMessage extends Message {
         }
 
     }
+
     Integer getHandlerInProgress() {
         return (m_handlerInProgress ? m_handlerId : 0);
     }
@@ -370,7 +371,6 @@ const char* GSIP_HDRNAME_REPLACES				="Replaces";
         return "";
     }
 
-
     public String getPeerIp() {
         return peerIp;
     }
@@ -378,7 +378,6 @@ const char* GSIP_HDRNAME_REPLACES				="Replaces";
     public void setPeerIp(String peerIp) {
         this.peerIp = peerIp;
     }
-
 
     private void parsePeer() {
         if (peerIp == null) {
@@ -426,7 +425,6 @@ const char* GSIP_HDRNAME_REPLACES				="Replaces";
     public void setPeerPort(String peerPort) {
         this.peerPort = peerPort;
     }
-
 
     boolean isCallRelated() {
         String cSeq = GetCSeq();
@@ -484,7 +482,7 @@ const char* GSIP_HDRNAME_REPLACES				="Replaces";
                         }
                     }
                 }
-                
+
                 for (int i = 0; i < ext.size(); i++) {
                     String get = ext.get(i);
                     Matcher m;
@@ -505,8 +503,8 @@ const char* GSIP_HDRNAME_REPLACES				="Replaces";
             }
             return ret;
         }
-        private String ConnID;
-        private Integer callIdx;
+        private final String ConnID;
+        private final Integer callIdx;
         private String UUID;
 
         public ExtentionCall(Integer callIdx, String ConnID, String UUID) {

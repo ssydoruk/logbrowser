@@ -18,7 +18,6 @@ import org.apache.commons.lang3.StringUtils;
  */
 public class VOIPEPParser extends Parser {
 
-
     static final String[] BlockNamesToIgnoreArray = {"SIP:CTI:callSync::0",
         "SIP:CTI:sipStackSync:0"};
 
@@ -159,7 +158,7 @@ public class VOIPEPParser extends Parser {
     }
 
     void ContinueParsing(String initial) {
-        String str ;
+        String str;
         BufferedReaderCrLf input = Main.getMain().GetNextFile();
         if (input == null) {
             return;
@@ -198,7 +197,6 @@ public class VOIPEPParser extends Parser {
             Main.logger.error(e);
         }
     }
-
 
     String ParseLine(BufferedReaderCrLf input, String str) throws Exception {
         String s = str;
@@ -420,7 +418,7 @@ public class VOIPEPParser extends Parser {
         Matcher m;
 
         // Populate our class representation of the message
-        SipMessage msg ;
+        SipMessage msg;
 
         msg = new SipMessage(contents, TableType.VOIPEP);
 
@@ -443,7 +441,6 @@ public class VOIPEPParser extends Parser {
             PrintMsg(contents);
         }
     }
-
 
     private void AddConfigMessage(ArrayList<String> m_MessageContents) {
         ConfigUpdateRecord msg = new ConfigUpdateRecord(m_MessageContents);

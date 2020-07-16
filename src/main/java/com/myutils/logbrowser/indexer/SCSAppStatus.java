@@ -12,7 +12,6 @@ public class SCSAppStatus extends Message {
 
     private String event = null;
 
-
     private String newMode;
     private int appDBID;
     private String appName;
@@ -28,6 +27,7 @@ public class SCSAppStatus extends Message {
     SCSAppStatus(ArrayList<String> m_MessageContents) {
         super(TableType.SCSAppStatus, m_MessageContents);
     }
+
     public String getHost() {
         return host;
     }

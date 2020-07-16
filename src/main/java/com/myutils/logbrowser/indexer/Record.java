@@ -28,17 +28,21 @@ public abstract class Record implements Cloneable {
 
     private static final Pattern regAllQuotes = Pattern.compile("^(['\"]).+\\1$");
     private static final Pattern regNoQuotes = Pattern.compile("^(['\"])(.+)\\1$");
+
     public static void setFileId(int m_fileId) {
         Record.fileId = m_fileId;
     }
+
     /*initial value - 1 because when record is inserted into
     file_logbr, initial ID is also 1. Bad design, sure, correct it next time*/
     public static int getFileId() {
         return fileId;
     }
+
     public static Integer getObjCreated() {
         return objCreated;
     }
+
     public static void resetCounter() {
         objCreated = 0;
     }
@@ -101,7 +105,6 @@ public abstract class Record implements Cloneable {
     protected long m_FileBytes;
     private int lastID = 0;
 
-
     public Record(TableType type) {
         this();
         m_type = type;
@@ -112,13 +115,15 @@ public abstract class Record implements Cloneable {
     public Record() {
 
     }
+
     @Override
     protected Object clone() throws CloneNotSupportedException {
         Record ret = (Record) super.clone(); //To change body of generated methods, choose Tools | Templates.
 //        ret.m_type=this.m_type;
 //        ret.m_FileBytes=m_FileBytes;
-return ret;
+        return ret;
     }
+
     public int getLastID() {
         return lastID;
     }

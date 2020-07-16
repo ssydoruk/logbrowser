@@ -15,7 +15,6 @@ public class IxnSS extends Ixn {
     final private static Pattern regIxnMessage = Pattern.compile("^Server: IxnEvent '([^']+)'");
     final private static Pattern regIxnCustomEvent = Pattern.compile("'([^']+)'$");
 
-
     final private static Pattern regConnID = Pattern.compile("^\\s+AttributeConnID .+ (\\w+)$");
     final private static Pattern regConnIDCustom = Pattern.compile("^\\s+ConnID\\s+(\\w+)");
     final private static Pattern regService = Pattern.compile("^\\s+'Service'.+= \"([^\"]+)\"$");
@@ -93,7 +92,6 @@ public class IxnSS extends Ixn {
         }
     }
 
-
     String GetService() {
         if (!customEvent) {
             return FindByRx(regService, 1, "");
@@ -103,7 +101,6 @@ public class IxnSS extends Ixn {
 
     }
 
-
     String GetMethod() {
         if (!customEvent) {
             return FindByRx(regMethod, 1, "");
@@ -111,7 +108,6 @@ public class IxnSS extends Ixn {
             return "";
         }
     }
-
 
     Integer GetClientRef() {
         if (!customEvent) {
@@ -121,7 +117,6 @@ public class IxnSS extends Ixn {
         }
 
     }
-
 
     Integer GetServerRef() {
         if (!customEvent) {

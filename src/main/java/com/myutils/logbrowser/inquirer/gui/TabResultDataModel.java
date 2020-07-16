@@ -51,13 +51,14 @@ public class TabResultDataModel extends AbstractTableModel {
     private static int stdColorsIdx = 0;
     private static HashMap<Integer, Pair<Color, Color>> assignedColorsAggregate = new HashMap<>();
     private static final Pattern normalPattern = Pattern.compile("^[\\s|]*(.+)[\\s|]*$");
+
     /*
     1st color - foreground
     2nd color - background
     
     http://www.javascripter.net/faq/colornam.htm
     http://www.rapidtables.com/web/color/RGB_Color.htm
-    */
+     */
     private static HashMap<MsgType, Pair<Color, Color>> initMsgColors() {
         HashMap<MsgType, Pair<Color, Color>> ret = new HashMap<>();
         ret.put(MsgType.TLIB, new Pair(Color.decode("#000000"), Color.decode("#FFFFFF")));
@@ -66,6 +67,7 @@ public class TabResultDataModel extends AbstractTableModel {
         ret.put(MsgType.ORSM, new Pair(Color.decode("#000000"), Color.decode("#BDB76B")));
         return ret;
     }
+
     private static ArrayList<Pair<Color, Color>> initStdColors() {
         ArrayList<Pair<Color, Color>> ret = new ArrayList<>();
         ret.add(new Pair(Color.decode("#000000"), Color.decode("#DEB887")));
@@ -75,9 +77,11 @@ public class TabResultDataModel extends AbstractTableModel {
         ret.add(new Pair(Color.decode("#FFFFFF"), Color.decode("#800000")));
         return ret;
     }
+
     public static int msgRowColorsSize() {
         return msgRowColors.size();
     }
+
     public static Pair<Color, Color> getColorIdx(int idx) {
         Pair<Color, Color> ret = null;
         if (idx < msgRowColors.size()) {
@@ -95,7 +99,6 @@ public class TabResultDataModel extends AbstractTableModel {
     private ArrayList<String> shortAbsoluteFileNames;
     private int emptyColumns;
 
-
     private HashMap<String, Integer> columnTitle;
     private ArrayList<TableRow> tableData;
 
@@ -111,17 +114,18 @@ public class TabResultDataModel extends AbstractTableModel {
     private TableRow currentRow = null;
     //    private int rowTypes = 0;
     MsgType lastRowType = MsgType.UNKNOWN;
+
     TabResultDataModel(TabResultDataModel srcModel) {
 //        this.columnIdxAdjusterType = new HashMap<>(srcModel.columnIdxAdjusterType);
-this.columnIdxAdjusterType = new HashMap<>();
+        this.columnIdxAdjusterType = new HashMap<>();
 
-this.columnsWithDataType = new HashMap(srcModel.columnsWithDataType);
-this.tableData = new ArrayList<>();
-copyData(tableData, srcModel.tableData);
+        this.columnsWithDataType = new HashMap(srcModel.columnsWithDataType);
+        this.tableData = new ArrayList<>();
+        copyData(tableData, srcModel.tableData);
 
-this.columnTitle = new HashMap<>(srcModel.columnTitle);
-columnParamsOrig = new ColumnParams(srcModel.columnParamsOrig);
-columnParams = new ColumnParams(columnParamsOrig);
+        this.columnTitle = new HashMap<>(srcModel.columnTitle);
+        columnParamsOrig = new ColumnParams(srcModel.columnParamsOrig);
+        columnParams = new ColumnParams(columnParamsOrig);
 
     }
 
@@ -139,12 +143,15 @@ columnParams = new ColumnParams(columnParamsOrig);
         columnParamsOrig = new ColumnParams();
 
     }
+
     public ColumnParams getColumnParams() {
         return columnParams;
     }
+
     public ArrayList<String> getFullFileNames() {
         return fullFileNames;
     }
+
     public ArrayList<String> getShortFileNames() {
         return shortFileNames;
     }
@@ -170,7 +177,7 @@ columnParams = new ColumnParams(columnParamsOrig);
             for (int i = 0; i < fixedColumns.length; i++) {
                 Integer idx = columnTitle.get(fixedColumns[i]);
                 if (idx != null) {
-                    inquirer.logger.trace("fixedIdx: i[" + i + "] - [" + ((idx == null) ? "null" : idx) + "]");
+                    inquirer.logger.trace("fixedIdx: i[" + i + "] - [" + idx + "]");
                     fixedIdx.put(j++, idx);
                 }
             }
@@ -274,7 +281,7 @@ columnParams = new ColumnParams(columnParamsOrig);
                 Integer adjustedCol = realColIdx(colIdx, row.getRowType());
 
                 if (adjustedCol != null) {
-                    return row.getColumn(adjustedCol.intValue());
+                    return row.getColumn(adjustedCol);
                 }
             }
         }
@@ -295,7 +302,7 @@ columnParams = new ColumnParams(columnParamsOrig);
 
     private String findColumnName(int column) {
         for (Map.Entry<String, Integer> entry : columnTitle.entrySet()) {
-            if (entry.getValue().intValue() == column) {
+            if (entry.getValue() == column) {
                 return entry.getKey();
             }
         }
@@ -316,9 +323,8 @@ columnParams = new ColumnParams(columnParamsOrig);
     public void setValueAt(Object aValue, int row, int column) {
     }
 
-
     Pair<Color, Color> rowColors(int row) {
-        Pair<Color, Color> ret = null;
+        Pair<Color, Color> ret;
         TableRow tableRow = getRow(row);
         if (isAggregate) {
             ret = tableRow.getCellColor();
@@ -356,7 +362,7 @@ columnParams = new ColumnParams(columnParamsOrig);
         return tableData.get(row);
     }
 
-    public void setFullFileNames(ArrayList<String> fullStreamsFileNames) {
+    final public void setFullFileNames(ArrayList<String> fullStreamsFileNames) {
         if (fullStreamsFileNames != null && fullStreamsFileNames.size() > 0) {
             fullFileNames = new ArrayList<>(fullStreamsFileNames.size());
             for (String fullStreamsFileName : fullStreamsFileNames) {
@@ -373,7 +379,6 @@ columnParams = new ColumnParams(columnParamsOrig);
             }
         }
     }
-
 
     private String normalizeCellData(String data) {
         Matcher m;
@@ -420,7 +425,7 @@ columnParams = new ColumnParams(columnParamsOrig);
                 {
                     return columnAdjuster;
                 } else {
-                    curIdx = entry.getKey().intValue();
+                    curIdx = entry.getKey();
                     break;
                 }
             }
@@ -431,14 +436,14 @@ columnParams = new ColumnParams(columnParamsOrig);
             return columnAdjuster;
         }
         HashMap<Integer, Integer> ret = new HashMap<>(columnAdjuster.size());
-        if (curIdx > fixedEntry.getKey().intValue()) {
+        if (curIdx > fixedEntry.getKey()) {
             for (Entry<Integer, Integer> entry : columnAdjuster.entrySet()) {
 //                inquirer.logger.trace("cycle greater: columnAdjuster entry " + entry + " fixed: " + fixedEntry + " curIdx: " + curIdx);
-                if (entry.getKey().intValue() == curIdx) {
+                if (entry.getKey() == curIdx) {
                     ret.put(fixedEntry.getKey(), fixedEntry.getValue());
-                } else if (entry.getKey().intValue() >= fixedEntry.getKey().intValue()
-                        && entry.getKey().intValue() < curIdx) {
-                    ret.put(entry.getKey().intValue() + 1, entry.getValue());
+                } else if (entry.getKey() >= fixedEntry.getKey()
+                        && entry.getKey() < curIdx) {
+                    ret.put(entry.getKey() + 1, entry.getValue());
                 } else {
                     ret.put(entry.getKey(), entry.getValue());
                 }
@@ -446,13 +451,13 @@ columnParams = new ColumnParams(columnParamsOrig);
         } else { // equal condition already taken care of
             for (Entry<Integer, Integer> entry : columnAdjuster.entrySet()) {
 //                inquirer.logger.trace("cycle less: columnAdjuster entry " + entry + " fixed: " + fixedEntry + " curIdx: " + curIdx);
-                if (entry.getKey().intValue() == curIdx) {
+                if (entry.getKey() == curIdx) {
 //                    inquirer.logger.trace("-1-");
                     ret.put(fixedEntry.getKey(), fixedEntry.getValue());
-                } else if (entry.getKey().intValue() <= fixedEntry.getKey().intValue()
-                        && entry.getKey().intValue() > curIdx) {
+                } else if (entry.getKey() <= fixedEntry.getKey()
+                        && entry.getKey() > curIdx) {
 //                    inquirer.logger.trace("-2-");
-                    ret.put(entry.getKey().intValue() - 1, entry.getValue());
+                    ret.put(entry.getKey() - 1, entry.getValue());
                 } else {
 //                    inquirer.logger.trace("-3-");
                     ret.put(entry.getKey(), entry.getValue());
@@ -477,7 +482,7 @@ columnParams = new ColumnParams(columnParamsOrig);
             out = new BufferedWriter(fstream);
             exportToExcel(tab, out, false);
 
-        } catch (Exception e) {
+        } catch (IOException e) {
             inquirer.ExceptionHandler.handleException(this.getClass().toString(), e);
         } finally {
             if (out != null) {
@@ -555,7 +560,7 @@ columnParams = new ColumnParams(columnParamsOrig);
     private void exportFull(MyJTable tab, Writer out) throws Exception {
         for (int i = 0; i < tab.getRowCount(); i++) {
             TableRow row = getRow(tab.convertRowIndexToModel(i));
-            int fileID = 0;
+            int fileID;
             int fileIDPrev = 0;
             ArrayList<Pattern> filters = null;
             if (row != null) {
@@ -589,7 +594,7 @@ columnParams = new ColumnParams(columnParamsOrig);
     private void exportShort(MyJTable tab, Writer out) throws Exception {
         for (int i = 0; i < tab.getRowCount(); i++) {
             TableRow row = getRow(tab.convertRowIndexToModel(i));
-            int fileID = 0;
+            int fileID ;
             int fileIDPrev = 0;
             ArrayList<Pattern> filters = null;
             if (row != null) {
@@ -903,7 +908,6 @@ columnParams = new ColumnParams(columnParamsOrig);
         columnParams.unhideTemps();
     }
 
-
     private Integer getTitleIdx(String title) {
         Integer ret = columnTitle.get(title);
         if (ret == null) {
@@ -933,7 +937,6 @@ columnParams = new ColumnParams(columnParamsOrig);
         }
 
     }
-
 
     public void addCell(OutputSpecFormatter.Parameter param, String data) {
         int columnIdx = addCell(param.getTitle(), data);
@@ -970,13 +973,12 @@ columnParams = new ColumnParams(columnParamsOrig);
             TableRow tableRow = getRow(table.convertRowIndexToModel(row));
             Integer curCnt = ret.get(tableRow.getRowType());
             if (curCnt == null) {
-                curCnt = new Integer(0);
+                curCnt = 0;
             }
-            ret.put(tableRow.getRowType(), curCnt.intValue() + 1);
+            ret.put(tableRow.getRowType(), curCnt + 1);
         }
         return ret;
     }
-
 
     public TableRow addRow() {
         if (currentRow != null) {
@@ -995,7 +997,7 @@ columnParams = new ColumnParams(columnParamsOrig);
         return currentRow;
     }
 
-    public class TableRow {
+    public final class TableRow {
 
         public final static String colPrefix = "$col$";
         private int fileID = 0;
@@ -1067,34 +1069,34 @@ columnParams = new ColumnParams(columnParamsOrig);
 //            if (data != null && !data.isEmpty() && (title==null || !title.equals("filename"))) {
 //                rowData.put(getTitleIdx(title), data);
 //                    columnIdx = getTitleIdx("col" + columntIdx);
-String t;
+                    String t;
 
-if (title != null && !title.isEmpty()) {
-    t = title;
-} else {
-    t = colPrefix + columntIdx;
-}
+                    if (title != null && !title.isEmpty()) {
+                        t = title;
+                    } else {
+                        t = colPrefix + columntIdx;
+                    }
 //                    t = colPrefix + columntIdx;
 
-if (data != null && !data.isEmpty()) {
-    columnIdx = getTitleIdx(t);
-    String curData = (String) rowData.get(columnIdx);
-    if (curData == null || curData.isEmpty()) {
-        putRowData(columnIdx, t, data);
-    } else {
-        putRowData(columnIdx, t, curData + " | " + data);
-        
-    }
-    HashSet hm = columnsWithDataType.get(getRowType());
-    if (hm == null) {
-        hm = new HashSet();
-        columnsWithDataType.put(getRowType(), hm);
-    }
-    if (!hm.contains(columnIdx)) {
-        hm.add(columnIdx);
-    }
-}
-columntIdx++;
+                    if (data != null && !data.isEmpty()) {
+                        columnIdx = getTitleIdx(t);
+                        String curData = (String) rowData.get(columnIdx);
+                        if (curData == null || curData.isEmpty()) {
+                            putRowData(columnIdx, t, data);
+                        } else {
+                            putRowData(columnIdx, t, curData + " | " + data);
+
+                        }
+                        HashSet hm = columnsWithDataType.get(getRowType());
+                        if (hm == null) {
+                            hm = new HashSet();
+                            columnsWithDataType.put(getRowType(), hm);
+                        }
+                        if (!hm.contains(columnIdx)) {
+                            hm.add(columnIdx);
+                        }
+                    }
+                    columntIdx++;
                 }
             }
             return columnIdx;
@@ -1123,9 +1125,9 @@ columntIdx++;
         public void setFileInfo(LogFile GetFileName, int GetFileBytes, int GetLine, long _offset) {
             this.FileName = GetFileName;
 //            inquirer.logger.info("b["+GetFileName+"] a["+this.FileName+"]");
-this.fileBytes = GetFileBytes;
-this.line = GetLine;
-this.offset = _offset;
+            this.fileBytes = GetFileBytes;
+            this.line = GetLine;
+            this.offset = _offset;
         }
 
         public long getOffset() {
@@ -1192,6 +1194,7 @@ this.offset = _offset;
             tempHidden = isHidden;
         }
     }
+
     class ColumnParam extends Pair<Integer, FieldParams> {
 
         private ColumnParam(int columnIdx, OutputSpecFormatter.Parameter param) {
@@ -1288,7 +1291,7 @@ this.offset = _offset;
 
         private boolean hidden(ArrayList<ColumnParam> paramMap, Integer colIdx) {
             for (ColumnParam pair : paramMap) {
-                if (pair.getKey() == colIdx) {
+                if (Objects.equals(pair.getKey(), colIdx)) {
                     return pair.getValue().isHidden();
                 }
             }

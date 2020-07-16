@@ -67,7 +67,6 @@ public class OCSPAEventInfo extends Message {
         return FindByRx(regAgentCallType, 1, "");
     }
 
-
     int CallResult() {
         return FindByRx(regCallResult, 1, 0);
     }

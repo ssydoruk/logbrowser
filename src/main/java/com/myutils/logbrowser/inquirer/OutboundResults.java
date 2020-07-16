@@ -35,9 +35,9 @@ final class OutboundResults extends IQueryResults {
 
     private ArrayList<NameID> appType = null;
 
-
     private UTCTimeRange timeRange = null;
     IDsFinder cidFinder;
+
     //    private DynamicTreeNode<OptionNode> repComponents=new DynamicTreeNode<OptionNode>();
     OutboundResults() throws SQLException {
         DynamicTreeNode<OptionNode> rootA = new DynamicTreeNode<>(null);
@@ -63,9 +63,10 @@ final class OutboundResults extends IQueryResults {
 //        repComponents.add("Campaign Group");
 //        repComponents.add("Agent");
 //        repComponents.add("Call");
-DoneSTDOptions();
+        DoneSTDOptions();
 
     }
+
     @Override
     public String getSearchString() {
         if (cidFinder != null) {
@@ -456,7 +457,6 @@ DoneSTDOptions();
     public DynamicTree<OptionNode> getReportItems() {
         return repComponents;
     }
-
 
     @Override
     public void Retrieve(QueryDialog dlg) throws SQLException {

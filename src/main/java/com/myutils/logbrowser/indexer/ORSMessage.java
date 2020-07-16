@@ -14,6 +14,7 @@ import org.apache.commons.lang3.StringUtils;
  * @author terry The class Replicates TLibMessage
  */
 public class ORSMessage extends Message {
+
     private static final Pattern regShortConnID = Pattern.compile("^\\sIID:(.+)$");
     private static final Pattern regShortThisDN = Pattern.compile("^\\sTDN:(.+)$");
     private static final Pattern regShortThisDNIS = Pattern.compile("^\\sDNIS:(.+)$");
@@ -57,9 +58,8 @@ public class ORSMessage extends Message {
         return m_MessageName;
     }
 
-
     public String GetConnID() {
-        return longOrShort(getAttributeTrim("AttributeConnID"), FindByRx(regShortConnID, 1, (String)null));
+        return longOrShort(getAttributeTrim("AttributeConnID"), FindByRx(regShortConnID, 1, (String) null));
     }
 
     private String longOrShort(String l, String s) {
@@ -95,7 +95,6 @@ public class ORSMessage extends Message {
     public void setM_refID(String m_refID) {
         this.m_refID = m_refID;
     }
-
 
     /**
      * @return the m_ThisDN
@@ -141,12 +140,10 @@ public class ORSMessage extends Message {
         return callID;
     }
 
-
     String getDNIS() {
         return longOrShort(getAttributeDN("AttributeDNIS"), FindByRx(regShortThisDNIS, 1, null));
 
     }
-
 
     String getANI() {
         return longOrShort(getAttributeDN("AttributeANI"), FindByRx(regShortANI, 1, null));

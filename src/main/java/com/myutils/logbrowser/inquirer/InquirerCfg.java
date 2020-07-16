@@ -14,6 +14,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.Serializable;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -28,21 +29,23 @@ import org.apache.commons.io.FilenameUtils;
  * @author ssydoruk
  */
 public class InquirerCfg implements Serializable {
+
     private static final long serialVersionUID = 1L;
     private static final HashSet<Character> filenameProhibited = new HashSet<Character>(
             Arrays.asList(new Character[]{
-                ':',
-                '\"',
-                '/',
-                '\\',
-                '|',
-                '?',
-                '*',
-                '<',
-                '>'}));
+        ':',
+        '\"',
+        '/',
+        '\\',
+        '|',
+        '?',
+        '*',
+        '<',
+        '>'}));
+
     public static String getFileUnique(String name) {
         Integer currFileIdx = 0;
-        
+
         String baseName = FilenameUtils.getBaseName(name);
         String extension = FilenameUtils.getExtension(name);
         String ret;
@@ -70,7 +73,6 @@ public class InquirerCfg implements Serializable {
     private boolean refsLoaded;
     private boolean newTlibSearch;
 
-
     private boolean saveFileShort;
     private boolean saveFileLong;
     private boolean addShortToFull;
@@ -88,6 +90,7 @@ public class InquirerCfg implements Serializable {
     private boolean messagesLoaded = false;
     HashSet<RegexFieldSettings> regexFieldsSettings = null;
     HashMap<MsgType, ArrayList<RegexFieldSettings>> rxFieldsSettings = null;
+
     public InquirerCfg() {
         this.constants = new GenesysConstants1();
         FileNameShort = ".logbr_short.txt";
@@ -110,22 +113,27 @@ public class InquirerCfg implements Serializable {
         messagesLoaded = false;
         newTlibSearch = false;
     }
+
     private GenesysConstants1 getConsts() {
         if (constants == null) {
             constants = new GenesysConstants1();
         }
         return constants;
     }
+
     public GenesysConstants getConstants() {
         return getConsts().toConstants();
     }
+
     public void setConstants(GenesysConstants constants) {
         this.getConsts().fromConstants(constants);
     }
+
     public Set<ReferenceType> getRefTypes() {
         checkRefsLoaded();
         return refsChecked.keySet();
     }
+
     public Set<TableType> getLogTypes() {
         checkMessagesLoaded();
         return logMessages.keySet();
@@ -177,7 +185,6 @@ public class InquirerCfg implements Serializable {
         this.FileNameShort = FileNameShort;
     }
 
-
     public String getFileNameLong() {
         return getFileUnique(FileNameLong);
     }
@@ -185,7 +192,6 @@ public class InquirerCfg implements Serializable {
     public void setFileNameLong(String FileNameLong) {
         this.FileNameLong = FileNameLong;
     }
-
 
     public boolean isFullTimeStamp() {
         return fullTimeStamp;
@@ -262,7 +268,7 @@ public class InquirerCfg implements Serializable {
             } else {
                 AddRefs(refType, refNames, refs);
             }
-        } catch (Exception ex) {
+        } catch (SQLException ex) {
             inquirer.ExceptionHandler.handleException(this.getClass().toString(), ex);
         }
     }
@@ -278,7 +284,7 @@ public class InquirerCfg implements Serializable {
                     AddLogs(tabType, refNamesNameID, msgs);
                 }
             }
-        } catch (Exception ex) {
+        } catch (SQLException ex) {
             inquirer.ExceptionHandler.handleException(this.getClass().toString(), ex);
         }
     }
@@ -378,7 +384,7 @@ public class InquirerCfg implements Serializable {
 
                 }
             }
-        } catch (Exception exception) {
+        } catch (SQLException exception) {
 
         }
     }
@@ -463,7 +469,6 @@ public class InquirerCfg implements Serializable {
         return getFileNameLong(tab.getQueryName(), tab.getSearchString());
     }
 
-
     private String cleanNonFileChars(String queryName) {
         StringBuilder ret = new StringBuilder(queryName.length());
         boolean anyGoodChar = false;
@@ -509,8 +514,7 @@ public class InquirerCfg implements Serializable {
     public HashMap<String, Boolean> arrToHash(ArrayList<OptionNode> refs) {
 
         if (refs != null) {
-            HashMap<String, Boolean> ret = null;
-            ret = new HashMap<>(refs.size());
+            HashMap<String, Boolean> ret = new HashMap<>(refs.size());
             for (OptionNode ref : refs) {
                 ret.put(ref.getName(), ref.isChecked());
             }
@@ -543,7 +547,6 @@ public class InquirerCfg implements Serializable {
 
         }
     }
-
 
     private void checkMessagesLoaded() {
         if (!messagesLoaded) {
@@ -626,7 +629,6 @@ public class InquirerCfg implements Serializable {
         rxFieldsSettings.put(t, l);
     }
 
-
     public ArrayList<RegexFieldSettings> getRegexFieldsSettings(MsgType t) {
         if (rxFieldsSettings == null) {
             rxFieldsSettings = new HashMap<>();
@@ -657,7 +659,6 @@ public class InquirerCfg implements Serializable {
 //        ret.add(regexFieldSettings);
 //        return regexFieldSettings;
 //    }
-
     public static class GenesysConstant implements Serializable {
 
         private static final long serialVersionUID = 1L;
@@ -671,7 +672,7 @@ public class InquirerCfg implements Serializable {
         public GenesysConstant(String n) {
             this();
             name = n;
-            
+
         }
 
         @Override
@@ -709,7 +710,7 @@ public class InquirerCfg implements Serializable {
             if (columnIndex < 0 || columnIndex > 1) {
                 throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
             }
-            Pair<String, Integer> el = null;
+            Pair<String, Integer> el;
             if (rowIndex > size()) {
                 el = new Pair<>();
                 values.add(el);
@@ -866,7 +867,7 @@ public class InquirerCfg implements Serializable {
         public GenesysConstant1(String n) {
             this();
             name = n;
-            
+
         }
 
         @Override
@@ -904,7 +905,7 @@ public class InquirerCfg implements Serializable {
             if (columnIndex < 0 || columnIndex > 1) {
                 throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
             }
-            Pair<String, Integer> el = null;
+            Pair<String, Integer> el;
             if (rowIndex > size()) {
                 el = new Pair<>();
                 values.add(el);

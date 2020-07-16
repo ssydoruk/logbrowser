@@ -56,8 +56,8 @@ public class AggrORSPerSecondConfig extends javax.swing.JPanel {
     private DynamicTreeNode<OptionNode> rootTLib;
     private GroupByPanel gpOrderByTLib;
     private GroupByPanel gpGroupByTLib;
-    private JPAppSelect jpAppSelect;
-    private JPSecSelect jpSecSelect;
+    private final JPAppSelect jpAppSelect;
+    private final JPSecSelect jpSecSelect;
     private final TDateRange timeRange;
     private final JPSecSelect jpHavingSelect;
 
@@ -95,7 +95,7 @@ public class AggrORSPerSecondConfig extends javax.swing.JPanel {
                     NameID item = (NameID) e.getItem();
                     try {
                         timeRange.setTimeRange(DatabaseConnector.getTimeRangeByAppID(item.getId()));
-                    } catch (Exception ex) {
+                    } catch (SQLException ex) {
                         inquirer.ExceptionHandler.handleException(this.getClass().toString(), ex);
                         timeRange.setTimeRange(null);
                     }
@@ -253,8 +253,9 @@ public class AggrORSPerSecondConfig extends javax.swing.JPanel {
 
     class OrderField {
 
-        private String fieldName;
-        private String displayName;
+        private final String fieldName;
+        private final String displayName;
+
         public OrderField(String fieldName, String displayName) {
             this.fieldName = fieldName;
             this.displayName = displayName;
@@ -272,7 +273,6 @@ public class AggrORSPerSecondConfig extends javax.swing.JPanel {
         public String toString() {
             return displayName;
         }
-
 
     }
 
@@ -386,7 +386,7 @@ public class AggrORSPerSecondConfig extends javax.swing.JPanel {
 
     }
 
-    private ButtonGroup group = new ButtonGroup();
+    private final ButtonGroup group = new ButtonGroup();
     private FileInfoType ft = FileInfoType.type_Unknown;
 
     /**

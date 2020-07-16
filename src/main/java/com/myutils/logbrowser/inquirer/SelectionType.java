@@ -34,7 +34,7 @@ public enum SelectionType {
     MCP_CALLID("MCP Session ID(XXXXXX-XXXXXX)"),
     JSESSIONID("JSessionID"),
     GWS_DEVICEID("GWS Device ID"),
-    GWS_USERID("GWS User ID"), 
+    GWS_USERID("GWS User ID"),
     ANYPARAM("Web request parameter");
     ;
 

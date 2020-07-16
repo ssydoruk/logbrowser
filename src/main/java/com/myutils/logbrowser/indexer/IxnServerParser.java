@@ -38,7 +38,6 @@ public class IxnServerParser extends Parser {
     HashMap<String, String> prevSeqno = new HashMap();
     private ParserState m_ParserState;
 
-
     IxnServerParser(HashMap<TableType, DBTable> m_tables) {
         super(FileInfoType.type_IxnServer, m_tables);
     }
@@ -53,7 +52,6 @@ public class IxnServerParser extends Parser {
             SetStdFieldsAndAdd(msg);
         }
     }
-
 
 //    private static Class<? extends Record>[] avail = new Class[]{Ixn.class};
     @Override
@@ -109,7 +107,7 @@ public class IxnServerParser extends Parser {
             }
             ParseLine("", null); // to complete the parsing of the last line/last message
         } catch (Exception e) {
-           Main.logger.error(e);
+            Main.logger.error(e);
             return m_CurrentLine - line;
         }
 //        for (Class<? extends Record> class1 : avail) {

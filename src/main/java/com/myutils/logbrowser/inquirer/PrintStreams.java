@@ -119,22 +119,22 @@ public class PrintStreams {
                     ret.add(file.getAbsolutePath());
                 }
             }
-            if (ret.size() == 0) {
+            if (ret.isEmpty()) {
                 return null;
             }
         }
         return ret;
     }
 
-    public ArrayList<String> getFullStreamsFileNames() {
+    final public ArrayList<String> getFullStreamsFileNames() {
         return getFileNames(fullStreams);
     }
 
-    public ArrayList<String> getShortStreamsFileNames() {
+    final public ArrayList<String> getShortStreamsFileNames() {
         return getFileNames(shortStreams);
     }
 
-    public ArrayList<String> getShortStreamsFullFileNames() {
+    final public ArrayList<String> getShortStreamsFullFileNames() {
         return getFullFileNames(shortStreams);
     }
 

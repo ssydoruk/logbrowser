@@ -96,6 +96,7 @@ public class inquirer {
     private static InquirerCfg cr = null;
     private final static String serFileDef = ".logbr_checkedref.ser";
     private static boolean useXMLSerializer = false;
+
     public static XmlCfg getXMLCfg() {
         return cfg;
     }
@@ -123,7 +124,6 @@ public class inquirer {
         }
         return prefix + " - " + title;
     }
-
 
     static String UTCtoDateTime(String fieldValue, String dtFormat) {
         try {
@@ -157,7 +157,6 @@ public class inquirer {
 //        }
     }
 
-
     static void reParse() throws Exception {
         if (parser == null) {
             parser = new Main(DBPath, config);
@@ -169,7 +168,6 @@ public class inquirer {
     public static boolean isRefSyncDisabled() {
         return refSyncDisabled;
     }
-
 
     public static void showInfoPanel(Window p, String t, Container jScrollPane, boolean isModal) {
 //        JDialog allFiles = new JDialog(parent, title);
@@ -207,7 +205,6 @@ public class inquirer {
         return infoDialog.getDialogResult();
     }
 
-
     public static boolean ifAll() {
         if (isAll == null) {
             String sIsAll = (String) System.getProperties().get("all");
@@ -215,7 +212,6 @@ public class inquirer {
         }
         return isAll;
     }
-
 
     public static String getVersion() throws IOException {
         try {
@@ -311,7 +307,6 @@ public class inquirer {
 
     }
 
-
     public static ArrayList<Pattern> getFullFilters(int GetFileId) throws SQLException, Exception {
         if (fileidType == null) {
             fileidType = new HashMap<>();
@@ -320,9 +315,9 @@ public class inquirer {
 
             try (ResultSet resultSet = connector.executeQuery(inquirer.class,
                     "select f.id, a.name from file_logbr f\n"
-                            + " inner join apptype a on a.id=f.apptypeid")) {
+                    + " inner join apptype a on a.id=f.apptypeid")) {
                 ResultSetMetaData rsmd = resultSet.getMetaData();
-                
+
                 int cnt = 0;
                 while (resultSet.next()) {
                     fileidType.put(resultSet.getInt(1), resultSet.getString(2));
@@ -358,7 +353,6 @@ public class inquirer {
         }
         return null;
     }
-
 
     public static boolean isDbg() {
         return dbg;
@@ -439,7 +433,6 @@ public class inquirer {
         return logBrDir;
     }
 
-
     public static QueryDialogSettings geLocaltQuerySettings() {
         if (queryDialogSettings == null) {
             queryDialogSettings = (QueryDialogSettings) readObj(getSerFile());
@@ -483,7 +476,6 @@ public class inquirer {
         }
         return ret;
     }
-
 
     private static void ShowGui() throws Exception {
 
@@ -562,7 +554,6 @@ public class inquirer {
 //        return dlg;
     }
 
-
     public static inquirer getInq() {
         return inq;
     }
@@ -612,16 +603,13 @@ public class inquirer {
 
     }
 
-
     public static String getSerFile() {
         return inquirer.getLogBrDir() + File.separator + serFile;
     }
 
-
     public static InquirerCfg getCr() {
         return getCr(serFileDef);
     }
-
 
     public static InquirerCfg getCr(String file) {
         if (cr == null) {
@@ -629,11 +617,11 @@ public class inquirer {
             if (f.exists()) {
                 FileInputStream fis = null;
                 ObjectInputStream in = null;
-                try { 
+                try {
                     fis = new FileInputStream(f);
                     if (f.getAbsolutePath().toLowerCase().endsWith(".json")) {
-                        try (JsonReader reader = new JsonReader(new InputStreamReader(fis, "UTF-8"))){
-                            cr=new Gson().fromJson(reader, com.myutils.logbrowser.inquirer.InquirerCfg.class);
+                        try (JsonReader reader = new JsonReader(new InputStreamReader(fis, "UTF-8"))) {
+                            cr = new Gson().fromJson(reader, com.myutils.logbrowser.inquirer.InquirerCfg.class);
                         }
 
                     } else if (useXMLSerializer) {
@@ -710,15 +698,18 @@ public class inquirer {
     String endTime = "";
     CommandLineReader clr;
     private final LogFileManager lfm = new LogFileManager();
+
     public ArrayList getFormatters() throws Exception {
         for (ILogRecordFormatter formatter : formatters) {
             formatter.refreshFormatter();
         }
         return formatters;
     }
+
     public boolean isIgnoreFileAccessErrors() {
         return ignoreFileAccessErrors;
     }
+
     private void ParseArgs(String[] args) throws IOException {
 
         ExecutionEnvironment theClr = new ExecutionEnvironment(args);
@@ -901,6 +892,7 @@ public class inquirer {
 //            components.add("SC");
 //        }
     }
+
     private boolean initReport() throws Exception {
         //DatabaseConnector.initDatabaseConnector(dbname,alias);
         if (!setCurrentDirectory(baseDir)) {
@@ -919,7 +911,7 @@ public class inquirer {
             logger.error("Cannot init", e);
             JOptionPane.showMessageDialog(null, "Not able to init:\n" + e.getMessage(), "Cannot continue", JOptionPane.ERROR_MESSAGE);
 //            inquirer.ExceptionHandler.handleException("Not able to init:\n", e);
-return false;
+            return false;
         }
         if (filesInDB <= 0) {
             JOptionPane.showMessageDialog(null, "Nothing to do,  no parsed files in DB found.\nApplication is terminating", "Cannot continue", JOptionPane.ERROR_MESSAGE);
@@ -948,16 +940,16 @@ return false;
 //                pseudoLogFormatter.ApplyMark(mark);
 //            }
 //        }
-if (outputSpecFile != null && !outputSpecFile.isEmpty()) {
-    
-    logger.debug("About to read XML config from file " + outputSpecFile);
-    cfg = new XmlCfg(outputSpecFile);
-    
-    // create formatter class by output spec file
-    ILogRecordFormatter formatter = new OutputSpecFormatterScreen(
-            cfg, true, null);
-    formatters.add(formatter);
-}
+        if (outputSpecFile != null && !outputSpecFile.isEmpty()) {
+
+            logger.debug("About to read XML config from file " + outputSpecFile);
+            cfg = new XmlCfg(outputSpecFile);
+
+            // create formatter class by output spec file
+            ILogRecordFormatter formatter = new OutputSpecFormatterScreen(
+                    cfg, true, null);
+            formatters.add(formatter);
+        }
 
 //        if (outputSpecFile == null) {
 //            if (outputSpecFile == null) {
@@ -966,8 +958,9 @@ if (outputSpecFile != null && !outputSpecFile.isEmpty()) {
 //                formatters.add(formatter);
 //            }
 //        }
-return true;
+        return true;
     }
+
     public void doRetrieve(IQueryResults queryResults, QueryDialog dlg) throws Exception {
         for (int i = 0; i < formatters.size(); i++) {
             queryResults.AddFormatter(
@@ -982,6 +975,7 @@ return true;
         long time4 = new Date().getTime();
         inquirer.logger.info("Retrieved " + queryResults.m_results.size() + " records. Took " + Utils.Util.pDuration(time4 - time3));
     }
+
     public void doPrint(IQueryResults queryResults, QueryDialog dlg, InquirerCfg cfg) throws Exception {
         int dialogResult = JOptionPane.YES_OPTION;
         boolean doPrint = true;
@@ -1008,13 +1002,13 @@ return true;
 //                inquirer.logger.info("Long output goes to " + fileName);
 //                ps.addFullStream(fileName, -1, cfg.isAddShortToFull());
 //            }
-if (cfg.isSaveFileShort()) {
-    String fileName = cfg.getFileNameShort();
-    inquirer.logger.info("Short output goes to " + fileName);
-    ps.addShortStream(fileName, -1);
-}
-queryResults.Print(ps);
-ps.closeStreams();
+            if (cfg.isSaveFileShort()) {
+                String fileName = cfg.getFileNameShort();
+                inquirer.logger.info("Short output goes to " + fileName);
+                ps.addShortStream(fileName, -1);
+            }
+            queryResults.Print(ps);
+            ps.closeStreams();
         }
 
         for (int i = 0; i < formatters.size(); i++) {
@@ -1026,6 +1020,7 @@ ps.closeStreams();
         }
         ps.OpenNotepad("openfiles.bat");
     }
+
     public LogFileManager getLfm() {
         return lfm;
     }
@@ -1064,7 +1059,7 @@ ps.closeStreams();
                     dlg.CenterWindow();
 //        dlg.setModal(false);
 
-ScreenInfo.setVisible(dlg, true);
+                    ScreenInfo.setVisible(dlg, true);
 //                    dlg.setVisible(true);
 
                 }
@@ -1113,14 +1108,14 @@ ScreenInfo.setVisible(dlg, true);
 //                bannerPannel = new BannerPanel("pannel tytle", "descrr");
 //                return bannerPannel;
 //            }
-return bannerPannel;
+            return bannerPannel;
         }
 
         @Override
         public JComponent createContentPanel() {
             JPanel panel = new JPanel(new BorderLayout(10, 10));
             panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 0, 10));
-            
+
             panel.add(mainPanel, BorderLayout.CENTER);
             return panel;
         }
@@ -1129,11 +1124,11 @@ return bannerPannel;
         public ButtonPanel createButtonPanel() {
             ButtonPanel buttonPanel = new ButtonPanel();
             switch (buttonOptions) {
-                
+
                 case JOptionPane.DEFAULT_OPTION: {
                     JButton cancelButton = new JButton();
                     buttonPanel.addButton(cancelButton);
-                    
+
                     cancelButton.setAction(new AbstractAction() {
                         @Override
                         public void actionPerformed(ActionEvent e) {
@@ -1143,17 +1138,17 @@ return bannerPannel;
                         }
                     });
                     cancelButton.setText("Close");
-                    
+
                     setDefaultCancelAction(cancelButton.getAction());
                     getRootPane().setDefaultButton(cancelButton);
                     break;
                 }
-                
+
                 case JOptionPane.YES_NO_CANCEL_OPTION: {
-                    
+
                     JButton yesButton = new JButton();
                     buttonPanel.addButton(yesButton);
-                    
+
                     yesButton.setAction(new AbstractAction("Yes") {
                         @Override
                         public void actionPerformed(ActionEvent e) {
@@ -1162,10 +1157,10 @@ return bannerPannel;
                             dispose();
                         }
                     });
-                    
+
                     JButton noButton = new JButton();
                     buttonPanel.addButton(noButton);
-                    
+
                     noButton.setAction(new AbstractAction("No") {
                         @Override
                         public void actionPerformed(ActionEvent e) {
@@ -1174,10 +1169,10 @@ return bannerPannel;
                             dispose();
                         }
                     });
-                    
+
                     JButton cancelButton = new JButton();
                     buttonPanel.addButton(cancelButton);
-                    
+
                     cancelButton.setAction(new AbstractAction("Cancel") {
                         @Override
                         public void actionPerformed(ActionEvent e) {
@@ -1186,16 +1181,16 @@ return bannerPannel;
                             dispose();
                         }
                     });
-                    
+
                     setDefaultCancelAction(cancelButton.getAction());
                     getRootPane().setDefaultButton(noButton);
                     break;
                 }
-                
+
                 case JOptionPane.YES_NO_OPTION: {
                     JButton yesButton = new JButton();
                     buttonPanel.addButton(yesButton);
-                    
+
                     yesButton.setAction(new AbstractAction("Yes") {
                         @Override
                         public void actionPerformed(ActionEvent e) {
@@ -1204,10 +1199,10 @@ return bannerPannel;
                             dispose();
                         }
                     });
-                    
+
                     JButton noButton = new JButton();
                     buttonPanel.addButton(noButton);
-                    
+
                     noButton.setAction(new AbstractAction("No") {
                         @Override
                         public void actionPerformed(ActionEvent e) {
@@ -1223,7 +1218,7 @@ return bannerPannel;
                 case JOptionPane.OK_CANCEL_OPTION: {
                     JButton yesButton = new JButton();
                     buttonPanel.addButton(yesButton);
-                    
+
                     yesButton.setAction(new AbstractAction("OK") {
                         @Override
                         public void actionPerformed(ActionEvent e) {
@@ -1232,10 +1227,10 @@ return bannerPannel;
                             dispose();
                         }
                     });
-                    
+
                     JButton noButton = new JButton();
                     buttonPanel.addButton(noButton);
-                    
+
                     noButton.setAction(new AbstractAction("Cancel") {
                         @Override
                         public void actionPerformed(ActionEvent e) {
@@ -1247,19 +1242,19 @@ return bannerPannel;
                     setDefaultCancelAction(noButton.getAction());
                     getRootPane().setDefaultButton(noButton);
                     break;
-                    
+
                 }
             }
 //            buttonPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-buttonPanel.setSizeConstraint(ButtonPanel.NO_LESS_THAN); // since the checkbox is quite wide, we don't want all of them have the same size.
-return buttonPanel;
+            buttonPanel.setSizeConstraint(ButtonPanel.NO_LESS_THAN); // since the checkbox is quite wide, we don't want all of them have the same size.
+            return buttonPanel;
         }
 
         public void showModal() {
             pack();
 //        ScreenInfo.CenterWindow(allFiles);
-setModal(true);
-ScreenInfo.setVisible(getParent(), this, true);
+            setModal(true);
+            ScreenInfo.setVisible(getParent(), this, true);
         }
     }
 
@@ -1314,7 +1309,7 @@ ScreenInfo.setVisible(getParent(), this, true);
 
         ExecutionEnvironment(String[] args1) {
             options = new Options();
-            
+
             optHelp = Option.builder("h")
                     .hasArg(false)
                     .required(false)
@@ -1322,7 +1317,7 @@ ScreenInfo.setVisible(getParent(), this, true);
                     .longOpt("help")
                     .build();
             options.addOption(optHelp);
-            
+
             optIgnoreFileAccessErrors = Option.builder()
                     .hasArg(false)
                     .required(false)
@@ -1330,7 +1325,7 @@ ScreenInfo.setVisible(getParent(), this, true);
                     .longOpt("ignore-file-errors")
                     .build();
             options.addOption(optIgnoreFileAccessErrors);
-            
+
             optOutSpec = Option.builder("x")
                     .hasArg(true)
                     .required(true)
@@ -1339,7 +1334,7 @@ ScreenInfo.setVisible(getParent(), this, true);
                     .longOpt("outputspec")
                     .build();
             options.addOption(optOutSpec);
-            
+
             optAlias = Option.builder("a")
                     .hasArg(true)
                     .required(false)
@@ -1348,7 +1343,7 @@ ScreenInfo.setVisible(getParent(), this, true);
                     .longOpt("alias")
                     .build();
             options.addOption(optAlias);
-            
+
             optDBName = Option.builder("d")
                     .hasArg(true)
                     .required(false)
@@ -1357,7 +1352,7 @@ ScreenInfo.setVisible(getParent(), this, true);
                     .longOpt("dbname")
                     .build();
             options.addOption(optDBName);
-            
+
             optDisableRefSync = Option.builder()
                     .hasArg(false)
                     .required(false)
@@ -1365,7 +1360,7 @@ ScreenInfo.setVisible(getParent(), this, true);
                     .longOpt("no-ref-sync")
                     .build();
             options.addOption(optDisableRefSync);
-            
+
             optLogsBaseDir = Option.builder("b")
                     .hasArg(true)
                     .required(false)
@@ -1374,7 +1369,7 @@ ScreenInfo.setVisible(getParent(), this, true);
                     .valueSeparator('=')
                     .build();
             options.addOption(optLogsBaseDir);
-            
+
             optAppConfigFile = Option.builder("c")
                     .hasArg(true)
                     .required(true)
@@ -1383,9 +1378,9 @@ ScreenInfo.setVisible(getParent(), this, true);
                     .valueSeparator('=')
                     .build();
             options.addOption(optAppConfigFile);
-            
+
             parser = new DefaultParser();
-            
+
             //        theTest();
             logBrDir = System.getProperty("logbr.dir");
             if (logBrDir != null && logBrDir.length() > 0) {
@@ -1394,16 +1389,16 @@ ScreenInfo.setVisible(getParent(), this, true);
                 System.setProperty("logPath", ".");
             }
             System.setProperty("log4j2.saveDirectory", "true");
-            
+
             String cmdLine = "";
             for (String arg : args1) {
                 cmdLine += arg + " ";
             }
             logger.info("parameters:" + cmdLine);
             logger.info("working directory: " + Paths.get(".").toAbsolutePath().normalize().toString());
-            
+
             parserCommandLine(args1);
-            
+
         }
 
         public String[] getArgs() {
@@ -1426,7 +1421,7 @@ ScreenInfo.setVisible(getParent(), this, true);
         private void showHelpExit(Options options) {
             HelpFormatter formatter = new HelpFormatter();
             formatter.printHelp("utility-name", options);
-            
+
             System.exit(0);
         }
 
@@ -1438,7 +1433,7 @@ ScreenInfo.setVisible(getParent(), this, true);
             return cmd.hasOption(optDisableRefSync.getLongOpt());
         }
 
-        private String getDBName() { 
+        private String getDBName() {
             return getStringOrDef(optDBName, "logbr");
         }
 
@@ -1481,7 +1476,7 @@ ScreenInfo.setVisible(getParent(), this, true);
                 System.out.println(e.getMessage());
                 showHelpExit(options);
             }
-            
+
             if (cmd.hasOption(optHelp.getLongOpt())) {
                 showHelpExit(options);
             }
@@ -1504,12 +1499,12 @@ ScreenInfo.setVisible(getParent(), this, true);
             if (errs != null) {
                 sw.append("\n").append(errs).append("\n");
             }
-            
+
             JTextArea jt = new JTextArea(sw.toString(), 40, 100);
             jt.setEditable(false);
             JScrollPane jsp = new JScrollPane(jt);
 //            JTextArea.setl
-JOptionPane.showMessageDialog(null, jsp, "Exception", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null, jsp, "Exception", JOptionPane.ERROR_MESSAGE);
         }
 
         static public void handleException(String t, Throwable e) {

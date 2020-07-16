@@ -14,10 +14,6 @@ import java.sql.SQLException;
  */
 public class IxnSSQuery extends IQuery {
 
-    private ResultSet m_resultSet;
-    private DatabaseConnector m_connector;
-    private int recCnt;
-
     private DynamicTreeNode<OptionNode> node;
     private boolean regex = false;
     private String selection = null;
@@ -47,6 +43,7 @@ public class IxnSSQuery extends IQuery {
             this.searchApps = cif.searchApps;
         }
     }
+
     public int getRecCnt() {
         return recCnt;
     }

@@ -55,7 +55,6 @@ public class MCPParser extends Parser {
     long m_CurrentFilePos;
     long m_HeaderOffset;
 
-
     private ParserState m_ParserState;
     int m_PacketLength;
     int m_ContentLength;
@@ -144,7 +143,7 @@ public class MCPParser extends Parser {
     }
 
     void ContinueParsing(String initial, FileInfo fi) {
-        String str ;
+        String str;
         BufferedReaderCrLf input = Main.getMain().GetNextFile();
         if (input == null) {
             return;
@@ -183,7 +182,6 @@ public class MCPParser extends Parser {
             Main.logger.error(e);
         }
     }
-
 
     String ParseLine(BufferedReaderCrLf input, String str, FileInfo fi) throws Exception {
         String s = str;
@@ -372,7 +370,7 @@ public class MCPParser extends Parser {
         Matcher m;
 
         // Populate our class representation of the message
-        SipMessage msg ;
+        SipMessage msg;
 
         msg = new SipMessage(contents, TableType.SIPMS);
 
@@ -393,7 +391,6 @@ public class MCPParser extends Parser {
             PrintMsg(contents);
         }
     }
-
 
     private void AddConfigMessage(ArrayList<String> m_MessageContents) {
         ConfigUpdateRecord msg = new ConfigUpdateRecord(m_MessageContents);
@@ -425,7 +422,6 @@ public class MCPParser extends Parser {
     private void noCallMessage(String[] split, int initalIndex) {
 //        Main.logger.debug("noCallMessage "+StringUtils.join(split, ", ")+" "+initalIndex);
     }
-
 
     private void callMessage(String callID, String messageText) {
         if (ptGVPCallID.matcher(callID).find()) {
@@ -506,6 +502,7 @@ public class MCPParser extends Parser {
         STATE_CONFIG,
         STATE_SIP_HEADER1
     }
+
     private class VXMLIntSteps extends Message {
 
         private String command;
@@ -520,9 +517,11 @@ public class MCPParser extends Parser {
         private VXMLIntSteps() {
             super(TableType.VXMLIntStepsTable);
         }
+
         public String getCommand() {
             return command;
         }
+
         public String getMcpCallID() {
             return mcpCallID;
         }
@@ -534,7 +533,6 @@ public class MCPParser extends Parser {
         private void setCommand(String msgParam) {
             this.command = msgParam;
         }
-
 
         /**
          * Get the value of params
@@ -554,7 +552,6 @@ public class MCPParser extends Parser {
             this.params = params;
         }
 
-
         /**
          * Get the value of sipCallID
          *
@@ -572,7 +569,6 @@ public class MCPParser extends Parser {
         public void setSipCallID(String sipCallID) {
             this.sipCallID = sipCallID;
         }
-
 
         /**
          * Get the value of GVPSession
@@ -592,7 +588,6 @@ public class MCPParser extends Parser {
             this.GVPSession = GVPSession;
         }
 
-
         /**
          * Get the value of Tenant
          *
@@ -610,7 +605,6 @@ public class MCPParser extends Parser {
         public void setTenant(String Tenant) {
             this.Tenant = Tenant;
         }
-
 
         /**
          * Get the value of IVRProfile

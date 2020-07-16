@@ -21,6 +21,7 @@ public class SCServerResults extends IQueryResults {
     private int m_componentFilter;
     private ArrayList<NameID> appType = null;
     private IDsFinder cidFinder = null;
+
     /**
      *
      */
@@ -32,6 +33,7 @@ public class SCServerResults extends IQueryResults {
         addSelectionType(SelectionType.NO_SELECTION);
         addSelectionType(SelectionType.GUESS_SELECTION);
     }
+
     public SCServerResults() {
         super();
         loadStdOptions();
@@ -61,7 +63,6 @@ public class SCServerResults extends IQueryResults {
     public String getName() {
         return "SCServer";
     }
-
 
     public void AddComponent(int filter) {
         m_componentFilter = m_componentFilter | filter;
@@ -99,7 +100,7 @@ public class SCServerResults extends IQueryResults {
         nd.addChild(subNode);
         try {
             addCustom(rootA, FileInfoType.type_SCS);
-        } catch (Exception ex) {
+        } catch (SQLException ex) {
             logger.log(org.apache.logging.log4j.Level.FATAL, ex);
         }
 
@@ -192,14 +193,12 @@ public class SCServerResults extends IQueryResults {
 //    private void retrieveSIP
     private void doRetrieve(QueryDialog dlg, SelectionType selectionType, String selection, boolean isRegex) throws SQLException {
         ILogRecord record = null;
-        IDsFinder cidFinder = null;
 
         if (selection != null && (selectionType == SelectionType.CONNID
                 || selectionType == SelectionType.CALLID)) {
             cidFinder = new IDsFinder();
             if (!cidFinder.initSearch()) {
                 inquirer.logger.info("No call ID found; returning");
-                return;
             }
         }
 //        RetrieveSIP(dlg,

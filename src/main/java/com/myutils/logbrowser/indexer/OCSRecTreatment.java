@@ -12,7 +12,7 @@ import java.util.regex.Pattern;
  *
  * @author terry The class Replicates TLibMessage
  */
-public class OCSRecTreatment extends Message {
+public final class OCSRecTreatment extends Message {
 
     private static final Pattern regRecHandle = Pattern.compile("^\\tRecordHandle = (\\d+)\\s+ChainID = (\\d+)\\s+ChainNum = (\\d+)");
     private static final Pattern regCampaignName = Pattern.compile("^\\tCampaignName = (.+)");
@@ -46,7 +46,7 @@ public class OCSRecTreatment extends Message {
     }
 
     String getcamp() {
-        Matcher m = null;
+        Matcher m;
         if ((m = FindRx(regCampaignName)) != null) {
             return m.group(1);
         }

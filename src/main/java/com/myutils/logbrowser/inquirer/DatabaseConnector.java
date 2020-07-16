@@ -826,7 +826,7 @@ public class DatabaseConnector {
     public static void GracefulClose() {
         try {
             if (databaseConnector != null) {
-                for (Object m_activeStatement : databaseConnector.m_activeStatements.keySet()) {
+                for (Object m_activeStatement : databaseConnector.m_activeStatements.values()) {
                     ((Statement) m_activeStatement).close();
                 }
                 databaseConnector.m_activeStatements.clear();
@@ -1173,7 +1173,7 @@ public class DatabaseConnector {
                         result((String) null);
                     }
 
-                } catch (Exception e) {
+                } catch (SQLException e) {
                     result(value_text(0));
                     inquirer.logger.error(CampaignGroupDBIDtoName + ": [" + value_text(0) + "]", e);
                     throw new SQLException(e);
@@ -1219,7 +1219,7 @@ public class DatabaseConnector {
                         result((String) null);
                     }
 
-                } catch (Exception e) {
+                } catch (SQLException e) {
                     result(value_text(0));
                     inquirer.logger.error(CampaignDBIDtoName + ": [" + value_text(0) + "]", e);
                     throw new SQLException(e);
@@ -1264,7 +1264,7 @@ public class DatabaseConnector {
                         result((String) null);
                     }
 
-                } catch (Exception e) {
+                } catch (SQLException e) {
                     result(value_text(0));
                     inquirer.logger.error(GroupDBIDtoName + ": [" + value_text(0) + "]", e);
                     throw new SQLException(e);
@@ -1309,7 +1309,7 @@ public class DatabaseConnector {
                         result((String) null);
                     }
 
-                } catch (Exception e) {
+                } catch (SQLException e) {
                     result(value_text(0));
                     inquirer.logger.error(ListDBIDtoName + ": [" + value_text(0) + "]", e);
                     throw new SQLException(e);

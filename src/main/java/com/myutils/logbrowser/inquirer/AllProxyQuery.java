@@ -4,7 +4,6 @@
  */
 package com.myutils.logbrowser.inquirer;
 
-import java.sql.ResultSet;
 import java.sql.SQLException;
 
 /**

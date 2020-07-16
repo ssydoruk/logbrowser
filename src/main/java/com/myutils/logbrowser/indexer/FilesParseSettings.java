@@ -8,7 +8,6 @@ package com.myutils.logbrowser.indexer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -17,6 +16,7 @@ import java.util.regex.Pattern;
  * @author ssydoruk
  */
 public class FilesParseSettings {
+
     private final HashMap<String, FileParseSettings> fileSettings = new HashMap<>();
 
     /**
@@ -58,6 +58,7 @@ public class FilesParseSettings {
         private final ArrayList<Parser.DateFmt> dateSettings = new ArrayList<>();
 
         private final ArrayList<FileParseCustomSearch> customSearch = new ArrayList<>();
+
         public ArrayList<FileParseCustomSearch> getCustomSearch() {
             return customSearch;
         }
@@ -180,7 +181,6 @@ public class FilesParseSettings {
             return "{" + " name=" + name + ", " + ", components=" + comps() + '}';
         }
 
-
         public HashMap<String, ArrayList<SearchComponent>> getComponents() {
             return components;
         }
@@ -283,8 +283,7 @@ public class FilesParseSettings {
                     return false;
                 }
                 final SearchComponent other = (SearchComponent) obj;
-                
-                
+
                 return true;
             }
 
@@ -314,6 +313,5 @@ public class FilesParseSettings {
         }
 
     }
-
 
 }

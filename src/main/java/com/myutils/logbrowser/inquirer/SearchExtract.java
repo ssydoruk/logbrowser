@@ -300,10 +300,10 @@ public class SearchExtract extends javax.swing.JDialog {
     private static class SearchParams {
 
         private Pattern selectedRegEx = null;
-        private String retValue;
+        private final String retValue;
 
-        private boolean wholeWorld;
-        private boolean matchCase;
+        private final boolean wholeWorld;
+        private final boolean matchCase;
 
         public SearchParams(String search, String replace, boolean wholeWorld, boolean matchCase) throws PatternSyntaxException {
             this.retValue = replace;
@@ -1018,7 +1018,6 @@ public class SearchExtract extends javax.swing.JDialog {
         }
 
     }
-
 
     private boolean debug = false;
 

@@ -146,7 +146,7 @@ class DbRecordComparator implements Comparator {
         if (GetField == null || GetField.isEmpty()) {
             return 1;
         }
-        int ownerid = 0;
+        int ownerid;
         try {
             ownerid = Integer.parseInt(GetField);
         } catch (NumberFormatException numberFormatException) {
@@ -339,7 +339,7 @@ class DbRecordComparator implements Comparator {
                     for (Object key2 : keys2) {
                         ILogRecord rec1 = (ILogRecord) hash1.get(key1);
                         ILogRecord rec2 = (ILogRecord) hash2.get(key2);
-                        if (rec1.GetFileId() == rec2.GetFileId()) {
+                        if (Objects.equals(rec1.GetFileId(), rec2.GetFileId())) {
                             return (int) (rec1.GetFileOffset() - rec2.GetFileOffset());
                         }
                     }
@@ -443,7 +443,7 @@ class DbRecordComparator implements Comparator {
             inquirer.logger.trace("compare: >" + record1);
             inquirer.logger.trace("compare: <" + record2);
             // if the same file - compare line numbers, does not matter what record type is
-            if (record1.GetFileId() == record2.GetFileId()) {
+            if (Objects.equals(record1.GetFileId(), record2.GetFileId())) {
                 inquirer.logger.trace("Same file; return " + (record1.GetFileOffset() - record2.GetFileOffset()));
                 return (int) (record1.GetFileOffset() - record2.GetFileOffset());
             }
@@ -586,7 +586,7 @@ class DbRecordComparator implements Comparator {
                     result.add(next);
                     for (int j = start; j < end; j++) {
                         current = (ILogRecord) list.get(j);
-                        if (current.GetFileId() == next.GetFileId()
+                        if (Objects.equals(current.GetFileId(), next.GetFileId())
                                 && !current.IsInbound()) {
                             result.add(current);
                             rec = current;
@@ -609,7 +609,7 @@ class DbRecordComparator implements Comparator {
                     result.add(next);
                     for (int j = start; j < end; j++) {
                         current = (ILogRecord) list.get(j);
-                        if (current.GetFileId() == next.GetFileId()
+                        if (Objects.equals(current.GetFileId(), next.GetFileId())
                                 && current.IsInbound()) {
                             result.add(current);
                             rec = current;
@@ -671,7 +671,7 @@ class DbRecordComparator implements Comparator {
                         && !rec.IsInbound()) {
                     ILogRecord prev = null;
                     for (ILogRecord curr : unused) {
-                        if (curr.GetFileId() == rec.GetFileId()
+                        if (Objects.equals(curr.GetFileId(), rec.GetFileId())
                                 && curr.GetLine() < rec.GetLine()) {
                             prev = curr;
                             break;
@@ -695,7 +695,7 @@ class DbRecordComparator implements Comparator {
             // for request, try to find its outbound
             ArrayList<ILogRecord> temp = new ArrayList();
             for (ILogRecord rec : unused) {
-                if (!rec.IsInbound() && rec.GetFileId() == orig.GetFileId()) {
+                if (!rec.IsInbound() && Objects.equals(rec.GetFileId(), orig.GetFileId())) {
                     temp.add(rec);
                 }
             }
@@ -721,7 +721,7 @@ class DbRecordComparator implements Comparator {
                     temp.add(inb);
                     // search for outbounds
                     for (ILogRecord rec : unused) {
-                        if (!rec.IsInbound() && rec.GetFileId() == inb.GetFileId()) {
+                        if (!rec.IsInbound() && Objects.equals(rec.GetFileId(), inb.GetFileId())) {
                             temp.add(rec);
                             queue.addLast(rec);
                         }
@@ -781,8 +781,8 @@ class DbRecordComparator implements Comparator {
     }
 
     private int CmpTlibOrsMetric(ILogRecord record1, ILogRecord record2) throws SQLException {
-        long seqNo1 = -1;
-        long seqNo2 = -1;
+        long seqNo1;
+        long seqNo2;
 
         if (record1.GetType() == MsgType.ORSM) {
             seqNo1 = GetORSSeqNo(record1.GetFileId(), record1.GetLine(), record1.getM_appName(), ((TLibEvent) record2).getApp());

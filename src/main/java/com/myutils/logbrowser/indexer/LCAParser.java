@@ -2,7 +2,6 @@ package com.myutils.logbrowser.indexer;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -152,7 +151,7 @@ public class LCAParser extends Parser {
                     msg.setConnected(false);
                     msg.setSCS(true);
                     SetStdFieldsAndAdd(msg);
-                } else if ((m = reqSCSRequestStartApplication.matcher(s)).find()) {
+                } else if ((reqSCSRequestStartApplication.matcher(s)).find()) {
                     setSavedFilePos(getFilePos());
                     m_MessageContents.add(s);
                     m_ParserState = ParserState.STATE_SCSREQUESTSTARTAPP;
@@ -160,7 +159,7 @@ public class LCAParser extends Parser {
                     setSavedFilePos(getFilePos());
                     m_MessageContents.add(s);
                     m_ParserState = ParserState.STATE_SCSREQUESTCHANGERUNMODE;
-                } else if ((m = reqSCSRequest.matcher(s)).find()) {
+                } else if ((reqSCSRequest.matcher(s)).find()) {
                     setSavedFilePos(getFilePos());
                     m_MessageContents.add(s);
                     m_ParserState = ParserState.STATE_SCSREQUEST;
@@ -278,7 +277,6 @@ public class LCAParser extends Parser {
         return null;
     }
 
-
     protected void ParseServerName(String str) {
 
         Matcher matcher = ptServerName.matcher(str);
@@ -296,7 +294,6 @@ public class LCAParser extends Parser {
         msg.parseConnect();
         SetStdFieldsAndAdd(msg);
     }
-
 
     private void addRunModeChanged(String substring) {
         ConfigUpdateRecord msg = new ConfigUpdateRecord(substring);

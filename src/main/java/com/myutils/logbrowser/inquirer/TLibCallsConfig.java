@@ -12,6 +12,7 @@ import com.myutils.logbrowser.indexer.ReferenceType;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.SQLException;
 import javax.swing.AbstractButton;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
@@ -31,7 +32,7 @@ public class TLibCallsConfig extends javax.swing.JPanel {
 
     private static final org.apache.logging.log4j.Logger logger = LogManager.getLogger();
 
-    private CheckBoxList _list;
+    private final CheckBoxList _list;
     private DefaultListModel _model;
 
     /**
@@ -50,7 +51,7 @@ public class TLibCallsConfig extends javax.swing.JPanel {
                         for (String s : QueryTools.getRefNames(this, ReferenceType.TEvent)) {
                             _model.addElement(s);
                         }
-                    } catch (Exception ex) {
+                    } catch (SQLException ex) {
                         logger.log(org.apache.logging.log4j.Level.FATAL, ex);
                     }
 
@@ -110,7 +111,7 @@ public class TLibCallsConfig extends javax.swing.JPanel {
         return list;
     }
 
-    private ButtonGroup group = new ButtonGroup();
+    private final ButtonGroup group = new ButtonGroup();
     private FileInfoType ft = FileInfoType.type_Unknown;
 
     /**

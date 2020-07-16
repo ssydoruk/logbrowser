@@ -34,7 +34,7 @@ import org.apache.logging.log4j.LogManager;
  *
  * @author ssydoruk
  */
-public class QuerySetting extends javax.swing.JDialog {
+public final class QuerySetting extends javax.swing.JDialog {
 
     private static final org.apache.logging.log4j.Logger logger = LogManager.getLogger();
 
@@ -1518,21 +1518,23 @@ public class QuerySetting extends javax.swing.JDialog {
     }
 
     private static class ConstantsModel extends AbstractTableModel {
+
         InquirerCfg.GenesysConstant theConstant;
-        private Class[] types;
-        private String[] columnNames;
+        private final Class[] types;
+        private final String[] columnNames;
+
         public ConstantsModel() {
             this.theConstant = new GenesysConstant();
-            
+
             columnNames
                     = new String[]{
                         "String value", "Constant ID"
                     };
-            
+
             types = new Class[]{
                 java.lang.String.class, java.lang.Integer.class
             };
-            
+
         }
 
         @Override
@@ -1550,7 +1552,6 @@ public class QuerySetting extends javax.swing.JDialog {
             theConstant.setValueAt(aValue, rowIndex, columnIndex); //To change body of generated methods, choose Tools | Templates.
         }
 
-
         public InquirerCfg.GenesysConstant getTheConstant() {
             return theConstant;
         }
@@ -1559,12 +1560,10 @@ public class QuerySetting extends javax.swing.JDialog {
             this.theConstant = theConstant;
         }
 
-
         @Override
         public boolean isCellEditable(int rowIndex, int columnIndex) {
             return true; //To change body of generated methods, choose Tools | Templates.
         }
-
 
         @Override
         public int getRowCount() {

@@ -18,7 +18,6 @@ import org.w3c.dom.NodeList;
 
 public abstract class OutputSpecFormatter extends DefaultFormatter {
 
-
     final static String FILELINK = "filelink";
     final static String TIMESTAMP = "timestamp";
     final static String SIPNAME = "sipname";
@@ -28,7 +27,6 @@ public abstract class OutputSpecFormatter extends DefaultFormatter {
     final static String CALLIDALIAS = "callidalias";
     final static String MSGSPECIFIC = "msgspecific";
 
-
     final static String ID_NULL = "id_none";
 
     final static String AttributeId = "id";
@@ -36,6 +34,7 @@ public abstract class OutputSpecFormatter extends DefaultFormatter {
 
     final static int MAX_NAME_LENGTH = 20;
     final static int DEFAULT_FILE_LINK_LENGTH = 40;
+
     static private ArrayList<Element> getElementsChildByName(Element e, String name) {
         ArrayList<Element> ret = new ArrayList<>();
         NodeList nl = e.getChildNodes();
@@ -49,12 +48,13 @@ public abstract class OutputSpecFormatter extends DefaultFormatter {
                 }
             }
         }
-        
+
         return ret;
     }
+
     static private int getCallID(String callId) {
         if (m_callIdHash.containsKey(callId)) {
-            return ((Integer) m_callIdHash.get(callId)).intValue();
+            return (m_callIdHash.get(callId));
         } else {
             m_callIdHash.put(callId, m_callIdCount++);
             int ret = m_callIdCount - 1;
@@ -65,6 +65,7 @@ public abstract class OutputSpecFormatter extends DefaultFormatter {
 
     private HashSet<String> m_filter;
     private HashMap<String, RecordLayout> outSpec = new HashMap<>();
+
     public OutputSpecFormatter(XmlCfg cfg,
             boolean isLongFileNameEnabled,
             HashSet<String> components) throws Exception {
@@ -72,13 +73,12 @@ public abstract class OutputSpecFormatter extends DefaultFormatter {
         inquirer.logger.debug("OutputSpecFormatter " + cfg.getXmlFile());
         this.cfg = cfg;
         doRefreshLayout();
-        
+
     }
 
     protected RecordLayout getLayout(MsgType GetType) {
         return outSpec.get(GetType.toString());
     }
-
 
     private Element getElementChildByName(Element e, String name) {
         NodeList nl = e.getChildNodes();
@@ -95,7 +95,6 @@ public abstract class OutputSpecFormatter extends DefaultFormatter {
 
         return null;
     }
-
 
     public String SubstituteEmbeddedFormats(String fromXml) {
         if (fromXml != null) {
@@ -124,7 +123,6 @@ public abstract class OutputSpecFormatter extends DefaultFormatter {
             lo.UpdateFormatString();
         }
     }
-
 
     private void doRefreshLayout() throws Exception {
         for (org.w3c.dom.Element el : cfg.getLayouts()) {
@@ -178,12 +176,12 @@ public abstract class OutputSpecFormatter extends DefaultFormatter {
 
         private boolean CheckFilter(String str) {
 //
-for (RegexParam f : m_filter) {
-    if (f.find(str)) {
-        return true;
-    }
-}
-return false;
+            for (RegexParam f : m_filter) {
+                if (f.find(str)) {
+                    return true;
+                }
+            }
+            return false;
         }
 
         /* returns true if record should be ignored because status not changed*/
@@ -269,7 +267,7 @@ return false;
         }
 
         protected void ParseParam(Element e, boolean ignorePatternForDBFields) {
-            
+
             if (e != null) {
                 try {
                     isStatus = Boolean.parseBoolean(e.getAttribute("status"));
@@ -289,7 +287,7 @@ return false;
                 for (Iterator<Element> el = getElementsChildByName(e, "filter").iterator();
                         el != null && el.hasNext();) {
                     SetFilter(el.next());
-                    
+
                 }
             }
         }
@@ -331,11 +329,11 @@ return false;
                     
                     if return == null - ignore record
                     if str ="" - ignore field if filter triggered
-                    */
+                     */
 //                    return null;
-str = "";
+                    str = "";
                 }
-                
+
                 /**
                  * strange block, not sure what it means -->*
                  */
@@ -345,18 +343,18 @@ str = "";
                     ret = String.format(m_format, str);
                 }
                 /*<---*/
-                
+
 //                ret = String.format(m_format, str);
-if (CheckStatus(ret)) {
-    ret = null;
-}
-return ret;
+                if (CheckStatus(ret)) {
+                    ret = null;
+                }
+                return ret;
             }
             return "";
         }
 
         public String printValue(ILogRecord record) throws Exception {
-            
+
             if (hasFormat()) {
                 return FormatValue(record);
             } else {
@@ -369,7 +367,7 @@ return ret;
         abstract public String FormatValue(ILogRecord record) throws Exception;
 
         class RegexParam {
-            
+
             private int m_group;
             private Pattern m_matchPattern;
             private ArrayList<Integer> m_groups = null;
@@ -441,7 +439,7 @@ return ret;
             private String evalExpr(String s) throws SQLException {
                 if (expr != null) {
 //                    try {
-return DatabaseConnector.getValue(expr, s);
+                    return DatabaseConnector.getValue(expr, s);
 //                    } catch (Exception ex) {
 //                        logger.log(org.apache.logging.log4j.Level.FATAL, ex);
 //                    }
@@ -561,6 +559,7 @@ return DatabaseConnector.getValue(expr, s);
 
         }
     }
+
     static class EmbeddedParameter extends Parameter {
 
         String m_id;
@@ -587,11 +586,11 @@ return DatabaseConnector.getValue(expr, s);
 //                    if (!m_isLongFileNameEnabled) {
 //                        file = GetRelativePath(file);
 //                    }
-int line = record.GetLine();
-value = file + "(" + line + "):";
-if (record.IsMarked()) {
-    value += " *";
-}
+                    int line = record.GetLine();
+                    value = file + "(" + line + "):";
+                    if (record.IsMarked()) {
+                        value += " *";
+                    }
                 } else {
                     value = "";
                 }
@@ -602,12 +601,12 @@ if (record.IsMarked()) {
             } else if (m_id.equals(SIPNAME)) {
                 String name = record.GetField("name");
 //                if (m_isLongFileNameEnabled) {
-name = (record.IsInbound() ? "<-" + name : "->" + name);
-if (name.length() > MAX_NAME_LENGTH) {
-    name = name.substring(0, MAX_NAME_LENGTH);
-}
+                name = (record.IsInbound() ? "<-" + name : "->" + name);
+                if (name.length() > MAX_NAME_LENGTH) {
+                    name = name.substring(0, MAX_NAME_LENGTH);
+                }
 
-value = name;
+                value = name;
 //                } else {
 //                    value = "";
 //                }
@@ -622,7 +621,7 @@ value = name;
 //                        }
 //                        name = newName;
 //                    }
-value = name;
+                    value = name;
                 } else {
                     value = "";
                 }
@@ -679,6 +678,7 @@ value = name;
         }
 
     }
+
     static class DatabaseParameter extends Parameter {
 
         String m_id;
@@ -716,6 +716,7 @@ value = name;
         }
 
     }
+
     static class FileParameter extends Parameter {
 
         private FileParameter(Element e, String defaultFieldName) throws Exception {
@@ -739,24 +740,26 @@ value = name;
             return "file";
         }
     }
+
     public class IgnoreRecordException extends Exception {
     }
+
     enum ParamType {
-        
+
         embedded("embedded"),
         database("database"),
         file("file");
-        
+
         private final String name;
-        
+
         private ParamType(String s) {
             name = s;
         }
-        
+
         public boolean equalsName(String otherName) {
             return (otherName == null) ? false : name.equals(otherName);
         }
-        
+
         @Override
         public String toString() {
             return this.name;
@@ -772,7 +775,7 @@ value = name;
         private RecordLayout(org.w3c.dom.Element el, String msgType) throws Exception {
             // get format attribute, save format string
             formatStringFromXml = el.getAttribute("format");
-            
+
 //            if (formatAttr != null) {
 //                formatStringFromXml = formatAttr.getValue();
 //            } else {
@@ -782,39 +785,39 @@ value = name;
 // with values meaningful for String.format
 //            formatString = SubstituteEmbeddedFormats(formatStringFromXml);
 // iterate through child elements, save parameters
-parameters = new ArrayList();
+            parameters = new ArrayList();
 
 //            Iterator itr = (el.getChildren()).iterator();
 //            while (itr.hasNext()) {
-NodeList nl = el.getChildNodes();
-for (int i = 0; i < nl.getLength(); i++) {
-    if (nl.item(i).getNodeType() == Node.ELEMENT_NODE) {
-        Element paramElement = (Element) nl.item(i);
-        Parameter parameter = null;
-        
-        ParamType paramType = ParamType.valueOf(paramElement.getAttribute("type"));
-        String fieldName = getAttribute(paramElement, "name", TabResultDataModel.TableRow.colPrefix + i);
-        
-        switch (paramType) {
-            case database:
-                parameter = new DatabaseParameter(paramElement, fieldName);
-                break;
-                
-            case file:
-                parameter = new FileParameter(paramElement, fieldName);
-                break;
-                
-            case embedded:
-                parameter = new EmbeddedParameter(paramElement, fieldName);
-                break;
-                
-        }
-        parameter.setHidden(getAttribute(paramElement, "hidden", false));
-        
-        parameters.add(parameter);
-        
-    }
-}
+            NodeList nl = el.getChildNodes();
+            for (int i = 0; i < nl.getLength(); i++) {
+                if (nl.item(i).getNodeType() == Node.ELEMENT_NODE) {
+                    Element paramElement = (Element) nl.item(i);
+                    Parameter parameter = null;
+
+                    ParamType paramType = ParamType.valueOf(paramElement.getAttribute("type"));
+                    String fieldName = getAttribute(paramElement, "name", TabResultDataModel.TableRow.colPrefix + i);
+
+                    switch (paramType) {
+                        case database:
+                            parameter = new DatabaseParameter(paramElement, fieldName);
+                            break;
+
+                        case file:
+                            parameter = new FileParameter(paramElement, fieldName);
+                            break;
+
+                        case embedded:
+                            parameter = new EmbeddedParameter(paramElement, fieldName);
+                            break;
+
+                    }
+                    parameter.setHidden(getAttribute(paramElement, "hidden", false));
+
+                    parameters.add(parameter);
+
+                }
+            }
         }
 
         private boolean getAttribute(Element e, String key, boolean defaultValue) {
@@ -831,7 +834,7 @@ for (int i = 0; i < nl.getLength(); i++) {
                 }
             }
             return defaultValue;
-            
+
         }
 
         private String getAttribute(Element e, String key, String defaultValue) {
@@ -852,94 +855,94 @@ for (int i = 0; i < nl.getLength(); i++) {
         public String PrintRecord(ILogRecord record, PrintStreams ps, IQueryResults qr) throws Exception {
 //                StringBuilder outString = new StringBuilder(512);
 //                ArrayList<String> paramValues = new ArrayList<>(parameters.size());
-for (Parameter param : parameters) {
-    if (!param.hasFormat()) {
-        String s = param.GetValue(record);
-        if (s == null) { //ignore record
-            return "";
-        } else {
+            for (Parameter param : parameters) {
+                if (!param.hasFormat()) {
+                    String s = param.GetValue(record);
+                    if (s == null) { //ignore record
+                        return "";
+                    } else {
 //                            paramValues.add(s);
-        }
-        ps.addField(param, s);
-    } else {
-        String s1 = param.FormatValue(record);
-        if (s1 == null) {
-            return "";
-        }
-        ps.addField(param, s1);
-    }
-}
-ArrayList<Parameter> addOutParams = qr.getAddOutParams(record.GetType());
-if (addOutParams != null) {
-    for (Parameter param : addOutParams) {
-        String s = param.printValue(record);
-        if (s == null) { //ignore record
-            return "";
-        } else {
+                    }
+                    ps.addField(param, s);
+                } else {
+                    String s1 = param.FormatValue(record);
+                    if (s1 == null) {
+                        return "";
+                    }
+                    ps.addField(param, s1);
+                }
+            }
+            ArrayList<Parameter> addOutParams = qr.getAddOutParams(record.GetType());
+            if (addOutParams != null) {
+                for (Parameter param : addOutParams) {
+                    String s = param.printValue(record);
+                    if (s == null) { //ignore record
+                        return "";
+                    } else {
 //                            paramValues.add(s);
-        }
-        ps.addField(param, s);
-    }
-}
+                    }
+                    ps.addField(param, s);
+                }
+            }
 //                ps.println(outString);
 //                return outString.toString();
-return null;
+            return null;
         }
 
         String PrintRecordFile(ILogRecord record, PrintStreams ps, IQueryResults qr) {
             StringBuilder outString = new StringBuilder(512);
 //                ArrayList<String> paramValues = new ArrayList<>(parameters.size());
-try {
-    if (isShouldPrintRecordType()) {
-        outString.append(excelQuote()).append(record.GetType().toString()).append(excelQuote());
-    }
-    for (Parameter param : parameters) {
-        if (!isShouldAccessFiles() && param instanceof FileParameter) {
-            continue;
-        }
-        if (!isPrintFileLine() && (param instanceof EmbeddedParameter && ((EmbeddedParameter) param).isFileLink())) {
-            continue;
-        }
-        addDelimiter(outString);
-        if (!param.hasFormat()) {
-            String s = param.GetValue(record);
-            if (s == null) { //ignore record
-                return "";
-            } else {
+            try {
+                if (isShouldPrintRecordType()) {
+                    outString.append(excelQuote()).append(record.GetType().toString()).append(excelQuote());
+                }
+                for (Parameter param : parameters) {
+                    if (!isShouldAccessFiles() && param instanceof FileParameter) {
+                        continue;
+                    }
+                    if (!isPrintFileLine() && (param instanceof EmbeddedParameter && ((EmbeddedParameter) param).isFileLink())) {
+                        continue;
+                    }
+                    addDelimiter(outString);
+                    if (!param.hasFormat()) {
+                        String s = param.GetValue(record);
+                        if (s == null) { //ignore record
+                            return "";
+                        } else {
 //                            paramValues.add(s);
-            }
-            outString.append(excelQuote()).append(s).append(excelQuote()); // param is field output parameters (hidden, etc). ignoring for now
+                        }
+                        outString.append(excelQuote()).append(s).append(excelQuote()); // param is field output parameters (hidden, etc). ignoring for now
 //                        ps.addField(param, s);
-        } else {
-            String s1 = param.FormatValue(record);
-            if (s1 == null) {
-                return "";
-            }
+                    } else {
+                        String s1 = param.FormatValue(record);
+                        if (s1 == null) {
+                            return "";
+                        }
 //                        ps.addField(param, s1);
-outString.append(excelQuote()).append(s1).append(excelQuote()); // param is field output parameters (hidden, etc). ignoring for now
-        }
-    }
-    ArrayList<Parameter> addOutParams = qr.getAddOutParams(record.GetType());
-    if (addOutParams != null) {
-        for (Parameter param : addOutParams) {
-            addDelimiter(outString);
-            String s = param.printValue(record);
-            if (s == null) { //ignore record
-                return "";
-            } else {
+                        outString.append(excelQuote()).append(s1).append(excelQuote()); // param is field output parameters (hidden, etc). ignoring for now
+                    }
+                }
+                ArrayList<Parameter> addOutParams = qr.getAddOutParams(record.GetType());
+                if (addOutParams != null) {
+                    for (Parameter param : addOutParams) {
+                        addDelimiter(outString);
+                        String s = param.printValue(record);
+                        if (s == null) { //ignore record
+                            return "";
+                        } else {
 //                            paramValues.add(s);
-            }
+                        }
 //                        ps.addField(param, s);
-outString.append(excelQuote()).append(s).append(excelQuote()); // param is field output parameters (hidden, etc). ignoring for now
-        }
-    }
-    ps.println(outString);
+                        outString.append(excelQuote()).append(s).append(excelQuote()); // param is field output parameters (hidden, etc). ignoring for now
+                    }
+                }
+                ps.println(outString);
 //                return outString.toString();
-return null;
-} catch (Exception e) {
-    inquirer.logger.error("error printing record type " + record.GetType().toString(), e);
-}
-return "";
+                return null;
+            } catch (Exception e) {
+                inquirer.logger.error("error printing record type " + record.GetType().toString(), e);
+            }
+            return "";
         }
     }
 }

@@ -9,7 +9,6 @@ import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Properties;
 
 public class DBServerResults extends IQueryResults {
 

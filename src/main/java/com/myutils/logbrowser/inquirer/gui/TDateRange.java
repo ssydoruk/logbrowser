@@ -11,7 +11,6 @@ import com.github.lgooddatepicker.components.TimePickerSettings;
 import com.github.lgooddatepicker.optionalusertools.PickerUtilities;
 import com.myutils.logbrowser.inquirer.UTCTimeRange;
 import com.myutils.logbrowser.inquirer.inquirer;
-import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -21,10 +20,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import javax.swing.JButton;
-import javax.swing.JFrame;
-import static javax.swing.JFrame.EXIT_ON_CLOSE;
 import javax.swing.JLabel;
-import javax.swing.UIManager;
 import org.apache.logging.log4j.LogManager;
 
 /**
@@ -100,8 +96,8 @@ public class TDateRange extends javax.swing.JPanel {
         dtTo.getTimePicker().getSettings().setDisplayToggleTimeMenuButton(true);
     }
 
-    private DateTimePicker dtFrom;
-    private DateTimePicker dtTo;
+    private final DateTimePicker dtFrom;
+    private final DateTimePicker dtTo;
 
     private DateTimePicker newPicker() {
         DateTimePicker dateTimePicker1 = new DateTimePicker();

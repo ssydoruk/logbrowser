@@ -21,16 +21,14 @@ public final class GenesysMsg extends Message {
     static private final Pattern ptThreadID = Pattern.compile("^(\\[\\S+\\])$");
     static GenesysMsgMap msgMap = new GenesysMsgMap();
 
-
     public static GenesysMsg CheckGenesysMsg(DateParsed dp, Parser p, TableType t, Pattern reg, Pattern ignoreMSGIDs) {
         return CheckGenesysMsg(dp, p, t, reg, ignoreMSGIDs, false);
     }
 
-
     public static GenesysMsg postGenesysMsg(DateParsed dp, Parser p, TableType t, Pattern ignoreMSGIDs,
             String _lastGenesysMsgLevel, String _lastGenesysMsgID, String generatedMsgID, String generatedMsg,
             boolean saveToDB) {
-        GenesysMsg msg ;
+        GenesysMsg msg;
 
         msg = new GenesysMsg(t, _lastGenesysMsgLevel, generatedMsgID, generatedMsg);
 
@@ -60,8 +58,8 @@ public final class GenesysMsg extends Message {
             boolean useFirstWord, boolean saveToDB) {
         Matcher m;
         GenesysMsg msg = null;
-        String _lastGenesysMsgLevel = null;
-        String _lastGenesysMsgID = null;
+        String _lastGenesysMsgLevel;
+        String _lastGenesysMsgID;
         String generatedMsgID = null;
         String generatedMsg = null;
 
@@ -146,12 +144,14 @@ public final class GenesysMsg extends Message {
     private final String msgID;
     private FileInfoType msgType;
     private String line;
+
     public GenesysMsg(TableType t, String level, String msgID, String line) {
         super(t);
         this.level = level;
         this.msgID = msgID;
         this.line = line;
     }
+
     /**
      * Get the value of savedToDB
      *
@@ -160,6 +160,7 @@ public final class GenesysMsg extends Message {
     public boolean isSavedToDB() {
         return savedToDB;
     }
+
     /**
      * Set the value of savedToDB
      *
@@ -168,15 +169,19 @@ public final class GenesysMsg extends Message {
     public void setSavedToDB(boolean savedToDB) {
         this.savedToDB = savedToDB;
     }
+
     public String getLastGenesysMsgLevel() {
         return lastGenesysMsgLevel;
     }
+
     public String getLastGenesysMsgID() {
         return lastGenesysMsgID;
     }
+
     public void setLastGenesysMsgID(String lastGenesysMsgID) {
         this.lastGenesysMsgID = lastGenesysMsgID;
     }
+
     /**
      * Get the value of toIgnore
      *
@@ -185,6 +190,7 @@ public final class GenesysMsg extends Message {
     public boolean isToIgnore() {
         return toIgnore;
     }
+
     /**
      * Set the value of toIgnore
      *
@@ -206,7 +212,6 @@ public final class GenesysMsg extends Message {
         this.line = line;
     }
 
-
     @Override
     public String toString() {
         return super.toString() + "level:" + level + ";msgID=" + msgID + ";msgType=" + msgType + "line:[" + line + "]}";
@@ -215,7 +220,6 @@ public final class GenesysMsg extends Message {
     int getLevel() {
         return Main.getRef(ReferenceType.MSGLEVEL, level);
     }
-
 
     int getMsgID() {
         msgMap.addMap(msgID, line);
@@ -239,7 +243,7 @@ public final class GenesysMsg extends Message {
 //        return Main.getRef(ReferenceType.LOGMESSAGE, buf.toString());
 //    }
     static class GenesysMsgMap extends HashMap<String, ArrayList<String>> {
-        
+
         private void addMap(String msgID, String line) {
             ArrayList<String> storedLine = get(msgID);
             if (storedLine == null) {
@@ -257,7 +261,7 @@ public final class GenesysMsg extends Message {
                 put(msgID, updatedStored);
             }
         }
-        
+
     }
 }
 

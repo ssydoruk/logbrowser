@@ -14,7 +14,7 @@ import java.sql.SQLException;
  */
 class RuntimeQuery {
 
-    private int statID;
+    private final int statID;
 
     public RuntimeQuery(String query) throws SQLException {
         statID = DatabaseConnector.getDatabaseConnector(this).PrepareStatement(query);

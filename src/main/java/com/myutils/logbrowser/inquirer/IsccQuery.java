@@ -13,7 +13,7 @@ import java.util.HashSet;
  *
  * @author ssydoruk
  */
-public class IsccQuery extends IQuery {
+final public class IsccQuery extends IQuery {
 
     private Integer[] m_connectionIds;
     private DynamicTreeNode<OptionNode> node;
@@ -49,6 +49,7 @@ public class IsccQuery extends IQuery {
         this(_eventsSettings, dlg, frm);
         this.refIDs = refIDs;
     }
+
     public void defRefs() throws SQLException {
         addRef("nameID", "name", ReferenceType.ISCCEvent.toString(), FieldType.Mandatory);
         addRef("thisDNID", "thisDN", ReferenceType.DN.toString(), FieldType.Optional);
@@ -109,11 +110,9 @@ public class IsccQuery extends IQuery {
         m_connector = null;
     }
 
-
     public boolean isNoSearchRequest() {
         return noSearchRequest;
     }
-
 
     private String getMyWhere(String alias) throws SQLException {
 
@@ -150,7 +149,6 @@ public class IsccQuery extends IQuery {
 
                 } else {
                     Integer[] ids = null;
-                    ids = cif.getDNs();
                     if ((ids = cif.getDNs()) != null && ids.length > 0) {
                         ret = " ( " + getWhere(alias + ".thisdnid", ids, false)
                                 + " or " + getWhere(alias + ".otherdnid", ids, false) + " )";

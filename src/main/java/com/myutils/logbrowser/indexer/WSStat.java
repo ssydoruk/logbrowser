@@ -13,6 +13,7 @@ import java.util.regex.Pattern;
  * @author terry The class Replicates TLibMessage
  */
 public class WSStat extends Message {
+
     final private static Pattern regConnID = Pattern.compile("^AttributeConnID .+= (\\w+)$");
     final private static Pattern regThisDN = Pattern.compile("^AttributeThisDN .+= \\\"([^\\\"]*)\\\"$");
 
@@ -39,7 +40,6 @@ public class WSStat extends Message {
     public String GetMessageName() {
         return m_MessageName;
     }
-
 
     public String GetThisDN() {
         return SingleQuotes(FindByRx(regThisDN, 1, ""));

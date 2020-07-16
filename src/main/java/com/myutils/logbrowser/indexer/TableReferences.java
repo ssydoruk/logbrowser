@@ -25,7 +25,6 @@ class TableReference {
 
     private int initialID = 0;
 
-
     private final ReferenceType type;
     private final HashMap<CIString, Integer> valRef;
 
@@ -66,6 +65,7 @@ class TableReference {
             }
         }
     }
+
     void updateRef(String key, String toString) {
         CIString ciString = new CIString(key);
         Integer id = valRef.get(ciString);
@@ -74,6 +74,7 @@ class TableReference {
             valRef.put(new CIString(toString), id);
         }
     }
+
     public HashMap<CIString, Integer> getValRef() {
         return valRef;
     }
@@ -226,7 +227,7 @@ class TableReference {
             if (o instanceof CIString) {
                 CIString o1 = (CIString) o;
 //                Main.logger.trace("TableReference equal: object: [" + o1.toString() + "] compare to [" + s + "]; result: [" + o1.s.equalsIgnoreCase(s) + "]");
-return o1.s.equalsIgnoreCase(s);
+                return o1.s.equalsIgnoreCase(s);
             } else {
                 return false;
             }
@@ -237,7 +238,7 @@ return o1.s.equalsIgnoreCase(s);
             if (hashCode == 0) {
                 hashCode = s.toUpperCase().hashCode();
             }
-            
+
             return hashCode;
         }
 

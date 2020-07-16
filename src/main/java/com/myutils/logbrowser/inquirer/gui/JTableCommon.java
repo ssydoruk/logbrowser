@@ -30,6 +30,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -70,20 +71,19 @@ abstract class JTableCommon extends JTablePopup {
 
     static final String RECORD_EMPTY = "<(Empty)>";
 
-    private HashMap<Integer, AColumnFilter> columnFilters = new HashMap<>();
-
+    private final HashMap<Integer, AColumnFilter> columnFilters = new HashMap<>();
 
     Rectangle r = null;
     private Color c;
     TableRowSorter<TableModel> sorter = null;
 
-    private TableCellRenderer savedHeaderRenderer;
+    private final TableCellRenderer savedHeaderRenderer;
     private final JMenuItem miCancelColumnFilter;
 
     JMenuItem miCancelFilters;
     private final JMenuItem showInfo = null;
     protected int copyItemsIdx = 0;
-    private TableColumnAdjuster tca;
+    private final TableColumnAdjuster tca;
     private JTablePopup uniquePopup = null;
 
     public JTableCommon() {
@@ -133,76 +133,81 @@ abstract class JTableCommon extends JTablePopup {
 //        }
 
     }
+
     @Override
-            void callingPopup() {
-                miCancelColumnFilter.setEnabled(popupCol > 0 && columnFilters.containsKey(popupCol));
-                miCancelFilters.setEnabled(!columnFilters.isEmpty());
-            }
-            public void showInfo() {
-                TabResultDataModel model = (TabResultDataModel) getModel();
-                HashMap<MsgType, Integer> typeStat = model.getTypeStat(this);
-                
-                DefaultTableModel infoTableModel = new DefaultTableModel();
-                infoTableModel.addColumn("Type name");
-                infoTableModel.addColumn("count");
-                int grandTotal = 0;
-                for (Map.Entry<MsgType, Integer> entry : typeStat.entrySet()) {
-                    infoTableModel.addRow(new Object[]{entry.getKey(), entry.getValue()});
-                    grandTotal += entry.getValue();
-                }
-                infoTableModel.addRow(new Object[]{"TOTAL", grandTotal});
-                
-                JTable tab = new JTable(infoTableModel);
-                JPanel jScrollPane = new JPanel(new BorderLayout());
-                jScrollPane.add(tab);
-                inquirer.showInfoPanel((Window) this.getRootPane().getParent(),
-                        ((this.getRowSorter() == null) ? "Full table" : "Filtered") + " - number of records by type", jScrollPane, true);
-                
-                inquirer.logger.trace(this.getSelectedRow() + " : " + this.getSelectedColumn());
-                
-            }
-            @Override
-            protected void paintComponent(Graphics g) {
+    void callingPopup() {
+        miCancelColumnFilter.setEnabled(popupCol > 0 && columnFilters.containsKey(popupCol));
+        miCancelFilters.setEnabled(!columnFilters.isEmpty());
+    }
+
+    public void showInfo() {
+        TabResultDataModel model = (TabResultDataModel) getModel();
+        HashMap<MsgType, Integer> typeStat = model.getTypeStat(this);
+
+        DefaultTableModel infoTableModel = new DefaultTableModel();
+        infoTableModel.addColumn("Type name");
+        infoTableModel.addColumn("count");
+        int grandTotal = 0;
+        for (Map.Entry<MsgType, Integer> entry : typeStat.entrySet()) {
+            infoTableModel.addRow(new Object[]{entry.getKey(), entry.getValue()});
+            grandTotal += entry.getValue();
+        }
+        infoTableModel.addRow(new Object[]{"TOTAL", grandTotal});
+
+        JTable tab = new JTable(infoTableModel);
+        JPanel jScrollPane = new JPanel(new BorderLayout());
+        jScrollPane.add(tab);
+        inquirer.showInfoPanel((Window) this.getRootPane().getParent(),
+                ((this.getRowSorter() == null) ? "Full table" : "Filtered") + " - number of records by type", jScrollPane, true);
+
+        inquirer.logger.trace(this.getSelectedRow() + " : " + this.getSelectedColumn());
+
+    }
+
+    @Override
+    protected void paintComponent(Graphics g) {
 //        inquirer.logger.debug("paintComponent");
-super.paintComponent(g);
-if (r != null) {
-    Graphics2D g2 = (Graphics2D) g;
-    g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-            RenderingHints.VALUE_ANTIALIAS_ON);
-    g2.setPaint(c);
-    g2.draw(r);
+        super.paintComponent(g);
+        if (r != null) {
+            Graphics2D g2 = (Graphics2D) g;
+            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+                    RenderingHints.VALUE_ANTIALIAS_ON);
+            g2.setPaint(c);
+            g2.draw(r);
 //            inquirer.logger.debug("paintComponent: "+r);
-}
-            }
-            private void doCancelFilters() {
-                int sel = popupRow;
-                if (sel >= 0) {
-                    sel = convertRowIndexToModel(sel);
-                }
-                for (Integer key : columnFilters.keySet()) {
-                    getColumnModel().getColumn(key).setHeaderRenderer(savedHeaderRenderer);
-                }
-                
-                getTableHeader().repaint();
-                setRowSorter(null);
-                columnFilters.clear();
-                boolean resizeColumns = tca.isResizeColumns();
-                tca.setResizeColumns(false);
-                ((AbstractTableModel) getModel()).fireTableDataChanged();
-                tca.setResizeColumns(resizeColumns);
-                if (sel >= 0) {
-                    setRowSelectionInterval(sel, sel);
-                    scrollRectToVisible(new Rectangle(getCellRect(sel, 0, true)));
-                } else {
-                    sel = -1;
-                }
-            }
-            public void setRect(Rectangle r, Color c) {
-                this.r = r;
-                this.c = c;
+        }
+    }
+
+    private void doCancelFilters() {
+        int sel = popupRow;
+        if (sel >= 0) {
+            sel = convertRowIndexToModel(sel);
+        }
+        for (Integer key : columnFilters.keySet()) {
+            getColumnModel().getColumn(key).setHeaderRenderer(savedHeaderRenderer);
+        }
+
+        getTableHeader().repaint();
+        setRowSorter(null);
+        columnFilters.clear();
+        boolean resizeColumns = tca.isResizeColumns();
+        tca.setResizeColumns(false);
+        ((AbstractTableModel) getModel()).fireTableDataChanged();
+        tca.setResizeColumns(resizeColumns);
+        if (sel >= 0) {
+            setRowSelectionInterval(sel, sel);
+            scrollRectToVisible(new Rectangle(getCellRect(sel, 0, true)));
+        } else {
+            sel = -1;
+        }
+    }
+
+    public void setRect(Rectangle r, Color c) {
+        this.r = r;
+        this.c = c;
 //        invalidate();
 //        repaint();
-            }
+    }
 
     public void adjustColumns() {
         tca.adjustColumns();
@@ -273,7 +278,6 @@ if (r != null) {
         return ret;
     }
 
-
     private JMenu directionFilter() {
         JMenu sectionsMenu = new JMenu("Directional filter");
         JMenuItem menuItem1 = new JMenuItem(new DirectionalFilterMenu("Current and above", true));
@@ -282,35 +286,37 @@ if (r != null) {
         sectionsMenu.add(menuItem2);
         return sectionsMenu;
     }
+
     private void applyFilter() {
-        
+
         ArrayList<RowSetFilter> andFilters = new ArrayList<>();
         DefaultTableCellRenderer headerRenderer = new DefaultTableCellRenderer();
         headerRenderer.setBackground(Color.RED);
 //        headerRenderer.setForeground(Color.RED);
 //        getTableHeader().setDefaultRenderer(headerRenderer);
-for (Map.Entry<Integer, AColumnFilter> entrySet : columnFilters.entrySet()) {
-    Integer key = entrySet.getKey();
-    AColumnFilter value = entrySet.getValue();
-    
-    getColumnModel().getColumn(key).setHeaderRenderer(headerRenderer);
-    
+        for (Map.Entry<Integer, AColumnFilter> entrySet : columnFilters.entrySet()) {
+            Integer key = entrySet.getKey();
+            AColumnFilter value = entrySet.getValue();
+
+            getColumnModel().getColumn(key).setHeaderRenderer(headerRenderer);
+
 //            for (int i = 0; i < getModel().getColumnCount(); i++) {
 //        getColumnModel().getColumn(i).setHeaderRenderer(headerRenderer);
 //}
-andFilters.add(new RowSetFilter(key, value));
+            andFilters.add(new RowSetFilter(key, value));
 
-}
-sorter.setRowFilter(RowFilter.andFilter(andFilters));
-setRowSorter(sorter);
-boolean resizeColumns = tca.isResizeColumns();
-tca.setResizeColumns(false);
-((AbstractTableModel) getModel()).fireTableDataChanged();
-tca.setResizeColumns(resizeColumns);
+        }
+        sorter.setRowFilter(RowFilter.andFilter(andFilters));
+        setRowSorter(sorter);
+        boolean resizeColumns = tca.isResizeColumns();
+        tca.setResizeColumns(false);
+        ((AbstractTableModel) getModel()).fireTableDataChanged();
+        tca.setResizeColumns(resizeColumns);
 //        getTableHeader().invalidate();
 //        getTableHeader().repaint();
 
     }
+
     @Override
     public void setModel(TableModel dataModel) {
         setRowSorter(null);
@@ -321,6 +327,7 @@ tca.setResizeColumns(resizeColumns);
 //        }
 
     }
+
     public void exportExcel(JTableCommon jTableCommon) {
         ArrayList<String> printFile = null;
         try {
@@ -331,7 +338,7 @@ tca.setResizeColumns(resizeColumns);
                 printStream.print("\"" + getColumnName(j) + "\",");
             }
             printStream.print("\n");
-            
+
             for (int i = 0; i < getRowCount(); i++) {
                 for (int j = 0; j < getColumnCount(); j++) {
                     printStream.print("\"" + getValueAt(i, j) + "\",");
@@ -339,19 +346,20 @@ tca.setResizeColumns(resizeColumns);
                 printStream.print("\n");
             }
             printStream.close();
-            
+
             printFile = new ArrayList<>(1);
             printFile.add(f.getAbsolutePath());
             Excel.reportEdit(printFile);
-        } catch (Exception e) {
+        } catch (IOException e) {
             inquirer.ExceptionHandler.handleException("export to Excel", e);
         }
-        
+
     }
+
     protected class DirectionalFilterMenu extends AbstractAction {
-        
+
         private jdNumberFilter flt;
-        private boolean isUp;
+        private final boolean isUp;
 
         private DirectionalFilterMenu(String current_and_above, boolean b) {
             super(current_and_above);
@@ -386,7 +394,6 @@ tca.setResizeColumns(resizeColumns);
         public void actionPerformed(ActionEvent e) {
             uniqueColumnValues(e);
         }
-
 
         public void uniqueColumnValues(ActionEvent e) {
             Component c = (Component) e.getSource();
@@ -495,7 +502,6 @@ tca.setResizeColumns(resizeColumns);
             super("Unique values in column (all)", true);
         }
     }
-
 
     protected class CancelColumnFilter extends AbstractAction {
 
@@ -830,12 +836,13 @@ tca.setResizeColumns(resizeColumns);
     class InfoPanel extends StandardDialog {
 
         private int closeCause = JOptionPane.CANCEL_OPTION;
-        private JTable tab;
+        private final JTable tab;
         JButton jbFilter;
+
         InfoPanel(Window parent, String title, JTable tab) {
             super(parent, title);
             this.tab = tab;
-            
+
         }
 
         public int getCloseCause() {
@@ -854,7 +861,6 @@ tca.setResizeColumns(resizeColumns);
                     : "Filter with " + rowsSelected + " items");
         }
 
-
         public void doShow() {
             setModal(true);
 
@@ -865,7 +871,7 @@ tca.setResizeColumns(resizeColumns);
                 for (int i = 0; i < tab.getRowCount(); i++) {
                     s.setLength(0);
                     for (int j = 0; j < tab.getColumnCount(); j++) {
-                        s.append("[" + tab.getValueAt(i, j) + "],");
+                        s.append("[").append(tab.getValueAt(i, j)).append("],");
                     }
                     inquirer.logger.trace(s);
                 }
@@ -898,7 +904,6 @@ tca.setResizeColumns(resizeColumns);
             listPane.add(new JPanel(new BorderLayout()).add(jScrollPane));
             return listPane;
         }
-
 
         @Override
         public ButtonPanel createButtonPanel() {
@@ -957,7 +962,6 @@ tca.setResizeColumns(resizeColumns);
         }
     }
 
-
     private class RowSetFilter extends RowFilter<TableModel, Object> {
 
         private final Integer col;
@@ -990,6 +994,5 @@ tca.setResizeColumns(resizeColumns);
         }
 
     }
-
 
 }

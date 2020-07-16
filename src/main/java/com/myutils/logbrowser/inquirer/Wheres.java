@@ -14,8 +14,8 @@ import java.util.ArrayList;
  */
 class Wheres {
 
-
     ArrayList<Where> wh = new ArrayList<>();
+
     void addWhere(Wheres addWh) {
         if (addWh != null) {
             wh.add(new Where(addWh, null));
@@ -23,9 +23,9 @@ class Wheres {
     }
 
     public Where addWhere(String st, String andOr) {
-        
+
         if (st != null && st.length() > 0) {
-            Where ret=new Where(st, andOr);
+            Where ret = new Where(st, andOr);
             wh.add(ret);
             return ret;
         }

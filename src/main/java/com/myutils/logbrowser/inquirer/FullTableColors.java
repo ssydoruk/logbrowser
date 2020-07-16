@@ -19,15 +19,16 @@ import java.util.HashSet;
  */
 public class FullTableColors {
 
-    private ArrayList<ArrayList<Object>> data;
-    private ArrayList<Pair<Color, Color>> columnColors;
+    private final ArrayList<ArrayList<Object>> data;
+    private final ArrayList<Pair<Color, Color>> columnColors;
     private int curColorIdx;
     private String fieldColorChange = null;
     private int colorIdx = -1;
     private Object prevColorCell = null;
     private ArrayList<String> columnNames = null;
     private ArrayList<Integer> columnTypes = null;
-    private HashSet<String> hiddenFields = new HashSet<>();
+    private final HashSet<String> hiddenFields = new HashSet<>();
+
     public FullTableColors() {
         data = new ArrayList<>();
         columnColors = new ArrayList<>();
@@ -45,7 +46,6 @@ public class FullTableColors {
     public ArrayList<Pair<Color, Color>> getColumnColors() {
         return columnColors;
     }
-
 
     public void setMetaData(ResultSetMetaData rsmd) throws SQLException {
         columnNames = new ArrayList<>(rsmd.getColumnCount());
@@ -119,7 +119,6 @@ public class FullTableColors {
         }
         return -1;
     }
-
 
     void setHiddenField(String rowType) {
         hiddenFields.add(rowType);

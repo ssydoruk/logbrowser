@@ -25,7 +25,6 @@ public class Ixn extends Message {
     final private static Pattern regIxnActor = Pattern.compile("^\\s+attr_actor_router_id .+ \"([^\"]+)\"$");
     final private static Pattern regIxnSubmitted = Pattern.compile("^\\s+attr_itx_submitted_by .+ \"([^\"]+)\"$");
 
-
     private static final Regexs AgentIDs = new Regexs(new Pair[]{
         new Pair("^\\s+attr_agent_id.+ \"([^\"]+)\"$", 1),
         new Pair("^\\s+attr_actor_agent_id.+ \"([^\"]+)\"$", 1),
@@ -96,30 +95,30 @@ public class Ixn extends Message {
     MessageAttributes attrs = new MessageAttributes();
     Attribute ixnID = new Attribute() {
         @Override
-                String getValue() {
-                    return FindByRx(IxnIDs);
-                }
+        String getValue() {
+            return FindByRx(IxnIDs);
+        }
     };
     Attribute attr1 = new Attribute() {
         @Override
-                String getValue() {
-                    String retService = FindByRx(regService, 1, null);
-                    String retMethod = FindByRx(regMethod, 1, null);
-                    StringBuilder ret = new StringBuilder(50);
-                    if (retService != null) {
-                        ret.append(retService);
-                    }
-                    if (retMethod != null) {
-                        if (ret.length() > 0) {
-                            ret.append("|");
-                        }
-                        ret.append(retMethod);
-                    }
-                    if (ret.length() > 0) {
-                        return ret.toString();
-                    }
-                    return null;
+        String getValue() {
+            String retService = FindByRx(regService, 1, null);
+            String retMethod = FindByRx(regMethod, 1, null);
+            StringBuilder ret = new StringBuilder(50);
+            if (retService != null) {
+                ret.append(retService);
+            }
+            if (retMethod != null) {
+                if (ret.length() > 0) {
+                    ret.append("|");
                 }
+                ret.append(retMethod);
+            }
+            if (ret.length() > 0) {
+                return ret.toString();
+            }
+            return null;
+        }
     };
 
     public Ixn(TableType t, ArrayList messageLines) {
@@ -177,7 +176,7 @@ public class Ixn extends Message {
             if ((m = regMsgAndClient.matcher(m_MessageLines.get(0))).find()) {
                 clientName = m.group(3);
                 String msg = m.group(1);
-                
+
                 if (m.group(2).startsWith("f")) {
                     Main.logger.debug("[-3-]");
 
@@ -188,11 +187,10 @@ public class Ixn extends Message {
                     SetInbound(false);
                 }
                 Matcher m1;
-                if((m = regMsgAndClientProxy.matcher(m_MessageLines.get(0).substring(m.end()))).find()){
-                    clientName=m.group(1);
+                if ((m = regMsgAndClientProxy.matcher(m_MessageLines.get(0).substring(m.end()))).find()) {
+                    clientName = m.group(1);
                 }
-                
-                        
+
                 return msg;
             }
             ret = FindByRx(regMsgName, m_MessageLines.get(0), 1, null);
@@ -228,7 +226,6 @@ public class Ixn extends Message {
         return null;
 
     }
-
 
     String GetIxnID() {
         return ixnID.toString();
@@ -277,11 +274,9 @@ public class Ixn extends Message {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
-
     String getAttr1() {
         return attr1.toString();
     }
-
 
     String getAttr2() {
         String msgName = GetMessageName();
