@@ -21,6 +21,25 @@ public class ConfServerResults extends IQueryResults {
 
     private int m_componentFilter;
     private ArrayList<NameID> appsType;
+    private IDsFinder cidFinder = null;
+    /**
+     *
+     */
+    public ConfServerResults(QueryDialogSettings qdSettings) throws SQLException {
+        super(qdSettings);
+        if (repComponents.isEmpty()) {
+            loadStdOptions();
+        }
+        addSelectionType(SelectionType.NO_SELECTION);
+        addSelectionType(SelectionType.GUESS_SELECTION);
+        addSelectionType(SelectionType.AGENT);
+        
+    }
+    public ConfServerResults() throws SQLException {
+        super();
+        loadStdOptions();
+//        repComponents.getRoot().addChild(addLogMessagesReportType(TableType.MsgTServer));
+    }
 
     @Override
     public String getReportSummary() {
@@ -46,25 +65,6 @@ public class ConfServerResults extends IQueryResults {
         return "ConfServer";
     }
 
-    /**
-     *
-     */
-    public ConfServerResults(QueryDialogSettings qdSettings) throws SQLException {
-        super(qdSettings);
-        if (repComponents.isEmpty()) {
-            loadStdOptions();
-        }
-        addSelectionType(SelectionType.NO_SELECTION);
-        addSelectionType(SelectionType.GUESS_SELECTION);
-        addSelectionType(SelectionType.AGENT);
-
-    }
-
-    public ConfServerResults() throws SQLException {
-        super();
-        loadStdOptions();
-//        repComponents.getRoot().addChild(addLogMessagesReportType(TableType.MsgTServer));
-    }
 
     public void AddComponent(int filter) {
         m_componentFilter = m_componentFilter | filter;
@@ -170,7 +170,6 @@ public class ConfServerResults extends IQueryResults {
     void SetConfig(InquirerCfg cr) {
 //        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
-    private IDsFinder cidFinder = null;
 
     @Override
     public void Retrieve(QueryDialog dlg) throws SQLException {

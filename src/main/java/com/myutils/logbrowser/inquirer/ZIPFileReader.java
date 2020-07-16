@@ -24,11 +24,7 @@ public class ZIPFileReader extends RandomFileReader {
     ZipEntry entry;
     private BufferedInputStream curStream;
 
-    private void openZIPStream() throws IOException {
-        curStream = IOUtils.buffer(logArchive.getInputStream(entry));
-
-    }
-
+    long currentPos;
     public ZIPFileReader(LogFile fileName) throws FileNotFoundException, IOException {
         this.logFile = fileName;
         inquirer.logger.debug("ZIPFileReader: " + logFile);
@@ -41,7 +37,10 @@ public class ZIPFileReader extends RandomFileReader {
             logArchive = null;
         }
     }
-    long currentPos;
+    private void openZIPStream() throws IOException {
+        curStream = IOUtils.buffer(logArchive.getInputStream(entry));
+        
+    }
 
     @Override
     public int Read(long offset, int bytes, byte[] buf) throws IOException {

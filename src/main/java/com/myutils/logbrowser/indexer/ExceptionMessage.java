@@ -8,8 +8,8 @@ import java.util.*;
 
 public class ExceptionMessage extends Message {
 
-    private String exception;
-    private String msg;
+    private final String exception;
+    private final String msg;
 
     ExceptionMessage(ArrayList<String> m_MessageContents, String m_msgName, String m_msg1) {
         super(TableType.WWEException);

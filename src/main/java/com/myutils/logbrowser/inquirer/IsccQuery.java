@@ -11,7 +11,7 @@ import java.util.HashSet;
 
 /**
  *
- * @author kvoroshi
+ * @author ssydoruk
  */
 public class IsccQuery extends IQuery {
 
@@ -20,15 +20,8 @@ public class IsccQuery extends IQuery {
     private IDsFinder cif;
     private HashSet<Long> refIDs;
 
-    public void defRefs() throws SQLException {
-        addRef("nameID", "name", ReferenceType.ISCCEvent.toString(), FieldType.Mandatory);
-        addRef("thisDNID", "thisDN", ReferenceType.DN.toString(), FieldType.Optional);
-        addRef("otherDNID", "otherDN", ReferenceType.DN.toString(), FieldType.Optional);
-        addRef("ConnectionIDID", "ConnectionID", ReferenceType.ConnID.toString(), FieldType.Optional);
-        addRef("otherConnectionIDID", "OtherConnectionID", ReferenceType.ConnID.toString(), FieldType.Optional);
-        addRef("srcTServerID", "source", ReferenceType.App.toString(), FieldType.Optional);
-        addRef("srcSwitchID", "sourceSwitch", ReferenceType.Switch.toString(), FieldType.Optional);
-    }
+    private boolean noSearchRequest = true;
+    HashSet<Long> tmpIDs;
 
     public IsccQuery(Integer[] connectionIds) throws SQLException {
         this.noSearchRequest = true;
@@ -55,6 +48,15 @@ public class IsccQuery extends IQuery {
             QueryDialog dlg, IQueryResults frm) throws SQLException {
         this(_eventsSettings, dlg, frm);
         this.refIDs = refIDs;
+    }
+    public void defRefs() throws SQLException {
+        addRef("nameID", "name", ReferenceType.ISCCEvent.toString(), FieldType.Mandatory);
+        addRef("thisDNID", "thisDN", ReferenceType.DN.toString(), FieldType.Optional);
+        addRef("otherDNID", "otherDN", ReferenceType.DN.toString(), FieldType.Optional);
+        addRef("ConnectionIDID", "ConnectionID", ReferenceType.ConnID.toString(), FieldType.Optional);
+        addRef("otherConnectionIDID", "OtherConnectionID", ReferenceType.ConnID.toString(), FieldType.Optional);
+        addRef("srcTServerID", "source", ReferenceType.App.toString(), FieldType.Optional);
+        addRef("srcSwitchID", "sourceSwitch", ReferenceType.Switch.toString(), FieldType.Optional);
     }
 
     @Override
@@ -107,13 +109,11 @@ public class IsccQuery extends IQuery {
         m_connector = null;
     }
 
-    private boolean noSearchRequest = true;
 
     public boolean isNoSearchRequest() {
         return noSearchRequest;
     }
 
-    HashSet<Long> tmpIDs;
 
     private String getMyWhere(String alias) throws SQLException {
 

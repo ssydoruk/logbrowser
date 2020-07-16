@@ -34,22 +34,45 @@ import javax.swing.table.DefaultTableCellRenderer;
  */
 public class QueryJTable extends JTableCommon {
 
+
+    static ZoneId zoneId = ZoneId.systemDefault();
+    private static final DefaultTableCellRenderer DEFAULT_RENDERER = new DefaultTableCellRenderer();
+    public static void setResize(JTable table) {
+//        for (int column = 0; column < table.getColumnCount(); column++) {
+//            TableColumn tableColumn = table.getColumnModel().getColumn(column);
+//            int preferredWidth = tableColumn.getMinWidth();
+//            int maxWidth = tableColumn.getMaxWidth();
+//
+//            for (int row = 0; row < table.getRowCount(); row++) {
+//                TableCellRenderer cellRenderer = table.getCellRenderer(row, column);
+//                Component c = table.prepareRenderer(cellRenderer, row, column);
+//                int width = c.getPreferredSize().width + table.getIntercellSpacing().width;
+//                preferredWidth = Math.max(preferredWidth, width);
+//
+//                //  We've exceeded the maximum width, no need to check other rows
+//                if (preferredWidth >= maxWidth) {
+//                    preferredWidth = maxWidth;
+//                    break;
+//                }
+//            }
+//
+//            tableColumn.setPreferredWidth(preferredWidth + 5);
+//        }
+    }
     public QueryJTable(FullTableColors tabs) throws Exception {
         super();
 
         this.setModel(new DataModel(tabs));
 //        setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
 
-        Font font = this.getFont();
+Font font = this.getFont();
 
-        setDefaultRenderer(Object.class, new QueryJTableCellRenderer(new Font(font.getName(), Font.BOLD, font.getSize())));
-        TableColumnAdjuster tca = getTca();
-        tca.setColumnHeaderIncluded(true);
-        tca.adjustColumns();
+setDefaultRenderer(Object.class, new QueryJTableCellRenderer(new Font(font.getName(), Font.BOLD, font.getSize())));
+TableColumnAdjuster tca = getTca();
+tca.setColumnHeaderIncluded(true);
+tca.adjustColumns();
 
     }
-
-    static ZoneId zoneId = ZoneId.systemDefault();
 
     @Override
     void theMousePressed(MouseEvent e) {
@@ -71,6 +94,12 @@ public class QueryJTable extends JTableCommon {
 
     protected class DataModel extends AbstractTableModel {
 
+
+        private FullTableColors tabData;
+
+        private DataModel(FullTableColors tabs) {
+            this.tabData = tabs;
+        }
         public ArrayList<String> exportToExcel() throws FileNotFoundException {
             String fileNameExcel = inquirer.getCr().getFileNameExcel();
             File f = new File(fileNameExcel);
@@ -92,12 +121,6 @@ public class QueryJTable extends JTableCommon {
             ret.add(f.getAbsolutePath());
 
             return ret;
-        }
-
-        private FullTableColors tabData;
-
-        private DataModel(FullTableColors tabs) {
-            this.tabData = tabs;
         }
 
         @Override
@@ -205,29 +228,6 @@ public class QueryJTable extends JTableCommon {
 
     }
 
-    public static void setResize(JTable table) {
-//        for (int column = 0; column < table.getColumnCount(); column++) {
-//            TableColumn tableColumn = table.getColumnModel().getColumn(column);
-//            int preferredWidth = tableColumn.getMinWidth();
-//            int maxWidth = tableColumn.getMaxWidth();
-//
-//            for (int row = 0; row < table.getRowCount(); row++) {
-//                TableCellRenderer cellRenderer = table.getCellRenderer(row, column);
-//                Component c = table.prepareRenderer(cellRenderer, row, column);
-//                int width = c.getPreferredSize().width + table.getIntercellSpacing().width;
-//                preferredWidth = Math.max(preferredWidth, width);
-//
-//                //  We've exceeded the maximum width, no need to check other rows
-//                if (preferredWidth >= maxWidth) {
-//                    preferredWidth = maxWidth;
-//                    break;
-//                }
-//            }
-//
-//            tableColumn.setPreferredWidth(preferredWidth + 5);
-//        }
-    }
-    private static final DefaultTableCellRenderer DEFAULT_RENDERER = new DefaultTableCellRenderer();
 
     class QueryJTableCellRenderer extends DefaultTableCellRenderer {
 

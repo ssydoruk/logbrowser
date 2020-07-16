@@ -19,23 +19,12 @@ import org.apache.commons.lang3.StringUtils;
  *
  * @author ssydoruk
  */
-class DateParsers {
+final class DateParsers {
 
     private ArrayList<Parser.DateFmt> dateFormats = new ArrayList<>();
     private ArrayList<Parser.DateFmt> prefferedFormats = null;
     private boolean checkRegex = true;
 
-    public void setCheckRegex(boolean checkRegex) {
-        this.checkRegex = checkRegex;
-        Main.logger.trace("checkRegex " + checkRegex);
-    }
-
-    public void setPrefferedFormats(ArrayList<Parser.DateFmt> _prefferedFormats) {
-        // if null passed, it will clear prefferedFormats and so parser will use default set of formats
-        // null to fix bug with multiple SIP Server files
-        this.prefferedFormats = _prefferedFormats;
-        Main.logger.trace("setPrefferedFormats");
-    }
     private Parser.DateFmt lastFmtMatched;
 
     public DateParsers() {
@@ -61,6 +50,16 @@ class DateParsers {
 //        Start time: [Wed Jan 17 08:37:07 CST 2018]
         AddFormat("^\\w{3} \\w{3} \\d{2} \\d{2}:\\d{2}:\\d{2} \\w{3} \\d{4}", "EEE MMM y HH:mm:ss zzz yyyy");
 
+    }
+    public void setCheckRegex(boolean checkRegex) {
+        this.checkRegex = checkRegex;
+        Main.logger.trace("checkRegex " + checkRegex);
+    }
+    public void setPrefferedFormats(ArrayList<Parser.DateFmt> _prefferedFormats) {
+        // if null passed, it will clear prefferedFormats and so parser will use default set of formats
+        // null to fix bug with multiple SIP Server files
+        this.prefferedFormats = _prefferedFormats;
+        Main.logger.trace("setPrefferedFormats");
     }
 
     /*
@@ -183,7 +182,8 @@ class DateParsers {
 
 }
 
-class DateParsed {
+final class DateParsed {
+    private static final DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
 
     String date;
     String rest;
@@ -197,13 +197,6 @@ class DateParsed {
         fmtDate = d.fmtDate;
     }
     
-    private static final DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-
-
-    @Override
-    public String toString() {
-        return "DateParsed{" + "date=" + date + ", rest=" + rest + ", fmtDate=" + dateFormat.format(fmtDate) + '}';
-    }
 
     DateParsed(String orig, String date, String rest) {
         this.date = date;
@@ -216,7 +209,11 @@ class DateParsed {
         this.date = date;
         this.rest = StringUtils.trimToEmpty(rest);
         this.fmtDate = f;
-        Main.logger.trace(this);
+        Main.logger.trace(toString());
+    }
+    @Override
+    public String toString() {
+        return "DateParsed{" + "date=" + date + ", rest=" + rest + ", fmtDate=" + dateFormat.format(fmtDate) + '}';
     }
 
     void addDay() {

@@ -21,7 +21,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Hashtable;
 import java.util.List;
 import java.util.Set;
 import javax.swing.JScrollPane;
@@ -44,16 +43,10 @@ class IxnIDs {
 
 class SearchIDs {
 
-    static class IDFound {
 
-        public IDFound(IDType idType, int id) {
-            this.idType = idType;
-            this.id = id;
-        }
-        public IDType idType;
-        public int id;
-    }
+    final static int m_maxDepth = 5;
 
+    private static final HashMap<Integer, Integer> tmpConnIDs = new HashMap();
     private static Integer[] getCallIDs(Integer[] ids) throws SQLException {
         tmpConnIDs.clear();
         for (String tab : new String[]{"tlib_logbr", "ocs_logbr", "ors_logbr", "urs_logbr"}) {
@@ -62,7 +55,6 @@ class SearchIDs {
         }
         return tmpConnIDs.keySet().toArray(new Integer[tmpConnIDs.size()]);
     }
-
     private static Integer[] getIxnIDs(Integer[] ids) throws SQLException {
         tmpConnIDs.clear();
         for (String tab : new String[]{"orsmm"}) {
@@ -71,10 +63,6 @@ class SearchIDs {
         }
         return tmpConnIDs.keySet().toArray(new Integer[tmpConnIDs.size()]);
     }
-
-    final static int m_maxDepth = 5;
-
-    static private HashMap<Integer, Integer> tmpConnIDs = new HashMap();
 
     static private boolean addTmp(Integer[] ids) {
         boolean ret = false;
@@ -128,15 +116,6 @@ class SearchIDs {
         return null;
     }
 
-    private HashMap<IDType, Integer[]> CallIDs = new HashMap<>();
-
-    public Integer[] getIDs(IDType idType) {
-        Integer[] ret = CallIDs.get(idType);
-        if (ret != null && ret.length > 0) {
-            return ret;
-        }
-        return null;
-    }
 
     public static SearchIDs getRoutingIDs(String[] ids) {
         return null;
@@ -423,6 +402,14 @@ class SearchIDs {
 
         return null;
     }
+    private HashMap<IDType, Integer[]> CallIDs = new HashMap<>();
+    public Integer[] getIDs(IDType idType) {
+        Integer[] ret = CallIDs.get(idType);
+        if (ret != null && ret.length > 0) {
+            return ret;
+        }
+        return null;
+    }
 
     private void AddIDs(IDType idType, Integer[] IDs) {
         /*should extend list by ID type */
@@ -441,6 +428,17 @@ class SearchIDs {
 
     boolean idFound() {
         return !CallIDs.isEmpty();
+    }
+
+    static class IDFound {
+
+        public IDType idType;
+        public int id;
+
+        public IDFound(IDType idType, int id) {
+            this.idType = idType;
+            this.id = id;
+        }
     }
 
 }
@@ -481,29 +479,10 @@ enum IDType {
 }
 
 abstract public class QueryTools {
+    private static ArrayList<String> queryMessages = new ArrayList<String>();private static final int SPLIT_ON = 300;
+    private static final HashMap<String, String> tableTypeByFileType = initTabTypes();
+    private static final HashMap<String, FileInfoType> timeDiffByFileType = initTimeDiffTypes();
 
-    protected boolean printAlone = false; // should print records as they are extracted. Used for file output
-
-    private boolean limitQueryResults;
-    private int maxQueryLines;
-    protected PrintStreams ps = null;
-
-    public boolean isLimitQueryResults() {
-        return limitQueryResults;
-    }
-
-    public int getMaxQueryLines() {
-        return maxQueryLines;
-    }
-
-    void setQueryLimit(boolean limitQueryResults, int maxQueryLines) {
-        this.limitQueryResults = limitQueryResults;
-        this.maxQueryLines = maxQueryLines;
-    }
-
-    public void setPrintAlone(boolean printAlone) {
-        this.printAlone = printAlone;
-    }
 
     public static ArrayList<Integer> sortedArray(Integer[] ids) {
         ArrayList<Integer> idsh = new ArrayList<>(Arrays.asList(ids));
@@ -560,20 +539,6 @@ abstract public class QueryTools {
 
     }
 
-    private IQueryResults.ProgressNotifications progressCallback;
-
-    public void setProgressCallback(IQueryResults.ProgressNotifications progressCallback) {
-        this.progressCallback = progressCallback;
-    }
-
-    protected void tellProgress(String s) {
-        inquirer.logger.debug("Progress: " + s);
-        if (progressCallback != null) {
-            progressCallback.sayProgress(s);
-        }
-    }
-
-    private static ArrayList<String> queryMessages = new ArrayList<String>();
 
     static public boolean queryMessagesAdd(String e) {
         return queryMessages.add(e);
@@ -613,9 +578,9 @@ abstract public class QueryTools {
                 }
             } catch (SQLException E) {
                 inquirer.ExceptionHandler.handleException("\t error printing records\n", E);
-            } catch (Exception e) {
+            } catch (RuntimeInterruptException e) {
                 System.out.println("e");
-                e.printStackTrace();
+                inquirer.logger.error(e);
                 throw e;
             }
         }
@@ -674,11 +639,6 @@ abstract public class QueryTools {
         return "";
     }
 
-    int LowestID(Hashtable m_callIdHash) {
-        List sortedKeys = new ArrayList(m_callIdHash.keySet());
-        Collections.sort(sortedKeys);
-        return (Integer) sortedKeys.get(0);
-    }
 
     public static String getWhere(String Field, String[] ids) {
         return getWhere(Field, ids, false, false);
@@ -688,7 +648,6 @@ abstract public class QueryTools {
         return getWhere(Field, ids, addWhere, true);
     }
 
-    private static final int SPLIT_ON = 300;
 
     public static String getWhere(String Field, String[] ids, boolean addWhere, boolean isRegex) {
         return IQuery.getWhere(Field, ids, addWhere, isRegex);
@@ -739,8 +698,6 @@ abstract public class QueryTools {
         return ret.toString();
     }
 
-    private static final HashMap<String, String> tableTypeByFileType = initTabTypes();
-    private static final HashMap<String, FileInfoType> timeDiffByFileType = initTimeDiffTypes();
 
     public static String TLibTableByFileType(String t) {
         return tableTypeByFileType.get(t);
@@ -847,7 +804,7 @@ abstract public class QueryTools {
 
     public static Integer[] getRefIDs(ReferenceType rt, String[] names, boolean isRegEx) throws SQLException {
         if (DatabaseConnector.refTableExist(rt)) {
-            String wh = "";
+            String wh ;
             if (!isRegEx) {
                 wh = getWhere("name", names, true);
             } else {
@@ -875,8 +832,8 @@ abstract public class QueryTools {
     }
 
     public static String[] getRefNames(Object owner, ReferenceType rt, String CheckTab, String CheckIDField, String CheckIDField1) throws SQLException {
-        if (DatabaseConnector.getDatabaseConnector(owner).refTableExist(rt) && (CheckTab == null || DatabaseConnector.TableExist(CheckTab))) {
-            return DatabaseConnector.getDatabaseConnector(owner).getRefNames(owner, rt.toString(), CheckTab, CheckIDField, CheckIDField1);
+        if (DatabaseConnector.refTableExist(rt) && (CheckTab == null || DatabaseConnector.TableExist(CheckTab))) {
+            return DatabaseConnector.getRefNames(owner, rt.toString(), CheckTab, CheckIDField, CheckIDField1);
         } else {
             return new String[0];
         }
@@ -887,16 +844,16 @@ abstract public class QueryTools {
     }
 
     public static ArrayList<NameID> getRefNamesNameID(Object owner, ReferenceType rt, String CheckTab, String CheckIDField, String CheckIDField1) throws SQLException {
-        if (DatabaseConnector.getDatabaseConnector(owner).refTableExist(rt) && (CheckTab == null || DatabaseConnector.TableExist(CheckTab))) {
-            return DatabaseConnector.getDatabaseConnector(owner).getRefNamesNameID(owner, rt.toString(), CheckTab, CheckIDField, CheckIDField1);
+        if (DatabaseConnector.refTableExist(rt) && (CheckTab == null || DatabaseConnector.TableExist(CheckTab))) {
+            return DatabaseConnector.getRefNamesNameID(owner, rt.toString(), CheckTab, CheckIDField, CheckIDField1);
         } else {
             return null;
         }
     }
 
     public static ArrayList<NameID> getRefNameIDs(Object owner, ReferenceType rt, String subQuery, boolean addOrderBy) throws SQLException {
-        if (DatabaseConnector.getDatabaseConnector(owner).refTableExist(rt)) {
-            return DatabaseConnector.getDatabaseConnector(owner).getRefNameIDs(owner, rt.toString(), subQuery, addOrderBy);
+        if (DatabaseConnector.refTableExist(rt)) {
+            return DatabaseConnector.getRefNameIDs(owner, rt.toString(), subQuery, addOrderBy);
         } else {
             return null;
         }
@@ -911,7 +868,7 @@ abstract public class QueryTools {
     }
 
     public static Integer[] getRefIDsLike(Object owner, ReferenceType rt, String[] names) throws SQLException {
-        if (DatabaseConnector.getDatabaseConnector(owner).refTableExist(rt)) {
+        if (DatabaseConnector.refTableExist(rt)) {
             return DatabaseConnector.getDatabaseConnector(owner).getIDs(owner, rt.toString(), "id", getWhereLike("name", names, true));
         }
         return new Integer[0];
@@ -937,9 +894,6 @@ abstract public class QueryTools {
         return " ( select id from " + rt.toString() + getWhere("name", names.toArray((new String[0])), true) + " ) ";
     }
 
-    public Integer[] getRecHandles(IxnIDs ConnIDs) throws SQLException {
-        return DatabaseConnector.getDatabaseConnector(this).getIDs(this, "ocs_logbr", "recHandle", getWhere("ConnectionIDID", ConnIDs.ids, true));
-    }
 
     public static <T> T[] concatAll(T[] first, T[]... rest) {
         int totalLength = first.length;
@@ -999,24 +953,9 @@ abstract public class QueryTools {
     }
 
     protected static boolean isChecked(DynamicTreeNode<OptionNode> node) {
-        if (node != null && ((OptionNode) node.getData()).isChecked()) {
-            return true;
-        }
-        return false;
+        return node != null && ((OptionNode) node.getData()).isChecked();
     }
 
-    boolean allChildrenChecked(DynamicTreeNode<OptionNode> node, DialogItem di) {
-        return allChildrenChecked(FindNode(node, di, null, null));
-    }
-
-    boolean allChildrenChecked(DynamicTreeNode<OptionNode> node) {
-        boolean ret = true;
-        if (isChecked(node)) {
-            return OptionNode.AllChildrenChecked(node);
-
-        }
-        return ret;
-    }
 
     protected static DynamicTreeNode<OptionNode> FindNode(DynamicTreeNode<OptionNode> root, String rootCh, String rootChCh, String rootChChCh) {
         if (root != null && rootCh != null) {
@@ -1094,6 +1033,52 @@ abstract public class QueryTools {
             }
         }
         return null;
+    }
+    protected boolean printAlone = false; // should print records as they are extracted. Used for file output
+    private boolean limitQueryResults;
+    private int maxQueryLines;
+    protected PrintStreams ps = null;
+    private IQueryResults.ProgressNotifications progressCallback;
+    public boolean isLimitQueryResults() {
+        return limitQueryResults;
+    }
+    public int getMaxQueryLines() {
+        return maxQueryLines;
+    }
+    void setQueryLimit(boolean limitQueryResults, int maxQueryLines) {
+        this.limitQueryResults = limitQueryResults;
+        this.maxQueryLines = maxQueryLines;
+    }
+    public void setPrintAlone(boolean printAlone) {
+        this.printAlone = printAlone;
+    }
+    public void setProgressCallback(IQueryResults.ProgressNotifications progressCallback) {
+        this.progressCallback = progressCallback;
+    }
+    protected void tellProgress(String s) {
+        inquirer.logger.debug("Progress: " + s);
+        if (progressCallback != null) {
+            progressCallback.sayProgress(s);
+        }
+    }
+    int LowestID(HashMap m_callIdHash) {
+        List sortedKeys = new ArrayList(m_callIdHash.keySet());
+        Collections.sort(sortedKeys);
+        return (Integer) sortedKeys.get(0);
+    }
+    public Integer[] getRecHandles(IxnIDs ConnIDs) throws SQLException {
+        return DatabaseConnector.getDatabaseConnector(this).getIDs(this, "ocs_logbr", "recHandle", getWhere("ConnectionIDID", ConnIDs.ids, true));
+    }
+    boolean allChildrenChecked(DynamicTreeNode<OptionNode> node, DialogItem di) {
+        return allChildrenChecked(FindNode(node, di, null, null));
+    }
+    boolean allChildrenChecked(DynamicTreeNode<OptionNode> node) {
+        boolean ret = true;
+        if (isChecked(node)) {
+            return OptionNode.AllChildrenChecked(node);
+            
+        }
+        return ret;
     }
 
     void setPrintStreams(PrintStreams ps) {

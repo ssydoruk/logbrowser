@@ -30,7 +30,7 @@ public class DynamicTree<OptionNode> implements Serializable {
         return this.root;
     }
 
-    public void setRoot(DynamicTreeNode<OptionNode> root) {
+    final public void setRoot(DynamicTreeNode<OptionNode> root) {
         this.root = root;
     }
 
@@ -70,7 +70,7 @@ public class DynamicTree<OptionNode> implements Serializable {
 
     private DynamicTreeNode<OptionNode> auxiliaryFind(DynamicTreeNode<OptionNode> currentNode, OptionNode dataToFind) {
         DynamicTreeNode<OptionNode> returnNode = null;
-        int i = 0;
+        int i;
 
         if (currentNode.getData().equals(dataToFind)) {
             returnNode = currentNode;

@@ -27,6 +27,8 @@ public class QueryDialogSettings implements Serializable {
 //        public ArrayList<IQueryResults> getQueries() {
 //            return queries;
 //        }
+    private ArrayList<String> savedSearches = new ArrayList<>();
+    private ArrayList<String> savedFilters = new ArrayList<>();
 
     public QueryDialogSettings() {
 //            queries = new ArrayList<IQueryResults>();
@@ -81,8 +83,6 @@ public class QueryDialogSettings implements Serializable {
         return savedSearches;
     }
 
-    private ArrayList<String> savedSearches = new ArrayList<>();
-    private ArrayList<String> savedFilters = new ArrayList<>();
 
     public ArrayList<String> getSavedFilters() {
         return savedFilters;

@@ -10,7 +10,7 @@ import java.sql.ResultSet;
 
 /**
  *
- * @author kvoroshi
+ * @author ssydoruk
  */
 public class PathManager {
 

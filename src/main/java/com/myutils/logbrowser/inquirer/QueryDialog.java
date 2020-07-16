@@ -321,49 +321,46 @@ public class QueryDialog extends javax.swing.JFrame {
 
         private String outFile;
 
-        public void setDisplayForm(boolean displayForm) {
-            this.displayForm = displayForm;
-        }
 
         private boolean displayForm;
 
-        private QueryTask(QueryDialog frm, IAggregateQuery selected) {
-            this.queryDialog = frm;
-            setQuery(selected);
-        }
-
-        @Override
-        protected void process(List<String> chunks) {
-            rp.addProgress(chunks);
-        }
 
         private QueryDialog queryDialog;
         private RequestProgress rp = null;
         IQueryResults qry = null;
 
-        public QueryTask(QueryDialog frm, IQueryResults theQuery, boolean displayForm) {
-            this.queryDialog = frm;
-            setQuery(theQuery);
-            this.displayForm = displayForm;
-        }
-
-        public void setRp(RequestProgress rp) {
-            this.rp = rp;
-        }
 
         PrintStreams ps = null;
 
         ArrayList<ILogRecordFormatter> formatters = null;
 
+        String theTitle = "";
+        ReportFrame frm = null;
+        private QueryTask(QueryDialog frm, IAggregateQuery selected) {
+            this.queryDialog = frm;
+            setQuery(selected);
+        }
+        public QueryTask(QueryDialog frm, IQueryResults theQuery, boolean displayForm) {
+            this.queryDialog = frm;
+            setQuery(theQuery);
+            this.displayForm = displayForm;
+        }
+        public void setDisplayForm(boolean displayForm) {
+            this.displayForm = displayForm;
+        }
+        @Override
+        protected void process(List<String> chunks) {
+            rp.addProgress(chunks);
+        }
+        public void setRp(RequestProgress rp) {
+            this.rp = rp;
+        }
         public void setFormatters(ArrayList<ILogRecordFormatter> formatters) {
             this.formatters = formatters;
         }
-
         public void setPs(PrintStreams ps) {
             this.ps = ps;
         }
-        String theTitle = "";
-        ReportFrame frm = null;
 
         @Override
         protected Void myDoInBackground() throws Exception {
@@ -618,10 +615,6 @@ public class QueryDialog extends javax.swing.JFrame {
 //<editor-fold defaultstate="collapsed" desc="Thread class">
                 class QueryAllTask extends MySwingWorker<Void, String> {
 
-                    @Override
-                    protected void process(List<String> chunks) {
-                        rp.addProgress(chunks);
-                    }
 
                     private final QueryDialog frm;
                     private final IQueryResults qry;
@@ -638,6 +631,10 @@ public class QueryDialog extends javax.swing.JFrame {
                                 publish(s);
                             }
                         });
+                    }
+                    @Override
+                    protected void process(List<String> chunks) {
+                        rp.addProgress(chunks);
                     }
 
                     public void setRp(RequestProgress rp) {
@@ -682,7 +679,8 @@ public class QueryDialog extends javax.swing.JFrame {
                         }
                     }
 
-                };
+                }
+;
 //</editor-fold>
                 QueryTools.queryMessagesClear();
                 QueryAllTask tsk = new QueryAllTask(this, qry);
@@ -707,18 +705,56 @@ public class QueryDialog extends javax.swing.JFrame {
         private final JLabel lblFile;
 //        private final JRadioButton excelButton;
 
-        public int getCloseCause() {
-            return closeCause;
-        }
-
-        public void setCloseCause(int closeCause) {
-            this.closeCause = closeCause;
-        }
-
         JRadioButton vimButton;
         JRadioButton texpadButton;
         JRadioButton notepadButton;
         JRadioButton doneButton;
+        protected JPanel bannerPanel;
+        protected JLabel lbl;
+        JPanel listPane;
+        DoneFileDialog(Window parent) {
+            super(parent);
+            
+            setTitle("Report complete");
+            
+            listPane = new JPanel(new GridLayout(0, 1));
+            
+            vimButton = new JRadioButton("Open in VIM");
+//            vimButton.addActionListener(this);
+texpadButton = new JRadioButton("Open in TextPad");
+//            texpadButton.addActionListener(this);
+notepadButton = new JRadioButton("Open in NotePad++");
+//            excelButton = new JRadioButton("Open in Excel");
+//            notepadButton.addActionListener(this);
+doneButton = new JRadioButton("Done");
+//            doneButton.addActionListener(this);
+
+//Group the radio buttons.
+ButtonGroup group = new ButtonGroup();
+group.add(vimButton);
+group.add(texpadButton);
+group.add(notepadButton);
+group.add(doneButton);
+//             group.add(excelButton);
+listPane.add(vimButton);
+listPane.add(texpadButton);
+listPane.add(notepadButton);
+listPane.add(doneButton);
+//            listPane.add(excelButton);
+
+bannerPanel = new JPanel();
+bannerPanel.setLayout(new GridLayout(0, 1));
+lbl = new JLabel();
+lblFile = new JLabel();
+bannerPanel.add(lblFile);
+bannerPanel.add(lbl);
+        }
+        public int getCloseCause() {
+            return closeCause;
+        }
+        public void setCloseCause(int closeCause) {
+            this.closeCause = closeCause;
+        }
 
         boolean isVim() {
             return vimButton.isSelected();
@@ -735,44 +771,6 @@ public class QueryDialog extends javax.swing.JFrame {
 //            return excelButton.isSelected();
 //        }
 
-        DoneFileDialog(Window parent) {
-            super(parent);
-
-            setTitle("Report complete");
-
-            listPane = new JPanel(new GridLayout(0, 1));
-
-            vimButton = new JRadioButton("Open in VIM");
-//            vimButton.addActionListener(this);
-            texpadButton = new JRadioButton("Open in TextPad");
-//            texpadButton.addActionListener(this);
-            notepadButton = new JRadioButton("Open in NotePad++");
-//            excelButton = new JRadioButton("Open in Excel");
-//            notepadButton.addActionListener(this);
-            doneButton = new JRadioButton("Done");
-//            doneButton.addActionListener(this);
-
-            //Group the radio buttons.
-            ButtonGroup group = new ButtonGroup();
-            group.add(vimButton);
-            group.add(texpadButton);
-            group.add(notepadButton);
-            group.add(doneButton);
-//             group.add(excelButton);
-            listPane.add(vimButton);
-            listPane.add(texpadButton);
-            listPane.add(notepadButton);
-            listPane.add(doneButton);
-//            listPane.add(excelButton);
-
-            bannerPanel = new JPanel();
-            bannerPanel.setLayout(new GridLayout(0, 1));
-            lbl = new JLabel();
-            lblFile = new JLabel();
-            bannerPanel.add(lblFile);
-            bannerPanel.add(lbl);
-        }
-
         public void doShow() {
             lblFile.setText("Created file " + outFile);
             lbl.setText("Extracted " + nrows + " records");
@@ -788,15 +786,12 @@ public class QueryDialog extends javax.swing.JFrame {
                     true);
         }
 
-        protected JPanel bannerPanel;
-        protected JLabel lbl;
 
         @Override
         public JComponent createBannerPanel() {
             return bannerPanel;
         }
 
-        JPanel listPane;
 
         @Override
         public JComponent createContentPanel() {
@@ -873,6 +868,11 @@ public class QueryDialog extends javax.swing.JFrame {
         private int closeCause = JOptionPane.CANCEL_OPTION;
 
         protected JPanel aggregatesPanel;
+        JPanel listPane;
+        CancelRunDialog(Window parent) {
+            super(parent);
+            listPane = new JPanel(new BorderLayout(10, 10));
+        }
 
         public int getCloseCause() {
             return closeCause;
@@ -882,10 +882,6 @@ public class QueryDialog extends javax.swing.JFrame {
             this.closeCause = closeCause;
         }
 
-        CancelRunDialog(Window parent) {
-            super(parent);
-            listPane = new JPanel(new BorderLayout(10, 10));
-        }
 
         public void doShow() {
             setModal(true);
@@ -902,7 +898,6 @@ public class QueryDialog extends javax.swing.JFrame {
             return null;
         }
 
-        JPanel listPane;
 
         @Override
         public JComponent createContentPanel() {
@@ -971,6 +966,19 @@ public class QueryDialog extends javax.swing.JFrame {
     class AggregateDialog extends CancelRunDialog {
 
         private final JPanel bannerPanel;
+        AggregateDialog(Window parent) {
+            super(parent);
+            this.bannerPanel = new JPanel(new BorderLayout(20, 20));
+            bannerPanel.setBorder(new BevelBorder(BevelBorder.RAISED));
+            JLabel ta = new JLabel();
+//            ta.setEditable(false);
+ta.setFocusable(false);
+ta.setHorizontalAlignment(SwingConstants.CENTER);
+ta.setVerticalAlignment(SwingConstants.CENTER);
+ta.setText("<html><b>On main window select application(s) and time range</b></html>");
+
+bannerPanel.add(ta);
+        }
 
         @Override
         public JComponent createBannerPanel() {
@@ -985,19 +993,6 @@ public class QueryDialog extends javax.swing.JFrame {
             return ((AggregatesPanel) aggregatesPanel).isPrintToScreen();
         }
 
-        AggregateDialog(Window parent) {
-            super(parent);
-            this.bannerPanel = new JPanel(new BorderLayout(20, 20));
-            bannerPanel.setBorder(new BevelBorder(BevelBorder.RAISED));
-            JLabel ta = new JLabel();
-//            ta.setEditable(false);
-            ta.setFocusable(false);
-            ta.setHorizontalAlignment(SwingConstants.CENTER);
-            ta.setVerticalAlignment(SwingConstants.CENTER);
-            ta.setText("<html><b>On main window select application(s) and time range</b></html>");
-
-            bannerPanel.add(ta);
-        }
 
         @Override
         public void doShow(String theTitle) {

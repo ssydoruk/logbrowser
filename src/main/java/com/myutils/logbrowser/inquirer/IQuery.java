@@ -18,72 +18,15 @@ import org.apache.commons.lang3.StringUtils;
 
 public abstract class IQuery extends QueryTools {
 
-    public interface IRecordLoadedProc {
+    static private int queryTypes;
 
-        void recordLoaded(ILogRecord rec);
-    }
-
-    protected IRecordLoadedProc recLoadedProc = null;
-
-    public IRecordLoadedProc getRecLoadedProc() {
-        return recLoadedProc;
-    }
-
-    public void setRecLoadedProc(IRecordLoadedProc recLoadedProc) {
-        this.recLoadedProc = recLoadedProc;
-    }
-
-    protected void recLoaded(ILogRecord tLibEvent) {
-        if (recLoadedProc != null) {
-            recLoadedProc.recordLoaded(tLibEvent);
-        }
-        try {
-            doCollectIDs(m_resultSet);
-        } catch (SQLException ex) {
-            Logger.getLogger(IQuery.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
-
-    public enum ANDOR {
-
-        AND("AND"),
-        OR("OR"),;
-
-        private final String name;
-
-        private ANDOR(String s) {
-            name = s;
-        }
-
-//    public boolean equals(DialogItem item) {
-//        
-//    }
-        public boolean equalsName(String otherName) {
-            return (otherName == null) ? false : name.toLowerCase().equals(otherName.toLowerCase());
-        }
-
-        @Override
-        public String toString() {
-            return this.name;
-        }
-
-    }
-
-    private ArrayList<String> outFields;
+    private static final int SPLIT_ON = 1000;
+    private static String[] RequestsToShow = {"RequestMakePredictiveCall", "RequestMakeCall", "RequestMonitorNextCall", "EventError"};
 
     static String theLimitClause() {
         return getLimitClause(inquirer.getCr().isLimitQueryResults(), inquirer.getCr().getMaxQueryLines());
     }
 
-    private ICalculatedFields calcFields = null;
-
-    void setCalculatedFields(ICalculatedFields iCalculatedFields) {
-        calcFields = iCalculatedFields;
-    }
-
-    public ICalculatedFields getCalcFields() {
-        return calcFields;
-    }
 
     static void reSetQueryNo() {
         queryTypes = 0;
@@ -104,50 +47,11 @@ public abstract class IQuery extends QueryTools {
         return "";
     }
 
-    protected String query;
-    protected ArrayList<Integer> searchApps = null;
-    protected UTCTimeRange timeRange = null;
-    private boolean limitQueryResults;
-    private int maxQueryLines;
-    static private int queryTypes;
-    protected DatabaseConnector m_connector;
-    protected ResultSet m_resultSet;
-    protected int recCnt;
 
     public static int getQueryTypes() {
         return queryTypes;
     }
 
-    public abstract void Execute() throws SQLException;
-
-    public abstract ILogRecord GetNext() throws SQLException;
-
-    public abstract void Reset() throws SQLException;
-
-    public void setSearchApps(ArrayList<Integer> searchApps) {
-        inquirer.logger.trace("Search app: " + searchApps.size());
-        this.searchApps = searchApps;
-    }
-
-    @Override
-    public boolean isLimitQueryResults() {
-        return limitQueryResults;
-    }
-
-    @Override
-    public int getMaxQueryLines() {
-        return maxQueryLines;
-    }
-
-    @Override
-    void setQueryLimit(boolean _limitQueryResults, int _maxQueryLines) {
-        this.limitQueryResults = _limitQueryResults;
-        this.maxQueryLines = _maxQueryLines;
-    }
-
-    protected String getLimitClause() {
-        return getLimitClause(isLimitQueryResults(), getMaxQueryLines());
-    }
 
     static public String getLimitClause(boolean _limitQueryResults, int _maxQueryLines) {
         if (_limitQueryResults) {
@@ -156,9 +60,6 @@ public abstract class IQuery extends QueryTools {
         return "";
     }
 
-    public String getFileFilters(String tab, String fileIDField) {
-        return getFileFilters(tab, fileIDField, searchApps);
-    }
 
     public static String getFileFilters(String tab, String fileIDField, ArrayList<Integer> apps, String andOr) {
         String ret = getFileFilters(tab, fileIDField, apps);
@@ -185,13 +86,6 @@ public abstract class IQuery extends QueryTools {
         return null;
     }
 
-    protected void addFileFilters(String tab, String fileIDField) {
-        inquirer.logger.trace("File filters defined: " + (searchApps != null && searchApps.size() > 0));
-        if (searchApps != null && searchApps.size() > 0) {
-            addWhere(getFileFilters(tab, fileIDField), "AND");
-        }
-
-    }
 
     public static String getDateTimeFilters(String tab, String timeField, UTCTimeRange timeRange, String andOr) {
         String ret = getDateTimeFilters(tab, timeField, timeRange);
@@ -209,40 +103,6 @@ public abstract class IQuery extends QueryTools {
         return null;
     }
 
-    protected void addDateTimeFilters(String tab, String timeField) {
-
-        addWhere(getDateTimeFilters(tab, timeField, timeRange), "AND");
-
-    }
-
-    public UTCTimeRange getTimeRange() throws SQLException {
-        return timeRange;
-    }
-
-    public void setTimeRange(UTCTimeRange timeRange) {
-        this.timeRange = timeRange;
-    }
-
-    public String getQuery() {
-        return query;
-    }
-    ;
-    
-    Wheres addWheres = new Wheres();
-
-    public boolean refTablesExist() throws SQLException {
-        boolean ret = true;
-
-        for (refTab TabRef : TabRefs) {
-            String tab = TabRef.getRefTableName();
-            inquirer.logger.trace("Checking is table [" + tab + "] exists");
-            if ((ret = DatabaseConnector.TableExist(tab))
-                    == false) {
-                break;
-            }
-        }
-        return ret;
-    }
 
     private static String getCheckedItems(DynamicTreeNode<OptionNode> orsMetrics) {
         StringBuilder ret = new StringBuilder(1024);
@@ -281,97 +141,6 @@ public abstract class IQuery extends QueryTools {
         return true;
     }
 
-    Where addWhere(String where, String or) {
-        return addWheres.addWhere(where, or);
-    }
-
-    void addWhere(Wheres _wh, String or) {
-        addWheres.addWhere(_wh, or);
-    }
-
-    void addWhere(Wheres wh) {
-        addWheres.addWhere(wh);
-    }
-
-//    void AddCheckedWhere(String nameID, ReferenceType referenceType, DynamicTreeNode<OptionNode> node, String AndOr) throws Exception {
-//    }
-    Where AddCheckedWhere(String nameID, ReferenceType referenceType, DynamicTreeNode<OptionNode> node, String AndOr, DialogItem di) {
-        if (node != null) {
-            DynamicTreeNode<OptionNode> nameSettings = getChildByName(node, di);
-            if (isChecked(nameSettings)) {
-
-                switch (OptionNode.getChildrenChecked(nameSettings)) {
-                    case PARTIALLY_CHECKED:
-                        return AddCheckedWhere(nameID, referenceType, nameSettings, AndOr);
-
-                    case NONE_CHECKED:
-                        return addWhere("0=1", AndOr);
-                }
-
-            }
-        }
-        return null;
-
-    }
-
-    void AddCheckedCustomWhere(String nameID, DynamicTreeNode<OptionNode> node, String AndOr) {
-        if (node != null) {
-            if (node.getData() != null && ((OptionNode) node.getData()).isChecked()) {
-                Wheres wh = new Wheres();
-                String isNull = OptionNode.getEmptyClause(node);
-                String isNullClause = "";
-                if (isNull != null) {
-                    isNullClause = " or " + nameID + " " + isNull;
-                }
-                ArrayList<Integer> keyIDs = new ArrayList<>();
-                for (DynamicTreeNode<OptionNode> n : node.getChildren()) {
-                    if (isChecked(n)) {
-                        for (DynamicTreeNode<OptionNode> n1 : n.getChildren()) {
-                            if (isChecked(n1)) {
-                                IQueryResults.CustomOptionNode data1 = (IQueryResults.CustomOptionNode) n1.getData();
-                                String fldName = data1.getFld();
-                                ArrayList<Integer> attrIDs = new ArrayList<>();
-                                for (DynamicTreeNode<OptionNode> n2 : n1.getChildren()) {
-                                    if (isChecked(n2)) {
-                                        IQueryResults.CustomOptionNode data = (IQueryResults.CustomOptionNode) n2.getData();
-                                        attrIDs.add(data.getId());
-                                    }
-                                }
-                                wh.addWhere(getWhere(fldName, (Integer[]) attrIDs.toArray(new Integer[attrIDs.size()])), "OR");
-                            }
-                        }
-                    }
-//                    TClonable data = n.getData();
-//                    if (data instanceof IQueryResults.CustomOptionNode) {
-//                        IQueryResults.CustomOptionNode n1 = (IQueryResults.CustomOptionNode) data;
-//                        if (n1.isChecked()) {
-//                            keyIDs.add(n1.getId());
-//                            for (DynamicTreeNode<OptionNode> attName : n1.getChildren()) {
-//                                if ((attName.getData() != null && !OptionNode.AllChildrenChecked(attName))) {
-//                                    ArrayList<Integer> attrIDs = new ArrayList<>();
-//                                    IQueryResults.CustomOptionNode n2 = (IQueryResults.CustomOptionNode) attName.getData();
-//                                    String fldName = n2.getFld();
-//                                    for (DynamicTreeNode<OptionNode> attr : attName.getChildren()) {
-//                                        IQueryResults.CustomOptionNode attrNode = (IQueryResults.CustomOptionNode) attr.getData();
-//                                        if (attrNode.isChecked()) {
-//                                            attrIDs.add(attrNode.getId());
-//                                        }
-//                                    }
-//                                    wh.addWhere(getWhere(fldName, (Integer[]) attrIDs.toArray(new Integer[attrIDs.size()])), "AND");
-//                                }
-//                            }
-//                        }
-//                    } else {
-//                        inquirer.logger.info("Is not custom node: " + data.toString() + "; type: " + data.getClass().getName());
-//                    }
-                }
-                if (keyIDs.size() < node.getNumberOfChildren()) {
-                    wh.addWhere(getWhere(nameID, (Integer[]) keyIDs.toArray(new Integer[keyIDs.size()])), "AND");
-                }
-                addWhere(wh, AndOr);
-            }
-        }
-    }
 
     static String getCheckedWhere(String nameID, ReferenceType referenceType, DynamicTreeNode<OptionNode> node, DialogItem di) {
         return getCheckedWhere(nameID, referenceType, node, di, false);
@@ -415,24 +184,6 @@ public abstract class IQuery extends QueryTools {
 //        }
 //
 //    }
-
-    Where AddCheckedWhere(String nameID, ReferenceType referenceType, DynamicTreeNode<OptionNode> nameSettings, String AndOr) {
-        DynamicTreeNode<OptionNode> parent = (DynamicTreeNode<OptionNode>) nameSettings.getParent();
-        if (parent != null) {
-            if (parent.getData() == null || ((OptionNode) parent.getData()).isChecked() && !OptionNode.AllChildrenChecked(nameSettings)) {
-//                String isNull = OptionNode.getEmptyClause(nameSettings);
-                String isNullClause = "";
-//                if (isNull != null) {
-//                    isNullClause = " or " + nameID + " is null ";
-//                }
-                return addWhere(
-                        OptionNode.checkedChildrenList(nameID, nameSettings) + isNullClause, " " + AndOr + " ");
-//                addWhere(nameID + " in \n"
-//                        + getRefSubQuery(this, referenceType, OptionNode.getChecked(nameSettings)) + isNullClause, " " + AndOr + " ");
-            }
-        }
-        return null;
-    }
 
     static String getCheckedWhere(String nameID, ReferenceType referenceType, DynamicTreeNode<OptionNode> nameSettings, String andOr) {
         String ret = getCheckedWhere(nameID, referenceType, nameSettings);
@@ -484,52 +235,6 @@ public abstract class IQuery extends QueryTools {
         return null;
     }
 
-    void AddCheckedWhere(String nameID, ReferenceType referenceType, DynamicTreeNode<OptionNode> nameSettings) throws Exception {
-        AddCheckedWhere(nameID, referenceType, nameSettings, "or");
-    }
-
-    private String makeWhere(boolean WhereClause) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    IQuery() {
-        TabRefs = new ArrayList<>();
-        joinTabs = new ArrayList<>();
-        nullTab = new ArrayList<>();
-        this.outFields = new ArrayList<>();
-        incQueryTypes();
-    }
-
-    void setOutFields(String[] strings) {
-        for (String string : strings) {
-            this.outFields.add(string);
-        }
-    }
-
-    void addOutField(String fld) {
-        outFields.add(fld);
-    }
-
-    public String addedFieldString(boolean startWithComa, boolean finishWithComa) {
-        StringBuilder qString = new StringBuilder();
-        if (outFields != null && outFields.size() > 0) {
-            if (startWithComa) {
-                qString.append(",");
-            }
-            boolean fieldsAdded = false;
-            for (String outField : outFields) {
-                if (fieldsAdded) {
-                    qString.append(",");
-                }
-                qString.append(outField);
-                fieldsAdded = true;
-            }
-        }
-        if (qString.length() > 0 && finishWithComa) {
-            qString.append(" ,");
-        }
-        return qString.toString();
-    }
 
     public static String getWhere(String Field, String[] ids) {
         return getWhere(Field, ids, false, false);
@@ -568,7 +273,6 @@ public abstract class IQuery extends QueryTools {
 
     }
 
-    private static final int SPLIT_ON = 1000;
 
     public static String escapeString(String str, boolean toLower) {
         return (toLower)
@@ -808,11 +512,284 @@ public abstract class IQuery extends QueryTools {
             return "";
         }
     }
+    public static String getAttrsWhere(String tabColumn, String refIdColumn, String refNameColumn, String refTable, DynamicTreeNode<OptionNode> node) {
+        String checkedItems = getCheckedItems(node);
+        if (checkedItems.length() > 0) {
+            return tabColumn + " in (select " + refIdColumn
+                    + " from " + refTable
+                    + " where " + refNameColumn + " in (" + checkedItems + ")" + ")";
+        }
+        return "";
+    }
+    public static String getAttrsWhere(String tabColumn, ReferenceType referenceType, DynamicTreeNode<OptionNode> node) {
+        if (!isAllChecked(node)) {
+            return getAttrsWhere(tabColumn, "id", "name", referenceType.toString(), node);
+        } else {
+            return "";
+        }
+    }
+    public static String getAttrsWhere(String[] tabColumns, ReferenceType referenceType, DynamicTreeNode<OptionNode> node) {
+        if (!isAllChecked(node)) {
+            StringBuilder ret = new StringBuilder();
+            for (String tabColumn : tabColumns) {
+                if (ret.length() > 0) {
+                    ret.append(" or ");
+                }
+                ret.append(getAttrsWhere(tabColumn, "id", "name", referenceType.toString(), node));
+            }
+            if (ret.length() > 0) {
+                return " ( " + ret.append(" ) ").toString();
+            }
+        }
+        return "";
+    }
+    protected IRecordLoadedProc recLoadedProc = null;
+    private ArrayList<String> outFields;
+    private ICalculatedFields calcFields = null;
+    protected String query;
+    protected ArrayList<Integer> searchApps = null;
+    protected UTCTimeRange timeRange = null;
+    private boolean limitQueryResults;
+    private int maxQueryLines;
+    protected DatabaseConnector m_connector;
+    protected ResultSet m_resultSet;
+    protected int recCnt;
+    Wheres addWheres = new Wheres();
 
 
     private ArrayList<refTab> TabRefs;
     private ArrayList<JoinTab> joinTabs;
     private ArrayList<String> nullTab;
+    private ArrayList<String> nullFields = new ArrayList<>();
+    private ArrayList<String> idsToCollect = new ArrayList<>();
+    private HashMap<String, HashSet<Long>> collectIDsValues = new HashMap<>();
+    IQuery() {
+        TabRefs = new ArrayList<>();
+        joinTabs = new ArrayList<>();
+        nullTab = new ArrayList<>();
+        this.outFields = new ArrayList<>();
+        incQueryTypes();
+    }
+    public IRecordLoadedProc getRecLoadedProc() {
+        return recLoadedProc;
+    }
+    public void setRecLoadedProc(IRecordLoadedProc recLoadedProc) {
+        this.recLoadedProc = recLoadedProc;
+    }
+    protected void recLoaded(ILogRecord tLibEvent) {
+        if (recLoadedProc != null) {
+            recLoadedProc.recordLoaded(tLibEvent);
+        }
+        try {
+            doCollectIDs(m_resultSet);
+        } catch (SQLException ex) {
+            Logger.getLogger(IQuery.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    void setCalculatedFields(ICalculatedFields iCalculatedFields) {
+        calcFields = iCalculatedFields;
+    }
+    public ICalculatedFields getCalcFields() {
+        return calcFields;
+    }
+    public abstract void Execute() throws SQLException;
+    public abstract ILogRecord GetNext() throws SQLException;
+    public abstract void Reset() throws SQLException;
+    public void setSearchApps(ArrayList<Integer> searchApps) {
+        inquirer.logger.trace("Search app: " + searchApps.size());
+        this.searchApps = searchApps;
+    }
+    @Override
+    public boolean isLimitQueryResults() {
+        return limitQueryResults;
+    }
+    @Override
+    public int getMaxQueryLines() {
+        return maxQueryLines;
+    }
+    @Override
+            void setQueryLimit(boolean _limitQueryResults, int _maxQueryLines) {
+                this.limitQueryResults = _limitQueryResults;
+                this.maxQueryLines = _maxQueryLines;
+            }
+            protected String getLimitClause() {
+                return getLimitClause(isLimitQueryResults(), getMaxQueryLines());
+            }
+            public String getFileFilters(String tab, String fileIDField) {
+                return getFileFilters(tab, fileIDField, searchApps);
+            }
+            protected void addFileFilters(String tab, String fileIDField) {
+                inquirer.logger.trace("File filters defined: " + (searchApps != null && searchApps.size() > 0));
+                if (searchApps != null && searchApps.size() > 0) {
+                    addWhere(getFileFilters(tab, fileIDField), "AND");
+                }
+                
+            }
+            protected void addDateTimeFilters(String tab, String timeField) {
+                
+                addWhere(getDateTimeFilters(tab, timeField, timeRange), "AND");
+                
+            }
+            public UTCTimeRange getTimeRange() throws SQLException {
+                return timeRange;
+            }
+            public void setTimeRange(UTCTimeRange timeRange) {
+                this.timeRange = timeRange;
+            }
+            public String getQuery() {
+                return query;
+            }
+            public boolean refTablesExist() throws SQLException {
+                boolean ret = true;
+                
+                for (refTab TabRef : TabRefs) {
+                    String tab = TabRef.getRefTableName();
+                    inquirer.logger.trace("Checking is table [" + tab + "] exists");
+                    if ((ret = DatabaseConnector.TableExist(tab))
+                            == false) {
+                        break;
+                    }
+                }
+                return ret;
+            }
+            Where addWhere(String where, String or) {
+                return addWheres.addWhere(where, or);
+            }
+            void addWhere(Wheres _wh, String or) {
+                addWheres.addWhere(_wh, or);
+            }
+            void addWhere(Wheres wh) {
+                addWheres.addWhere(wh);
+            }
+            //    void AddCheckedWhere(String nameID, ReferenceType referenceType, DynamicTreeNode<OptionNode> node, String AndOr) throws Exception {
+//    }
+            Where AddCheckedWhere(String nameID, ReferenceType referenceType, DynamicTreeNode<OptionNode> node, String AndOr, DialogItem di) {
+                if (node != null) {
+                    DynamicTreeNode<OptionNode> nameSettings = getChildByName(node, di);
+                    if (isChecked(nameSettings)) {
+                        
+                        switch (OptionNode.getChildrenChecked(nameSettings)) {
+                            case PARTIALLY_CHECKED:
+                                return AddCheckedWhere(nameID, referenceType, nameSettings, AndOr);
+                                
+                            case NONE_CHECKED:
+                                return addWhere("0=1", AndOr);
+                        }
+                        
+                    }
+                }
+                return null;
+                
+            }
+            void AddCheckedCustomWhere(String nameID, DynamicTreeNode<OptionNode> node, String AndOr) {
+                if (node != null) {
+                    if (node.getData() != null && ((OptionNode) node.getData()).isChecked()) {
+                        Wheres wh = new Wheres();
+                        String isNull = OptionNode.getEmptyClause(node);
+                        String isNullClause = "";
+                        if (isNull != null) {
+                            isNullClause = " or " + nameID + " " + isNull;
+                        }
+                        ArrayList<Integer> keyIDs = new ArrayList<>();
+                        for (DynamicTreeNode<OptionNode> n : node.getChildren()) {
+                            if (isChecked(n)) {
+                                for (DynamicTreeNode<OptionNode> n1 : n.getChildren()) {
+                                    if (isChecked(n1)) {
+                                        IQueryResults.CustomOptionNode data1 = (IQueryResults.CustomOptionNode) n1.getData();
+                                        String fldName = data1.getFld();
+                                        ArrayList<Integer> attrIDs = new ArrayList<>();
+                                        for (DynamicTreeNode<OptionNode> n2 : n1.getChildren()) {
+                                            if (isChecked(n2)) {
+                                                IQueryResults.CustomOptionNode data = (IQueryResults.CustomOptionNode) n2.getData();
+                                                attrIDs.add(data.getId());
+                                            }
+                                        }
+                                        wh.addWhere(getWhere(fldName, (Integer[]) attrIDs.toArray(new Integer[attrIDs.size()])), "OR");
+                                    }
+                                }
+                            }
+//                    TClonable data = n.getData();
+//                    if (data instanceof IQueryResults.CustomOptionNode) {
+//                        IQueryResults.CustomOptionNode n1 = (IQueryResults.CustomOptionNode) data;
+//                        if (n1.isChecked()) {
+//                            keyIDs.add(n1.getId());
+//                            for (DynamicTreeNode<OptionNode> attName : n1.getChildren()) {
+//                                if ((attName.getData() != null && !OptionNode.AllChildrenChecked(attName))) {
+//                                    ArrayList<Integer> attrIDs = new ArrayList<>();
+//                                    IQueryResults.CustomOptionNode n2 = (IQueryResults.CustomOptionNode) attName.getData();
+//                                    String fldName = n2.getFld();
+//                                    for (DynamicTreeNode<OptionNode> attr : attName.getChildren()) {
+//                                        IQueryResults.CustomOptionNode attrNode = (IQueryResults.CustomOptionNode) attr.getData();
+//                                        if (attrNode.isChecked()) {
+//                                            attrIDs.add(attrNode.getId());
+//                                        }
+//                                    }
+//                                    wh.addWhere(getWhere(fldName, (Integer[]) attrIDs.toArray(new Integer[attrIDs.size()])), "AND");
+//                                }
+//                            }
+//                        }
+//                    } else {
+//                        inquirer.logger.info("Is not custom node: " + data.toString() + "; type: " + data.getClass().getName());
+//                    }
+                        }
+                        if (keyIDs.size() < node.getNumberOfChildren()) {
+                            wh.addWhere(getWhere(nameID, (Integer[]) keyIDs.toArray(new Integer[keyIDs.size()])), "AND");
+                        }
+                        addWhere(wh, AndOr);
+                    }
+                }
+            }
+            Where AddCheckedWhere(String nameID, ReferenceType referenceType, DynamicTreeNode<OptionNode> nameSettings, String AndOr) {
+                DynamicTreeNode<OptionNode> parent = (DynamicTreeNode<OptionNode>) nameSettings.getParent();
+                if (parent != null) {
+                    if (parent.getData() == null || ((OptionNode) parent.getData()).isChecked() && !OptionNode.AllChildrenChecked(nameSettings)) {
+//                String isNull = OptionNode.getEmptyClause(nameSettings);
+String isNullClause = "";
+//                if (isNull != null) {
+//                    isNullClause = " or " + nameID + " is null ";
+//                }
+return addWhere(
+        OptionNode.checkedChildrenList(nameID, nameSettings) + isNullClause, " " + AndOr + " ");
+//                addWhere(nameID + " in \n"
+//                        + getRefSubQuery(this, referenceType, OptionNode.getChecked(nameSettings)) + isNullClause, " " + AndOr + " ");
+                    }
+                }
+                return null;
+            }
+            void AddCheckedWhere(String nameID, ReferenceType referenceType, DynamicTreeNode<OptionNode> nameSettings) throws Exception {
+                AddCheckedWhere(nameID, referenceType, nameSettings, "or");
+            }
+            private String makeWhere(boolean WhereClause) {
+                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            }
+            void setOutFields(String[] strings) {
+                for (String string : strings) {
+                    this.outFields.add(string);
+                }
+            }
+            void addOutField(String fld) {
+                outFields.add(fld);
+            }
+            public String addedFieldString(boolean startWithComa, boolean finishWithComa) {
+                StringBuilder qString = new StringBuilder();
+                if (outFields != null && outFields.size() > 0) {
+                    if (startWithComa) {
+                        qString.append(",");
+                    }
+                    boolean fieldsAdded = false;
+                    for (String outField : outFields) {
+                        if (fieldsAdded) {
+                            qString.append(",");
+                        }
+                        qString.append(outField);
+                        fieldsAdded = true;
+                    }
+                }
+                if (qString.length() > 0 && finishWithComa) {
+                    qString.append(" ,");
+                }
+                return qString.toString();
+            }
 
     public void addRef(String refField, String outField, String refTable, FieldType ft) throws SQLException {
         if (DatabaseConnector.refTableExist(refTable)) {
@@ -865,112 +842,6 @@ public abstract class IQuery extends QueryTools {
         return refTable + String.format("%02d", id);
     }
 
-    enum FieldType {
-        Mandatory,
-        Optional;
-    }
-
-    class refTab {
-
-        private String refField;
-        private String outField;
-        private String refTable;
-        private String refTabAlias;
-        private FieldType ft;
-
-        public String getRefTable() {
-            return refTabAlias;
-        }
-
-        public String getRefTableName() {
-            return refTable;
-        }
-
-        refTab(String refField, String outField, String refTable, FieldType ft) {
-            this.outField = outField;
-            this.refField = refField;
-            this.refTable = refTable;
-            this.refTabAlias = UniqueTable(refTable);
-            this.ft = ft;
-
-            inquirer.logger.trace(this.toString());
-        }
-
-        @Override
-        public String toString() {
-            return "refTab{" + "refField=" + refField + ", outField=" + outField + ", refTable=" + refTable + ", refTabAlias=" + refTabAlias + ", ft=" + ft + '}';
-        }
-
-        String getJoin() {
-            String jType = "";
-
-            switch (ft) {
-                case Mandatory:
-                    jType = "INNER";
-                    break;
-                case Optional:
-                    jType = "LEFT";
-                    break;
-            }
-            return jType + " JOIN " + refTable + " AS " + refTabAlias + " on "
-                    + refField + "=" + refTabAlias + ".id\n";
-        }
-
-        String getRetField() {
-            return refTabAlias + ".name as " + outField;
-        }
-
-        private boolean eqRef(String _refField, String _refTable) {
-            inquirer.logger.trace("Comparing " + this.refField + " vs " + _refField
-                    + "; " + this.refTable + " vs " + _refTable);
-            return (this.refField.equals(_refField) && this.refTable.equals(_refTable));
-        }
-    }
-
-    class JoinTab {
-
-        private String joinTable = null;
-        private String tabAlias;
-
-        public JoinTab(String joinTable, String JoinExpr, String JoinWhere, FieldType ft, String tabAlias) {
-            this.joinTable = joinTable;
-            this.JoinExpr = JoinExpr;
-            this.JoinWhere = JoinWhere;
-            this.ft = ft;
-            this.tabAlias = tabAlias;
-        }
-
-        public JoinTab(String joinTable, String JoinExpr, String JoinWhere, FieldType ft) {
-            this(joinTable, JoinExpr, JoinWhere, ft, joinTable);
-        }
-        private String JoinExpr = null;
-        private String JoinWhere = null;
-        private FieldType ft;
-
-        String getJoin() {
-            String jType = "";
-
-            switch (ft) {
-                case Mandatory:
-                    jType = "INNER";
-                    break;
-                case Optional:
-                    jType = "LEFT";
-                    break;
-            }
-            StringBuilder ret = new StringBuilder();
-
-            ret.append(jType).append(" JOIN ").append(joinTable).append(" AS ").append(tabAlias).append(" on ").append(JoinExpr).append("\n");
-//            if (JoinWhere != null) {
-//                ret.append(" where " + JoinWhere);
-//            }
-            return ret.toString();
-        }
-
-        private String getJoinField() {
-            return "";
-        }
-    }
 
     public boolean isTabRefsEmpty() {
         return TabRefs == null || TabRefs.isEmpty();
@@ -1020,41 +891,6 @@ public abstract class IQuery extends QueryTools {
         }
     }
 
-    private ArrayList<String> nullFields = new ArrayList<>();
-
-    public static String getAttrsWhere(String tabColumn, String refIdColumn, String refNameColumn, String refTable, DynamicTreeNode<OptionNode> node) {
-        String checkedItems = getCheckedItems(node);
-        if (checkedItems.length() > 0) {
-            return tabColumn + " in (select " + refIdColumn
-                    + " from " + refTable
-                    + " where " + refNameColumn + " in (" + checkedItems + ")" + ")";
-        }
-        return "";
-    }
-
-    public static String getAttrsWhere(String tabColumn, ReferenceType referenceType, DynamicTreeNode<OptionNode> node) {
-        if (!isAllChecked(node)) {
-            return getAttrsWhere(tabColumn, "id", "name", referenceType.toString(), node);
-        } else {
-            return "";
-        }
-    }
-
-    public static String getAttrsWhere(String[] tabColumns, ReferenceType referenceType, DynamicTreeNode<OptionNode> node) {
-        if (!isAllChecked(node)) {
-            StringBuilder ret = new StringBuilder();
-            for (String tabColumn : tabColumns) {
-                if (ret.length() > 0) {
-                    ret.append(" or ");
-                }
-                ret.append(getAttrsWhere(tabColumn, "id", "name", referenceType.toString(), node));
-            }
-            if (ret.length() > 0) {
-                return " ( " + ret.append(" ) ").toString();
-            }
-        }
-        return "";
-    }
 
     public void addNullField(String fld) {
         nullFields.add(fld);
@@ -1088,13 +924,11 @@ public abstract class IQuery extends QueryTools {
         return DNIDs;
     }
 
-    private ArrayList<String> idsToCollect = new ArrayList<>();
 
     void addCollectIDs(String refid) {
         idsToCollect.add(refid);
     }
 
-    private HashMap<String, HashSet<Long>> collectIDsValues = new HashMap<>();
 
     protected boolean isCollectingID(String field) throws SQLException {
         return collectIDsValues.containsKey(field);
@@ -1134,7 +968,6 @@ public abstract class IQuery extends QueryTools {
         }
     }
 
-    private static String[] RequestsToShow = {"RequestMakePredictiveCall", "RequestMakeCall", "RequestMonitorNextCall", "EventError"};
 
     private String fullFieldName(String tab, String col) {
         if (tab != null && !tab.isEmpty()) {
@@ -1179,5 +1012,139 @@ public abstract class IQuery extends QueryTools {
         setQueryLimit(qry.isLimitQueryResults(), qry.getMaxQueryLines());
         setTimeRange(dlg.getTimeRange());
         setSearchApps(dlg.getSearchApps());
+    }
+    public interface IRecordLoadedProc {
+        
+        void recordLoaded(ILogRecord rec);
+    }
+    public enum ANDOR {
+        
+        AND("AND"),
+        OR("OR"),;
+        
+        private final String name;
+        
+        private ANDOR(String s) {
+            name = s;
+        }
+        
+//    public boolean equals(DialogItem item) {
+//
+//    }
+        public boolean equalsName(String otherName) {
+            return (otherName == null) ? false : name.toLowerCase().equals(otherName.toLowerCase());
+        }
+        
+        @Override
+        public String toString() {
+            return this.name;
+        }
+        
+    }
+    enum FieldType {
+        Mandatory,
+        Optional;
+    }
+
+    class refTab {
+
+        private String refField;
+        private String outField;
+        private String refTable;
+        private String refTabAlias;
+        private FieldType ft;
+
+        refTab(String refField, String outField, String refTable, FieldType ft) {
+            this.outField = outField;
+            this.refField = refField;
+            this.refTable = refTable;
+            this.refTabAlias = UniqueTable(refTable);
+            this.ft = ft;
+            
+            inquirer.logger.trace(this.toString());
+        }
+
+        public String getRefTable() {
+            return refTabAlias;
+        }
+
+        public String getRefTableName() {
+            return refTable;
+        }
+
+        @Override
+        public String toString() {
+            return "refTab{" + "refField=" + refField + ", outField=" + outField + ", refTable=" + refTable + ", refTabAlias=" + refTabAlias + ", ft=" + ft + '}';
+        }
+
+        String getJoin() {
+            String jType = "";
+            
+            switch (ft) {
+                case Mandatory:
+                    jType = "INNER";
+                    break;
+                case Optional:
+                    jType = "LEFT";
+                    break;
+            }
+            return jType + " JOIN " + refTable + " AS " + refTabAlias + " on "
+                    + refField + "=" + refTabAlias + ".id\n";
+        }
+
+        String getRetField() {
+            return refTabAlias + ".name as " + outField;
+        }
+
+        private boolean eqRef(String _refField, String _refTable) {
+            inquirer.logger.trace("Comparing " + this.refField + " vs " + _refField
+                    + "; " + this.refTable + " vs " + _refTable);
+            return (this.refField.equals(_refField) && this.refTable.equals(_refTable));
+        }
+    }
+
+    class JoinTab {
+
+        private String joinTable = null;
+        private String tabAlias;
+        private String JoinExpr = null;
+        private String JoinWhere = null;
+        private FieldType ft;
+
+        public JoinTab(String joinTable, String JoinExpr, String JoinWhere, FieldType ft, String tabAlias) {
+            this.joinTable = joinTable;
+            this.JoinExpr = JoinExpr;
+            this.JoinWhere = JoinWhere;
+            this.ft = ft;
+            this.tabAlias = tabAlias;
+        }
+
+        public JoinTab(String joinTable, String JoinExpr, String JoinWhere, FieldType ft) {
+            this(joinTable, JoinExpr, JoinWhere, ft, joinTable);
+        }
+
+        String getJoin() {
+            String jType = "";
+            
+            switch (ft) {
+                case Mandatory:
+                    jType = "INNER";
+                    break;
+                case Optional:
+                    jType = "LEFT";
+                    break;
+            }
+            StringBuilder ret = new StringBuilder();
+            
+            ret.append(jType).append(" JOIN ").append(joinTable).append(" AS ").append(tabAlias).append(" on ").append(JoinExpr).append("\n");
+//            if (JoinWhere != null) {
+//                ret.append(" where " + JoinWhere);
+//            }
+return ret.toString();
+        }
+
+        private String getJoinField() {
+            return "";
+        }
     }
 }

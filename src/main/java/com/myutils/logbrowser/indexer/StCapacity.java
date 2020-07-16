@@ -15,6 +15,8 @@ public class StCapacity extends Message {
     private static final Pattern regStatusLineAgent = Pattern.compile("^Status: (Capacity snapshot) for agent '([^']+)'(?:.+, place '([^']+)'.+\\(CR='([^\\']+))?");
     private static final Pattern regStatusLinePlace = Pattern.compile("^Status: (Capacity snapshot) for place '([^']+)'(?:.+, agent '([^']+)'.+\\(CR='([^\\']+))?");
     private static final Pattern regStatusLineDN = Pattern.compile("^Status: (Capacity snapshot) for \\w+ '([^@']+)");
+    private static final Pattern regStatusMedia = Pattern.compile("^\\s*\\[\\s*(\\w+)\\s+(\\d+)\\s+(\\d+).+--\\s(\\w+)");
+    public static final int MAX_MEDIA = 5;
 
     private String plGroup = null;
     private String agent = null;
@@ -23,9 +25,6 @@ public class StCapacity extends Message {
     private String NewStatus = null;
     private String capacityRule = null;
 
-    public String getCapacityRule() {
-        return capacityRule;
-    }
 
     private String dn = null;
 
@@ -48,6 +47,9 @@ public class StCapacity extends Message {
         } else {
             Main.logger.debug("Not matched for [" + name + "]");
         }
+    }
+    public String getCapacityRule() {
+        return capacityRule;
     }
 
     public String getDn() {
@@ -74,9 +76,6 @@ public class StCapacity extends Message {
         return NewStatus;
     }
 
-    private static final Pattern regStatusMedia = Pattern.compile("^\\s*\\[\\s*(\\w+)\\s+(\\d+)\\s+(\\d+).+--\\s(\\w+)");
-
-    public static final int MAX_MEDIA = 5;
 
     ArrayList<MediaStatuses> getMediaStatuses() {
         Matcher m;

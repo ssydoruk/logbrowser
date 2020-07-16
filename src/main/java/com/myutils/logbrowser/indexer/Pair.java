@@ -4,13 +4,13 @@ import java.io.Serializable;
 
 public class Pair<K, V> implements Serializable {
 
-    private K key;
-    private V value;
     private static final String OPEN_BRACE = "{";
     private static final String COMMA = ",";
     private static final String CLOSE_BRACE = "}";
 
     private static final long serialVersionUID = 1L;
+    private K key;
+    private V value;
 
     public Pair() {
     }

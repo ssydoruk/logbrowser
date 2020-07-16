@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 
 public class DefaultFormatter implements ILogRecordFormatter {
+    static protected HashMap<String, Integer> m_callIdHash = new HashMap<>();
+    static protected int m_callIdCount = 0;
 
     public static String GetRelativePath(String canonicalPath) {
 
@@ -14,8 +16,6 @@ public class DefaultFormatter implements ILogRecordFormatter {
 
     protected int m_maxFileNameLength;
     protected boolean m_isLongFileNameEnabled;
-    static protected HashMap<String, Integer> m_callIdHash = new HashMap<>();
-    static protected int m_callIdCount = 0;
     protected HashSet<String> m_components;
     private boolean headerOnTop = true;
     private boolean allFields = false;
@@ -23,24 +23,24 @@ public class DefaultFormatter implements ILogRecordFormatter {
     private boolean shouldPrintRecordType = true;
     private boolean isExcel;
 
-    public boolean isShouldPrintRecordType() {
-        return shouldPrintRecordType;
-    }
-
-    public boolean isPrintFileLine() {
-        return printFileLine;
-    }
     private boolean printFileLine = false;
     private Character delimiter;
 
-    public boolean isShouldAccessFiles() {
-        return shouldAccessFiles;
-    }
+    MsgType lastType = MsgType.UNKNOWN;
 
     public DefaultFormatter(boolean isLongFileNameEnabled, HashSet<String> components) {
         m_isLongFileNameEnabled = isLongFileNameEnabled;
         m_maxFileNameLength = 0;
         m_components = components;
+    }
+    public boolean isShouldPrintRecordType() {
+        return shouldPrintRecordType;
+    }
+    public boolean isPrintFileLine() {
+        return printFileLine;
+    }
+    public boolean isShouldAccessFiles() {
+        return shouldAccessFiles;
     }
 
     @Override
@@ -74,7 +74,6 @@ public class DefaultFormatter implements ILogRecordFormatter {
     public void ProcessLayout() {
     }
 
-    MsgType lastType = MsgType.UNKNOWN;
 
     /**
      *

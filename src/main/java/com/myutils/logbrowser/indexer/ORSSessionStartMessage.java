@@ -22,6 +22,8 @@ public class ORSSessionStartMessage extends Message {
     private String clientIP;
     private boolean POSTParsed = false;
     private String newSessionID;
+    private Pair<String, String> parseORSURI = null;
+    ArrayList<String> params = new ArrayList<>();
 
     ORSSessionStartMessage(ArrayList<String> m_MessageContents) {
         super(TableType.ORSSessionStart, m_MessageContents);
@@ -104,13 +106,11 @@ public class ORSSessionStartMessage extends Message {
         }
     }
 
-    private Pair<String, String> parseORSURI = null;
 
     String getPhone() {
         return getGMSAttributeString(new String[]{"phone_number", "_customer_number"});
     }
 
-    ArrayList<String> params = new ArrayList<>();
 
     void addParam(String str) {
         params.add(str);

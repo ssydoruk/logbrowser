@@ -13,12 +13,6 @@ import java.util.regex.Pattern;
  */
 public class WorkspaceParser extends Parser {
 
-    private static final Pattern regRIGenerated = Pattern.compile("^\\[19:0f\\]connid (\\w+) generated for client=(\\d+)\\(([^\\]]+)\\).+\\*(\\w+)$");
-    private static final Pattern regRIRequestStart = Pattern.compile("^\\[19:10\\][^:]+: ([^\\?]+)\\?(.+), client=(\\d+)\\((\\w+)\\).+ref=(\\d+)$");
-    private static final Pattern regRIResp = Pattern.compile("^\\[19:11\\].+'(\\w+)'.+ client (\\d+)\\((\\w+)\\).+ref=(\\d+)$");
-    private static final Pattern regRIConnIDGenerated = Pattern.compile("^\\[19:10\\] connid (\\w+).+client=(\\d+)\\((\\w+)\\).+ref id=(\\d+), .+name=(\\w+)");
-    private static final Pattern regDate = Pattern.compile("^(\\d{2}:\\d{2}:\\d{2}\\.\\d{3})");
-
 //17:33:04.587_I_I_01d9027e17ef8b38 [09:05] >>>>>>>>>>>>resume interpretator(0), func:SuspendForDN
 //    _I_I_01d9027e17ef8b38 [09:04] ASSIGN: agent_target(LOCAL) <- STRING: "return:timeout"
 //    _I_I_01d9027e17ef8b38 [09:04] ASSIGN: N_attempt(LOCAL) <- INTEGER: 1
@@ -30,34 +24,22 @@ public class WorkspaceParser extends Parser {
 //    _M_I_ [10:17] -ready DN 1077 @ TMK_SIP_Switch (type 1 CallInbound time=1463063585) for agent AZvyagina_tsk, place Place_1077_TMK, WaitForNextCall time=1463063585
 //    _M_I_ [10:17] STATOBJECT(06409ed0 208 2) tenant=Resources name=AZvyagina_tsk@OBN_StatServerRouting.A: 0(1) ready DNs reported, dT=0
 //17:33:04.697_T_I_03350282382b5512 [14:02] sending event 85 for virtual queue OBN_IP_Skill1_VQ_OBN_SIP_Outbound_Virtual
-    private static final Pattern regStrategyMessage = Pattern.compile("^\\s*_\\S_\\S_(\\S{16})\\s*\\[(\\S{2}:\\S{2})\\]\\s*");
-    private static final Pattern regNonStrategyMessage = Pattern.compile("^\\s*_\\S_\\S_\\s*\\[(\\S{2}:\\S{2})\\]\\s*");
-    private static final Pattern regRLibMessage = Pattern.compile("^\\s*RLIB: ");
-    private static final Pattern regStartsFromSpace = Pattern.compile("^\\s+");
     private static final Pattern regTMessageOutFinal = Pattern.compile("^\\.\\.sent to");
-    private static final Pattern regTMessageAttribute = Pattern.compile("^\t");
     private static final Pattern regTMessageInFinal = Pattern.compile("^\\. Processing with  state");
-    private static final Pattern regTMessageInInvoke = Pattern.compile("Invoke EventHandlerTask");
     private static final Pattern regTMessageRequestFinal = Pattern.compile("^(ReferenceId|AttributeReferenceID|attr_ref_id|$)");
 
-//15:49:45.068_R_I_ [19:10] routing interface request received: urs/call/00e2029a670222cb/func?name=FindConfigObject&params=%5B1%2C+%22name%3ASwitch_VyS%22%5D&sync=1, client=732(OR_Server), ref=674437
-    private static final Pattern regRI = Pattern.compile("^_R_I_\\s*");
 
     private static final Pattern regCfgUpdate = Pattern.compile("^\\s+PopCfg");
 
-//11:50:52.636_R_I_ [19:0f] connid 0150028acff24002 generated for client=23(OR_Server_811), ref id=5, method name=ORS: 0000GaBNKN2Q0021
-    private static final Pattern regCONNID_UUID = Pattern.compile("connid (\\w+) generated for client.+[\\* ](\\w+)$");
 
     // keys: multiline function spec, value: pattern that ML is still on
     static HashMap<String, Pattern> regMultiLine = new HashMap<String, Pattern>();
     private static final Pattern regTMessageInStart = Pattern.compile("Proxy got message");
     private static final Pattern regTMessageCompleted = Pattern.compile("- Completed handling");
     private static final Pattern regTMessageSending = Pattern.compile("Sending message to");
-    private static final Pattern regTMessageFirstAttribute = Pattern.compile("^\\t(Attribute|\\()");
     private static final Pattern regTMessageOutFirstLine = Pattern.compile("^(request to|\\tAttribute|\\t\\()");
     private static final Pattern regReceived = Pattern.compile("received from (\\d+)\\(([^\\)]+)\\).+message (Event\\w+)(?:\\(refid=(\\d+)\\))*");
     private static final Pattern regProxyReceived = Pattern.compile("Proxy got message '(\\w+)' \\('(\\d+)'\\)");
-    private static final Pattern regServerIn = Pattern.compile("is received for ts ([^\\[]+)");
     private static final Pattern regSentTo = Pattern.compile("send to ts ([^\\[\\s]+)");
     private static final Pattern regSendingTo = Pattern.compile(" sending event ");
     private static final Pattern regSendingMessageTo = Pattern.compile(" Sending message to (\\w+)");
@@ -65,12 +47,44 @@ public class WorkspaceParser extends Parser {
     private static final Pattern regLastOneOrTwoWords = Pattern.compile("(?:\\s*(?:\\w+)){1,2}$");
     private static final Pattern regReqTo = Pattern.compile("^request to (\\d+).+message (Request\\w+)");
     private static final Pattern regToRequest = Pattern.compile("^'(\\w+)'");
+    private static final Pattern regStrategy = Pattern.compile("strategy:.+\\*+(\\S+)");
+    //[14:33] strategy: **ORS (1085200831) is attached to the call
+    private final static HashSet<String> eventsStatServer = new HashSet<String>(
+            Arrays.asList(new String[]{
+                "EventInfo",
+                "EventStatisticOpened",
+                "EventCurrentTargetStateSnapshot",
+                "RequestCloseStatistic",
+                "EventStatisticClosed",
+                "RequestGetStatisticEx",
+                "EventCurrentTargetStateTargetUpdated",
+                "RequestOpenStatistic",
+                "RequestGetStatistic",
+                "RequestSuspendNotification",
+                "RequestOpenStatisticEx"}));
+    private final static HashSet<String> eventsEServices = new HashSet<String>(
+            Arrays.asList(new String[]{
+                "EventCurrentAgentStatus",
+                "Event3rdServerResponse",
+                "EventCurrentAgentStatus",
+                "RequestRemoveMedia",
+                "RequestNotReadyForMedia",
+                "RequestCancelNotReadyForMedia",
+                "Request3rdServer"}));
+    private final static HashSet<String> eventsConfig = new HashSet<String>(
+            Arrays.asList(new String[]{
+                "EventObjectsRead",
+                "EventObjectsSent",
+                "RequestUnregisterNotification",
+                "EventNotificationUnregistered",
+                "RequestReadObjects"}));
+    private static final Pattern regCfgObjectName = Pattern.compile("(?:name|userName|number|loginCode)='([^']+)'");
+    private static final Pattern regCfgObjectType = Pattern.compile("^Cfg([^=]+)=.*\\{DBID=(\\d+)");
+    //    private static final Pattern regCfgAGType = Pattern.compile("^Cfg([^=]+)=\\{DBID=(\\d+)");
+    private static final Pattern regCfgOp = Pattern.compile("PopCfg.+\\s(\\w+)$");
     long m_CurrentFilePos;
-    int m_CurrentLine;
     final int MSG_STRING_LIMIT = 200;
     private String ConnID;
-    private Pattern MLPattern;
-    private String URSFileID;
     private String URSRest;
     long m_HeaderOffset;
     ParserState m_ParserState;
@@ -100,14 +114,12 @@ public class WorkspaceParser extends Parser {
         }
     }
 
-    private static final Pattern regStrategy = Pattern.compile("strategy:.+\\*+(\\S+)");
-    //[14:33] strategy: **ORS (1085200831) is attached to the call
 
     //17:42:51.895_I_I_00d202972e8c2ebc [01:08] call (252087-104e77cd0) deleting truly
 //                addStep("01:08", null, "call deleting truly");
     private void AddStrategyMessageLine(String line, String FileLine) {
         Matcher m;
-        Message msg = null;
+        Message msg ;
         if ((FileLine.equals("14:33") || FileLine.equals("1B:01")) && (m = regStrategy.matcher(line)).find()) {
             msg = new URSStrategyInit(line, ConnID, m.group(1), "strategy is attached to the call");
         } else if (FileLine.equals("01:08")) {
@@ -199,7 +211,7 @@ public class WorkspaceParser extends Parser {
             }
             ParseLine(""); // to complete the parsing of the last line/last message
         } catch (Exception e) {
-            e.printStackTrace();
+            Main.logger.error(e);
             return m_CurrentLine - line;
         }
 
@@ -341,7 +353,7 @@ public class WorkspaceParser extends Parser {
     protected void AddTServerMessage(ArrayList<String> contents, String header, String urs_message) throws Exception {
         Matcher m;
         String server = null;
-        DateParsed dp = null;
+        DateParsed theDP = null;
         String event = null;
         String fileHandle = null;
         String refID = null;
@@ -361,7 +373,6 @@ public class WorkspaceParser extends Parser {
                 server = m.group(2);
                 event = m.group(3);
                 refID = m.group(4);
-                dp = ParseFormatDate(urs_message);
             } else if ((m = regSendingMessageTo.matcher(header)).find()) {
                 server = m.group(1);
                 if ((m = regToRequest.matcher((CharSequence) contents.get(0))).find()) {
@@ -370,7 +381,7 @@ public class WorkspaceParser extends Parser {
                 isInbound = false;
             } else if ((m = regCompletedHandling.matcher(header)).find()) {
                 server = m.group(1);
-                if (contents.size() == 0) {
+                if (contents.isEmpty()) {
                     if ((m = regLastOneOrTwoWords.matcher((CharSequence) header)).find()) {
                         event = m.group(0);
                     }
@@ -379,16 +390,16 @@ public class WorkspaceParser extends Parser {
                     event = m.group(1);
                 }
             } else {
-                dp = ParseFormatDate(header);
-                if (dp != null) {
-                    if ((m = regSentTo.matcher(dp.rest)).find()) {
+                theDP = ParseFormatDate(header);
+                if (theDP != null) {
+                    if ((m = regSentTo.matcher(theDP.rest)).find()) {
                         server = m.group(1);
                         if ((m = regReqTo.matcher(contents.get(0))).find()) {
                             fileHandle = m.group(1);
                             event = m.group(2);
                         }
                         isInbound = false;
-                    } else if ((m = regSendingTo.matcher(dp.rest)).find()) {
+                    } else if (( regSendingTo.matcher(theDP.rest)).find()) {
                         if ((m = regReqTo.matcher((CharSequence) contents.get(0))).find()) {
                             fileHandle = m.group(1);
                             event = m.group(2);
@@ -436,42 +447,6 @@ public class WorkspaceParser extends Parser {
         }
     }
 
-    private final static HashSet<String> eventsStatServer = new HashSet<String>(
-            Arrays.asList(new String[]{
-        "EventInfo",
-        "EventStatisticOpened",
-        "EventCurrentTargetStateSnapshot",
-        "RequestCloseStatistic",
-        "EventStatisticClosed",
-        "RequestGetStatisticEx",
-        "EventCurrentTargetStateTargetUpdated",
-        "RequestOpenStatistic",
-        "RequestGetStatistic",
-        "RequestSuspendNotification",
-        "RequestOpenStatisticEx"}));
-
-    private final static HashSet<String> eventsEServices = new HashSet<String>(
-            Arrays.asList(new String[]{
-        "EventCurrentAgentStatus",
-        "Event3rdServerResponse",
-        "EventCurrentAgentStatus",
-        "RequestRemoveMedia",
-        "RequestNotReadyForMedia",
-        "RequestCancelNotReadyForMedia",
-        "Request3rdServer"}));
-
-    private final static HashSet<String> eventsConfig = new HashSet<String>(
-            Arrays.asList(new String[]{
-        "EventObjectsRead",
-        "EventObjectsSent",
-        "RequestUnregisterNotification",
-        "EventNotificationUnregistered",
-        "RequestReadObjects"}));
-
-    private static final Pattern regCfgObjectName = Pattern.compile("(?:name|userName|number|loginCode)='([^']+)'");
-    private static final Pattern regCfgObjectType = Pattern.compile("^Cfg([^=]+)=.*\\{DBID=(\\d+)");
-//    private static final Pattern regCfgAGType = Pattern.compile("^Cfg([^=]+)=\\{DBID=(\\d+)");
-    private static final Pattern regCfgOp = Pattern.compile("PopCfg.+\\s(\\w+)$");
 
     private void AddConfigMessage(ArrayList<String> m_MessageContents) {
         ConfigUpdateRecord msg = new ConfigUpdateRecord(m_MessageContents);

@@ -11,7 +11,7 @@ import java.util.Collection;
 
 /**
  *
- * @author kvoroshi
+ * @author ssydoruk
  */
 public class OCSByConnIdQuery extends IQuery {
 

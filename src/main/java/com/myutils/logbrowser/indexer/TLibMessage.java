@@ -19,15 +19,30 @@ public class TLibMessage extends Message {
     private final static Pattern regTRequest = Pattern.compile("^(\\w+)");
     private final static Pattern regTRequesSource = Pattern.compile("\\s+\\(\\w+\\s+([^\\s]+)");
     private final static Pattern regTEvtPrivateI = Pattern.compile("^(\\w+)");
+    final private static Pattern regISCCRefID = Pattern.compile("^\\s+ISCCAttributeReferenceID\\s+(\\d+)");
 
     String m_MessageName;
     private String m_source;
     private String ConnID = null;
-    private GenesysMsg lastLogMsg;
+    final private GenesysMsg lastLogMsg;
+    private String UUID = null;
+    private Long _seqNo = null;
+    private String thisDN = null;
+    private Long _errorCode = null;
 
     TLibMessage(GenesysMsg lastLogMsg) {
         super(TableType.TLib);
         this.lastLogMsg = lastLogMsg;
+    }
+    TLibMessage(TLibMessage msg, GenesysMsg lastLogMsg) {
+        super(TableType.TLib);
+        this.m_MessageName = msg.GetMessageName();
+        this.lastLogMsg = msg.getLastLogMsg();
+        m_MessageLines = new ArrayList<>(msg.m_MessageLines.size());
+        for (String m_MessageLine : msg.m_MessageLines) {
+            m_MessageLines.add(m_MessageLine);
+        }
+        
     }
 
     public String getConnID() {
@@ -55,7 +70,6 @@ public class TLibMessage extends Message {
             this.UUID = UUID;
         }
     }
-    private String UUID = null;
 
     void setData(String hdr, ArrayList<String> newMessageLines) {
 
@@ -101,16 +115,6 @@ public class TLibMessage extends Message {
         return lastLogMsg;
     }
 
-    TLibMessage(TLibMessage msg, GenesysMsg lastLogMsg) {
-        super(TableType.TLib);
-        this.m_MessageName = msg.GetMessageName();
-        this.lastLogMsg = msg.getLastLogMsg();
-        m_MessageLines = new ArrayList<>(msg.m_MessageLines.size());
-        for (String m_MessageLine : msg.m_MessageLines) {
-            m_MessageLines.add(m_MessageLine);
-        }
-
-    }
 
     @Override
     public String toString() {
@@ -142,7 +146,6 @@ public class TLibMessage extends Message {
         return ret;
     }
 
-    final private static Pattern regISCCRefID = Pattern.compile("^\\s+ISCCAttributeReferenceID\\s+(\\d+)");
 
     Long getRefID() {
         Long ret = getAttributeLong("AttributeReferenceID");
@@ -173,7 +176,6 @@ public class TLibMessage extends Message {
         return null;
     }
 
-    private Long _seqNo = null;
 
     Long getSeqNo() {
         if (_seqNo == null) {
@@ -182,7 +184,6 @@ public class TLibMessage extends Message {
         return _seqNo;
     }
 
-    private String thisDN = null;
 
     String getThisDN() {
         if (thisDN == null) {
@@ -191,7 +192,6 @@ public class TLibMessage extends Message {
         return thisDN;
     }
 
-    private Long _errorCode = null;
 
     Long getErrorCode() {
         if (_errorCode == null) {

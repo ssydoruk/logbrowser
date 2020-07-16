@@ -15,7 +15,6 @@ public class DBServerParser extends Parser {
     private static final Pattern regCfgUpdate = Pattern.compile("^\\s+PopCfg");
 
     long m_CurrentFilePos;
-    int m_CurrentLine;
     final int MSG_STRING_LIMIT = 200;
     long m_HeaderOffset;
     ParserState m_ParserState;
@@ -66,7 +65,7 @@ public class DBServerParser extends Parser {
             }
             ParseLine(""); // to complete the parsing of the last line/last message
         } catch (Exception e) {
-            e.printStackTrace();
+            Main.logger.error(e);
             return m_CurrentLine - line;
         }
 

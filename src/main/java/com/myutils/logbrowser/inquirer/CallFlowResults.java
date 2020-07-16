@@ -21,6 +21,33 @@ import javax.swing.JOptionPane;
 import static org.apache.commons.lang3.ArrayUtils.isEmpty;
 
 public class CallFlowResults extends IQueryResults {
+    public static final int TLIB = 0x01;
+    public static final int ISCC = 0x02;
+    public static final int TC = 0x04;
+    public static final int SIP = 0x08;
+    public static final int PROXY = 0x10;
+    private static String[] RequestsToShow = {"RequestMakePredictiveCall", "RequestMakeCall", "RequestMonitorNextCall"};
+    private static String[] EventsToShow = {"EventDialing", "EventNetworkReached", "EventMonitoringNextCall"};
+    private IDsFinder cidFinder;
+    private String m_tlibFilter;
+    private int m_componentFilter;
+    ArrayList<NameID> appsType;
+    private Handlers handlerIDs = new Handlers();
+    public CallFlowResults(QueryDialogSettings qdSettings) throws SQLException {
+        super(qdSettings);
+        if (repComponents.isEmpty()) {
+            loadStdOptions();
+        }
+        addSelectionType(SelectionType.NO_SELECTION);
+        addSelectionType(SelectionType.GUESS_SELECTION);
+        addSelectionType(SelectionType.CONNID);
+        addSelectionType(SelectionType.CALLID);
+        addSelectionType(SelectionType.DN);
+        addSelectionType(SelectionType.PEERIP);
+        addSelectionType(SelectionType.AGENTID);
+        addSelectionType(SelectionType.UUID);
+        addSelectionType(SelectionType.REFERENCEID);
+    }
 
     @Override
     public String getSearchString() {
@@ -36,7 +63,6 @@ public class CallFlowResults extends IQueryResults {
         showAllResults(getAllResults); //To change body of generated methods, choose Tools | Templates.
     }
 
-    private IDsFinder cidFinder;
 
     @Override
     public void Retrieve(QueryDialog dlg, SelectionType key, String searchID) throws SQLException {
@@ -271,15 +297,6 @@ public class CallFlowResults extends IQueryResults {
         return refreshTimeRange(null);
     }
 
-    public static final int TLIB = 0x01;
-    public static final int ISCC = 0x02;
-    public static final int TC = 0x04;
-    public static final int SIP = 0x08;
-    public static final int PROXY = 0x10;
-
-    private String m_tlibFilter;
-
-    private int m_componentFilter;
 
     @Override
     public String getReportSummary() {
@@ -337,21 +354,6 @@ public class CallFlowResults extends IQueryResults {
 
     }
 
-    public CallFlowResults(QueryDialogSettings qdSettings) throws SQLException {
-        super(qdSettings);
-        if (repComponents.isEmpty()) {
-            loadStdOptions();
-        }
-        addSelectionType(SelectionType.NO_SELECTION);
-        addSelectionType(SelectionType.GUESS_SELECTION);
-        addSelectionType(SelectionType.CONNID);
-        addSelectionType(SelectionType.CALLID);
-        addSelectionType(SelectionType.DN);
-        addSelectionType(SelectionType.PEERIP);
-        addSelectionType(SelectionType.AGENTID);
-        addSelectionType(SelectionType.UUID);
-        addSelectionType(SelectionType.REFERENCEID);
-    }
 
     public void SetConfig(Properties config) {
         if (config != null && !config.isEmpty()) {
@@ -359,8 +361,6 @@ public class CallFlowResults extends IQueryResults {
         }
     }
 
-    private static String[] RequestsToShow = {"RequestMakePredictiveCall", "RequestMakeCall", "RequestMonitorNextCall"};
-    private static String[] EventsToShow = {"EventDialing", "EventNetworkReached", "EventMonitoringNextCall"};
 
     private void addSIPReportType(DynamicTreeNode<OptionNode> root) {
         DynamicTreeNode<OptionNode> nd = new DynamicTreeNode<>(new OptionNode(true, DialogItem.TLIB_CALLS_SIP));
@@ -484,7 +484,6 @@ public class CallFlowResults extends IQueryResults {
         DoneSTDOptions();
     }
 
-    ArrayList<NameID> appsType;
 
     @Override
     public ArrayList<NameID> getApps() throws SQLException {
@@ -536,25 +535,6 @@ public class CallFlowResults extends IQueryResults {
         return TLibReq;
     }
 
-    private class Handlers extends HashSet {
-
-        @Override
-        public boolean addAll(Collection c) {
-            if (c != null) {
-                return super.addAll(c); //To change body of generated methods, choose Tools | Templates.
-            } else {
-                return false;
-            }
-        }
-
-        private void addAll(Integer[] hID) {
-            if (hID != null && hID.length > 0) {
-                handlerIDs.addAll(Arrays.asList(hID));
-            }
-        }
-
-    }
-    private Handlers handlerIDs = new Handlers();
 
     private void RetrieveSIP(QueryDialog dlg, DynamicTreeNode<OptionNode> reportSettings, IDsFinder cidFinder) throws SQLException {
         if (isChecked(reportSettings) && DatabaseConnector.TableExist("sip_logbr")) {
@@ -968,6 +948,24 @@ public class CallFlowResults extends IQueryResults {
             return cidFinder.AnythingTLibRelated();
         }
         return true;
+    }
+    private class Handlers extends HashSet {
+        
+        @Override
+        public boolean addAll(Collection c) {
+            if (c != null) {
+                return super.addAll(c); //To change body of generated methods, choose Tools | Templates.
+            } else {
+                return false;
+            }
+        }
+        
+        private void addAll(Integer[] hID) {
+            if (hID != null && hID.length > 0) {
+                handlerIDs.addAll(Arrays.asList(hID));
+            }
+        }
+        
     }
 
 }

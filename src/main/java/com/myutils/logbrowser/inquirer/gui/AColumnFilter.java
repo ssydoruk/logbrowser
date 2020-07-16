@@ -17,6 +17,15 @@ import javax.swing.event.ListDataListener;
  * @author ssydoruk
  */
 abstract class AColumnFilter {
+    static public double convertDouble(Object val) throws NumberFormatException {
+        double l;
+        if (val instanceof Integer) {
+            l = ((Integer) val).doubleValue();
+        } else {
+            l = Double.parseDouble((String) val.toString());
+        }
+        return l;
+    }
 
     public AColumnFilter() {
     }
@@ -67,24 +76,22 @@ abstract class AColumnFilter {
         }
     }
 
-    static public double convertDouble(Object val) throws NumberFormatException {
-        double l;
-        if (val instanceof Integer) {
-            l = ((Integer) val).doubleValue();
-        } else {
-            l = Double.parseDouble((String) val.toString());
-        }
-        return l;
-    }
 
     public static abstract class DateFilter extends AColumnFilter {
 
-        public long convertToTime(Object val) {
-            return DatabaseConnector.convertToTime(val);
-        }
 
         private String name;
         private boolean needsSecond;
+        private long firstDate;
+        private long secondDate;
+        private boolean showNonDate = false;
+        public DateFilter(String name, boolean needsSecond) {
+            this.name = name;
+            this.needsSecond = needsSecond;
+        }
+        public long convertToTime(Object val) {
+            return DatabaseConnector.convertToTime(val);
+        }
 
         public String getName() {
             return name;
@@ -125,9 +132,6 @@ abstract class AColumnFilter {
         public void setShowNonDate(boolean showNonDate) {
             this.showNonDate = showNonDate;
         }
-        private long firstDate;
-        private long secondDate;
-        private boolean showNonDate = false;
 
         public long chopMS(long convertToTime) {
 //            double name = convertToTime/1000;
@@ -135,10 +139,6 @@ abstract class AColumnFilter {
             return (long) ((double) convertToTime / 1000) * 1000;
         }
 
-        public DateFilter(String name, boolean needsSecond) {
-            this.name = name;
-            this.needsSecond = needsSecond;
-        }
 
         @Override
         public String toString() {
@@ -153,6 +153,10 @@ abstract class AColumnFilter {
         private double firstNum;
         private double secondNum;
         private boolean showNonNumbers = false;
+        public NumberFilter(String name, boolean needsSecond) {
+            this.name = name;
+            this.needsSecond = needsSecond;
+        }
 
         public boolean isShowNonNumbers() {
             return showNonNumbers;
@@ -203,10 +207,6 @@ abstract class AColumnFilter {
             return name;
         }
 
-        public NumberFilter(String name, boolean needsSecond) {
-            this.name = name;
-            this.needsSecond = needsSecond;
-        }
 
         public void setShowNonNumbers(boolean selected) {
             this.showNonNumbers = selected;

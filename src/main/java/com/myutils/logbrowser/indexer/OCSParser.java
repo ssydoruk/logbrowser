@@ -107,6 +107,10 @@ public class OCSParser extends Parser {
     private static final Pattern regSentTo = Pattern.compile("^\\.{2}sent to");
     private static final Pattern regLineSkip = Pattern.compile("^\\s*");
     //	private DBAccessor m_accessor;
+    private static final Pattern regCfgObjectName = Pattern.compile("(?:name|userName)='([^']+)'");
+    private static final Pattern regCfgObjectType = Pattern.compile("CfgDelta([^=]+)=");
+    private static final Pattern regCfgOp = Pattern.compile("PopCfg.+\\s(\\w+)$");
+    private static final Pattern regCfgObjectDBID = Pattern.compile("\\WDBID=(\\d+)\\W");
 
     private int m_CurrentLine;
     private StatEventType statEventType;
@@ -268,7 +272,7 @@ public class OCSParser extends Parser {
             }
             ParseLine("", null); // to complete the parsing of the last line/last message
         } catch (Exception e) {
-            e.printStackTrace();
+            Main.logger.error(e);;
             return m_CurrentLine - line;
         }
 
@@ -647,7 +651,7 @@ public class OCSParser extends Parser {
             OCSStatEvent msg = new OCSStatEvent(statEventType, m_MessageContents);
             SetStdFieldsAndAdd(msg);
         } catch (Exception e) {
-            e.printStackTrace();
+            Main.logger.error(e);;
             throw e;
         }
     }
@@ -661,7 +665,26 @@ public class OCSParser extends Parser {
 
     @Override
     void init(HashMap<TableType, DBTable> m_tables) {
-        m_tables.put(TableType.OCSPredInfo, new OCSPredInfoTable(Main.getMain().getM_accessor(), TableType.OCSPredInfo));
+        m_tables.put(TableType.OCSPredInfo, new OCSPredInfoTable(Main.getM_accessor(), TableType.OCSPredInfo));
+    }
+    private void AddConfigMessage(String s) {
+        ConfigUpdateRecord msg = new ConfigUpdateRecord(s);
+        try {
+            Matcher m;
+            msg.setObjectType(Message.getRx(s, regCfgObjectType, 1, ""));
+            msg.setObjectDBID(Message.getRx(s, regCfgObjectDBID, 1, ""));
+//            msg.setObjName(Message.FindByRx(m_MessageContents, regCfgObjectName, 1, ""));
+//            msg.setOp(Message.FindByRx(m_MessageContents, regCfgOp, 1, ""));
+//
+//            if ((m = Message.FindMatcher(m_MessageContents, regCfgObjectType)) != null) {
+//                msg.setObjectType(m.group(1));
+//                msg.setObjectDBID(m.group(2));
+//            }
+
+SetStdFieldsAndAdd(msg);
+        } catch (Exception e) {
+            Main.logger.error("Not added \"" + msg.getM_type() + "\" record:" + e.getMessage(), e);
+        }
     }
 
     enum ParserState {
@@ -722,30 +745,6 @@ public class OCSParser extends Parser {
 
     }
 
-    private static final Pattern regCfgObjectName = Pattern.compile("(?:name|userName)='([^']+)'");
-    private static final Pattern regCfgObjectType = Pattern.compile("CfgDelta([^=]+)=");
-    private static final Pattern regCfgOp = Pattern.compile("PopCfg.+\\s(\\w+)$");
-    private static final Pattern regCfgObjectDBID = Pattern.compile("\\WDBID=(\\d+)\\W");
-
-    private void AddConfigMessage(String s) {
-        ConfigUpdateRecord msg = new ConfigUpdateRecord(s);
-        try {
-            Matcher m;
-            msg.setObjectType(Message.getRx(s, regCfgObjectType, 1, ""));
-            msg.setObjectDBID(Message.getRx(s, regCfgObjectDBID, 1, ""));
-//            msg.setObjName(Message.FindByRx(m_MessageContents, regCfgObjectName, 1, ""));
-//            msg.setOp(Message.FindByRx(m_MessageContents, regCfgOp, 1, ""));
-//
-//            if ((m = Message.FindMatcher(m_MessageContents, regCfgObjectType)) != null) {
-//                msg.setObjectType(m.group(1));
-//                msg.setObjectDBID(m.group(2));
-//            }
-
-            SetStdFieldsAndAdd(msg);
-        } catch (Exception e) {
-            Main.logger.error("Not added \"" + msg.getM_type() + "\" record:" + e.getMessage(), e);
-        }
-    }
 
     private class OCSPredInfo extends Message {
 
@@ -853,7 +852,7 @@ public class OCSParser extends Parser {
 
             try {
                 stmt.setTimestamp(1, new Timestamp(rec.GetAdjustedUsecTime()));
-                stmt.setInt(2, rec.getFileId());
+                stmt.setInt(2, OCSPredInfo.getFileId());
                 stmt.setLong(3, rec.m_fileOffset);
                 stmt.setLong(4, rec.getM_FileBytes());
                 stmt.setLong(5, rec.m_line);

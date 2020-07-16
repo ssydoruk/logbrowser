@@ -27,7 +27,7 @@ enum GenesysConstants {
         return ret.toString();
     }
 
-    private String name;
+    private final String name;
 
     private static final Map<String, GenesysConstants> ENUM_MAP;
 

@@ -9,27 +9,26 @@ import java.util.regex.Pattern;
 
 /**
  *
- * @author kvoroshi
+ * @author ssydoruk
  */
 public class ProxiedMessage extends Message {
 
-    private final String event;
-    private final String contents;
-
-    public String getEvent() {
-        return event;
-    }
 
     private static Pattern regAttributeReferenceID = Pattern.compile("AttributeReferenceID[\\s\\[]+(\\w+)");
     private static Pattern regAttributeThisDN = Pattern.compile("AttributeThisDN[\\s\\[]+(\\w+)");
     private static Pattern regFrom = Pattern.compile("from[\\s\\(]+\\([\\w]+\\s([^\\s]+)");
     private static Pattern regTo = Pattern.compile("to[\\s\\(]+\\([\\w]+\\s([^\\s]+)");
+    private final String event;
+    private final String contents;
 
     public ProxiedMessage(String evName, String contents) {
         super(TableType.TLibProxied, contents);
         this.event = evName;
         this.contents = contents;
 
+    }
+    public String getEvent() {
+        return event;
     }
 
     public String getRefid() {

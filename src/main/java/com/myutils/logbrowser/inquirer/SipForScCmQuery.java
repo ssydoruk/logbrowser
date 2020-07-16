@@ -9,12 +9,12 @@ import com.myutils.logbrowser.indexer.ReferenceType;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashSet;
-import java.util.Hashtable;
+import java.util.HashMap;
 import org.apache.commons.lang3.StringUtils;
 
 /**
  *
- * @author kvoroshi
+ * @author ssydoruk
  */
 public class SipForScCmQuery extends IQuery {
 
@@ -22,9 +22,6 @@ public class SipForScCmQuery extends IQuery {
     private HashSet handlerIDs = new HashSet();
     private boolean collectHandlers = false;
 
-    public String getTabAlias() {
-        return "sip";
-    }
 
     private Integer[] m_CallIds;
     private boolean m_useProxy = true;
@@ -51,7 +48,7 @@ public class SipForScCmQuery extends IQuery {
         setOrderBy(new String[]{"time"});
     }
 
-    public SipForScCmQuery(Hashtable callIds, boolean useProxy) throws Exception {
+    public SipForScCmQuery(HashMap callIds, boolean useProxy) throws Exception {
         this();
         m_CallIds = (Integer[]) callIds.keySet().toArray(new Integer[callIds.size()]);
         m_useProxy = useProxy;
@@ -67,6 +64,9 @@ public class SipForScCmQuery extends IQuery {
         this.node = reportSettings;
         this.cidFinder = cidFinder;
         this.collectHandlers = collectHandlers;
+    }
+    public String getTabAlias() {
+        return "sip";
     }
 
     @Override
@@ -97,8 +97,8 @@ public class SipForScCmQuery extends IQuery {
         recCnt = 0;
     }
 
-//    private Hashtable sipRecords = new Hashtable();
-//    public Hashtable getSipRecords() {
+//    private HashMap sipRecords = new HashMap();
+//    public HashMap getSipRecords() {
 //        return sipRecords;
 //    }
     @Override

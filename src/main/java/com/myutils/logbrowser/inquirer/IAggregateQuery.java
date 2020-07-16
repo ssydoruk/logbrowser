@@ -17,6 +17,11 @@ import javax.swing.JPanel;
  * @author ssydoruk
  */
 public abstract class IAggregateQuery extends IQueryResults {
+    private static final String TMP_TABLE_PREFIX = "tmp";
+    private static int tmpTableIdx = 0;
+    protected QueryDialog qd = null;
+    private JPanel jpConfig = null;
+    protected AnyQuery resultQuery = null;
 
     @Override
     boolean callRelatedSearch(IDsFinder cidFinder) throws SQLException {
@@ -34,7 +39,6 @@ public abstract class IAggregateQuery extends IQueryResults {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
-    protected QueryDialog qd = null;
 
     @Override
     protected ArrayList<IAggregateQuery> loadReportAggregates() {
@@ -61,7 +65,6 @@ public abstract class IAggregateQuery extends IQueryResults {
         return null;
     }
 
-    private JPanel jpConfig = null;
 
     public JPanel getJpConfig() {
         return jpConfig;
@@ -88,10 +91,6 @@ public abstract class IAggregateQuery extends IQueryResults {
 
     abstract public boolean needPrint();
 
-    protected AnyQuery resultQuery = null;
-
-    private static final String TMP_TABLE_PREFIX = "tmp";
-    private static int tmpTableIdx = 0;
 
     public String resetTempTable() {
         String ret = TMP_TABLE_PREFIX + (tmpTableIdx++);

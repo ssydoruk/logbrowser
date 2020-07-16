@@ -9,7 +9,7 @@ import org.json.JSONObject;
 
 /**
  *
- * @author kvoroshi
+ * @author ssydoruk
  */
 public class JsonMessage extends Message {
 

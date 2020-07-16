@@ -22,6 +22,7 @@ public abstract class URSRIBase extends Message {
 
     public static final int MAX_WEB_PARAMS = 5;
     private static final HashMap<String, Integer> keysPos = new HashMap<>(MAX_WEB_PARAMS);
+    private static final org.apache.logging.log4j.Logger logger = LogManager.getLogger();
 
     static void addIndexes(DBTable tab) {
         for (int i = 1; i <= MAX_WEB_PARAMS; i++) {
@@ -62,9 +63,26 @@ public abstract class URSRIBase extends Message {
             }
 
     }
+    public static Map<String, List<String>> splitQuery(String url) throws UnsupportedEncodingException {
+        if (StringUtils.isNotBlank(url)) {
+            final Map<String, List<String>> query_pairs = new LinkedHashMap<>();
+            final String[] pairs = url.split("&");
+            for (String pair : pairs) {
+                final int idx = pair.indexOf("=");
+                final String key = idx > 0 ? URLDecoder.decode(pair.substring(0, idx), "UTF-8") : pair;
+                if (!query_pairs.containsKey(key)) {
+                    query_pairs.put(key, new LinkedList<>());
+                }
+                final String value = idx > 0 && pair.length() > idx + 1 ? URLDecoder.decode(pair.substring(idx + 1), "UTF-8") : null;
+                query_pairs.get(key).add(value);
+            }
+            return query_pairs;
+        } else {
+            return null;
+        }
+    }
     private List<Pair<String, String>> allParams;
 
-    private static final org.apache.logging.log4j.Logger logger = LogManager.getLogger();
 
     private String ConnID;
     private String clientApp;
@@ -178,24 +196,6 @@ public abstract class URSRIBase extends Message {
         }
     }
 
-    public static Map<String, List<String>> splitQuery(String url) throws UnsupportedEncodingException {
-        if (StringUtils.isNotBlank(url)) {
-            final Map<String, List<String>> query_pairs = new LinkedHashMap<>();
-            final String[] pairs = url.split("&");
-            for (String pair : pairs) {
-                final int idx = pair.indexOf("=");
-                final String key = idx > 0 ? URLDecoder.decode(pair.substring(0, idx), "UTF-8") : pair;
-                if (!query_pairs.containsKey(key)) {
-                    query_pairs.put(key, new LinkedList<>());
-                }
-                final String value = idx > 0 && pair.length() > idx + 1 ? URLDecoder.decode(pair.substring(idx + 1), "UTF-8") : null;
-                query_pairs.get(key).add(value);
-            }
-            return query_pairs;
-        } else {
-            return null;
-        }
-    }
 
     void setURIParams(String uriParams) {
 //        try {

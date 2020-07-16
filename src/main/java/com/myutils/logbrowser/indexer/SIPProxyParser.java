@@ -16,12 +16,10 @@ import org.apache.commons.lang3.StringUtils;
 
 /**
  *
- * @author kvoroshi
+ * @author ssydoruk
  */
 public class SIPProxyParser extends Parser {
 
-    final int MSG_STRING_LIMIT = 200;
-    // parse state contants
 
     static final String[] BlockNamesToIgnoreArray = {
         "NET:TCO:EventResourceInfo:",
@@ -33,12 +31,6 @@ public class SIPProxyParser extends Parser {
         "SIP:CTI:tControllerSync:",
         "SIP:CTI:callSync:"
     };
-    HashSet m_BlockNamesToIgnoreHash;
-
-    StringBuilder sipBuf = new StringBuilder();
-
-    long m_CurrentFilePos;
-    long m_HeaderOffset;
 
 //15:37:21.918 +++ CIFace::Request +++
 //   -- new invoke
@@ -51,11 +43,30 @@ public class SIPProxyParser extends Parser {
     private static final Pattern regNumbers = Pattern.compile("Numbers: \\+<([^>]+)> -<([^>]+)>");
     private static final Pattern regSIPHeaderIP = Pattern.compile("(?:(\\S+) (>>>>>|<<<<<))$");
     private static final Pattern regSIPHeaderNetwork = Pattern.compile("(?:(\\S+) (>>>|<<<))$");
-    private static final Pattern regTMessageContinue = Pattern.compile("^(\\t|message|\\d*\\s\\[BSYNC\\] Trace:)");
-    private static final Pattern regTriggerStart = Pattern.compile("^\\$((\\*:)|\\+|-)");
     private static final Pattern regConfigUpdate = Pattern.compile("^[\\d\\s]+\\[TCONF\\]");
 
     private static final Pattern regConfigOneLineDN = Pattern.compile("^\\s\\[(\\d+)\\] dn = '([^']+)' type = (\\w+)");
+    private static final Pattern ptSkip = Pattern.compile("^[:\\s]*");
+    private final static Pattern regProxy = Pattern.compile("^Proxy\\((\\w+):");
+    static private boolean ifSIPLines = false;
+    private final static Pattern SIPHeaderContinue = Pattern.compile("^\\s*(\\w.+)");
+    private static boolean ifSIPLinesForce = false;
+    private static boolean gaveWarning = false;
+    private static final Pattern regSIPHeader = Pattern.compile("(\\d+) bytes .+ (>>>>>|<<<<<)$");
+//    15:22:50.980: Sending  [0,UDP] 3384 bytes to 10.82.10.146:5060 >>>>>
+    private static final Pattern regNotParseMessage = Pattern.compile("^(0454[1-5]"
+            + ")");
+    private static final Pattern regCfgObjectName = Pattern.compile("(?:name|userName|number|loginCode)='([^']+)'");
+    private static final Pattern regCfgObjectDBID = Pattern.compile("DBID=(\\d+)");
+    private static final Pattern regCfgObjectType = Pattern.compile("object Cfg(\\w+)=");
+    private static final Pattern regCfgOp = Pattern.compile("\\(type Object(\\w+)\\)");
+    private static final Pattern regSIPServerStartDN = Pattern.compile("^\\s*DN added \\(dbid (\\d+)\\) \\(number ([^\\(]+)\\) ");
+    final int MSG_STRING_LIMIT = 200;
+    // parse state contants
+    HashSet m_BlockNamesToIgnoreHash;
+    StringBuilder sipBuf = new StringBuilder();
+    long m_CurrentFilePos;
+    long m_HeaderOffset;
 
     private ParserState m_ParserState;
     int m_PacketLength;
@@ -73,26 +84,18 @@ public class SIPProxyParser extends Parser {
     private String msgName;
     private boolean inbound;
     private DateParsed dpHeader;
-    private static final Pattern ptSkip = Pattern.compile("^[:\\s]*");
-
-    private final static Pattern regProxy = Pattern.compile("^Proxy\\((\\w+):");
-    static private boolean ifSIPLines = false;
-    private final static Pattern SIPHeaderContinue = Pattern.compile("^\\s*(\\w.+)");
-    private ArrayList<String> extraBuff;
-    private static boolean ifSIPLinesForce = false;
-    private static boolean gaveWarning = false;
+    private final ArrayList<String> extraBuff;
     private boolean haMessage;
     private String handleAdd;
+    private long lastSeqNo = 0;
 
     public SIPProxyParser(HashMap<TableType, DBTable> m_tables) {
         super(FileInfoType.type_SessionController, m_tables);
         this.extraBuff = new ArrayList<>();
         //m_accessor = accessor;
         m_BlockNamesToIgnoreHash = new HashSet();
-        for (int i = 0; i < BlockNamesToIgnoreArray.length; i++) {
-            m_BlockNamesToIgnoreHash.add(BlockNamesToIgnoreArray[i]);
-        }
-        this.ifSIPLinesForce = Main.ifSIPLines();
+        m_BlockNamesToIgnoreHash.addAll(Arrays.asList(BlockNamesToIgnoreArray));
+        SIPProxyParser.ifSIPLinesForce = Main.ifSIPLines();
 
     }
 
@@ -160,7 +163,7 @@ public class SIPProxyParser extends Parser {
 
             ParseLine(input, ""); // to complete the parsing of the last line/last message
         } catch (Exception e) {
-            e.printStackTrace();
+            Main.logger.error(e);
             return m_CurrentLine - line;
         }
 
@@ -168,7 +171,7 @@ public class SIPProxyParser extends Parser {
     }
 
     void ContinueParsing(String initial) {
-        String str = "";
+        String str ;
         BufferedReaderCrLf input = Main.getMain().GetNextFile();
         if (input == null) {
             return;
@@ -185,11 +188,9 @@ public class SIPProxyParser extends Parser {
             if (notFound) {
                 return;
             }
-            notFound = true;
             while ((str = input.readLine()) != null) {
                 Main.logger.trace("l: " + m_CurrentLine + " [" + str + "]");
                 if (str.trim().isEmpty()) {
-                    notFound = false;
                     break;
                 }
             }
@@ -206,15 +207,10 @@ public class SIPProxyParser extends Parser {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            Main.logger.error(e);
         }
     }
 
-    private static final Pattern regSIPHeader = Pattern.compile("(\\d+) bytes .+ (>>>>>|<<<<<)$");
-//    15:22:50.980: Sending  [0,UDP] 3384 bytes to 10.82.10.146:5060 >>>>>
-
-    private static final Pattern regNotParseMessage = Pattern.compile("^(0454[1-5]"
-            + ")");
 
     String ParseLine(BufferedReaderCrLf input, String str) throws Exception {
         Matcher m;
@@ -439,7 +435,7 @@ public class SIPProxyParser extends Parser {
             case STATE_SIP_BODY: {
                 m_PacketLength -= s.length() + 2;
 
-                if ((m = SIPHeaderContinue.matcher(str)).find()) {
+                if (( SIPHeaderContinue.matcher(str)).find()) {
                     m_MessageContents.add(s);
 
                 } else {
@@ -566,7 +562,7 @@ public class SIPProxyParser extends Parser {
         Matcher m;
 
         // Populate our class representation of the message
-        SipMessage msg = null;
+        SipMessage msg ;
 
 //        if (contents.isEmpty()) {
 //            Main.logger.error("Could not find message itself!");
@@ -755,8 +751,8 @@ public class SIPProxyParser extends Parser {
 
         m_lastMsgType = 1;
 
-        String msgName = msg.GetName();
-        if (msgName != null && msgName.equals("NOTIFY")) {
+        String theMsgName = msg.GetName();
+        if (theMsgName != null && theMsgName.equals("NOTIFY")) {
             String contentType = msg.GetSIPHeader("Content-Type", "c");
             String contentEvent = msg.GetSIPHeader("Event", null);
 
@@ -775,10 +771,6 @@ public class SIPProxyParser extends Parser {
         }
     }
 
-    private final static HashSet<String> eventsWithCallInfo = new HashSet<String>(
-            Arrays.asList(new String[]{
-        "EventRegistered",
-        "EventAddressInfo"}));
 
     protected void AddCireqMessage(ArrayList contents, String header) throws Exception {
         Matcher m;
@@ -796,26 +788,15 @@ public class SIPProxyParser extends Parser {
             }
         }
         req.SetOffset(m_HeaderOffset);
-        int headerLine = m_CurrentLine - contents.size();
-        if (headerLine < 1) {
-            headerLine = 1;
-        }
         req.SetLine(m_headerLine);
         SetStdFieldsAndAdd(req);
     }
 
-    private static final Pattern regOldConnID = Pattern.compile("was (\\w+)\\)$");
-    private static final Pattern regNewConnID = Pattern.compile("\\@ c:(\\w+),");
 
     private boolean FullSIPMsg() {
         return true;
     }
 
-    private static final Pattern regCfgObjectName = Pattern.compile("(?:name|userName|number|loginCode)='([^']+)'");
-    private static final Pattern regCfgObjectDBID = Pattern.compile("DBID=(\\d+)");
-    private static final Pattern regCfgObjectType = Pattern.compile("object Cfg(\\w+)=");
-    private static final Pattern regCfgOp = Pattern.compile("\\(type Object(\\w+)\\)");
-    private static final Pattern regSIPServerStartDN = Pattern.compile("^\\s*DN added \\(dbid (\\d+)\\) \\(number ([^\\(]+)\\) ");
 
     private void AddConfigMessage(ArrayList<String> m_MessageContents) {
         ConfigUpdateRecord msg = new ConfigUpdateRecord(m_MessageContents);
@@ -839,7 +820,6 @@ public class SIPProxyParser extends Parser {
         }
     }
 
-    private long lastSeqNo = 0;
 
     private boolean newSeqNo(TLibMessage msg) {
         Long seqNo = msg.getSeqNo();

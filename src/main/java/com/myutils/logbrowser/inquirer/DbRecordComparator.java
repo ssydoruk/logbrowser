@@ -4,24 +4,25 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Deque;
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Objects;
 import java.util.Set;
 
 class DbRecordComparator implements Comparator {
 
-    private Hashtable m_sipRecords;
-    private Hashtable m_tlibRecords;
-    private Hashtable m_anchors;
-    private Hashtable m_sipAnchors;
-    private Hashtable m_sipMasters;
+    private HashMap m_sipRecords;
+    private HashMap m_tlibRecords;
+    private HashMap m_anchors;
+    private HashMap m_sipAnchors;
+    private HashMap m_sipMasters;
     private RuntimeQuery orsQuery = null;
     private RuntimeQuery tlibQuery = null;
 
     public DbRecordComparator() throws SQLException {
     }
 
-    public DbRecordComparator(Hashtable sip_records, Hashtable tlib_records) throws SQLException {
+    public DbRecordComparator(HashMap sip_records, HashMap tlib_records) throws SQLException {
         this();
         if (DatabaseConnector.TableExist("ors_logbr")) {
             orsQuery = new RuntimeQuery(
@@ -44,7 +45,7 @@ class DbRecordComparator implements Comparator {
         m_sipRecords = sip_records;
         m_tlibRecords = tlib_records;
 
-        m_anchors = new Hashtable();
+        m_anchors = new HashMap();
         if (m_tlibRecords != null) {
             Set keys = m_tlibRecords.keySet();
             for (Object key : keys) {
@@ -55,15 +56,15 @@ class DbRecordComparator implements Comparator {
                     continue;
                 }
                 if (!m_anchors.containsKey(anchor)) {
-                    m_anchors.put(anchor, new Hashtable());
+                    m_anchors.put(anchor, new HashMap());
                 }
-                Hashtable current = (Hashtable) m_anchors.get(anchor);
+                HashMap current = (HashMap) m_anchors.get(anchor);
                 current.put(iKey, val);
             }
         }
 
-        m_sipAnchors = new Hashtable();
-        m_sipMasters = new Hashtable();
+        m_sipAnchors = new HashMap();
+        m_sipMasters = new HashMap();
         if (m_sipRecords != null) {
             Set sipkeys = m_sipRecords.keySet();
             for (Object key : sipkeys) {
@@ -71,13 +72,13 @@ class DbRecordComparator implements Comparator {
                 ILogRecord val = (ILogRecord) m_sipRecords.get(iKey);
                 int anchor = val.GetAnchorId();
                 if (!m_sipAnchors.containsKey(anchor)) {
-                    m_sipAnchors.put(anchor, new Hashtable());
+                    m_sipAnchors.put(anchor, new HashMap());
                 }
-                Hashtable current = (Hashtable) m_sipAnchors.get(anchor);
+                HashMap current = (HashMap) m_sipAnchors.get(anchor);
                 current.put(iKey, val);
 
                 if (val.GetField("comp").equals("CM")) {
-                    if (!m_sipMasters.contains(anchor)) {
+                    if (!m_sipMasters.containsKey(anchor)) {
                         m_sipMasters.put(anchor, val);
                     }
                 }
@@ -121,7 +122,7 @@ class DbRecordComparator implements Comparator {
             if (owner1 == null && owner2 == null) {
                 // if items are in the same file
                 // arrange in order they arrear in the file
-                if (item1.GetFileId() == item2.GetFileId()) {
+                if (Objects.equals(item1.GetFileId(), item2.GetFileId())) {
                     return item1.GetLine() - item2.GetLine();
                 }
                 return 0;
@@ -230,8 +231,8 @@ class DbRecordComparator implements Comparator {
             return (int) (record1.GetFileOffset() - record2.GetFileOffset());
         }
 
-        Hashtable hash1 = (m_sipAnchors == null) ? null : (Hashtable) m_sipAnchors.get(anchor1);
-        Hashtable hash2 = (m_sipAnchors == null) ? null : (Hashtable) m_sipAnchors.get(anchor2);
+        HashMap hash1 = (m_sipAnchors == null) ? null : (HashMap) m_sipAnchors.get(anchor1);
+        HashMap hash2 = (m_sipAnchors == null) ? null : (HashMap) m_sipAnchors.get(anchor2);
         if (hash1 != null && hash2 != null) {
             Set keys1 = hash1.keySet();
             Set keys2 = hash2.keySet();
@@ -329,8 +330,8 @@ class DbRecordComparator implements Comparator {
         }
 
         if (m_anchors != null) {
-            Hashtable hash1 = (Hashtable) m_anchors.get(anchor1);
-            Hashtable hash2 = (Hashtable) m_anchors.get(anchor2);
+            HashMap hash1 = (HashMap) m_anchors.get(anchor1);
+            HashMap hash2 = (HashMap) m_anchors.get(anchor2);
             if (hash1 != null && hash2 != null) {
                 Set keys1 = hash1.keySet();
                 Set keys2 = hash2.keySet();

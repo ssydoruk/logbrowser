@@ -6,7 +6,7 @@ package com.myutils.logbrowser.indexer;
 
 /**
  *
- * @author kvoroshi
+ * @author ssydoruk
  */
 public class CIFaceRequest extends Record {
 

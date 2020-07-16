@@ -19,11 +19,9 @@ public class FileInfoTable extends DBTable {
     public static int getFilesAdded() {
         return filesAdded;
     }
-    private boolean finalized;
 
     public FileInfoTable(DBAccessor dbaccessor) {
         super(dbaccessor, TableType.File);
-        finalized = false;
     }
 
     @Override

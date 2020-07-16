@@ -16,6 +16,10 @@ public abstract class IReportConfigItem {
     private IReportConfigItem parent = null;
     private String name;
     private ArrayList<IReportConfigItem> children = new ArrayList<>();
+    public IReportConfigItem(IReportConfigItem _parent, String name) {
+        parent = _parent;
+        this.name = name;
+    }
 
     public void addChild(IReportConfigItem iReportConfigItem) {
         children.add(iReportConfigItem);
@@ -37,8 +41,4 @@ public abstract class IReportConfigItem {
         this.name = name;
     }
 
-    public IReportConfigItem(IReportConfigItem _parent, String name) {
-        parent = _parent;
-        this.name = name;
-    }
 }

@@ -20,6 +20,13 @@ import org.apache.logging.log4j.LogManager;
 public abstract class DBTable {
 
     private static final org.apache.logging.log4j.Logger logger = LogManager.getLogger();
+    static public void setFieldString(PreparedStatement stmt, int i, String ref) throws SQLException {
+        if (ref != null) {
+            stmt.setString(i, ref);
+        } else {
+            stmt.setNull(i, java.sql.Types.CHAR);
+        }
+    }
 
     private SqliteAccessor m_dbAccessor;
     protected int m_InsertStatementId;
@@ -29,6 +36,18 @@ public abstract class DBTable {
     private String tabName;
     private final ArrayList<ArrayList<String>> idxFields;
     private int recordsAdded = 0;
+    private String fileIDField;
+    private int currentID; // primary key on the table. Implies that each table has to have field named
+    //ID
+    public DBTable(DBAccessor dbaccessor, TableType type) {
+        m_dbAccessor = (SqliteAccessor) dbaccessor;
+        m_type = type;
+        setTabName(type.toString());
+        idxFields = new ArrayList();
+    }
+    public DBTable(DBAccessor dbaccessor) {
+        this(dbaccessor, TableType.UNKNOWN);
+    }
 
     public int getRecordsAdded() {
         return recordsAdded;
@@ -61,7 +80,6 @@ public abstract class DBTable {
         getM_dbAccessor().runQuery("drop index if exists " + idxName(tabName, idxField) + ";");
     }
 
-    private String fileIDField;
 
     /**
      * Get the value of fileIDField
@@ -120,16 +138,6 @@ public abstract class DBTable {
         return tabName;
     }
 
-    public DBTable(DBAccessor dbaccessor, TableType type) {
-        m_dbAccessor = (SqliteAccessor) dbaccessor;
-        m_type = type;
-        setTabName(type.toString());
-        idxFields = new ArrayList();
-    }
-
-    public DBTable(DBAccessor dbaccessor) {
-        this(dbaccessor, TableType.UNKNOWN);
-    }
 
     public TableType getM_type() {
         return m_type;
@@ -143,12 +151,6 @@ public abstract class DBTable {
         return m_dbAccessor;
     }
 
-    /**
-     * @return the m_pParser
-     */
-//    public Parser getM_pParser() {
-//        return m_pParser;
-//    }
     public abstract void InitDB();
 
     public abstract void FinalizeDB() throws Exception;
@@ -169,8 +171,6 @@ public abstract class DBTable {
         return tabCreated;
     }
 
-    private int currentID; // primary key on the table. Implies that each table has to have field named
-    //ID
 
     void checkInit() {
         if (!tabCreated) {
@@ -209,13 +209,6 @@ public abstract class DBTable {
         }
     }
 
-    static public void setFieldString(PreparedStatement stmt, int i, String ref) throws SQLException {
-        if (ref != null) {
-            stmt.setString(i, ref);
-        } else {
-            stmt.setNull(i, java.sql.Types.CHAR);
-        }
-    }
 
     protected void generateID(PreparedStatement stmt, int i, Record _rec) throws SQLException {
         currentID++;

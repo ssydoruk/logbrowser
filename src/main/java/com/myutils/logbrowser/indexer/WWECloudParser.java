@@ -6,6 +6,7 @@ package com.myutils.logbrowser.indexer;
 
 import Utils.Pair;
 import static Utils.Util.intOrDef;
+import java.io.IOException;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
@@ -20,17 +21,6 @@ public class WWECloudParser extends Parser {
 
     private static final org.apache.logging.log4j.Logger logger = LogManager.getLogger();
 
-    long m_CurrentFilePos;
-
-    long m_HeaderOffset;
-    private ParserState m_ParserState;
-    String m_Header;
-
-    int m_dbRecords = 0;
-    private String m_LastLine;
-    private boolean isInbound;
-    private String m_msgName;
-    private String m_msg1;
 
     private static final HashMap<Pattern, String> IGNORE_LOG_WORDS = new HashMap<Pattern, String>() {
         {
@@ -47,12 +37,36 @@ public class WWECloudParser extends Parser {
             put(Pattern.compile("\\[[\\p{XDigit}-]+\\]"), "\\[...\\]");
         }
     };
-    private Object msg;
+    private static final Pattern regLineSkip = Pattern.compile("^[>\\s]*");
+    private static final Pattern regNotParseMessage = Pattern.compile("(30201)");
+    private static final Pattern regMsgStart = Pattern.compile("Handling update message:$");
+    private static final Pattern regMsgRequest = Pattern.compile(" Sent '([^']+)' ");
 
+    private static final Pattern regAuthResult = Pattern.compile("CloudWebBasicAuthenticationFilter\\s+(.+)$");
+    private static final Pattern regTMessageStart = Pattern.compile("message='([^']+)'");
+    private static final Pattern regTMessageAttributesContinue = Pattern.compile("^(Attr|\\s|Time|Call)");
+    private static final Pattern regAuthAttributesContinue = Pattern.compile("^(SATR|IATR)");
+    private static final Pattern regExceptionStart = Pattern.compile("^([\\w_\\.]+Exception[\\w\\.]*):(.*)");
+    private static final Pattern regExceptionContinue = Pattern.compile("^(\\s|Caused by:)");
+    private static final Pattern regLogMessage = Pattern.compile("^(WARN|ERROR|INFO)");
+    private static final Pattern regLogMessageMsg = Pattern.compile("\\s(?:\\b[a-zA-Z][\\w\\.]*)+(.+)");
+    private static final Message.Regexs regAuthUsers = new Message.Regexs(new Pair[]{
+        new Pair("user \\[([^\\]]+)\\]", 1),
+        new Pair("Username: ([^;]+);", 1)
+    });
+    long m_CurrentFilePos;
+    long m_HeaderOffset;
+    private ParserState m_ParserState;
+    String m_Header;
+    int m_dbRecords = 0;
+    private String m_LastLine;
+    private boolean isInbound;
+    private String m_msgName;
+    private String m_msg1;
+    private Object msg;
     public WWECloudParser(HashMap<TableType, DBTable> m_tables) {
         super(FileInfoType.type_WWECloud, m_tables);
     }
-
     @Override
     public int ParseFrom(BufferedReaderCrLf input, long offset, int line, FileInfo fi) {
         m_CurrentFilePos = offset;
@@ -76,12 +90,12 @@ public class WWECloudParser extends Parser {
                 try {
                     int l = input.getLastBytesConsumed();
 //                    SetBytesConsumed(input.getLastBytesConsumed());
-                    setEndFilePos(getFilePos() + l); // to calculate file bytes
+setEndFilePos(getFilePos() + l); // to calculate file bytes
 
-                    while (str != null) {
-                        str = ParseLine(str);
-                    }
-                    setFilePos(getFilePos() + l);
+while (str != null) {
+    str = ParseLine(str);
+}
+setFilePos(getFilePos() + l);
 
                 } catch (Exception e) {
                     Main.logger.error("Failure parsing line " + m_CurrentLine + ":"
@@ -90,26 +104,13 @@ public class WWECloudParser extends Parser {
 
                 m_LastLine = str; // store previous line for server name
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (IOException e) {
+            Main.logger.error(e);
             return m_CurrentLine - line;
         }
 
         return m_CurrentLine - line;
     }
-    private static final Pattern regLineSkip = Pattern.compile("^[>\\s]*");
-    private static final Pattern regNotParseMessage = Pattern.compile("(30201)");
-    private static final Pattern regMsgStart = Pattern.compile("Handling update message:$");
-    private static final Pattern regMsgRequest = Pattern.compile(" Sent '([^']+)' ");
-
-    private static final Pattern regAuthResult = Pattern.compile("CloudWebBasicAuthenticationFilter\\s+(.+)$");
-    private static final Pattern regTMessageStart = Pattern.compile("message='([^']+)'");
-    private static final Pattern regTMessageAttributesContinue = Pattern.compile("^(Attr|\\s|Time|Call)");
-    private static final Pattern regAuthAttributesContinue = Pattern.compile("^(SATR|IATR)");
-    private static final Pattern regExceptionStart = Pattern.compile("^([\\w_\\.]+Exception[\\w\\.]*):(.*)");
-    private static final Pattern regExceptionContinue = Pattern.compile("^(\\s|Caused by:)");
-    private static final Pattern regLogMessage = Pattern.compile("^(WARN|ERROR|INFO)");
-    private static final Pattern regLogMessageMsg = Pattern.compile("\\s(?:\\b[a-zA-Z][\\w\\.]*)+(.+)");
 
     String ParseLine(String str) throws Exception {
         Matcher m;
@@ -133,7 +134,7 @@ public class WWECloudParser extends Parser {
 
                 String s = ParseGenesys(str, TableType.MsgWWECloud, regNotParseMessage, regLineSkip);
 
-                if ((m = regMsgStart.matcher(s)).find()) {
+                if (( regMsgStart.matcher(s)).find()) {
                     m_HeaderOffset = m_CurrentFilePos;
                     m_ParserState = ParserState.STATE_TMESSAGE_EVENT;
                     setSavedFilePos(getFilePos());
@@ -156,14 +157,14 @@ public class WWECloudParser extends Parser {
                 } else if ((m = regLogMessage.matcher(s)).find()) {
                     m_msgName = m.group(1);
                     String rest = s.substring(m.end());
-                    String msgText = "";
+                    String msgText ;
                     if ((m = regLogMessageMsg.matcher(rest)).find()) {
                         msgText = m.group(1);
                     } else {
                         msgText = rest;
                     }
-                    WWECloudLogMsg msg = new WWECloudLogMsg(m_msgName, msgText);
-                    SetStdFieldsAndAdd(msg);
+                    WWECloudLogMsg theMsg = new WWECloudLogMsg(m_msgName, msgText);
+                    SetStdFieldsAndAdd(theMsg);
 
                 } else if ((m = regAuthResult.matcher(s)).find()) {
                     m_HeaderOffset = m_CurrentFilePos;
@@ -186,7 +187,7 @@ public class WWECloudParser extends Parser {
                 break;
 
             case STATE_AUTHRESULT: {
-                if ((m = regAuthAttributesContinue.matcher(str)).find()) {
+                if (( regAuthAttributesContinue.matcher(str)).find()) {
                     m_MessageContents.add(str);
                 } else {
                     addAuthResponse();
@@ -199,7 +200,7 @@ public class WWECloudParser extends Parser {
             }
 
             case STATE_EXCEPTION: {
-                if ((m = regExceptionContinue.matcher(str)).find()) {
+                if (( regExceptionContinue.matcher(str)).find()) {
                     m_MessageContents.add(str);
                 } else {
                     if (msg instanceof WWECloudExeptionMsg) {
@@ -250,23 +251,23 @@ public class WWECloudParser extends Parser {
 
     @Override
     void init(HashMap<TableType, DBTable> m_tables) {
-        m_tables.put(TableType.WWECloud, new WWECloudTable(Main.getMain().getM_accessor(), TableType.WWECloud));
-        m_tables.put(TableType.WWECloudAuth, new WWECloudAuthTab(Main.getMain().getM_accessor(), TableType.WWECloudAuth));
-        m_tables.put(TableType.WWECloudException, new WWECloudExeptionTab(Main.getMain().getM_accessor(), TableType.WWECloudException));
-        m_tables.put(TableType.WWECloudLog, new WWECloudLogTab(Main.getMain().getM_accessor(), TableType.WWECloudLog));
+        m_tables.put(TableType.WWECloud, new WWECloudTable(Main.getM_accessor(), TableType.WWECloud));
+        m_tables.put(TableType.WWECloudAuth, new WWECloudAuthTab(Main.getM_accessor(), TableType.WWECloudAuth));
+        m_tables.put(TableType.WWECloudException, new WWECloudExeptionTab(Main.getM_accessor(), TableType.WWECloudException));
+        m_tables.put(TableType.WWECloudLog, new WWECloudLogTab(Main.getM_accessor(), TableType.WWECloudLog));
 
     }
 
     private void addTLibMessage() throws Exception {
-        WWECloudMessage msg = new WWECloudMessage(m_msgName, m_MessageContents, isParseTimeDiff());
-        msg.SetInbound(isInbound);
-        SetStdFieldsAndAdd(msg);
+        WWECloudMessage theMsg = new WWECloudMessage(m_msgName, m_MessageContents, isParseTimeDiff());
+        theMsg.SetInbound(isInbound);
+        SetStdFieldsAndAdd(theMsg);
     }
 
     private void addAuthResponse() {
         try {
-            WWECloudAuthMsg msg = new WWECloudAuthMsg(m_MessageContents);
-            SetStdFieldsAndAdd(msg);
+            WWECloudAuthMsg theMsg = new WWECloudAuthMsg(m_MessageContents);
+            SetStdFieldsAndAdd(theMsg);
         } catch (Exception ex) {
             logger.log(org.apache.logging.log4j.Level.FATAL, ex);
         }
@@ -444,7 +445,7 @@ public class WWECloudParser extends Parser {
             try {
 
                 stmt.setTimestamp(1, new Timestamp(wweRec.GetAdjustedUsecTime()));
-                stmt.setInt(2, wweRec.getFileId());
+                stmt.setInt(2, WWECloudMessage.getFileId());
                 stmt.setLong(3, wweRec.m_fileOffset);
                 stmt.setLong(4, wweRec.getM_FileBytes());
                 stmt.setLong(5, wweRec.m_line);
@@ -472,11 +473,6 @@ public class WWECloudParser extends Parser {
     }
 //</editor-fold>
 //<editor-fold defaultstate="collapsed" desc="CloudAuth">
-
-    private static final Message.Regexs regAuthUsers = new Message.Regexs(new Pair[]{
-        new Pair("user \\[([^\\]]+)\\]", 1),
-        new Pair("Username: ([^;]+);", 1)
-    });
 
     private class WWECloudAuthMsg extends Message {
 
@@ -562,7 +558,7 @@ public class WWECloudParser extends Parser {
 
             try {
                 stmt.setTimestamp(1, new Timestamp(rec.GetAdjustedUsecTime()));
-                stmt.setInt(2, rec.getFileId());
+                stmt.setInt(2, WWECloudAuthMsg.getFileId());
                 stmt.setLong(3, rec.m_fileOffset);
                 stmt.setLong(4, rec.getM_FileBytes());
                 stmt.setLong(5, rec.m_line);
@@ -579,12 +575,15 @@ public class WWECloudParser extends Parser {
 
     }
 //</editor-fold>
-
-//<editor-fold defaultstate="collapsed" desc="WWECloudLogMsg">
     private class WWECloudLogMsg extends Message {
 
-        private String msg;
-        private String msgText;
+        private final String msg;
+        private final String msgText;
+        private WWECloudLogMsg(String m_msgName, String msgText) {
+            super(TableType.WWECloudLog);
+            this.msg = m_msgName;
+            this.msgText = optimizeText(msgText);
+        }
 
         public String getMsg() {
             return msg;
@@ -594,14 +593,9 @@ public class WWECloudParser extends Parser {
             return msgText;
         }
 
-        private WWECloudLogMsg(String m_msgName, String msgText) {
-            super(TableType.WWECloudLog);
-            this.msg = m_msgName;
-            this.msgText = optimizeText(msgText);
-        }
 
         private String optimizeText(String msgText) {
-            String ret = new String(msgText);
+            String ret = msgText;
             for (Map.Entry<Pattern, String> entry : IGNORE_LOG_WORDS.entrySet()) {
                 ret = entry.getKey().matcher(ret).replaceAll(entry.getValue());
             }
@@ -614,19 +608,18 @@ public class WWECloudParser extends Parser {
 
         private final String exceptionName;
 
-        public String getExceptionName() {
-            return exceptionName;
-        }
-
-        public String getMsg() {
-            return msg;
-        }
         private final String msg;
 
         private WWECloudExeptionMsg(String exName, String msg) {
             super(TableType.WWECloudException);
             this.exceptionName = exName;
             this.msg = msg;
+        }
+        public String getExceptionName() {
+            return exceptionName;
+        }
+        public String getMsg() {
+            return msg;
         }
 
     }
@@ -639,7 +632,7 @@ public class WWECloudParser extends Parser {
 
         @Override
         public void InitDB() {
-            StringBuilder buf = new StringBuilder();;
+            StringBuilder buf = new StringBuilder();
             addIndex("time");
             addIndex("FileId");
             addIndex("exNameID");
@@ -684,7 +677,7 @@ public class WWECloudParser extends Parser {
 
             try {
                 stmt.setTimestamp(1, new Timestamp(rec.GetAdjustedUsecTime()));
-                stmt.setInt(2, rec.getFileId());
+                stmt.setInt(2, WWECloudExeptionMsg.getFileId());
                 stmt.setLong(3, rec.m_fileOffset);
                 stmt.setLong(4, rec.getM_FileBytes());
                 stmt.setLong(5, rec.m_line);
@@ -752,7 +745,7 @@ public class WWECloudParser extends Parser {
 
             try {
                 stmt.setTimestamp(1, new Timestamp(rec.GetAdjustedUsecTime()));
-                stmt.setInt(2, rec.getFileId());
+                stmt.setInt(2, WWECloudLogMsg.getFileId());
                 stmt.setLong(3, rec.m_fileOffset);
                 stmt.setLong(4, rec.getM_FileBytes());
                 stmt.setLong(5, rec.m_line);

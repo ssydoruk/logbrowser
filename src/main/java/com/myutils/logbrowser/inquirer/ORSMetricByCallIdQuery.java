@@ -12,10 +12,6 @@ public class ORSMetricByCallIdQuery extends IQuery {
     private int recCnt;
     private DynamicTreeNode<OptionNode> orsMetrics = null;
 
-    private String[] SIDbyCONNID(Integer[] ConnIDs) {
-
-        return null;
-    }
 
     public ORSMetricByCallIdQuery() throws SQLException {
         addRef("metricid", "metric", ReferenceType.METRIC.toString(), FieldType.Mandatory);
@@ -43,6 +39,10 @@ public class ORSMetricByCallIdQuery extends IQuery {
         SIDs = new Integer[1];
         SIDs[0] = SIDID;
 
+    }
+    private String[] SIDbyCONNID(Integer[] ConnIDs) {
+        
+        return null;
     }
 
     @Override

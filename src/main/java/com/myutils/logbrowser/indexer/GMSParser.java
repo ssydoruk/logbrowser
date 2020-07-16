@@ -102,12 +102,25 @@ public class GMSParser extends Parser {
     //21:06:45.840 HTTP[42,TCP] >>>> 131 bytes >>>>
 //    private static final Pattern regHTTPout = Pattern.compile("^\\s*HTTP\\[(\\d+)\\,TCP\\] >>>> (\\d+) bytes >>>>$");
 //    private static final Pattern regHTTPignore = Pattern.compile(": OnConnect|client .+ exception|discard pending resonse| client [\\d\\.]+ disconnected");
+    private static final StartSessionTransition startSessionTransition = new StartSessionTransition();
+    private static final Pattern regNotParseMessage = Pattern.compile(
+            //07:47:39.182 Trc 09900  [qtp747464370-17] >>> /1/service/callback/RCC_CORK_CallBack - CCID [null]
+            "^(09900"
+                    + ")");
+    private static final Pattern regStatisticMessage = Pattern.compile(
+            "^StatisticService: ");
+    private static final Pattern regOpenMediaInteraction = Pattern.compile(
+            "^CreateOpenMediaInteractionController webRequestId \\[(\\d+)\\], submitInteraction (request received|response) for (\\S+)\\s+");
+    private static final Pattern regSendIxnServerMsg = Pattern.compile(
+            "^CreateOpenMediaInteractionTask.+(to|from) Interaction Server: '([^']+)'");
+    //<editor-fold defaultstate="collapsed" desc="GMSStatServerMsg">
+    private static final Pattern ptStatStringValue = Pattern.compile("^\\s*'STRING_VALUE'.+= \"(.+)\"$");
+    private static final Pattern ptStatMessageStart = Pattern.compile("message from (\\S+) - tcp:\\/\\/([^:]+):(\\d+): '([^']+)'.+attributes:\\s+");
+    private static final Pattern ptStatMessageAttr = Pattern.compile("(?:(\\S+)\\s+\\[\\S+\\]\\s+=\\s+([\\-\\d]+|\"[^\\\"]+\"|ObjectValue:[^\\}]+)\\s+)");
+    public static final int MAX_WEB_PARAMS = 20;
+    private static final HashMap<String, Integer> keysPos = new HashMap<>(MAX_WEB_PARAMS);
 
-    private DBAccessor m_accessor;
-    private int m_fileId;
-    private int m_id;
     private long m_CurrentFilePos;
-    private int m_CurrentLine;
     private int m_TotalLen;
     private int m_dbRecords;
     private String m_msgName;
@@ -154,8 +167,20 @@ public class GMSParser extends Parser {
     private String oldThread;
     private String savedThreadID;
     private final ParserThreadsProcessor ptpsThreadProcessor;
+    Message msg = null;
+    HashMap<String, GMSORSMessage> threadReqs = new HashMap<>();
+    GMSParser(HashMap<TableType, DBTable> m_tables) {
+        super(FileInfoType.type_GMS, m_tables);
+        m_MessageContents = new ArrayList();
+        ThreadAlias.put("ORSInternal", "FMWeb");
+        
+        ptpsThreadProcessor = new ParserThreadsProcessor();
+        //<editor-fold defaultstate="collapsed" desc="processing of fetch per thread">
+        ptpsThreadProcessor.addStateTransition(new StartSessionTransition());
+//        ptpsThreadProcessor.add(ptp);
+//</editor-fold>
 
-    private static final StartSessionTransition startSessionTransition = new StartSessionTransition();
+    }
 
     private void processStatisticNotification(String substring) {
 //        GMSStatServerMsg msg = new GMSStatServerMsg(substring);
@@ -167,56 +192,6 @@ public class GMSParser extends Parser {
         msg.SetStdFieldsAndAdd(this);
     }
 
-    private static class StartSessionTransition implements ParserThreadsProcessor.StateTransition {
-
-        private final static Pattern regParams = Pattern.compile("^\\s*Params:");
-
-        @Override
-        public ParserThreadsProcessor.StateTransitionResult stateTransition(ParserThreadState threadState,
-                String sOrig, String sParsedAndTruncated, String threadID, Parser parser) {
-            Matcher m;
-
-            switch (threadState.getParserState()) {
-                case STATE_START_SESSION: {
-                    if (regParams.matcher(sParsedAndTruncated).find()) {
-                        threadState.setParserState(ParserThreadsProcessor.ParserState.STATE_START_SESSION1);
-                        threadState.addString(sParsedAndTruncated);
-                        return ParserThreadsProcessor.StateTransitionResult.NON_STATE_LINE_WAITED;
-                    } else {
-                        Main.logger.error("l:" + parser.getM_CurrentLine() + " - Unexpected thread message: " + sOrig);
-                        return ParserThreadsProcessor.StateTransitionResult.ERROR_STATE;
-                    }
-                }
-
-                case STATE_START_SESSION1:
-                    if ((m = regKVList.matcher(sParsedAndTruncated)).find()) {
-                        threadState.addString(sOrig);
-                        return ParserThreadsProcessor.StateTransitionResult.NON_STATE_LINE_WAITED;
-                    } else {
-                        GMSStartMessage msg = new GMSStartMessage(threadState.getMsgLines());
-                        msg.SetStdFieldsAndAdd(parser);
-                        return ParserThreadsProcessor.StateTransitionResult.FINAL_REACHED;
-
-                    }
-
-            }
-            return ParserThreadsProcessor.StateTransitionResult.ERROR_STATE;
-        }
-
-    }
-
-    GMSParser(HashMap<TableType, DBTable> m_tables) {
-        super(FileInfoType.type_GMS, m_tables);
-        m_MessageContents = new ArrayList();
-        ThreadAlias.put("ORSInternal", "FMWeb");
-
-        ptpsThreadProcessor = new ParserThreadsProcessor();
-        //<editor-fold defaultstate="collapsed" desc="processing of fetch per thread">
-        ptpsThreadProcessor.addStateTransition(new StartSessionTransition());
-//        ptpsThreadProcessor.add(ptp);
-//</editor-fold>
-
-    }
 
     private OrsHTTP getFullHTTP(OrsHTTP orsHTTP) {
         OrsHTTP tmpOrsHTTP = partHTTP.get(orsHTTP.getSocket());
@@ -323,27 +298,13 @@ public class GMSParser extends Parser {
             }
 //            ParseLine("", null); // to complete the parsing of the last line/last message
         } catch (IOException e) {
-            e.printStackTrace();
+            Main.logger.error(e);
             return m_CurrentLine - line;
         }
 
         return m_CurrentLine - line;
     }
 
-    private static final Pattern regNotParseMessage = Pattern.compile(
-            //07:47:39.182 Trc 09900  [qtp747464370-17] >>> /1/service/callback/RCC_CORK_CallBack - CCID [null]
-            "^(09900"
-            + ")");
-
-    private static final Pattern regStatisticMessage = Pattern.compile(
-            "^StatisticService: ");
-
-    private static final Pattern regOpenMediaInteraction = Pattern.compile(
-            "^CreateOpenMediaInteractionController webRequestId \\[(\\d+)\\], submitInteraction (request received|response) for (\\S+)\\s+");
-
-    private static final Pattern regSendIxnServerMsg = Pattern.compile(
-            "^CreateOpenMediaInteractionTask.+(to|from) Interaction Server: '([^']+)'");
-    Message msg = null;
 
     private String ParseLine(String str, BufferedReaderCrLf in) throws Exception {
         Matcher m;
@@ -396,7 +357,7 @@ public class GMSParser extends Parser {
                     m_ParserState = ParserState.STATE_EXCEPTION;
                     setSavedFilePos(getFilePos());
                     break;
-                } else if ((m = regPOST.matcher(s)).find()) {
+                } else if (( regPOST.matcher(s)).find()) {
                     m_HeaderOffset = m_CurrentFilePos;
                     m_MessageContents.add(s);
                     m_TotalLen = str.length() + in.charsSkippedOnReadLine;
@@ -559,23 +520,22 @@ public class GMSParser extends Parser {
     }
 
     private void addPostMessage() throws Exception {
-        GMSPostMessage msg = new GMSPostMessage(m_MessageContents);
-        SetStdFieldsAndAdd(msg);
+        GMSPostMessage _msg = new GMSPostMessage(m_MessageContents);
+        SetStdFieldsAndAdd(_msg);
     }
 
     private void addException() {
         Matcher m;
         Main.logger.trace("addException");
-        ExceptionMessage msg = new ExceptionMessage(
+        ExceptionMessage _msg = new ExceptionMessage(
                 m_MessageContents,
                 m_msgName,
                 m_msg1
         );
-        SetStdFieldsAndAdd(msg);
+        SetStdFieldsAndAdd(_msg);
 
     }
 
-    HashMap<String, GMSORSMessage> threadReqs = new HashMap<>();
 
     private void addORSRequest(String threadID, DateParsed d) {
         Main.logger.trace("l:" + m_CurrentLine + " - threadID:[" + threadID + "] saving ORS request, [" + d.orig + "]");
@@ -595,10 +555,10 @@ public class GMSParser extends Parser {
                 logger.log(org.apache.logging.log4j.Level.FATAL, ex);
             }
         }
-        GMSORSMessage msg = new GMSORSMessage(threadID, dp.rest);
-        msg.SetInbound(false);
-        SetStdFields(msg);
-        threadReqs.put(threadID, msg);
+        GMSORSMessage _msg = new GMSORSMessage(threadID, dp.rest);
+        _msg.SetInbound(false);
+        SetStdFields(_msg);
+        threadReqs.put(threadID, _msg);
     }
 
     private void addORSResponseMessage(String resp) {
@@ -660,11 +620,48 @@ public class GMSParser extends Parser {
     @Override
 
     void init(HashMap<TableType, DBTable> m_tables) {
-        m_tables.put(TableType.GMSStart, new GMSStartTable(Main.getMain().getM_accessor(), TableType.GMSStart));
-        m_tables.put(TableType.GMSStatServerMessage, new GMSStatServerMsgTable(Main.getMain().getM_accessor(), TableType.GMSStatServerMessage));
-        m_tables.put(TableType.GMSWebClientMessage, new GMSWebClientMsgTable(Main.getMain().getM_accessor(), TableType.GMSWebClientMessage));
-        m_tables.put(TableType.IxnGMS, new IxnGMSTable(Main.getMain().getM_accessor(), TableType.IxnGMS));
+        m_tables.put(TableType.GMSStart, new GMSStartTable(Main.getM_accessor(), TableType.GMSStart));
+        m_tables.put(TableType.GMSStatServerMessage, new GMSStatServerMsgTable(Main.getM_accessor(), TableType.GMSStatServerMessage));
+        m_tables.put(TableType.GMSWebClientMessage, new GMSWebClientMsgTable(Main.getM_accessor(), TableType.GMSWebClientMessage));
+        m_tables.put(TableType.IxnGMS, new IxnGMSTable(Main.getM_accessor(), TableType.IxnGMS));
 
+    }
+    private static class StartSessionTransition implements ParserThreadsProcessor.StateTransition {
+        
+        private final static Pattern regParams = Pattern.compile("^\\s*Params:");
+        
+        @Override
+        public ParserThreadsProcessor.StateTransitionResult stateTransition(ParserThreadState threadState,
+                String sOrig, String sParsedAndTruncated, String threadID, Parser parser) {
+            Matcher m;
+            
+            switch (threadState.getParserState()) {
+                case STATE_START_SESSION: {
+                    if (regParams.matcher(sParsedAndTruncated).find()) {
+                        threadState.setParserState(ParserThreadsProcessor.ParserState.STATE_START_SESSION1);
+                        threadState.addString(sParsedAndTruncated);
+                        return ParserThreadsProcessor.StateTransitionResult.NON_STATE_LINE_WAITED;
+                    } else {
+                        Main.logger.error("l:" + parser.getM_CurrentLine() + " - Unexpected thread message: " + sOrig);
+                        return ParserThreadsProcessor.StateTransitionResult.ERROR_STATE;
+                    }
+                }
+                
+                case STATE_START_SESSION1:
+                    if ((m = regKVList.matcher(sParsedAndTruncated)).find()) {
+                        threadState.addString(sOrig);
+                        return ParserThreadsProcessor.StateTransitionResult.NON_STATE_LINE_WAITED;
+                    } else {
+                        GMSStartMessage msg = new GMSStartMessage(threadState.getMsgLines());
+                        msg.SetStdFieldsAndAdd(parser);
+                        return ParserThreadsProcessor.StateTransitionResult.FINAL_REACHED;
+                        
+                    }
+                    
+            }
+            return ParserThreadsProcessor.StateTransitionResult.ERROR_STATE;
+        }
+        
     }
 
     enum ParserState {
@@ -689,10 +686,6 @@ public class GMSParser extends Parser {
         MSG_TLIB
     }
 
-//<editor-fold defaultstate="collapsed" desc="GMSStatServerMsg">
-    private static final Pattern ptStatStringValue = Pattern.compile("^\\s*'STRING_VALUE'.+= \"(.+)\"$");
-    private static final Pattern ptStatMessageStart = Pattern.compile("message from (\\S+) - tcp:\\/\\/([^:]+):(\\d+): '([^']+)'.+attributes:\\s+");
-    private static final Pattern ptStatMessageAttr = Pattern.compile("(?:(\\S+)\\s+\\[\\S+\\]\\s+=\\s+([\\-\\d]+|\"[^\\\"]+\"|ObjectValue:[^\\}]+)\\s+)");
 
     private class GMSStatServerMsg extends Message {
 
@@ -704,9 +697,6 @@ public class GMSParser extends Parser {
         private String stringValue;
         private boolean corruptMessage = false;
 
-        public boolean isCorruptMessage() {
-            return corruptMessage;
-        }
 
         private GMSStatServerMsg(String substring) {
             this();
@@ -729,6 +719,15 @@ public class GMSParser extends Parser {
             } else {
                 this.corruptMessage = true;
             }
+        }
+        private GMSStatServerMsg(TableType t) {
+            super(t);
+        }
+        private GMSStatServerMsg() {
+            this(TableType.GMSStatServerMessage);
+        }
+        public boolean isCorruptMessage() {
+            return corruptMessage;
         }
 
         public String getSsApp() {
@@ -755,13 +754,6 @@ public class GMSParser extends Parser {
             return stringValue;
         }
 
-        private GMSStatServerMsg(TableType t) {
-            super(t);
-        }
-
-        private GMSStatServerMsg() {
-            this(TableType.GMSStatServerMessage);
-        }
 
     }
 
@@ -831,7 +823,7 @@ public class GMSParser extends Parser {
 
                 try {
                     stmt.setTimestamp(1, new Timestamp(rec.GetAdjustedUsecTime()));
-                    stmt.setInt(2, rec.getFileId());
+                    stmt.setInt(2, GMSStatServerMsg.getFileId());
                     stmt.setLong(3, rec.m_fileOffset);
                     stmt.setLong(4, rec.getM_FileBytes());
                     stmt.setLong(5, rec.m_line);
@@ -852,27 +844,12 @@ public class GMSParser extends Parser {
 
     }
 //</editor-fold> 
-
-//<editor-fold defaultstate="collapsed" desc="GMSWebClientMsg">
     private class GMSWebClientMsg extends Message {
 
         private String webReqID;
         private boolean response;
         private String URL;
         private List<Pair<String, String>> allParams;
-
-        public Integer getWebReqID() {
-            return getIntOrDef(webReqID, (Integer) null);
-        }
-
-        public boolean isResponse() {
-            return response;
-        }
-
-        public String getURL() {
-            return URL;
-        }
-
         private GMSWebClientMsg(String webReqID, boolean response, String URL, String rest) {
             this();
             this.webReqID = webReqID;
@@ -896,10 +873,22 @@ public class GMSParser extends Parser {
 
             }
         }
-
         private GMSWebClientMsg() {
             super(TableType.GMSWebClientMessage);
         }
+
+        public Integer getWebReqID() {
+            return getIntOrDef(webReqID, (Integer) null);
+        }
+
+        public boolean isResponse() {
+            return response;
+        }
+
+        public String getURL() {
+            return URL;
+        }
+
 
         private List<Pair<String, String>> getAllParams() {
             return allParams;
@@ -926,9 +915,6 @@ public class GMSParser extends Parser {
 
     }
 
-    public static final int MAX_WEB_PARAMS = 20;
-
-    private static final HashMap<String, Integer> keysPos = new HashMap<>(MAX_WEB_PARAMS);
 
     private class GMSWebClientMsgTable extends DBTable {
 
@@ -1003,7 +989,7 @@ public class GMSParser extends Parser {
 
             try {
                 stmt.setTimestamp(1, new Timestamp(rec.GetAdjustedUsecTime()));
-                stmt.setInt(2, rec.getFileId());
+                stmt.setInt(2, GMSWebClientMsg.getFileId());
                 stmt.setLong(3, rec.m_fileOffset);
                 stmt.setLong(4, rec.getM_FileBytes());
                 stmt.setLong(5, rec.m_line);

@@ -15,11 +15,17 @@ import java.util.Map;
  */
 public class ParserThreadsProcessor {
 
+    private boolean threadWaitsForNonthreadMessage = false;
+    private ArrayList<StateTransition> stateTransitions;
+    private HashMap<String, ParserThreadState> threadStates;
+    public ParserThreadsProcessor() {
+        stateTransitions = new ArrayList();
+        threadStates = new HashMap<>();
+    }
     boolean threadPending() {
         Main.logger.trace("threads pending: " + !threadStates.isEmpty());
         return !threadStates.isEmpty();
     }
-    private boolean threadWaitsForNonthreadMessage = false;
 
     public void setThreadWaitsForNonthreadMessage(boolean threadWaitsForNonthreadMessage) {
         this.threadWaitsForNonthreadMessage = threadWaitsForNonthreadMessage;
@@ -128,6 +134,23 @@ public class ParserThreadsProcessor {
         threadStates.remove(threadID);
         return false;
     }
+    public void addStateTransition(StateTransition stateTransition) {
+        stateTransitions.add(stateTransition);
+    }
+    public void addThreadState(String threadID, ParserThreadState pts) {
+        Main.logger.trace("addThreadState: " + threadID + " pts: " + pts.toString());
+        threadStates.put(threadID, pts);
+        setThreadWaitsForNonthreadMessage(pts.isWaitNonthread());
+    }
+    
+//        boolean threadPending() {
+//        for (ParserThreadsProcessor thi : this) {
+//            if (thi.threadPending()) {
+//                return true;
+//            }
+//        }
+//        return false;
+//    }
 
     /**
      * ThreadConsumeResult
@@ -176,22 +199,6 @@ public class ParserThreadsProcessor {
         ERROR_STATE
     };
 
-    public interface StateTransition {
-
-        abstract StateTransitionResult stateTransition(ParserThreadState threadState,
-                String sOrig, String sParsedAndTruncated, String threadID, Parser parser);
-    }
-
-    public ParserThreadsProcessor() {
-        stateTransitions = new ArrayList();
-        threadStates = new HashMap<>();
-    }
-
-    private ArrayList<StateTransition> stateTransitions;
-
-    public void addStateTransition(StateTransition stateTransition) {
-        stateTransitions.add(stateTransition);
-    }
 
     public static enum ParserState {
         STATE_HEADER,
@@ -214,20 +221,9 @@ public class ParserThreadsProcessor {
         STATE_HTTPOUT;
     };
 
-    private HashMap<String, ParserThreadState> threadStates;
-
-    public void addThreadState(String threadID, ParserThreadState pts) {
-        Main.logger.trace("addThreadState: " + threadID + " pts: " + pts.toString());
-        threadStates.put(threadID, pts);
-        setThreadWaitsForNonthreadMessage(pts.isWaitNonthread());
+    public interface StateTransition {
+        
+        abstract StateTransitionResult stateTransition(ParserThreadState threadState,
+                String sOrig, String sParsedAndTruncated, String threadID, Parser parser);
     }
-
-//        boolean threadPending() {
-//        for (ParserThreadsProcessor thi : this) {
-//            if (thi.threadPending()) {
-//                return true;
-//            }
-//        }
-//        return false;
-//    }
 }

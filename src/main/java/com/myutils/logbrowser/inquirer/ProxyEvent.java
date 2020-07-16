@@ -9,7 +9,7 @@ import java.sql.SQLException;
 
 /**
  *
- * @author kvoroshi
+ * @author ssydoruk
  */
 public class ProxyEvent extends ILogRecord {
 

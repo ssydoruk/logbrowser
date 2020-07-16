@@ -25,64 +25,10 @@ class TableReference {
 
     private int initialID = 0;
 
-    void updateRef(String key, String toString) {
-        CIString ciString = new CIString(key);
-        Integer id = valRef.get(ciString);
-        if (id != null) {
-            valRef.remove(ciString);
-            valRef.put(new CIString(toString), id);
-        }
-    }
-
-    public final class CIString {
-
-        private String s;
-
-        public CIString(String s) {
-            if (s == null) {
-                throw new NullPointerException();
-            }
-            this.s = s;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (o instanceof CIString) {
-                CIString o1 = (CIString) o;
-//                Main.logger.trace("TableReference equal: object: [" + o1.toString() + "] compare to [" + s + "]; result: [" + o1.s.equalsIgnoreCase(s) + "]");
-                return o1.s.equalsIgnoreCase(s);
-            } else {
-                return false;
-            }
-        }
-
-        private int hashCode = 0;
-
-        @Override
-        public int hashCode() {
-            if (hashCode == 0) {
-                hashCode = s.toUpperCase().hashCode();
-            }
-
-            return hashCode;
-        }
-
-        @Override
-        public String toString() {
-            return s;
-        }
-
-        private int length() {
-            return s.length();
-        }
-    }
 
     private final ReferenceType type;
     private final HashMap<CIString, Integer> valRef;
 
-    public HashMap<CIString, Integer> getValRef() {
-        return valRef;
-    }
     private int maxID;
 
     TableReference(ReferenceType type) {
@@ -119,6 +65,17 @@ class TableReference {
                 logger.log(org.apache.logging.log4j.Level.FATAL, ex);
             }
         }
+    }
+    void updateRef(String key, String toString) {
+        CIString ciString = new CIString(key);
+        Integer id = valRef.get(ciString);
+        if (id != null) {
+            valRef.remove(ciString);
+            valRef.put(new CIString(toString), id);
+        }
+    }
+    public HashMap<CIString, Integer> getValRef() {
+        return valRef;
     }
 
     public ReferenceType getType() {
@@ -252,13 +209,55 @@ class TableReference {
         }
     }
 
+    public final class CIString {
+
+        private String s;
+        private int hashCode = 0;
+
+        public CIString(String s) {
+            if (s == null) {
+                throw new NullPointerException();
+            }
+            this.s = s;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (o instanceof CIString) {
+                CIString o1 = (CIString) o;
+//                Main.logger.trace("TableReference equal: object: [" + o1.toString() + "] compare to [" + s + "]; result: [" + o1.s.equalsIgnoreCase(s) + "]");
+return o1.s.equalsIgnoreCase(s);
+            } else {
+                return false;
+            }
+        }
+
+        @Override
+        public int hashCode() {
+            if (hashCode == 0) {
+                hashCode = s.toUpperCase().hashCode();
+            }
+            
+            return hashCode;
+        }
+
+        @Override
+        public String toString() {
+            return s;
+        }
+
+        private int length() {
+            return s.length();
+        }
+    }
+
 }
 
 public class TableReferences {
 
     private final HashMap<ReferenceType, TableReference> tabRefs;
     SqliteAccessor m_accessor;
-    private HashSet<ReferenceType> doNotSave;
+    private final HashSet<ReferenceType> doNotSave;
 
     TableReferences(SqliteAccessor m_accessor) {
         tabRefs = new HashMap();
@@ -276,7 +275,7 @@ public class TableReferences {
                     tabRef.Finalize(m_accessor, true);
                 }
                 m_accessor.Commit();
-            } catch (Exception sQLException) {
+            } catch (SQLException sQLException) {
                 Main.logger.error("Not able to finalize " + tabRef.getType().toString(), sQLException);
                 for (Map.Entry<TableReference.CIString, Integer> entry : tabRef.getValRef().entrySet()) {
                     Main.logger.info("[" + entry.getKey() + "]->[" + entry.getValue() + "]");

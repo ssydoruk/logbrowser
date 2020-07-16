@@ -24,18 +24,6 @@ public class LogFile {
         }
     }
 
-    @Override
-    public String toString() {
-        return makeString(fileName, arcName);
-    }
-
-    public String getFileName() {
-        return fileName;
-    }
-
-    public String getArcName() {
-        return arcName;
-    }
 
     private String fileName;
     private String arcName;
@@ -83,6 +71,16 @@ public class LogFile {
 
         }
 
+    }
+    @Override
+    public String toString() {
+        return makeString(fileName, arcName);
+    }
+    public String getFileName() {
+        return fileName;
+    }
+    public String getArcName() {
+        return arcName;
     }
 
     public boolean isText() {

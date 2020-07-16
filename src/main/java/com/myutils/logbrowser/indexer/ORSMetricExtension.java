@@ -19,11 +19,15 @@ public class ORSMetricExtension extends Message {
 
     private static Pattern regTMessageStart = Pattern.compile("^<([\\w~]+) sid='([\\w~]+)");
 //    private static Pattern regReqID = Pattern.compile("^\\s*<eval_expr .+expression='system.LastSubmitRequestId;.+result='(\\d+)' />");
+    private static Pattern regFunc = Pattern.compile("(?:function|name)='([^']+)'");
+    private static Pattern regNS = Pattern.compile("namespace='.+\\/([^']+)'");
+    private static final Pattern regNamespace = Pattern.compile("namespace='[^']/([^\\/]+)'");
 
     public String sid = "";
     public String Method = "";
     private String param1 = null;
     private String param2 = null;
+    private String ns = null;
 
     public ORSMetricExtension(String line) {
         super(TableType.ORSMetricExtension, line);
@@ -77,7 +81,6 @@ public class ORSMetricExtension extends Message {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
-    private static Pattern regFunc = Pattern.compile("(?:function|name)='([^']+)'");
 
     String getMethodFunc() {
         String line = m_MessageLines.get(0);
@@ -91,7 +94,6 @@ public class ORSMetricExtension extends Message {
         return func;
     }
 
-    private static Pattern regNS = Pattern.compile("namespace='.+\\/([^']+)'");
 
     String getNameSpace() {
         if (ns == null) {
@@ -121,9 +123,6 @@ public class ORSMetricExtension extends Message {
         return param2;
     }
 
-    private static final Pattern regNamespace = Pattern.compile("namespace='[^']/([^\\/]+)'");
-
-    private String ns = null;
 
     void parseNS(String rest) {
         Main.logger.trace("r: " + rest);

@@ -15,14 +15,16 @@ import java.util.regex.Pattern;
  * @author terry The class Replicates TLibMessage
  */
 public class GMSStartMessage extends Message {
+    final private static Pattern regPOSTMessage = Pattern.compile("^\\(POST\\) Client IP Address: ([0-9\\.]+),\\s*");
 
     String m_MessageName;
 
     private String m_refID;
     private String m_ThisDN;
-    private boolean isTServerReq = false;
+    private final boolean isTServerReq = false;
     private String clientIP;
     private boolean POSTParsed = false;
+    private Pair<String, String> parseORSURI = null;
 
     GMSStartMessage(ArrayList<String> m_MessageContents) {
         super(TableType.GMSStart, m_MessageContents);
@@ -88,7 +90,6 @@ public class GMSStartMessage extends Message {
         return getGMSAttributeString(new String[]{"_service_id", "service_id"});
     }
 
-    final private static Pattern regPOSTMessage = Pattern.compile("^\\(POST\\) Client IP Address: ([0-9\\.]+),\\s*");
 
     String ORSSessionID() {
         parsePOST();
@@ -108,7 +109,6 @@ public class GMSStartMessage extends Message {
         }
     }
 
-    private Pair<String, String> parseORSURI = null;
 
     private void parsePOST() {
         if (!this.POSTParsed) {

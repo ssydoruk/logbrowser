@@ -11,7 +11,7 @@ import java.util.Collection;
 
 /**
  *
- * @author kvoroshi
+ * @author ssydoruk
  */
 public class UrsByConnIdQuery extends IQuery {
 
@@ -23,6 +23,7 @@ public class UrsByConnIdQuery extends IQuery {
     private Collection<Long> refIDs;
     private Collection<Long> existingIDs;
     private Collection<Long> dnIDs;
+    private IDsFinder cif = null;
 
     public UrsByConnIdQuery() throws SQLException {
         addRef("thisDNID", "thisDN", ReferenceType.DN.toString(), FieldType.Optional);
@@ -103,7 +104,6 @@ public class UrsByConnIdQuery extends IQuery {
         recCnt = 0;
     }
 
-    private IDsFinder cif = null;
 
     private String getMyWhere() throws SQLException {
         String ret = "";

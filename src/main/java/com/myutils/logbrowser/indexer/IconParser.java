@@ -10,7 +10,6 @@ import java.util.HashMap;
 public class IconParser extends Parser {
 
     long m_CurrentFilePos;
-    int m_CurrentLine;
 
     final int MSG_STRING_LIMIT = 200;
     // parse state contants
@@ -23,7 +22,6 @@ public class IconParser extends Parser {
     long m_HeaderOffset;
     int m_ParserState;
     String m_Header;
-    ArrayList m_MessageContents;
 
     int m_dbRecords = 0;
 

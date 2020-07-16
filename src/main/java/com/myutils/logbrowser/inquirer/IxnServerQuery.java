@@ -10,16 +10,15 @@ import org.apache.commons.lang3.StringUtils;
 
 /**
  *
- * @author kvoroshi
+ * @author ssydoruk
  */
 public final class IxnServerQuery extends IQuery {
+    public static String FIELD_REFID = "refid";
+    public static String FIELD_ID = "id";
 
     private DatabaseConnector m_connector;
     private int recCnt;
 
-    public int getRecCnt() {
-        return recCnt;
-    }
     private DynamicTreeNode<OptionNode> node;
     private IDsFinder cif = null;
 
@@ -45,6 +44,9 @@ public final class IxnServerQuery extends IQuery {
         if (cif != null) {
             this.searchApps = cif.searchApps;
         }
+    }
+    public int getRecCnt() {
+        return recCnt;
     }
 
     @Override
@@ -94,8 +96,6 @@ public final class IxnServerQuery extends IQuery {
         m_connector = null;
     }
 
-    public static String FIELD_REFID = "refid";
-    public static String FIELD_ID = "id";
 
     private String getMyWhere() throws SQLException {
         String ret = "";

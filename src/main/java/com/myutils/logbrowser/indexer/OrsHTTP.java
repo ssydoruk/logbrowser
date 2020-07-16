@@ -19,6 +19,9 @@ public class OrsHTTP extends Message {
     //    Set-Cookie:ORSSESSIONID=00FAVPM3BOBM3223H3CA9ATAES00000G.node1576
     private static final Pattern regSIDCookie = Pattern.compile("ORSSESSIONID=([\\w~]+)");
     private static final Pattern regHTTPMethod = Pattern.compile("^(\\w+)");
+    private static final Pattern regSessionID = Pattern.compile("session/([^\\/]+)");
+    private static final Pattern regHTTPURL = Pattern.compile("^(?:POST|GET) (.+) HTTP/");
+    private static final Pattern regHTTPResp = Pattern.compile("^HTTP/.\\.. (.+)");
     private String ip = null;
     private int socket = 0;
     private int bytes = 0;
@@ -28,6 +31,9 @@ public class OrsHTTP extends Message {
     private String url = null;
     private String gmsService = null;
     private String httpResponseID;
+    private int bodyLineIdx = -2;
+    private String httpMessageBody = null;
+    JSONObject _jsonBody = null;
 
     public OrsHTTP(ArrayList messageLines) {
         super(TableType.ORSHTTP, messageLines);
@@ -66,7 +72,6 @@ public class OrsHTTP extends Message {
         return ip;
     }
 
-    private static final Pattern regSessionID = Pattern.compile("session/([^\\/]+)");
 
     String getSID() {
         if (sid == null) {
@@ -128,9 +133,6 @@ public class OrsHTTP extends Message {
 
     }
 
-    private int bodyLineIdx = -2;
-
-    private String httpMessageBody = null;
 
     /**
      * returns httpMessageBody of HTTP message
@@ -217,7 +219,6 @@ public class OrsHTTP extends Message {
 
     }
 
-    JSONObject _jsonBody = null;
 
     JSONObject getJsonBody(String body) {
         if (_jsonBody == null) {
@@ -258,8 +259,6 @@ public class OrsHTTP extends Message {
         return getURL();
     }
 
-    private static final Pattern regHTTPURL = Pattern.compile("^(?:POST|GET) (.+) HTTP/");
-    private static final Pattern regHTTPResp = Pattern.compile("^HTTP/.\\.. (.+)");
 
     private String getURL() {
         if (url == null) {

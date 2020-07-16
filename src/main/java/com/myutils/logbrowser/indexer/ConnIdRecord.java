@@ -6,7 +6,7 @@ package com.myutils.logbrowser.indexer;
 
 /**
  *
- * @author kvoroshi
+ * @author ssydoruk
  */
 public class ConnIdRecord extends Message {
 
@@ -21,6 +21,12 @@ public class ConnIdRecord extends Message {
         this.newID = newId;
 //        Main.logger.info("ConnIdRecord: ["+oldId+"] new["+newId+"]");
     }
+    public ConnIdRecord(String connId, boolean created) {
+        super(TableType.ConnID);
+        this.isTemp = false;
+        m_connId = connId;
+        m_created = created;
+    }
 
     public String getNewID() {
         return newID;
@@ -30,12 +36,6 @@ public class ConnIdRecord extends Message {
         return isTemp;
     }
 
-    public ConnIdRecord(String connId, boolean created) {
-        super(TableType.ConnID);
-        this.isTemp = false;
-        m_connId = connId;
-        m_created = created;
-    }
 
     @Override
     public String toString() {

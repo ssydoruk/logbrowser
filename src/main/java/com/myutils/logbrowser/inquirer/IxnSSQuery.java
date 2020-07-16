@@ -10,7 +10,7 @@ import java.sql.SQLException;
 
 /**
  *
- * @author kvoroshi
+ * @author ssydoruk
  */
 public class IxnSSQuery extends IQuery {
 
@@ -18,9 +18,6 @@ public class IxnSSQuery extends IQuery {
     private DatabaseConnector m_connector;
     private int recCnt;
 
-    public int getRecCnt() {
-        return recCnt;
-    }
     private DynamicTreeNode<OptionNode> node;
     private boolean regex = false;
     private String selection = null;
@@ -49,6 +46,9 @@ public class IxnSSQuery extends IQuery {
         if (cif != null) {
             this.searchApps = cif.searchApps;
         }
+    }
+    public int getRecCnt() {
+        return recCnt;
     }
 
     @Override

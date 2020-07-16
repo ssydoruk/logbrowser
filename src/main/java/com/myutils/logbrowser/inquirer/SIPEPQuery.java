@@ -8,21 +8,18 @@ import com.myutils.logbrowser.indexer.FileInfoType;
 import com.myutils.logbrowser.indexer.ReferenceType;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Hashtable;
+import java.util.HashMap;
 import org.apache.commons.lang3.StringUtils;
 
 /**
  *
- * @author kvoroshi
+ * @author ssydoruk
  */
 public class SIPEPQuery extends IQuery {
 
     private String[] orderBy;
     private String tabName;
 
-    public String getTabAlias() {
-        return "sip";
-    }
 
     private Integer[] m_CallIds;
     private boolean m_useProxy = true;
@@ -31,6 +28,7 @@ public class SIPEPQuery extends IQuery {
     private int recCnt;
     private DynamicTreeNode<OptionNode> node = null;
     private IDsFinder cidFinder;
+    private HashMap sipRecords = new HashMap();
 
     public SIPEPQuery() throws SQLException {
         addRef("ToUriID", "ToUri", ReferenceType.SIPURI.toString(), FieldType.Optional);
@@ -48,7 +46,7 @@ public class SIPEPQuery extends IQuery {
         setOrderBy(new String[]{"time"});
     }
 
-    public SIPEPQuery(Hashtable callIds, boolean useProxy) throws Exception {
+    public SIPEPQuery(HashMap callIds, boolean useProxy) throws Exception {
         this();
         m_CallIds = (Integer[]) callIds.keySet().toArray(new Integer[callIds.size()]);
         m_useProxy = useProxy;
@@ -64,6 +62,9 @@ public class SIPEPQuery extends IQuery {
         this.node = reportSettings;
         this.cidFinder = cidFinder;
         this.tabName = tabName;
+    }
+    public String getTabAlias() {
+        return "sip";
     }
 
     @Override
@@ -94,9 +95,8 @@ public class SIPEPQuery extends IQuery {
         recCnt = 0;
     }
 
-    private Hashtable sipRecords = new Hashtable();
 
-    public Hashtable getSipRecords() {
+    public HashMap getSipRecords() {
         return sipRecords;
     }
 

@@ -118,7 +118,7 @@ public class TLibTable extends DBTable {
             setFieldInt(stmt, 26, Main.getRef(ReferenceType.TLIBATTR2, theRec.getAttr2()));
             setFieldInt(stmt, 27, Main.getRef(ReferenceType.DN, theRec.getAttributeDN("AttributeDNIS")));
             setFieldInt(stmt, 28, Main.getRef(ReferenceType.Place, theRec.getAttributeDN("AttributePlace")));
-            theRec.SetTlibId(getCurrentID());
+            TLibMessage.SetTlibId(getCurrentID());
 
             getM_dbAccessor().SubmitStatement(m_InsertStatementId);
         } catch (SQLException e) {

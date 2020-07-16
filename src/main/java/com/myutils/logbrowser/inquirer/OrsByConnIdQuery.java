@@ -11,7 +11,7 @@ import java.util.Collection;
 
 /**
  *
- * @author kvoroshi
+ * @author ssydoruk
  */
 public class OrsByConnIdQuery extends IQuery {
 
@@ -23,6 +23,7 @@ public class OrsByConnIdQuery extends IQuery {
     private Collection<Long> refIDs = null;
     private Collection<Long> recIDs = null;
     private Collection<Long> dnIDs;
+    private IDsFinder cif = null;
 
     public OrsByConnIdQuery() throws SQLException {
         addRef("ors.thisDNID", "thisDN", ReferenceType.DN.toString(), FieldType.Optional);
@@ -164,7 +165,6 @@ public class OrsByConnIdQuery extends IQuery {
     void setReportSettings(DynamicTreeNode<OptionNode> reportSettings) {
         this.node = reportSettings;
     }
-    private IDsFinder cif = null;
 
     private String getMyWhere() throws SQLException {
 //        if (node != null) {

@@ -14,58 +14,23 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 
-public class GenesysMsg extends Message {
+public final class GenesysMsg extends Message {
 
     private static final Pattern regMsg = Pattern.compile("^\\s*(None|Debug|Trace|Interaction|Standard|Alarm|Unknown|Non|Dbg|Trc|Int|Std|Alr|Unk) (\\d{5})\\s*");
     private static final Pattern regMsgSCS = Pattern.compile("^\\s*(None|Debug|Trace|Interaction|Standard|Alarm|Unknown|Non|Dbg|Trc|Int|Std|Alr|Unk)(?:\\s+(?:\\S+)){3}.+-(?:\\d{2})-(\\d{5})");
+    static private final Pattern ptThreadID = Pattern.compile("^(\\[\\S+\\])$");
+    static GenesysMsgMap msgMap = new GenesysMsgMap();
 
-    private static final Pattern regMsgWords = Pattern.compile("([a-zA-Z]+)");
-    private static final int MAX_LOG_WORDS = 3;
-    private String lastGenesysMsgLevel;
-    private String lastGenesysMsgID;
-
-    private boolean savedToDB = false;
-
-    /**
-     * Get the value of savedToDB
-     *
-     * @return the value of savedToDB
-     */
-    public boolean isSavedToDB() {
-        return savedToDB;
-    }
-
-    /**
-     * Set the value of savedToDB
-     *
-     * @param savedToDB new value of savedToDB
-     */
-    public void setSavedToDB(boolean savedToDB) {
-        this.savedToDB = savedToDB;
-    }
-
-    public String getLastGenesysMsgLevel() {
-        return lastGenesysMsgLevel;
-    }
-
-    public String getLastGenesysMsgID() {
-        return lastGenesysMsgID;
-    }
 
     public static GenesysMsg CheckGenesysMsg(DateParsed dp, Parser p, TableType t, Pattern reg, Pattern ignoreMSGIDs) {
         return CheckGenesysMsg(dp, p, t, reg, ignoreMSGIDs, false);
     }
 
-    public void setLastGenesysMsgID(String lastGenesysMsgID) {
-        this.lastGenesysMsgID = lastGenesysMsgID;
-    }
-
-    static private final Pattern ptThreadID = Pattern.compile("^(\\[\\S+\\])$");
 
     public static GenesysMsg postGenesysMsg(DateParsed dp, Parser p, TableType t, Pattern ignoreMSGIDs,
             String _lastGenesysMsgLevel, String _lastGenesysMsgID, String generatedMsgID, String generatedMsg,
             boolean saveToDB) {
-        GenesysMsg msg = null;
+        GenesysMsg msg ;
 
         msg = new GenesysMsg(t, _lastGenesysMsgLevel, generatedMsgID, generatedMsg);
 
@@ -83,25 +48,6 @@ public class GenesysMsg extends Message {
 
         }
         return msg;
-    }
-    private boolean toIgnore = false;
-
-    /**
-     * Get the value of toIgnore
-     *
-     * @return the value of toIgnore
-     */
-    public boolean isToIgnore() {
-        return toIgnore;
-    }
-
-    /**
-     * Set the value of toIgnore
-     *
-     * @param toIgnore new value of toIgnore
-     */
-    public void setToIgnore(boolean toIgnore) {
-        this.toIgnore = toIgnore;
     }
 
     public static GenesysMsg postGenesysMsg(DateParsed dp, Parser p, TableType t, Pattern ignoreMSGIDs,
@@ -190,10 +136,63 @@ public class GenesysMsg extends Message {
             Main.getMain().tabRefs.updateRef(ReferenceType.LOGMESSAGE, entry.getKey(), s.toString());
         }
     }
+    //    private static final Pattern regMsgWords = Pattern.compile("([a-zA-Z]+)");
+//    private static final int MAX_LOG_WORDS = 3;
+    private String lastGenesysMsgLevel;
+    private String lastGenesysMsgID;
+    private boolean savedToDB = false;
+    private boolean toIgnore = false;
     private final String level;
     private final String msgID;
     private FileInfoType msgType;
     private String line;
+    public GenesysMsg(TableType t, String level, String msgID, String line) {
+        super(t);
+        this.level = level;
+        this.msgID = msgID;
+        this.line = line;
+    }
+    /**
+     * Get the value of savedToDB
+     *
+     * @return the value of savedToDB
+     */
+    public boolean isSavedToDB() {
+        return savedToDB;
+    }
+    /**
+     * Set the value of savedToDB
+     *
+     * @param savedToDB new value of savedToDB
+     */
+    public void setSavedToDB(boolean savedToDB) {
+        this.savedToDB = savedToDB;
+    }
+    public String getLastGenesysMsgLevel() {
+        return lastGenesysMsgLevel;
+    }
+    public String getLastGenesysMsgID() {
+        return lastGenesysMsgID;
+    }
+    public void setLastGenesysMsgID(String lastGenesysMsgID) {
+        this.lastGenesysMsgID = lastGenesysMsgID;
+    }
+    /**
+     * Get the value of toIgnore
+     *
+     * @return the value of toIgnore
+     */
+    public boolean isToIgnore() {
+        return toIgnore;
+    }
+    /**
+     * Set the value of toIgnore
+     *
+     * @param toIgnore new value of toIgnore
+     */
+    public void setToIgnore(boolean toIgnore) {
+        this.toIgnore = toIgnore;
+    }
 
     public String getLevelString() {
         return level;
@@ -207,12 +206,6 @@ public class GenesysMsg extends Message {
         this.line = line;
     }
 
-    public GenesysMsg(TableType t, String level, String msgID, String line) {
-        super(t);
-        this.level = level;
-        this.msgID = msgID;
-        this.line = line;
-    }
 
     @Override
     public String toString() {
@@ -223,29 +216,6 @@ public class GenesysMsg extends Message {
         return Main.getRef(ReferenceType.MSGLEVEL, level);
     }
 
-    static GenesysMsgMap msgMap = new GenesysMsgMap();
-
-    static class GenesysMsgMap extends HashMap<String, ArrayList<String>> {
-
-        private void addMap(String msgID, String line) {
-            ArrayList<String> storedLine = get(msgID);
-            if (storedLine == null) {
-                put(msgID, new ArrayList(Arrays.asList(StringUtils.split(line))));
-            } else {
-                String[] split = StringUtils.split(line);
-                HashSet<String> oldWords = new HashSet<>(storedLine);
-                oldWords.retainAll(Arrays.asList(split));
-                ArrayList<String> updatedStored = new ArrayList<>();
-                for (String string : storedLine) {
-                    if (oldWords.contains(string)) {
-                        updatedStored.add(string);
-                    }
-                }
-                put(msgID, updatedStored);
-            }
-        }
-
-    }
 
     int getMsgID() {
         msgMap.addMap(msgID, line);
@@ -268,6 +238,27 @@ public class GenesysMsg extends Message {
 //
 //        return Main.getRef(ReferenceType.LOGMESSAGE, buf.toString());
 //    }
+    static class GenesysMsgMap extends HashMap<String, ArrayList<String>> {
+        
+        private void addMap(String msgID, String line) {
+            ArrayList<String> storedLine = get(msgID);
+            if (storedLine == null) {
+                put(msgID, new ArrayList(Arrays.asList(StringUtils.split(line))));
+            } else {
+                String[] split = StringUtils.split(line);
+                HashSet<String> oldWords = new HashSet<>(storedLine);
+                oldWords.retainAll(Arrays.asList(split));
+                ArrayList<String> updatedStored = new ArrayList<>();
+                for (String string : storedLine) {
+                    if (oldWords.contains(string)) {
+                        updatedStored.add(string);
+                    }
+                }
+                put(msgID, updatedStored);
+            }
+        }
+        
+    }
 }
 
 class GenesysMsgs {

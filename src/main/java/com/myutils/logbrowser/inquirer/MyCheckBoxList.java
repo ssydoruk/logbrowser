@@ -47,15 +47,15 @@ public class MyCheckBoxList extends CheckBoxList {
 
     private int lastIdx;
 
-    public DefaultListModel getLm() {
-        return lm;
-    }
 
     private String lastRegEx = null;
     private JPanel jpo = null;
     private DefaultListModel lm = null;
     EnterRegexDialog dlg = null;
 
+
+    MyChBoxListPopup menu;
+    private ListSelectionListener[] listSelectionListeners = null;
     public MyCheckBoxList(JPanel jpo) {
         super();
         lm = new DefaultListModel();
@@ -92,8 +92,6 @@ public class MyCheckBoxList extends CheckBoxList {
 
     }
 
-    MyChBoxListPopup menu;
-
     public MyCheckBoxList(DefaultListModel lmRefValues, JPanel jpo) {
         this(jpo);
         setModel(lmRefValues);
@@ -102,6 +100,9 @@ public class MyCheckBoxList extends CheckBoxList {
 
         addMouseListener(new PopClickListener(menu));
 
+    }
+    public DefaultListModel getLm() {
+        return lm;
     }
 
     public String getLastRegEx() {
@@ -149,7 +150,6 @@ public class MyCheckBoxList extends CheckBoxList {
         }
     }
 
-    private ListSelectionListener[] listSelectionListeners = null;
 
     private void doSearch(boolean initialRun, boolean searchForward) {
         Window windowAncestor = (Window) SwingUtilities.getWindowAncestor(this);
@@ -239,9 +239,6 @@ public class MyCheckBoxList extends CheckBoxList {
 
     class MyChBoxListPopup extends JPopupMenu {
 
-        public CheckBoxList getList() {
-            return list;
-        }
 
         private CheckBoxList list;
         private JMenuItem jmCheckAll;
@@ -261,6 +258,61 @@ public class MyCheckBoxList extends CheckBoxList {
         private JMenuItem jmFindPrev;
         private JMenuItem jmCopyValue;
 
+
+        JDialog jd = null;
+        JList jdList;
+
+        JDialog jdStat = null;
+        private MyChBoxListPopup(MyCheckBoxList _list, JPanel w) {
+            InitItems();
+            this.list = _list;
+            this.w = w;
+            addPopupMenuListener(new PopupMenuListener() {
+                
+                @Override
+                public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
+                    CheckBoxListSelectionModel checkBoxListSelectionModel = list.getCheckBoxListSelectionModel();
+                    ListModel model = list.getModel();
+                    boolean listEmpty = model.getSize() <= 0;
+                    boolean allChecked = !listEmpty && !checkBoxListSelectionModel.isSelectedIndex(0);
+                    boolean anyChecked = !listEmpty && isAnyChecked(checkBoxListSelectionModel, model);
+                    
+                    jmCheckAll.setEnabled(allChecked);
+                    jmCheckByRegex.setEnabled(allChecked);
+                    jmUncheckAll.setEnabled(anyChecked);
+                    jmUncheckByRegex.setEnabled(anyChecked);
+                    jmShowStat.setEnabled(!listEmpty);
+                }
+                
+                @Override
+                public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
+                    
+                }
+                
+                @Override
+                public void popupMenuCanceled(PopupMenuEvent e) {
+                }
+                
+                private boolean isAnyChecked(CheckBoxListSelectionModel checkBoxListSelectionModel, ListModel model) {
+                    for (int i = 0; i < model.getSize(); i++) {
+                        Object elementAt = model.getElementAt(i);
+                        if (elementAt.equals(CheckBoxList.ALL_ENTRY)) {
+                            if (checkBoxListSelectionModel.isSelectedIndex(i)) {
+                                return true;
+                            }
+                        } else {
+                            if ((checkBoxListSelectionModel.isSelectedIndex(i))) {
+                                return true;
+                            }
+                        }
+                    }
+                    return false;
+                }
+            });
+        }
+        public CheckBoxList getList() {
+            return list;
+        }
         private void SetChecked(boolean b) {
             CheckBoxListSelectionModel checkBoxListSelectionModel = list.getCheckBoxListSelectionModel();
             ListModel model = list.getModel();
@@ -277,11 +329,6 @@ public class MyCheckBoxList extends CheckBoxList {
 
             }
         }
-
-        JDialog jd = null;
-        JList jdList;
-
-        JDialog jdStat = null;
 
         private void copyChecked(ActionEvent evt, boolean isChecked) {
             if (isChecked) {
@@ -589,53 +636,6 @@ public class MyCheckBoxList extends CheckBoxList {
 //            add(jmHideUnchecked);
         }
 
-        private MyChBoxListPopup(MyCheckBoxList _list, JPanel w) {
-            InitItems();
-            this.list = _list;
-            this.w = w;
-            addPopupMenuListener(new PopupMenuListener() {
-
-                @Override
-                public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
-                    CheckBoxListSelectionModel checkBoxListSelectionModel = list.getCheckBoxListSelectionModel();
-                    ListModel model = list.getModel();
-                    boolean listEmpty = model.getSize() <= 0;
-                    boolean allChecked = !listEmpty && !checkBoxListSelectionModel.isSelectedIndex(0);
-                    boolean anyChecked = !listEmpty && isAnyChecked(checkBoxListSelectionModel, model);
-
-                    jmCheckAll.setEnabled(allChecked);
-                    jmCheckByRegex.setEnabled(allChecked);
-                    jmUncheckAll.setEnabled(anyChecked);
-                    jmUncheckByRegex.setEnabled(anyChecked);
-                    jmShowStat.setEnabled(!listEmpty);
-                }
-
-                @Override
-                public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
-
-                }
-
-                @Override
-                public void popupMenuCanceled(PopupMenuEvent e) {
-                }
-
-                private boolean isAnyChecked(CheckBoxListSelectionModel checkBoxListSelectionModel, ListModel model) {
-                    for (int i = 0; i < model.getSize(); i++) {
-                        Object elementAt = model.getElementAt(i);
-                        if (elementAt.equals(CheckBoxList.ALL_ENTRY)) {
-                            if (checkBoxListSelectionModel.isSelectedIndex(i)) {
-                                return true;
-                            }
-                        } else {
-                            if ((checkBoxListSelectionModel.isSelectedIndex(i))) {
-                                return true;
-                            }
-                        }
-                    }
-                    return false;
-                }
-            });
-        }
 
     }
 

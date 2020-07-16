@@ -28,6 +28,19 @@ public class StatServerResults extends IQueryResults {
 
     private int m_componentFilter;
     private ArrayList<NameID> appType = null;
+    IDsFinder cidFinder = null;
+    public StatServerResults(QueryDialogSettings qdSettings) throws SQLException {
+        super(qdSettings);
+        if (repComponents.isEmpty()) {
+            loadStdOptions();
+        }
+        addSelectionType(SelectionType.NO_SELECTION);
+        addSelectionType(SelectionType.GUESS_SELECTION);
+        addSelectionType(SelectionType.CONNID);
+        addSelectionType(SelectionType.DN);
+        addSelectionType(SelectionType.AGENT);
+        addSelectionType(SelectionType.PLACE);
+    }
 
     @Override
     public String getName() {
@@ -75,18 +88,6 @@ public class StatServerResults extends IQueryResults {
 
     }
 
-    public StatServerResults(QueryDialogSettings qdSettings) throws SQLException {
-        super(qdSettings);
-        if (repComponents.isEmpty()) {
-            loadStdOptions();
-        }
-        addSelectionType(SelectionType.NO_SELECTION);
-        addSelectionType(SelectionType.GUESS_SELECTION);
-        addSelectionType(SelectionType.CONNID);
-        addSelectionType(SelectionType.DN);
-        addSelectionType(SelectionType.AGENT);
-        addSelectionType(SelectionType.PLACE);
-    }
 
     @Override
     public UTCTimeRange refreshTimeRange(ArrayList<Integer> searchApps) throws SQLException {
@@ -212,7 +213,6 @@ public class StatServerResults extends IQueryResults {
     void SetConfig(InquirerCfg cr) {
 //        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
-    IDsFinder cidFinder = null;
 
     @Override
     public void Retrieve(QueryDialog dlg) throws SQLException {
@@ -309,17 +309,17 @@ public class StatServerResults extends IQueryResults {
                 statsAgents = new TableQuery(MsgType.STATSAgent, "ststatus");
 
                 Wheres wh = new Wheres();
-                wh.addWhere(statsAgents.getCheckedWhere("oldstatusid", ReferenceType.StatType,
+                wh.addWhere(TableQuery.getCheckedWhere("oldstatusid", ReferenceType.StatType,
                         FindNode(agentRoot, DialogItem.STATAGENTPLACE_STATUS, DialogItem.STATAGENTPLACE_STATUS_NAME, null)), "OR");
 
-                wh.addWhere(statsAgents.getCheckedWhere("newstatusid", ReferenceType.StatType,
+                wh.addWhere(TableQuery.getCheckedWhere("newstatusid", ReferenceType.StatType,
                         FindNode(agentRoot, DialogItem.STATAGENTPLACE_STATUS, DialogItem.STATAGENTPLACE_STATUS_NAME, null)), "OR");
 
                 wh1 = new Wheres();
-                wh1.addWhere(statsAgents.getCheckedWhere("placeid", ReferenceType.Place,
+                wh1.addWhere(TableQuery.getCheckedWhere("placeid", ReferenceType.Place,
                         FindNode(agentRoot, DialogItem.STATAGENTPLACE_PLACE, DialogItem.STATAGENTPLACE_PLACE_NAME, null)), "OR");
 
-                wh1.addWhere(statsAgents.getCheckedWhere("agentid", ReferenceType.Agent,
+                wh1.addWhere(TableQuery.getCheckedWhere("agentid", ReferenceType.Agent,
                         FindNode(agentRoot, DialogItem.STATAGENTPLACE_AGENT, DialogItem.STATAGENTPLACE_AGENT_NAME, null)), "OR");
 
                 statsAgents.addRef("placeid", "place", ReferenceType.Place.toString(), FieldType.Optional);
@@ -337,10 +337,10 @@ public class StatServerResults extends IQueryResults {
                 statsAgents = new TableQuery(MsgType.STATSCapacity, "stcapacity");
 
                 wh1 = new Wheres();
-                wh1.addWhere(statsAgents.getCheckedWhere("placeid", ReferenceType.Place,
+                wh1.addWhere(TableQuery.getCheckedWhere("placeid", ReferenceType.Place,
                         FindNode(agentRoot, DialogItem.STATAGENTPLACE_PLACE, DialogItem.STATAGENTPLACE_PLACE_NAME, null)), "OR");
 
-                wh1.addWhere(statsAgents.getCheckedWhere("agentid", ReferenceType.Agent,
+                wh1.addWhere(TableQuery.getCheckedWhere("agentid", ReferenceType.Agent,
                         FindNode(agentRoot, DialogItem.STATAGENTPLACE_AGENT, DialogItem.STATAGENTPLACE_AGENT_NAME, null)), "OR");
 
                 statsAgents.addRef("placeid", "place", ReferenceType.Place.toString(), FieldType.Optional);

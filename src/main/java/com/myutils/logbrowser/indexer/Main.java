@@ -53,22 +53,1028 @@ import org.xml.sax.SAXException;
 
 /**
  *
- * @author kvoroshi
+ * @author ssydoruk
  */
 public class Main {
 
     static Main theParser = null;
 
-    static class Constants extends HashMap<GenesysConstants, HashMap<Integer, String>> {
 
+    private static final Constants constants = new Constants();
+    public static SqliteAccessor m_accessor;
+    static String m_component = "all";
+    static String m_executableName = "indexer.jar";
+    public static Logger logger;
+    private static String logBrDir;
+    private static boolean ignoreZIP = false;
+    public static ExecutionEnvironment clr;
+    static long totalBytes = 0;
+    private static Pattern regFilesNotGood = Pattern.compile("(^\\.logbr|logbr.db)");
+    static Boolean isAll = null;
+
+    static String lookupConstant(GenesysConstants constName, Integer intOrDef) {
+        if (intOrDef != null) {
+            HashMap<Integer, String> get = constants.get(constName);
+            if (get != null) {
+                String ret = get.get(intOrDef);
+                if (StringUtils.isNotBlank(ret)) {
+                    return ret;
+                }
+            }
+
+        }
+        return null;
+    }
+
+    static public Main getMain() {
+        return theParser;
+    }
+
+
+    public static SqliteAccessor getM_accessor() {
+        return m_accessor;
+    }
+    public static SqliteAccessor getSQLiteaccessor() {
+        return m_accessor;
+    }
+    public static void PrintUsage() {
+        System.out.print("Usage: " + m_executableName
+                + " -DbName name"
+                        + " [-Alias alias]"
+                        + " [-Regexp regexp]"
+                        + " [-Logdb name]"
+                        + " [-component sc | tc | sip | all ]"
+                        + " [-config config]"
+                        + " file1|dir1 [file2|dir2 ...]\n");
+    }
+    public static String getVersion() throws IOException {
+//        try {
+//            String name = Main.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath().substring(1);
+//            JarFile jarStream = new JarFile(name);
+//            Manifest mf = jarStream.getManifest();
+//            Attributes attr = mf.getMainAttributes();
+//            return attr.getValue("version");
+//        } catch (Exception e) {
+//            System.out.println("Error: "+e);
+//            Main.logger.error(e);;
+//        }
+return "";
+    }
+    static void theTest() {
+        String s = "20/02/2018 11:41:03 a.m..557_I_I_017302afa531b580 [09:06] >>>>>>>>>>>>start interp()";
+        Pattern p = Pattern.compile("^\\d{2}/\\d{2}/\\d{4} \\d{2}:\\d{2}:\\d{2} ([am\\.]+)\\.\\d{3}");
+        Matcher m = p.matcher(s);
+        System.out.println(m.replaceFirst("$1"));
+
+        DateTimeFormatter formatter
+                = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss a.SSS");
+        LocalDate date = LocalDate.parse("20/02/2018 11:41:03 a.m..557", formatter);
+        System.out.printf("%s%n", date);
+
+        System.exit(0);
+    }
+    public static void main(String[] args) throws IOException, ParserConfigurationException, SAXException, Exception {
+        
+        
+        /*
+        //<editor-fold defaultstate="collapsed" desc="standard log parsing">
+        for (int i = 0; i < args.length;) {
+        String currentStr = args[i];
+        if (currentStr.equalsIgnoreCase("/alias")
+        || currentStr.equalsIgnoreCase("-alias")) {
+        if (i + 1 == args.length || !alias.isEmpty()) {
+        System.out.println("Invalid alias.");
+        PrintUsage();
+        return;
+        }
+        alias = args[i + 1];
+        i += 2;
+        
+        } else if (currentStr.equalsIgnoreCase("/dbname")
+        || currentStr.equalsIgnoreCase("-dbname")) {
+        if (i + 1 == args.length || !dbname.isEmpty()) {
+        System.out.println("Invalid DbName.");
+        PrintUsage();
+        return;
+        }
+        dbname = args[i + 1];
+        i += 2;
+        
+        } else if (currentStr.equalsIgnoreCase("/cfgxml")
+        || currentStr.equalsIgnoreCase("-cfgxml")) {
+        if (i + 1 == args.length || !xmlCFG.isEmpty()) {
+        System.out.println("Invalid xmlCFG.");
+        PrintUsage();
+        return;
+        }
+        xmlCFG = args[i + 1];
+        i += 2;
+        
+        } else if (currentStr.equalsIgnoreCase("/logdb")
+        || currentStr.equalsIgnoreCase("-logdb")) {
+        if (i + 1 == args.length || !logdb.isEmpty()) {
+        System.out.println("Invalid logs database file.");
+        PrintUsage();
+        return;
+        }
+        logdb = args[i + 1];
+        i += 2;
+        
+        } else if (currentStr.equalsIgnoreCase("/component")
+        || currentStr.equalsIgnoreCase("-component")) {
+        if (i + 1 != args.length) {
+        m_component = args[i + 1];
+        if (!m_component.equalsIgnoreCase("all")
+        && !m_component.equalsIgnoreCase("sip")
+        && !m_component.equalsIgnoreCase("sc")
+        && !m_component.equalsIgnoreCase("tc")
+        && !m_component.equalsIgnoreCase("proxy")) {
+        PrintUsage();
+        return;
+        }
+        }
+        i += 2;
+        } else if (currentStr.equalsIgnoreCase("/config")
+        || currentStr.equalsIgnoreCase("-config")) {
+        if (i + 1 == args.length) {
+        PrintUsage();
+        return;
+        }
+        String configFile = args[i + 1];
+        try {
+        if (!configFile.isEmpty()) {
+        Properties config = new Properties();
+        FileInputStream file = new FileInputStream(configFile);
+        config.load(file);
+        file.close();
+        
+        //                        String dirs = config.getProperty("ScanSubdirs");
+        //                        if (dirs != null && dirs.equalsIgnoreCase("on")) {
+        //                            m_scanDir = true;
+        //                        }
+        //
+        //                        String zip = config.getProperty("ParseZip");
+        //                        if (zip != null && zip.equalsIgnoreCase("on")) {
+        //                            m_parseZip = true;
+        //                        }
+        }
+        } catch (IOException e) {
+        }
+        i += 2;
+        
+        } else {
+        scanDir = currentStr;
+        i++;
+        }
+        }
+        
+        if (alias.isEmpty()) {
+        DateFormat dateFormat = new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss");
+        Date date = new Date();
+        alias = dateFormat.format(date);
+        }
+
+        if (dbname.isEmpty()) {
+        System.out.println("DbName required.");
+        PrintUsage();
+        return;
+        }
+
+        if (scanDir == null || scanDir.isEmpty()) {
+        System.out.println("File or dir required.");
+        PrintUsage();
+        return;
+        }
+
+        if (logdb.isEmpty()) {
+        logdb = "logdb"; //default value
+        }
+        //</editor-fold>
+        */
+        Thread.setDefaultUncaughtExceptionHandler(new ExceptionHandler());
+        System.setProperty("sun.awt.exception.handler",
+                ExceptionHandler.class.getName());
+
+        clr = new ExecutionEnvironment();
+        logger = LogManager.getLogger("indexer");
+
+        String cmdLine = "";
+        for (String arg : args) {
+            cmdLine += arg + " ";
+        }
+        logger.info("parameters:" + cmdLine);
+        logger.info("working directory: " + Paths.get(".").toAbsolutePath().normalize().toString());
+
+        clr.parserCommandLine(args);
+        logger.info("params: parsing timediff: " + Parser.isParseTimeDiff());
+
+        String alias = clr.getAlias();
+        String dbname = clr.getDBName();
+        File f = new File(dbname);
+        if (!f.isAbsolute()) {
+            dbname = f.getAbsolutePath();
+        }
+
+        ignoreZIP = clr.isIgnoreZIP();
+
+        String xmlCFG = clr.getXmlCfg();
+        String baseDir = clr.getBaseDir();
+
+        theParser = new Main(dbname, xmlCFG);
+
+        theParser.parseAll(baseDir, dbname, alias);
+//        Thread.sleep(3000);
+    }
+    public static String getLogBrDir() {
+        return logBrDir;
+    }
+    public static String formatSize(long v) {
+        if (v < 1024) {
+            return v + " B";
+        }
+        int z = (63 - Long.numberOfLeadingZeros(v)) / 10;
+        return String.format("%.1f %sB", (double) v / (1L << (z * 10)), " KMGTPE".charAt(z));
+    }
+    public static Integer getRef(ReferenceType type, String name) {
+        Integer ret = getMain().tabRefs.getRef(type, name);
+        Main.logger.trace("getRef for [" + type + "] key:[" + name + "]" + " ret=" + ret);
+        
+        return ret;
+    }
+    public static Integer getRef(ReferenceType type, String name, int wordsToCompare) {
+        Integer ret = getMain().tabRefs.getRef(type, name, wordsToCompare);
+        Main.logger.trace("getRefLog key:[" + name + "]" + " ret=" + ret);
+        
+        return ret;
+    }
+    static boolean IgnoreTable(Message msg) {
+        return theParser.checkIgnoreTable(msg);
+    }
+    static int getRefQuotes(ReferenceType referenceType, String m_ThisDN) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+    private static boolean fileOK(File fileInfo) {
+        if (regFilesNotGood.matcher(fileInfo.getName()).find()) {
+            return false;
+        }
+        return true;
+    }
+    private static void extendFilesList(ArrayList<FileInfo> filesToProcess, LogFileWrapper newLog) throws IOException {
+        if (newLog != null) {
+            for (FileInfo fileInfo : newLog.getFileInfos()) {
+                logger.debug("adding file to process: [" + fileInfo.getM_path() + "] log name [" + fileInfo.getLogFileName() + "]");
+                for (FileInfo fiExisting : filesToProcess) {
+                    if (fiExisting.fileEqual(fileInfo)) {
+                        Main.logger.warn("Duplicate file found: [" + fileInfo.getM_path() + "] vs [" + fiExisting.getM_path() + "]");
+                        if (fiExisting.getSize() >= fileInfo.getSize()) {
+                            Main.logger.warn("Ignored [" + fileInfo.getM_path() + "]");
+                            return;
+                        } else {
+                            Main.logger.warn("Will use [" + fileInfo.getM_path() + "] as it is larger "
+                                    + "(" + fileInfo.getSize()
+                                    + "b " + formatSize(fileInfo.getSize())
+                                    + " vs " + fiExisting.getSize() + "b " + formatSize(fiExisting.getSize()) + ")");
+                            filesToProcess.remove(fiExisting);
+                            fiExisting.setIgnoring();
+                            break;
+                        }
+                    }
+                }
+                filesToProcess.add(fileInfo);
+            }
+        }
+    }
+    private static boolean myEqual(String logFileName, String logFileName0) {
+        return logFileName != null && !logFileName.isEmpty()
+                && logFileName0 != null && !logFileName0.isEmpty()
+                && logFileName.equals(logFileName0);
+    }
+    static public boolean isDbExisted() {
+        return Main.getMain().dbExisted;
+    }
+    private static void initStatic(SqliteAccessor m_accessor) throws Exception {
+        Record.setFileId(m_accessor.getID("select max(id) from file_logbr;", 0));
+        Record.m_handlerId = m_accessor.getID("select max(HandlerId) from sip_" + m_accessor.getM_alias() + ";", "sip_" + m_accessor.getM_alias(), 0);
+        Record.m_handlerId = m_accessor.getID("select max(HandlerId) from tlib_" + m_accessor.getM_alias() + ";", "tlib_" + m_accessor.getM_alias(), Record.m_handlerId);
+        Record.m_handlerId = m_accessor.getID("select max(HandlerId) from cireq_" + m_accessor.getM_alias() + ";", "cireq_" + m_accessor.getM_alias(), Record.m_handlerId);
+        Record.m_handlerId++;
+        Record.m_sipId = m_accessor.getID("select max(SipId) from trigger_" + m_accessor.getM_alias() + ";", "trigger_" + m_accessor.getM_alias(), 0) + 1;
+        Record.m_tlibId = m_accessor.getID("select max(TlibId) from trigger_" + m_accessor.getM_alias() + ";", "trigger_" + m_accessor.getM_alias(), 0) + 1;
+        Record.m_jsonId = m_accessor.getID("select max(JsonId) from trigger_" + m_accessor.getM_alias() + ";", "trigger_" + m_accessor.getM_alias(), 0) + 1;
+    }
+    public static boolean setCurrentDirectory(String directory_name) {
+        boolean result = false;  // Boolean indicating whether directory was set
+        File directory;       // Desired current working directory
+        
+        directory = new File(directory_name).getAbsoluteFile();
+        if (directory.exists() || directory.mkdirs()) {
+            result = (System.setProperty("user.dir", directory.getAbsolutePath()) != null);
+        }
+        
+        return result;
+    }
+    public static boolean ifSIPLines() {
+        String isAll = (String) System.getProperties().get("SIPLINES");
+        if (isAll == null || isAll.length() == 0 || !isAll.equals("1")) {
+            return false;
+        }
+        return true;
+    }
+    public static boolean isIgnoreZIP() {
+        return ignoreZIP;
+    }
+    public static boolean ifAll() {
+        if (isAll == null) {
+            String sIsAll = (String) System.getProperties().get("all");
+            isAll = (sIsAll != null && sIsAll.equals("1"));
+        }
+        return isAll;
+    }
+    private static void ParseZip(File file) {
+        try {
+            ZipFile logArchive = new ZipFile(file, ZipFile.OPEN_READ);
+            Enumeration e = logArchive.entries();
+            while (e.hasMoreElements()) {
+                ZipEntry entry = (ZipEntry) e.nextElement();
+                InputStreamReader reader = new InputStreamReader(logArchive.getInputStream(entry));
+                /*                BufferedReaderCrLf input = new BufferedReaderCrLf(reader);
+                FileInfo fileInfo = new FileInfo();
+                fileInfo.m_path = entry.getName();
+                fileInfo.m_name = entry.getName();
+                fileInfo.setFileFilter(m_component);
+                Parser parser = null;
+                int componentType = fileInfo.CheckLog(input);
+                switch (componentType) {
+                case FileInfo.type_SessionController:
+                case FileInfo.type_InteractionProxy:
+                case FileInfo.type_tController:
+                parser = m_parsers.get(0);
+                break;
+                
+                case FileInfo.type_SipProxy:
+                case FileInfo.type_CallManager:
+                case FileInfo.type_TransportLayer:
+                if(m_component.equalsIgnoreCase("all")) {
+                parser = m_parsers.get(0);
+                } else {
+                parser = m_parsers.get(1);
+                }
+                break;
+                
+                case FileInfo.type_URS:
+                parser = m_parsers.get(2);
+                break;
+                
+                case FileInfo.type_StatServer:
+                parser = m_parsers.get(3);
+                break;
+                
+                case FileInfo.type_ICON:
+                parser = m_parsers.get(4);
+                break;
+                
+                case FileInfo.type_ORS:
+                parser = m_parsers.get(5);
+                break;
+                
+                default:
+                return;
+                }
+                
+                fileInfo.AddToDB(m_accessor);
+                LogDB.FileEntry logEntry = m_logDB.GetInfo(file);
+                if (logEntry.Offset >= entry.getSize()) {
+                System.out.println("Nothing new to parse: " + entry.getName());
+                return;
+                }
+                InputStreamReader parsingReader = new InputStreamReader(logArchive.getInputStream(entry));
+                BufferedReaderCrLf parsingInput = new BufferedReaderCrLf(parsingReader);
+                int lines = parser.ParseFrom(parsingInput, logEntry.Offset, logEntry.Line);
+                parsingInput.close();
+                logEntry.Line += lines;
+                logEntry.Offset = entry.getSize();
+                m_logDB.SetInfo(file, logEntry);
+                System.out.println("Parsed " + lines + " lines in " + entry.getName());
+                
+                input.close();
+                */
+            }
+        } catch (Exception e) {
+            System.out.println("ERROR parsing zip archive: " + e);
+            return;
+        }
+    }
+    private final String dbname;
+    private int totalFiles = 0;
+    private boolean dbExisted = false;
+
+
+    HashMap<FileInfoType, Parser> m_parsers = new HashMap<>();
+//    static SqliteAccessor m_accessor; 
+
+    private FileInfoTable m_FileInfoTable;
+
+
+    private ArrayList<File> m_files = new ArrayList();
+    int m_current;
+    private HashMap<TableType, DBTable> m_tables;
+
+    boolean m_scanDir = true;
+    boolean m_parseZip = false;
+
+    public XmlCfg xmlCfg = null;
+
+    TableReferences tabRefs;
+    ArrayList<FileInfo> filesToAccess = new ArrayList();
+    public Main(String dbname, String xmlCFG) throws IOException, Exception {
+        setXMLCfg(xmlCFG);
+        this.dbname = dbname;
+    }
+
+
+    private void ScanDir(File file) throws IOException {
+        logger.info("Processing directory " + file.getAbsolutePath());
+        File[] filesInDir = file.listFiles();
+        for (int j = 0; j < filesInDir.length; j++) {
+//            String fileType = Files.probeContentType(filesInDir[j].toPath());
+//
+//            logger.info(filesInDir[j].getName() + "- type:" + fileType);
+            if (filesInDir[j].isFile()) {
+//                FileInfo fileInfo = getFileInfo(filesInDir[j]);
+//                extendFilesList(filesToAccess, fileInfo);
+                LogFileWrapper logFile = LogFileWrapper.getContainer(filesInDir[j]);
+                if (logFile != null) {
+                    extendFilesList(filesToAccess, logFile);
+                }
+
+            } else if (filesInDir[j].isDirectory() && m_scanDir && !isLogBRDir(filesInDir[j])) {
+                ScanDir(filesInDir[j]);
+            }
+        }
+    }
+
+
+
+    private void Parse(FileInfo fileInfo) {
+        Date fileStart = new Date();
+        Parser parser = null;
+        DBTable tab = null;
+        FileInfoType componentType = fileInfo.getM_componentType();
+        if (componentType == FileInfoType.type_SessionController
+                || componentType == FileInfoType.type_InteractionProxy
+                || componentType == FileInfoType.type_tController
+                || componentType == FileInfoType.type_CallManager
+                || componentType == FileInfoType.type_TransportLayer) {
+            parser = GetParser(FileInfoType.type_SessionController);
+        } else {
+            parser = GetParser(componentType);
+        }
+        if (parser != null) {
+            parser.setFileInfo(fileInfo);
+
+            int lines = 0;
+            try {
+                fileInfo.startParsing();
+                try (InputStream inputStream = fileInfo.getInputStream()) {
+                    BufferedReaderCrLf parsingInput = new BufferedReaderCrLf(inputStream);
+
+                    lines = parser.ParseFrom(parsingInput, 0, 0, fileInfo);
+                    parser.doneParsingFile();
+                    fileInfo.setFileEndTime(parser.getLastTimeStamp());
+                    m_FileInfoTable.AddToDB(fileInfo);
+                    parsingInput.close();
+                }
+
+                fileInfo.doneParsing();
+            } catch (Exception exception) {
+                logger.error("Uncought exception while parsing: " + exception);
+            }
+
+            Date fileEnd = new Date();
+            totalBytes += fileInfo.getSize();
+            totalFiles++;
+            logger.info("\tParsed " + lines + " lines, " + formatSize(fileInfo.getSize()) + ". Took " + pDuration(fileEnd.getTime() - fileStart.getTime()));
+        } else {
+            if (ifAll()) {
+                logger.error("No parser for file [" + fileInfo.m_path + "] type: " + componentType + "; file skippped");
+            }
+
+        }
+    }
+
+
+    public BufferedReaderCrLf GetNextFile() {
+        try {
+            if (m_current < m_files.size() - 1) {
+                return new BufferedReaderCrLf(new FileInputStream(m_files.get(m_current + 1)));
+            }
+            return null;
+        } catch (FileNotFoundException e) {
+            logger.error("Cannot get next file for continuous parsing: " + e, e);
+            return null;
+        }
+    }
+
+    private void InitTables() {
+
+        DBTable t;
+        m_FileInfoTable = new FileInfoTable(m_accessor);
+        m_FileInfoTable.InitDB();
+        m_FileInfoTable.setCurrentID(Record.getFileId());
+
+        m_tables = new HashMap<>();
+
+//        DBTable dbt = new ORSTable(m_accessor);
+//        dbt.InitDB();
+//        m_tables.add(dbt);
+//        ORSTable tab1 = new ORSTable(m_accessor);
+//        try {
+//            tab1.FinalizeDB();
+//        } catch (Exception ex) {
+//            logger.log(org.apache.logging.log4j.Level.FATAL, ex);
+//        }
+        m_tables.put(TableType.ConfigUpdate, new ConfigUpdateTable(m_accessor, TableType.ConfigUpdate));
+
+        t = new TLibTable(m_accessor, TableType.TLib);
+        t.setCurrentID(Record.m_tlibId);
+        m_tables.put(TableType.TLib, t);
+        m_tables.put(TableType.TLibProxied, new ProxiedTable(m_accessor, TableType.TLibProxied));
+
+        m_tables.put(TableType.Handler, new HandlerTable(m_accessor, TableType.Handler));
+        m_tables.put(TableType.CIFaceRequest, new CIFaceRequestTable(m_accessor, TableType.CIFaceRequest));
+        m_tables.put(TableType.ISCC, new ISCCTable(m_accessor, TableType.ISCC));
+        t = new SIPTable(m_accessor, TableType.SIP);
+        t.setCurrentID(Record.m_sipId);
+        m_tables.put(TableType.SIP, t);
+        m_tables.put(TableType.ConnID, new ConnIDTable(m_accessor, TableType.ConnID));
+        m_tables.put(TableType.Trigger, new TriggerTable(m_accessor, TableType.Trigger));
+        t = new JsonTable(m_accessor, TableType.JSon);
+        t.setCurrentID(Record.m_jsonId);
+        m_tables.put(TableType.JSon, t);
+
+        m_tables.put(TableType.URSWaiting, new URSWaitingTable(m_accessor, TableType.URSWaiting));
+
+        m_tables.put(TableType.SIPMS, new SIPMSTable(m_accessor, TableType.SIPMS));
+        m_tables.put(TableType.SIPEP, new SIPEPTable(m_accessor, TableType.SIPEP));
+        m_tables.put(TableType.VOIPEP, new VOIPEPTable(m_accessor, TableType.VOIPEP));
+
+        m_tables.put(TableType.OCSTLib, new OCSTable(m_accessor, TableType.OCSTLib));
+        m_tables.put(TableType.OCSIxn, new OCSIxnTable(m_accessor, TableType.OCSIxn));
+        m_tables.put(TableType.OCSClient, new OCSClientTable(m_accessor, TableType.OCSClient));
+        m_tables.put(TableType.OCSHTTP, new OCSHTTPTable(m_accessor, TableType.OCSHTTP));
+        m_tables.put(TableType.OCSCG, new OCSCGTable(m_accessor, TableType.OCSCG));
+        m_tables.put(TableType.OCSDBActivity, new OCSDBActivityTable(m_accessor, TableType.OCSDBActivity));
+        m_tables.put(TableType.OCSPAAgentInfo, new OCSPAAgentInfoTable(m_accessor, TableType.OCSPAAgentInfo));
+        m_tables.put(TableType.OCSPASessionInfo, new OCSPASessionInfoTable(m_accessor, TableType.OCSPASessionInfo));
+        m_tables.put(TableType.OCSStatEvent, new OCSStatEventTable(m_accessor, TableType.OCSStatEvent));
+        m_tables.put(TableType.OCSPAEventInfo, new OCSPAEventInfoTable(m_accessor, TableType.OCSPAEventInfo));
+        m_tables.put(TableType.OCSAssignment, new OCSAgentAssignmentTable(m_accessor, TableType.OCSAssignment));
+        m_tables.put(TableType.OCSRecCreate, new OCSRecCreateTable(m_accessor, TableType.OCSRecCreate));
+        m_tables.put(TableType.OCSSCXMLTreatment, new OCSSCXMLTreatmentTable(m_accessor, TableType.OCSSCXMLTreatment));
+        m_tables.put(TableType.OCSSCXMLScript, new OCSSCXMLScriptTable(m_accessor, TableType.OCSSCXMLScript));
+        m_tables.put(TableType.OCSTreatment, new OCSRecTreatmentTable(m_accessor, TableType.OCSTreatment));
+        m_tables.put(TableType.OCSIcon, new OCSIconTable(m_accessor));
+
+        m_tables.put(TableType.StSTEvent, new StSTEventTable(m_accessor, TableType.StSTEvent));
+        m_tables.put(TableType.StSAction, new StSActionTable(m_accessor, TableType.StSAction));
+        m_tables.put(TableType.StSRequestHistory, new StSRequestHistoryTable(m_accessor, TableType.StSRequestHistory));
+        m_tables.put(TableType.StStatus, new StStatusTable(m_accessor, TableType.StStatus));
+        m_tables.put(TableType.StCapacity, new StCapacityTable(m_accessor, TableType.StCapacity));
+        m_tables.put(TableType.IxnSS, new IxnSSTable(m_accessor, TableType.IxnSS));
+
+//        m_tables.put(new ORSEspTable(m_accessor));
+//        m_tables.put(new ORSEventTable(m_accessor));
+//        m_tables.put(new ORSLinkTable(m_accessor));
+//        m_tables.put(new ORSLogTable(m_accessor));
+        m_tables.put(TableType.ORSUrs, new OrsUrsTable(m_accessor, TableType.ORSUrs));
+        m_tables.put(TableType.ORSTlib, new ORSTable(m_accessor, TableType.ORSTlib));
+        m_tables.put(TableType.ORSSidUUID, new ORSSidUUIDTable(m_accessor, TableType.ORSSidUUID));
+        m_tables.put(TableType.ORSSidIxnID, new ORSSidIxnIDTable(m_accessor, TableType.ORSSidIxnID));
+        m_tables.put(TableType.URSCONNIDIxnID, new URSCONNIDIxnIDTable(m_accessor, TableType.URSCONNIDIxnID));
+        m_tables.put(TableType.URSRI, new URSRITable(m_accessor, TableType.URSRI));
+
+        m_tables.put(TableType.ORSMetric, new ORSMetricTable(m_accessor, TableType.ORSMetric));
+        m_tables.put(TableType.ORSMetricExtension, new ORSMetricExtensionTable(m_accessor, TableType.ORSMetricExtension));
+        m_tables.put(TableType.ORSSidSid, new ORSSidSidTable(m_accessor, TableType.ORSSidSid));
+
+        m_tables.put(TableType.ORSHTTP, new OrsHTTPTable(m_accessor));
+        m_tables.put(TableType.ORSMMessage, new ORSMMTable(m_accessor));
+
+        m_tables.put(TableType.URSStrategy, new URSStrategyTable(m_accessor, TableType.URSStrategy));
+        m_tables.put(TableType.URSStrategyInit, new URSStrategyInitTable(m_accessor, TableType.URSStrategyInit));
+        m_tables.put(TableType.URSTlib, new URSTlibTable(m_accessor, TableType.URSTlib));
+        m_tables.put(TableType.URSSTAT, new URSStatTable(m_accessor, TableType.URSSTAT));
+        m_tables.put(TableType.URSRlib, new URSRlibTable(m_accessor, TableType.URSRlib));
+        m_tables.put(TableType.URSCONNIDSID, new URSCONNIDSIDTable(m_accessor, TableType.URSCONNIDSID));
+        m_tables.put(TableType.URSVQ, new URSVQTable(m_accessor, TableType.URSVQ));
+        m_tables.put(TableType.URSTargetSet, new URSTargetSetTable(m_accessor, TableType.URSTargetSet));
+
+        m_tables.put(TableType.WSTlib, new WSTlibTable(m_accessor, TableType.WSTlib));
+        m_tables.put(TableType.WSStat, new WSStatTable(m_accessor, TableType.WSStat));
+        m_tables.put(TableType.WSConf, new WSConfTable(m_accessor, TableType.WSConf));
+        m_tables.put(TableType.WSEServ, new WSEServTable(m_accessor, TableType.WSEServ));
+
+        m_tables.put(TableType.Ixn, new IxnTable(m_accessor, TableType.Ixn));
+        m_tables.put(TableType.IxnDB, new IxnDBActivityTable(m_accessor, TableType.IxnDB));
+
+        m_tables.put(TableType.MsgOCServer, new GenesysMsgTable(m_accessor, TableType.MsgOCServer));
+        m_tables.put(TableType.MsgIxnServer, new GenesysMsgTable(m_accessor, TableType.MsgIxnServer));
+        m_tables.put(TableType.MsgORServer, new GenesysMsgTable(m_accessor, TableType.MsgORServer));
+        m_tables.put(TableType.MsgTServer, new GenesysMsgTable(m_accessor, TableType.MsgTServer));
+        m_tables.put(TableType.MsgURServer, new GenesysMsgTable(m_accessor, TableType.MsgURServer));
+        m_tables.put(TableType.MsgStatServer, new GenesysMsgTable(m_accessor, TableType.MsgStatServer));
+        m_tables.put(TableType.MsgRM, new GenesysMsgTable(m_accessor, TableType.MsgRM));
+        m_tables.put(TableType.MsgMCP, new GenesysMsgTable(m_accessor, TableType.MsgMCP));
+        m_tables.put(TableType.MsgDBServer, new GenesysMsgTable(m_accessor, TableType.MsgDBServer));
+        m_tables.put(TableType.MsgGMS, new GenesysMsgTable(m_accessor, TableType.MsgGMS));
+        m_tables.put(TableType.MsgConfServer, new GenesysMsgTable(m_accessor, TableType.MsgConfServer));
+        m_tables.put(TableType.MsgWWE, new GenesysMsgTable(m_accessor, TableType.MsgWWE));
+
+        m_tables.put(TableType.MsgSCServer, new GenesysMsgTable(m_accessor, TableType.MsgSCServer));
+        m_tables.put(TableType.SCSAppStatus, new SCSAppStatusTable(m_accessor));
+        m_tables.put(TableType.SCSSelfStatus, new SCSSelfStatusTable(m_accessor));
+
+        m_tables.put(TableType.MsgLCAServer, new GenesysMsgTable(m_accessor, TableType.MsgLCAServer));
+        m_tables.put(TableType.LCAAppStatus, new LCAAppStatusTable(m_accessor));
+        m_tables.put(TableType.LCAClient, new LCAClientTable(m_accessor));
+
+        m_tables.put(TableType.WWETable, new WWETable(m_accessor, TableType.WWETable));
+        m_tables.put(TableType.WWEException, new ExceptionTable(m_accessor, TableType.WWEException));
+        m_tables.put(TableType.GMSPOST, new GMSPostTable(m_accessor, TableType.GMSPOST));
+
+        m_tables.put(TableType.GMSORSMessage, new GMSORSTable(m_accessor, TableType.GMSORSMessage));
+
+//        for (DBTable tab : m_tables.values()) {
+//            tab.InitDB();
+//        }
+    }
+
+    private Parser GetParser(FileInfoType type) {
+        if (m_parsers.containsKey(type)) {
+            return m_parsers.get(type);
+        } else {
+            Parser parser = initParser(type);
+            if (parser == null && ifAll()) {
+                logger.error("Parser not yet implemented for " + type.toString());
+                return null;
+            }
+            m_parsers.put(type, parser);
+            return parser;
+        }
+    }
+
+
+    private void parseAll(String scanDir, String dbname, String alias) throws SQLException, Exception {
+        if (!setCurrentDirectory(scanDir)) {
+            logger.error("Cannot cd to directory [" + scanDir + "]. Exiting");
+            System.exit(1);
+        }
+        String startDir = ".";
+
+        Date start = new Date();
+
+        File f = null;
+        f = new File(startDir);
+        if (f.isDirectory()) {
+            ScanDir(f);
+        } else {
+            LogFileWrapper log = LogFileWrapper.getContainer(f);
+            if (log != null) {
+                extendFilesList(filesToAccess, log);
+            }
+        }
+
+        try {
+            m_accessor = new SqliteAccessor(dbname, alias);
+
+        } catch (Exception e) {
+            System.out.println("Could not create accessor: " + e);
+            return;
+        }
+        boolean restartParsing = false;
+        ArrayList<FileInfo> filesToProcess = new ArrayList();
+        ArrayList<Long> filesToDelete = new ArrayList<>();
+
+        try {
+            if (m_accessor.TableExist("file_logbr")) {
+                setDBExisted(true);
+                int i;
+                for (i = 0; i < filesToAccess.size(); i++) {
+                    String logFileName = filesToAccess.get(i).getLogFileName();
+                    if (logFileName != null && !logFileName.isEmpty()) { // fix for error resulting in empty DB. workspace file names are empty
+                        ArrayList<ArrayList<Long>> iDs = m_accessor.getIDsMultiple(
+                                "select id, size from file_logbr where intfilename = \'"
+                                + filesToAccess.get(i).getLogFileName() + "\'"
+                                //                            + "and size=" + filesToAccess.get(i).getSize()
+                                + " ;");
+                        if (iDs == null || iDs.size() == 0) {
+                            logger.debug("Will process file [" + filesToAccess.get(i).getM_path() + "]");
+                            filesToProcess.add(filesToAccess.get(i));
+                        } else {
+                            long fileID = iDs.get(0).get(0);
+                            long size = iDs.get(0).get(1);
+                            if (size < filesToAccess.get(i).getSize()) {
+                                logger.info(filesToAccess.get(i).getLogFileName()
+                                        + " id(" + fileID + ")"
+                                        + ": size[" + filesToAccess.get(i).getSize()
+                                        + "] size in DB[" + size + "]; file data to be removed");
+                                filesToDelete.add(fileID);
+                                filesToProcess.add(filesToAccess.get(i));
+//                                restartParsing = true;
+//                                break;
+                            }
+                        }
+                    }
+                }
+            } else {
+                restartParsing = true;
+
+            }
+        } catch (Exception exception) {
+            logger.error("Failed to verify for new log files. Will parse a new");
+        }
+        if (restartParsing) {
+            logger.debug("Restart parsing");
+            m_accessor.Close(false);
+            for (int i = 0; i < filesToAccess.size(); i++) {
+                filesToProcess.add(filesToAccess.get(i));
+            }
+            f = null;
+            for (String file : new String[]{dbname, dbname + ".db"}) {
+                try {
+                    f = new File(file);
+                    if (f.exists()) {
+                        boolean delete = f.delete();
+                        if (!delete) {
+                            throw new Exception("likely busy");
+                        } else {
+                            logger.info("Removed database " + f);
+                        }
+                    }
+                } catch (Exception e) {
+                    logger.error("Unable to delete file " + f, e);
+                    JOptionPane.showMessageDialog(null, "Unable to delete file "
+                            + f + "\n", "Error", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+            }
+            m_accessor = new SqliteAccessor(dbname, alias);
+        } else if (filesToProcess.size() == 0) {
+            logger.info("No new log files found; parser exit");
+            return;
+        } else {
+            initStatic(m_accessor);
+        }
+        m_accessor.setFilesToDelete(filesToDelete);
+
+        logger.info("Initializing...");
+        InitTables();
+        logger.info("Starting DB...");
+        m_accessor.start();
+        logger.info("Done init");
+
+        tabRefs = new TableReferences(m_accessor);
+        if (!logger.isDebugEnabled()) {
+            tabRefs.doNotSave(ReferenceType.HANDLER);
+        }
+
+//        try {
+//            m_logDB = new LogDB(logdb);
+//        } catch (Exception e) {
+//            System.out.println("Could not init logs DB: " + e);
+//            return;
+//        }
+        Path dir = Paths.get(dbname);
+        dir = dir.getParent();
+        String dirName = dir.toString();
+        FileInfo dirInfo = new FileInfo();
+        dirInfo.m_path = dirName;
+        //dirInfo.AddToDB(m_accessor);
+//        m_FileInfoTable.AddToDB(dirInfo);
+
+        for (int i = 0; i < filesToProcess.size(); i++) {
+            FileInfo newFile = filesToProcess.get(i);
+            Main.logger.info("processing file : " + newFile.getM_path() + ((newFile.getArchiveName() == null) ? "" : ", archive: " + newFile.getArchiveName()) + " (" + (i + 1) + " of " + filesToProcess.size() + ")");
+            Parse(newFile);
+        }
+
+        m_accessor.DoneInserts();
+        m_accessor.Commit();
+        m_accessor.exit();
+        m_accessor.join();
+        GenesysMsg.updateMsg();
+        tabRefs.Finalize();
+
+        try {
+            Date stopParsing = new Date();
+            logger.info("Parsing took " + pDuration(stopParsing.getTime() - start.getTime()) + ".");
+            if (FileInfoTable.getFilesAdded() == 0 || totalFiles == 0) {
+                logger.info("No Genesys logs found.");
+            } else {
+                m_accessor.ResetAutoCommit(true);
+                m_FileInfoTable.FinalizeDB();
+                for (DBTable tab : m_tables.values()) {
+                    if (tab.isTabCreated()) {
+                        logger.info("Finalizing " + tab.getM_type() + " (added " + tab.getRecordsAdded() + " recs)");
+                        tab.FinalizeDB();
+                    }
+                }
+                FinalizeParsers();
+
+            }
+//            m_accessor.exit();
+//            m_logDB.Close();
+            m_accessor.Commit();
+            m_accessor.Close(true);
+
+            Date stop = new Date();
+            logger.info("All done. Completed in " + pDuration(stop.getTime() - start.getTime()) + "; processed " + totalFiles + " files (" + formatSize(totalBytes) + ")");
+        } catch (Exception e) {
+            logger.error("Exit exception " + e, e);
+        }
+    }
+
+    private void FinalizeParsers() throws Exception {
+        for (Parser m_parser : m_parsers.values()) {
+            if (m_parser != null) {
+                m_parser.doFinalize();
+            }
+        }
+    }
+
+
+    private void setDBExisted(boolean b) {
+        dbExisted = b;
+    }
+
+
+    void finalizeTable(TableType tableType) throws Exception {
+        DBTable tab = m_tables.get(tableType);
+        if (tab != null) {
+            tab.FinalizeDB();
+        }
+    }
+
+    private Parser initParser(FileInfoType type) {
+        Parser ret = null;
+        switch (type) {
+            case type_SipProxy:
+                if (ifAll()) {
+                    ret = new SIPProxyParser(m_tables);
+                }
+                break;
+
+            case type_VOIPEP:
+                if (ifAll()) {
+                    ret = new VOIPEPParser(m_tables);
+                }
+                break;
+
+            case type_URS:
+                if (ifAll()) {
+                    ret = new UrsParser(m_tables);
+                }
+                break;
+
+            case type_SessionController:
+                ret = new SingleThreadParser(m_tables);
+                break;
+
+            case type_StatServer:
+                if (ifAll()) {
+                    ret = new StSParser(m_tables);
+                }
+                break;
+
+            case type_ORS:
+                if (ifAll()) {
+                    ret = new OrsParser(m_tables);
+                }
+                break;
+
+            case type_OCS:
+                if (ifAll()) {
+                    ret = new OCSParser(m_tables);
+                }
+                break;
+
+            case type_IxnServer:
+                if (ifAll()) {
+                    ret = new IxnServerParser(m_tables);
+                }
+                break;
+
+            case type_RM:
+                if (ifAll()) {
+                    ret = new RMParser(m_tables);
+                }
+                break;
+
+            case type_MCP:
+                if (ifAll()) {
+                    ret = new MCPParser(m_tables);
+                }
+                break;
+
+            case type_WorkSpace:
+                if (ifAll()) {
+                    ret = new WorkspaceParser(m_tables);
+                }
+                break;
+
+            case type_SIPEP:
+                if (ifAll()) {
+                    ret = new SIPEPParser(m_tables);
+                }
+                break;
+
+            case type_SCS:
+                if (ifAll()) {
+                    ret = new SCSParser(m_tables);
+                }
+                break;
+
+            case type_LCA:
+                if (ifAll()) {
+                    ret = new LCAParser(m_tables);
+                }
+                break;
+
+            case type_WWE:
+                if (ifAll()) {
+                    ret = new WWEParser(m_tables);
+                }
+                break;
+
+            case type_URSHTTP:
+                if (ifAll()) {
+                    ret = new URShttpinterfaceParser(m_tables);
+                }
+                break;
+
+            case type_WWECloud:
+                if (ifAll()) {
+                    ret = new WWECloudParser(m_tables);
+                }
+                break;
+
+            case type_DBServer:
+                if (ifAll()) {
+                    ret = new DBServerParser(m_tables);
+                }
+                break;
+
+            case type_GMS:
+                if (ifAll()) {
+                    ret = new GMSParser(m_tables);
+                }
+                break;
+            case type_ConfServer:
+                if (ifAll()) {
+                    ret = new ConfServParser(m_tables);
+                }
+                break;
+
+            case type_ApacheWeb:
+                if (ifAll()) {
+                    ret = new ApacheWebLogsParser(m_tables);
+                }
+                break;
+        }
+        if (ret != null) {
+            ret.init(m_tables);
+        }
+        return ret;
+
+    }
+
+
+    private void setXMLCfg(String xmlCFG) throws SAXException, IOException, Exception {
+        xmlCfg = new XmlCfg((xmlCFG));
+    }
+
+    private boolean checkIgnoreTable(Message msg) {
+        if (xmlCfg != null) {
+            return xmlCfg.CheckIgnore(msg);
+        }
+        return false;
+
+    }
+
+    private boolean isLogBRDir(File file) {
+        return FilenameUtils.normalizeNoEndSeparator(file.getAbsolutePath())
+                .equalsIgnoreCase(logBrDir);
+    }
+    static class Constants extends HashMap<GenesysConstants, HashMap<Integer, String>> {
+        
         public Constants() {
             super();
             put(GenesysConstants.TSERVER, initTServerConstants());
         }
-
+        
         private HashMap<Integer, String> initTServerConstants() {
             HashMap<Integer, String> ret = new HashMap<>();
-
+            
             String txt
                     = "RequestRegisterClient, 0\n"
                     + "RequestQueryServer, 1\n"
@@ -260,303 +1266,10 @@ public class Main {
             }
             return ret;
         }
-
+        
     }
 
-    private static final Constants constants = new Constants();
-
-    static String lookupConstant(GenesysConstants constName, Integer intOrDef) {
-        if (intOrDef != null) {
-            HashMap<Integer, String> get = constants.get(constName);
-            if (get != null) {
-                String ret = get.get(intOrDef);
-                if (StringUtils.isNotBlank(ret)) {
-                    return ret;
-                }
-            }
-
-        }
-        return null;
-    }
-    private final String dbname;
-
-    static public Main getMain() {
-        return theParser;
-    }
-
-    public Main(String dbname, String xmlCFG) throws IOException, Exception {
-        setXMLCfg(xmlCFG);
-        this.dbname = dbname;
-    }
-
-    public static SqliteAccessor m_accessor;
-
-    public static SqliteAccessor getM_accessor() {
-        return m_accessor;
-    }
-    private int totalFiles = 0;
-    private boolean dbExisted = false;
-
-    public static SqliteAccessor getSQLiteaccessor() {
-        return m_accessor;
-    }
-
-    HashMap<FileInfoType, Parser> m_parsers = new HashMap<>();
-//    static SqliteAccessor m_accessor; 
-
-    private FileInfoTable m_FileInfoTable;
-
-    static String m_component = "all";
-
-    static String m_executableName = "indexer.jar";
-
-    private ArrayList<File> m_files = new ArrayList();
-    int m_current;
-    private HashMap<TableType, DBTable> m_tables;
-
-    boolean m_scanDir = true;
-    boolean m_parseZip = false;
-
-    public XmlCfg xmlCfg = null;
-
-    TableReferences tabRefs;
-
-    public static Logger logger;
-    private static String logBrDir;
-    private static boolean ignoreZIP = false;
-
-    public static void PrintUsage() {
-        System.out.print("Usage: " + m_executableName
-                + " -DbName name"
-                + " [-Alias alias]"
-                + " [-Regexp regexp]"
-                + " [-Logdb name]"
-                + " [-component sc | tc | sip | all ]"
-                + " [-config config]"
-                + " file1|dir1 [file2|dir2 ...]\n");
-    }
-
-    public static String getVersion() throws IOException {
-//        try {
-//            String name = Main.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath().substring(1);
-//            JarFile jarStream = new JarFile(name);
-//            Manifest mf = jarStream.getManifest();
-//            Attributes attr = mf.getMainAttributes();
-//            return attr.getValue("version");
-//        } catch (Exception e) {
-//            System.out.println("Error: "+e);
-//            e.printStackTrace();
-//        }
-        return "";
-    }
-
-    static void theTest() {
-        String s = "20/02/2018 11:41:03 a.m..557_I_I_017302afa531b580 [09:06] >>>>>>>>>>>>start interp()";
-        Pattern p = Pattern.compile("^\\d{2}/\\d{2}/\\d{4} \\d{2}:\\d{2}:\\d{2} ([am\\.]+)\\.\\d{3}");
-        Matcher m = p.matcher(s);
-        System.out.println(m.replaceFirst("$1"));
-
-        DateTimeFormatter formatter
-                = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss a.SSS");
-        LocalDate date = LocalDate.parse("20/02/2018 11:41:03 a.m..557", formatter);
-        System.out.printf("%s%n", date);
-
-        System.exit(0);
-    }
-
-    public static void main(String[] args) throws IOException, ParserConfigurationException, SAXException, Exception {
-
-
-        /*
-//<editor-fold defaultstate="collapsed" desc="standard log parsing">
-        for (int i = 0; i < args.length;) {
-            String currentStr = args[i];
-            if (currentStr.equalsIgnoreCase("/alias")
-                    || currentStr.equalsIgnoreCase("-alias")) {
-                if (i + 1 == args.length || !alias.isEmpty()) {
-                    System.out.println("Invalid alias.");
-                    PrintUsage();
-                    return;
-                }
-                alias = args[i + 1];
-                i += 2;
-
-            } else if (currentStr.equalsIgnoreCase("/dbname")
-                    || currentStr.equalsIgnoreCase("-dbname")) {
-                if (i + 1 == args.length || !dbname.isEmpty()) {
-                    System.out.println("Invalid DbName.");
-                    PrintUsage();
-                    return;
-                }
-                dbname = args[i + 1];
-                i += 2;
-
-            } else if (currentStr.equalsIgnoreCase("/cfgxml")
-                    || currentStr.equalsIgnoreCase("-cfgxml")) {
-                if (i + 1 == args.length || !xmlCFG.isEmpty()) {
-                    System.out.println("Invalid xmlCFG.");
-                    PrintUsage();
-                    return;
-                }
-                xmlCFG = args[i + 1];
-                i += 2;
-
-            } else if (currentStr.equalsIgnoreCase("/logdb")
-                    || currentStr.equalsIgnoreCase("-logdb")) {
-                if (i + 1 == args.length || !logdb.isEmpty()) {
-                    System.out.println("Invalid logs database file.");
-                    PrintUsage();
-                    return;
-                }
-                logdb = args[i + 1];
-                i += 2;
-
-            } else if (currentStr.equalsIgnoreCase("/component")
-                    || currentStr.equalsIgnoreCase("-component")) {
-                if (i + 1 != args.length) {
-                    m_component = args[i + 1];
-                    if (!m_component.equalsIgnoreCase("all")
-                            && !m_component.equalsIgnoreCase("sip")
-                            && !m_component.equalsIgnoreCase("sc")
-                            && !m_component.equalsIgnoreCase("tc")
-                            && !m_component.equalsIgnoreCase("proxy")) {
-                        PrintUsage();
-                        return;
-                    }
-                }
-                i += 2;
-            } else if (currentStr.equalsIgnoreCase("/config")
-                    || currentStr.equalsIgnoreCase("-config")) {
-                if (i + 1 == args.length) {
-                    PrintUsage();
-                    return;
-                }
-                String configFile = args[i + 1];
-                try {
-                    if (!configFile.isEmpty()) {
-                        Properties config = new Properties();
-                        FileInputStream file = new FileInputStream(configFile);
-                        config.load(file);
-                        file.close();
-
-//                        String dirs = config.getProperty("ScanSubdirs");
-//                        if (dirs != null && dirs.equalsIgnoreCase("on")) {
-//                            m_scanDir = true;
-//                        }
-//
-//                        String zip = config.getProperty("ParseZip");
-//                        if (zip != null && zip.equalsIgnoreCase("on")) {
-//                            m_parseZip = true;
-//                        }
-                    }
-                } catch (IOException e) {
-                }
-                i += 2;
-
-            } else {
-                scanDir = currentStr;
-                i++;
-            }
-        }
-
-        if (alias.isEmpty()) {
-            DateFormat dateFormat = new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss");
-            Date date = new Date();
-            alias = dateFormat.format(date);
-        }
-
-        if (dbname.isEmpty()) {
-            System.out.println("DbName required.");
-            PrintUsage();
-            return;
-        }
-
-        if (scanDir == null || scanDir.isEmpty()) {
-            System.out.println("File or dir required.");
-            PrintUsage();
-            return;
-        }
-
-        if (logdb.isEmpty()) {
-            logdb = "logdb"; //default value
-        }
-//</editor-fold>
-         */
-        Thread.setDefaultUncaughtExceptionHandler(new ExceptionHandler());
-        System.setProperty("sun.awt.exception.handler",
-                ExceptionHandler.class.getName());
-
-        clr = new ExecutionEnvironment();
-        logger = LogManager.getLogger("indexer");
-
-        String cmdLine = "";
-        for (String arg : args) {
-            cmdLine += arg + " ";
-        }
-        logger.info("parameters:" + cmdLine);
-        logger.info("working directory: " + Paths.get(".").toAbsolutePath().normalize().toString());
-
-        clr.parserCommandLine(args);
-        logger.info("params: parsing timediff: " + Parser.isParseTimeDiff());
-
-        String alias = clr.getAlias();
-        String dbname = clr.getDBName();
-        File f = new File(dbname);
-        if (!f.isAbsolute()) {
-            dbname = f.getAbsolutePath();
-        }
-
-        ignoreZIP = clr.isIgnoreZIP();
-
-        String xmlCFG = clr.getXmlCfg();
-        String baseDir = clr.getBaseDir();
-
-        theParser = new Main(dbname, xmlCFG);
-
-        theParser.parseAll(baseDir, dbname, alias);
-//        Thread.sleep(3000);
-    }
-
-    public static ExecutionEnvironment clr;
-
-    public static String getLogBrDir() {
-        return logBrDir;
-    }
-
-    private void ScanDir(File file) throws IOException {
-        logger.info("Processing directory " + file.getAbsolutePath());
-        File[] filesInDir = file.listFiles();
-        for (int j = 0; j < filesInDir.length; j++) {
-//            String fileType = Files.probeContentType(filesInDir[j].toPath());
-//
-//            logger.info(filesInDir[j].getName() + "- type:" + fileType);
-            if (filesInDir[j].isFile()) {
-//                FileInfo fileInfo = getFileInfo(filesInDir[j]);
-//                extendFilesList(filesToAccess, fileInfo);
-                LogFileWrapper logFile = LogFileWrapper.getContainer(filesInDir[j]);
-                if (logFile != null) {
-                    extendFilesList(filesToAccess, logFile);
-                }
-
-            } else if (filesInDir[j].isDirectory() && m_scanDir && !isLogBRDir(filesInDir[j])) {
-                ScanDir(filesInDir[j]);
-            }
-        }
-    }
-
-    public static class ExceptionHandler
-            implements Thread.UncaughtExceptionHandler {
-
-        public void handle(Throwable thrown) {
-            // for EDT exceptions
-            handleException(Thread.currentThread().getName(), thrown);
-        }
-
-        @Override
-        public void uncaughtException(Thread thread, Throwable thrown) {
-            // for other uncaught exceptions
-            handleException(thread.getName(), thrown);
-        }
+    public static class ExceptionHandler implements Thread.UncaughtExceptionHandler {
 
         static public void handleException(String t, Throwable e, String errs) {
             String msg = "Uncaught Exception in thread '" + t + "'";
@@ -568,668 +1281,28 @@ public class Main {
             if (errs != null) {
                 sw.append("\n").append(errs).append("\n");
             }
-
+            
             JTextArea jt = new JTextArea(sw.toString(), 40, 100);
             jt.setEditable(false);
             JScrollPane jsp = new JScrollPane(jt);
 //            JTextArea.setl
-            JOptionPane.showMessageDialog(null, jsp, "Exception", JOptionPane.ERROR_MESSAGE);
+JOptionPane.showMessageDialog(null, jsp, "Exception", JOptionPane.ERROR_MESSAGE);
         }
 
         static public void handleException(String t, Throwable e) {
             handleException(t, e, null);
         }
-    }
 
-    static long totalBytes = 0;
-
-
-    private void Parse(FileInfo fileInfo) {
-        Date fileStart = new Date();
-        Parser parser = null;
-        DBTable tab = null;
-        FileInfoType componentType = fileInfo.getM_componentType();
-        if (componentType == FileInfoType.type_SessionController
-                || componentType == FileInfoType.type_InteractionProxy
-                || componentType == FileInfoType.type_tController
-                || componentType == FileInfoType.type_CallManager
-                || componentType == FileInfoType.type_TransportLayer) {
-            parser = GetParser(FileInfoType.type_SessionController);
-        } else {
-            parser = GetParser(componentType);
-        }
-        if (parser != null) {
-            parser.setFileInfo(fileInfo);
-
-            int lines = 0;
-            try {
-                fileInfo.startParsing();
-                try (InputStream inputStream = fileInfo.getInputStream()) {
-                    BufferedReaderCrLf parsingInput = new BufferedReaderCrLf(inputStream);
-
-                    lines = parser.ParseFrom(parsingInput, 0, 0, fileInfo);
-                    parser.doneParsingFile();
-                    fileInfo.setFileEndTime(parser.getLastTimeStamp());
-                    m_FileInfoTable.AddToDB(fileInfo);
-                    parsingInput.close();
-                }
-
-                fileInfo.doneParsing();
-            } catch (Exception exception) {
-                logger.error("Uncought exception while parsing: " + exception);
-            }
-
-            Date fileEnd = new Date();
-            totalBytes += fileInfo.getSize();
-            totalFiles++;
-            logger.info("\tParsed " + lines + " lines, " + formatSize(fileInfo.getSize()) + ". Took " + pDuration(fileEnd.getTime() - fileStart.getTime()));
-        } else {
-            if (ifAll()) {
-                logger.error("No parser for file [" + fileInfo.m_path + "] type: " + componentType + "; file skippped");
-            }
-
-        }
-    }
-
-    public static String formatSize(long v) {
-        if (v < 1024) {
-            return v + " B";
-        }
-        int z = (63 - Long.numberOfLeadingZeros(v)) / 10;
-        return String.format("%.1f %sB", (double) v / (1L << (z * 10)), " KMGTPE".charAt(z));
-    }
-
-
-
-    public static Integer getRef(ReferenceType type, String name) {
-        Integer ret = getMain().tabRefs.getRef(type, name);
-        Main.logger.trace("getRef for [" + type + "] key:[" + name + "]" + " ret=" + ret);
-
-        return ret;
-    }
-
-    public static Integer getRef(ReferenceType type, String name, int wordsToCompare) {
-        Integer ret = getMain().tabRefs.getRef(type, name, wordsToCompare);
-        Main.logger.trace("getRefLog key:[" + name + "]" + " ret=" + ret);
-
-        return ret;
-    }
-
-    public BufferedReaderCrLf GetNextFile() {
-        try {
-            if (m_current < m_files.size() - 1) {
-                return new BufferedReaderCrLf(new FileInputStream(m_files.get(m_current + 1)));
-            }
-            return null;
-        } catch (FileNotFoundException e) {
-            logger.error("Cannot get next file for continuous parsing: " + e, e);
-            return null;
-        }
-    }
-
-    private void InitTables() {
-
-        DBTable t;
-        m_FileInfoTable = new FileInfoTable(m_accessor);
-        m_FileInfoTable.InitDB();
-        m_FileInfoTable.setCurrentID(Record.getFileId());
-
-        m_tables = new HashMap<>();
-
-//        DBTable dbt = new ORSTable(m_accessor);
-//        dbt.InitDB();
-//        m_tables.add(dbt);
-//        ORSTable tab1 = new ORSTable(m_accessor);
-//        try {
-//            tab1.FinalizeDB();
-//        } catch (Exception ex) {
-//            logger.log(org.apache.logging.log4j.Level.FATAL, ex);
-//        }
-        m_tables.put(TableType.ConfigUpdate, new ConfigUpdateTable(m_accessor, TableType.ConfigUpdate));
-
-        t = new TLibTable(m_accessor, TableType.TLib);
-        t.setCurrentID(Record.m_tlibId);
-        m_tables.put(TableType.TLib, t);
-        m_tables.put(TableType.TLibProxied, new ProxiedTable(m_accessor, TableType.TLibProxied));
-
-        m_tables.put(TableType.Handler, new HandlerTable(m_accessor, TableType.Handler));
-        m_tables.put(TableType.CIFaceRequest, new CIFaceRequestTable(m_accessor, TableType.CIFaceRequest));
-        m_tables.put(TableType.ISCC, new ISCCTable(m_accessor, TableType.ISCC));
-        t = new SIPTable(m_accessor, TableType.SIP);
-        t.setCurrentID(Record.m_sipId);
-        m_tables.put(TableType.SIP, t);
-        m_tables.put(TableType.ConnID, new ConnIDTable(m_accessor, TableType.ConnID));
-        m_tables.put(TableType.Trigger, new TriggerTable(m_accessor, TableType.Trigger));
-        t = new JsonTable(m_accessor, TableType.JSon);
-        t.setCurrentID(Record.m_jsonId);
-        m_tables.put(TableType.JSon, t);
-
-        m_tables.put(TableType.URSWaiting, new URSWaitingTable(m_accessor, TableType.URSWaiting));
-
-        m_tables.put(TableType.SIPMS, new SIPMSTable(m_accessor, TableType.SIPMS));
-        m_tables.put(TableType.SIPEP, new SIPEPTable(m_accessor, TableType.SIPEP));
-        m_tables.put(TableType.VOIPEP, new VOIPEPTable(m_accessor, TableType.VOIPEP));
-
-        m_tables.put(TableType.OCSTLib, new OCSTable(m_accessor, TableType.OCSTLib));
-        m_tables.put(TableType.OCSIxn, new OCSIxnTable(m_accessor, TableType.OCSIxn));
-        m_tables.put(TableType.OCSClient, new OCSClientTable(m_accessor, TableType.OCSClient));
-        m_tables.put(TableType.OCSHTTP, new OCSHTTPTable(m_accessor, TableType.OCSHTTP));
-        m_tables.put(TableType.OCSCG, new OCSCGTable(m_accessor, TableType.OCSCG));
-        m_tables.put(TableType.OCSDBActivity, new OCSDBActivityTable(m_accessor, TableType.OCSDBActivity));
-        m_tables.put(TableType.OCSPAAgentInfo, new OCSPAAgentInfoTable(m_accessor, TableType.OCSPAAgentInfo));
-        m_tables.put(TableType.OCSPASessionInfo, new OCSPASessionInfoTable(m_accessor, TableType.OCSPASessionInfo));
-        m_tables.put(TableType.OCSStatEvent, new OCSStatEventTable(m_accessor, TableType.OCSStatEvent));
-        m_tables.put(TableType.OCSPAEventInfo, new OCSPAEventInfoTable(m_accessor, TableType.OCSPAEventInfo));
-        m_tables.put(TableType.OCSAssignment, new OCSAgentAssignmentTable(m_accessor, TableType.OCSAssignment));
-        m_tables.put(TableType.OCSRecCreate, new OCSRecCreateTable(m_accessor, TableType.OCSRecCreate));
-        m_tables.put(TableType.OCSSCXMLTreatment, new OCSSCXMLTreatmentTable(m_accessor, TableType.OCSSCXMLTreatment));
-        m_tables.put(TableType.OCSSCXMLScript, new OCSSCXMLScriptTable(m_accessor, TableType.OCSSCXMLScript));
-        m_tables.put(TableType.OCSTreatment, new OCSRecTreatmentTable(m_accessor, TableType.OCSTreatment));
-        m_tables.put(TableType.OCSIcon, new OCSIconTable(m_accessor));
-
-        m_tables.put(TableType.StSTEvent, new StSTEventTable(m_accessor, TableType.StSTEvent));
-        m_tables.put(TableType.StSAction, new StSActionTable(m_accessor, TableType.StSAction));
-        m_tables.put(TableType.StSRequestHistory, new StSRequestHistoryTable(m_accessor, TableType.StSRequestHistory));
-        m_tables.put(TableType.StStatus, new StStatusTable(m_accessor, TableType.StStatus));
-        m_tables.put(TableType.StCapacity, new StCapacityTable(m_accessor, TableType.StCapacity));
-        m_tables.put(TableType.IxnSS, new IxnSSTable(m_accessor, TableType.IxnSS));
-
-//        m_tables.put(new ORSEspTable(m_accessor));
-//        m_tables.put(new ORSEventTable(m_accessor));
-//        m_tables.put(new ORSLinkTable(m_accessor));
-//        m_tables.put(new ORSLogTable(m_accessor));
-        m_tables.put(TableType.ORSUrs, new OrsUrsTable(m_accessor, TableType.ORSUrs));
-        m_tables.put(TableType.ORSTlib, new ORSTable(m_accessor, TableType.ORSTlib));
-        m_tables.put(TableType.ORSSidUUID, new ORSSidUUIDTable(m_accessor, TableType.ORSSidUUID));
-        m_tables.put(TableType.ORSSidIxnID, new ORSSidIxnIDTable(m_accessor, TableType.ORSSidIxnID));
-        m_tables.put(TableType.URSCONNIDIxnID, new URSCONNIDIxnIDTable(m_accessor, TableType.URSCONNIDIxnID));
-        m_tables.put(TableType.URSRI, new URSRITable(m_accessor, TableType.URSRI));
-
-        m_tables.put(TableType.ORSMetric, new ORSMetricTable(m_accessor, TableType.ORSMetric));
-        m_tables.put(TableType.ORSMetricExtension, new ORSMetricExtensionTable(m_accessor, TableType.ORSMetricExtension));
-        m_tables.put(TableType.ORSSidSid, new ORSSidSidTable(m_accessor, TableType.ORSSidSid));
-
-        m_tables.put(TableType.ORSHTTP, new OrsHTTPTable(m_accessor));
-        m_tables.put(TableType.ORSMMessage, new ORSMMTable(m_accessor));
-
-        m_tables.put(TableType.URSStrategy, new URSStrategyTable(m_accessor, TableType.URSStrategy));
-        m_tables.put(TableType.URSStrategyInit, new URSStrategyInitTable(m_accessor, TableType.URSStrategyInit));
-        m_tables.put(TableType.URSTlib, new URSTlibTable(m_accessor, TableType.URSTlib));
-        m_tables.put(TableType.URSSTAT, new URSStatTable(m_accessor, TableType.URSSTAT));
-        m_tables.put(TableType.URSRlib, new URSRlibTable(m_accessor, TableType.URSRlib));
-        m_tables.put(TableType.URSCONNIDSID, new URSCONNIDSIDTable(m_accessor, TableType.URSCONNIDSID));
-        m_tables.put(TableType.URSVQ, new URSVQTable(m_accessor, TableType.URSVQ));
-        m_tables.put(TableType.URSTargetSet, new URSTargetSetTable(m_accessor, TableType.URSTargetSet));
-
-        m_tables.put(TableType.WSTlib, new WSTlibTable(m_accessor, TableType.WSTlib));
-        m_tables.put(TableType.WSStat, new WSStatTable(m_accessor, TableType.WSStat));
-        m_tables.put(TableType.WSConf, new WSConfTable(m_accessor, TableType.WSConf));
-        m_tables.put(TableType.WSEServ, new WSEServTable(m_accessor, TableType.WSEServ));
-
-        m_tables.put(TableType.Ixn, new IxnTable(m_accessor, TableType.Ixn));
-        m_tables.put(TableType.IxnDB, new IxnDBActivityTable(m_accessor, TableType.IxnDB));
-
-        m_tables.put(TableType.MsgOCServer, new GenesysMsgTable(m_accessor, TableType.MsgOCServer));
-        m_tables.put(TableType.MsgIxnServer, new GenesysMsgTable(m_accessor, TableType.MsgIxnServer));
-        m_tables.put(TableType.MsgORServer, new GenesysMsgTable(m_accessor, TableType.MsgORServer));
-        m_tables.put(TableType.MsgTServer, new GenesysMsgTable(m_accessor, TableType.MsgTServer));
-        m_tables.put(TableType.MsgURServer, new GenesysMsgTable(m_accessor, TableType.MsgURServer));
-        m_tables.put(TableType.MsgStatServer, new GenesysMsgTable(m_accessor, TableType.MsgStatServer));
-        m_tables.put(TableType.MsgRM, new GenesysMsgTable(m_accessor, TableType.MsgRM));
-        m_tables.put(TableType.MsgMCP, new GenesysMsgTable(m_accessor, TableType.MsgMCP));
-        m_tables.put(TableType.MsgDBServer, new GenesysMsgTable(m_accessor, TableType.MsgDBServer));
-        m_tables.put(TableType.MsgGMS, new GenesysMsgTable(m_accessor, TableType.MsgGMS));
-        m_tables.put(TableType.MsgConfServer, new GenesysMsgTable(m_accessor, TableType.MsgConfServer));
-        m_tables.put(TableType.MsgWWE, new GenesysMsgTable(m_accessor, TableType.MsgWWE));
-
-        m_tables.put(TableType.MsgSCServer, new GenesysMsgTable(m_accessor, TableType.MsgSCServer));
-        m_tables.put(TableType.SCSAppStatus, new SCSAppStatusTable(m_accessor));
-        m_tables.put(TableType.SCSSelfStatus, new SCSSelfStatusTable(m_accessor));
-
-        m_tables.put(TableType.MsgLCAServer, new GenesysMsgTable(m_accessor, TableType.MsgLCAServer));
-        m_tables.put(TableType.LCAAppStatus, new LCAAppStatusTable(m_accessor));
-        m_tables.put(TableType.LCAClient, new LCAClientTable(m_accessor));
-
-        m_tables.put(TableType.WWETable, new WWETable(m_accessor, TableType.WWETable));
-        m_tables.put(TableType.WWEException, new ExceptionTable(m_accessor, TableType.WWEException));
-        m_tables.put(TableType.GMSPOST, new GMSPostTable(m_accessor, TableType.GMSPOST));
-
-        m_tables.put(TableType.GMSORSMessage, new GMSORSTable(m_accessor, TableType.GMSORSMessage));
-
-//        for (DBTable tab : m_tables.values()) {
-//            tab.InitDB();
-//        }
-    }
-
-    private Parser GetParser(FileInfoType type) {
-        if (m_parsers.containsKey(type)) {
-            return m_parsers.get(type);
-        } else {
-            Parser parser = initParser(type);
-            if (parser == null && ifAll()) {
-                logger.error("Parser not yet implemented for " + type.toString());
-                return null;
-            }
-            m_parsers.put(type, parser);
-            return parser;
-        }
-    }
-
-    static boolean IgnoreTable(Message msg) {
-        return theParser.checkIgnoreTable(msg);
-    }
-
-    static int getRefQuotes(ReferenceType referenceType, String m_ThisDN) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    private static Pattern regFilesNotGood = Pattern.compile("(^\\.logbr|logbr.db)");
-
-    private static boolean fileOK(File fileInfo) {
-        if (regFilesNotGood.matcher(fileInfo.getName()).find()) {
-            return false;
-        }
-        return true;
-    }
-
-    ArrayList<FileInfo> filesToAccess = new ArrayList();
-
-    private void parseAll(String scanDir, String dbname, String alias) throws SQLException, Exception {
-        if (!setCurrentDirectory(scanDir)) {
-            logger.error("Cannot cd to directory [" + scanDir + "]. Exiting");
-            System.exit(1);
-        }
-        String startDir = ".";
-
-        Date start = new Date();
-
-        File f = null;
-        f = new File(startDir);
-        if (f.isDirectory()) {
-            ScanDir(f);
-        } else {
-            LogFileWrapper log = LogFileWrapper.getContainer(f);
-            if (log != null) {
-                extendFilesList(filesToAccess, log);
-            }
+        public void handle(Throwable thrown) {
+            // for EDT exceptions
+            handleException(Thread.currentThread().getName(), thrown);
         }
 
-        try {
-            m_accessor = new SqliteAccessor(dbname, alias);
-
-        } catch (Exception e) {
-            System.out.println("Could not create accessor: " + e);
-            return;
+        @Override
+        public void uncaughtException(Thread thread, Throwable thrown) {
+            // for other uncaught exceptions
+            handleException(thread.getName(), thrown);
         }
-        boolean restartParsing = false;
-        ArrayList<FileInfo> filesToProcess = new ArrayList();
-        ArrayList<Long> filesToDelete = new ArrayList<>();
-
-        try {
-            if (m_accessor.TableExist("file_logbr")) {
-                setDBExisted(true);
-                int i;
-                for (i = 0; i < filesToAccess.size(); i++) {
-                    String logFileName = filesToAccess.get(i).getLogFileName();
-                    if (logFileName != null && !logFileName.isEmpty()) { // fix for error resulting in empty DB. workspace file names are empty
-                        ArrayList<ArrayList<Long>> iDs = m_accessor.getIDsMultiple(
-                                "select id, size from file_logbr where intfilename = \'"
-                                + filesToAccess.get(i).getLogFileName() + "\'"
-                                //                            + "and size=" + filesToAccess.get(i).getSize()
-                                + " ;");
-                        if (iDs == null || iDs.size() == 0) {
-                            logger.debug("Will process file [" + filesToAccess.get(i).getM_path() + "]");
-                            filesToProcess.add(filesToAccess.get(i));
-                        } else {
-                            long fileID = iDs.get(0).get(0);
-                            long size = iDs.get(0).get(1);
-                            if (size < filesToAccess.get(i).getSize()) {
-                                logger.info(filesToAccess.get(i).getLogFileName()
-                                        + " id(" + fileID + ")"
-                                        + ": size[" + filesToAccess.get(i).getSize()
-                                        + "] size in DB[" + size + "]; file data to be removed");
-                                filesToDelete.add(fileID);
-                                filesToProcess.add(filesToAccess.get(i));
-//                                restartParsing = true;
-//                                break;
-                            }
-                        }
-                    }
-                }
-            } else {
-                restartParsing = true;
-
-            }
-        } catch (Exception exception) {
-            logger.error("Failed to verify for new log files. Will parse a new");
-        }
-        if (restartParsing) {
-            logger.debug("Restart parsing");
-            m_accessor.Close(false);
-            for (int i = 0; i < filesToAccess.size(); i++) {
-                filesToProcess.add(filesToAccess.get(i));
-            }
-            f = null;
-            for (String file : new String[]{dbname, dbname + ".db"}) {
-                try {
-                    f = new File(file);
-                    if (f.exists()) {
-                        boolean delete = f.delete();
-                        if (!delete) {
-                            throw new Exception("likely busy");
-                        } else {
-                            logger.info("Removed database " + f);
-                        }
-                    }
-                } catch (Exception e) {
-                    logger.error("Unable to delete file " + f, e);
-                    JOptionPane.showMessageDialog(null, "Unable to delete file "
-                            + f + "\n", "Error", JOptionPane.ERROR_MESSAGE);
-                    return;
-                }
-            }
-            m_accessor = new SqliteAccessor(dbname, alias);
-        } else if (filesToProcess.size() == 0) {
-            logger.info("No new log files found; parser exit");
-            return;
-        } else {
-            initStatic(m_accessor);
-        }
-        m_accessor.setFilesToDelete(filesToDelete);
-
-        logger.info("Initializing...");
-        InitTables();
-        logger.info("Starting DB...");
-        m_accessor.start();
-        logger.info("Done init");
-
-        tabRefs = new TableReferences(m_accessor);
-        if (!logger.isDebugEnabled()) {
-            tabRefs.doNotSave(ReferenceType.HANDLER);
-        }
-
-//        try {
-//            m_logDB = new LogDB(logdb);
-//        } catch (Exception e) {
-//            System.out.println("Could not init logs DB: " + e);
-//            return;
-//        }
-        Path dir = Paths.get(dbname);
-        dir = dir.getParent();
-        String dirName = dir.toString();
-        FileInfo dirInfo = new FileInfo();
-        dirInfo.m_path = dirName;
-        //dirInfo.AddToDB(m_accessor);
-//        m_FileInfoTable.AddToDB(dirInfo);
-
-        for (int i = 0; i < filesToProcess.size(); i++) {
-            FileInfo newFile = filesToProcess.get(i);
-            Main.logger.info("processing file : " + newFile.getM_path() + ((newFile.getArchiveName() == null) ? "" : ", archive: " + newFile.getArchiveName()) + " (" + (i + 1) + " of " + filesToProcess.size() + ")");
-            Parse(newFile);
-        }
-
-        m_accessor.DoneInserts();
-        m_accessor.Commit();
-        m_accessor.exit();
-        m_accessor.join();
-        GenesysMsg.updateMsg();
-        tabRefs.Finalize();
-
-        try {
-            Date stopParsing = new Date();
-            logger.info("Parsing took " + pDuration(stopParsing.getTime() - start.getTime()) + ".");
-            if (m_FileInfoTable.getFilesAdded() == 0 || totalFiles == 0) {
-                logger.info("No Genesys logs found.");
-            } else {
-                m_accessor.ResetAutoCommit(true);
-                m_FileInfoTable.FinalizeDB();
-                for (DBTable tab : m_tables.values()) {
-                    if (tab.isTabCreated()) {
-                        logger.info("Finalizing " + tab.getM_type() + " (added " + tab.getRecordsAdded() + " recs)");
-                        tab.FinalizeDB();
-                    }
-                }
-                FinalizeParsers();
-
-            }
-//            m_accessor.exit();
-//            m_logDB.Close();
-            m_accessor.Commit();
-            m_accessor.Close(true);
-
-            Date stop = new Date();
-            logger.info("All done. Completed in " + pDuration(stop.getTime() - start.getTime()) + "; processed " + totalFiles + " files (" + formatSize(totalBytes) + ")");
-        } catch (Exception e) {
-            logger.error("Exit exception " + e, e);
-        }
-    }
-
-    private void FinalizeParsers() throws Exception {
-        for (Parser m_parser : m_parsers.values()) {
-            if (m_parser != null) {
-                m_parser.doFinalize();
-            }
-        }
-    }
-
-    private static void extendFilesList(ArrayList<FileInfo> filesToProcess, LogFileWrapper newLog) throws IOException {
-        if (newLog != null) {
-            for (FileInfo fileInfo : newLog.getFileInfos()) {
-                logger.debug("adding file to process: [" + fileInfo.getM_path() + "] log name [" + fileInfo.getLogFileName() + "]");
-                for (FileInfo fiExisting : filesToProcess) {
-                    if (fiExisting.fileEqual(fileInfo)) {
-                        Main.logger.warn("Duplicate file found: [" + fileInfo.getM_path() + "] vs [" + fiExisting.getM_path() + "]");
-                        if (fiExisting.getSize() >= fileInfo.getSize()) {
-                            Main.logger.warn("Ignored [" + fileInfo.getM_path() + "]");
-                            return;
-                        } else {
-                            Main.logger.warn("Will use [" + fileInfo.getM_path() + "] as it is larger "
-                                    + "(" + fileInfo.getSize()
-                                    + "b " + formatSize(fileInfo.getSize())
-                                    + " vs " + fiExisting.getSize() + "b " + formatSize(fiExisting.getSize()) + ")");
-                            filesToProcess.remove(fiExisting);
-                            fiExisting.setIgnoring();
-                            break;
-                        }
-                    }
-                }
-                filesToProcess.add(fileInfo);
-            }
-        }
-    }
-
-    private static boolean myEqual(String logFileName, String logFileName0) {
-        return logFileName != null && !logFileName.isEmpty()
-                && logFileName0 != null && !logFileName0.isEmpty()
-                && logFileName.equals(logFileName0);
-    }
-
-    private void setDBExisted(boolean b) {
-        dbExisted = b;
-    }
-
-    static public boolean isDbExisted() {
-        return Main.getMain().dbExisted;
-    }
-
-    private static void initStatic(SqliteAccessor m_accessor) throws Exception {
-        Record.setFileId(m_accessor.getID("select max(id) from file_logbr;", 0));
-        Record.m_handlerId = m_accessor.getID("select max(HandlerId) from sip_" + m_accessor.getM_alias() + ";", "sip_" + m_accessor.getM_alias(), 0);
-        Record.m_handlerId = m_accessor.getID("select max(HandlerId) from tlib_" + m_accessor.getM_alias() + ";", "tlib_" + m_accessor.getM_alias(), Record.m_handlerId);
-        Record.m_handlerId = m_accessor.getID("select max(HandlerId) from cireq_" + m_accessor.getM_alias() + ";", "cireq_" + m_accessor.getM_alias(), Record.m_handlerId);
-        Record.m_handlerId++;
-        Record.m_sipId = m_accessor.getID("select max(SipId) from trigger_" + m_accessor.getM_alias() + ";", "trigger_" + m_accessor.getM_alias(), 0) + 1;
-        Record.m_tlibId = m_accessor.getID("select max(TlibId) from trigger_" + m_accessor.getM_alias() + ";", "trigger_" + m_accessor.getM_alias(), 0) + 1;
-        Record.m_jsonId = m_accessor.getID("select max(JsonId) from trigger_" + m_accessor.getM_alias() + ";", "trigger_" + m_accessor.getM_alias(), 0) + 1;
-    }
-
-    void finalizeTable(TableType tableType) throws Exception {
-        DBTable tab = m_tables.get(tableType);
-        if (tab != null) {
-            tab.FinalizeDB();
-        }
-    }
-
-    private Parser initParser(FileInfoType type) {
-        Parser ret = null;
-        switch (type) {
-            case type_SipProxy:
-                if (ifAll()) {
-                    ret = new SIPProxyParser(m_tables);
-                }
-                break;
-
-            case type_VOIPEP:
-                if (ifAll()) {
-                    ret = new VOIPEPParser(m_tables);
-                }
-                break;
-
-            case type_URS:
-                if (ifAll()) {
-                    ret = new UrsParser(m_tables);
-                }
-                break;
-
-            case type_SessionController:
-                ret = new SingleThreadParser(m_tables);
-                break;
-
-            case type_StatServer:
-                if (ifAll()) {
-                    ret = new StSParser(m_tables);
-                }
-                break;
-
-            case type_ORS:
-                if (ifAll()) {
-                    ret = new OrsParser(m_tables);
-                }
-                break;
-
-            case type_OCS:
-                if (ifAll()) {
-                    ret = new OCSParser(m_tables);
-                }
-                break;
-
-            case type_IxnServer:
-                if (ifAll()) {
-                    ret = new IxnServerParser(m_tables);
-                }
-                break;
-
-            case type_RM:
-                if (ifAll()) {
-                    ret = new RMParser(m_tables);
-                }
-                break;
-
-            case type_MCP:
-                if (ifAll()) {
-                    ret = new MCPParser(m_tables);
-                }
-                break;
-
-            case type_WorkSpace:
-                if (ifAll()) {
-                    ret = new WorkspaceParser(m_tables);
-                }
-                break;
-
-            case type_SIPEP:
-                if (ifAll()) {
-                    ret = new SIPEPParser(m_tables);
-                }
-                break;
-
-            case type_SCS:
-                if (ifAll()) {
-                    ret = new SCSParser(m_tables);
-                }
-                break;
-
-            case type_LCA:
-                if (ifAll()) {
-                    ret = new LCAParser(m_tables);
-                }
-                break;
-
-            case type_WWE:
-                if (ifAll()) {
-                    ret = new WWEParser(m_tables);
-                }
-                break;
-
-            case type_URSHTTP:
-                if (ifAll()) {
-                    ret = new URShttpinterfaceParser(m_tables);
-                }
-                break;
-
-            case type_WWECloud:
-                if (ifAll()) {
-                    ret = new WWECloudParser(m_tables);
-                }
-                break;
-
-            case type_DBServer:
-                if (ifAll()) {
-                    ret = new DBServerParser(m_tables);
-                }
-                break;
-
-            case type_GMS:
-                if (ifAll()) {
-                    ret = new GMSParser(m_tables);
-                }
-                break;
-            case type_ConfServer:
-                if (ifAll()) {
-                    ret = new ConfServParser(m_tables);
-                }
-                break;
-
-            case type_ApacheWeb:
-                if (ifAll()) {
-                    ret = new ApacheWebLogsParser(m_tables);
-                }
-                break;
-        }
-        if (ret != null) {
-            ret.init(m_tables);
-        }
-        return ret;
-
-    }
-
-    public static boolean setCurrentDirectory(String directory_name) {
-        boolean result = false;  // Boolean indicating whether directory was set
-        File directory;       // Desired current working directory
-
-        directory = new File(directory_name).getAbsoluteFile();
-        if (directory.exists() || directory.mkdirs()) {
-            result = (System.setProperty("user.dir", directory.getAbsolutePath()) != null);
-        }
-
-        return result;
-    }
-
-    private void setXMLCfg(String xmlCFG) throws SAXException, IOException, Exception {
-        xmlCfg = new XmlCfg((xmlCFG));
-    }
-
-    private boolean checkIgnoreTable(Message msg) {
-        if (xmlCfg != null) {
-            return xmlCfg.CheckIgnore(msg);
-        }
-        return false;
-
-    }
-
-    private boolean isLogBRDir(File file) {
-        return FilenameUtils.normalizeNoEndSeparator(file.getAbsolutePath())
-                .equalsIgnoreCase(logBrDir);
     }
 
     static class XmlCfg {
@@ -1438,17 +1511,6 @@ public class Main {
 
     }
 
-    public static boolean ifSIPLines() {
-        String isAll = (String) System.getProperties().get("SIPLINES");
-        if (isAll == null || isAll.length() == 0 || !isAll.equals("1")) {
-            return false;
-        }
-        return true;
-    }
-
-    public static boolean isIgnoreZIP() {
-        return ignoreZIP;
-    }
 
     public static class ExecutionEnvironment {
 
@@ -1462,13 +1524,6 @@ public class Main {
         private final Option optTDiffParse;
         private boolean parseTDiff = false;
 
-        public String[] getArgs() {
-            return cmd.getArgs();
-        }
-
-        public List<String> getArgList() {
-            return cmd.getArgList();
-        }
 
         private Options options = null;
 
@@ -1546,6 +1601,12 @@ public class Main {
             System.setProperty("log4j2.saveDirectory", "true");
 
         }
+        public String[] getArgs() {
+            return cmd.getArgs();
+        }
+        public List<String> getArgList() {
+            return cmd.getArgList();
+        }
 
         public void printHelp() {
             HelpFormatter hf = new HelpFormatter();
@@ -1615,89 +1676,5 @@ public class Main {
 
     }
 
-    static Boolean isAll = null;
-
-    public static boolean ifAll() {
-        if (isAll == null) {
-            String sIsAll = (String) System.getProperties().get("all");
-            isAll = (sIsAll != null && sIsAll.equals("1"));
-        }
-        return isAll;
-    }
-
-    private static void ParseZip(File file) {
-        try {
-            ZipFile logArchive = new ZipFile(file, ZipFile.OPEN_READ);
-            Enumeration e = logArchive.entries();
-            while (e.hasMoreElements()) {
-                ZipEntry entry = (ZipEntry) e.nextElement();
-                InputStreamReader reader = new InputStreamReader(logArchive.getInputStream(entry));
-                /*                BufferedReaderCrLf input = new BufferedReaderCrLf(reader);
-                FileInfo fileInfo = new FileInfo();
-                fileInfo.m_path = entry.getName();
-                fileInfo.m_name = entry.getName();
-                fileInfo.setFileFilter(m_component);
-                Parser parser = null;
-                int componentType = fileInfo.CheckLog(input);
-                switch (componentType) {
-                    case FileInfo.type_SessionController:
-                    case FileInfo.type_InteractionProxy:
-                    case FileInfo.type_tController:
-                        parser = m_parsers.get(0);
-                        break;
-                        
-                    case FileInfo.type_SipProxy:
-                    case FileInfo.type_CallManager:
-                    case FileInfo.type_TransportLayer:
-                        if(m_component.equalsIgnoreCase("all")) {
-                            parser = m_parsers.get(0);
-                        } else {
-                            parser = m_parsers.get(1);
-                        }
-                        break;
-                        
-                    case FileInfo.type_URS:
-                        parser = m_parsers.get(2);
-                        break;
-                        
-                    case FileInfo.type_StatServer:
-                        parser = m_parsers.get(3);
-                        break;
-                        
-                    case FileInfo.type_ICON:
-                        parser = m_parsers.get(4);
-                        break;
-                        
-                    case FileInfo.type_ORS:
-                        parser = m_parsers.get(5);
-                        break;
-                        
-                    default:
-                        return;
-                }
-                
-                fileInfo.AddToDB(m_accessor);
-                LogDB.FileEntry logEntry = m_logDB.GetInfo(file);
-                if (logEntry.Offset >= entry.getSize()) {
-                    System.out.println("Nothing new to parse: " + entry.getName());
-                    return;
-                }
-                InputStreamReader parsingReader = new InputStreamReader(logArchive.getInputStream(entry));
-                BufferedReaderCrLf parsingInput = new BufferedReaderCrLf(parsingReader);
-                int lines = parser.ParseFrom(parsingInput, logEntry.Offset, logEntry.Line);
-                parsingInput.close();
-                logEntry.Line += lines;
-                logEntry.Offset = entry.getSize();
-                m_logDB.SetInfo(file, logEntry);
-                System.out.println("Parsed " + lines + " lines in " + entry.getName());
-                
-                input.close();
-                 */
-            }
-        } catch (Exception e) {
-            System.out.println("ERROR parsing zip archive: " + e);
-            return;
-        }
-    }
 
 }

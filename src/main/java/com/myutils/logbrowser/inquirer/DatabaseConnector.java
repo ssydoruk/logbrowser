@@ -24,9 +24,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.IllegalFormatException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -40,6 +38,16 @@ import static org.sqlite.SQLiteErrorCode.SQLITE_INTERRUPT;
 public class DatabaseConnector {
 
     private static final org.apache.logging.log4j.Logger logger = LogManager.getLogger();
+    private static final HashMap<String, DateTimeFormatter> parsedFormats = new HashMap<>();
+    private static DatabaseConnector databaseConnector = null;
+    // List of function names;
+    public static final String CampaignGroupDBIDtoName = "CampaignGroupDBIDtoName";
+    public static final String CampaignDBIDtoName = "CampaignDBIDtoName";
+    public static final String GroupDBIDtoName = "GroupDBIDtoName";
+    public static final String ListDBIDtoName = "ListDBIDtoName";
+    private static final HashMap<String, Boolean> tabExists = new HashMap<String, Boolean>();
+    static public Statement currentStatement = null;
+    static private int noAppTypes = -1;
 
     static void dropTable(String tab) throws SQLException {
 //        if (TableExist(tab, true)) {
@@ -93,8 +101,6 @@ public class DatabaseConnector {
 //        };
 
     }
-
-    private static final HashMap<String, DateTimeFormatter> parsedFormats = new HashMap<>();
 
     private static long parseTime(String dateString, String dateFormat) {
 //    DateTimeFormatter formatter =
@@ -170,15 +176,6 @@ public class DatabaseConnector {
         return TableExist(tableType.toString());
     }
 
-    private String m_dbName;
-    private String m_dbAlias;
-    private Connection m_conn;
-    Hashtable m_activeStatements;
-    ArrayList m_freeStatements;
-    ArrayList<PreparedStatement> m_statements;
-
-    private static DatabaseConnector databaseConnector = null;
-
     public static DatabaseConnector getDatabaseConnector(Object obj) throws SQLException {
         if (databaseConnector != null) {
             if (obj != null) {
@@ -194,10 +191,6 @@ public class DatabaseConnector {
         return databaseConnector;
     }
 
-    public String getAlias() {
-        return m_dbAlias;
-    }
-
     public static void initDatabaseConnector(String dbName, String dbAlias) throws SQLException {
         databaseConnector = new DatabaseConnector(dbName, dbAlias);
 //        long time3 = new Date().getTime();
@@ -206,91 +199,796 @@ public class DatabaseConnector {
 //        inquirer.logger.info("Analyze table took " + com.myutils.logbrowser.indexer.Main.pDuration(time4 - time3));
     }
 
-    private HashMap<ReferenceType, HashMap<Integer, String>> thePersistentRef = new HashMap<>();
+    private static void Explain(Statement stmt, String query) throws SQLException {
+        if (inquirer.logger.isTraceEnabled()) {
 
-    String persistentRef(ReferenceType referenceType, Integer i) throws SQLException {
-        HashMap<Integer, String> theRef = thePersistentRef.get(referenceType);
-        if (theRef == null) {
-            theRef = getRefs(referenceType);
-            thePersistentRef.put(referenceType, theRef);
+            if (Thread.currentThread().isInterrupted()) {
+                throw new RuntimeInterruptException();
+            }
+
+            inquirer.logger.trace("---> explain " + query);
+            ResultSet rs = stmt.executeQuery("EXPLAIN QUERY PLAN " + query);
+
+            ResultSetMetaData metadata = rs.getMetaData();
+            int columnCount = metadata.getColumnCount();
+            for (int i = 1; i <= columnCount; i++) {
+                inquirer.logger.trace(metadata.getColumnName(i) + ", ");
+            }
+//        inquirer.logger.debug();
+            while (rs.next()) {
+                String row = "";
+                for (int i = 1; i <= columnCount; i++) {
+                    row += rs.getString(i) + ", ";
+                }
+                if (Thread.currentThread().isInterrupted()) {
+                    throw new RuntimeInterruptException();
+                }
+                inquirer.logger.trace(row);
+            }
         }
-        return theRef.get(i);
     }
 
-    abstract class ILoadFun {
+    public static boolean refTableExist(ReferenceType rt) throws SQLException {
+        return TableExist(rt.toString());
+    }
 
-        public abstract String[] getNames(String id) throws SQLException;
-    };
+    public static boolean refTableExist(String rt) throws SQLException {
+        return TableExist(rt);
+    }
 
-    class IDsToName {
+    public static boolean TableExist(String tab) throws SQLException {
+        return TableExist(tab, false);
+    }
 
-        class IDToName {
+    public static boolean fileExits(FileInfoType types) throws SQLException {
 
-            private ILoadFun fun;
-            private HashMap<String, String[]> idToName;
+        return fileExits(new FileInfoType[]{types});
+    }
 
-            public IDToName(ILoadFun fun) {
-                this.fun = fun;
-                idToName = new HashMap<>();
+    public static boolean fileExits(FileInfoType[] types) throws SQLException {
+        String[] names = new String[types.length];
+        for (int i = 0; i < types.length; i++) {
+            names[i] = FileInfoType.getFileType(types[i]);
+
+        }
+
+//        Integer[] ids = getRefIDs(ReferenceType.AppType, names);
+        Integer[] ids = getIDs("file_logbr", "id", getWhere("apptypeid", ReferenceType.AppType, names, true, false));
+        return (ids != null && ids.length > 0);
+    }
+
+    public static void checkIndexes(String tabName, String[] fieldNames) throws SQLException {
+        for (String n : fieldNames) {
+            String req = " select count(*) from sqlite_master where type='index'\n"
+                    //            String req = "select type from sqlite_master where type='index'\n"
+                    + " and lower(tbl_name)='" + tabName.toLowerCase() + "' "
+                    + "and REGEXP ('\\s*\\(\\s*" + n.toLowerCase() + "\\s*\\)\\s*$', lower(sql) )=1"
+                    //                    + "and REGEXP( 'd', 'dd')=1"
+                    + ";";
+//            inquirer.logger.info(req);
+            Integer[] ids;
+            boolean b;
+            ids = getIDs(req);
+            b = (ids != null && ids.length > 0 && ids[0] > 0);
+//                inquirer.logger.info(b);
+            if (!b) {
+                runQuery("create index idx_" + tabName + "_" + n + " on " + tabName + "(" + n + ");");
             }
 
-            public String[] getNames(String id) throws SQLException {
-                if (idToName.containsKey(id)) {
-                    return idToName.get(id);
+        }
+
+    }
+
+    public static boolean TableExist(String tab, boolean forceCheck) throws SQLException {
+        if (!forceCheck && tabExists.containsKey(tab)) {
+            return tabExists.get(tab);
+        } else {
+            Integer[] ids = getIDs("select count(*) from sqlite_master WHERE "
+                    + "type=\"table\" and lower(name)=\"" + tab.toLowerCase() + "\" ");
+            boolean b = (ids.length > 0 && ids[0] == 1);
+            tabExists.put(tab, b);
+            return b;
+        }
+    }
+
+    public static boolean TableEmpty(String tab) throws SQLException {
+        if (TableExist(tab)) {
+            Integer[] ids = getIDs("select count(*) from " + tab + ";");
+            boolean b = (ids.length > 0 && ids[0] > 0);
+            return !b;
+        }
+        return true;
+    }
+
+    public static boolean TableEmptySilent(String tab) {
+        try {
+            if (TableExist(tab)) {
+                Integer[] ids = getIDs("select count(*) from " + tab + ";");
+                boolean b = (ids.length > 0 && ids[0] > 0);
+                return !b;
+            }
+            return true;
+        } catch (SQLException ex) {
+            Logger.getLogger(DatabaseConnector.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return false;
+    }
+
+    public static ResultSet executeQuery(String query) throws SQLException {
+        long timeStart = new Date().getTime();
+        ResultSet ret = null;
+
+        try {
+            currentStatement = databaseConnector.m_conn.createStatement();
+            currentStatement.closeOnCompletion();
+            inquirer.logger.debug("About to executeQuery [" + query + "]");
+
+            Explain(currentStatement, query);
+
+            ret = currentStatement.executeQuery(query);
+
+        } catch (SQLException sQLException) {
+            if (sQLException.getErrorCode() == SQLITE_INTERRUPT.code) {
+                inquirer.logger.debug("Statement cancelled");
+                Thread.currentThread().interrupt();
+                throw new RuntimeInterruptException();
+            } else {
+                inquirer.ExceptionHandler.handleException("RunQuery failed: " + sQLException + " query " + query, sQLException);
+                throw sQLException;
+            }
+        } finally {
+            synchronized (currentStatement) {
+                currentStatement = null;
+            }
+        }
+
+        long timeEnd = new Date().getTime();
+        inquirer.logger.debug("\tExecuteQuery execution took " + pDuration(timeEnd - timeStart));
+        return ret;
+
+    }
+
+    public static int runQuery(String query) throws SQLException {
+        long timeStart = new Date().getTime();
+        currentStatement = databaseConnector.m_conn.createStatement();
+        synchronized (currentStatement) {
+            currentStatement.closeOnCompletion();
+            Explain(currentStatement, query);
+        }
+        inquirer.logger.debug("about to runQuery [" + query + "]");
+        int executeUpdate = 0;
+        try {
+            executeUpdate = currentStatement.executeUpdate(query);
+        } catch (SQLException sQLException) {
+            if (sQLException.getErrorCode() == SQLITE_INTERRUPT.code) {
+                inquirer.logger.info("Statement cancelled");
+                Thread.currentThread().interrupt();
+                throw new RuntimeInterruptException();
+            } else {
+                inquirer.ExceptionHandler.handleException("RunQuery failed: " + sQLException + " query " + query, sQLException);
+                throw sQLException;
+            }
+        } finally {
+//            synchronized (currentStatement) {
+            currentStatement = null;
+//            }
+        }
+        long timeEnd = new Date().getTime();
+        inquirer.logger.debug("Statement executed: affected " + executeUpdate + " rows; took " + pDuration(timeEnd - timeStart));
+        if (Thread.currentThread().isInterrupted()) {
+            throw new RuntimeInterruptException();
+        }
+        checkLimitClause(executeUpdate);
+        return executeUpdate;
+//            databaseConnector.m_conn.commit();
+    }
+
+    public static boolean onlyOneApp() throws SQLException {
+        if (noAppTypes < 0) {
+            Integer[] iDs = getIDs("file_logbr", "apptypeid", "where apptypeid>0");
+            noAppTypes = iDs.length;
+        }
+        return noAppTypes < 2;
+    }
+
+    public static String[] getNames(Object obj, String tab, String retField, String where) throws SQLException {
+//        m_connector.getIDs(this, "select sid from orssess_logbr WHERE "+getWhere("connid", m_ConnIds));
+        return (TableExist(tab))
+                ? getNames(obj, "select distinct " + retField + " from " + tab + " " + where) : null;
+    }
+
+    public static ArrayList<NameID> getNamesNameID(Object obj, String tab, String retField, String where) throws SQLException {
+//        m_connector.getIDs(this, "select sid from orssess_logbr WHERE "+getWhere("connid", m_ConnIds));
+        return (TableExist(tab))
+                ? getNamesNameID(obj, "select distinct " + retField + " from " + tab + " " + where) : null;
+    }
+
+    public static String[] getRefNames(ReferenceType refTab, Integer[] ids) throws SQLException {
+        return (TableExist(refTab.toString()) && (ids != null && ids.length > 0))
+                ? getNames("select distinct name from " + refTab.toString() + getWhere("id", ids, true))
+                : null;
+    }
+
+    public static Integer[] translateIDs(ReferenceType fromRef, Integer[] fromIDs, ReferenceType toRef) throws SQLException {
+        String[] refNames = getRefNames(fromRef, fromIDs);
+        if (ArrayUtils.isNotEmpty(refNames)) {
+            return getRefIDs(toRef, refNames);
+        } else {
+            return null;
+        }
+    }
+
+    public static HashMap<Integer, String> getRefs(ReferenceType refTab) throws SQLException {
+        return (TableExist(refTab.toString()))
+                ? getRefs("select id, name from " + refTab.toString())
+                : null;
+    }
+
+    private static HashMap<Integer, String> getRefs(String query) throws SQLException {
+        HashMap<Integer, String> ret = new HashMap();
+
+        try (ResultSet resultSet = DatabaseConnector.executeQuery(query)) {
+            ResultSetMetaData rsmd = resultSet.getMetaData();
+            if (rsmd.getColumnCount() != 2) {
+                throw new SQLException("getRefs: there are " + rsmd.getColumnCount() + " output columns; has to be only 2");
+            }
+            int cnt = 0;
+            while (resultSet.next()) {
+                Integer id = resultSet.getInt(1);
+                String name = resultSet.getString(2);
+                if (name != null && name.length() > 0 && id != null) {
+                    ret.put(id, name);
+                    QueryTools.DebugRec(resultSet);
+                    cnt++;
+                }
+            }
+            inquirer.logger.debug("\tRetrieved " + cnt + " records");
+//        resultSet.getStatement().close();
+        }
+
+        return ret;
+
+    }
+
+    public static String[] getNames(Object obj, String tab, String retField, String where, String orderBy) throws SQLException {
+//        m_connector.getIDs(this, "select sid from orssess_logbr WHERE "+getWhere("connid", m_ConnIds));
+        return (TableExist(tab))
+                ? getNames(obj, "select distinct " + retField + " from " + tab + " " + where + " order by " + orderBy)
+                : null;
+    }
+
+    static public Integer[] getIDs(String tab, String retField, String where) throws SQLException {
+//        m_connector.getIDs(this, "select sid from orssess_logbr WHERE "+getWhere("connid", m_ConnIds));
+        return (TableExist(tab))
+                ? getIDs("select distinct " + retField + " from " + tab + " " + where)
+                : null;
+    }
+
+    public static Integer[] getRefIDs(ReferenceType rt, String[] names) throws SQLException {
+        if (refTableExist(rt)) {
+            return getIDs(rt.toString(), "id", getWhere("name", names, true));
+        }
+        return new Integer[0];
+    }
+
+    public static Integer[] getRefIDs(ReferenceType rt, String[] names, boolean isRegex) throws SQLException {
+        if (refTableExist(rt)) {
+            return getIDs(rt.toString(), "id", getWhere("name", names, true));
+        }
+        return new Integer[0];
+    }
+
+    public static Integer[] getIDs(Object obj, String query) throws SQLException {
+        ArrayList<Integer> ret = new ArrayList();
+        DatabaseConnector connector = DatabaseConnector.getDatabaseConnector(obj);
+
+        try (ResultSet resultSet = connector.executeQuery(obj, query)) {
+            ResultSetMetaData rsmd = resultSet.getMetaData();
+
+            if (rsmd.getColumnCount() != 1) {
+                throw new SQLException("getIDs: there are " + rsmd.getColumnCount() + " output columns; has to be only 1");
+            }
+            int cnt = 0;
+            while (resultSet.next()) {
+                Integer res = resultSet.getInt(1);
+                if (res > 0) {
+                    ret.add(res);
+                    QueryTools.DebugRec(resultSet);
+                    cnt++;
+                }
+            }
+            inquirer.logger.debug("\tRetrieved " + cnt + " records");
+        }
+
+        return (Integer[]) ret.toArray(new Integer[ret.size()]);
+    }
+
+    public static String[] getNames(String query) throws SQLException {
+        ArrayList<String> ret = new ArrayList();
+
+        try (ResultSet resultSet = executeQuery(query)) {
+            ResultSetMetaData rsmd = resultSet.getMetaData();
+
+            if (rsmd.getColumnCount() != 1) {
+                throw new SQLException("getIDs: there are " + rsmd.getColumnCount() + " output columns; has to be only 1");
+            }
+            int cnt = 0;
+            while (resultSet.next()) {
+                String res = resultSet.getString(1);
+                if (res != null && res.length() > 0) {
+                    ret.add(res);
+                    QueryTools.DebugRec(resultSet);
+                    cnt++;
+                }
+            }
+            inquirer.logger.debug("\tRetrieved " + cnt + " records");
+//        resultSet.getStatement().close();
+            resultSet.getStatement().close();
+        }
+
+        return (String[]) ret.toArray(new String[ret.size()]);
+
+    }
+
+    public static ArrayList<NameID> getNamesNameID(Object obj, String query) throws SQLException {
+        ArrayList<NameID> ret = new ArrayList();
+        DatabaseConnector connector = DatabaseConnector.getDatabaseConnector(obj);
+
+        try (ResultSet resultSet = connector.executeQuery(obj, query)) {
+            ResultSetMetaData rsmd = resultSet.getMetaData();
+            boolean noID = rsmd.getColumnCount() == 1;
+            if (rsmd.getColumnCount() != 2 && !noID) {
+                throw new SQLException("getNamesPair: there are " + rsmd.getColumnCount() + " output columns; has to be only 2");
+            }
+            if (!noID && (!textColumn(rsmd.getColumnType(2))
+                    || !numColumn(rsmd.getColumnType(1)))) {
+                throw new SQLException("getNamesPair: col[1] is " + rsmd.getColumnType(1) + " expected int;"
+                        + "col[2] is " + rsmd.getColumnType(2) + " expected text;");
+            }
+            int cnt = 0;
+            while (resultSet.next()) {
+                String res;
+                int aInt = 0;
+                if (noID) {
+                    res = resultSet.getString(1);
                 } else {
-                    String[] names = fun.getNames(id);
-                    if (names != null && names.length == 0) {
-                        names = null;
-                    }
-                    idToName.put(id, names);
-                    return names;
+                    res = resultSet.getString(2);
+                    aInt = resultSet.getInt(1);
+                }
+                if (res != null && res.length() > 0) {
+                    ret.add(new NameID(res, aInt));
+                    QueryTools.DebugRec(resultSet);
+                    cnt++;
+                }
+            }
+            inquirer.logger.debug("\tRetrieved " + cnt + " records");
+            //        resultSet.getStatement().close();
+        }
+
+        return ret;
+    }
+
+    public static String[] getNames(Object obj, String query) throws SQLException {
+        ArrayList<String> ret = new ArrayList();
+        DatabaseConnector connector = DatabaseConnector.getDatabaseConnector(obj);
+
+        try (ResultSet resultSet = connector.executeQuery(obj, query)) {
+            ResultSetMetaData rsmd = resultSet.getMetaData();
+            if (rsmd.getColumnCount() != 1) {
+                throw new SQLException("getIDs: there are " + rsmd.getColumnCount() + " output columns; has to be only 1");
+            }
+            int cnt = 0;
+            while (resultSet.next()) {
+                String res = resultSet.getString(1);
+                if (res != null && res.length() > 0) {
+                    ret.add(res);
+                    QueryTools.DebugRec(resultSet);
+                    cnt++;
+                }
+            }
+            inquirer.logger.debug("\tRetrieved " + cnt + " records");
+            //        resultSet.getStatement().close();
+        }
+
+        return (String[]) ret.toArray(new String[ret.size()]);
+    }
+
+    public static UTCTimeRange getTimeRange(String[] tabs) throws SQLException {
+        return getTimeRange(tabs, null);
+    }
+
+    static UTCTimeRange getTimeRange(FileInfoType[] tabs, ArrayList<Integer> searchApps) throws SQLException {
+        UTCTimeRange ret = new UTCTimeRange(0, 0);
+        StringBuilder q = new StringBuilder(256);
+        Integer[] arrSearchApps;
+        q.append("select min(filestarttime), max(endtime) from file_logbr ");
+
+        if (searchApps != null && searchApps.size() > 0) {
+            arrSearchApps = (Integer[]) searchApps.toArray(new Integer[searchApps.size()]);
+            q.append(getWhere("id", arrSearchApps, true));
+        } else {
+            String[] n = new String[tabs.length];
+            for (int i = 0; i < tabs.length; i++) {
+                n[i] = FileInfoType.getFileType(tabs[i]);
+
+            }
+            q.append(getWhere("apptypeid", ReferenceType.AppType, n, true));
+        }
+
+        ArrayList<ArrayList<Long>> iDsMultiple = getIDsMultiple(q.toString());
+        if (iDsMultiple.size() > 0) {
+            ArrayList<Long> dbRet = iDsMultiple.get(0);
+            Long val = dbRet.get(0);
+            if (val != null && val > 0) {
+                if (ret.getStart() == 0 || ret.getStart() > val) {
+                    ret.setStart(val);
                 }
             }
 
-        };
+            val = dbRet.get(1);
+            if (val != null && val > 0) {
+                if (ret.getEnd() == 0 || ret.getEnd() < val) {
+                    ret.setEnd(val);
 
-        private HashMap<String, IDToName> idsToName;
+                }
+            }
+        }
+        return ret;
 
-        public IDsToName() {
-            this.idsToName = new HashMap<>();
+    }
+
+    static UTCTimeRange getTimeRange(String[] tabs, ArrayList<Integer> searchApps) throws SQLException {
+        UTCTimeRange ret = new UTCTimeRange(0, 0);
+        StringBuilder q = new StringBuilder(256);
+        Integer[] arrSearchApps = null;
+        if (searchApps != null && searchApps.size() > 0) {
+            arrSearchApps = (Integer[]) searchApps.toArray(new Integer[searchApps.size()]);
         }
 
-        public void addFun(String funName, ILoadFun fun) throws SQLException {
-            idsToName.put(funName, new IDToName(fun));
-        }
+        for (String tab : tabs) {
 
-        public String getNames(String fName, String id) throws SQLException {
-            if (fName != null && id != null) {
-                IDToName idn = idsToName.get(fName);
-                if (idn != null) {
-                    String[] refNames = idn.getNames(id);
-                    if (refNames != null && refNames.length > 0) {
-                        StringBuilder res = new StringBuilder(120);
-                        for (String refName : refNames) {
-                            if (res.length() > 0) {
-                                res.append(",");
-                            }
-                            res.append(refName);
+            if (TableExist(tab)) {
+                q.setLength(0);
+                q.append("select min(time), max(time) from ").append(tab);
+                if (arrSearchApps != null) {
+                    q.append(" where fileid in (select id from file_logbr ")
+                            .append(getWhere("appnameid", arrSearchApps, true))
+                            .append(")");
+                }
+
+                ArrayList<ArrayList<Long>> iDsMultiple = getIDsMultiple(q.toString());
+                if (iDsMultiple.size() > 0) {
+                    ArrayList<Long> dbRet = iDsMultiple.get(0);
+                    Long val = dbRet.get(0);
+                    if (val != null && val > 0) {
+                        if (ret.getStart() == 0 || ret.getStart() > val) {
+                            ret.setStart(val);
                         }
-                        res.append("(").append(id).append(")");
-                        return (res.toString());
                     }
 
+                    val = dbRet.get(1);
+                    if (val != null && val > 0) {
+                        if (ret.getEnd() == 0 || ret.getEnd() < val) {
+                            ret.setEnd(val);
+
+                        }
+                    }
                 }
-                inquirer.logger.error("Const not found. fn:[" + fName + "} id:[" + id + "]");
+
             }
-            return id;
 
         }
-    };
+        if (ret.getStart() == 0 && ret.getEnd() == 0) {
+            return null;
+        }
+        return ret;
+    }
 
+    public static UTCTimeRange getTimeRange(String tab) throws SQLException {
+        return getTimeRange(new String[]{tab});
+    }
+
+    public static ArrayList<ArrayList<Long>> getIDsMultiple(String query) throws SQLException {
+
+        ArrayList<ArrayList<Long>> ret;
+        try (ResultSet rs = executeQuery(query)) {
+            ResultSetMetaData rsmd = rs.getMetaData();
+            ret = new ArrayList<>();
+            int columnCount = rsmd.getColumnCount();
+            int cnt = 0;
+            while (rs.next()) {
+                ArrayList<Long> row = new ArrayList<>();
+                for (int i = 1; i <= columnCount; i++) {
+                    row.add(rs.getLong(i));
+                }
+                ret.add(row);
+                QueryTools.DebugRec(rs);
+                cnt++;
+            }
+            inquirer.logger.debug("\tRetrieved " + cnt + " records");
+            rs.getStatement().close();
+        }
+
+        return ret;
+
+    }
+
+    public static FullTableColors getFullTableColors(String query) throws SQLException {
+        return getFullTableColors(query, null);
+    }
+
+    static FullTableColors getFullTableColors(String query, String filestarttime) throws SQLException {
+
+        FullTableColors ret;
+
+        try (ResultSet rs = executeQuery(query)) {
+            ResultSetMetaData rsmd = rs.getMetaData();
+
+            ret = new FullTableColors();
+            ret.setMetaData(rsmd);
+            if (filestarttime != null) {
+                ret.setFieldColorChange(filestarttime);
+            }
+            int columnCount = rsmd.getColumnCount();
+
+            int cnt = 0;
+            while (rs.next()) {
+                ArrayList<Object> row = new ArrayList<>(columnCount);
+                for (int i = 1; i <= columnCount; i++) {
+                    row.add(rs.getObject(i));
+                }
+                QueryTools.DebugRec(rs);
+                ret.addRow(row);
+                cnt++;
+            }
+            inquirer.logger.debug("\tRetrieved " + cnt + " records");
+            rs.getStatement().close();
+        }
+
+        return ret;
+
+    }
+
+    public static FullTable getFullTable(String query) throws SQLException {
+
+        FullTable ret;
+
+        try (ResultSet rs = executeQuery(query)) {
+            ResultSetMetaData rsmd = rs.getMetaData();
+
+            ret = new FullTable();
+            ret.setMetaData(rsmd);
+
+            int columnCount = rsmd.getColumnCount();
+
+            int cnt = 0;
+            while (rs.next()) {
+                ArrayList<Object> row = new ArrayList<>(columnCount);
+                for (int i = 1; i <= columnCount; i++) {
+                    row.add(rs.getObject(i));
+                }
+                QueryTools.DebugRec(rs);
+                ret.addRow(row);
+                cnt++;
+            }
+            inquirer.logger.debug("\tRetrieved " + cnt + " records");
+            rs.getStatement().close();
+        }
+
+        return ret;
+
+    }
+
+    public static String getValue(String exp, String p) throws SQLException {
+
+        String s = exp.replaceAll("\\$1\\b", "'" + p + "'");
+
+        Statement createStatement = databaseConnector.m_conn.createStatement();
+
+        ResultSet rs = createStatement.executeQuery(s);
+
+//        ResultSetMetaData rsmd = rs.getMetaData();
+//        if (rsmd.getColumnCount() != 1) {
+//            throw new Exception("getValue: there are " + rsmd.getColumnCount() + " output columns; has to be only 1");
+//        }
+        while (rs.next()) {
+            return rs.getString(1);
+        }
+        inquirer.logger.info("\tgetValue " + " nothing returned");
+        return null;
+    }
+
+    public static Integer[] getIDs(String query) throws SQLException {
+        ArrayList<Integer> ret = new ArrayList();
+
+        Integer[] ids;
+        try (ResultSet rs = executeQuery(query)) {
+            ResultSetMetaData rsmd = rs.getMetaData();
+            if (rsmd.getColumnCount() != 1) {
+                throw new SQLException("getIDs: there are " + rsmd.getColumnCount() + " output columns; has to be only 1");
+            }
+            int cnt = 0;
+            while (rs.next()) {
+                Integer res = rs.getInt(1);
+                if (res != null && res > 0) {
+                    ret.add(res);
+                    cnt++;
+                }
+            }
+            inquirer.logger.debug("\tRetrieved " + cnt + " records");
+            ids = (Integer[]) ret.toArray(new Integer[ret.size()]);
+            QueryTools.DebugIDs(ids);
+            rs.getStatement().close();
+        }
+        return ids;
+    }
+
+    public static void GracefulClose() {
+        try {
+            if (databaseConnector != null) {
+                for (Object m_activeStatement : databaseConnector.m_activeStatements.keySet()) {
+                    ((Statement) m_activeStatement).close();
+                }
+                databaseConnector.m_activeStatements.clear();
+
+                for (int i = 0; i < databaseConnector.m_freeStatements.size(); i++) {
+                    Statement stmt = (Statement) databaseConnector.m_freeStatements.get(i);
+                    stmt.close();
+                }
+                databaseConnector.m_freeStatements.clear();
+
+                if (databaseConnector.m_conn != null) {
+                    databaseConnector.m_conn.close();
+                }
+            }
+        } catch (SQLException sQLException) {
+            inquirer.logger.error("Exception closing", sQLException);
+        }
+    }
+
+    static String[] getRefNames(Object obj, String tab) throws SQLException {
+        return getRefNames(obj, tab, null, null);
+    }
+
+    static String[] getRefNames(Object obj, String tab, String CheckTab, String CheckIDField) throws SQLException {
+        return getRefNames(obj, tab, CheckTab, CheckIDField, null);
+    }
+
+    static String[] getRefNames(Object obj, String tab, String CheckTab, String CheckIDField, String CheckIDField1) throws SQLException {
+
+        if (!TableExist(tab)) {
+            return null;
+        }
+        ArrayList<String> ret = new ArrayList();
+        DatabaseConnector connector = DatabaseConnector.getDatabaseConnector(obj);
+
+        StringBuilder q = new StringBuilder(256);
+        q.append("select name from ").append(tab).append("");//remove 'distinct' from here. Uniquness of names is ensured by parser,
+        //so no need to sort again
+        if (CheckTab != null && CheckIDField != null) {
+            q.append(" where id in (select distinct ").append(CheckIDField).append(" from ").append(CheckTab);
+            if (CheckIDField1 != null) {
+                q.append("\nunion\nselect distinct ").append(CheckIDField1).append(" from ").append(CheckTab);
+            }
+
+            q.append("\n)");
+        }
+        q.append("\norder by name");
+        try (ResultSet resultSet = connector.executeQuery(obj, q.toString())) {
+            ResultSetMetaData rsmd = resultSet.getMetaData();
+
+            if (rsmd.getColumnCount() != 1) {
+                throw new SQLException("getRefNames: there are " + rsmd.getColumnCount() + " output columns; has to be only 1");
+            }
+            int cnt = 0;
+            while (resultSet.next()) {
+                String res = resultSet.getString(1);
+                if (res != null && res.length() > 0) {
+                    ret.add(res);
+                    QueryTools.DebugRec(resultSet);
+                    cnt++;
+                }
+            }
+            inquirer.logger.debug("\tRetrieved " + cnt + " records");
+        }
+
+        return (String[]) ret.toArray(new String[ret.size()]);
+    }
+
+    static ArrayList<NameID> getRefNamesNameID(Object obj, String tab, String CheckTab, String CheckIDField, String CheckIDField1) throws SQLException {
+
+        if (!TableExist(tab) || (CheckTab != null && !TableExist(CheckTab))) {
+            return null;
+        }
+        ArrayList<NameID> ret = new ArrayList();
+        DatabaseConnector connector = DatabaseConnector.getDatabaseConnector(obj);
+
+        StringBuilder q = new StringBuilder(256);
+        q.append("select id, name from ").append(tab).append("");//remove 'distinct' from here. Uniquness of names is ensured by parser,
+        //so no need to sort again
+        if (CheckTab != null && CheckIDField != null) {
+            q.append(" where id in (select distinct ").append(CheckIDField).append(" from ").append(CheckTab);
+            if (CheckIDField1 != null) {
+                q.append("\nunion\nselect distinct ").append(CheckIDField1).append(" from ").append(CheckTab);
+            }
+
+            q.append("\n)");
+        }
+        q.append("\norder by name");
+        try (ResultSet resultSet = connector.executeQuery(obj, q.toString())) {
+            if (resultSet == null) {
+                return null;
+            }
+            ResultSetMetaData rsmd = resultSet.getMetaData();
+
+            if (rsmd.getColumnCount() != 2) {
+                throw new SQLException("getRefNames: there are " + rsmd.getColumnCount() + " output columns; has to be only 2");
+            }
+            if (!textColumn(rsmd.getColumnType(2))
+                    || !numColumn(rsmd.getColumnType(1))) {
+                throw new SQLException("getNamesPair: col[1] is " + rsmd.getColumnType(1) + " expected int;"
+                        + "col[2] is " + rsmd.getColumnType(2) + " expected text;");
+            }
+
+            int cnt = 0;
+            while (resultSet.next()) {
+                String res = resultSet.getString(2);
+                int aInt = resultSet.getInt(1);
+                if (res != null && res.length() > 0) {
+                    ret.add(new NameID(res, aInt));
+                    QueryTools.DebugRec(resultSet);
+                    cnt++;
+                }
+            }
+            inquirer.logger.debug("\tRetrieved " + cnt + " records");
+        }
+
+        return ret;
+    }
+
+    static ArrayList<NameID> getRefNameIDs(Object obj, String tab, String subQuery) throws SQLException {
+        return getRefNameIDs(obj, tab, subQuery, false);
+    }
+
+    static ArrayList<NameID> getRefNameIDs(Object obj, String tab, String subQuery, boolean addOrderBy) throws SQLException {
+        if (!TableExist(tab)) {
+            return null;
+        }
+        ArrayList<NameID> ret = new ArrayList();
+        StringBuilder query = new StringBuilder("select id, name from ");
+        query.append(tab);
+        if (subQuery != null) {
+            query.append(" where ( ").append(subQuery).append(" )");
+        }
+        if (addOrderBy) {
+            query.append(" order by name");
+        }
+        try (ResultSet resultSet = DatabaseConnector.executeQuery(query.toString())) {
+            ResultSetMetaData rsmd = resultSet.getMetaData();
+
+            if (rsmd.getColumnCount() != 2) {
+                throw new SQLException("getRefNameIDs: there are " + rsmd.getColumnCount() + " output columns; has to be only 2");
+            }
+            int cnt = 0;
+            while (resultSet.next()) {
+                NameID res = new NameID(resultSet.getString(2), resultSet.getInt(1));
+                ret.add(res);
+                QueryTools.DebugRec(resultSet);
+                cnt++;
+            }
+            inquirer.logger.debug("\tRetrieved " + cnt + " records");
+        }
+
+        return ret;
+    }
+    private String m_dbName;
+    private String m_dbAlias;
+    private Connection m_conn;
+    HashMap m_activeStatements;
+    ArrayList m_freeStatements;
+    ArrayList<PreparedStatement> m_statements;
+    private HashMap<ReferenceType, HashMap<Integer, String>> thePersistentRef = new HashMap<>();
     private IDsToName idsToName;
-
-    // List of function names;
-    public static final String CampaignGroupDBIDtoName = "CampaignGroupDBIDtoName";
-    public static final String CampaignDBIDtoName = "CampaignDBIDtoName";
-    public static final String GroupDBIDtoName = "GroupDBIDtoName";
-    public static final String ListDBIDtoName = "ListDBIDtoName";
 
     protected DatabaseConnector(String dbName, String dbAlias) throws SQLException {
         m_dbName = dbName;
@@ -683,9 +1381,22 @@ public class DatabaseConnector {
             }
         });
 
-        m_activeStatements = new Hashtable();
+        m_activeStatements = new HashMap();
         m_freeStatements = new ArrayList();
         m_statements = new ArrayList<>();
+    }
+
+    public String getAlias() {
+        return m_dbAlias;
+    }
+
+    String persistentRef(ReferenceType referenceType, Integer i) throws SQLException {
+        HashMap<Integer, String> theRef = thePersistentRef.get(referenceType);
+        if (theRef == null) {
+            theRef = getRefs(referenceType);
+            thePersistentRef.put(referenceType, theRef);
+        }
+        return theRef.get(i);
     }
 
     public void releaseConnector(Object owner) {
@@ -694,195 +1405,7 @@ public class DatabaseConnector {
             m_activeStatements.remove(owner);
             m_freeStatements.add(stmt);
         }
-        databaseConnector.currentStatement = null;
-    }
-
-    private static void Explain(Statement stmt, String query) throws SQLException {
-        if (inquirer.logger.isTraceEnabled()) {
-
-            if (Thread.currentThread().isInterrupted()) {
-                throw new RuntimeInterruptException();
-            }
-
-            inquirer.logger.trace("---> explain " + query);
-            ResultSet rs = stmt.executeQuery("EXPLAIN QUERY PLAN " + query);
-
-            ResultSetMetaData metadata = rs.getMetaData();
-            int columnCount = metadata.getColumnCount();
-            for (int i = 1; i <= columnCount; i++) {
-                inquirer.logger.trace(metadata.getColumnName(i) + ", ");
-            }
-//        inquirer.logger.debug();
-            while (rs.next()) {
-                String row = "";
-                for (int i = 1; i <= columnCount; i++) {
-                    row += rs.getString(i) + ", ";
-                }
-                if (Thread.currentThread().isInterrupted()) {
-                    throw new RuntimeInterruptException();
-                }
-                inquirer.logger.trace(row);
-            }
-        }
-    }
-
-    static private HashMap<String, Boolean> tabExists = new HashMap<String, Boolean>();
-
-    public static boolean refTableExist(ReferenceType rt) throws SQLException {
-        return TableExist(rt.toString());
-    }
-
-    public static boolean refTableExist(String rt) throws SQLException {
-        return TableExist(rt);
-    }
-
-    public static boolean TableExist(String tab) throws SQLException {
-        return TableExist(tab, false);
-    }
-
-    public static boolean fileExits(FileInfoType types) throws SQLException {
-
-        return fileExits(new FileInfoType[]{types});
-    }
-
-    public static boolean fileExits(FileInfoType[] types) throws SQLException {
-        String[] names = new String[types.length];
-        for (int i = 0; i < types.length; i++) {
-            names[i] = FileInfoType.getFileType(types[i]);
-
-        }
-
-//        Integer[] ids = getRefIDs(ReferenceType.AppType, names);
-        Integer[] ids = getIDs("file_logbr", "id", getWhere("apptypeid", ReferenceType.AppType, names, true, false));
-        return (ids != null && ids.length > 0);
-    }
-
-    public static void checkIndexes(String tabName, String[] fieldNames) throws SQLException {
-        for (String n : fieldNames) {
-            String req = " select count(*) from sqlite_master where type='index'\n"
-                    //            String req = "select type from sqlite_master where type='index'\n"
-                    + " and lower(tbl_name)='" + tabName.toLowerCase() + "' "
-                    + "and REGEXP ('\\s*\\(\\s*" + n.toLowerCase() + "\\s*\\)\\s*$', lower(sql) )=1"
-                    //                    + "and REGEXP( 'd', 'dd')=1"
-                    + ";";
-//            inquirer.logger.info(req);
-            Integer[] ids;
-            boolean b = false;
-            ids = getIDs(req);
-            b = (ids != null && ids.length > 0 && ids[0] > 0);
-//                inquirer.logger.info(b);
-            if (!b) {
-                runQuery("create index idx_" + tabName + "_" + n + " on " + tabName + "(" + n + ");");
-            }
-
-        }
-
-    }
-
-    public static boolean TableExist(String tab, boolean forceCheck) throws SQLException {
-        if (!forceCheck && tabExists.containsKey(tab)) {
-            return tabExists.get(tab);
-        } else {
-            Integer[] ids = getIDs("select count(*) from sqlite_master WHERE "
-                    + "type=\"table\" and lower(name)=\"" + tab.toLowerCase() + "\" ");
-            boolean b = (ids.length > 0 && ids[0] == 1);
-            tabExists.put(tab, b);
-            return b;
-        }
-    }
-
-    public static boolean TableEmpty(String tab) throws SQLException {
-        if (TableExist(tab)) {
-            Integer[] ids = getIDs("select count(*) from " + tab + ";");
-            boolean b = (ids.length > 0 && ids[0] > 0);
-            return !b;
-        }
-        return true;
-    }
-
-    public static boolean TableEmptySilent(String tab) {
-        try {
-            if (TableExist(tab)) {
-                Integer[] ids = getIDs("select count(*) from " + tab + ";");
-                boolean b = (ids.length > 0 && ids[0] > 0);
-                return !b;
-            }
-            return true;
-        } catch (SQLException ex) {
-            Logger.getLogger(DatabaseConnector.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return false;
-    }
-
-    public static ResultSet executeQuery(String query) throws SQLException {
-        long timeStart = new Date().getTime();
-        ResultSet ret = null;
-
-        try {
-            currentStatement = databaseConnector.m_conn.createStatement();
-            currentStatement.closeOnCompletion();
-            inquirer.logger.debug("About to executeQuery [" + query + "]");
-
-            Explain(currentStatement, query);
-
-            ret = currentStatement.executeQuery(query);
-
-        } catch (SQLException sQLException) {
-            if (sQLException.getErrorCode() == SQLITE_INTERRUPT.code) {
-                inquirer.logger.debug("Statement cancelled");
-                Thread.currentThread().interrupt();
-                throw new RuntimeInterruptException();
-            } else {
-                inquirer.ExceptionHandler.handleException("RunQuery failed: " + sQLException + " query " + query, sQLException);
-                throw sQLException;
-            }
-        } finally {
-            synchronized (currentStatement) {
-                currentStatement = null;
-            }
-        }
-
-        long timeEnd = new Date().getTime();
-        inquirer.logger.debug("\tExecuteQuery execution took " + pDuration(timeEnd - timeStart));
-        return ret;
-
-    }
-
-    static public Statement currentStatement = null;
-
-    public static int runQuery(String query) throws SQLException {
-        long timeStart = new Date().getTime();
-        currentStatement = databaseConnector.m_conn.createStatement();
-        synchronized (currentStatement) {
-            currentStatement.closeOnCompletion();
-            Explain(currentStatement, query);
-        }
-        inquirer.logger.debug("about to runQuery [" + query + "]");
-        int executeUpdate = 0;
-        try {
-            executeUpdate = currentStatement.executeUpdate(query);
-        } catch (SQLException sQLException) {
-            if (sQLException.getErrorCode() == SQLITE_INTERRUPT.code) {
-                inquirer.logger.info("Statement cancelled");
-                Thread.currentThread().interrupt();
-                throw new RuntimeInterruptException();
-            } else {
-                inquirer.ExceptionHandler.handleException("RunQuery failed: " + sQLException + " query " + query, sQLException);
-                throw sQLException;
-            }
-        } finally {
-//            synchronized (currentStatement) {
-            currentStatement = null;
-//            }
-        }
-        long timeEnd = new Date().getTime();
-        inquirer.logger.debug("Statement executed: affected " + executeUpdate + " rows; took " + pDuration(timeEnd - timeStart));
-        if (Thread.currentThread().isInterrupted()) {
-            throw new RuntimeInterruptException();
-        }
-        checkLimitClause(executeUpdate);
-        return executeUpdate;
-//            databaseConnector.m_conn.commit();
+        DatabaseConnector.currentStatement = null;
     }
 
     public ResultSet executeQuery(Object obj, String query) throws SQLException {
@@ -924,491 +1447,15 @@ public class DatabaseConnector {
 
     }
 
-    static private int noAppTypes = -1;
-
-    public static boolean onlyOneApp() throws SQLException {
-        if (noAppTypes < 0) {
-            Integer[] iDs = getIDs("file_logbr", "apptypeid", "where apptypeid>0");
-            noAppTypes = iDs.length;
-        }
-        return noAppTypes < 2;
-    }
-
     public Integer[] getIDs(Object obj, String tab, String retField, String where) throws SQLException {
 //        m_connector.getIDs(this, "select sid from orssess_logbr WHERE "+getWhere("connid", m_ConnIds));
         return (TableExist(tab))
                 ? getIDs(obj, "select distinct " + retField + " from " + tab + " " + where) : null;
     }
 
-    public static String[] getNames(Object obj, String tab, String retField, String where) throws SQLException {
-//        m_connector.getIDs(this, "select sid from orssess_logbr WHERE "+getWhere("connid", m_ConnIds));
-        return (TableExist(tab))
-                ? getNames(obj, "select distinct " + retField + " from " + tab + " " + where) : null;
-    }
-
-    public static ArrayList<NameID> getNamesNameID(Object obj, String tab, String retField, String where) throws SQLException {
-//        m_connector.getIDs(this, "select sid from orssess_logbr WHERE "+getWhere("connid", m_ConnIds));
-        return (TableExist(tab))
-                ? getNamesNameID(obj, "select distinct " + retField + " from " + tab + " " + where) : null;
-    }
-
-    public static String[] getRefNames(ReferenceType refTab, Integer[] ids) throws SQLException {
-        return (TableExist(refTab.toString()) && (ids != null && ids.length > 0))
-                ? getNames("select distinct name from " + refTab.toString() + getWhere("id", ids, true))
-                : null;
-    }
-
-    public static Integer[] translateIDs(ReferenceType fromRef, Integer[] fromIDs, ReferenceType toRef) throws SQLException {
-        String[] refNames = getRefNames(fromRef, fromIDs);
-        if (ArrayUtils.isNotEmpty(refNames)) {
-            return getRefIDs(toRef, refNames);
-        } else {
-            return null;
-        }
-    }
-
-    public static HashMap<Integer, String> getRefs(ReferenceType refTab) throws SQLException {
-        return (TableExist(refTab.toString()))
-                ? getRefs("select id, name from " + refTab.toString())
-                : null;
-    }
-
-    private static HashMap<Integer, String> getRefs(String query) throws SQLException {
-        HashMap<Integer, String> ret = new HashMap();
-
-        ResultSet resultSet = DatabaseConnector.executeQuery(query);
-        ResultSetMetaData rsmd = resultSet.getMetaData();
-
-        if (rsmd.getColumnCount() != 2) {
-            throw new SQLException("getRefs: there are " + rsmd.getColumnCount() + " output columns; has to be only 2");
-        }
-        int cnt = 0;
-        while (resultSet.next()) {
-            Integer id = resultSet.getInt(1);
-            String name = resultSet.getString(2);
-            if (name != null && name.length() > 0 && id != null) {
-                ret.put(id, name);
-                QueryTools.DebugRec(resultSet);
-                cnt++;
-            }
-        }
-        inquirer.logger.debug("\tRetrieved " + cnt + " records");
-//        resultSet.getStatement().close();
-        resultSet.close();
-
-        return ret;
-
-    }
-
-    public static String[] getNames(Object obj, String tab, String retField, String where, String orderBy) throws SQLException {
-//        m_connector.getIDs(this, "select sid from orssess_logbr WHERE "+getWhere("connid", m_ConnIds));
-        return (TableExist(tab))
-                ? getNames(obj, "select distinct " + retField + " from " + tab + " " + where + " order by " + orderBy)
-                : null;
-    }
-
-    static public Integer[] getIDs(String tab, String retField, String where) throws SQLException {
-//        m_connector.getIDs(this, "select sid from orssess_logbr WHERE "+getWhere("connid", m_ConnIds));
-        return (TableExist(tab))
-                ? getIDs("select distinct " + retField + " from " + tab + " " + where)
-                : null;
-    }
-
-    public static Integer[] getRefIDs(ReferenceType rt, String[] names) throws SQLException {
-        if (refTableExist(rt)) {
-            return getIDs(rt.toString(), "id", getWhere("name", names, true));
-        }
-        return new Integer[0];
-    }
-
-    public static Integer[] getRefIDs(ReferenceType rt, String[] names, boolean isRegex) throws SQLException {
-        if (refTableExist(rt)) {
-            return getIDs(rt.toString(), "id", getWhere("name", names, true));
-        }
-        return new Integer[0];
-    }
-
     public Integer[] getIDSubquery(Object obj, String tab, String retField, String Subquery) throws SQLException {
         return (TableExist(tab))
                 ? getIDs(obj, "select distinct " + retField + " from " + tab + " where " + Subquery) : null;
-    }
-
-    public static Integer[] getIDs(Object obj, String query) throws SQLException {
-        ArrayList<Integer> ret = new ArrayList();
-        DatabaseConnector connector = DatabaseConnector.getDatabaseConnector(obj);
-
-        ResultSet resultSet = connector.executeQuery(obj, query);
-        ResultSetMetaData rsmd = resultSet.getMetaData();
-
-        if (rsmd.getColumnCount() != 1) {
-            throw new SQLException("getIDs: there are " + rsmd.getColumnCount() + " output columns; has to be only 1");
-        }
-        int cnt = 0;
-        while (resultSet.next()) {
-            Integer res = resultSet.getInt(1);
-            if (res != null && res > 0) {
-                ret.add(res);
-                QueryTools.DebugRec(resultSet);
-                cnt++;
-            }
-        }
-        inquirer.logger.debug("\tRetrieved " + cnt + " records");
-        resultSet.close();
-
-        return (Integer[]) ret.toArray(new Integer[ret.size()]);
-    }
-
-    public static String[] getNames(String query) throws SQLException {
-        ArrayList<String> ret = new ArrayList();
-
-        ResultSet resultSet = executeQuery(query);
-        ResultSetMetaData rsmd = resultSet.getMetaData();
-
-        if (rsmd.getColumnCount() != 1) {
-            throw new SQLException("getIDs: there are " + rsmd.getColumnCount() + " output columns; has to be only 1");
-        }
-        int cnt = 0;
-        while (resultSet.next()) {
-            String res = resultSet.getString(1);
-            if (res != null && res.length() > 0) {
-                ret.add(res);
-                QueryTools.DebugRec(resultSet);
-                cnt++;
-            }
-        }
-        inquirer.logger.debug("\tRetrieved " + cnt + " records");
-//        resultSet.getStatement().close();
-        resultSet.getStatement().close();
-        resultSet.close();
-
-        return (String[]) ret.toArray(new String[ret.size()]);
-
-    }
-
-    public static ArrayList<NameID> getNamesNameID(Object obj, String query) throws SQLException {
-        ArrayList<NameID> ret = new ArrayList();
-        DatabaseConnector connector = DatabaseConnector.getDatabaseConnector(obj);
-
-        ResultSet resultSet = connector.executeQuery(obj, query);
-        ResultSetMetaData rsmd = resultSet.getMetaData();
-
-        boolean noID = rsmd.getColumnCount() == 1;
-
-        if (rsmd.getColumnCount() != 2 && !noID) {
-            throw new SQLException("getNamesPair: there are " + rsmd.getColumnCount() + " output columns; has to be only 2");
-        }
-        if (!noID && (!textColumn(rsmd.getColumnType(2))
-                || !numColumn(rsmd.getColumnType(1)))) {
-            throw new SQLException("getNamesPair: col[1] is " + rsmd.getColumnType(1) + " expected int;"
-                    + "col[2] is " + rsmd.getColumnType(2) + " expected text;");
-        }
-
-        int cnt = 0;
-        while (resultSet.next()) {
-            String res = null;
-            int aInt = 0;
-            if (noID) {
-                res = resultSet.getString(1);
-            } else {
-                res = resultSet.getString(2);
-                aInt = resultSet.getInt(1);
-            }
-            if (res != null && res.length() > 0) {
-                ret.add(new NameID(res, aInt));
-                QueryTools.DebugRec(resultSet);
-                cnt++;
-            }
-        }
-        inquirer.logger.debug("\tRetrieved " + cnt + " records");
-//        resultSet.getStatement().close();
-        resultSet.close();
-
-        return ret;
-    }
-
-    public static String[] getNames(Object obj, String query) throws SQLException {
-        ArrayList<String> ret = new ArrayList();
-        DatabaseConnector connector = DatabaseConnector.getDatabaseConnector(obj);
-
-        ResultSet resultSet = connector.executeQuery(obj, query);
-        ResultSetMetaData rsmd = resultSet.getMetaData();
-
-        if (rsmd.getColumnCount() != 1) {
-            throw new SQLException("getIDs: there are " + rsmd.getColumnCount() + " output columns; has to be only 1");
-        }
-        int cnt = 0;
-        while (resultSet.next()) {
-            String res = resultSet.getString(1);
-            if (res != null && res.length() > 0) {
-                ret.add(res);
-                QueryTools.DebugRec(resultSet);
-                cnt++;
-            }
-        }
-        inquirer.logger.debug("\tRetrieved " + cnt + " records");
-//        resultSet.getStatement().close();
-        resultSet.close();
-
-        return (String[]) ret.toArray(new String[ret.size()]);
-    }
-
-    public static UTCTimeRange getTimeRange(String[] tabs) throws SQLException {
-        return getTimeRange(tabs, null);
-    }
-
-    static UTCTimeRange getTimeRange(FileInfoType[] tabs, ArrayList<Integer> searchApps) throws SQLException {
-        UTCTimeRange ret = new UTCTimeRange(0, 0);
-        StringBuilder q = new StringBuilder(256);
-        Integer[] arrSearchApps = null;
-        q.append("select min(filestarttime), max(endtime) from file_logbr ");
-
-        if (searchApps != null && searchApps.size() > 0) {
-            arrSearchApps = (Integer[]) searchApps.toArray(new Integer[searchApps.size()]);
-            q.append(getWhere("id", arrSearchApps, true));
-        } else {
-            String[] n = new String[tabs.length];
-            for (int i = 0; i < tabs.length; i++) {
-                n[i] = FileInfoType.getFileType(tabs[i]);
-
-            }
-            q.append(getWhere("apptypeid", ReferenceType.AppType, n, true));
-        }
-
-        ArrayList<ArrayList<Long>> iDsMultiple = getIDsMultiple(q.toString());
-        if (iDsMultiple.size() > 0) {
-            ArrayList<Long> dbRet = iDsMultiple.get(0);
-            Long val = dbRet.get(0);
-            if (val != null && val > 0) {
-                if (ret.getStart() == 0 || ret.getStart() > val) {
-                    ret.setStart(val);
-                }
-            }
-
-            val = dbRet.get(1);
-            if (val != null && val > 0) {
-                if (ret.getEnd() == 0 || ret.getEnd() < val) {
-                    ret.setEnd(val);
-
-                }
-            }
-        }
-        return ret;
-
-    }
-
-    static UTCTimeRange getTimeRange(String[] tabs, ArrayList<Integer> searchApps) throws SQLException {
-        UTCTimeRange ret = new UTCTimeRange(0, 0);
-        StringBuilder q = new StringBuilder(256);
-        Integer[] arrSearchApps = null;
-        if (searchApps != null && searchApps.size() > 0) {
-            arrSearchApps = (Integer[]) searchApps.toArray(new Integer[searchApps.size()]);
-        }
-
-        for (String tab : tabs) {
-
-            if (TableExist(tab)) {
-                q.setLength(0);
-                q.append("select min(time), max(time) from ").append(tab);
-                if (arrSearchApps != null) {
-                    q.append(" where fileid in (select id from file_logbr ")
-                            .append(getWhere("appnameid", arrSearchApps, true))
-                            .append(")");
-                }
-
-                ArrayList<ArrayList<Long>> iDsMultiple = getIDsMultiple(q.toString());
-                if (iDsMultiple.size() > 0) {
-                    ArrayList<Long> dbRet = iDsMultiple.get(0);
-                    Long val = dbRet.get(0);
-                    if (val != null && val > 0) {
-                        if (ret.getStart() == 0 || ret.getStart() > val) {
-                            ret.setStart(val);
-                        }
-                    }
-
-                    val = dbRet.get(1);
-                    if (val != null && val > 0) {
-                        if (ret.getEnd() == 0 || ret.getEnd() < val) {
-                            ret.setEnd(val);
-
-                        }
-                    }
-                }
-
-            }
-
-        }
-        if (ret.getStart() == 0 && ret.getEnd() == 0) {
-            return null;
-        }
-        return ret;
-    }
-
-    public static UTCTimeRange getTimeRange(String tab) throws SQLException {
-        return getTimeRange(new String[]{tab});
-    }
-
-    public static ArrayList<ArrayList<Long>> getIDsMultiple(String query) throws SQLException {
-
-        ResultSet rs = executeQuery(query);
-
-        ResultSetMetaData rsmd = rs.getMetaData();
-
-        ArrayList<ArrayList<Long>> ret = new ArrayList<>();
-        int columnCount = rsmd.getColumnCount();
-
-        int cnt = 0;
-        while (rs.next()) {
-            ArrayList<Long> row = new ArrayList<>();
-            for (int i = 1; i <= columnCount; i++) {
-                row.add(rs.getLong(i));
-            }
-            ret.add(row);
-            QueryTools.DebugRec(rs);
-            cnt++;
-        }
-        inquirer.logger.debug("\tRetrieved " + cnt + " records");
-        rs.getStatement().close();
-        rs.close();
-
-        return ret;
-
-    }
-
-    public static FullTableColors getFullTableColors(String query) throws SQLException {
-        return getFullTableColors(query, null);
-    }
-
-    static FullTableColors getFullTableColors(String query, String filestarttime) throws SQLException {
-
-        FullTableColors ret;
-
-        ResultSet rs = executeQuery(query);
-
-        ResultSetMetaData rsmd = rs.getMetaData();
-
-        ret = new FullTableColors();
-        ret.setMetaData(rsmd);
-        if (filestarttime != null) {
-            ret.setFieldColorChange(filestarttime);
-        }
-        int columnCount = rsmd.getColumnCount();
-
-        int cnt = 0;
-        while (rs.next()) {
-            ArrayList<Object> row = new ArrayList<>(columnCount);
-            for (int i = 1; i <= columnCount; i++) {
-                row.add(rs.getObject(i));
-            }
-            QueryTools.DebugRec(rs);
-            ret.addRow(row);
-            cnt++;
-        }
-        inquirer.logger.debug("\tRetrieved " + cnt + " records");
-        rs.getStatement().close();
-        rs.close();
-
-        return ret;
-
-    }
-
-    public static FullTable getFullTable(String query) throws SQLException {
-
-        FullTable ret;
-
-        ResultSet rs = executeQuery(query);
-
-        ResultSetMetaData rsmd = rs.getMetaData();
-
-        ret = new FullTable();
-        ret.setMetaData(rsmd);
-
-        int columnCount = rsmd.getColumnCount();
-
-        int cnt = 0;
-        while (rs.next()) {
-            ArrayList<Object> row = new ArrayList<>(columnCount);
-            for (int i = 1; i <= columnCount; i++) {
-                row.add(rs.getObject(i));
-            }
-            QueryTools.DebugRec(rs);
-            ret.addRow(row);
-            cnt++;
-        }
-        inquirer.logger.debug("\tRetrieved " + cnt + " records");
-        rs.getStatement().close();
-        rs.close();
-
-        return ret;
-
-    }
-
-    public static String getValue(String exp, String p) throws SQLException {
-
-        String s = exp.replaceAll("\\$1\\b", "'" + p + "'");
-
-        Statement createStatement = databaseConnector.m_conn.createStatement();
-
-        ResultSet rs = createStatement.executeQuery(s);
-
-//        ResultSetMetaData rsmd = rs.getMetaData();
-//        if (rsmd.getColumnCount() != 1) {
-//            throw new Exception("getValue: there are " + rsmd.getColumnCount() + " output columns; has to be only 1");
-//        }
-        while (rs.next()) {
-            return rs.getString(1);
-        }
-        inquirer.logger.info("\tgetValue " + " nothing returned");
-        return null;
-    }
-
-    public static Integer[] getIDs(String query) throws SQLException {
-        ArrayList<Integer> ret = new ArrayList();
-
-        ResultSet rs = executeQuery(query);
-        ResultSetMetaData rsmd = rs.getMetaData();
-
-        if (rsmd.getColumnCount() != 1) {
-            throw new SQLException("getIDs: there are " + rsmd.getColumnCount() + " output columns; has to be only 1");
-        }
-        int cnt = 0;
-        while (rs.next()) {
-            Integer res = rs.getInt(1);
-            if (res != null && res > 0) {
-                ret.add(res);
-                cnt++;
-            }
-        }
-        inquirer.logger.debug("\tRetrieved " + cnt + " records");
-        Integer[] ids = (Integer[]) ret.toArray(new Integer[ret.size()]);
-        QueryTools.DebugIDs(ids);
-        rs.getStatement().close();
-        rs.close();
-        return ids;
-    }
-
-    public static void GracefulClose() {
-        try {
-            if (databaseConnector != null) {
-                Enumeration e = databaseConnector.m_activeStatements.elements();
-                for (int i = 0; e.hasMoreElements(); i++) {
-                    Statement stmt = (Statement) e.nextElement();
-                    stmt.close();
-                }
-                databaseConnector.m_activeStatements.clear();
-
-                for (int i = 0; i < databaseConnector.m_freeStatements.size(); i++) {
-                    Statement stmt = (Statement) databaseConnector.m_freeStatements.get(i);
-                    stmt.close();
-                }
-                databaseConnector.m_freeStatements.clear();
-
-                if (databaseConnector.m_conn != null) {
-                    databaseConnector.m_conn.close();
-                }
-            }
-        } catch (SQLException sQLException) {
-            inquirer.logger.error("Exception closing", sQLException);
-        }
     }
 
     public int PrepareStatement(String query) {
@@ -1438,142 +1485,71 @@ public class DatabaseConnector {
         return null;
     }
 
-    static String[] getRefNames(Object obj, String tab) throws SQLException {
-        return getRefNames(obj, tab, null, null);
+    abstract class ILoadFun {
+
+        public abstract String[] getNames(String id) throws SQLException;
     }
 
-    static String[] getRefNames(Object obj, String tab, String CheckTab, String CheckIDField) throws SQLException {
-        return getRefNames(obj, tab, CheckTab, CheckIDField, null);
-    }
+    class IDsToName {
 
-    static String[] getRefNames(Object obj, String tab, String CheckTab, String CheckIDField, String CheckIDField1) throws SQLException {
+        private final HashMap<String, IDToName> idsToName;
 
-        if (!TableExist(tab)) {
-            return null;
+        public IDsToName() {
+            this.idsToName = new HashMap<>();
         }
-        ArrayList<String> ret = new ArrayList();
-        DatabaseConnector connector = DatabaseConnector.getDatabaseConnector(obj);
 
-        StringBuilder q = new StringBuilder(256);
-        q.append("select name from ").append(tab).append("");//remove 'distinct' from here. Uniquness of names is ensured by parser,
-        //so no need to sort again
-        if (CheckTab != null && CheckIDField != null) {
-            q.append(" where id in (select distinct ").append(CheckIDField).append(" from ").append(CheckTab);
-            if (CheckIDField1 != null) {
-                q.append("\nunion\nselect distinct ").append(CheckIDField1).append(" from ").append(CheckTab);
+        public void addFun(String funName, ILoadFun fun) throws SQLException {
+            idsToName.put(funName, new IDToName(fun));
+        }
+
+        public String getNames(String fName, String id) throws SQLException {
+            if (fName != null && id != null) {
+                IDToName idn = idsToName.get(fName);
+                if (idn != null) {
+                    String[] refNames = idn.getNames(id);
+                    if (refNames != null && refNames.length > 0) {
+                        StringBuilder res = new StringBuilder(120);
+                        for (String refName : refNames) {
+                            if (res.length() > 0) {
+                                res.append(",");
+                            }
+                            res.append(refName);
+                        }
+                        res.append("(").append(id).append(")");
+                        return (res.toString());
+                    }
+
+                }
+                inquirer.logger.error("Const not found. fn:[" + fName + "} id:[" + id + "]");
+            }
+            return id;
+
+        }
+
+        class IDToName {
+
+            private final ILoadFun fun;
+            private final HashMap<String, String[]> idToName;
+
+            public IDToName(ILoadFun fun) {
+                this.fun = fun;
+                idToName = new HashMap<>();
             }
 
-            q.append("\n)");
-        }
-        q.append("\norder by name");
-        ResultSet resultSet = connector.executeQuery(obj, q.toString());
-        ResultSetMetaData rsmd = resultSet.getMetaData();
-
-        if (rsmd.getColumnCount() != 1) {
-            throw new SQLException("getRefNames: there are " + rsmd.getColumnCount() + " output columns; has to be only 1");
-        }
-        int cnt = 0;
-        while (resultSet.next()) {
-            String res = resultSet.getString(1);
-            if (res != null && res.length() > 0) {
-                ret.add(res);
-                QueryTools.DebugRec(resultSet);
-                cnt++;
-            }
-        }
-        inquirer.logger.debug("\tRetrieved " + cnt + " records");
-        resultSet.close();
-
-        return (String[]) ret.toArray(new String[ret.size()]);
-    }
-
-    static ArrayList<NameID> getRefNamesNameID(Object obj, String tab, String CheckTab, String CheckIDField, String CheckIDField1) throws SQLException {
-
-        if (!TableExist(tab) || (CheckTab != null && !TableExist(CheckTab))) {
-            return null;
-        }
-        ArrayList<NameID> ret = new ArrayList();
-        DatabaseConnector connector = DatabaseConnector.getDatabaseConnector(obj);
-
-        StringBuilder q = new StringBuilder(256);
-        q.append("select id, name from ").append(tab).append("");//remove 'distinct' from here. Uniquness of names is ensured by parser,
-        //so no need to sort again
-        if (CheckTab != null && CheckIDField != null) {
-            q.append(" where id in (select distinct ").append(CheckIDField).append(" from ").append(CheckTab);
-            if (CheckIDField1 != null) {
-                q.append("\nunion\nselect distinct ").append(CheckIDField1).append(" from ").append(CheckTab);
+            public String[] getNames(String id) throws SQLException {
+                if (idToName.containsKey(id)) {
+                    return idToName.get(id);
+                } else {
+                    String[] names = fun.getNames(id);
+                    if (names != null && names.length == 0) {
+                        names = null;
+                    }
+                    idToName.put(id, names);
+                    return names;
+                }
             }
 
-            q.append("\n)");
         }
-        q.append("\norder by name");
-        ResultSet resultSet = connector.executeQuery(obj, q.toString());
-        if (resultSet == null) {
-            return null;
-        }
-        ResultSetMetaData rsmd = resultSet.getMetaData();
-
-        if (rsmd.getColumnCount() != 2) {
-            throw new SQLException("getRefNames: there are " + rsmd.getColumnCount() + " output columns; has to be only 2");
-        }
-        if (!textColumn(rsmd.getColumnType(2))
-                || !numColumn(rsmd.getColumnType(1))) {
-            throw new SQLException("getNamesPair: col[1] is " + rsmd.getColumnType(1) + " expected int;"
-                    + "col[2] is " + rsmd.getColumnType(2) + " expected text;");
-        }
-
-        int cnt = 0;
-        while (resultSet.next()) {
-            String res = resultSet.getString(2);
-            int aInt = resultSet.getInt(1);
-            if (res != null && res.length() > 0) {
-                ret.add(new NameID(res, aInt));
-                QueryTools.DebugRec(resultSet);
-                cnt++;
-            }
-        }
-        inquirer.logger.debug("\tRetrieved " + cnt + " records");
-        resultSet.close();
-
-        return ret;
-    }
-
-    static ArrayList<NameID> getRefNameIDs(Object obj, String tab, String subQuery) throws SQLException {
-        return getRefNameIDs(obj, tab, subQuery, false);
-    }
-
-    static ArrayList<NameID> getRefNameIDs(Object obj, String tab, String subQuery, boolean addOrderBy) throws SQLException {
-        if (!TableExist(tab)) {
-            return null;
-        }
-        ArrayList<NameID> ret = new ArrayList();
-        StringBuilder query = new StringBuilder("select id, name from ");
-        query.append(tab);
-        if (subQuery != null) {
-            query.append(" where ( ").append(subQuery).append(" )");
-        }
-        if (addOrderBy) {
-            query.append(" order by name");
-        }
-        ResultSet resultSet = databaseConnector.executeQuery(query.toString());
-        ResultSetMetaData rsmd = resultSet.getMetaData();
-
-        if (rsmd.getColumnCount() != 2) {
-            throw new SQLException("getRefNameIDs: there are " + rsmd.getColumnCount() + " output columns; has to be only 2");
-        }
-        int cnt = 0;
-        while (resultSet.next()) {
-            NameID res = new NameID(resultSet.getString(2), resultSet.getInt(1));
-            if (res != null) {
-                ret.add(res);
-                QueryTools.DebugRec(resultSet);
-                cnt++;
-            }
-        }
-        inquirer.logger.debug("\tRetrieved " + cnt + " records");
-        resultSet.close();
-
-        return ret;
     }
 
 }

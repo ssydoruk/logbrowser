@@ -8,7 +8,7 @@ package com.myutils.logbrowser.indexer;
 import java.util.ArrayList;
 import java.util.regex.Pattern;
 
-public class OCSHTTP extends Message {
+public final class OCSHTTP extends Message {
 
     final private static Pattern regIsInbound = Pattern.compile("(::mesage received)$");
 
@@ -29,6 +29,7 @@ public class OCSHTTP extends Message {
 
     final private static Pattern regGSW_CHAIN_ID = Pattern.compile("^\\s+\'GSW_CHAIN_ID\'.+= (\\d+)");
     final private static Pattern regchain_id = Pattern.compile("^\\s+\'chain_id\'.+= (\\d+)");
+    final private static Pattern regGSW_CAMPAIGN = Pattern.compile("^\\s+\'GSW_CAMPAIGN_NAME\'.+= \'([^\']+)\'");
 
     public OCSHTTP(ArrayList messageLines) {
         super(TableType.OCSHTTP, messageLines);
@@ -76,7 +77,6 @@ public class OCSHTTP extends Message {
         return ret;
     }
 
-    final private static Pattern regGSW_CAMPAIGN = Pattern.compile("^\\s+\'GSW_CAMPAIGN_NAME\'.+= \'([^\']+)\'");
 
     String GetCampaignName() {
         return FindByRx(regGSW_CAMPAIGN, 1, (String) null);

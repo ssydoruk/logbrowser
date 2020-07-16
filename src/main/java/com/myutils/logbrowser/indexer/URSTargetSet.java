@@ -10,10 +10,11 @@ import java.util.regex.Pattern;
 
 public final class URSTargetSet extends Message {
 
-    private String obj;
 
     private static final Pattern ptTargetItem = Pattern.compile("^[\\(\\s]*(.+)@[^@]+\\.(\\w{1,2})[\\)\\s]*$");
+    private String obj;
     private String objType;
+    private String target;
 
     URSTargetSet(String target, String targetItem) {
         this(target);
@@ -39,6 +40,9 @@ public final class URSTargetSet extends Message {
         this();
         this.target = target;
     }
+    public URSTargetSet() {
+        super(TableType.URSTargetSet);
+    }
 
     public String getObject() {
         return obj;
@@ -50,11 +54,6 @@ public final class URSTargetSet extends Message {
 
     public String getTarget() {
         return target;
-    }
-    private String target;
-
-    public URSTargetSet() {
-        super(TableType.URSTargetSet);
     }
 
 }

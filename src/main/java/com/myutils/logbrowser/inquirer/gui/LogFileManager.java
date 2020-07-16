@@ -39,6 +39,7 @@ public class LogFileManager {
     }
 
     HashSet<String> usedArchives = new HashSet<>();
+    private final HashMap<String, LogFile> logFileStore = new HashMap();
 
 //    HashMap<LogFile, ZipEntry> openedZIPFiles;
     void unpackFile(LogFile logFile) throws FileNotFoundException, IOException {
@@ -81,7 +82,6 @@ public class LogFileManager {
         }
     }
 
-    private final HashMap<String, LogFile> logFileStore = new HashMap();
 
     /**
      * Used to contain uniqueness of LogFile objects for application, because

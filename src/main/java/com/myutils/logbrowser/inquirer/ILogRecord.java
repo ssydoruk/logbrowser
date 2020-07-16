@@ -11,20 +11,22 @@ import java.util.Properties;
 
 public abstract class ILogRecord {
 
-    private int m_appid;
-    private int appnameid;
 
     private static long totalBytes = 0;
+    private static final HashSet<String> stdFields = new HashSet<String>(Arrays.asList(
+            new String[]{"id", "time",
+                "fileid", "fileOffset", "filebytes", "line",
+                "filename", "time", "app", "component"}));
+    private static String[] sInboundFieldNames = {"inbound"
+    };
 
     static public void resetTotalBytes() {
         totalBytes = 0;
     }
+    private int m_appid;
+    private int appnameid;
     private int id;
 
-    @Override
-    public String toString() {
-        return "ILogRecord{" + "m_fields=" + m_fields + ", m_fieldsAll=" + m_fieldsAll + ", m_isMarked=" + m_isMarked + ", m_id=" + getID() + ", m_unixtime=" + m_unixtime + ", m_fileOffset=" + m_fileOffset + ", m_fileBytes=" + m_fileBytes + ", m_fileId=" + GetFileId() + ", m_line=" + GetLine() + ", m_fileName=" + GetFileName() + ", m_time=" + m_time + ", m_appName=" + getM_appName() + ", m_type=" + m_type + ", m_component=" + m_component + '}';
-    }
 
     public Properties m_fields;
     public Properties m_fieldsAll;
@@ -40,6 +42,24 @@ public abstract class ILogRecord {
     private MsgType m_type;
     private int m_component;
     private ArrayList<String> timeStampFields = new ArrayList<>();
+    private ICalculatedFields calcFields;
+    private Date dateTime = null;
+    private LogFile logFile = null;
+    public ILogRecord() {
+        m_fields = new Properties();
+        m_fieldsAll = new Properties();
+    }
+    public ILogRecord(ResultSet rs, MsgType type) throws SQLException {
+        this();
+        if (Thread.currentThread().isInterrupted()) {
+            throw new RuntimeInterruptException();
+        }
+        initRecord(rs, type);
+    }
+    @Override
+    public String toString() {
+        return "ILogRecord{" + "m_fields=" + m_fields + ", m_fieldsAll=" + m_fieldsAll + ", m_isMarked=" + m_isMarked + ", m_id=" + getID() + ", m_unixtime=" + m_unixtime + ", m_fileOffset=" + m_fileOffset + ", m_fileBytes=" + m_fileBytes + ", m_fileId=" + GetFileId() + ", m_line=" + GetLine() + ", m_fileName=" + GetFileName() + ", m_time=" + m_time + ", m_appName=" + getM_appName() + ", m_type=" + m_type + ", m_component=" + m_component + '}';
+    }
 
     void setTimestampField(String prevTimestamp) {
         timeStampFields.add(prevTimestamp);
@@ -58,15 +78,10 @@ public abstract class ILogRecord {
 
     }
 
-    private static final HashSet<String> stdFields = new HashSet<String>(Arrays.asList(
-            new String[]{"id", "time",
-                "fileid", "fileOffset", "filebytes", "line",
-                "filename", "time", "app", "component"}));
 
     private boolean IsStdField(String name) {
         return stdFields.contains(name.toLowerCase());
     }
-    private ICalculatedFields calcFields;
 
     public ICalculatedFields getCalcFields() {
         return calcFields;
@@ -77,10 +92,6 @@ public abstract class ILogRecord {
         m_fieldsAll.putAll(calcFields.calc(m_fieldsAll));
     }
 
-    public ILogRecord() {
-        m_fields = new Properties();
-        m_fieldsAll = new Properties();
-    }
 
     public void initRecord(ResultSet rs, MsgType type) throws SQLException {
         try {
@@ -135,13 +146,6 @@ public abstract class ILogRecord {
         return id;
     }
 
-    public ILogRecord(ResultSet rs, MsgType type) throws SQLException {
-        this();
-        if (Thread.currentThread().isInterrupted()) {
-            throw new RuntimeInterruptException();
-        }
-        initRecord(rs, type);
-    }
 
     public int getAppnameid() {
         return appnameid;
@@ -151,7 +155,6 @@ public abstract class ILogRecord {
         return m_appid;
     }
 
-    private Date dateTime = null;
 
     public Date getDateTime() {
         return dateTime;
@@ -201,7 +204,6 @@ public abstract class ILogRecord {
         return m_line;
     }
 
-    private LogFile logFile = null;
 
     public LogFile GetFileName() {
         if (logFile == null) {
@@ -294,8 +296,6 @@ public abstract class ILogRecord {
         return 0;
     }
 
-    private static String[] sInboundFieldNames = {"inbound"
-    };
 
     private boolean getBool(Object obj) {
         try {

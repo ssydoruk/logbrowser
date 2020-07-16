@@ -19,41 +19,68 @@ public class WorkspaceResults extends IQueryResults {
 
     private static final org.apache.logging.log4j.Logger logger = LogManager.getLogger();
 
+
+    public static final int TLIB = 0x01;
+    public static final int ISCC = 0x02;
+    public static final int TC = 0x04;
+    public static final int SIP = 0x08;
+    public static final int PROXY = 0x10;
+    private static String[] RequestsToShow = {"RequestMakePredictiveCall", "RequestMakeCall"};
+    private static String[] EventsToShow = {"EventDialing", "EventNetworkReached"};
+    private static final boolean TLIBNowRequests = "true".equals(System.getProperty("tlib.norequest"));
     private Object cidFinder;
     private ArrayList<NameID> appsType;
 
+    private String m_tlibFilter;
+
+    private int m_componentFilter;
+    private UTCTimeRange timeRange = null;
+    public WorkspaceResults(QueryDialogSettings qdSettings) {
+        super(qdSettings);
+        if (repComponents.isEmpty()) {
+            loadStdOptions();
+        }
+        addSelectionType(SelectionType.NO_SELECTION);
+        addSelectionType(SelectionType.GUESS_SELECTION);
+        addSelectionType(SelectionType.CONNID);
+        addSelectionType(SelectionType.CALLID);
+        addSelectionType(SelectionType.DN);
+        addSelectionType(SelectionType.PEERIP);
+        addSelectionType(SelectionType.AGENTID);
+        addSelectionType(SelectionType.UUID);
+        addSelectionType(SelectionType.REFERENCEID);
+    }
     @Override
     public void Retrieve(QueryDialog dlg, SelectionType key, String searchID) throws SQLException {
         runSelectionQuery(dlg, key, new IDsFinder(dlg, key, searchID));
         doSort();
 
     }
-
     @Override
-    FullTableColors getAll(QueryDialog qd) throws SQLException {
-        try {
-            String tmpTable = "callFlowTmp";
-            DynamicTreeNode.setNoRefNoLoad(true);
-
-            DatabaseConnector.dropTable(tmpTable);
-            inquirer.logger.info("Building temp tables");
-            String tab = "wstlib";
-
-            DatabaseConnector.runQuery("create temp table " + tmpTable + " ("
-                    + "connectionidid int"
-                    + ",callidid int"
-                    + ",started timestamp"
-                    + ",ended timestamp"
-                    + ",thisdnid int"
-                    + ",otherdnid int"
-                    + ",aniid int"
-                    + ",nameid int"
-                    + ",dnisid int"
-                    + ",isconsult bit"
-                    + ",isiscc bit"
-                    + ")\n;"
-            );
-
+            FullTableColors getAll(QueryDialog qd) throws SQLException {
+                try {
+                    String tmpTable = "callFlowTmp";
+                    DynamicTreeNode.setNoRefNoLoad(true);
+                    
+                    DatabaseConnector.dropTable(tmpTable);
+                    inquirer.logger.info("Building temp tables");
+                    String tab = "wstlib";
+                    
+                    DatabaseConnector.runQuery("create temp table " + tmpTable + " ("
+                            + "connectionidid int"
+                            + ",callidid int"
+                            + ",started timestamp"
+                            + ",ended timestamp"
+                            + ",thisdnid int"
+                            + ",otherdnid int"
+                            + ",aniid int"
+                            + ",nameid int"
+                            + ",dnisid int"
+                            + ",isconsult bit"
+                            + ",isiscc bit"
+                            + ")\n;"
+                    );
+                    
 //            Wheres wh = new Wheres();
 //            wh.addWhere(IQuery.getCheckedWhere("ThisDNid", ReferenceType.DN,
 //                    FindNode(repComponents.getRoot(), DialogItem.TLIB_CALLS, DialogItem.TLIB_CALLS_TEVENT, DialogItem.TLIB_CALLS_TEVENT_DN)), "OR");
@@ -61,79 +88,66 @@ public class WorkspaceResults extends IQueryResults {
 //                    FindNode(repComponents.getRoot(), DialogItem.TLIB_CALLS, DialogItem.TLIB_CALLS_TEVENT, DialogItem.TLIB_CALLS_TEVENT_DN)), "OR");
 //
 //            String dnWhere = wh.makeWhere("AND", false);
-            Wheres wh = new Wheres();
-            wh.addWhere(IQuery.getFileFilters(tab, "fileid", qd.getSearchApps(false)), "AND");
-            wh.addWhere(IQuery.getDateTimeFilters(tab, "time", qd.getTimeRange()), "AND");
-            DatabaseConnector.runQuery("insert into " + tmpTable + " (connectionidid, started, ended)"
-                    + "\nselect distinct connectionidid, min(time), max(time) from " + tab
-                    + "\n" + wh.makeWhere(true)
-                    + "\ngroup by 1;");
+Wheres wh = new Wheres();
+wh.addWhere(IQuery.getFileFilters(tab, "fileid", qd.getSearchApps(false)), "AND");
+wh.addWhere(IQuery.getDateTimeFilters(tab, "time", qd.getTimeRange()), "AND");
+DatabaseConnector.runQuery("insert into " + tmpTable + " (connectionidid, started, ended)"
+        + "\nselect distinct connectionidid, min(time), max(time) from " + tab
+        + "\n" + wh.makeWhere(true)
+        + "\ngroup by 1;");
 
-            tab = "sipep";
-            wh = new Wheres();
-            wh.addWhere(IQuery.getFileFilters(tab, "fileid", qd.getSearchApps(false)), "AND");
-            wh.addWhere(IQuery.getDateTimeFilters(tab, "time", qd.getTimeRange()), "AND");
-            DatabaseConnector.runQuery("insert into " + tmpTable + " (callidid, started, ended)"
-                    + "\nselect distinct callidid, min(time), max(time) from " + tab
-                    + "\n" + wh.makeWhere(true)
-                    + "\ngroup by 1;");
+tab = "sipep";
+wh = new Wheres();
+wh.addWhere(IQuery.getFileFilters(tab, "fileid", qd.getSearchApps(false)), "AND");
+wh.addWhere(IQuery.getDateTimeFilters(tab, "time", qd.getTimeRange()), "AND");
+DatabaseConnector.runQuery("insert into " + tmpTable + " (callidid, started, ended)"
+        + "\nselect distinct callidid, min(time), max(time) from " + tab
+        + "\n" + wh.makeWhere(true)
+        + "\ngroup by 1;");
 
-            DatabaseConnector.runQuery("create index idx_" + tmpTable + "connID on " + tmpTable + "(connectionidid);");
-            DatabaseConnector.runQuery("create index idx_" + tmpTable + "started on " + tmpTable + "(started);");
+DatabaseConnector.runQuery("create index idx_" + tmpTable + "connID on " + tmpTable + "(connectionidid);");
+DatabaseConnector.runQuery("create index idx_" + tmpTable + "started on " + tmpTable + "(started);");
 
-            DatabaseConnector.runQuery("create index idx_" + tmpTable + "thisdnid on " + tmpTable + "(thisdnid);");
+DatabaseConnector.runQuery("create index idx_" + tmpTable + "thisdnid on " + tmpTable + "(thisdnid);");
 
-            DatabaseConnector.runQuery("create index idx_" + tmpTable + "otherdnid on " + tmpTable + "(otherdnid);");
+DatabaseConnector.runQuery("create index idx_" + tmpTable + "otherdnid on " + tmpTable + "(otherdnid);");
 
-            DatabaseConnector.runQuery("create index idx_" + tmpTable + "nameid on " + tmpTable + "(nameid);");
-            TableQuery tabReport = new TableQuery(tmpTable);
-            tabReport.addOutField("UTCtoDateTime(started, \"YYYY-MM-dd HH:mm:ss.SSS\") started");
-            tabReport.addOutField("UTCtoDateTime(ended, \"YYYY-MM-dd HH:mm:ss.SSS\") ended");
-            tabReport.addOutField("jduration(ended-started) duration ");
-            tabReport.setAddAll(false);
+DatabaseConnector.runQuery("create index idx_" + tmpTable + "nameid on " + tmpTable + "(nameid);");
+TableQuery tabReport = new TableQuery(tmpTable);
+tabReport.addOutField("UTCtoDateTime(started, \"YYYY-MM-dd HH:mm:ss.SSS\") started");
+tabReport.addOutField("UTCtoDateTime(ended, \"YYYY-MM-dd HH:mm:ss.SSS\") ended");
+tabReport.addOutField("jduration(ended-started) duration ");
+tabReport.setAddAll(false);
 
-            tabReport.addRef("connectionidid", "connectionid", ReferenceType.ConnID.toString(), FieldType.Optional);
-            tabReport.addRef("callidid", "callid", ReferenceType.SIPCALLID.toString(), FieldType.Optional);
-            tabReport.addRef("nameid", "\"First TEvent\"", ReferenceType.TEvent.toString(), FieldType.Optional);
-            tabReport.setOrderBy(tabReport.getTabAlias() + ".started");
-            FullTableColors currTable = tabReport.getFullTable();
+tabReport.addRef("connectionidid", "connectionid", ReferenceType.ConnID.toString(), FieldType.Optional);
+tabReport.addRef("callidid", "callid", ReferenceType.SIPCALLID.toString(), FieldType.Optional);
+tabReport.addRef("nameid", "\"First TEvent\"", ReferenceType.TEvent.toString(), FieldType.Optional);
+tabReport.setOrderBy(tabReport.getTabAlias() + ".started");
+FullTableColors currTable = tabReport.getFullTable();
 
-            return currTable; //To change body of generated methods, choose Tools | Templates.
-        } catch (Exception ex) {
-            inquirer.ExceptionHandler.handleException(this.getClass().toString(), ex);
-        } finally {
-            DynamicTreeNode.setNoRefNoLoad(false);
-
-        }
-        return null;
-    }
-
-    @Override
-    SearchFields getSearchField() {
-        SearchFields ret = new SearchFields();
-        ret.addRecMap(FileInfoType.type_CallManager, new Pair<>(SelectionType.CONNID, "connectionid"));
-        return ret;
-    }
-
-    @Override
-    public UTCTimeRange refreshTimeRange(ArrayList<Integer> searchApps) throws SQLException {
-        return DatabaseConnector.getTimeRange(new String[]{"sipep", "wstlib"}, searchApps);
-    }
-
-    @Override
-    public UTCTimeRange getTimeRange() throws SQLException {
-        return DatabaseConnector.getTimeRange(new String[]{"sipep", "wstlib"});
-    }
-
-    public static final int TLIB = 0x01;
-    public static final int ISCC = 0x02;
-    public static final int TC = 0x04;
-    public static final int SIP = 0x08;
-    public static final int PROXY = 0x10;
-
-    private String m_tlibFilter;
-
-    private int m_componentFilter;
+return currTable; //To change body of generated methods, choose Tools | Templates.
+                } catch (Exception ex) {
+                    inquirer.ExceptionHandler.handleException(this.getClass().toString(), ex);
+                } finally {
+                    DynamicTreeNode.setNoRefNoLoad(false);
+                    
+                }
+                return null;
+            }
+            @Override
+            SearchFields getSearchField() {
+                SearchFields ret = new SearchFields();
+                ret.addRecMap(FileInfoType.type_CallManager, new Pair<>(SelectionType.CONNID, "connectionid"));
+                return ret;
+            }
+            @Override
+            public UTCTimeRange refreshTimeRange(ArrayList<Integer> searchApps) throws SQLException {
+                return DatabaseConnector.getTimeRange(new String[]{"sipep", "wstlib"}, searchApps);
+            }
+            @Override
+            public UTCTimeRange getTimeRange() throws SQLException {
+                return DatabaseConnector.getTimeRange(new String[]{"sipep", "wstlib"});
+            }
 
     @Override
     public String getReportSummary() {
@@ -180,21 +194,6 @@ public class WorkspaceResults extends IQueryResults {
 
     }
 
-    public WorkspaceResults(QueryDialogSettings qdSettings) {
-        super(qdSettings);
-        if (repComponents.isEmpty()) {
-            loadStdOptions();
-        }
-        addSelectionType(SelectionType.NO_SELECTION);
-        addSelectionType(SelectionType.GUESS_SELECTION);
-        addSelectionType(SelectionType.CONNID);
-        addSelectionType(SelectionType.CALLID);
-        addSelectionType(SelectionType.DN);
-        addSelectionType(SelectionType.PEERIP);
-        addSelectionType(SelectionType.AGENTID);
-        addSelectionType(SelectionType.UUID);
-        addSelectionType(SelectionType.REFERENCEID);
-    }
 
     public void AddComponent(int filter) {
         m_componentFilter = m_componentFilter | filter;
@@ -206,8 +205,6 @@ public class WorkspaceResults extends IQueryResults {
         }
     }
 
-    private static String[] RequestsToShow = {"RequestMakePredictiveCall", "RequestMakeCall"};
-    private static String[] EventsToShow = {"EventDialing", "EventNetworkReached"};
 
     private void addSIPReportType(DynamicTreeNode<OptionNode> root) {
         DynamicTreeNode<OptionNode> nd = new DynamicTreeNode<>(new OptionNode(true, DialogItem.TLIB_CALLS_SIP));
@@ -322,7 +319,6 @@ public class WorkspaceResults extends IQueryResults {
     void SetConfig(InquirerCfg cr) {
 //        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
-    private UTCTimeRange timeRange = null;
 
     @Override
     public void Retrieve(QueryDialog dlg) throws SQLException {
@@ -409,7 +405,6 @@ public class WorkspaceResults extends IQueryResults {
         }
     }
 
-    private static final boolean TLIBNowRequests = "true".equals(System.getProperty("tlib.norequest"));
 
     private void RetrieveTLib(QueryDialog dlg, DynamicTreeNode<OptionNode> eventsSettings, IDsFinder cidFinder) throws SQLException {
         if (isChecked(eventsSettings)) {

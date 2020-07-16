@@ -33,12 +33,12 @@ public class ReportItem extends IReportConfigItem {
 
         ArrayList<ComponentAttribute> attrs = new ArrayList<>();
 
-        public ArrayList<ComponentAttribute> getAttrs() {
-            return attrs;
-        }
 
         public ReportComponent(IReportConfigItem _parent, String name) {
             super(_parent, name);
+        }
+        public ArrayList<ComponentAttribute> getAttrs() {
+            return attrs;
         }
 
         ComponentAttribute addAttribute(String metric_type) {

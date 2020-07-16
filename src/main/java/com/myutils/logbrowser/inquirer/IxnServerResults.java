@@ -19,6 +19,20 @@ public class IxnServerResults extends IQueryResults {
 
     private int m_componentFilter;
     private ArrayList<NameID> appType = null;
+    private IDsFinder cidFinder = null;
+    public IxnServerResults(QueryDialogSettings qdSettings) throws SQLException {
+        super(qdSettings);
+        if (repComponents.isEmpty()) {
+            loadStdOptions();
+        }
+        addSelectionType(SelectionType.NO_SELECTION);
+        addSelectionType(SelectionType.GUESS_SELECTION);
+        addSelectionType(SelectionType.CONNID);
+        addSelectionType(SelectionType.IXN);
+        addSelectionType(SelectionType.QUEUE);
+        addSelectionType(SelectionType.AGENT);
+        addSelectionType(SelectionType.REFERENCEID);
+    }
 
     @Override
     public String getReportSummary() {
@@ -86,19 +100,6 @@ public class IxnServerResults extends IQueryResults {
 
     }
 
-    public IxnServerResults(QueryDialogSettings qdSettings) throws SQLException {
-        super(qdSettings);
-        if (repComponents.isEmpty()) {
-            loadStdOptions();
-        }
-        addSelectionType(SelectionType.NO_SELECTION);
-        addSelectionType(SelectionType.GUESS_SELECTION);
-        addSelectionType(SelectionType.CONNID);
-        addSelectionType(SelectionType.IXN);
-        addSelectionType(SelectionType.QUEUE);
-        addSelectionType(SelectionType.AGENT);
-        addSelectionType(SelectionType.REFERENCEID);
-    }
 
     public void SetConfig(Properties config) {
         if (config != null && !config.isEmpty()) {
@@ -155,7 +156,6 @@ public class IxnServerResults extends IQueryResults {
     void SetConfig(InquirerCfg cr) {
 //        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
-    private IDsFinder cidFinder = null;
 
     @Override
     public void Retrieve(QueryDialog dlg) throws SQLException {

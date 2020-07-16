@@ -13,10 +13,27 @@ import java.util.Properties;
 
 public class DBServerResults extends IQueryResults {
 
-    private String m_tlibFilter;
-
     private int m_componentFilter;
     private ArrayList<NameID> appsType;
+    private IDsFinder cidFinder = null;
+
+    /**
+     *
+     */
+    public DBServerResults(QueryDialogSettings qdSettings) throws SQLException {
+        super(qdSettings);
+        if (repComponents.isEmpty()) {
+            loadStdOptions();
+        }
+        addSelectionType(SelectionType.NO_SELECTION);
+        addSelectionType(SelectionType.GUESS_SELECTION);
+    }
+
+    public DBServerResults() throws SQLException {
+        super();
+        loadStdOptions();
+//        repComponents.getRoot().addChild(addLogMessagesReportType(TableType.MsgTServer));
+    }
 
     @Override
     public String getReportSummary() {
@@ -42,32 +59,8 @@ public class DBServerResults extends IQueryResults {
         return "DBServer";
     }
 
-    /**
-     *
-     */
-    public DBServerResults(QueryDialogSettings qdSettings) throws SQLException {
-        super(qdSettings);
-        if (repComponents.isEmpty()) {
-            loadStdOptions();
-        }
-        addSelectionType(SelectionType.NO_SELECTION);
-        addSelectionType(SelectionType.GUESS_SELECTION);
-    }
-
-    public DBServerResults() throws SQLException {
-        super();
-        loadStdOptions();
-//        repComponents.getRoot().addChild(addLogMessagesReportType(TableType.MsgTServer));
-    }
-
     public void AddComponent(int filter) {
         m_componentFilter = m_componentFilter | filter;
-    }
-
-    public void SetConfig(Properties config) {
-        if (config != null && !config.isEmpty()) {
-            m_tlibFilter = config.getProperty("TlibFilter");
-        }
     }
 
     private void addLogMessagesReportType(DynamicTreeNode<OptionNode> root, TableType tableType) {
@@ -123,7 +116,6 @@ public class DBServerResults extends IQueryResults {
     void SetConfig(InquirerCfg cr) {
 //        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
-    private IDsFinder cidFinder = null;
 
     @Override
     public void Retrieve(QueryDialog dlg) throws SQLException {

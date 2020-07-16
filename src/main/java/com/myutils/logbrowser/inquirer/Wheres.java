@@ -14,40 +14,13 @@ import java.util.ArrayList;
  */
 class Wheres {
 
+
+    ArrayList<Where> wh = new ArrayList<>();
     void addWhere(Wheres addWh) {
         if (addWh != null) {
             wh.add(new Where(addWh, null));
         }
     }
-
-    class Where {
-
-        public String getWh() {
-            if (st != null) {
-                return st;
-            } else if (theWh != null) {
-                String makeWhere = theWh.makeWhere(false).trim();
-                return (makeWhere != null && makeWhere.length() > 0) ? "( " + makeWhere + " )" : null;
-            }
-            return "";
-        }
-
-        private String st = null;
-        String andOr = null;
-        private Wheres theWh = null;
-
-        Where(String st, String andOr) {
-            this.st = st;
-            this.andOr = andOr;
-        }
-
-        Where(Wheres _wh, String andOr) {
-            this.theWh = _wh;
-            this.andOr = andOr;
-        }
-    }
-
-    ArrayList<Where> wh = new ArrayList<>();
 
     public Where addWhere(String st, String andOr) {
         
@@ -150,5 +123,32 @@ class Wheres {
         }
 
         return ret.toString();
+    }
+
+    class Where {
+
+        private String st = null;
+        String andOr = null;
+        private Wheres theWh = null;
+
+        Where(String st, String andOr) {
+            this.st = st;
+            this.andOr = andOr;
+        }
+
+        Where(Wheres _wh, String andOr) {
+            this.theWh = _wh;
+            this.andOr = andOr;
+        }
+
+        public String getWh() {
+            if (st != null) {
+                return st;
+            } else if (theWh != null) {
+                String makeWhere = theWh.makeWhere(false).trim();
+                return (makeWhere != null && makeWhere.length() > 0) ? "( " + makeWhere + " )" : null;
+            }
+            return "";
+        }
     }
 }

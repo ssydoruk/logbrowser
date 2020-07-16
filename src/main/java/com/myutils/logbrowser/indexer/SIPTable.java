@@ -98,7 +98,7 @@ public class SIPTable extends DBTable {
             setFieldInt(stmt, 19, theRec.m_line);
             setFieldInt(stmt, 20, Main.getRef(ReferenceType.UUID, theRec.getUUID()));
             setFieldInt(stmt, 21, Main.getRef(ReferenceType.DN, transformDN(SipMessage.SingleQuotes(theRec.getRequestURIDN()))));
-            theRec.SetSipId(getCurrentID());
+            SipMessage.SetSipId(getCurrentID());
 
             getM_dbAccessor().SubmitStatement(m_InsertStatementId);
         } catch (SQLException e) {

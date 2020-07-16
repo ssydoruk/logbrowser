@@ -14,7 +14,13 @@ public class IxnNonIxn extends Message {
     private static final Pattern rxThisDN = Pattern.compile("^\\s+AttributeThisDN .+ \"([^\"]+)\"$");
 
     MessageAttributes attrs = new MessageAttributes();
-    private Ixn parentMsg;
+    private final Ixn parentMsg;
+    IxnNonIxn(TableType tableType, Ixn msg) {
+        super(tableType);
+        parentMsg = msg;
+//        setMessageLines(parentMsg.m_MessageLines);
+
+    }
 
     public String GetSid() {
         return parentMsg.GetSid();
@@ -76,12 +82,6 @@ public class IxnNonIxn extends Message {
         return parentMsg.getAttr2();
     }
 
-    IxnNonIxn(TableType tableType, Ixn msg) {
-        super(tableType);
-        parentMsg = msg;
-//        setMessageLines(parentMsg.m_MessageLines);
-
-    }
 
     String getUserEvent() {
         return Main.lookupConstant(GenesysConstants.TSERVER,

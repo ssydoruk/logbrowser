@@ -563,8 +563,8 @@ public class FileOutSettings extends javax.swing.JPanel {
         int returnVal = chooser.showOpenDialog(this);
         if (returnVal == JFileChooser.APPROVE_OPTION) {
             jtfOutFile.setText(chooser.getSelectedFile().getAbsoluteFile().getAbsolutePath());
-            System.out.println("You chose to open this file: "
-                    + chooser.getSelectedFile().getName());
+//            System.out.println("You chose to open this file: "
+//                    + chooser.getSelectedFile().getName());
         }
 
     }//GEN-LAST:event_jbChooseFileActionPerformed

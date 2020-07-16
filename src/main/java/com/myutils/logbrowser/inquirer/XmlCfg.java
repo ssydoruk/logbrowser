@@ -22,7 +22,7 @@ import org.xml.sax.SAXParseException;
  *
  * @author ssydoruk
  */
-public class XmlCfg {
+public final class XmlCfg {
 
     private Document doc; // XML doc for the CFG
     private Element root;

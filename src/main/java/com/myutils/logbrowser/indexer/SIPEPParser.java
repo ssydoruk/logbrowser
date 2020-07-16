@@ -8,7 +8,6 @@ import static com.myutils.logbrowser.indexer.SIPEPParser.ParserState.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.swing.JOptionPane;
@@ -16,23 +15,12 @@ import org.apache.commons.lang3.StringUtils;
 
 /**
  *
- * @author kvoroshi
+ * @author ssydoruk
  */
 public class SIPEPParser extends Parser {
 
-    final int MSG_STRING_LIMIT = 200;
-    // parse state contants
-
     static final String[] BlockNamesToIgnoreArray = {"SIP:CTI:callSync::0",
         "SIP:CTI:sipStackSync:0"};
-    Hashtable m_BlockNamesToIgnoreHash;
-
-    StringBuilder sipBuf = new StringBuilder();
-
-    Pattern m_CustomRegexp;
-    long m_CurrentFilePos;
-    long m_HeaderOffset;
-    int m_CurrentLine;
 
 //15:37:21.918 +++ CIFace::Request +++
 //   -- new invoke
@@ -41,20 +29,34 @@ public class SIPEPParser extends Parser {
 //  Numbers: +<SIP to RM> -<none>
 //  Status: parsed:1 queued:0 sent:0 acked:0 preevent:0 event:0 context:0 transferred:0
 //  -----
-    private static final Pattern regFrom = Pattern.compile("From: .+/([0-9]+)");
-    private static final Pattern regNumbers = Pattern.compile("Numbers: \\+<([^>]+)> -<([^>]+)>");
-
-    private final static Pattern regSIPResp = Pattern.compile(" bytes to|from (\\S+)");
     private final static Pattern regSIPReq = Pattern.compile(" bytes (to|from) (\\S+)");
-    private static final Pattern regTMessageContinue = Pattern.compile("^(\\t|message|\\d*\\s\\[BSYNC\\] Trace:)");
-    private static final Pattern regTBackupMessage = Pattern.compile("^\\d*\\s\\[BSYNC\\] Trace:");
-    private static final Pattern regGenesysMessage = Pattern.compile(" (None|Debug|Trace|Interaction|Standard|Alarm|Unknown|Non|Dbg|Trc|Int|Std|Alr|Unk) (\\d{5}) ");
-    private static final Pattern regTLibMessage = Pattern.compile("(: message|04541\\s+Request|0454[12] Event)");
 
     private static final Pattern regConfigUpdate = Pattern.compile("^[\\d\\s]+\\[TCONF\\]");
 
     private static final Pattern regConfigOneLineDN = Pattern.compile("^\\s\\[(\\d+)\\] dn = '([^']+)' type = (\\w+)");
     private static final Pattern regHeaderEnd = Pattern.compile("^File:\\s+");
+    private static final Pattern ptSkip = Pattern.compile("^[:\\s]*");
+    private final static Pattern regProxy = Pattern.compile("^Proxy\\((\\w+):");
+    static private boolean ifSIPLines = false;
+    private final static Pattern SIPHeaderContinue = Pattern.compile("^\\S");
+    private static boolean ifSIPLinesForce = false;
+    private static boolean gaveWarning = false;
+    private static final Pattern regSIPHeader = Pattern.compile("(\\d+) bytes .+ (>>>>>|<<<<<)$");
+    //    15:22:50.980: Sending  [0,UDP] 3384 bytes to 10.82.10.146:5060 >>>>>
+    private static final Pattern regNotParseMessage = Pattern.compile("^(0454[1-5]"
+            + ")");
+    private static final Pattern regCfgObjectName = Pattern.compile("(?:name|userName|number|loginCode)='([^']+)'");
+    private static final Pattern regCfgObjectDBID = Pattern.compile("DBID=(\\d+)");
+    private static final Pattern regCfgObjectType = Pattern.compile("object Cfg(\\w+)=");
+    private static final Pattern regCfgOp = Pattern.compile("\\(type Object(\\w+)\\)");
+    private static final Pattern regSIPServerStartDN = Pattern.compile("^\\s*DN added \\(dbid (\\d+)\\) \\(number ([^\\(]+)\\) ");
+    final int MSG_STRING_LIMIT = 200;
+    // parse state contants
+    HashMap m_BlockNamesToIgnoreHash;
+    StringBuilder sipBuf = new StringBuilder();
+    Pattern m_CustomRegexp;
+    long m_CurrentFilePos;
+    long m_HeaderOffset;
 
     private ParserState m_ParserState;
     int m_PacketLength;
@@ -74,26 +76,17 @@ public class SIPEPParser extends Parser {
     private String msgName;
     private boolean inbound;
     private DateParsed dpHeader;
-    private static final Pattern ptSkip = Pattern.compile("^[:\\s]*");
-
-    private final static Pattern regProxy = Pattern.compile("^Proxy\\((\\w+):");
-    private final static Pattern regConnidChangeEnd = Pattern.compile("^\\S");
-    static private boolean ifSIPLines = false;
-    private final static Pattern SIPHeaderContinue = Pattern.compile("^\\S");
-    private final static Pattern SIPContentLength = Pattern.compile("^\\s");
-    private ArrayList<String> extraBuff;
-    private static boolean ifSIPLinesForce = false;
-    private static boolean gaveWarning = false;
+    private final ArrayList<String> extraBuff;
 
     public SIPEPParser(HashMap<TableType, DBTable> m_tables) {
         super(FileInfoType.type_SIPEP, m_tables);
         this.extraBuff = new ArrayList<>();
         //m_accessor = accessor;
-        m_BlockNamesToIgnoreHash = new Hashtable();
-        for (int i = 0; i < BlockNamesToIgnoreArray.length; i++) {
-            m_BlockNamesToIgnoreHash.put(BlockNamesToIgnoreArray[i], 0);
+        m_BlockNamesToIgnoreHash = new HashMap();
+        for (String BlockNamesToIgnoreArray1 : BlockNamesToIgnoreArray) {
+            m_BlockNamesToIgnoreHash.put(BlockNamesToIgnoreArray1, 0);
         }
-        this.ifSIPLinesForce = Main.ifSIPLines();
+        SIPEPParser.ifSIPLinesForce = Main.ifSIPLines();
 
     }
 
@@ -158,7 +151,7 @@ public class SIPEPParser extends Parser {
 
             ParseLine(input, ""); // to complete the parsing of the last line/last message
         } catch (Exception e) {
-            e.printStackTrace();
+            Main.logger.error(e);
             return m_CurrentLine - line;
         }
 
@@ -166,7 +159,7 @@ public class SIPEPParser extends Parser {
     }
 
     void ContinueParsing(String initial) {
-        String str = "";
+        String str ;
         BufferedReaderCrLf input = Main.getMain().GetNextFile();
         if (input == null) {
             return;
@@ -183,11 +176,9 @@ public class SIPEPParser extends Parser {
             if (notFound) {
                 return;
             }
-            notFound = true;
             while ((str = input.readLine()) != null) {
                 Main.logger.trace("l: " + m_CurrentLine + " [" + str + "]");
                 if (str.trim().isEmpty()) {
-                    notFound = false;
                     break;
                 }
             }
@@ -204,17 +195,9 @@ public class SIPEPParser extends Parser {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            Main.logger.error(e);
         }
     }
-
-    private static final Pattern regSIPHeader = Pattern.compile("(\\d+) bytes .+ (>>>>>|<<<<<)$");
-
-//    15:22:50.980: Sending  [0,UDP] 3384 bytes to 10.82.10.146:5060 >>>>>
-    private static final Pattern regNotParseMessage = Pattern.compile("^(0454[1-5]"
-            + ")");
-
-    private static final Pattern regISCCStart = Pattern.compile("(\\d+) bytes .+ (>>>>>|<<<<<)$");
 
     String ParseLine(BufferedReaderCrLf input, String str) throws Exception {
         String s = str;
@@ -434,7 +417,7 @@ public class SIPEPParser extends Parser {
         Matcher m;
 
         // Populate our class representation of the message
-        SipMessage msg = null;
+        SipMessage msg ;
 
         msg = new SipMessage(contents, TableType.SIPEP);
 
@@ -457,12 +440,6 @@ public class SIPEPParser extends Parser {
             PrintMsg(contents);
         }
     }
-
-    private static final Pattern regCfgObjectName = Pattern.compile("(?:name|userName|number|loginCode)='([^']+)'");
-    private static final Pattern regCfgObjectDBID = Pattern.compile("DBID=(\\d+)");
-    private static final Pattern regCfgObjectType = Pattern.compile("object Cfg(\\w+)=");
-    private static final Pattern regCfgOp = Pattern.compile("\\(type Object(\\w+)\\)");
-    private static final Pattern regSIPServerStartDN = Pattern.compile("^\\s*DN added \\(dbid (\\d+)\\) \\(number ([^\\(]+)\\) ");
 
     private void AddConfigMessage(ArrayList<String> m_MessageContents) {
         ConfigUpdateRecord msg = new ConfigUpdateRecord(m_MessageContents);

@@ -14,6 +14,10 @@ import org.apache.commons.lang3.StringUtils;
  * @author terry The class Replicates TLibMessage
  */
 public class ORSMessage extends Message {
+    private static final Pattern regShortConnID = Pattern.compile("^\\sIID:(.+)$");
+    private static final Pattern regShortThisDN = Pattern.compile("^\\sTDN:(.+)$");
+    private static final Pattern regShortThisDNIS = Pattern.compile("^\\sDNIS:(.+)$");
+    private static final Pattern regShortANI = Pattern.compile("^\\sANI:(.+)$");
 
     String m_MessageName;
     private final String m_TserverSRC;
@@ -53,7 +57,6 @@ public class ORSMessage extends Message {
         return m_MessageName;
     }
 
-    private static final Pattern regShortConnID = Pattern.compile("^\\sIID:(.+)$");
 
     public String GetConnID() {
         return longOrShort(getAttributeTrim("AttributeConnID"), FindByRx(regShortConnID, 1, (String)null));
@@ -93,7 +96,6 @@ public class ORSMessage extends Message {
         this.m_refID = m_refID;
     }
 
-    private static final Pattern regShortThisDN = Pattern.compile("^\\sTDN:(.+)$");
 
     /**
      * @return the m_ThisDN
@@ -139,14 +141,12 @@ public class ORSMessage extends Message {
         return callID;
     }
 
-    private static final Pattern regShortThisDNIS = Pattern.compile("^\\sDNIS:(.+)$");
 
     String getDNIS() {
         return longOrShort(getAttributeDN("AttributeDNIS"), FindByRx(regShortThisDNIS, 1, null));
 
     }
 
-    private static final Pattern regShortANI = Pattern.compile("^\\sANI:(.+)$");
 
     String getANI() {
         return longOrShort(getAttributeDN("AttributeANI"), FindByRx(regShortANI, 1, null));

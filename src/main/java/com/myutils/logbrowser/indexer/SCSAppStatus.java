@@ -12,9 +12,6 @@ public class SCSAppStatus extends Message {
 
     private String event = null;
 
-    public String getHost() {
-        return host;
-    }
 
     private String newMode;
     private int appDBID;
@@ -30,6 +27,9 @@ public class SCSAppStatus extends Message {
 
     SCSAppStatus(ArrayList<String> m_MessageContents) {
         super(TableType.SCSAppStatus, m_MessageContents);
+    }
+    public String getHost() {
+        return host;
     }
 
     void setNewMode(String group) {

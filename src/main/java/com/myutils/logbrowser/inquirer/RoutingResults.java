@@ -25,18 +25,90 @@ import org.apache.logging.log4j.LogManager;
 
 /**
  *
- * @author kvoroshi
+ * @author ssydoruk
  */
 public class RoutingResults extends IQueryResults {
 
     private static final org.apache.logging.log4j.Logger logger = LogManager.getLogger();
+    static private final String URS_LOG_MSG = "URS log messages";
+    static private final String ORS_LOG_MSG = "ORS log messages";
 
     private UTCTimeRange timeRange;
     private DynamicTreeNode<OptionNode> msgUrsConfig;
     private DynamicTreeNode<OptionNode> msgOrsConfig;
-
-    static private final String URS_LOG_MSG = "URS log messages";
-    static private final String ORS_LOG_MSG = "ORS log messages";
+    IDsFinder cidFinder = null;
+    ArrayList<NameID> appsType = null;
+    public RoutingResults() throws SQLException {
+        super();
+        boolean isORS = true;
+        boolean isURS = true;
+        try {
+            isORS = (DatabaseConnector.fileExits(new FileInfoType[]{FileInfoType.type_ORS}));
+        } catch (Exception e) {
+            logger.log(org.apache.logging.log4j.Level.FATAL, e);
+            
+        }
+        
+        try {
+            isURS = (DatabaseConnector.fileExits(new FileInfoType[]{FileInfoType.type_URS, FileInfoType.type_URSHTTP}));
+        } catch (Exception e) {
+            logger.log(org.apache.logging.log4j.Level.FATAL, e);
+        }
+        
+        addSelectionType(SelectionType.NO_SELECTION);
+        addSelectionType(SelectionType.GUESS_SELECTION);
+        addSelectionType(SelectionType.CONNID);
+        addSelectionType(SelectionType.DN);
+        addSelectionType(SelectionType.AGENT);
+        if (isURS) {
+            addSelectionType(SelectionType.SESSION);
+        }
+        addSelectionType(SelectionType.UUID);
+        addSelectionType(SelectionType.IXN);
+        addSelectionType(SelectionType.REFERENCEID);
+        
+        DynamicTreeNode<OptionNode> rootA = new DynamicTreeNode<>(null);
+        repComponents.setRoot(rootA);
+        
+        if (isURS) {
+            addURSReportType(rootA);
+        }
+        
+        if (isORS) {
+            addORSReportType(rootA);
+        }
+        
+        addConfigUpdates(rootA);
+        
+        try {
+            if (isURS) {
+                addCustom(rootA, FileInfoType.type_ORS);
+            }
+            if (isORS) {
+                addCustom(rootA, FileInfoType.type_URS);
+            }
+        } catch (Exception ex) {
+            logger.log(org.apache.logging.log4j.Level.FATAL, ex);
+        }
+        if (isURS) {
+            msgUrsConfig = rootA.getLogMessagesReportType(TableType.MsgURServer, URS_LOG_MSG);
+            rootA.addChild(msgUrsConfig);
+        }
+        if (isORS) {
+            msgOrsConfig = rootA.getLogMessagesReportType(TableType.MsgORServer, ORS_LOG_MSG);
+            rootA.addChild(msgOrsConfig);
+            
+            if (DatabaseConnector.TableExist(TableType.ORSAlarm.toString())) {
+                DynamicTreeNode<Object> tEventsNode = new DynamicTreeNode<>(new OptionNode(false, DialogItem.ORSALARM));
+                rootA.addChild(tEventsNode);
+//            tEventsNode.addDynamicRef(DialogItem.ORS_IXN_NAME, ReferenceType.TEvent, "orsmm", "nameid");
+//        tEventsNode.addDynamicRef(DialogItem.ORS_TEVENTS_DN, ReferenceType.DN, "orsmm", "thisdnid", "otherdnid");
+            }
+            
+        }
+        DoneSTDOptions();
+        
+    }
 
     @Override
     public String getSearchString() {
@@ -199,7 +271,6 @@ public class RoutingResults extends IQueryResults {
 
     }
 
-    IDsFinder cidFinder = null;
 
     @Override
     FullTableColors getAll(QueryDialog qd) throws SQLException {
@@ -676,77 +747,6 @@ public class RoutingResults extends IQueryResults {
 
     }
 
-    public RoutingResults() throws SQLException {
-        super();
-        boolean isORS = true;
-        boolean isURS = true;
-        try {
-            isORS = (DatabaseConnector.fileExits(new FileInfoType[]{FileInfoType.type_ORS}));
-        } catch (Exception e) {
-            logger.log(org.apache.logging.log4j.Level.FATAL, e);
-
-        }
-
-        try {
-            isURS = (DatabaseConnector.fileExits(new FileInfoType[]{FileInfoType.type_URS, FileInfoType.type_URSHTTP}));
-        } catch (Exception e) {
-            logger.log(org.apache.logging.log4j.Level.FATAL, e);
-        }
-
-        addSelectionType(SelectionType.NO_SELECTION);
-        addSelectionType(SelectionType.GUESS_SELECTION);
-        addSelectionType(SelectionType.CONNID);
-        addSelectionType(SelectionType.DN);
-        addSelectionType(SelectionType.AGENT);
-        if (isURS) {
-            addSelectionType(SelectionType.SESSION);
-        }
-        addSelectionType(SelectionType.UUID);
-        addSelectionType(SelectionType.IXN);
-        addSelectionType(SelectionType.REFERENCEID);
-
-        DynamicTreeNode<OptionNode> rootA = new DynamicTreeNode<>(null);
-        repComponents.setRoot(rootA);
-
-        if (isURS) {
-            addURSReportType(rootA);
-        }
-
-        if (isORS) {
-            addORSReportType(rootA);
-        }
-
-        addConfigUpdates(rootA);
-
-        try {
-            if (isURS) {
-                addCustom(rootA, FileInfoType.type_ORS);
-            }
-            if (isORS) {
-                addCustom(rootA, FileInfoType.type_URS);
-            }
-        } catch (Exception ex) {
-            logger.log(org.apache.logging.log4j.Level.FATAL, ex);
-        }
-        if (isURS) {
-            msgUrsConfig = rootA.getLogMessagesReportType(TableType.MsgURServer, URS_LOG_MSG);
-            rootA.addChild(msgUrsConfig);
-        }
-        if (isORS) {
-            msgOrsConfig = rootA.getLogMessagesReportType(TableType.MsgORServer, ORS_LOG_MSG);
-            rootA.addChild(msgOrsConfig);
-
-            if (DatabaseConnector.TableExist(TableType.ORSAlarm.toString())) {
-                DynamicTreeNode<Object> tEventsNode = new DynamicTreeNode<>(new OptionNode(false, DialogItem.ORSALARM));
-                rootA.addChild(tEventsNode);
-//            tEventsNode.addDynamicRef(DialogItem.ORS_IXN_NAME, ReferenceType.TEvent, "orsmm", "nameid");
-//        tEventsNode.addDynamicRef(DialogItem.ORS_TEVENTS_DN, ReferenceType.DN, "orsmm", "thisdnid", "otherdnid");
-            }
-
-        }
-        DoneSTDOptions();
-
-    }
 
 //    }
     @Override
@@ -1557,7 +1557,6 @@ public class RoutingResults extends IQueryResults {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
-    ArrayList<NameID> appsType = null;
 
     @Override
     public ArrayList<NameID> getApps() throws SQLException {

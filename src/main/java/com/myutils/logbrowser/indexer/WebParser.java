@@ -14,11 +14,6 @@ import java.util.regex.Pattern;
  */
 abstract class WebParser extends Parser {
 
-    public WebParser(FileInfoType type, HashMap<TableType, DBTable> tables) {
-        super(type, tables);
-        initURLProcessor();
-
-    }
 
     protected static final String PATH_UUID = "<UUID>";
     protected static final String PATH_DeviceID = "<DeviceID>";
@@ -42,6 +37,13 @@ abstract class WebParser extends Parser {
     protected static final String QUERY_personDBID = "person_dbid";
     protected static final String QUERY_ownerDBID = "owner_dbid";
 
+
+    protected static URLProcessor urlProcessor = new URLProcessor();
+    public WebParser(FileInfoType type, HashMap<TableType, DBTable> tables) {
+        super(type, tables);
+        initURLProcessor();
+        
+    }
     private void initURLProcessor() {
         urlProcessor.addPathProcessor(PATH_UUID, Pattern.compile("^/api/v2/me/calls/([^/\\&]+)", Pattern.CASE_INSENSITIVE));
         urlProcessor.addPathProcessor(PATH_DeviceID, Pattern.compile("^/api/v2/(?:me/)?devices/([^/\\&]+)", Pattern.CASE_INSENSITIVE));
@@ -67,7 +69,5 @@ abstract class WebParser extends Parser {
         urlProcessor.addQueryProcessor(QUERY_personDBID, "<person_dbid>");
         urlProcessor.addQueryProcessor(QUERY_ownerDBID, "<owner_dbid>");
     }
-
-    protected static URLProcessor urlProcessor = new URLProcessor();
 
 }

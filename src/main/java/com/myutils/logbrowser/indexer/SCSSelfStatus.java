@@ -10,9 +10,6 @@ import java.util.ArrayList;
 
 public class SCSSelfStatus extends Message {
 
-    public String getHost() {
-        return host;
-    }
 
     private String newMode;
     private int appDBID;
@@ -28,6 +25,9 @@ public class SCSSelfStatus extends Message {
 
     SCSSelfStatus(ArrayList<String> m_MessageContents) {
         super(TableType.SCSSelfStatus, m_MessageContents);
+    }
+    public String getHost() {
+        return host;
     }
 
     void setNewMode(String group) {

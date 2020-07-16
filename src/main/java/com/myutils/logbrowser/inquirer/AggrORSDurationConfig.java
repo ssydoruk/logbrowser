@@ -165,6 +165,11 @@ public class AggrORSDurationConfig extends javax.swing.JPanel {
     class OrderField {
 
         private String fieldName;
+        private String displayName;
+        public OrderField(String fieldName, String displayName) {
+            this.fieldName = fieldName;
+            this.displayName = displayName;
+        }
 
         public String getFieldName() {
             return fieldName;
@@ -173,17 +178,12 @@ public class AggrORSDurationConfig extends javax.swing.JPanel {
         public String getDisplayName() {
             return displayName;
         }
-        private String displayName;
 
         @Override
         public String toString() {
             return displayName;
         }
 
-        public OrderField(String fieldName, String displayName) {
-            this.fieldName = fieldName;
-            this.displayName = displayName;
-        }
 
     }
 

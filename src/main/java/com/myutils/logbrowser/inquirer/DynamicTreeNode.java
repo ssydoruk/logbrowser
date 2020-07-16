@@ -30,19 +30,15 @@ public class DynamicTreeNode<T> extends GenericTreeNode implements Serializable 
 
     private static final long serialVersionUID = 1L;
 
-    public static boolean isBlockLoad() {
-        return blockLoad;
-    }
-
-    public static void setBlockLoad(boolean aBlockLoad) {
-        blockLoad = aBlockLoad;
-    }
-
-    private boolean dynamicChildren = false;
-    private boolean ChildrenLoaded = false;
 
     private static boolean blockLoad = false;
     private static boolean noRefNoLoad = false;
+    public static boolean isBlockLoad() {
+        return blockLoad;
+    }
+    public static void setBlockLoad(boolean aBlockLoad) {
+        blockLoad = aBlockLoad;
+    }
 
     public static boolean isNoRefNoLoad() {
         return noRefNoLoad;
@@ -51,7 +47,12 @@ public class DynamicTreeNode<T> extends GenericTreeNode implements Serializable 
     public static void setNoRefNoLoad(boolean noRefNoLoad) {
         DynamicTreeNode.noRefNoLoad = noRefNoLoad;
     }
+    private boolean dynamicChildren = false;
+    private boolean ChildrenLoaded = false;
     private TableType tableType = null;
+    private ReferenceType refType = ReferenceType.UNKNOWN;
+    HashMap<String, Boolean> onlyChildrenChecked = null;
+    private ILoadChildrenProc loadChildrenProc = null;
 
     public DynamicTreeNode() {
         super();
@@ -78,6 +79,10 @@ public class DynamicTreeNode<T> extends GenericTreeNode implements Serializable 
         } else {
             inquirer.logger.debug("Duplicating from null!!");
         }
+    }
+    public DynamicTreeNode(Object data) {
+        this();
+        setData((OptionNode) data);
     }
 
     protected void NodeCopy(DynamicTreeNode<T> src) {
@@ -221,7 +226,6 @@ public class DynamicTreeNode<T> extends GenericTreeNode implements Serializable 
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
-    private ReferenceType refType = ReferenceType.UNKNOWN;
 
     private void setRefType(ReferenceType referenceType) {
         refType = referenceType;
@@ -261,7 +265,6 @@ public class DynamicTreeNode<T> extends GenericTreeNode implements Serializable 
             localRoot.addChild(tEventsNode);
         }
     }
-    HashMap<String, Boolean> onlyChildrenChecked = null;
 
     public void setOnlyChecked(String[] onlyChecked) {
         onlyChildrenChecked = new HashMap<>(onlyChecked.length);
@@ -349,23 +352,6 @@ public class DynamicTreeNode<T> extends GenericTreeNode implements Serializable 
         return null;
     }
 
-    public static abstract class ILoadChildrenProc {
-
-        abstract ArrayList<NameID> LoadChidlren(DynamicTreeNode parent);
-
-        abstract void treeLoad(DynamicTreeNode parent);
-        private boolean treeLoad = false;
-
-        public boolean isTreeLoad() {
-            return treeLoad;
-        }
-
-        public void setTreeLoad(boolean treeLoad) {
-            this.treeLoad = treeLoad;
-        }
-    }
-
-    private ILoadChildrenProc loadChildrenProc = null;
 
     public ILoadChildrenProc getLoadChildrenProc() {
         return loadChildrenProc;
@@ -436,10 +422,6 @@ public class DynamicTreeNode<T> extends GenericTreeNode implements Serializable 
         ChildrenLoaded = false;
     }
 
-    public DynamicTreeNode(Object data) {
-        this();
-        setData((OptionNode) data);
-    }
 
     @Override
     public DynamicTreeNode getChildAt(int index) throws IndexOutOfBoundsException {
@@ -545,6 +527,23 @@ public class DynamicTreeNode<T> extends GenericTreeNode implements Serializable 
         int chN = s.readInt();
         for (int i = 0; i < chN; i++) {
             addChild((DynamicTreeNode<T>) s.readObject());
+        }
+    }
+
+    public static abstract class ILoadChildrenProc {
+
+        private boolean treeLoad = false;
+
+        abstract ArrayList<NameID> LoadChidlren(DynamicTreeNode parent);
+
+        abstract void treeLoad(DynamicTreeNode parent);
+
+        public boolean isTreeLoad() {
+            return treeLoad;
+        }
+
+        public void setTreeLoad(boolean treeLoad) {
+            this.treeLoad = treeLoad;
         }
     }
 }

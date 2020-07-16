@@ -147,13 +147,6 @@ public class ReportFrame extends javax.swing.JFrame implements Cloneable {
 
     protected class ToggleButtonToolBar extends JToolBar {
 
-        private JButton addButton(String title, String hint0, ActionListener act) {
-            JButton tb = new JButton(title);
-            tb.setToolTipText(hint0);
-            tb.addActionListener(act);
-            add(tb);
-            return tb;
-        }
 
         public ToggleButtonToolBar() {
             super();
@@ -182,6 +175,13 @@ public class ReportFrame extends javax.swing.JFrame implements Cloneable {
 //                }
 //
 //            });
+        }
+        private JButton addButton(String title, String hint0, ActionListener act) {
+            JButton tb = new JButton(title);
+            tb.setToolTipText(hint0);
+            tb.addActionListener(act);
+            add(tb);
+            return tb;
         }
 
         JToggleButton addToggleButton(Action a) {

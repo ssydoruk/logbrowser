@@ -13,6 +13,10 @@ import java.util.HashSet;
  */
 public class OutputSpecFormatterFile extends OutputSpecFormatter {
 
+
+    public OutputSpecFormatterFile(XmlCfg cfg, boolean isLongFileNameEnabled, HashSet<String> components) throws Exception {
+        super(cfg, isLongFileNameEnabled, components);
+    }
     @Override
     public void Print(ILogRecord record, PrintStreams ps, IQueryResults qr) {
         RecordLayout lo = getLayout(record.GetType());
@@ -23,10 +27,6 @@ public class OutputSpecFormatterFile extends OutputSpecFormatter {
         } else {
             super.Print(record, ps, qr);
         }
-    }
-
-    public OutputSpecFormatterFile(XmlCfg cfg, boolean isLongFileNameEnabled, HashSet<String> components) throws Exception {
-        super(cfg, isLongFileNameEnabled, components);
     }
 
 }

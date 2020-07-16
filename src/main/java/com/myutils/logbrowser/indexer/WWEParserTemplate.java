@@ -112,7 +112,7 @@ public class WWEParserTemplate extends WebParser {
             }
 //            ParseLine("", null); // to complete the parsing of the last line/last message
         } catch (IOException e) {
-            e.printStackTrace();
+            Main.logger.error(e);;
             return m_CurrentLine - line;
         }
 
@@ -198,7 +198,7 @@ public class WWEParserTemplate extends WebParser {
 
     @Override
     void init(HashMap<TableType, DBTable> m_tables) {
-        m_tables.put(TableType.WWEMessage, new WWEDebugMessageTable(Main.getMain().getM_accessor(), TableType.WWEMessage));
+        m_tables.put(TableType.WWEMessage, new WWEDebugMessageTable(Main.getM_accessor(), TableType.WWEMessage));
 
     }
 
@@ -232,6 +232,27 @@ public class WWEParserTemplate extends WebParser {
         private String userID;
         private String browserClient;
         private String sessionID;
+        private String UUID;
+        private String ixnID;
+        private WWEDebugMsg(TableType t) {
+            super(t);
+        }
+        private WWEDebugMsg() {
+            this(TableType.WWEMessage);
+        }
+        private WWEDebugMsg(TableType t, WWEDebugMsg orig) {
+            this(t);
+            this.setClassName(orig.getClassName());
+            this.setJSessionID(orig.getjSessionID());
+            this.setLevel(orig.getLevel());
+            this.setUserName(orig.getUserName());
+            this.setIP(orig.getIp());
+            this.setURL(orig.getUrl());
+            this.setMessageText(orig.getMsgText());
+            this.setUUID(orig.getUUID());
+            this.setIxnID(orig.getIxnID());
+            this.setDeviceID(orig.getDeviceID());
+        }
 
         public String getParam2() {
             return param2;
@@ -256,7 +277,6 @@ public class WWEParserTemplate extends WebParser {
             this.deviceID = deviceID;
         }
 
-        private String UUID;
 
         /**
          * Get the value of UUID
@@ -278,7 +298,6 @@ public class WWEParserTemplate extends WebParser {
             this.UUID = UUID;
         }
 
-        private String ixnID;
 
         /**
          * Get the value of ixnID
@@ -300,27 +319,6 @@ public class WWEParserTemplate extends WebParser {
             this.ixnID = ixnID;
         }
 
-        private WWEDebugMsg(TableType t) {
-            super(t);
-        }
-
-        private WWEDebugMsg() {
-            this(TableType.WWEMessage);
-        }
-
-        private WWEDebugMsg(TableType t, WWEDebugMsg orig) {
-            this(t);
-            this.setClassName(orig.getClassName());
-            this.setJSessionID(orig.getjSessionID());
-            this.setLevel(orig.getLevel());
-            this.setUserName(orig.getUserName());
-            this.setIP(orig.getIp());
-            this.setURL(orig.getUrl());
-            this.setMessageText(orig.getMsgText());
-            this.setUUID(orig.getUUID());
-            this.setIxnID(orig.getIxnID());
-            this.setDeviceID(orig.getDeviceID());
-        }
 
         public String getHttpCode() {
 
@@ -569,7 +567,7 @@ public class WWEParserTemplate extends WebParser {
 
             try {
                 stmt.setTimestamp(1, new Timestamp(rec.GetAdjustedUsecTime()));
-                stmt.setInt(2, rec.getFileId());
+                stmt.setInt(2, WWEDebugMsg.getFileId());
                 stmt.setLong(3, rec.m_fileOffset);
                 stmt.setLong(4, rec.getM_FileBytes());
                 stmt.setLong(5, rec.m_line);

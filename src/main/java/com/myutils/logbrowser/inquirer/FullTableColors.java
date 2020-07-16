@@ -25,6 +25,14 @@ public class FullTableColors {
     private String fieldColorChange = null;
     private int colorIdx = -1;
     private Object prevColorCell = null;
+    private ArrayList<String> columnNames = null;
+    private ArrayList<Integer> columnTypes = null;
+    private HashSet<String> hiddenFields = new HashSet<>();
+    public FullTableColors() {
+        data = new ArrayList<>();
+        columnColors = new ArrayList<>();
+        curColorIdx = 0;
+    }
 
     public ArrayList<ArrayList<Object>> getData() {
         return data;
@@ -38,14 +46,6 @@ public class FullTableColors {
         return columnColors;
     }
 
-    public FullTableColors() {
-        data = new ArrayList<>();
-        columnColors = new ArrayList<>();
-        curColorIdx = 0;
-    }
-
-    private ArrayList<String> columnNames = null;
-    private ArrayList<Integer> columnTypes = null;
 
     public void setMetaData(ResultSetMetaData rsmd) throws SQLException {
         columnNames = new ArrayList<>(rsmd.getColumnCount());
@@ -120,7 +120,6 @@ public class FullTableColors {
         return -1;
     }
 
-    private HashSet<String> hiddenFields = new HashSet<>();
 
     void setHiddenField(String rowType) {
         hiddenFields.add(rowType);

@@ -8,15 +8,15 @@ package com.myutils.logbrowser.indexer;
 import java.util.regex.Pattern;
 
 public final class URSStrategyInit extends Message {
+    private static final Pattern uuidPattern = Pattern.compile("^calluuid ([\\w~]+) is bound");
 
     private String FileLine;
-    private String ConnID;
-    private String strategyMsg;
+    private final String ConnID;
+    private final String strategyMsg;
     private final String strategyName;
 
     URSStrategyInit(String line, String ConnID, String strategyName, String strategyMsg) {
         super(TableType.URSStrategyInit, line);
-        this.FileLine = FileLine;
         this.ConnID = ConnID;
         this.strategyName = strategyName;
         this.strategyMsg = strategyMsg;
@@ -40,7 +40,6 @@ public final class URSStrategyInit extends Message {
         return strategyMsg;
     }
 
-    private static final Pattern uuidPattern = Pattern.compile("^calluuid ([\\w~]+) is bound");
 
     String getUUID() {
         return FindByRx(uuidPattern, strategyMsg, 1, "");

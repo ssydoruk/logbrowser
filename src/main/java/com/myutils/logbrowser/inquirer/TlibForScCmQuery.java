@@ -12,22 +12,23 @@ import java.util.HashSet;
 
 /**
  *
- * @author kvoroshi
+ * @author ssydoruk
  */
-public class TlibForScCmQuery extends IQuery {
+public final class TlibForScCmQuery extends IQuery {
 
     private Integer[] m_connectionIds = null;
     private int m_componentFilter;
     private String m_msgFilter;
     private DynamicTreeNode<OptionNode> node;
     private IDsFinder cif = null;
-    private HashSet handlerIDs = new HashSet();
+    private HashSet handlerIDs;
     private Collection<Long> refIDs = null;
     private Collection<Long> recIDs = null;
     private Collection<Long> dnIDs;
     private boolean collectHandlers = false;
 
     public TlibForScCmQuery() throws SQLException {
+        this.handlerIDs = new HashSet();
         m_componentFilter = CallFlowResults.TLIB;
         m_msgFilter = "";
         addRef("thisDNID", "thisDN", ReferenceType.DN.toString(), FieldType.Optional);
@@ -54,11 +55,13 @@ public class TlibForScCmQuery extends IQuery {
 
     public TlibForScCmQuery(Integer[] connectionIds) throws SQLException {
         this();
+        this.handlerIDs = new HashSet();
         m_connectionIds = connectionIds;
     }
 
     TlibForScCmQuery(DynamicTreeNode<OptionNode> eventsSettings, IDsFinder cif, boolean collectHandlers) throws SQLException {
         this();
+        this.handlerIDs = new HashSet();
         this.node = eventsSettings;
         this.cif = cif;
         if (cif != null) {
@@ -70,12 +73,14 @@ public class TlibForScCmQuery extends IQuery {
 
     TlibForScCmQuery(Collection<Long> refIDs, Collection<Long> seqnoIDs) throws SQLException {
         this();
+        this.handlerIDs = new HashSet();
         this.refIDs = refIDs;
         this.recIDs = seqnoIDs;
     }
 
     TlibForScCmQuery(Collection<Long> refIDs, Collection<Long> ids, Collection<Long> dnIDs) throws SQLException {
         this(refIDs, ids);
+        this.handlerIDs = new HashSet();
         this.dnIDs = dnIDs;
     }
 
@@ -247,8 +252,8 @@ public class TlibForScCmQuery extends IQuery {
                     }
                 }
             } else {
-                Integer[] dnID = null;
-                Integer[] dnConnIDs = null;
+                Integer[] dnID;
+                Integer[] dnConnIDs;
                 switch (cif.getSearchType()) {
                     case DN:
                         dnID = cif.getDNs();

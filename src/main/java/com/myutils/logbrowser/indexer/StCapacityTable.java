@@ -18,7 +18,7 @@ import java.util.ArrayList;
  */
 public class StCapacityTable extends DBTable {
 
-    static private int MAX_MEDIA = 5;
+    private static final int MAX_MEDIA = 5;
 
     public StCapacityTable(DBAccessor dbaccessor, TableType t) {
         super(dbaccessor, t);

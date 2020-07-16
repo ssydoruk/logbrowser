@@ -50,7 +50,7 @@ import java.io.*;
  */
 public class BufferedReaderCrLf {
 
-    private static Object lock;
+    private static final Object lock = new Object();
     private static final int INVALIDATED = -2;
     private static final int UNMARKED = -1;
     private static int defaultCharBufferSize = 8_192;
@@ -89,7 +89,6 @@ public class BufferedReaderCrLf {
      */
     public BufferedReaderCrLf(InputStream in, int sz) {
 //	super(in);
-        lock = new Object();
         if (sz <= 0) {
             throw new IllegalArgumentException("Buffer size <= 0");
         }
@@ -550,10 +549,11 @@ public class BufferedReaderCrLf {
     }
 
     /**
-     * Tells whether this stream is ready to be read. A buffered character
-     * stream is ready if the buffer is not empty, or if the underlying
-     * character stream is ready.
+     * Tells whether this stream is ready to be read.A buffered character
+ stream is ready if the buffer is not empty, or if the underlying
+ character stream is ready.
      *
+     * @return 
      * @exception IOException If an I/O error occurs
      */
     public boolean ready() throws IOException {
@@ -585,6 +585,7 @@ public class BufferedReaderCrLf {
 
     /**
      * Tells whether this stream supports the mark() operation, which it does.
+     * @return 
      */
     public boolean markSupported() {
         return true;

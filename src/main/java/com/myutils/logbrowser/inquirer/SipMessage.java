@@ -10,9 +10,6 @@ public class SipMessage extends ILogRecord {
     int handlerId;
     private String callId;
 
-    public int getHandlerId() {
-        return handlerId;
-    }
 
     public SipMessage(ResultSet rs) throws SQLException {
         super(rs, MsgType.SIP);
@@ -76,6 +73,9 @@ public class SipMessage extends ILogRecord {
             inquirer.logger.error("ERROR: mandatory field missing for SIP message with ID " + getID(), e);
             throw new SQLException("Missing parameters");
         }
+    }
+    public int getHandlerId() {
+        return handlerId;
     }
 
     public String getCallId() {

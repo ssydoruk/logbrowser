@@ -11,7 +11,7 @@ import java.sql.Timestamp;
 
 /**
  *
- * @author kvoroshi
+ * @author ssydoruk
  */
 public class OrsUrsTable extends DBTable {
 

@@ -22,7 +22,7 @@ import java.awt.event.ItemListener;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Hashtable;
+import java.util.HashMap;
 import javax.swing.AbstractAction;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListModel;
@@ -408,7 +408,7 @@ public class RequestParams extends javax.swing.JPanel {
     private CheckBoxList _listComps = null;
     private DefaultListModel _modelComps = null;
 
-    private Hashtable<Integer, int[]> compChecked = new Hashtable<>();
+    private HashMap<Integer, int[]> compChecked = new HashMap<>();
     private int rptSelected = -1;
 
     class ChangeListItem {
@@ -477,7 +477,7 @@ public class RequestParams extends javax.swing.JPanel {
 
     }
 
-    private Hashtable<CheckBoxList, ChangeListItem> changeList = new Hashtable<>();
+    private HashMap<CheckBoxList, ChangeListItem> changeList = new HashMap<>();
 
     private void setChildChecked(CheckBoxList lChild, boolean boxEnabled, boolean isCurrent) {
 //        inquirer.logger.debug("in setChildChecked " + boxEnabled);

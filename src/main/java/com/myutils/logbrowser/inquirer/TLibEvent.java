@@ -18,20 +18,23 @@ public class TLibEvent extends ILogRecord {
     private int thisDNID;
     private int otherDNID;
 
-    public String getApp() {
-        return app;
-    }
-
-    public long getSeqNo() {
-        return seqNo;
-    }
     private long seqNo;
 
+
+    int handlerId;
     public TLibEvent(ResultSet rs) throws SQLException {
         this(rs, MsgType.TLIB);
     }
-
-    int handlerId;
+    public TLibEvent(ResultSet rs, MsgType msgType) throws SQLException {
+        super(rs, msgType);
+        initRecord(rs, msgType);
+    }
+    public String getApp() {
+        return app;
+    }
+    public long getSeqNo() {
+        return seqNo;
+    }
 
     public int getHandlerId() {
         return handlerId;
@@ -141,10 +144,6 @@ public class TLibEvent extends ILogRecord {
         return otherDn;
     }
 
-    public TLibEvent(ResultSet rs, MsgType msgType) throws SQLException {
-        super(rs, msgType);
-        initRecord(rs, msgType);
-    }
 
     public long GetReferenceId() {
         return m_referenceId;

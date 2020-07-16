@@ -2,7 +2,7 @@ package com.myutils.logbrowser.indexer;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -20,14 +20,17 @@ public class LCAParser extends Parser {
     private static final Pattern reqSCSDisconnected = Pattern.compile("SCSRequester '(.+)' disconnected, fd=(\\w+)");
 
     private static final Pattern regNOtificationReceived = Pattern.compile("\\#{4} App\\{(\\w+),(\\w+)\\} status changed to (\\w+) mode=(\\w+), \\[prev=(\\w+)\\]");
-    private static final Pattern regNotifyApp = Pattern.compile("'([^']+)': NotifyApp: status= (\\w+) mode=(\\w+) pid=(\\w+) \\{(\\w+), (\\w+)\\}");
-    private static final Pattern regSelfServer = Pattern.compile("SelfServer: Internal Change RUNMODE from '(\\w+)' to '(\\w+)'");
-    private static final Pattern regSCSReq = Pattern.compile("\\#{5} Request change RUNMODE for Application \\<(\\w+),(\\w+)\\> from '(\\w+)' to '(\\w+)'");
+//    private static final Pattern regNotifyApp = Pattern.compile("'([^']+)': NotifyApp: status= (\\w+) mode=(\\w+) pid=(\\w+) \\{(\\w+), (\\w+)\\}");
+//    private static final Pattern regSelfServer = Pattern.compile("SelfServer: Internal Change RUNMODE from '(\\w+)' to '(\\w+)'");
+//    private static final Pattern regSCSReq = Pattern.compile("\\#{5} Request change RUNMODE for Application \\<(\\w+),(\\w+)\\> from '(\\w+)' to '(\\w+)'");
 
     private static final Pattern regLineSkip = Pattern.compile("^[>\\s]*");
     private static final Pattern regNotParseMessage = Pattern.compile("(30201)");
+    private static final Pattern ptServerName = Pattern.compile("^Application\\s+name:\\s+(\\S+)");
+    private static final Pattern regCfgObjectName = Pattern.compile("(?:name|userName)='([^']+)'");
+    private static final Pattern regCfgObjectType = Pattern.compile("^Cfg([^=]+)=\\{DBID=(\\w+)");
+    private static final Pattern regCfgOp = Pattern.compile("^(Creating|Adding\\s[\\w]+)");
     long m_CurrentFilePos;
-    int m_CurrentLine;
     final int MSG_STRING_LIMIT = 200;
     // parse state contants
 
@@ -37,13 +40,11 @@ public class LCAParser extends Parser {
     String m_ServerName;
 
     int m_dbRecords = 0;
-    private final Hashtable m_BlockNamesToIgnoreHash;
-    private String m_LastLine;
-    private boolean customEvent = false;
+    private final HashMap m_BlockNamesToIgnoreHash;
 
     public LCAParser(HashMap<TableType, DBTable> m_tables) {
         super(FileInfoType.type_LCA, m_tables);
-        m_BlockNamesToIgnoreHash = new Hashtable();
+        m_BlockNamesToIgnoreHash = new HashMap();
 
     }
 
@@ -73,7 +74,7 @@ public class LCAParser extends Parser {
                     int l = input.getLastBytesConsumed();
                     setEndFilePos(getFilePos() + l); // to calculate file bytes
                     m_CurrentLine++;
-                    m_LastLine = str; // store previous line for server name
+//                    m_LastLine = str; // store previous line for server name
                     Main.logger.trace("l: " + m_CurrentLine + " [" + str + "]");
 
                     while (str != null) {
@@ -91,7 +92,7 @@ public class LCAParser extends Parser {
             ParseLine("", null); // to complete the parsing of the last line/last message
 
         } catch (Exception e) {
-            e.printStackTrace();
+            Main.logger.error(e);
             return m_CurrentLine - line;
         }
 
@@ -277,7 +278,6 @@ public class LCAParser extends Parser {
         return null;
     }
 
-    private static final Pattern ptServerName = Pattern.compile("^Application\\s+name:\\s+(\\S+)");
 
     protected void ParseServerName(String str) {
 
@@ -297,9 +297,6 @@ public class LCAParser extends Parser {
         SetStdFieldsAndAdd(msg);
     }
 
-    private static final Pattern regCfgObjectName = Pattern.compile("(?:name|userName)='([^']+)'");
-    private static final Pattern regCfgObjectType = Pattern.compile("^Cfg([^=]+)=\\{DBID=(\\w+)");
-    private static final Pattern regCfgOp = Pattern.compile("^(Creating|Adding\\s[\\w]+)");
 
     private void addRunModeChanged(String substring) {
         ConfigUpdateRecord msg = new ConfigUpdateRecord(substring);

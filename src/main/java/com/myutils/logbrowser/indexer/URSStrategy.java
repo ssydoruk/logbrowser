@@ -18,8 +18,14 @@ import org.apache.commons.lang3.StringUtils;
 public final class URSStrategy extends Message {
 
     private static final StrategySteps1 StrategySteps = new StrategySteps1();
+    private static final Pattern uuidPattern = Pattern.compile("^calluuid ([\\w~]+) is bound");
+    private static final Pattern ptnMod = Pattern.compile("^ASSIGN: v:\\d+:_m.+\"([\\w~]+)\"$");
+    private static final Pattern ptnFun = Pattern.compile("^ASSIGN: v:\\d+:_f.+\"([\\w~]+)\"$");
+    private static final Pattern ptnParam = Pattern.compile("^ASSIGN: v:\\d+:_p.+(\\[.+\\])$");
+    private static final Pattern ptnEventAll = Pattern.compile("^ASSIGN: v:\\d+:_eventdata\\(LOCAL\\) <- LIST: (.+)$");
+    private static final Pattern ptnNotif = Pattern.compile("^ASSIGN: v:\\d+:_event\\(LOCAL\\) <- OBJECT:[^=]+=(.+)");
 
-    private String FileLine;
+    private final String FileLine;
     private String ConnID;
     private String rest;
     private String ref2;
@@ -68,17 +74,11 @@ public final class URSStrategy extends Message {
         return StrategySteps.get(FileLine, rest);
     }
 
-    private static final Pattern uuidPattern = Pattern.compile("^calluuid ([\\w~]+) is bound");
 
     String getUUID() {
         return FindByRx(uuidPattern, rest, 1, "");
     }
 
-    private static final Pattern ptnMod = Pattern.compile("^ASSIGN: v:\\d+:_m.+\"([\\w~]+)\"$");
-    private static final Pattern ptnFun = Pattern.compile("^ASSIGN: v:\\d+:_f.+\"([\\w~]+)\"$");
-    private static final Pattern ptnParam = Pattern.compile("^ASSIGN: v:\\d+:_p.+(\\[.+\\])$");
-    private static final Pattern ptnEventAll = Pattern.compile("^ASSIGN: v:\\d+:_eventdata\\(LOCAL\\) <- LIST: (.+)$");
-    private static final Pattern ptnNotif = Pattern.compile("^ASSIGN: v:\\d+:_event\\(LOCAL\\) <- OBJECT:[^=]+=(.+)");
 
     String getStrategyRef1() {
         return ref1;
@@ -133,7 +133,6 @@ public final class URSStrategy extends Message {
                     ref2 = obj.get("data").toString();
                 }
             }
-            return;
         }
     }
 

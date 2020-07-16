@@ -18,10 +18,6 @@ import org.w3c.dom.NodeList;
 
 public abstract class OutputSpecFormatter extends DefaultFormatter {
 
-    private final XmlCfg cfg;
-
-    public class IgnoreRecordException extends Exception {
-    }
 
     final static String FILELINK = "filelink";
     final static String TIMESTAMP = "timestamp";
@@ -32,27 +28,6 @@ public abstract class OutputSpecFormatter extends DefaultFormatter {
     final static String CALLIDALIAS = "callidalias";
     final static String MSGSPECIFIC = "msgspecific";
 
-    enum ParamType {
-
-        embedded("embedded"),
-        database("database"),
-        file("file");
-
-        private final String name;
-
-        private ParamType(String s) {
-            name = s;
-        }
-
-        public boolean equalsName(String otherName) {
-            return (otherName == null) ? false : name.equals(otherName);
-        }
-
-        @Override
-        public String toString() {
-            return this.name;
-        }
-    }
 
     final static String ID_NULL = "id_none";
 
@@ -61,211 +36,140 @@ public abstract class OutputSpecFormatter extends DefaultFormatter {
 
     final static int MAX_NAME_LENGTH = 20;
     final static int DEFAULT_FILE_LINK_LENGTH = 40;
+    static private ArrayList<Element> getElementsChildByName(Element e, String name) {
+        ArrayList<Element> ret = new ArrayList<>();
+        NodeList nl = e.getChildNodes();
+        if (nl != null && nl.getLength() > 0) {
+            for (int i = 0; i < nl.getLength(); i++) {
+                if (nl.item(i).getNodeType() == Node.ELEMENT_NODE) {
+                    Element el = (Element) nl.item(i);
+                    if (el.getNodeName().equalsIgnoreCase(name)) {
+                        ret.add(el);
+                    }
+                }
+            }
+        }
+        
+        return ret;
+    }
+    static private int getCallID(String callId) {
+        if (m_callIdHash.containsKey(callId)) {
+            return ((Integer) m_callIdHash.get(callId)).intValue();
+        } else {
+            m_callIdHash.put(callId, m_callIdCount++);
+            int ret = m_callIdCount - 1;
+            return ret;
+        }
+    }
+    private final XmlCfg cfg;
 
     private HashSet<String> m_filter;
+    private HashMap<String, RecordLayout> outSpec = new HashMap<>();
+    public OutputSpecFormatter(XmlCfg cfg,
+            boolean isLongFileNameEnabled,
+            HashSet<String> components) throws Exception {
+        super(isLongFileNameEnabled, components);
+        inquirer.logger.debug("OutputSpecFormatter " + cfg.getXmlFile());
+        this.cfg = cfg;
+        doRefreshLayout();
+        
+    }
 
     protected RecordLayout getLayout(MsgType GetType) {
         return outSpec.get(GetType.toString());
     }
 
-    class RecordLayout {
 
-        ArrayList<Parameter> parameters;
-        String formatString;
-        String formatStringFromXml;
-
-        private boolean getAttribute(Element e, String key, boolean defaultValue) {
-            if (e.hasAttribute(key)) {
-                String val = e.getAttribute(key);
-                if (val != null) {
-                    if (val.equalsIgnoreCase("true") || val.equalsIgnoreCase("yes")) {
-                        return true;
-                    } else if (val.equalsIgnoreCase("false") || val.equalsIgnoreCase("no")) {
-                        return false;
-                    } else {
-                        inquirer.logger.error("Unsupported value for boolean key [" + key + "], element: [" + e + "]");
-                    }
-                }
-            }
-            return defaultValue;
-
-        }
-
-        private String getAttribute(Element e, String key, String defaultValue) {
-            String attribute = null;
-            if (e.hasAttribute(key)) {
-                attribute = e.getAttribute(key);
-            }
-            if (attribute != null && attribute.length() > 0) {
-                return attribute;
-            }
-            return defaultValue;
-        }
-
-        private RecordLayout(org.w3c.dom.Element el, String msgType) throws Exception {
-            // get format attribute, save format string
-            formatStringFromXml = el.getAttribute("format");
-
-//            if (formatAttr != null) {
-//                formatStringFromXml = formatAttr.getValue();
-//            } else {
-//                formatStringFromXml = "";
-//            }
-            // replace embedded format aliases like FILELINK
-            // with values meaningful for String.format
-//            formatString = SubstituteEmbeddedFormats(formatStringFromXml);
-            // iterate through child elements, save parameters
-            parameters = new ArrayList();
-
-//            Iterator itr = (el.getChildren()).iterator();
-//            while (itr.hasNext()) {
-            NodeList nl = el.getChildNodes();
+    private Element getElementChildByName(Element e, String name) {
+        NodeList nl = e.getChildNodes();
+        if (nl != null && nl.getLength() > 0) {
             for (int i = 0; i < nl.getLength(); i++) {
                 if (nl.item(i).getNodeType() == Node.ELEMENT_NODE) {
-                    Element paramElement = (Element) nl.item(i);
-                    Parameter parameter = null;
-
-                    ParamType paramType = ParamType.valueOf(paramElement.getAttribute("type"));
-                    String fieldName = getAttribute(paramElement, "name", TabResultDataModel.TableRow.colPrefix + i);
-
-                    switch (paramType) {
-                        case database:
-                            parameter = new DatabaseParameter(paramElement, fieldName);
-                            break;
-
-                        case file:
-                            parameter = new FileParameter(paramElement, fieldName);
-                            break;
-
-                        case embedded:
-                            parameter = new EmbeddedParameter(paramElement, fieldName);
-                            break;
-
+                    Element el = (Element) nl.item(i);
+                    if (el.getNodeName().equalsIgnoreCase(name)) {
+                        return el;
                     }
-                    parameter.setHidden(getAttribute(paramElement, "hidden", false));
-
-                    parameters.add(parameter);
-
                 }
             }
         }
 
-        public void UpdateFormatString() {
-            formatString = SubstituteEmbeddedFormats(formatStringFromXml);
-        }
+        return null;
+    }
 
-        public String PrintRecord(ILogRecord record, PrintStreams ps, IQueryResults qr) throws Exception {
-//                StringBuilder outString = new StringBuilder(512);
-//                ArrayList<String> paramValues = new ArrayList<>(parameters.size());
-            for (Parameter param : parameters) {
-                if (!param.hasFormat()) {
-                    String s = param.GetValue(record);
-                    if (s == null) { //ignore record
-                        return "";
-                    } else {
-//                            paramValues.add(s);
-                    }
-                    ps.addField(param, s);
-                } else {
-                    String s1 = param.FormatValue(record);
-                    if (s1 == null) {
-                        return "";
-                    }
-                    ps.addField(param, s1);
-                }
-            }
-            ArrayList<Parameter> addOutParams = qr.getAddOutParams(record.GetType());
-            if (addOutParams != null) {
-                for (Parameter param : addOutParams) {
-                    String s = param.printValue(record);
-                    if (s == null) { //ignore record
-                        return "";
-                    } else {
-//                            paramValues.add(s);
-                    }
-                    ps.addField(param, s);
-                }
-            }
-//                ps.println(outString);
-//                return outString.toString();
-            return null;
-        }
 
-        String PrintRecordFile(ILogRecord record, PrintStreams ps, IQueryResults qr) {
-            StringBuilder outString = new StringBuilder(512);
-//                ArrayList<String> paramValues = new ArrayList<>(parameters.size());
-            try {
-                if (isShouldPrintRecordType()) {
-                    outString.append(excelQuote()).append(record.GetType().toString()).append(excelQuote());
-                }
-                for (Parameter param : parameters) {
-                    if (!isShouldAccessFiles() && param instanceof FileParameter) {
-                        continue;
-                    }
-                    if (!isPrintFileLine() && (param instanceof EmbeddedParameter && ((EmbeddedParameter) param).isFileLink())) {
-                        continue;
-                    }
-                    addDelimiter(outString);
-                    if (!param.hasFormat()) {
-                        String s = param.GetValue(record);
-                        if (s == null) { //ignore record
-                            return "";
-                        } else {
-//                            paramValues.add(s);
-                        }
-                        outString.append(excelQuote()).append(s).append(excelQuote()); // param is field output parameters (hidden, etc). ignoring for now
-//                        ps.addField(param, s);
-                    } else {
-                        String s1 = param.FormatValue(record);
-                        if (s1 == null) {
-                            return "";
-                        }
-//                        ps.addField(param, s1);
-                        outString.append(excelQuote()).append(s1).append(excelQuote()); // param is field output parameters (hidden, etc). ignoring for now
-                    }
-                }
-                ArrayList<Parameter> addOutParams = qr.getAddOutParams(record.GetType());
-                if (addOutParams != null) {
-                    for (Parameter param : addOutParams) {
-                        addDelimiter(outString);
-                        String s = param.printValue(record);
-                        if (s == null) { //ignore record
-                            return "";
-                        } else {
-//                            paramValues.add(s);
-                        }
-//                        ps.addField(param, s);
-                        outString.append(excelQuote()).append(s).append(excelQuote()); // param is field output parameters (hidden, etc). ignoring for now
-                    }
-                }
-                ps.println(outString);
-//                return outString.toString();
-                return null;
-            } catch (Exception e) {
-                inquirer.logger.error("error printing record type " + record.GetType().toString(), e);
+    public String SubstituteEmbeddedFormats(String fromXml) {
+        if (fromXml != null) {
+            String result = "";
+            if (inquirer.getCr().isPrintLogFileName()) {
+                result = fromXml.replace(FILELINK, "%-" + (m_maxFileNameLength + 10) + "s");
+            } else {
+                result = fromXml;
             }
+            result = result.replace(CALLIDALIAS, "%-6s");
+            result = result.replace(DIRARROW, "%-2s");
+            result = result.replace(DIRVERB, "%-3s");
+            result = result.replace(SIPNAME, "%20s");
+            result = result.replace(TLIBNAME, "%20s");
+            result = result.replace(TIMESTAMP, "%s");
+            result = result.replace(MSGSPECIFIC, "%s");
+            return result;
+        } else {
             return "";
+        }
+    }
+
+    @Override
+    public void ProcessLayout() {
+        for (RecordLayout lo : outSpec.values()) {
+            lo.UpdateFormatString();
+        }
+    }
+
+
+    private void doRefreshLayout() throws Exception {
+        for (org.w3c.dom.Element el : cfg.getLayouts()) {
+            String msgType = el.getAttribute("MsgType").toLowerCase();
+            outSpec.put(msgType, new RecordLayout(el, msgType));
         }
 
     }
 
-    static public abstract class Parameter {
+    @Override
+    public void refreshFormatter() throws Exception {
+        if (cfg.loadFile()) {
+            outSpec.clear();
+            doRefreshLayout();
+        }
+    }
+
+    public void SetTlibFilter(String filter) {
+        m_filter = new HashSet<>();
+        String[] fList = filter.split(",");
+        m_filter.addAll(Arrays.asList(fList));
+    }
+
+    public static abstract class Parameter {
+
+        private String m_ShortFormat;
+        private String m_Title;
+        private boolean hidden;
+        private HashSet<RegexParam> m_match = new HashSet<>();
+        private HashSet<RegexParam> m_filter = new HashSet<>();
+        private String m_format;
+        private boolean isStatus;
+        private String prevValue = "";
+
+        Parameter(String title) {
+            this.m_Title = title;
+        }
 
         @Override
         public String toString() {
             return "Parameter{" + "m_Title=" + m_Title + ", hidden=" + hidden + '}';
         }
 
-        private String m_ShortFormat;
-        private String m_Title;
-        private boolean hidden;
-
         public boolean isHidden() {
             return hidden;
-        }
-
-        Parameter(String title) {
-            this.m_Title = title;
         }
 
         public String getTitle() {
@@ -274,12 +178,12 @@ public abstract class OutputSpecFormatter extends DefaultFormatter {
 
         private boolean CheckFilter(String str) {
 //
-            for (RegexParam f : m_filter) {
-                if (f.find(str)) {
-                    return true;
-                }
-            }
-            return false;
+for (RegexParam f : m_filter) {
+    if (f.find(str)) {
+        return true;
+    }
+}
+return false;
         }
 
         /* returns true if record should be ignored because status not changed*/
@@ -352,8 +256,120 @@ public abstract class OutputSpecFormatter extends DefaultFormatter {
             }
         }
 
-        class RegexParam {
+        public boolean hasFormat() {
+            return m_format != null && m_format.length() > 0;
+        }
 
+        public void SetFormat(String format) {
+            m_format = format;
+        }
+
+        protected void ParseParam(Element e) {
+            ParseParam(e, false);
+        }
+
+        protected void ParseParam(Element e, boolean ignorePatternForDBFields) {
+            
+            if (e != null) {
+                try {
+                    isStatus = Boolean.parseBoolean(e.getAttribute("status"));
+                    m_format = e.getAttribute("format");
+                    m_ShortFormat = e.getAttribute("shortFormat");
+                } catch (Exception ex) {
+                }
+                if (!ignorePatternForDBFields) {
+                    ArrayList<Element> els = getElementsChildByName(e, "pattern");
+                    if (els != null && els.size() > 0) {
+                        for (Iterator<Element> iterator = els.iterator(); iterator.hasNext();) {
+                            Element next = iterator.next();
+                            SetMatch(next);
+                        }
+                    }
+                }
+                for (Iterator<Element> el = getElementsChildByName(e, "filter").iterator();
+                        el != null && el.hasNext();) {
+                    SetFilter(el.next());
+                    
+                }
+            }
+        }
+
+        public void SetMatch(Element patternElement) {
+            if (patternElement != null) {
+                m_match.add(new RegexParam(patternElement));
+            }
+        }
+
+        public void SetFilter(Element patternElement) {
+            if (patternElement != null) {
+                m_filter.add(new RegexParam(patternElement));
+            }
+        }
+
+        public String GetValueFilter(String str, ILogRecord record) throws SQLException {
+            if (str != null && !str.isEmpty()) {
+                if (CheckFilter(str)) {
+                    return null;
+                }
+                if (m_match.size() > 0) {
+                    String ret = getMatchGroup(str, record);
+                    if (ret != null && CheckStatus(ret)) {
+                        ret = null;
+                    }
+                    return ret;
+                }
+            }
+            return str;
+        }
+
+        public String GetFormatFilter(String str, ILogRecord record) throws Exception {
+            if (str != null && !str.isEmpty()) {
+                String ret;
+                if (CheckFilter(str)) {
+                    /*
+                    to implement - flag to ignore field or record
+                    
+                    if return == null - ignore record
+                    if str ="" - ignore field if filter triggered
+                    */
+//                    return null;
+str = "";
+                }
+                
+                /**
+                 * strange block, not sure what it means -->*
+                 */
+                if (m_match.size() > 0) {
+                    ret = getFormatGroup(str, record);
+                } else {
+                    ret = String.format(m_format, str);
+                }
+                /*<---*/
+                
+//                ret = String.format(m_format, str);
+if (CheckStatus(ret)) {
+    ret = null;
+}
+return ret;
+            }
+            return "";
+        }
+
+        public String printValue(ILogRecord record) throws Exception {
+            
+            if (hasFormat()) {
+                return FormatValue(record);
+            } else {
+                return GetValue(record);
+            }
+        }
+
+        abstract public String GetValue(ILogRecord record) throws Exception;
+
+        abstract public String FormatValue(ILogRecord record) throws Exception;
+
+        class RegexParam {
+            
             private int m_group;
             private Pattern m_matchPattern;
             private ArrayList<Integer> m_groups = null;
@@ -425,7 +441,7 @@ public abstract class OutputSpecFormatter extends DefaultFormatter {
             private String evalExpr(String s) throws SQLException {
                 if (expr != null) {
 //                    try {
-                    return DatabaseConnector.getValue(expr, s);
+return DatabaseConnector.getValue(expr, s);
 //                    } catch (Exception ex) {
 //                        logger.log(org.apache.logging.log4j.Level.FATAL, ex);
 //                    }
@@ -543,129 +559,8 @@ public abstract class OutputSpecFormatter extends DefaultFormatter {
                 return ret;
             }
 
-        };
-
-        private HashSet<RegexParam> m_match = new HashSet<>();
-        private HashSet<RegexParam> m_filter = new HashSet<>();
-
-        private String m_format;
-
-        private boolean isStatus;
-        private String prevValue = "";
-
-        public boolean hasFormat() {
-            return m_format != null && m_format.length() > 0;
         }
-
-        public void SetFormat(String format) {
-            m_format = format;
-        }
-
-        protected void ParseParam(Element e) {
-            ParseParam(e, false);
-        }
-
-        protected void ParseParam(Element e, boolean ignorePatternForDBFields) {
-
-            if (e != null) {
-                try {
-                    isStatus = Boolean.parseBoolean(e.getAttribute("status"));
-                    m_format = e.getAttribute("format");
-                    m_ShortFormat = e.getAttribute("shortFormat");
-                } catch (Exception ex) {
-                }
-                if (!ignorePatternForDBFields) {
-                    ArrayList<Element> els = getElementsChildByName(e, "pattern");
-                    if (els != null && els.size() > 0) {
-                        for (Iterator<Element> iterator = els.iterator(); iterator.hasNext();) {
-                            Element next = iterator.next();
-                            SetMatch(next);
-                        }
-                    }
-                }
-                for (Iterator<Element> el = getElementsChildByName(e, "filter").iterator();
-                        el != null && el.hasNext();) {
-                    SetFilter(el.next());
-
-                }
-            }
-        }
-
-        public void SetMatch(Element patternElement) {
-            if (patternElement != null) {
-                m_match.add(new RegexParam(patternElement));
-            }
-        }
-
-        public void SetFilter(Element patternElement) {
-            if (patternElement != null) {
-                m_filter.add(new RegexParam(patternElement));
-            }
-        }
-
-        public String GetValueFilter(String str, ILogRecord record) throws SQLException {
-            if (str != null && !str.isEmpty()) {
-                if (CheckFilter(str)) {
-                    return null;
-                }
-                if (m_match.size() > 0) {
-                    String ret = getMatchGroup(str, record);
-                    if (ret != null && CheckStatus(ret)) {
-                        ret = null;
-                    }
-                    return ret;
-                }
-            }
-            return str;
-        }
-
-        public String GetFormatFilter(String str, ILogRecord record) throws Exception {
-            if (str != null && !str.isEmpty()) {
-                String ret;
-                if (CheckFilter(str)) {
-                    /*
-                    to implement - flag to ignore field or record
-                    
-                    if return == null - ignore record
-                    if str ="" - ignore field if filter triggered
-                     */
-//                    return null;
-                    str = "";
-                }
-
-                /**
-                 * strange block, not sure what it means -->*
-                 */
-                if (m_match.size() > 0) {
-                    ret = getFormatGroup(str, record);
-                } else {
-                    ret = String.format(m_format, str);
-                }
-                /*<---*/
-
-//                ret = String.format(m_format, str);
-                if (CheckStatus(ret)) {
-                    ret = null;
-                }
-                return ret;
-            }
-            return "";
-        }
-
-        public String printValue(ILogRecord record) throws Exception {
-
-            if (hasFormat()) {
-                return FormatValue(record);
-            } else {
-                return GetValue(record);
-            }
-        }
-
-        abstract public String GetValue(ILogRecord record) throws Exception;
-
-        abstract public String FormatValue(ILogRecord record) throws Exception;
     }
-
     static class EmbeddedParameter extends Parameter {
 
         String m_id;
@@ -692,11 +587,11 @@ public abstract class OutputSpecFormatter extends DefaultFormatter {
 //                    if (!m_isLongFileNameEnabled) {
 //                        file = GetRelativePath(file);
 //                    }
-                    int line = record.GetLine();
-                    value = file + "(" + line + "):";
-                    if (record.IsMarked()) {
-                        value += " *";
-                    }
+int line = record.GetLine();
+value = file + "(" + line + "):";
+if (record.IsMarked()) {
+    value += " *";
+}
                 } else {
                     value = "";
                 }
@@ -707,12 +602,12 @@ public abstract class OutputSpecFormatter extends DefaultFormatter {
             } else if (m_id.equals(SIPNAME)) {
                 String name = record.GetField("name");
 //                if (m_isLongFileNameEnabled) {
-                name = (record.IsInbound() ? "<-" + name : "->" + name);
-                if (name.length() > MAX_NAME_LENGTH) {
-                    name = name.substring(0, MAX_NAME_LENGTH);
-                }
+name = (record.IsInbound() ? "<-" + name : "->" + name);
+if (name.length() > MAX_NAME_LENGTH) {
+    name = name.substring(0, MAX_NAME_LENGTH);
+}
 
-                value = name;
+value = name;
 //                } else {
 //                    value = "";
 //                }
@@ -727,7 +622,7 @@ public abstract class OutputSpecFormatter extends DefaultFormatter {
 //                        }
 //                        name = newName;
 //                    }
-                    value = name;
+value = name;
                 } else {
                     value = "";
                 }
@@ -784,40 +679,6 @@ public abstract class OutputSpecFormatter extends DefaultFormatter {
         }
 
     }
-
-    private Element getElementChildByName(Element e, String name) {
-        NodeList nl = e.getChildNodes();
-        if (nl != null && nl.getLength() > 0) {
-            for (int i = 0; i < nl.getLength(); i++) {
-                if (nl.item(i).getNodeType() == Node.ELEMENT_NODE) {
-                    Element el = (Element) nl.item(i);
-                    if (el.getNodeName().equalsIgnoreCase(name)) {
-                        return el;
-                    }
-                }
-            }
-        }
-
-        return null;
-    }
-
-    static private ArrayList<Element> getElementsChildByName(Element e, String name) {
-        ArrayList<Element> ret = new ArrayList<>();
-        NodeList nl = e.getChildNodes();
-        if (nl != null && nl.getLength() > 0) {
-            for (int i = 0; i < nl.getLength(); i++) {
-                if (nl.item(i).getNodeType() == Node.ELEMENT_NODE) {
-                    Element el = (Element) nl.item(i);
-                    if (el.getNodeName().equalsIgnoreCase(name)) {
-                        ret.add(el);
-                    }
-                }
-            }
-        }
-
-        return ret;
-    }
-
     static class DatabaseParameter extends Parameter {
 
         String m_id;
@@ -855,7 +716,6 @@ public abstract class OutputSpecFormatter extends DefaultFormatter {
         }
 
     }
-
     static class FileParameter extends Parameter {
 
         private FileParameter(Element e, String defaultFieldName) throws Exception {
@@ -879,76 +739,207 @@ public abstract class OutputSpecFormatter extends DefaultFormatter {
             return "file";
         }
     }
-
-    private HashMap<String, RecordLayout> outSpec = new HashMap<>();
-
-    static private int getCallID(String callId) {
-        if (m_callIdHash.containsKey(callId)) {
-            return ((Integer) m_callIdHash.get(callId)).intValue();
-        } else {
-            m_callIdHash.put(callId, m_callIdCount++);
-            int ret = m_callIdCount - 1;
-            return ret;
+    public class IgnoreRecordException extends Exception {
+    }
+    enum ParamType {
+        
+        embedded("embedded"),
+        database("database"),
+        file("file");
+        
+        private final String name;
+        
+        private ParamType(String s) {
+            name = s;
+        }
+        
+        public boolean equalsName(String otherName) {
+            return (otherName == null) ? false : name.equals(otherName);
+        }
+        
+        @Override
+        public String toString() {
+            return this.name;
         }
     }
 
-    public String SubstituteEmbeddedFormats(String fromXml) {
-        if (fromXml != null) {
-            String result = "";
-            if (inquirer.getCr().isPrintLogFileName()) {
-                result = fromXml.replace(FILELINK, "%-" + (m_maxFileNameLength + 10) + "s");
-            } else {
-                result = fromXml;
+    class RecordLayout {
+
+        ArrayList<Parameter> parameters;
+        String formatString;
+        String formatStringFromXml;
+
+        private RecordLayout(org.w3c.dom.Element el, String msgType) throws Exception {
+            // get format attribute, save format string
+            formatStringFromXml = el.getAttribute("format");
+            
+//            if (formatAttr != null) {
+//                formatStringFromXml = formatAttr.getValue();
+//            } else {
+//                formatStringFromXml = "";
+//            }
+// replace embedded format aliases like FILELINK
+// with values meaningful for String.format
+//            formatString = SubstituteEmbeddedFormats(formatStringFromXml);
+// iterate through child elements, save parameters
+parameters = new ArrayList();
+
+//            Iterator itr = (el.getChildren()).iterator();
+//            while (itr.hasNext()) {
+NodeList nl = el.getChildNodes();
+for (int i = 0; i < nl.getLength(); i++) {
+    if (nl.item(i).getNodeType() == Node.ELEMENT_NODE) {
+        Element paramElement = (Element) nl.item(i);
+        Parameter parameter = null;
+        
+        ParamType paramType = ParamType.valueOf(paramElement.getAttribute("type"));
+        String fieldName = getAttribute(paramElement, "name", TabResultDataModel.TableRow.colPrefix + i);
+        
+        switch (paramType) {
+            case database:
+                parameter = new DatabaseParameter(paramElement, fieldName);
+                break;
+                
+            case file:
+                parameter = new FileParameter(paramElement, fieldName);
+                break;
+                
+            case embedded:
+                parameter = new EmbeddedParameter(paramElement, fieldName);
+                break;
+                
+        }
+        parameter.setHidden(getAttribute(paramElement, "hidden", false));
+        
+        parameters.add(parameter);
+        
+    }
+}
+        }
+
+        private boolean getAttribute(Element e, String key, boolean defaultValue) {
+            if (e.hasAttribute(key)) {
+                String val = e.getAttribute(key);
+                if (val != null) {
+                    if (val.equalsIgnoreCase("true") || val.equalsIgnoreCase("yes")) {
+                        return true;
+                    } else if (val.equalsIgnoreCase("false") || val.equalsIgnoreCase("no")) {
+                        return false;
+                    } else {
+                        inquirer.logger.error("Unsupported value for boolean key [" + key + "], element: [" + e + "]");
+                    }
+                }
             }
-            result = result.replace(CALLIDALIAS, "%-6s");
-            result = result.replace(DIRARROW, "%-2s");
-            result = result.replace(DIRVERB, "%-3s");
-            result = result.replace(SIPNAME, "%20s");
-            result = result.replace(TLIBNAME, "%20s");
-            result = result.replace(TIMESTAMP, "%s");
-            result = result.replace(MSGSPECIFIC, "%s");
-            return result;
+            return defaultValue;
+            
+        }
+
+        private String getAttribute(Element e, String key, String defaultValue) {
+            String attribute = null;
+            if (e.hasAttribute(key)) {
+                attribute = e.getAttribute(key);
+            }
+            if (attribute != null && attribute.length() > 0) {
+                return attribute;
+            }
+            return defaultValue;
+        }
+
+        public void UpdateFormatString() {
+            formatString = SubstituteEmbeddedFormats(formatStringFromXml);
+        }
+
+        public String PrintRecord(ILogRecord record, PrintStreams ps, IQueryResults qr) throws Exception {
+//                StringBuilder outString = new StringBuilder(512);
+//                ArrayList<String> paramValues = new ArrayList<>(parameters.size());
+for (Parameter param : parameters) {
+    if (!param.hasFormat()) {
+        String s = param.GetValue(record);
+        if (s == null) { //ignore record
+            return "";
         } else {
+//                            paramValues.add(s);
+        }
+        ps.addField(param, s);
+    } else {
+        String s1 = param.FormatValue(record);
+        if (s1 == null) {
             return "";
         }
+        ps.addField(param, s1);
     }
-
-    @Override
-    public void ProcessLayout() {
-        for (RecordLayout lo : outSpec.values()) {
-            lo.UpdateFormatString();
+}
+ArrayList<Parameter> addOutParams = qr.getAddOutParams(record.GetType());
+if (addOutParams != null) {
+    for (Parameter param : addOutParams) {
+        String s = param.printValue(record);
+        if (s == null) { //ignore record
+            return "";
+        } else {
+//                            paramValues.add(s);
         }
+        ps.addField(param, s);
     }
-
-    public OutputSpecFormatter(XmlCfg cfg,
-            boolean isLongFileNameEnabled,
-            HashSet<String> components) throws Exception {
-        super(isLongFileNameEnabled, components);
-        inquirer.logger.debug("OutputSpecFormatter " + cfg.getXmlFile());
-        this.cfg = cfg;
-        doRefreshLayout();
-
-    }
-
-    private void doRefreshLayout() throws Exception {
-        for (org.w3c.dom.Element el : cfg.getLayouts()) {
-            String msgType = el.getAttribute("MsgType").toLowerCase();
-            outSpec.put(msgType, new RecordLayout(el, msgType));
+}
+//                ps.println(outString);
+//                return outString.toString();
+return null;
         }
 
+        String PrintRecordFile(ILogRecord record, PrintStreams ps, IQueryResults qr) {
+            StringBuilder outString = new StringBuilder(512);
+//                ArrayList<String> paramValues = new ArrayList<>(parameters.size());
+try {
+    if (isShouldPrintRecordType()) {
+        outString.append(excelQuote()).append(record.GetType().toString()).append(excelQuote());
     }
-
-    @Override
-    public void refreshFormatter() throws Exception {
-        if (cfg.loadFile()) {
-            outSpec.clear();
-            doRefreshLayout();
+    for (Parameter param : parameters) {
+        if (!isShouldAccessFiles() && param instanceof FileParameter) {
+            continue;
+        }
+        if (!isPrintFileLine() && (param instanceof EmbeddedParameter && ((EmbeddedParameter) param).isFileLink())) {
+            continue;
+        }
+        addDelimiter(outString);
+        if (!param.hasFormat()) {
+            String s = param.GetValue(record);
+            if (s == null) { //ignore record
+                return "";
+            } else {
+//                            paramValues.add(s);
+            }
+            outString.append(excelQuote()).append(s).append(excelQuote()); // param is field output parameters (hidden, etc). ignoring for now
+//                        ps.addField(param, s);
+        } else {
+            String s1 = param.FormatValue(record);
+            if (s1 == null) {
+                return "";
+            }
+//                        ps.addField(param, s1);
+outString.append(excelQuote()).append(s1).append(excelQuote()); // param is field output parameters (hidden, etc). ignoring for now
         }
     }
-
-    public void SetTlibFilter(String filter) {
-        m_filter = new HashSet<>();
-        String[] fList = filter.split(",");
-        m_filter.addAll(Arrays.asList(fList));
+    ArrayList<Parameter> addOutParams = qr.getAddOutParams(record.GetType());
+    if (addOutParams != null) {
+        for (Parameter param : addOutParams) {
+            addDelimiter(outString);
+            String s = param.printValue(record);
+            if (s == null) { //ignore record
+                return "";
+            } else {
+//                            paramValues.add(s);
+            }
+//                        ps.addField(param, s);
+outString.append(excelQuote()).append(s).append(excelQuote()); // param is field output parameters (hidden, etc). ignoring for now
+        }
+    }
+    ps.println(outString);
+//                return outString.toString();
+return null;
+} catch (Exception e) {
+    inquirer.logger.error("error printing record type " + record.GetType().toString(), e);
+}
+return "";
+        }
     }
 }

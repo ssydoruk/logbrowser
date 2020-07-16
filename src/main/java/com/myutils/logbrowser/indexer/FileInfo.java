@@ -13,7 +13,7 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
@@ -23,18 +23,80 @@ import org.apache.logging.log4j.LogManager;
 
 /**
  *
- * @author kvoroshi
+ * @author ssydoruk
  */
-public class FileInfo extends Record {
+public final class FileInfo extends Record {
 
     private static final org.apache.logging.log4j.Logger logger = LogManager.getLogger();
 
     private static final int BUF_SIZE = 1024;
+
+    static HashMap m_runIds;
+    private static final Pattern regAppType = Pattern.compile("^Application type:\\s+([^\\(]+)", Pattern.CASE_INSENSITIVE);
+    private static final Pattern regGWS = Pattern.compile("^GWS\\s+(\\w+)", Pattern.CASE_INSENSITIVE);
+    private static final Pattern regGWSPIDHost = Pattern.compile("^PID@host: \\[(\\d+)@(.+)\\]$", Pattern.CASE_INSENSITIVE);
+    private static final Pattern regGWSStart = Pattern.compile("Start time: \\[(.+)\\]$", Pattern.CASE_INSENSITIVE);
+    /*
+    public static String InitDB(DBAccessor accessor, int statementId) {
+    m_fileId = 1;
+    m_runIds = new HashMap();
+    m_batchId = statementId;
+    String query = "create table if not exists file_" + m_alias + " (id INTEGER PRIMARY KEY ASC,"+
+    "name CHAR(255), RunID BIGINT, Component INTEGER, NodeId CHAR(8), App CHAR(32), Host CHAR(32));";
+    accessor.ExecuteQuery(query);
+    return "INSERT INTO file_" + m_alias + " VALUES(NULL,?,?,?,?,?,?);";
+    }
+    */
+    private static final byte[] WS_BYTES = new byte[]{(byte) 0xef, (byte) 0xbb, (byte) 0xbf};
+    private static final Pattern patternLocalTime = Pattern.compile("^Local\\s+time:\\s+(\\S+)\\s*$", Pattern.CASE_INSENSITIVE);
+    private static final Pattern startTimePattern = Pattern.compile("^Start\\s+time\\s+\\(UTC\\):\\s+(\\S+)\\s*$");
+    private static final Pattern startTimePatternGMS = Pattern.compile("^UTC START TIME:\\s+(\\S+)\\s*$");
+    private static final Pattern startTimeSIPEP = Pattern.compile("^UTC\\s+Start\\s+Time:\\s+(\\S+)\\s*$");
+    private static final Pattern startTimePatternFinalDot = Pattern.compile("\\.\\d+$");
+    private static final Pattern regAppName = Pattern.compile("^Application name:\\s+(\\S+)", Pattern.CASE_INSENSITIVE);
+    private static final Pattern regHostName = Pattern.compile("^Host name:\\s+(\\S.+)");
+    private static final Pattern regWorkSpaceHostName = Pattern.compile("^\\s+MachineName:\\s+(\\S.+)");
+    private static final Pattern regGMSHostName = Pattern.compile("^APPLICATION HOST.+:\\s+(\\S.+)");
+    private static final Pattern regHostSIPEP = Pattern.compile("^Application Host.+:\\s+(\\S.+)$");
+    private static final Pattern regTimezone = Pattern.compile("^Time zone:\\s+(\\d+)");
+    private static final Pattern regFileName = Pattern.compile("^File:\\s+\\((\\d+)\\)\\s+(\\S.+)");
+    private static final Pattern regFileNameGMS = Pattern.compile("^FILE:\\s+(\\S.+)");
+    private static final Pattern regWWECloud = Pattern.compile("(DEBUG|ERROR|WARN|INFO)\\s+\\[");
+    private static final int NUM_PARAMS_TO_READ = 7;
+    private static final Pattern regFileNameTypeSIP = Pattern.compile("-(\\d+)\\.\\d{8}_\\d{6}_\\d{3}\\.log$");
+    public static final int WORKSPACE_BYTES = 1024;
+    private static final Pattern regFileNameDate = Pattern.compile("\\.(\\d{8}_\\d{6}_\\d{3})\\.log");
+    static private DateFormat formatFileNameDate = new SimpleDateFormat("yyyyMMdd_HHmmss_SSS");
     private LogFileWrapper logFile;
     private String archiveName;
     private String filePath;
     private String fileDir;
 
+    public FileInfoType m_componentType;
+
+    public long m_runId;
+    public String m_nodeId;
+    public String m_path;
+    public String m_name;
+    private String m_app;
+    private String m_host;
+    private int appID = 0;
+
+
+    FileInfoType m_fileFilterId;
+    boolean m_ServerStartTimeSet;
+    private String appType = "";
+
+    private DateParsers dateParsers;
+    private DateParsed fileLocalTime;
+    private String logFileNo;
+    private String logFileName;
+    private long size;
+    private DateParsed fileEndTime = null;
+    private DateParsed fileStartTime;
+    private boolean ignoring = false;
+    private byte buf[] = null;
+    private int bufRead = 0;
     FileInfo(File file, LogFileWrapper wrapper) throws IOException {
         this(file);
         filePath = FilenameUtils.normalize(file.getAbsolutePath());
@@ -42,11 +104,6 @@ public class FileInfo extends Record {
         this.logFile = wrapper;
 
     }
-
-    public String getArchiveName() {
-        return archiveName;
-    }
-
     FileInfo(ZipFile logArchive, ZipEntry entry, ZIPLog aThis) throws IOException {
         this();
         m_path = entry.getName();
@@ -61,6 +118,27 @@ public class FileInfo extends Record {
         this.archiveName = logFile.getName();
     }
 
+    FileInfo(File _file) throws FileNotFoundException, IOException {
+        this();
+        m_path = _file.getPath();
+        m_name = _file.getName();
+        setSize(_file.length());
+        setFileFilter(m_component);
+        Main.logger.trace(this.toString());
+    }
+    public FileInfo() {
+        super();
+        m_nodeId = "";
+        m_runId = 0;
+        m_componentType = FileInfoType.type_Unknown;
+        m_fileFilterId = FileInfoType.type_Unknown;
+        m_ServerStartTimeSet = false;
+        m_runIds = new HashMap();
+        dateParsers = new DateParsers();
+    }
+    public String getArchiveName() {
+        return archiveName;
+    }
     public boolean fileEqual(FileInfo otherFile) throws IOException {
 
         if (getM_componentType() != otherFile.getM_componentType()) {
@@ -107,76 +185,25 @@ public class FileInfo extends Record {
 
         return false;
     }
-
     int readBytes(byte[] cbuf, int len) throws FileNotFoundException, IOException {
         BufferedReaderCrLf input = new BufferedReaderCrLf(logFile.getInputStream(this));
         int read = input.read(cbuf, 0, len);
         input.close();
         return read;
     }
-
-    static Hashtable m_runIds;
-    private static final Pattern regAppType = Pattern.compile("^Application type:\\s+([^\\(]+)", Pattern.CASE_INSENSITIVE);
-    private static final Pattern regGWS = Pattern.compile("^GWS\\s+(\\w+)", Pattern.CASE_INSENSITIVE);
-    private static final Pattern regGWSPIDHost = Pattern.compile("^PID@host: \\[(\\d+)@(.+)\\]$", Pattern.CASE_INSENSITIVE);
-    private static final Pattern regGWSStart = Pattern.compile("Start time: \\[(.+)\\]$", Pattern.CASE_INSENSITIVE);
-
-    public FileInfoType m_componentType;
-
-    public long m_runId;
-    public String m_nodeId;
-    public String m_path;
-    public String m_name;
-    private String m_app;
-    private String m_host;
-    private int appID = 0;
-
-    public DateParsed getFileEndTime() {
+    protected DateParsed getFileEndTime() {
         return fileEndTime;
     }
-
-    public void setFileEndTime(DateParsed fileEndTime) {
+    protected void setFileEndTime(DateParsed fileEndTime) {
         this.fileEndTime = fileEndTime;
     }
 
-    FileInfoType m_fileFilterId;
-    boolean m_ServerStartTimeSet;
-    private String appType = "";
-
-    private DateParsers dateParsers;
-    private DateParsed fileLocalTime;
-    private String logFileNo;
-    private String logFileName;
-    private long size;
-    private DateParsed fileEndTime = null;
-
-    FileInfo(File _file) throws FileNotFoundException, IOException {
-        this();
-        m_path = _file.getPath();
-        m_name = _file.getName();
-        setSize(_file.length());
-        setFileFilter(m_component);
-        Main.logger.trace(this.toString());
-    }
-
-    public DateParsed getFileLocalTime() {
+    protected DateParsed getFileLocalTime() {
         return fileLocalTime;
     }
 
     public DateParsed getFileStartTime() {
         return fileStartTime;
-    }
-    private DateParsed fileStartTime;
-
-    public FileInfo() {
-        super();
-        m_nodeId = "";
-        m_runId = 0;
-        m_componentType = FileInfoType.type_Unknown;
-        m_fileFilterId = FileInfoType.type_Unknown;
-        m_ServerStartTimeSet = false;
-        m_runIds = new Hashtable();
-        dateParsers = new DateParsers();
     }
 
     @Override
@@ -250,18 +277,6 @@ public class FileInfo extends Record {
         return appType;
     }
 
-    /*
-    public static String InitDB(DBAccessor accessor, int statementId) {
-            m_fileId = 1;
-            m_runIds = new Hashtable();
-            m_batchId = statementId;
-            String query = "create table if not exists file_" + m_alias + " (id INTEGER PRIMARY KEY ASC,"+
-                "name CHAR(255), RunID BIGINT, Component INTEGER, NodeId CHAR(8), App CHAR(32), Host CHAR(32));";
-            accessor.ExecuteQuery(query);
-            return "INSERT INTO file_" + m_alias + " VALUES(NULL,?,?,?,?,?,?);";
-    }
-     */
-    private static final byte[] WS_BYTES = new byte[]{(byte) 0xef, (byte) 0xbb, (byte) 0xbf};
 
     private boolean CheckCM(String filename) {
         return filename.contains("-001.")
@@ -283,27 +298,6 @@ public class FileInfo extends Record {
                 || filename.contains("-512.");
     }
 
-    private static final Pattern patternLocalTime = Pattern.compile("^Local\\s+time:\\s+(\\S+)\\s*$", Pattern.CASE_INSENSITIVE);
-    private static final Pattern startTimePattern = Pattern.compile("^Start\\s+time\\s+\\(UTC\\):\\s+(\\S+)\\s*$");
-    private static final Pattern startTimePatternGMS = Pattern.compile("^UTC START TIME:\\s+(\\S+)\\s*$");
-    private static final Pattern startTimeSIPEP = Pattern.compile("^UTC\\s+Start\\s+Time:\\s+(\\S+)\\s*$");
-
-    private static final Pattern startTimePatternFinalDot = Pattern.compile("\\.\\d+$");
-
-    private static final Pattern regAppName = Pattern.compile("^Application name:\\s+(\\S+)", Pattern.CASE_INSENSITIVE);
-    private static final Pattern regHostName = Pattern.compile("^Host name:\\s+(\\S.+)");
-    private static final Pattern regWorkSpaceHostName = Pattern.compile("^\\s+MachineName:\\s+(\\S.+)");
-    private static final Pattern regGMSHostName = Pattern.compile("^APPLICATION HOST.+:\\s+(\\S.+)");
-    private static final Pattern regHostSIPEP = Pattern.compile("^Application Host.+:\\s+(\\S.+)$");
-
-    private static final Pattern regTimezone = Pattern.compile("^Time zone:\\s+(\\d+)");
-    private static final Pattern regFileName = Pattern.compile("^File:\\s+\\((\\d+)\\)\\s+(\\S.+)");
-    private static final Pattern regFileNameGMS = Pattern.compile("^FILE:\\s+(\\S.+)");
-    private static final Pattern regWWECloud = Pattern.compile("(DEBUG|ERROR|WARN|INFO)\\s+\\[");
-
-    private static final int NUM_PARAMS_TO_READ = 7;
-
-    private static final Pattern regFileNameTypeSIP = Pattern.compile("-(\\d+)\\.\\d{8}_\\d{6}_\\d{3}\\.log$");
 
     FileType getFileType() {
 
@@ -337,7 +331,6 @@ public class FileInfo extends Record {
         logFile.doneParsing();
     }
 
-    private boolean ignoring = false;
 
     boolean getIgnoring() {
         return ignoring;
@@ -348,18 +341,6 @@ public class FileInfo extends Record {
         ignoring = true;
     }
 
-    static protected enum FileType {
-        SIP_1536,
-        UNKNOWN
-    }
-
-    private enum ParserState {
-
-        STATE_HEADER,
-        WWE_DATE,
-        APACHE_LOG_SUSPECT
-
-    }
 
     public FileInfoType CheckLog(BufferedReaderCrLf input) {
         m_handlerInProgress = false;
@@ -594,7 +575,7 @@ public class FileInfo extends Record {
 
 //                            m_app=
                             doBreak = true;
-                        } else if (!(m = ApacheWebLogsParser.getENTRY_BEGIN_PATTERN().matcher(str)).find()) {
+                        } else if (!( ApacheWebLogsParser.getENTRY_BEGIN_PATTERN().matcher(str)).find()) {
                             parserState = ParserState.STATE_HEADER;
                             doBreak = true;
                         }
@@ -803,13 +784,6 @@ public class FileInfo extends Record {
 
     }
 
-    public static final int WORKSPACE_BYTES = 1024;
-    private byte buf[] = null;
-    private int bufRead = 0;
-
-    private static final Pattern regFileNameDate = Pattern.compile("\\.(\\d{8}_\\d{6}_\\d{3})\\.log");
-
-    static private DateFormat formatFileNameDate = new SimpleDateFormat("yyyyMMdd_HHmmss_SSS");
 
     private FileInfoType checkWorkSpace(BufferedReaderCrLf input) {
         logFileName = m_name;
@@ -836,6 +810,17 @@ public class FileInfo extends Record {
 //        } catch (IOException iOException) {
 //        }
         return m_componentType;
+    }
+    static protected enum FileType {
+        SIP_1536,
+        UNKNOWN
+    }
+    private enum ParserState {
+        
+        STATE_HEADER,
+        WWE_DATE,
+        APACHE_LOG_SUSPECT
+        
     }
 
 }

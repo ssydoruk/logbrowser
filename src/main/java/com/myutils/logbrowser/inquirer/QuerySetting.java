@@ -1518,6 +1518,22 @@ public class QuerySetting extends javax.swing.JDialog {
     }
 
     private static class ConstantsModel extends AbstractTableModel {
+        InquirerCfg.GenesysConstant theConstant;
+        private Class[] types;
+        private String[] columnNames;
+        public ConstantsModel() {
+            this.theConstant = new GenesysConstant();
+            
+            columnNames
+                    = new String[]{
+                        "String value", "Constant ID"
+                    };
+            
+            types = new Class[]{
+                java.lang.String.class, java.lang.Integer.class
+            };
+            
+        }
 
         @Override
         public Class<?> getColumnClass(int columnIndex) {
@@ -1534,7 +1550,6 @@ public class QuerySetting extends javax.swing.JDialog {
             theConstant.setValueAt(aValue, rowIndex, columnIndex); //To change body of generated methods, choose Tools | Templates.
         }
 
-        InquirerCfg.GenesysConstant theConstant;
 
         public InquirerCfg.GenesysConstant getTheConstant() {
             return theConstant;
@@ -1544,27 +1559,12 @@ public class QuerySetting extends javax.swing.JDialog {
             this.theConstant = theConstant;
         }
 
-        private Class[] types;
-        private String[] columnNames;
 
         @Override
         public boolean isCellEditable(int rowIndex, int columnIndex) {
             return true; //To change body of generated methods, choose Tools | Templates.
         }
 
-        public ConstantsModel() {
-            this.theConstant = new GenesysConstant();
-
-            columnNames
-                    = new String[]{
-                        "String value", "Constant ID"
-                    };
-
-            types = new Class[]{
-                java.lang.String.class, java.lang.Integer.class
-            };
-
-        }
 
         @Override
         public int getRowCount() {

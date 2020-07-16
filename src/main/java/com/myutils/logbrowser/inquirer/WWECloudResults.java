@@ -20,110 +20,21 @@ public class WWECloudResults extends IQueryResults {
 
     private static final org.apache.logging.log4j.Logger logger = LogManager.getLogger();
 
-    private Object cidFinder;
-
-    @Override
-    public void Retrieve(QueryDialog dlg, SelectionType key, String searchID) throws SQLException {
-        runSelectionQuery(dlg, key, new IDsFinder(dlg, key, searchID));
-        doSort();
-
-    }
-
-    @Override
-    FullTableColors getAll(QueryDialog qd) throws Exception {
-        try {
-            String tmpTable = "callFlowTmp";
-            DynamicTreeNode.setNoRefNoLoad(true);
-
-            DatabaseConnector.dropTable(tmpTable);
-            inquirer.logger.info("Building temp tables");
-            String tab = "sipms";
-
-            DatabaseConnector.runQuery("create temp table " + tmpTable + " ("
-                    + "callidid int"
-                    + ",started timestamp"
-                    + ",ended timestamp"
-                    + ")\n;"
-            );
-
-//            String sWhere = StringUtils.join(new String[]{
-//                IQuery.getFileFilters(tab, "fileid", qd.getSearchApps(false)),
-//                IQuery.getDateTimeFilters(tab, "time", qd.getTimeRange()),
-//                getCheckedWhere("sip.nameID", ReferenceType.SIPMETHOD, node, "AND", DialogItem.TLIB_CALLS_SIP_NAME)
-//            },
-//                    "AND", 1, 3);
-            Wheres wh = new Wheres();
-            wh.addWhere(IQuery.getFileFilters(tab, "fileid", qd.getSearchApps(false)), "AND");
-            wh.addWhere(IQuery.getDateTimeFilters(tab, "time", qd.getTimeRange()), "AND");
-//            wh.addWhere(IQuery.getCheckedWhere("sipms.nameID", ReferenceType.SIPMETHOD,
-//                    FindNode(repComponents.getRoot(), DialogItem.TLIB_CALLS, DialogItem.TLIB_CALLS_SIP, DialogItem.TLIB_CALLS_SIP_NAME)), "AND");
-            wh.addWhere(getWhere("sipms.nameID", ReferenceType.SIPMETHOD, new String[]{"OPTIONS", "200 OK OPTIONS", "NOTIFY", "200 OK NOTIFY"}, false, false, true), "AND");
-
-            DatabaseConnector.runQuery("insert into " + tmpTable + " (callidid, started, ended)"
-                    + "\nselect distinct callidid, min(time), max(time) from " + tab
-                    + "\n" + wh.makeWhere(true)
-                    + "\ngroup by 1;");
-
-            DatabaseConnector.runQuery("create index idx_" + tmpTable + "callidid on " + tmpTable + "(callidid);");
-            DatabaseConnector.runQuery("create index idx_" + tmpTable + "started on " + tmpTable + "(started);");
-
-            TableQuery tabReport = new TableQuery(tmpTable);
-            tabReport.addOutField("UTCtoDateTime(started, \"YYYY-MM-dd HH:mm:ss.SSS\") started");
-            tabReport.addOutField("UTCtoDateTime(ended, \"YYYY-MM-dd HH:mm:ss.SSS\") ended");
-            tabReport.addOutField("jduration(ended-started) duration ");
-            tabReport.setAddAll(false);
-
-            tabReport.addRef("callidid", "callid", ReferenceType.SIPCALLID.toString(), FieldType.Optional);
-            tabReport.setOrderBy(tabReport.getTabAlias() + ".started");
-            FullTableColors currTable = tabReport.getFullTable();
-
-            return currTable; //To change body of generated methods, choose Tools | Templates.
-        } catch (Exception ex) {
-            inquirer.ExceptionHandler.handleException(this.getClass().toString(), ex);
-        } finally {
-            DynamicTreeNode.setNoRefNoLoad(false);
-
-        }
-        return null;
-    }
-
-    @Override
-    SearchFields getSearchField() {
-        SearchFields ret = new SearchFields();
-        ret.addRecMap(FileInfoType.type_WWECloud, new Pair<>(SelectionType.CALLID, "callid"));
-        return ret;
-    }
-
-    @Override
-    public UTCTimeRange refreshTimeRange(ArrayList<Integer> searchApps) throws SQLException {
-        return DatabaseConnector.getTimeRange(new String[]{TableType.WWECloud.toString(), "wweexceptions"}, searchApps);
-    }
-
-    @Override
-    public UTCTimeRange getTimeRange() throws SQLException {
-        return DatabaseConnector.getTimeRange(new String[]{TableType.WWECloud.toString(), "wweexceptions"});
-    }
 
     public static final int TLIB = 0x01;
     public static final int ISCC = 0x02;
     public static final int TC = 0x04;
     public static final int SIP = 0x08;
     public static final int PROXY = 0x10;
+    private static String[] RequestsToShow = {"RequestMakePredictiveCall", "RequestMakeCall"};
+    private static String[] EventsToShow = {"EventDialing", "EventNetworkReached"};
+    private Object cidFinder;
 
     private String m_tlibFilter;
 
     private int m_componentFilter;
-
-    @Override
-    public String getReportSummary() {
-        return getName() + "\n\t" + "search: " + ((cidFinder != null) ? cidFinder.toString() : "<not specified>");
-    }
-
-    @Override
-    public String getName() {
-        return "WS Cloud Web";
-    }
-
+    ArrayList<NameID> appsType = null;
+    private UTCTimeRange timeRange = null;
     /**
      *
      */
@@ -140,6 +51,94 @@ public class WWECloudResults extends IQueryResults {
         addSelectionType(SelectionType.AGENTID);
         addSelectionType(SelectionType.UUID);
     }
+    @Override
+    public void Retrieve(QueryDialog dlg, SelectionType key, String searchID) throws SQLException {
+        runSelectionQuery(dlg, key, new IDsFinder(dlg, key, searchID));
+        doSort();
+
+    }
+    @Override
+            FullTableColors getAll(QueryDialog qd) throws Exception {
+                try {
+                    String tmpTable = "callFlowTmp";
+                    DynamicTreeNode.setNoRefNoLoad(true);
+                    
+                    DatabaseConnector.dropTable(tmpTable);
+                    inquirer.logger.info("Building temp tables");
+                    String tab = "sipms";
+                    
+                    DatabaseConnector.runQuery("create temp table " + tmpTable + " ("
+                            + "callidid int"
+                            + ",started timestamp"
+                            + ",ended timestamp"
+                            + ")\n;"
+                    );
+                    
+//            String sWhere = StringUtils.join(new String[]{
+//                IQuery.getFileFilters(tab, "fileid", qd.getSearchApps(false)),
+//                IQuery.getDateTimeFilters(tab, "time", qd.getTimeRange()),
+//                getCheckedWhere("sip.nameID", ReferenceType.SIPMETHOD, node, "AND", DialogItem.TLIB_CALLS_SIP_NAME)
+//            },
+//                    "AND", 1, 3);
+Wheres wh = new Wheres();
+wh.addWhere(IQuery.getFileFilters(tab, "fileid", qd.getSearchApps(false)), "AND");
+wh.addWhere(IQuery.getDateTimeFilters(tab, "time", qd.getTimeRange()), "AND");
+//            wh.addWhere(IQuery.getCheckedWhere("sipms.nameID", ReferenceType.SIPMETHOD,
+//                    FindNode(repComponents.getRoot(), DialogItem.TLIB_CALLS, DialogItem.TLIB_CALLS_SIP, DialogItem.TLIB_CALLS_SIP_NAME)), "AND");
+wh.addWhere(getWhere("sipms.nameID", ReferenceType.SIPMETHOD, new String[]{"OPTIONS", "200 OK OPTIONS", "NOTIFY", "200 OK NOTIFY"}, false, false, true), "AND");
+
+DatabaseConnector.runQuery("insert into " + tmpTable + " (callidid, started, ended)"
+        + "\nselect distinct callidid, min(time), max(time) from " + tab
+        + "\n" + wh.makeWhere(true)
+        + "\ngroup by 1;");
+
+DatabaseConnector.runQuery("create index idx_" + tmpTable + "callidid on " + tmpTable + "(callidid);");
+DatabaseConnector.runQuery("create index idx_" + tmpTable + "started on " + tmpTable + "(started);");
+
+TableQuery tabReport = new TableQuery(tmpTable);
+tabReport.addOutField("UTCtoDateTime(started, \"YYYY-MM-dd HH:mm:ss.SSS\") started");
+tabReport.addOutField("UTCtoDateTime(ended, \"YYYY-MM-dd HH:mm:ss.SSS\") ended");
+tabReport.addOutField("jduration(ended-started) duration ");
+tabReport.setAddAll(false);
+
+tabReport.addRef("callidid", "callid", ReferenceType.SIPCALLID.toString(), FieldType.Optional);
+tabReport.setOrderBy(tabReport.getTabAlias() + ".started");
+FullTableColors currTable = tabReport.getFullTable();
+
+return currTable; //To change body of generated methods, choose Tools | Templates.
+                } catch (Exception ex) {
+                    inquirer.ExceptionHandler.handleException(this.getClass().toString(), ex);
+                } finally {
+                    DynamicTreeNode.setNoRefNoLoad(false);
+                    
+                }
+                return null;
+            }
+            @Override
+            SearchFields getSearchField() {
+                SearchFields ret = new SearchFields();
+                ret.addRecMap(FileInfoType.type_WWECloud, new Pair<>(SelectionType.CALLID, "callid"));
+                return ret;
+            }
+            @Override
+            public UTCTimeRange refreshTimeRange(ArrayList<Integer> searchApps) throws SQLException {
+                return DatabaseConnector.getTimeRange(new String[]{TableType.WWECloud.toString(), "wweexceptions"}, searchApps);
+            }
+            @Override
+            public UTCTimeRange getTimeRange() throws SQLException {
+                return DatabaseConnector.getTimeRange(new String[]{TableType.WWECloud.toString(), "wweexceptions"});
+            }
+
+    @Override
+    public String getReportSummary() {
+        return getName() + "\n\t" + "search: " + ((cidFinder != null) ? cidFinder.toString() : "<not specified>");
+    }
+
+    @Override
+    public String getName() {
+        return "WS Cloud Web";
+    }
+
 
     public void SetConfig(Properties config) {
         if (config != null && !config.isEmpty()) {
@@ -147,8 +146,6 @@ public class WWECloudResults extends IQueryResults {
         }
     }
 
-    private static String[] RequestsToShow = {"RequestMakePredictiveCall", "RequestMakeCall"};
-    private static String[] EventsToShow = {"EventDialing", "EventNetworkReached"};
 
     public void addTLibReportType(DynamicTreeNode<OptionNode> root) {
         DynamicTreeNode<OptionNode> nd = new DynamicTreeNode<>(new OptionNode(DialogItem.TLIB_CALLS_TEVENT));
@@ -247,7 +244,6 @@ public class WWECloudResults extends IQueryResults {
         DoneSTDOptions();
     }
 
-    ArrayList<NameID> appsType = null;
 
     @Override
     public ArrayList<NameID> getApps() throws Exception {
@@ -262,7 +258,6 @@ public class WWECloudResults extends IQueryResults {
     void SetConfig(InquirerCfg cr) {
 //        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
-    private UTCTimeRange timeRange = null;
 
     @Override
     public void Retrieve(QueryDialog dlg) throws SQLException {

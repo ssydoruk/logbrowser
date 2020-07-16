@@ -43,44 +43,21 @@ import org.apache.logging.log4j.LogManager;
 public class TabResultDataModel extends AbstractTableModel {
 
     private static final org.apache.logging.log4j.Logger logger = LogManager.getLogger();
-
-    TabResultDataModel(TabResultDataModel srcModel) {
-//        this.columnIdxAdjusterType = new HashMap<>(srcModel.columnIdxAdjusterType);
-        this.columnIdxAdjusterType = new HashMap<>();
-
-        this.columnsWithDataType = new HashMap(srcModel.columnsWithDataType);
-        this.tableData = new ArrayList<>();
-        copyData(tableData, srcModel.tableData);
-
-        this.columnTitle = new HashMap<>(srcModel.columnTitle);
-        columnParamsOrig = new ColumnParams(srcModel.columnParamsOrig);
-        columnParams = new ColumnParams(columnParamsOrig);
-
-    }
-
-    public ColumnParams getColumnParams() {
-        return columnParams;
-    }
-
-    private boolean isAggregate;
-    private ArrayList<String> shortAbsoluteFileNames;
-    private int emptyColumns;
-
-    public ArrayList<String> getFullFileNames() {
-        return fullFileNames;
-    }
-
-    public ArrayList<String> getShortFileNames() {
-        return shortFileNames;
-    }
-
+    /*order of columns by default*/
+    private static final String[] fixedColumns = new String[]{"Type", "timestamp", "app", "direction", "name", "connid", "sid", "thisdn", "otherdn"};
+    private static final HashMap<MsgType, Pair<Color, Color>> msgRowColors = initMsgColors();
+    private static HashMap<MsgType, Pair<Color, Color>> msgAssignedColors = new HashMap<>();
+    private static final ArrayList<Pair<Color, Color>> stdColors = initStdColors();
+    private static int stdColorsIdx = 0;
+    private static HashMap<Integer, Pair<Color, Color>> assignedColorsAggregate = new HashMap<>();
+    private static final Pattern normalPattern = Pattern.compile("^[\\s|]*(.+)[\\s|]*$");
     /*
     1st color - foreground
     2nd color - background
     
-    http://www.javascripter.net/faq/colornam.htm    
-    http://www.rapidtables.com/web/color/RGB_Color.htm    
-     */
+    http://www.javascripter.net/faq/colornam.htm
+    http://www.rapidtables.com/web/color/RGB_Color.htm
+    */
     private static HashMap<MsgType, Pair<Color, Color>> initMsgColors() {
         HashMap<MsgType, Pair<Color, Color>> ret = new HashMap<>();
         ret.put(MsgType.TLIB, new Pair(Color.decode("#000000"), Color.decode("#FFFFFF")));
@@ -89,7 +66,6 @@ public class TabResultDataModel extends AbstractTableModel {
         ret.put(MsgType.ORSM, new Pair(Color.decode("#000000"), Color.decode("#BDB76B")));
         return ret;
     }
-
     private static ArrayList<Pair<Color, Color>> initStdColors() {
         ArrayList<Pair<Color, Color>> ret = new ArrayList<>();
         ret.add(new Pair(Color.decode("#000000"), Color.decode("#DEB887")));
@@ -99,6 +75,26 @@ public class TabResultDataModel extends AbstractTableModel {
         ret.add(new Pair(Color.decode("#FFFFFF"), Color.decode("#800000")));
         return ret;
     }
+    public static int msgRowColorsSize() {
+        return msgRowColors.size();
+    }
+    public static Pair<Color, Color> getColorIdx(int idx) {
+        Pair<Color, Color> ret = null;
+        if (idx < msgRowColors.size()) {
+            ret = (Pair<Color, Color>) msgRowColors.values().toArray()[idx];
+        } else {
+            idx -= msgRowColors.size();
+            if (idx < stdColors.size()) {
+                ret = (Pair<Color, Color>) stdColors.toArray()[idx];
+            }
+        }
+        return ret;
+    }
+
+    private boolean isAggregate;
+    private ArrayList<String> shortAbsoluteFileNames;
+    private int emptyColumns;
+
 
     private HashMap<String, Integer> columnTitle;
     private ArrayList<TableRow> tableData;
@@ -112,6 +108,22 @@ public class TabResultDataModel extends AbstractTableModel {
     private HashMap<MsgType, HashMap> columnIdxAdjusterType;
     ColumnParams columnParams;
     ColumnParams columnParamsOrig;
+    private TableRow currentRow = null;
+    //    private int rowTypes = 0;
+    MsgType lastRowType = MsgType.UNKNOWN;
+    TabResultDataModel(TabResultDataModel srcModel) {
+//        this.columnIdxAdjusterType = new HashMap<>(srcModel.columnIdxAdjusterType);
+this.columnIdxAdjusterType = new HashMap<>();
+
+this.columnsWithDataType = new HashMap(srcModel.columnsWithDataType);
+this.tableData = new ArrayList<>();
+copyData(tableData, srcModel.tableData);
+
+this.columnTitle = new HashMap<>(srcModel.columnTitle);
+columnParamsOrig = new ColumnParams(srcModel.columnParamsOrig);
+columnParams = new ColumnParams(columnParamsOrig);
+
+    }
 
     public TabResultDataModel() {
         this.columnIdxAdjusterType = new HashMap<>();
@@ -127,6 +139,15 @@ public class TabResultDataModel extends AbstractTableModel {
         columnParamsOrig = new ColumnParams();
 
     }
+    public ColumnParams getColumnParams() {
+        return columnParams;
+    }
+    public ArrayList<String> getFullFileNames() {
+        return fullFileNames;
+    }
+    public ArrayList<String> getShortFileNames() {
+        return shortFileNames;
+    }
 
     private <T, E> T getKeyByValue(Map<T, E> map, E value) {
         for (Entry<T, E> entry : map.entrySet()) {
@@ -136,8 +157,6 @@ public class TabResultDataModel extends AbstractTableModel {
         }
         return null;
     }
-    /*order of columns by default*/
-    private static final String[] fixedColumns = new String[]{"Type", "timestamp", "app", "direction", "name", "connid", "sid", "thisdn", "otherdn"};
 
     @Override
     public int getColumnCount() {
@@ -297,32 +316,6 @@ public class TabResultDataModel extends AbstractTableModel {
     public void setValueAt(Object aValue, int row, int column) {
     }
 
-    private static final HashMap<MsgType, Pair<Color, Color>> msgRowColors = initMsgColors();
-
-    private static HashMap<MsgType, Pair<Color, Color>> msgAssignedColors = new HashMap<>();
-
-    public static int msgRowColorsSize() {
-        return msgRowColors.size();
-    }
-
-    private static final ArrayList<Pair<Color, Color>> stdColors = initStdColors();
-
-    private static int stdColorsIdx = 0;
-
-    private static HashMap<Integer, Pair<Color, Color>> assignedColorsAggregate = new HashMap<>();
-
-    public static Pair<Color, Color> getColorIdx(int idx) {
-        Pair<Color, Color> ret = null;
-        if (idx < msgRowColors.size()) {
-            ret = (Pair<Color, Color>) msgRowColors.values().toArray()[idx];
-        } else {
-            idx -= msgRowColors.size();
-            if (idx < stdColors.size()) {
-                ret = (Pair<Color, Color>) stdColors.toArray()[idx];
-            }
-        }
-        return ret;
-    }
 
     Pair<Color, Color> rowColors(int row) {
         Pair<Color, Color> ret = null;
@@ -381,7 +374,6 @@ public class TabResultDataModel extends AbstractTableModel {
         }
     }
 
-    private static final Pattern normalPattern = Pattern.compile("^[\\s|]*(.+)[\\s|]*$");
 
     private String normalizeCellData(String data) {
         Matcher m;
@@ -911,156 +903,6 @@ public class TabResultDataModel extends AbstractTableModel {
         columnParams.unhideTemps();
     }
 
-    public class TableRow {
-
-        private int fileID = 0;
-
-        @Override
-        public String toString() {
-            return "TableRow{" + "fileID=" + fileID + ", rowData=" + rowData + ", rowType=" + rowType + ", columntIdx=" + columntIdx + ", FileName=" + FileName + ", fileBytes=" + fileBytes + ", line=" + line + ", offset=" + offset + ", cellColor=" + cellColor + '}';
-        }
-
-        private TableRow(TableRow tableRow) {
-            this();
-            for (Entry<Integer, Object> row : tableRow.rowData.entrySet()) {
-                rowData.put(row.getKey(), row.getValue());
-            }
-            setFileInfo(tableRow.FileName, tableRow.fileBytes, tableRow.line, tableRow.offset);
-            rowType = tableRow.rowType;
-        }
-
-        public int getFileID() {
-            return fileID;
-        }
-
-        public void setFileID(int fileID) {
-            this.fileID = fileID;
-        }
-
-        public int getFileBytes() {
-            return fileBytes;
-        }
-
-        private HashMap<Integer, Object> rowData;
-
-        public MsgType getRowType() {
-            return rowType;
-        }
-
-        private MsgType rowType;
-        private int columntIdx;
-        private LogFile FileName;
-        private int fileBytes;
-        private int line;
-        private long offset;
-
-        private Pair<Color, Color> cellColor = null;
-
-        public Pair<Color, Color> getCellColor() {
-            return cellColor;
-        }
-
-        public void setCellColor(Pair<Color, Color> cellColor) {
-            this.cellColor = cellColor;
-        }
-
-        public TableRow() {
-            this.rowData = new HashMap<>();
-            columntIdx = 0;
-        }
-
-        public final static String colPrefix = "$col$";
-
-        public int size() {
-            return rowData.size();
-        }
-
-        public int addCell(String title, String data) {
-            int columnIdx = 0;
-            if (isAggregate) {
-                if (data != null && !data.isEmpty() && (title == null || !title.equals("filename"))) {
-                    columnIdx = getTitleIdx(title);
-                    rowData.put(columnIdx, data);
-                }
-            } else {
-                if ((title == null || !title.equals("filename"))) {
-//            if (data != null && !data.isEmpty() && (title==null || !title.equals("filename"))) {
-//                rowData.put(getTitleIdx(title), data);
-//                    columnIdx = getTitleIdx("col" + columntIdx);
-                    String t;
-
-                    if (title != null && !title.isEmpty()) {
-                        t = title;
-                    } else {
-                        t = colPrefix + columntIdx;
-                    }
-//                    t = colPrefix + columntIdx;
-
-                    if (data != null && !data.isEmpty()) {
-                        columnIdx = getTitleIdx(t);
-                        String curData = (String) rowData.get(columnIdx);
-                        if (curData == null || curData.isEmpty()) {
-                            putRowData(columnIdx, t, data);
-                        } else {
-                            putRowData(columnIdx, t, curData + " | " + data);
-
-                        }
-                        HashSet hm = columnsWithDataType.get(getRowType());
-                        if (hm == null) {
-                            hm = new HashSet();
-                            columnsWithDataType.put(getRowType(), hm);
-                        }
-                        if (!hm.contains(columnIdx)) {
-                            hm.add(columnIdx);
-                        }
-                    }
-                    columntIdx++;
-                }
-            }
-            return columnIdx;
-        }
-
-        private String getColumn(int colIdx) {
-            Object ret = rowData.get(colIdx);
-            if (ret != null && (ret instanceof String) && !((String) ret).isEmpty()) {
-                return (String) ret;
-            }
-            return "";
-        }
-
-        public void setType(MsgType GetType) {
-            this.rowType = GetType;
-        }
-
-        public LogFile getFileName() {
-            return FileName;
-        }
-
-        public int getLine() {
-            return line;
-        }
-
-        public void setFileInfo(LogFile GetFileName, int GetFileBytes, int GetLine, long _offset) {
-            this.FileName = GetFileName;
-//            inquirer.logger.info("b["+GetFileName+"] a["+this.FileName+"]");
-            this.fileBytes = GetFileBytes;
-            this.line = GetLine;
-            this.offset = _offset;
-        }
-
-        public long getOffset() {
-            return offset;
-        }
-
-        private void putRowData(int columnIdx, String t, String data) {
-            if (inquirer.logger.isTraceEnabled()) {
-                rowData.put(columnIdx, t + "[" + data + "]");
-            } else {
-                rowData.put(columnIdx, data);
-            }
-        }
-
-    }
 
     private Integer getTitleIdx(String title) {
         Integer ret = columnTitle.get(title);
@@ -1092,20 +934,217 @@ public class TabResultDataModel extends AbstractTableModel {
 
     }
 
-    private TableRow currentRow = null;
+
+    public void addCell(OutputSpecFormatter.Parameter param, String data) {
+        int columnIdx = addCell(param.getTitle(), data);
+        columnParams.setParams(currentRow.getRowType(), columnIdx, param);
+        columnParamsOrig.setParams(currentRow.getRowType(), columnIdx, param);
+    }
+
+    public int addCell(String title, String data) {
+        if (tableData.isEmpty()) {
+            addRow();
+        }
+        return currentRow.addCell(title, normalizeCellData(data));
+//        int columnIdx = currentRow.addCell(title, normalizeCellData(data));
+
+//        if (data != null && !data.trim().isEmpty()) {
+////            if (!columnsWithData.contains(columnIdx)) {
+////                columnsWithData.add(columnIdx);
+////            }
+//            HashSet hm = columnsWithDataType.get(currentRow.getRowType());
+//            if (hm == null) {
+//                hm = new HashSet();
+//                columnsWithDataType.put(currentRow.getRowType(), hm);
+//            }
+//            if (!hm.contains(columnIdx)) {
+//                hm.add(columnIdx);
+//            }
+//        }
+    }
+
+    public HashMap<MsgType, Integer> getTypeStat(JTable table) {
+        HashMap<MsgType, Integer> ret = new HashMap<>();
+
+        for (int row = 0; row < table.getRowCount(); row++) {
+            TableRow tableRow = getRow(table.convertRowIndexToModel(row));
+            Integer curCnt = ret.get(tableRow.getRowType());
+            if (curCnt == null) {
+                curCnt = new Integer(0);
+            }
+            ret.put(tableRow.getRowType(), curCnt.intValue() + 1);
+        }
+        return ret;
+    }
+
+
+    public TableRow addRow() {
+        if (currentRow != null) {
+            MsgType rowType = currentRow.getRowType();
+            if (rowType != null && rowType != MsgType.UNKNOWN && lastRowType != rowType) {
+                lastRowType = rowType;
+//                rowTypes++;
+            }
+        }
+        currentRow = new TableRow();
+        tableData.add(currentRow);
+        return currentRow;
+    }
+
+    public TableRow getCurrentRow() {
+        return currentRow;
+    }
+
+    public class TableRow {
+
+        public final static String colPrefix = "$col$";
+        private int fileID = 0;
+        private HashMap<Integer, Object> rowData;
+        private MsgType rowType;
+        private int columntIdx;
+        private LogFile FileName;
+        private int fileBytes;
+        private int line;
+        private long offset;
+        private Pair<Color, Color> cellColor = null;
+
+        private TableRow(TableRow tableRow) {
+            this();
+            for (Entry<Integer, Object> row : tableRow.rowData.entrySet()) {
+                rowData.put(row.getKey(), row.getValue());
+            }
+            setFileInfo(tableRow.FileName, tableRow.fileBytes, tableRow.line, tableRow.offset);
+            rowType = tableRow.rowType;
+        }
+
+        public TableRow() {
+            this.rowData = new HashMap<>();
+            columntIdx = 0;
+        }
+
+        @Override
+        public String toString() {
+            return "TableRow{" + "fileID=" + fileID + ", rowData=" + rowData + ", rowType=" + rowType + ", columntIdx=" + columntIdx + ", FileName=" + FileName + ", fileBytes=" + fileBytes + ", line=" + line + ", offset=" + offset + ", cellColor=" + cellColor + '}';
+        }
+
+        public int getFileID() {
+            return fileID;
+        }
+
+        public void setFileID(int fileID) {
+            this.fileID = fileID;
+        }
+
+        public int getFileBytes() {
+            return fileBytes;
+        }
+
+        public MsgType getRowType() {
+            return rowType;
+        }
+
+        public Pair<Color, Color> getCellColor() {
+            return cellColor;
+        }
+
+        public void setCellColor(Pair<Color, Color> cellColor) {
+            this.cellColor = cellColor;
+        }
+
+        public int size() {
+            return rowData.size();
+        }
+
+        public int addCell(String title, String data) {
+            int columnIdx = 0;
+            if (isAggregate) {
+                if (data != null && !data.isEmpty() && (title == null || !title.equals("filename"))) {
+                    columnIdx = getTitleIdx(title);
+                    rowData.put(columnIdx, data);
+                }
+            } else {
+                if ((title == null || !title.equals("filename"))) {
+//            if (data != null && !data.isEmpty() && (title==null || !title.equals("filename"))) {
+//                rowData.put(getTitleIdx(title), data);
+//                    columnIdx = getTitleIdx("col" + columntIdx);
+String t;
+
+if (title != null && !title.isEmpty()) {
+    t = title;
+} else {
+    t = colPrefix + columntIdx;
+}
+//                    t = colPrefix + columntIdx;
+
+if (data != null && !data.isEmpty()) {
+    columnIdx = getTitleIdx(t);
+    String curData = (String) rowData.get(columnIdx);
+    if (curData == null || curData.isEmpty()) {
+        putRowData(columnIdx, t, data);
+    } else {
+        putRowData(columnIdx, t, curData + " | " + data);
+        
+    }
+    HashSet hm = columnsWithDataType.get(getRowType());
+    if (hm == null) {
+        hm = new HashSet();
+        columnsWithDataType.put(getRowType(), hm);
+    }
+    if (!hm.contains(columnIdx)) {
+        hm.add(columnIdx);
+    }
+}
+columntIdx++;
+                }
+            }
+            return columnIdx;
+        }
+
+        private String getColumn(int colIdx) {
+            Object ret = rowData.get(colIdx);
+            if (ret != null && (ret instanceof String) && !((String) ret).isEmpty()) {
+                return (String) ret;
+            }
+            return "";
+        }
+
+        public void setType(MsgType GetType) {
+            this.rowType = GetType;
+        }
+
+        public LogFile getFileName() {
+            return FileName;
+        }
+
+        public int getLine() {
+            return line;
+        }
+
+        public void setFileInfo(LogFile GetFileName, int GetFileBytes, int GetLine, long _offset) {
+            this.FileName = GetFileName;
+//            inquirer.logger.info("b["+GetFileName+"] a["+this.FileName+"]");
+this.fileBytes = GetFileBytes;
+this.line = GetLine;
+this.offset = _offset;
+        }
+
+        public long getOffset() {
+            return offset;
+        }
+
+        private void putRowData(int columnIdx, String t, String data) {
+            if (inquirer.logger.isTraceEnabled()) {
+                rowData.put(columnIdx, t + "[" + data + "]");
+            } else {
+                rowData.put(columnIdx, data);
+            }
+        }
+    }
 
     class FieldParams {
 
         private boolean hidden;
         private boolean tempHidden;
-
-        public boolean isTempHidden() {
-            return tempHidden;
-        }
-
-        public void setTempHidden(boolean tempHidden) {
-            this.tempHidden = tempHidden;
-        }
         private String title;
         private String type;
 
@@ -1128,6 +1167,14 @@ public class TabResultDataModel extends AbstractTableModel {
             this.type = prm.getType();
         }
 
+        public boolean isTempHidden() {
+            return tempHidden;
+        }
+
+        public void setTempHidden(boolean tempHidden) {
+            this.tempHidden = tempHidden;
+        }
+
         public String getType() {
             return type;
         }
@@ -1144,9 +1191,7 @@ public class TabResultDataModel extends AbstractTableModel {
             hidden = isHidden;
             tempHidden = isHidden;
         }
-
     }
-
     class ColumnParam extends Pair<Integer, FieldParams> {
 
         private ColumnParam(int columnIdx, OutputSpecFormatter.Parameter param) {
@@ -1176,6 +1221,13 @@ public class TabResultDataModel extends AbstractTableModel {
         public ColumnParams() {
         }
 
+        private ColumnParams(ColumnParams columnParams) {
+            this();
+            for (Entry<MsgType, ArrayList<ColumnParam>> entry : columnParams.entrySet()) {
+                put(entry.getKey(), dupl(entry.getValue()));
+            }
+        }
+
         private ArrayList<ColumnParam> dupl(ArrayList<ColumnParam> src) {
             ArrayList<ColumnParam> ret = new ArrayList<>(src.size());
             for (ColumnParam columnParam : src) {
@@ -1183,13 +1235,6 @@ public class TabResultDataModel extends AbstractTableModel {
             }
             return ret;
 
-        }
-
-        private ColumnParams(ColumnParams columnParams) {
-            this();
-            for (Entry<MsgType, ArrayList<ColumnParam>> entry : columnParams.entrySet()) {
-                put(entry.getKey(), dupl(entry.getValue()));
-            }
         }
 
         private void setParams(MsgType rowType, int columnIdx, OutputSpecFormatter.Parameter param) {
@@ -1276,69 +1321,6 @@ public class TabResultDataModel extends AbstractTableModel {
                 }
             }
         }
-
-    }
-
-    public void addCell(OutputSpecFormatter.Parameter param, String data) {
-        int columnIdx = addCell(param.getTitle(), data);
-        columnParams.setParams(currentRow.getRowType(), columnIdx, param);
-        columnParamsOrig.setParams(currentRow.getRowType(), columnIdx, param);
-    }
-
-    public int addCell(String title, String data) {
-        if (tableData.isEmpty()) {
-            addRow();
-        }
-        return currentRow.addCell(title, normalizeCellData(data));
-//        int columnIdx = currentRow.addCell(title, normalizeCellData(data));
-
-//        if (data != null && !data.trim().isEmpty()) {
-////            if (!columnsWithData.contains(columnIdx)) {
-////                columnsWithData.add(columnIdx);
-////            }
-//            HashSet hm = columnsWithDataType.get(currentRow.getRowType());
-//            if (hm == null) {
-//                hm = new HashSet();
-//                columnsWithDataType.put(currentRow.getRowType(), hm);
-//            }
-//            if (!hm.contains(columnIdx)) {
-//                hm.add(columnIdx);
-//            }
-//        }
-    }
-
-    public HashMap<MsgType, Integer> getTypeStat(JTable table) {
-        HashMap<MsgType, Integer> ret = new HashMap<>();
-
-        for (int row = 0; row < table.getRowCount(); row++) {
-            TableRow tableRow = getRow(table.convertRowIndexToModel(row));
-            Integer curCnt = ret.get(tableRow.getRowType());
-            if (curCnt == null) {
-                curCnt = new Integer(0);
-            }
-            ret.put(tableRow.getRowType(), curCnt.intValue() + 1);
-        }
-        return ret;
-    }
-
-//    private int rowTypes = 0;
-    MsgType lastRowType = MsgType.UNKNOWN;
-
-    public TableRow addRow() {
-        if (currentRow != null) {
-            MsgType rowType = currentRow.getRowType();
-            if (rowType != null && rowType != MsgType.UNKNOWN && lastRowType != rowType) {
-                lastRowType = rowType;
-//                rowTypes++;
-            }
-        }
-        currentRow = new TableRow();
-        tableData.add(currentRow);
-        return currentRow;
-    }
-
-    public TableRow getCurrentRow() {
-        return currentRow;
     }
 
 }

@@ -15,8 +15,37 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 public class MediaServerResults extends IQueryResults {
+    public static final int TLIB = 0x01;
+    public static final int ISCC = 0x02;
+    public static final int TC = 0x04;
+    public static final int SIP = 0x08;
+    public static final int PROXY = 0x10;
 
     private Object cidFinder;
+    ArrayList<NameID> appsType = null;
+    private UTCTimeRange timeRange = null;
+    /**
+     *
+     */
+    public MediaServerResults(QueryDialogSettings qdSettings) throws SQLException {
+        super(qdSettings);
+        if (repComponents.isEmpty()) {
+            loadStdOptions();
+        }
+        addSelectionType(SelectionType.NO_SELECTION);
+        addSelectionType(SelectionType.GUESS_SELECTION);
+        addSelectionType(SelectionType.CALLID);
+        addSelectionType(SelectionType.MCP_CALLID);
+        addSelectionType(SelectionType.DN);
+        addSelectionType(SelectionType.PEERIP);
+        addSelectionType(SelectionType.AGENTID);
+        addSelectionType(SelectionType.UUID);
+    }
+    public MediaServerResults() throws SQLException {
+        super();
+        loadStdOptions();
+//        repComponents.getRoot().addChild(addLogMessagesReportType(TableType.MsgTServer));
+    }
 
     @Override
     public void Retrieve(QueryDialog dlg, SelectionType key, String searchID) throws SQLException {
@@ -118,11 +147,6 @@ public class MediaServerResults extends IQueryResults {
         return refreshTimeRange(null);
     }
 
-    public static final int TLIB = 0x01;
-    public static final int ISCC = 0x02;
-    public static final int TC = 0x04;
-    public static final int SIP = 0x08;
-    public static final int PROXY = 0x10;
 
     @Override
     public String getReportSummary() {
@@ -134,29 +158,6 @@ public class MediaServerResults extends IQueryResults {
         return "Media Server";
     }
 
-    /**
-     *
-     */
-    public MediaServerResults(QueryDialogSettings qdSettings) throws SQLException {
-        super(qdSettings);
-        if (repComponents.isEmpty()) {
-            loadStdOptions();
-        }
-        addSelectionType(SelectionType.NO_SELECTION);
-        addSelectionType(SelectionType.GUESS_SELECTION);
-        addSelectionType(SelectionType.CALLID);
-        addSelectionType(SelectionType.MCP_CALLID);
-        addSelectionType(SelectionType.DN);
-        addSelectionType(SelectionType.PEERIP);
-        addSelectionType(SelectionType.AGENTID);
-        addSelectionType(SelectionType.UUID);
-    }
-
-    public MediaServerResults() throws SQLException {
-        super();
-        loadStdOptions();
-//        repComponents.getRoot().addChild(addLogMessagesReportType(TableType.MsgTServer));
-    }
 
     private void addSIPReportType(DynamicTreeNode<OptionNode> root) {
         DynamicTreeNode<OptionNode> nd = new DynamicTreeNode<>(new OptionNode(true, DialogItem.TLIB_CALLS_SIP));
@@ -215,7 +216,6 @@ public class MediaServerResults extends IQueryResults {
         DoneSTDOptions();
     }
 
-    ArrayList<NameID> appsType = null;
 
     @Override
     public ArrayList<NameID> getApps() throws SQLException {
@@ -227,7 +227,6 @@ public class MediaServerResults extends IQueryResults {
         return appsType;
     }
 
-    private UTCTimeRange timeRange = null;
 
     @Override
     public void Retrieve(QueryDialog dlg) throws SQLException {

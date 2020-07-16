@@ -96,7 +96,7 @@ public class WWETable extends DBTable {
         try {
 
             stmt.setTimestamp(1, new Timestamp(wweRec.GetAdjustedUsecTime()));
-            stmt.setInt(2, wweRec.getFileId());
+            stmt.setInt(2, WWEMessage.getFileId());
             stmt.setLong(3, wweRec.m_fileOffset);
             stmt.setLong(4, wweRec.getM_FileBytes());
             stmt.setLong(5, wweRec.m_line);

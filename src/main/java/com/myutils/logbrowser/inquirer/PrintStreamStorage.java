@@ -16,9 +16,9 @@ import java.io.PrintStream;
  */
 class PrintStreamStorage extends PrintStreams {
 
-    private PrintStream ps;
+    private final PrintStream ps;
     private int MaxRecords;
-    private String FileName;
+    private final String FileName;
     private int linesPrinted = 0;
     private int recsPrinted = 0;
     private boolean addShort = false;

@@ -14,17 +14,10 @@ import org.apache.commons.lang3.StringUtils;
 
 public class AnyQuery extends IQuery {
 
-    private String query;
-    private DatabaseConnector m_connector;
-    private ResultSet m_resultSet;
-    private int recCnt;
     private ResultSetMetaData rsmd;
     private String queryTable;
     private ArrayList<Pair> selectFields;
 
-    public ResultSetMetaData getRsmd() {
-        return rsmd;
-    }
 
     public AnyQuery() {
         query = null;
@@ -34,6 +27,9 @@ public class AnyQuery extends IQuery {
     public AnyQuery(String _query) {
         this();
         query = _query;
+    }
+    public ResultSetMetaData getRsmd() {
+        return rsmd;
     }
 
     @Override

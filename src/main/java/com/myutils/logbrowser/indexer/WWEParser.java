@@ -84,28 +84,76 @@ public class WWEParser extends WebParser {
     private static final Pattern regWWEReceivedInteractions = Pattern.compile(" received interactions from Interaction Server (.+)\\s*$");
     private static final Pattern regIxnContinue = Pattern.compile("^\\s");
 
+
+//<editor-fold defaultstate="collapsed" desc="WWEStatServerMsg">
+    private static final Pattern ptStatStringValue = Pattern.compile("^\\s*'STRING_VALUE'.+= \"(.+)\"$");
+
+
+//<editor-fold defaultstate="collapsed" desc="WWEBayeuxSMsg">
+    private static final Pattern regBayeuxNotificationType = Pattern.compile("notificationType=([^,\\}]+)");
+//    private static final Pattern regBayeuxMessageType = Pattern.compile("messageType=([^,\\}]+)");
+    private static final Pattern regBayeuxCallUUID = Pattern.compile("CallUUID=([^,]+),", Pattern.CASE_INSENSITIVE);
+
+    private static final Pattern regBayeuxDeviceURI = Pattern.compile("deviceUri=[\\S,]+/api/v2/devices/([^,]+),");
+
+    private static final Pattern regMessageUUID = Pattern.compile("Found call \\[(\\p{Alnum}+)\\]");
+
+    private static final Pattern regMessageStartingHTTP = Pattern.compile("^https?://(\\S+)", Pattern.CASE_INSENSITIVE);
+
+    private static final Pattern regMessageUserID = Pattern.compile("(?:user(?:Id)?|agent):? \\[?(\\p{Alnum}{32})\\]?", Pattern.CASE_INSENSITIVE);
+    private static final Pattern regMessageUserNameID = Pattern.compile("(?:(?<!No )[Ll]ogin *[Cc]ode|UserName:) \\[?((?!for)[^\\]\\s]+)\\]?");
+    private static final Pattern regMessageUserNameID1 = Pattern.compile(" agentId=([^\\s,]+), ");
+    private static final Pattern regMessageUserNameID2 = Pattern.compile(" [Uu]ser \\[([^\\]]+)\\]");
+    private static final Pattern regMessageDeviceID = Pattern.compile("device .*(?:\\[(?:Id=)|DeviceV2\\(id=)([\\w\\-]+)", Pattern.CASE_INSENSITIVE);
+    private static final Pattern regMessageDevice1ID = Pattern.compile("[Dd]evice \\[*([\\w\\-]+)\\]*");
+
+    private static final Pattern regMessageCalUUID1 = Pattern.compile("Call \\[(?:Id=)?([\\w\\-]{32})\\]", Pattern.CASE_INSENSITIVE);
+    private static final Pattern regMessageCalUUID2 = Pattern.compile("call recording details \\[([\\w\\-]{32})\\]", Pattern.CASE_INSENSITIVE);
+    private static final Pattern regMessageGSessionID = Pattern.compile(" session \\[*(\\p{Alnum}{20,}+)\\]*", Pattern.CASE_INSENSITIVE);
+//    private static final Pattern regMessageGSessionMonitorID = Pattern.compile("^Session \\[(\\p{Alnum}+)\\]", Pattern.CASE_INSENSITIVE);
+    private static final Pattern regUserWithID = Pattern.compile("user(?: with ID| settings)? \\[?([^\\s\\]]{12,}+)\\]?", Pattern.CASE_INSENSITIVE);
+    private static final Pattern regUserWithID1 = Pattern.compile("for (?:user|agent) \\[([^\\]]+)\\]");
+    private static final Pattern regUserWithID2 = Pattern.compile("user \\[([^\\s\\]]+)\\] not", Pattern.CASE_INSENSITIVE);
+    private static final Pattern regMessageWWESessionID = Pattern.compile("Session \\[(\\p{Alnum}+)\\] removed", Pattern.CASE_INSENSITIVE);
+
+    private static final Pattern regUserID1 = Pattern.compile("userId=([^\\s,\\>\\<]+)", Pattern.CASE_INSENSITIVE);
+    private static final Pattern regUserID2 = Pattern.compile("(?:for|with) userId ([^\\s,\\>\\<]+)", Pattern.CASE_INSENSITIVE);
+
+    private static final Pattern regUserID3ID = Pattern.compile("sessions from (\\w+)");
+    private static final Pattern regUserRemovingSession = Pattern.compile("Removing session (\\w+)");
+//    private static final Pattern regUserSettings = Pattern.compile("user settings \\[(\\p{Alnum}+)\\]");
+
+    private static final Pattern regMessageBrowser1ID = Pattern.compile("browserId ([\\w\\-]+)");
+    private static final Pattern regMessageBrowser2ID = Pattern.compile("clientId=([\\w\\-]+),");
+    private static final Pattern regMessageIxnID = Pattern.compile("﻿interaction with identity \\[([\\w\\-]+)\\]");
+    private static final Pattern regMessageIxn1ID = Pattern.compile("interactionId=(\\w+)");
+    private static final Pattern regMessageIxn2ID = Pattern.compile("(?:interactionid|chat id) '*\\{*(\\w+)\\}*'*", Pattern.CASE_INSENSITIVE);
+    private static final Pattern regMessageIxn3ID = Pattern.compile("ixnId=(\\w+)");
+    private static final Pattern regMessageIxn4ID = Pattern.compile("(?:interactionId|interaction with identity) \\[(\\w+)\\]", Pattern.CASE_INSENSITIVE);
+//    private static final Pattern regMessageUserToken = Pattern.compile("userToken=(\\w+)");
+    private static final Pattern regMessageIxnChatID = Pattern.compile("/(?:chats|calls)/(\\w+)");
+
+    private static final WWEMessageCleanTool msgCleaner = new WWEMessageCleanTool();
+
+//05/30/2019 13:35:39.159 DEBUG [graham.saludares@outreach.airbnb.com] [Ca6138neMXSzsR6ccjA7eA1ekz4a2zuirypscugq9fj67a1] [7c3316db-ae59-43a8-aa67-4990fe4506cc] [hystrix-ApiOperationPool-483] 203.153.14.144 /api/v2/me  c.g.c.v.a.t.u.o.StartContactCenterSessionApiTaskV2 https://esv1-cvt-gws-p.airbnb.biz/ui/crm-workspace/index.html?sfdcIFrameOrigin=https%3A%2F%2Fairbnb.my.salesforce.com&nonce=b205c3a50141a2989a23ce1abfc1f8c7bb46bf0dfa5da4bf898c3257d12dc8ee&isAdapterUrl=true&isdtp=vw& Place: [Configuration object: type = CfgPlace, properties = {
+    private static final Pattern regConfigObjectRead = Pattern.compile("Configuration object: type = (\\S+), properties = \\{");
     private String m_msgName;
     private String m_TserverSRC;
-
     private ParserState m_ParserState;
-
     private final HashMap<String, ParserState> threadParserState = new HashMap<>();
-
     MsgType MessageType;
-
-
     /*	public OrsParser(DBAccessor accessor) {
-     m_accessor = accessor;
-     }
-     */
- /*
-     public boolean CheckLog(File file) {
-     FileInfo fi = new FileInfo();
-     fi.m_componentType = FileInfo.type_Unknown;
-     m_fileId = m_accessor.SetFileInfo(file, fi);
-     return true;
-     }
-     */
+    m_accessor = accessor;
+    }
+    */
+    /*
+    public boolean CheckLog(File file) {
+    FileInfo fi = new FileInfo();
+    fi.m_componentType = FileInfo.type_Unknown;
+    m_fileId = m_accessor.SetFileInfo(file, fi);
+    return true;
+    }
+    */
     private final HashMap<String, String> ThreadAlias = new HashMap<>();
     private String URL = null;
     private String app = null;
@@ -113,13 +161,11 @@ public class WWEParser extends WebParser {
     private boolean skipNextLine;
     private boolean skipMessage;
     private Message msg;
-
     WWEParser(HashMap<TableType, DBTable> m_tables) {
         super(FileInfoType.type_WWE, m_tables);
         m_MessageContents = new ArrayList();
         ThreadAlias.put("ORSInternal", "FMWeb");
     }
-
     private void SetParserThreadState(String thr, ParserState ps) throws Exception {
         if (thr == null) {
             throw new Exception("No thread");
@@ -130,7 +176,6 @@ public class WWEParser extends WebParser {
             threadParserState.put(thr, ps);
         }
     }
-
     @Override
     public int ParseFrom(BufferedReaderCrLf input, long offset, int line, FileInfo fi) {
         m_CurrentLine = line;
@@ -156,13 +201,13 @@ public class WWEParser extends WebParser {
                 try {
                     int l = input.getLastBytesConsumed();
 //                    SetBytesConsumed(input.getLastBytesConsumed());
-                    setEndFilePos(getFilePos() + l); // to calculate file bytes
+setEndFilePos(getFilePos() + l); // to calculate file bytes
 
-                    Object o = str;
-                    while (o != null) {
-                        o = ParseLine(o, input);
-                    }
-                    setFilePos(getFilePos() + l);
+Object o = str;
+while (o != null) {
+    o = ParseLine(o, input);
+}
+setFilePos(getFilePos() + l);
 
                 } catch (Exception e) {
                     Main.logger.error("Failure parsing line " + m_CurrentLine + ":"
@@ -173,13 +218,12 @@ public class WWEParser extends WebParser {
             }
 //            ParseLine("", null); // to complete the parsing of the last line/last message
         } catch (IOException e) {
-            e.printStackTrace();
+            Main.logger.error(e);;
             return m_CurrentLine - line;
         }
 
         return m_CurrentLine - line;
     }
-
     private Object ParseLine(Object objToParse, BufferedReaderCrLf in) throws Exception {
         if (objToParse == null) {
             return null;
@@ -299,59 +343,59 @@ public class WWEParser extends WebParser {
                     }
 //                    entry.setURL(url);
 
-                    if (theMessage != null && !theMessage.trim().isEmpty()) {
-                        Pair<String, String> rxReplace;
-                        boolean needsCleanup = true;
-
-                        if (className.endsWith("InteractionRepository")) {
-                            rxReplace = Message.getRxReplace(theMessage, regMessageIxn1ID, 1, "<IxnID>");
-                            if (rxReplace != null) {
-                                theMessage = rxReplace.getValue();
-                                entry.setIxnID(rxReplace.getKey());
-                            }
-                            if ((rxReplace = Message.getRxReplace(theMessage, regMessageUserID, 1, "<userID>")) != null) {
-                                theMessage = rxReplace.getValue();
-                                entry.setUserID(rxReplace.getKey());
-
-                            }
-
-                        } else if (className.endsWith("JoinChatSessionTaskV2") || className.endsWith("LeaveChatSessionTaskV2")) {
-                            if ((rxReplace = Message.getRxReplace(theMessage, regMessageIxn2ID, 1, "<IxnID>")) != null) {
-                                theMessage = rxReplace.getValue();
-                                if (entry.getIxnID() == null) {
-                                    entry.setIxnID(rxReplace.getKey());
-                                }
-                            }
-
-                        } else if (className.endsWith("HttpSessionMonitor")) {
-                            if ( //                                    (rxReplace = Message.getRxReplace(theMessage, regUserWithID, 1, "<userID>")) != null|| 
-                                    (rxReplace = Message.getRxReplace(theMessage, regUserWithID1, 1, "<userID>")) != null) {
-                                theMessage = rxReplace.getValue();
-                                entry.setUserName(rxReplace.getKey());
-                            }
-                            rxReplace = Message.getRxReplace(theMessage, regMessageGSessionID, 1, "<sessionID>");
-                            if (rxReplace != null) {
-                                theMessage = rxReplace.getValue();
-                                entry.setJSessionID(rxReplace.getKey());
-                            } else if ((rxReplace = Message.getRxReplace(theMessage, regMessageWWESessionID, 1, "<sessionID>")) != null) {
-                                theMessage = rxReplace.getValue();
-                                entry.setJSessionID(rxReplace.getKey());
-
-                            }
-                        } else if (className.endsWith("IxnServerContextV2")) {
-                            if ((rxReplace = Message.getRxReplace(theMessage, regUserID1, 1, "<userID>")) != null
-                                    || (rxReplace = Message.getRxReplace(theMessage, regUserWithID1, 1, "<userID>")) != null
-                                    || (rxReplace = Message.getRxReplace(theMessage, regUserID2, 1, "<userID>")) != null) {
-
-                                theMessage = rxReplace.getValue();
-                                entry.setUserID(rxReplace.getKey());
-                                needsCleanup = false;
-                            }
-
-                            if ((rxReplace = Message.getRxReplace(theMessage, regMessageIxn3ID, 1, "<IxnID>")) != null) {
-                                theMessage = rxReplace.getValue();
-                                entry.setIxnID(rxReplace.getKey());
-                            }
+if (theMessage != null && !theMessage.trim().isEmpty()) {
+    Pair<String, String> rxReplace;
+    boolean needsCleanup = true;
+    
+    if (className.endsWith("InteractionRepository")) {
+        rxReplace = Message.getRxReplace(theMessage, regMessageIxn1ID, 1, "<IxnID>");
+        if (rxReplace != null) {
+            theMessage = rxReplace.getValue();
+            entry.setIxnID(rxReplace.getKey());
+        }
+        if ((rxReplace = Message.getRxReplace(theMessage, regMessageUserID, 1, "<userID>")) != null) {
+            theMessage = rxReplace.getValue();
+            entry.setUserID(rxReplace.getKey());
+            
+        }
+        
+    } else if (className.endsWith("JoinChatSessionTaskV2") || className.endsWith("LeaveChatSessionTaskV2")) {
+        if ((rxReplace = Message.getRxReplace(theMessage, regMessageIxn2ID, 1, "<IxnID>")) != null) {
+            theMessage = rxReplace.getValue();
+            if (entry.getIxnID() == null) {
+                entry.setIxnID(rxReplace.getKey());
+            }
+        }
+        
+    } else if (className.endsWith("HttpSessionMonitor")) {
+        if ( //                                    (rxReplace = Message.getRxReplace(theMessage, regUserWithID, 1, "<userID>")) != null||
+                (rxReplace = Message.getRxReplace(theMessage, regUserWithID1, 1, "<userID>")) != null) {
+            theMessage = rxReplace.getValue();
+            entry.setUserName(rxReplace.getKey());
+        }
+        rxReplace = Message.getRxReplace(theMessage, regMessageGSessionID, 1, "<sessionID>");
+        if (rxReplace != null) {
+            theMessage = rxReplace.getValue();
+            entry.setJSessionID(rxReplace.getKey());
+        } else if ((rxReplace = Message.getRxReplace(theMessage, regMessageWWESessionID, 1, "<sessionID>")) != null) {
+            theMessage = rxReplace.getValue();
+            entry.setJSessionID(rxReplace.getKey());
+            
+        }
+    } else if (className.endsWith("IxnServerContextV2")) {
+        if ((rxReplace = Message.getRxReplace(theMessage, regUserID1, 1, "<userID>")) != null
+                || (rxReplace = Message.getRxReplace(theMessage, regUserWithID1, 1, "<userID>")) != null
+                || (rxReplace = Message.getRxReplace(theMessage, regUserID2, 1, "<userID>")) != null) {
+            
+            theMessage = rxReplace.getValue();
+            entry.setUserID(rxReplace.getKey());
+            needsCleanup = false;
+        }
+        
+        if ((rxReplace = Message.getRxReplace(theMessage, regMessageIxn3ID, 1, "<IxnID>")) != null) {
+            theMessage = rxReplace.getValue();
+            entry.setIxnID(rxReplace.getKey());
+        }
 //                        } else if (className.endsWith("TelephonyUserMonitorV2")) {
 //                            if ((rxReplace = Message.getRxReplace(theMessage, regUserID1, 1, "<userID>")) != null
 //                                    || (rxReplace = Message.getRxReplace(theMessage, regMessageUserNameID2, 1, "<userID>")) != null) {
@@ -360,239 +404,239 @@ public class WWEParser extends WebParser {
 //                                needsCleanup=false;
 //                            }
 
-                        } else {
-                            if ((rxReplace = Message.getRxReplace(theMessage, regMessageStartingHTTP, 1, "<url>")) != null) {
-                                theMessage = rxReplace.getValue();
-                            }
-                            if ((rxReplace = Message.getRxReplace(theMessage, regMessageUUID, 1, "<UUID>")) != null
-                                    || (rxReplace = Message.getRxReplace(theMessage, regMessageCalUUID1, 1, "<UUID>")) != null
-                                    || (rxReplace = Message.getRxReplace(theMessage, regMessageCalUUID2, 1, "<UUID>")) != null) {
-                                theMessage = rxReplace.getValue();
-                                entry.setUUID(rxReplace.getKey());
-                            }
-                            if ((rxReplace = Message.getRxReplace(theMessage, regMessageUserNameID, 1, "<UserName>")) != null
-                                    || (rxReplace = Message.getRxReplace(theMessage, regMessageUserNameID1, 1, "<UserName>")) != null) {
-                                theMessage = rxReplace.getValue();
-                                entry.setUserName(rxReplace.getKey());
-                            }
-
-                            if ((rxReplace = Message.getRxReplace(theMessage, regUserWithID2, 1, "<UserID>")) != null) {
-                                theMessage = rxReplace.getValue();
-                                entry.setUserName(rxReplace.getKey());
-                            }
-
-                            if ((rxReplace = Message.getRxReplace(theMessage, regMessageUserID, 1, "<UserID>")) != null
-                                    || (rxReplace = Message.getRxReplace(theMessage, regUserWithID, 1, "<UserID>")) != null
-                                    || (rxReplace = Message.getRxReplace(theMessage, regUserID3ID, 1, "<userID>")) != null
-                                    //                                    || (rxReplace = Message.getRxReplace(theMessage, regMessageUserToken, 1, "<UserID>")) != null
-                                    || (rxReplace = Message.getRxReplace(theMessage, regUserRemovingSession, 1, "<UserID>")) != null //                                    || (rxReplace = Message.getRxReplace(theMessage, regUserSettings, 1, "<UserID>")) != null
-                                    ) {
-                                theMessage = rxReplace.getValue();
-                                entry.setUserID(rxReplace.getKey());
-                            }
-
-                            rxReplace = Message.getRxReplace(theMessage, regMessageGSessionID, 1, "<GSessionID>");
-                            if (rxReplace != null) {
-                                theMessage = rxReplace.getValue();
-                                entry.setJSessionID(rxReplace.getKey());
-                            }
-                            if (((rxReplace = Message.getRxReplace(theMessage, regMessageDeviceID, 1, "<DeviceID>")) != null)
-                                    || ((rxReplace = Message.getRxReplace(theMessage, regMessageDevice1ID, 1, "<DeviceID>")) != null)) {
-                                theMessage = rxReplace.getValue();
-                                entry.setDeviceID(rxReplace.getKey());
-                            }
-
-                            if ((rxReplace = Message.getRxReplace(theMessage, regMessageBrowser1ID, 1, "<clientID>")) != null
-                                    || (rxReplace = Message.getRxReplace(theMessage, regMessageBrowser1ID, 1, "<clientID>")) != null
-                                    || (rxReplace = Message.getRxReplace(theMessage, regMessageBrowser2ID, 1, "<clientID>")) != null) {
-                                theMessage = rxReplace.getValue();
-                                entry.setClientID(rxReplace.getKey());
-                            }
-
-                            if ((rxReplace = Message.getRxReplace(theMessage, regMessageIxnID, 1, "<IxnID>")) != null
-                                    || (rxReplace = Message.getRxReplace(theMessage, regMessageIxn2ID, 1, "<IxnID>")) != null
-                                    || (rxReplace = Message.getRxReplace(theMessage, regMessageIxn4ID, 1, "<IxnID>")) != null
-                                    || (rxReplace = Message.getRxReplace(theMessage, regMessageIxnChatID, 1, "<IxnID>")) != null) {
-                                theMessage = rxReplace.getValue();
-                                entry.setIxnID(rxReplace.getKey());
-                            }
-                        }
-                        String theMessageToLog;
-                        if (needsCleanup) {
-                            theMessageToLog = msgCleaner.cleanString(theMessage);
-                        } else {
-                            theMessageToLog = theMessage;
-                        }
-                        if (theMessageToLog != null && theMessageToLog.length() > 120) {
-                            entry.setMessageText(theMessageToLog.substring(0, 120));
-                        } else {
-                            entry.setMsgText(theMessageToLog);
-                        }
-                    }
+    } else {
+        if ((rxReplace = Message.getRxReplace(theMessage, regMessageStartingHTTP, 1, "<url>")) != null) {
+            theMessage = rxReplace.getValue();
+        }
+        if ((rxReplace = Message.getRxReplace(theMessage, regMessageUUID, 1, "<UUID>")) != null
+                || (rxReplace = Message.getRxReplace(theMessage, regMessageCalUUID1, 1, "<UUID>")) != null
+                || (rxReplace = Message.getRxReplace(theMessage, regMessageCalUUID2, 1, "<UUID>")) != null) {
+            theMessage = rxReplace.getValue();
+            entry.setUUID(rxReplace.getKey());
+        }
+        if ((rxReplace = Message.getRxReplace(theMessage, regMessageUserNameID, 1, "<UserName>")) != null
+                || (rxReplace = Message.getRxReplace(theMessage, regMessageUserNameID1, 1, "<UserName>")) != null) {
+            theMessage = rxReplace.getValue();
+            entry.setUserName(rxReplace.getKey());
+        }
+        
+        if ((rxReplace = Message.getRxReplace(theMessage, regUserWithID2, 1, "<UserID>")) != null) {
+            theMessage = rxReplace.getValue();
+            entry.setUserName(rxReplace.getKey());
+        }
+        
+        if ((rxReplace = Message.getRxReplace(theMessage, regMessageUserID, 1, "<UserID>")) != null
+                || (rxReplace = Message.getRxReplace(theMessage, regUserWithID, 1, "<UserID>")) != null
+                || (rxReplace = Message.getRxReplace(theMessage, regUserID3ID, 1, "<userID>")) != null
+                //                                    || (rxReplace = Message.getRxReplace(theMessage, regMessageUserToken, 1, "<UserID>")) != null
+                || (rxReplace = Message.getRxReplace(theMessage, regUserRemovingSession, 1, "<UserID>")) != null //                                    || (rxReplace = Message.getRxReplace(theMessage, regUserSettings, 1, "<UserID>")) != null
+                ) {
+            theMessage = rxReplace.getValue();
+            entry.setUserID(rxReplace.getKey());
+        }
+        
+        rxReplace = Message.getRxReplace(theMessage, regMessageGSessionID, 1, "<GSessionID>");
+        if (rxReplace != null) {
+            theMessage = rxReplace.getValue();
+            entry.setJSessionID(rxReplace.getKey());
+        }
+        if (((rxReplace = Message.getRxReplace(theMessage, regMessageDeviceID, 1, "<DeviceID>")) != null)
+                || ((rxReplace = Message.getRxReplace(theMessage, regMessageDevice1ID, 1, "<DeviceID>")) != null)) {
+            theMessage = rxReplace.getValue();
+            entry.setDeviceID(rxReplace.getKey());
+        }
+        
+        if ((rxReplace = Message.getRxReplace(theMessage, regMessageBrowser1ID, 1, "<clientID>")) != null
+                || (rxReplace = Message.getRxReplace(theMessage, regMessageBrowser1ID, 1, "<clientID>")) != null
+                || (rxReplace = Message.getRxReplace(theMessage, regMessageBrowser2ID, 1, "<clientID>")) != null) {
+            theMessage = rxReplace.getValue();
+            entry.setClientID(rxReplace.getKey());
+        }
+        
+        if ((rxReplace = Message.getRxReplace(theMessage, regMessageIxnID, 1, "<IxnID>")) != null
+                || (rxReplace = Message.getRxReplace(theMessage, regMessageIxn2ID, 1, "<IxnID>")) != null
+                || (rxReplace = Message.getRxReplace(theMessage, regMessageIxn4ID, 1, "<IxnID>")) != null
+                || (rxReplace = Message.getRxReplace(theMessage, regMessageIxnChatID, 1, "<IxnID>")) != null) {
+            theMessage = rxReplace.getValue();
+            entry.setIxnID(rxReplace.getKey());
+        }
+    }
+    String theMessageToLog;
+    if (needsCleanup) {
+        theMessageToLog = msgCleaner.cleanString(theMessage);
+    } else {
+        theMessageToLog = theMessage;
+    }
+    if (theMessageToLog != null && theMessageToLog.length() > 120) {
+        entry.setMessageText(theMessageToLog.substring(0, 120));
+    } else {
+        entry.setMsgText(theMessageToLog);
+    }
+}
 
 //                    String theMessageToLog = theMessage;
-                    entry.setClassName(className);
+entry.setClassName(className);
 
-                    entry.setURIParam(m.group(8));
+entry.setURIParam(m.group(8));
 
-                    if (!stopParsingMsg && (className != null && !className.isEmpty())) {
-
-                        Matcher m2;
-                        if (className.endsWith("CloudWebBasicAuthenticationFilter")) {
-                            Matcher m3;
-                            if (theMessage.startsWith("Authentication success:")) {
-                                msg = new WWEUCSConfigMsg(entry, "AuthSuccess");
-                                SetStdFieldsAndAdd(msg);
-                                msg = null;
-                                return null;
-                            } else if ((m3 = regWWEUCSConfigErrorUser.matcher(theMessage)).find()) {
-                                msg = new WWEUCSConfigMsg(entry, "EventError");
-                                m_ParserState = ParserState.STATE_CONFIG_ERROR;
-                                setSavedFilePos(getFilePos());
-                                m_MessageContents.add(s);
-                                return null;
-
-                            } else {
-                                msg = new WWEUCSConfigMsg(entry, "MsgError");
-                                SetStdFieldsAndAdd(msg);
-                                msg = null;
-                                return null;
-                            }
-                        } else if (className.endsWith("ChatServerContextV2")) {
-                            if (theMessage.endsWith("Info:")) {
-                                m_ParserState = ParserState.STATE_READ_INFO;
-                                setSavedFilePos(getFilePos());
-                                m_MessageContents.add(s);
-
-                            }
-                        } else if (className.endsWith("UcsInteractionOperationController") || className.endsWith("GetAcceptContentCompletionHandlerV2")
-                                || className.endsWith("ChatOperationControllerV2") || className.endsWith("InteractionManageUserDataApiTaskV2")
-                                || className.endsWith("GetUserMultimediaControllerV2")
-                                || className.endsWith("InteractionManageUserDataTaskV2")
-                                || className.endsWith("GetUcsHistoryCompletionHandler")) {
-                            m_ParserState = ParserState.STATE_READ_INFO;
-                            setSavedFilePos(getFilePos());
-                            m_MessageContents.add(s);
-                            stopParsingMsg = true;
-                        } else if (className.contains(".BayeuxServerImpl.")) {
-                            msg = new WWEBayeuxSMsg(entry);
-                            ((WWEBayeuxSMsg) msg).setBayeuxId(getRx(theMessage, regBayeuxId, 1, null));
-                            ((WWEBayeuxSMsg) msg).setLastConnected(getRx(theMessage, regBayeuxLastConnected, 1, null));
-                            ((WWEBayeuxSMsg) msg).setAction(getRx(theMessage, regBayeuxAction, 1, null));
-                            ((WWEBayeuxSMsg) msg).setChannel(getRx(theMessage, regBayeuxChannel, 1, null));
-                            ((WWEBayeuxSMsg) msg).setMessageType(getRx(theMessage, regBayeuxMessageType, 1, null));
-                            if (((WWEBayeuxSMsg) msg).getIxnID() == null) {
-                                ((WWEBayeuxSMsg) msg).setIxnID(getRx(theMessage, regURIChatIxnID, 1, null));
-                            }
-
-                            if (theMessage.endsWith("}") || theMessage.endsWith("} null")) {
-                                SetStdFieldsAndAdd(msg);
-                            } else {
-                                m_ParserState = ParserState.STATE_BAYEUX;
-                                setSavedFilePos(getFilePos());
-                                m_MessageContents.add(s);
-                            }
-                            return null;
-                        } else if (className.endsWith("rtreporting.RTRContextAsync")) {
-                            msg = new WWEStatServerMsg(entry);
-                            m_ParserState = ParserState.STATE_STATSERVER;
-                            setSavedFilePos(getFilePos());
-                            m_MessageContents.add(s);
-                        }
-
-                        if (!stopParsingMsg && (theMessage != null && !theMessage.isEmpty())) {
+if (!stopParsingMsg && (className != null && !className.isEmpty())) {
+    
+    Matcher m2;
+    if (className.endsWith("CloudWebBasicAuthenticationFilter")) {
+        Matcher m3;
+        if (theMessage.startsWith("Authentication success:")) {
+            msg = new WWEUCSConfigMsg(entry, "AuthSuccess");
+            SetStdFieldsAndAdd(msg);
+            msg = null;
+            return null;
+        } else if ((m3 = regWWEUCSConfigErrorUser.matcher(theMessage)).find()) {
+            msg = new WWEUCSConfigMsg(entry, "EventError");
+            m_ParserState = ParserState.STATE_CONFIG_ERROR;
+            setSavedFilePos(getFilePos());
+            m_MessageContents.add(s);
+            return null;
+            
+        } else {
+            msg = new WWEUCSConfigMsg(entry, "MsgError");
+            SetStdFieldsAndAdd(msg);
+            msg = null;
+            return null;
+        }
+    } else if (className.endsWith("ChatServerContextV2")) {
+        if (theMessage.endsWith("Info:")) {
+            m_ParserState = ParserState.STATE_READ_INFO;
+            setSavedFilePos(getFilePos());
+            m_MessageContents.add(s);
+            
+        }
+    } else if (className.endsWith("UcsInteractionOperationController") || className.endsWith("GetAcceptContentCompletionHandlerV2")
+            || className.endsWith("ChatOperationControllerV2") || className.endsWith("InteractionManageUserDataApiTaskV2")
+            || className.endsWith("GetUserMultimediaControllerV2")
+            || className.endsWith("InteractionManageUserDataTaskV2")
+            || className.endsWith("GetUcsHistoryCompletionHandler")) {
+        m_ParserState = ParserState.STATE_READ_INFO;
+        setSavedFilePos(getFilePos());
+        m_MessageContents.add(s);
+        stopParsingMsg = true;
+    } else if (className.contains(".BayeuxServerImpl.")) {
+        msg = new WWEBayeuxSMsg(entry);
+        ((WWEBayeuxSMsg) msg).setBayeuxId(getRx(theMessage, regBayeuxId, 1, null));
+        ((WWEBayeuxSMsg) msg).setLastConnected(getRx(theMessage, regBayeuxLastConnected, 1, null));
+        ((WWEBayeuxSMsg) msg).setAction(getRx(theMessage, regBayeuxAction, 1, null));
+        ((WWEBayeuxSMsg) msg).setChannel(getRx(theMessage, regBayeuxChannel, 1, null));
+        ((WWEBayeuxSMsg) msg).setMessageType(getRx(theMessage, regBayeuxMessageType, 1, null));
+        if (((WWEBayeuxSMsg) msg).getIxnID() == null) {
+            ((WWEBayeuxSMsg) msg).setIxnID(getRx(theMessage, regURIChatIxnID, 1, null));
+        }
+        
+        if (theMessage.endsWith("}") || theMessage.endsWith("} null")) {
+            SetStdFieldsAndAdd(msg);
+        } else {
+            m_ParserState = ParserState.STATE_BAYEUX;
+            setSavedFilePos(getFilePos());
+            m_MessageContents.add(s);
+        }
+        return null;
+    } else if (className.endsWith("rtreporting.RTRContextAsync")) {
+        msg = new WWEStatServerMsg(entry);
+        m_ParserState = ParserState.STATE_STATSERVER;
+        setSavedFilePos(getFilePos());
+        m_MessageContents.add(s);
+    }
+    
+    if (!stopParsingMsg && (theMessage != null && !theMessage.isEmpty())) {
 //                            entry.setMessageText(theMessage);
-                            if (regKVList.matcher(theMessage).find()) {
-                                m_ParserState = ParserState.STATE_KVLIST;
-                                m_MessageContents.add(s);
-                                setSavedFilePos(getFilePos());
-                            } else if (theMessage.startsWith("Failed to process message:")) {
-                                m_ParserState = ParserState.STATE_TMESSAGE_ATTRIBUTES;
-                                setSavedFilePos(getFilePos());
-                                m_MessageContents.add(s);
-                                skipMessage = true;
-                            } else if (regIndexListStart.matcher(theMessage).find()) {
-                                m_ParserState = ParserState.STATE_IndexList;
-                                setSavedFilePos(getFilePos());
-                                skipMessage = true;
-                            } else if ((m2 = regWWEUCSStart.matcher(theMessage)).find()) {
-                                m_ParserState = ParserState.STATE_UCSREQUEST;
-                                setSavedFilePos(getFilePos());
-                                m_MessageContents.add(s);
-
-                                msg = new WWEUCSMsg(entry, m2.group(1));
-                                return null; // do not insert debug message
-
-                            } else if ((m2 = regWWEIxnServerRequestStart.matcher(theMessage)).find() || (m2 = regWWEIxnServerEventStart.matcher(theMessage)).find()) {
-                                m_ParserState = ParserState.STATE_IXNSERVER_REQUEST;
-                                m_MessageContents.add(s);
-                                setSavedFilePos(getFilePos());
-                                msg = new WWEIxnServerMsg(m2.group(1));
-                                return null; // do not insert debug message
-
-                            } else if ((m2 = regWWEUCSEvent.matcher(theMessage)).find()) {
-                                m_ParserState = ParserState.STATE_UCSRESPONSE;
-                                m_MessageContents.add(s);
-                                setSavedFilePos(getFilePos());
-                                msg = new WWEUCSMsg(entry, m2.group(1));
-                                return null; // do not insert debug message
-
-                            } else if ((m2 = regWWEUCSEventOther.matcher(theMessage)).find()) {
-                                m_ParserState = ParserState.STATE_UCSRESPONSEOTHER;
-                                m_MessageContents.add(s);
-                                setSavedFilePos(getFilePos());
-                                msg = new WWEUCSMsg(entry, m2.group(1));
-                                return null; // do not insert debug message
-
-                            } else if ((m2 = regWWEUCSHandlingEvent.matcher(theMessage)).find()) {
-                                m_ParserState = ParserState.STATE_UCSHANDLINGRESPONSE;
-                                m_MessageContents.add(s);
-                                setSavedFilePos(getFilePos());
-                                msg = new WWEUCSMsg(entry, m2.group(1));
-                                return null; // do not insert debug message
+if (regKVList.matcher(theMessage).find()) {
+    m_ParserState = ParserState.STATE_KVLIST;
+    m_MessageContents.add(s);
+    setSavedFilePos(getFilePos());
+} else if (theMessage.startsWith("Failed to process message:")) {
+    m_ParserState = ParserState.STATE_TMESSAGE_ATTRIBUTES;
+    setSavedFilePos(getFilePos());
+    m_MessageContents.add(s);
+    skipMessage = true;
+} else if (regIndexListStart.matcher(theMessage).find()) {
+    m_ParserState = ParserState.STATE_IndexList;
+    setSavedFilePos(getFilePos());
+    skipMessage = true;
+} else if ((m2 = regWWEUCSStart.matcher(theMessage)).find()) {
+    m_ParserState = ParserState.STATE_UCSREQUEST;
+    setSavedFilePos(getFilePos());
+    m_MessageContents.add(s);
+    
+    msg = new WWEUCSMsg(entry, m2.group(1));
+    return null; // do not insert debug message
+    
+} else if ((m2 = regWWEIxnServerRequestStart.matcher(theMessage)).find() || (m2 = regWWEIxnServerEventStart.matcher(theMessage)).find()) {
+    m_ParserState = ParserState.STATE_IXNSERVER_REQUEST;
+    m_MessageContents.add(s);
+    setSavedFilePos(getFilePos());
+    msg = new WWEIxnServerMsg(m2.group(1));
+    return null; // do not insert debug message
+    
+} else if ((m2 = regWWEUCSEvent.matcher(theMessage)).find()) {
+    m_ParserState = ParserState.STATE_UCSRESPONSE;
+    m_MessageContents.add(s);
+    setSavedFilePos(getFilePos());
+    msg = new WWEUCSMsg(entry, m2.group(1));
+    return null; // do not insert debug message
+    
+} else if ((m2 = regWWEUCSEventOther.matcher(theMessage)).find()) {
+    m_ParserState = ParserState.STATE_UCSRESPONSEOTHER;
+    m_MessageContents.add(s);
+    setSavedFilePos(getFilePos());
+    msg = new WWEUCSMsg(entry, m2.group(1));
+    return null; // do not insert debug message
+    
+} else if ((m2 = regWWEUCSHandlingEvent.matcher(theMessage)).find()) {
+    m_ParserState = ParserState.STATE_UCSHANDLINGRESPONSE;
+    m_MessageContents.add(s);
+    setSavedFilePos(getFilePos());
+    msg = new WWEUCSMsg(entry, m2.group(1));
+    return null; // do not insert debug message
 
 //                            } else if ((m2 = regWWEUCSPrepareTask.matcher(theMessage)).find()) {
 //                                m_ParserState = ParserState.STATE_UCSPREPARETASK;
 //                                m_MessageContents.add(s);
 //                                setSavedFilePos(getFilePos());
 //                                return null; // do not insert debug message
-                            } else if ((m2 = regGetRootCategories.matcher(theMessage)).find()) {
-                                m_ParserState = ParserState.STATE_GETROOTCATEGORIES;
-                                m_MessageContents.add(s);
-                                setSavedFilePos(getFilePos());
-                            } else if ((m2 = regInteractionAttributes.matcher(theMessage)).find()) {
-                                m_ParserState = ParserState.STATE_INTERACTION_ATTRIBUTES;
-                                m_MessageContents.add(s);
-                                setSavedFilePos(getFilePos());
-                            } else if ((m2 = regInteractionProperties.matcher(theMessage)).find()) {
-                                m_ParserState = ParserState.STATE_INTERACTION_PROPERTIES;
-                                m_MessageContents.add(s);
-                                setSavedFilePos(getFilePos());
-                            } else if ((m2 = regCreateChatContext.matcher(theMessage)).find()) {
-                                m_ParserState = ParserState.STATE_CREATECHATCONTEXT;
-                                m_MessageContents.add(s);
-                                setSavedFilePos(getFilePos());
-                            } else if ((m2 = regItems.matcher(theMessage)).find()) {
-                                m_ParserState = ParserState.STATE_ITEMS;
-                                m_MessageContents.add(s);
-                                setSavedFilePos(getFilePos());
-                            } else if ((m2 = regWWEReceivedInteractions.matcher(theMessage)).find()) {
-                                String s1 = m2.group(1);
-                                if (s1 != null) {
-                                    if (s1.startsWith("KVList")) {
-                                        m_ParserState = ParserState.STATE_RECEIVED_INTERACTION;
-                                        m_MessageContents.add(s);
-                                        setSavedFilePos(getFilePos());
+} else if ((m2 = regGetRootCategories.matcher(theMessage)).find()) {
+    m_ParserState = ParserState.STATE_GETROOTCATEGORIES;
+    m_MessageContents.add(s);
+    setSavedFilePos(getFilePos());
+} else if ((m2 = regInteractionAttributes.matcher(theMessage)).find()) {
+    m_ParserState = ParserState.STATE_INTERACTION_ATTRIBUTES;
+    m_MessageContents.add(s);
+    setSavedFilePos(getFilePos());
+} else if ((m2 = regInteractionProperties.matcher(theMessage)).find()) {
+    m_ParserState = ParserState.STATE_INTERACTION_PROPERTIES;
+    m_MessageContents.add(s);
+    setSavedFilePos(getFilePos());
+} else if ((m2 = regCreateChatContext.matcher(theMessage)).find()) {
+    m_ParserState = ParserState.STATE_CREATECHATCONTEXT;
+    m_MessageContents.add(s);
+    setSavedFilePos(getFilePos());
+} else if ((m2 = regItems.matcher(theMessage)).find()) {
+    m_ParserState = ParserState.STATE_ITEMS;
+    m_MessageContents.add(s);
+    setSavedFilePos(getFilePos());
+} else if ((m2 = regWWEReceivedInteractions.matcher(theMessage)).find()) {
+    String s1 = m2.group(1);
+    if (s1 != null) {
+        if (s1.startsWith("KVList")) {
+            m_ParserState = ParserState.STATE_RECEIVED_INTERACTION;
+            m_MessageContents.add(s);
+            setSavedFilePos(getFilePos());
+            
+        }
+    }
+}
 
-                                    }
-                                }
-                            }
-
-                        }
-
-                    }
-                    SetStdFieldsAndAdd(entry);
-                    break;
+    }
+    
+}
+SetStdFieldsAndAdd(entry);
+break;
                 } //                else if ((m = regElasticSearch.matcher(s)).find()) {
                 //                    fakeGenesysMsg(dp, this, TableType.MsgWWE, null, "Custom", "00000", "00000", m.group(1));
                 //                } 
@@ -847,12 +891,10 @@ public class WWEParser extends WebParser {
         }
         return null;
     }
-
     private void addTLibMessage() throws Exception {
         WWEMessage msg = new WWEMessage(m_msgName, m_TserverSRC, m_MessageContents, isParseTimeDiff());
         SetStdFieldsAndAdd(msg);
     }
-
     private void addException() {
         Matcher m;
         Main.logger.trace("addException");
@@ -864,18 +906,190 @@ public class WWEParser extends WebParser {
         SetStdFieldsAndAdd(msg);
 
     }
-
     @Override
-    void init(HashMap<TableType, DBTable> m_tables) {
-        m_tables.put(TableType.WWEMessage, new WWEDebugMessageTable(Main.getMain().getM_accessor(), TableType.WWEMessage));
-        m_tables.put(TableType.WWEUCSMessage, new WWEUCSTable(Main.getMain().getM_accessor(), TableType.WWEUCSMessage));
-        m_tables.put(TableType.WWEUCSConfigMessage, new WWEUCSConfigTable(Main.getMain().getM_accessor(), TableType.WWEUCSConfigMessage));
-        m_tables.put(TableType.WWEIxnMessage, new WWEIxnTable(Main.getMain().getM_accessor(), TableType.WWEIxnMessage));
-        m_tables.put(TableType.WWEBayeuxMessage, new WWEBayeuxSMsgTable(Main.getMain().getM_accessor(), TableType.WWEBayeuxMessage));
-        m_tables.put(TableType.WWEStatServerMessage, new WWEWWEStatServerMsgTable(Main.getMain().getM_accessor(), TableType.WWEStatServerMessage));
+            void init(HashMap<TableType, DBTable> m_tables) {
+                m_tables.put(TableType.WWEMessage, new WWEDebugMessageTable(Main.getM_accessor(), TableType.WWEMessage));
+                m_tables.put(TableType.WWEUCSMessage, new WWEUCSTable(Main.getM_accessor(), TableType.WWEUCSMessage));
+                m_tables.put(TableType.WWEUCSConfigMessage, new WWEUCSConfigTable(Main.getM_accessor(), TableType.WWEUCSConfigMessage));
+                m_tables.put(TableType.WWEIxnMessage, new WWEIxnTable(Main.getM_accessor(), TableType.WWEIxnMessage));
+                m_tables.put(TableType.WWEBayeuxMessage, new WWEBayeuxSMsgTable(Main.getM_accessor(), TableType.WWEBayeuxMessage));
+                m_tables.put(TableType.WWEStatServerMessage, new WWEWWEStatServerMsgTable(Main.getM_accessor(), TableType.WWEStatServerMessage));
+                
+            }
+
+    private static class WWEMessageCleanTool {
+        private static ArrayList<ICleanString> rxs = new ArrayList<>();
+        public WWEMessageCleanTool() {
+            rxs = new ArrayList<>();
+//            rxs.add(new ReplaceRx(Pattern.compile("(.+﻿VoiceUcsInteraction was updated with values .+)", Pattern.CASE_INSENSITIVE), 1, "<VoiceUcsInteraction was updated with ..>", true));
+//            rxs.add(new ReplaceRx(Pattern.compile("(.+﻿Updating of telephonyProcessingContext .+)", Pattern.CASE_INSENSITIVE), 1, "<Updating of telephonyProcessingContext>", true));
+//            rxs.add(new ReplaceRx(Pattern.compile("(.+ UpdateRequest: index .+)", Pattern.CASE_INSENSITIVE), 1, "<UpdateRequest: index>", true));
+rxs.add(new ReplaceLiteral("﻿called with baseUCSInteractionResource", "<https://*ad/v1﻿called with baseUCSInteractionResource>", true));
+rxs.add(new ReplaceLiteral("performUCSContactOperation called with baseUCSContactsResourceV2", "﻿performUCSContactOperation called with baseUCSContactsResourceV2", true));
+//            rxs.add(new ReplaceLiteral("VoiceUcsInteraction was updated with values", "<VoiceUcsInteraction was updated with values>", true));
+rxs.add(new ReplaceLiteral(" performInteractionOperation called with baseUCSInteractionResource", "<performInteractionOperation called with baseUCSInteractionResource>", true));
+rxs.add(new ReplaceLiteral(" Execution completed with baseUCSInteractionResource", "<Execution completed with baseUCSInteractionResource>", true));
+rxs.add(new ReplaceLiteral("Read all nodes:", "<Read all nodes:>", true));
+rxs.add(new ReplaceLiteral("Updating setting for object", "<Updating setting for object>", true));
+rxs.add(new ReplaceLiteral("UpdateRequest: index", "<﻿UpdateRequest: index>", true));
+rxs.add(new ReplaceLiteral("Skipped update of context", "<﻿Skipped update of context>", true));
+rxs.add(new ReplaceLiteral("Read object", "<Read object>", true));
+
+rxs.add(new ReplaceLiteral("Login agent: deviceId", "<Login agent: deviceId>", true));
+rxs.add(new ReplaceLiteral(" setting CustomContact", "<setting CustomContact>", true));
+rxs.add(new ReplaceLiteral(" Requesting extended user settings", "<Requesting extended user settings>", true));
+rxs.add(new ReplaceLiteral(" Starting registration for device", "Starting registration for device", true));
+rxs.add(new ReplaceLiteral(" Result device context", "<Result device contex>", true));
+rxs.add(new ReplaceLiteral(" Creating setting for object", "<Creating setting for object>", true));
+rxs.add(new ReplaceLiteral(": TelephonyUserMonitorV2.UserSessionInfo", "<Creating setting for object>", true));
+
+rxs.add(new ReplaceRx(Pattern.compile("^(UpdateRequest: index .+)$", Pattern.CASE_INSENSITIVE), 1, "<UpdateRequest: index>", true));
+rxs.add(new ReplaceRx(Pattern.compile("^(Unregistering from TServer device .+)$", Pattern.CASE_INSENSITIVE), 1, "<Unregistering from TServer device>", true));
+rxs.add(new ReplaceRx(Pattern.compile("^(Unregistering DN .+)$", Pattern.CASE_INSENSITIVE), 1, "<Unregistering DN>", true));
+rxs.add(new ReplaceRx(Pattern.compile("^Successfully saved heartbeat qualifier(.+)"), 1, "<...>", true));
+rxs.add(new ReplaceRx(Pattern.compile("\\$Servlet3SaveToSessionRequestWrapper@(\\w+)", Pattern.CASE_INSENSITIVE), 1, "<wrapperNo>"));
+rxs.add(new ReplaceRx(Pattern.compile("last connect (\\d+) ms ago"), 1, "<secs>"));
+rxs.add(new ReplaceRx(Pattern.compile("/meta/(?:dis)?connect, id=(\\d+)"), 1, "<id>"));
+//            rxs.add(new ReplaceRx(Pattern.compile("client ([\\w\\-]+) "), 1, "<clientID>"));
+//            rxs.add(new ReplaceRx(Pattern.compile("^\\< client ([\\w\\-]+) "), 1, "<clientId>"));
+//            rxs.add(new ReplaceRx(Pattern.compile("clientId=(\\w+),"), 1, "<clientID>"));
+//            rxs.add(new ReplaceRx(Pattern.compile("Session \\[(\\w+)\\]"), 1, "<session>"));
+rxs.add(new ReplaceRx(Pattern.compile("contact center \\[([\\w\\-]+)\\]"), 1, "<ccID>"));
+rxs.add(new ReplaceRx(Pattern.compile("referenceId \\[([\\w\\-]+)\\]", Pattern.CASE_INSENSITIVE), 1, "<refID>"));
+rxs.add(new ReplaceRx(Pattern.compile("[\\s\\[]Number=?\\[?([\\w\\-]+)\\]?", Pattern.CASE_INSENSITIVE), 1, "<number>"));
+rxs.add(new ReplaceRx(Pattern.compile("session\\.SessionInformation@(\\w+)"), 1, "<SessionInstance>"));
+rxs.add(new ReplaceRx(Pattern.compile(" DN \\[?([\\w\\-]+)\\]?"), 1, "<DN>"));
+rxs.add(new ReplaceRx(Pattern.compile(" Employee ID: (.+)\\]"), 1, "<Employee ID>"));
+rxs.add(new ReplaceRx(Pattern.compile(" Place(?:(?: name| by name))? \\[?([^\\],]+)\\]?", Pattern.CASE_INSENSITIVE), 1, "<Place>"));
+rxs.add(new ReplaceRx(Pattern.compile(" took \\[(\\d+)ms\\]"), 1, "<xx>"));
+rxs.add(new ReplaceRx(Pattern.compile("Object \\[*(\\S+)\\]*"), 1, "<obj>"));
+rxs.add(new ReplaceRx(Pattern.compile("referenceid=(\\w+)", Pattern.CASE_INSENSITIVE), 1, "<refID>"));
+rxs.add(new ReplaceRx(Pattern.compile("userToken=\\[*(\\w+)\\]*"), 1, "<userToken>"));
+rxs.add(new ReplaceRx(Pattern.compile("destination \\[*([^\\s\\]]+)\\]*"), 1, "<DN>"));
+rxs.add(new ReplaceRx(Pattern.compile("DeviceRuntimeContext\\(dn=(\\S+)"), 1, "<DN>"));
+rxs.add(new ReplaceRx(Pattern.compile("Place name \\[*(\\S+)\\]*"), 1, "<Place>"));
+rxs.add(new ReplaceRx(Pattern.compile("[Cc]all \\[(\\S+)\\]"), 1, "<ConnID>"));
+rxs.add(new ReplaceRx(Pattern.compile("(?:with parent|relatedConnId|related connId) \\[(\\S+)\\]"), 1, "<ConnID>"));
+
+rxs.add(new ReplaceRx(Pattern.compile("java.lang.Object;([^,]+),"), 1, "<SomeID>"));
+rxs.add(new ReplaceRx(Pattern.compile("FirstName: (.+)"), 1, "<The guy>"));
+rxs.add(new ReplaceRx(Pattern.compile("\\[DBID=([^\\]]+)\\]"), 1, "<DBID>"));
+rxs.add(new ReplaceRx(Pattern.compile("Attempting to start contact center.+\\(([^\\)]+)\\)$"), 1, "<UserName>"));
+rxs.add(new ReplaceRx(Pattern.compile("timestampMicros=(\\d+),"), 1, "<timestampMicros>"));
+rxs.add(new ReplaceRx(Pattern.compile("^Starting registration for device \\[Id=([^,]+),"), 1, "<DeviceID>"));
+rxs.add(new ReplaceRx(Pattern.compile("AgentStateDescriptorV2\\(id=([^,\\s]+)"), 1, "<AgentStateDescriptorID>"));
+rxs.add(new ReplaceRx(Pattern.compile("contact \\[(\\w+)\\]"), 1, "<contactID>"));
+rxs.add(new ReplaceRx(Pattern.compile("contact \\[(\\w+)\\]"), 1, "<contactID>"));
+rxs.add(new ReplaceRx(Pattern.compile("with referenceId (\\d+)"), 1, "<refID>"));
+rxs.add(new ReplaceRx(Pattern.compile("found [([^\\]]+)] documents"), 1, "<num>"));
+rxs.add(new ReplaceRx(Pattern.compile("foundDocuments=([^,\\s]+),"), 1, "<num>"));
+rxs.add(new ReplaceRx(Pattern.compile("sessions for (\\w+)"), 1, "<session>"));
+rxs.add(new ReplaceRx(Pattern.compile(" client ([\\w\\-]+)"), 1, "<client>"));
+rxs.add(new ReplaceRx(Pattern.compile("userToken=(\\w+)"), 1, "<userID?>"));
+rxs.add(new ReplaceRx(Pattern.compile("referenceId (\\d+)"), 1, "<refID>"));
+rxs.add(new ReplaceRx(Pattern.compile("universalcontactserver\\.tasks\\.UpdateUcsInteractionTaskV2@(\\w+)"), 1, "<instanceID>"));
+rxs.add(new ReplaceRx(Pattern.compile(", index=(\\d+),"), 1, "<ID>"));
+rxs.add(new ReplaceRx(Pattern.compile("﻿AgentState operation name \\[([^\\]]+)\\]"), 1, "<ACW>"));
+rxs.add(new ReplaceRx(Pattern.compile("Extracted ReasonCode \\[([^\\]]+)\\]"), 1, "<ACW>"));
+rxs.add(new ReplaceRx(Pattern.compile("﻿operationName=([^\\],]+)"), 1, "<ACW>"));
+rxs.add(new ReplaceRx(Pattern.compile("Found \\[(\\d+)\\]"), 1, "<NUM>"));
+
+        }
+        public String cleanString(String s) {
+            String ret = s;
+            for (ICleanString rx : rxs) {
+                Pair<String, String> ret1 = rx.cleanString1(ret);
+                if (ret1 != null) {
+                    ret = ret1.getValue();
+                    if (rx.isStopIfFound()) {
+                        break;
+                    }
+                }
+            }
+            
+            return ret;
+        }
+
+        static interface IRXFoundProc {
+            
+            abstract void foundFun(String newLine, String replacedString);
+        }
+
+        private class ReplaceLiteral extends ICleanString {
+            
+            private final String searchString;
+            private final String replaceString;
+            
+            public ReplaceLiteral(String searchString, String replaceString, boolean isFinal) {
+                super(isFinal);
+                this.searchString = searchString;
+                this.replaceString = replaceString;
+            }
+            
+            @Override
+            public Pair<String, String> cleanString1(String s) {
+                if (s != null && s.contains(searchString)) {
+                    return new Pair(replaceString, searchString);
+                } else {
+                    return null;
+                }
+                
+            }
+            
+        }
+
+        private class ReplaceRx extends ICleanString {
+            
+            private final Pattern p;
+            private final int idx;
+            private final String replaceString;
+            
+            public ReplaceRx(Pattern p, int idx, String replaceString) {
+                this(p, idx, replaceString, false);
+            }
+            
+            public ReplaceRx(Pattern p, int idx, String replaceString, boolean isFinal) {
+                super(isFinal);
+                this.p = p;
+                this.idx = idx;
+                this.replaceString = replaceString;
+                
+            }
+            
+            @Override
+            public Pair<String, String> cleanString1(String s) {
+                return Message.getRxReplace(s, p, idx, replaceString);
+            }
+            
+            private boolean cleanString(String s, IRXFoundProc pr) {
+                Pair<String, String> rxReplace;
+                rxReplace = Message.getRxReplace(s, p, idx, replaceString);
+                if (rxReplace != null) {
+                    pr.foundFun(rxReplace.getValue(), rxReplace.getKey());
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+        }
+
+        private abstract class ICleanString {
+            
+            protected final boolean stopIfFound;
+            
+            public ICleanString(boolean b) {
+                stopIfFound = b;
+            }
+            
+            abstract public Pair<String, String> cleanString1(String s);
+            
+            public boolean isStopIfFound() {
+                return stopIfFound;
+            }
+            
+        }
 
     }
-
     enum ParserState {
         STATE_INIT,
         STATE_HEADER,
@@ -908,16 +1122,12 @@ public class WWEParser extends WebParser {
         STATE_ITEMS,
         STATE_CONFIG_OBJECT, STATE_STATSERVER
     }
-
     enum MsgType {
         MSG_UNKNOWN,
         MSG_MM_OUT,
         MSG_MM_IN,
         MSG_TLIB
     }
-
-//<editor-fold defaultstate="collapsed" desc="WWEStatServerMsg">
-    private static final Pattern ptStatStringValue = Pattern.compile("^\\s*'STRING_VALUE'.+= \"(.+)\"$");
 
     private class WWEStatServerMsg extends Message {
 
@@ -928,7 +1138,6 @@ public class WWEParser extends WebParser {
         private String method;
         private String key;
         private String url;
-
         private String deviceID;
         private String userName;
         private String level;
@@ -939,6 +1148,30 @@ public class WWEParser extends WebParser {
         private String userID;
         private String browserClient;
         private String sessionID;
+        private String UUID;
+        private String ixnID;
+
+        private WWEStatServerMsg(TableType t) {
+            super(t);
+        }
+
+        private WWEStatServerMsg() {
+            this(TableType.WWEStatServerMessage);
+        }
+
+        private WWEStatServerMsg(WWEDebugMsg orig) {
+            this();
+            this.setClassName(orig.getClassName());
+            this.setJSessionID(orig.getjSessionID());
+            this.setLevel(orig.getLevel());
+            this.setUserName(orig.getUserName());
+            this.setIP(orig.getIp());
+            this.setURL(orig.getUrl());
+            this.setMessageText(orig.getMsgText());
+            this.setUUID(orig.getUUID());
+            this.setIxnID(orig.getIxnID());
+            this.setDeviceID(orig.getDeviceID());
+        }
 
         public String getParam2() {
             return param2;
@@ -963,8 +1196,6 @@ public class WWEParser extends WebParser {
             this.deviceID = deviceID;
         }
 
-        private String UUID;
-
         /**
          * Get the value of UUID
          *
@@ -985,8 +1216,6 @@ public class WWEParser extends WebParser {
             this.UUID = UUID;
         }
 
-        private String ixnID;
-
         /**
          * Get the value of ixnID
          *
@@ -1005,28 +1234,6 @@ public class WWEParser extends WebParser {
             checkDiffer(this.ixnID, ixnID, "ixnID", m_CurrentLine);
 
             this.ixnID = ixnID;
-        }
-
-        private WWEStatServerMsg(TableType t) {
-            super(t);
-        }
-
-        private WWEStatServerMsg() {
-            this(TableType.WWEStatServerMessage);
-        }
-
-        private WWEStatServerMsg(WWEDebugMsg orig) {
-            this();
-            this.setClassName(orig.getClassName());
-            this.setJSessionID(orig.getjSessionID());
-            this.setLevel(orig.getLevel());
-            this.setUserName(orig.getUserName());
-            this.setIP(orig.getIp());
-            this.setURL(orig.getUrl());
-            this.setMessageText(orig.getMsgText());
-            this.setUUID(orig.getUUID());
-            this.setIxnID(orig.getIxnID());
-            this.setDeviceID(orig.getDeviceID());
         }
 
         public String getHttpCode() {
@@ -1179,9 +1386,7 @@ public class WWEParser extends WebParser {
         public String getSessionID() {
             return sessionID;
         }
-
     }
-
     private class WWEWWEStatServerMsgTable extends DBTable {
 
         public WWEWWEStatServerMsgTable(DBAccessor dbaccessor, TableType t) {
@@ -1274,7 +1479,7 @@ public class WWEParser extends WebParser {
 
             try {
                 stmt.setTimestamp(1, new Timestamp(rec.GetAdjustedUsecTime()));
-                stmt.setInt(2, rec.getFileId());
+                stmt.setInt(2, WWEStatServerMsg.getFileId());
                 stmt.setLong(3, rec.m_fileOffset);
                 stmt.setLong(4, rec.getM_FileBytes());
                 stmt.setLong(5, rec.m_line);
@@ -1304,7 +1509,6 @@ public class WWEParser extends WebParser {
     }
 //</editor-fold> 
 
-//<editor-fold defaultstate="collapsed" desc="WWEDebugMsg">
     private class WWEDebugMsg extends Message {
 
         private String ip;
@@ -1314,7 +1518,6 @@ public class WWEParser extends WebParser {
         private String method;
         private String key;
         private String url;
-
         private String deviceID;
         private String userName;
         private String level;
@@ -1325,6 +1528,30 @@ public class WWEParser extends WebParser {
         private String userID;
         private String browserClient;
         private String sessionID;
+        private String UUID;
+        private String ixnID;
+
+        private WWEDebugMsg(TableType t) {
+            super(t);
+        }
+
+        private WWEDebugMsg() {
+            this(TableType.WWEMessage);
+        }
+
+        private WWEDebugMsg(TableType t, WWEDebugMsg orig) {
+            this(t);
+            this.setClassName(orig.getClassName());
+            this.setJSessionID(orig.getjSessionID());
+            this.setLevel(orig.getLevel());
+            this.setUserName(orig.getUserName());
+            this.setIP(orig.getIp());
+            this.setURL(orig.getUrl());
+            this.setMessageText(orig.getMsgText());
+            this.setUUID(orig.getUUID());
+            this.setIxnID(orig.getIxnID());
+            this.setDeviceID(orig.getDeviceID());
+        }
 
         public String getParam2() {
             return param2;
@@ -1349,8 +1576,6 @@ public class WWEParser extends WebParser {
             this.deviceID = deviceID;
         }
 
-        private String UUID;
-
         /**
          * Get the value of UUID
          *
@@ -1371,8 +1596,6 @@ public class WWEParser extends WebParser {
             this.UUID = UUID;
         }
 
-        private String ixnID;
-
         /**
          * Get the value of ixnID
          *
@@ -1391,28 +1614,6 @@ public class WWEParser extends WebParser {
             checkDiffer(this.ixnID, ixnID, "ixnID", m_CurrentLine);
 
             this.ixnID = ixnID;
-        }
-
-        private WWEDebugMsg(TableType t) {
-            super(t);
-        }
-
-        private WWEDebugMsg() {
-            this(TableType.WWEMessage);
-        }
-
-        private WWEDebugMsg(TableType t, WWEDebugMsg orig) {
-            this(t);
-            this.setClassName(orig.getClassName());
-            this.setJSessionID(orig.getjSessionID());
-            this.setLevel(orig.getLevel());
-            this.setUserName(orig.getUserName());
-            this.setIP(orig.getIp());
-            this.setURL(orig.getUrl());
-            this.setMessageText(orig.getMsgText());
-            this.setUUID(orig.getUUID());
-            this.setIxnID(orig.getIxnID());
-            this.setDeviceID(orig.getDeviceID());
         }
 
         public String getHttpCode() {
@@ -1567,9 +1768,7 @@ public class WWEParser extends WebParser {
         public String getSessionID() {
             return sessionID;
         }
-
     }
-
     private class WWEDebugMessageTable extends DBTable {
 
         public WWEDebugMessageTable(DBAccessor dbaccessor, TableType t) {
@@ -1662,7 +1861,7 @@ public class WWEParser extends WebParser {
 
             try {
                 stmt.setTimestamp(1, new Timestamp(rec.GetAdjustedUsecTime()));
-                stmt.setInt(2, rec.getFileId());
+                stmt.setInt(2, WWEDebugMsg.getFileId());
                 stmt.setLong(3, rec.m_fileOffset);
                 stmt.setLong(4, rec.getM_FileBytes());
                 stmt.setLong(5, rec.m_line);
@@ -1692,231 +1891,6 @@ public class WWEParser extends WebParser {
     }
 //</editor-fold>
 
-//<editor-fold defaultstate="collapsed" desc="WWEBayeuxSMsg">
-    private static final Pattern regBayeuxNotificationType = Pattern.compile("notificationType=([^,\\}]+)");
-//    private static final Pattern regBayeuxMessageType = Pattern.compile("messageType=([^,\\}]+)");
-    private static final Pattern regBayeuxCallUUID = Pattern.compile("CallUUID=([^,]+),", Pattern.CASE_INSENSITIVE);
-
-    private static final Pattern regBayeuxDeviceURI = Pattern.compile("deviceUri=[\\S,]+/api/v2/devices/([^,]+),");
-
-    private static final Pattern regMessageUUID = Pattern.compile("Found call \\[(\\p{Alnum}+)\\]");
-
-    private static final Pattern regMessageStartingHTTP = Pattern.compile("^https?://(\\S+)", Pattern.CASE_INSENSITIVE);
-
-    private static final Pattern regMessageUserID = Pattern.compile("(?:user(?:Id)?|agent):? \\[?(\\p{Alnum}{32})\\]?", Pattern.CASE_INSENSITIVE);
-    private static final Pattern regMessageUserNameID = Pattern.compile("(?:(?<!No )[Ll]ogin *[Cc]ode|UserName:) \\[?((?!for)[^\\]\\s]+)\\]?");
-    private static final Pattern regMessageUserNameID1 = Pattern.compile(" agentId=([^\\s,]+), ");
-    private static final Pattern regMessageUserNameID2 = Pattern.compile(" [Uu]ser \\[([^\\]]+)\\]");
-    private static final Pattern regMessageDeviceID = Pattern.compile("device .*(?:\\[(?:Id=)|DeviceV2\\(id=)([\\w\\-]+)", Pattern.CASE_INSENSITIVE);
-    private static final Pattern regMessageDevice1ID = Pattern.compile("[Dd]evice \\[*([\\w\\-]+)\\]*");
-
-    private static final Pattern regMessageCalUUID1 = Pattern.compile("Call \\[(?:Id=)?([\\w\\-]{32})\\]", Pattern.CASE_INSENSITIVE);
-    private static final Pattern regMessageCalUUID2 = Pattern.compile("call recording details \\[([\\w\\-]{32})\\]", Pattern.CASE_INSENSITIVE);
-    private static final Pattern regMessageGSessionID = Pattern.compile(" session \\[*(\\p{Alnum}{20,}+)\\]*", Pattern.CASE_INSENSITIVE);
-//    private static final Pattern regMessageGSessionMonitorID = Pattern.compile("^Session \\[(\\p{Alnum}+)\\]", Pattern.CASE_INSENSITIVE);
-    private static final Pattern regUserWithID = Pattern.compile("user(?: with ID| settings)? \\[?([^\\s\\]]{12,}+)\\]?", Pattern.CASE_INSENSITIVE);
-    private static final Pattern regUserWithID1 = Pattern.compile("for (?:user|agent) \\[([^\\]]+)\\]");
-    private static final Pattern regUserWithID2 = Pattern.compile("user \\[([^\\s\\]]+)\\] not", Pattern.CASE_INSENSITIVE);
-    private static final Pattern regMessageWWESessionID = Pattern.compile("Session \\[(\\p{Alnum}+)\\] removed", Pattern.CASE_INSENSITIVE);
-
-    private static final Pattern regUserID1 = Pattern.compile("userId=([^\\s,\\>\\<]+)", Pattern.CASE_INSENSITIVE);
-    private static final Pattern regUserID2 = Pattern.compile("(?:for|with) userId ([^\\s,\\>\\<]+)", Pattern.CASE_INSENSITIVE);
-
-    private static final Pattern regUserID3ID = Pattern.compile("sessions from (\\w+)");
-    private static final Pattern regUserRemovingSession = Pattern.compile("Removing session (\\w+)");
-//    private static final Pattern regUserSettings = Pattern.compile("user settings \\[(\\p{Alnum}+)\\]");
-
-    private static final Pattern regMessageBrowser1ID = Pattern.compile("browserId ([\\w\\-]+)");
-    private static final Pattern regMessageBrowser2ID = Pattern.compile("clientId=([\\w\\-]+),");
-    private static final Pattern regMessageIxnID = Pattern.compile("﻿interaction with identity \\[([\\w\\-]+)\\]");
-    private static final Pattern regMessageIxn1ID = Pattern.compile("interactionId=(\\w+)");
-    private static final Pattern regMessageIxn2ID = Pattern.compile("(?:interactionid|chat id) '*\\{*(\\w+)\\}*'*", Pattern.CASE_INSENSITIVE);
-    private static final Pattern regMessageIxn3ID = Pattern.compile("ixnId=(\\w+)");
-    private static final Pattern regMessageIxn4ID = Pattern.compile("(?:interactionId|interaction with identity) \\[(\\w+)\\]", Pattern.CASE_INSENSITIVE);
-//    private static final Pattern regMessageUserToken = Pattern.compile("userToken=(\\w+)");
-    private static final Pattern regMessageIxnChatID = Pattern.compile("/(?:chats|calls)/(\\w+)");
-
-    private static class WWEMessageCleanTool {
-
-        static interface IRXFoundProc {
-
-            abstract void foundFun(String newLine, String replacedString);
-        }
-
-        private class ReplaceLiteral extends ICleanString {
-
-            private final String searchString;
-            private final String replaceString;
-
-            public ReplaceLiteral(String searchString, String replaceString, boolean isFinal) {
-                super(isFinal);
-                this.searchString = searchString;
-                this.replaceString = replaceString;
-            }
-
-            @Override
-            public Pair<String, String> cleanString1(String s) {
-                if (s != null && s.contains(searchString)) {
-                    return new Pair(replaceString, searchString);
-                } else {
-                    return null;
-                }
-
-            }
-
-        }
-
-        private class ReplaceRx extends ICleanString {
-
-            private final Pattern p;
-            private final int idx;
-            private final String replaceString;
-
-            public ReplaceRx(Pattern p, int idx, String replaceString) {
-                this(p, idx, replaceString, false);
-            }
-
-            public ReplaceRx(Pattern p, int idx, String replaceString, boolean isFinal) {
-                super(isFinal);
-                this.p = p;
-                this.idx = idx;
-                this.replaceString = replaceString;
-
-            }
-
-            @Override
-            public Pair<String, String> cleanString1(String s) {
-                return Message.getRxReplace(s, p, idx, replaceString);
-            }
-
-            private boolean cleanString(String s, IRXFoundProc pr) {
-                Pair<String, String> rxReplace;
-                rxReplace = Message.getRxReplace(s, p, idx, replaceString);
-                if (rxReplace != null) {
-                    pr.foundFun(rxReplace.getValue(), rxReplace.getKey());
-                    return true;
-                } else {
-                    return false;
-                }
-            }
-        }
-
-        private abstract class ICleanString {
-
-            protected final boolean stopIfFound;
-
-            public ICleanString(boolean b) {
-                stopIfFound = b;
-            }
-
-            abstract public Pair<String, String> cleanString1(String s);
-
-            public boolean isStopIfFound() {
-                return stopIfFound;
-            }
-
-        }
-
-        private static ArrayList<ICleanString> rxs = new ArrayList<>();
-
-        public WWEMessageCleanTool() {
-            rxs = new ArrayList<>();
-//            rxs.add(new ReplaceRx(Pattern.compile("(.+﻿VoiceUcsInteraction was updated with values .+)", Pattern.CASE_INSENSITIVE), 1, "<VoiceUcsInteraction was updated with ..>", true));
-//            rxs.add(new ReplaceRx(Pattern.compile("(.+﻿Updating of telephonyProcessingContext .+)", Pattern.CASE_INSENSITIVE), 1, "<Updating of telephonyProcessingContext>", true));
-//            rxs.add(new ReplaceRx(Pattern.compile("(.+ UpdateRequest: index .+)", Pattern.CASE_INSENSITIVE), 1, "<UpdateRequest: index>", true));
-            rxs.add(new ReplaceLiteral("﻿called with baseUCSInteractionResource", "<https://*ad/v1﻿called with baseUCSInteractionResource>", true));
-            rxs.add(new ReplaceLiteral("performUCSContactOperation called with baseUCSContactsResourceV2", "﻿performUCSContactOperation called with baseUCSContactsResourceV2", true));
-//            rxs.add(new ReplaceLiteral("VoiceUcsInteraction was updated with values", "<VoiceUcsInteraction was updated with values>", true));
-            rxs.add(new ReplaceLiteral(" performInteractionOperation called with baseUCSInteractionResource", "<performInteractionOperation called with baseUCSInteractionResource>", true));
-            rxs.add(new ReplaceLiteral(" Execution completed with baseUCSInteractionResource", "<Execution completed with baseUCSInteractionResource>", true));
-            rxs.add(new ReplaceLiteral("Read all nodes:", "<Read all nodes:>", true));
-            rxs.add(new ReplaceLiteral("Updating setting for object", "<Updating setting for object>", true));
-            rxs.add(new ReplaceLiteral("UpdateRequest: index", "<﻿UpdateRequest: index>", true));
-            rxs.add(new ReplaceLiteral("Skipped update of context", "<﻿Skipped update of context>", true));
-            rxs.add(new ReplaceLiteral("Read object", "<Read object>", true));
-
-            rxs.add(new ReplaceLiteral("Login agent: deviceId", "<Login agent: deviceId>", true));
-            rxs.add(new ReplaceLiteral(" setting CustomContact", "<setting CustomContact>", true));
-            rxs.add(new ReplaceLiteral(" Requesting extended user settings", "<Requesting extended user settings>", true));
-            rxs.add(new ReplaceLiteral(" Starting registration for device", "Starting registration for device", true));
-            rxs.add(new ReplaceLiteral(" Result device context", "<Result device contex>", true));
-            rxs.add(new ReplaceLiteral(" Creating setting for object", "<Creating setting for object>", true));
-            rxs.add(new ReplaceLiteral(": TelephonyUserMonitorV2.UserSessionInfo", "<Creating setting for object>", true));
-
-            rxs.add(new ReplaceRx(Pattern.compile("^(UpdateRequest: index .+)$", Pattern.CASE_INSENSITIVE), 1, "<UpdateRequest: index>", true));
-            rxs.add(new ReplaceRx(Pattern.compile("^(Unregistering from TServer device .+)$", Pattern.CASE_INSENSITIVE), 1, "<Unregistering from TServer device>", true));
-            rxs.add(new ReplaceRx(Pattern.compile("^(Unregistering DN .+)$", Pattern.CASE_INSENSITIVE), 1, "<Unregistering DN>", true));
-            rxs.add(new ReplaceRx(Pattern.compile("^Successfully saved heartbeat qualifier(.+)"), 1, "<...>", true));
-            rxs.add(new ReplaceRx(Pattern.compile("\\$Servlet3SaveToSessionRequestWrapper@(\\w+)", Pattern.CASE_INSENSITIVE), 1, "<wrapperNo>"));
-            rxs.add(new ReplaceRx(Pattern.compile("last connect (\\d+) ms ago"), 1, "<secs>"));
-            rxs.add(new ReplaceRx(Pattern.compile("/meta/(?:dis)?connect, id=(\\d+)"), 1, "<id>"));
-//            rxs.add(new ReplaceRx(Pattern.compile("client ([\\w\\-]+) "), 1, "<clientID>"));
-//            rxs.add(new ReplaceRx(Pattern.compile("^\\< client ([\\w\\-]+) "), 1, "<clientId>"));
-//            rxs.add(new ReplaceRx(Pattern.compile("clientId=(\\w+),"), 1, "<clientID>"));
-//            rxs.add(new ReplaceRx(Pattern.compile("Session \\[(\\w+)\\]"), 1, "<session>"));
-            rxs.add(new ReplaceRx(Pattern.compile("contact center \\[([\\w\\-]+)\\]"), 1, "<ccID>"));
-            rxs.add(new ReplaceRx(Pattern.compile("referenceId \\[([\\w\\-]+)\\]", Pattern.CASE_INSENSITIVE), 1, "<refID>"));
-            rxs.add(new ReplaceRx(Pattern.compile("[\\s\\[]Number=?\\[?([\\w\\-]+)\\]?", Pattern.CASE_INSENSITIVE), 1, "<number>"));
-            rxs.add(new ReplaceRx(Pattern.compile("session\\.SessionInformation@(\\w+)"), 1, "<SessionInstance>"));
-            rxs.add(new ReplaceRx(Pattern.compile(" DN \\[?([\\w\\-]+)\\]?"), 1, "<DN>"));
-            rxs.add(new ReplaceRx(Pattern.compile(" Employee ID: (.+)\\]"), 1, "<Employee ID>"));
-            rxs.add(new ReplaceRx(Pattern.compile(" Place(?:(?: name| by name))? \\[?([^\\],]+)\\]?", Pattern.CASE_INSENSITIVE), 1, "<Place>"));
-            rxs.add(new ReplaceRx(Pattern.compile(" took \\[(\\d+)ms\\]"), 1, "<xx>"));
-            rxs.add(new ReplaceRx(Pattern.compile("Object \\[*(\\S+)\\]*"), 1, "<obj>"));
-            rxs.add(new ReplaceRx(Pattern.compile("referenceid=(\\w+)", Pattern.CASE_INSENSITIVE), 1, "<refID>"));
-            rxs.add(new ReplaceRx(Pattern.compile("userToken=\\[*(\\w+)\\]*"), 1, "<userToken>"));
-            rxs.add(new ReplaceRx(Pattern.compile("destination \\[*([^\\s\\]]+)\\]*"), 1, "<DN>"));
-            rxs.add(new ReplaceRx(Pattern.compile("DeviceRuntimeContext\\(dn=(\\S+)"), 1, "<DN>"));
-            rxs.add(new ReplaceRx(Pattern.compile("Place name \\[*(\\S+)\\]*"), 1, "<Place>"));
-            rxs.add(new ReplaceRx(Pattern.compile("[Cc]all \\[(\\S+)\\]"), 1, "<ConnID>"));
-            rxs.add(new ReplaceRx(Pattern.compile("(?:with parent|relatedConnId|related connId) \\[(\\S+)\\]"), 1, "<ConnID>"));
-
-            rxs.add(new ReplaceRx(Pattern.compile("java.lang.Object;([^,]+),"), 1, "<SomeID>"));
-            rxs.add(new ReplaceRx(Pattern.compile("FirstName: (.+)"), 1, "<The guy>"));
-            rxs.add(new ReplaceRx(Pattern.compile("\\[DBID=([^\\]]+)\\]"), 1, "<DBID>"));
-            rxs.add(new ReplaceRx(Pattern.compile("Attempting to start contact center.+\\(([^\\)]+)\\)$"), 1, "<UserName>"));
-            rxs.add(new ReplaceRx(Pattern.compile("timestampMicros=(\\d+),"), 1, "<timestampMicros>"));
-            rxs.add(new ReplaceRx(Pattern.compile("^Starting registration for device \\[Id=([^,]+),"), 1, "<DeviceID>"));
-            rxs.add(new ReplaceRx(Pattern.compile("AgentStateDescriptorV2\\(id=([^,\\s]+)"), 1, "<AgentStateDescriptorID>"));
-            rxs.add(new ReplaceRx(Pattern.compile("contact \\[(\\w+)\\]"), 1, "<contactID>"));
-            rxs.add(new ReplaceRx(Pattern.compile("contact \\[(\\w+)\\]"), 1, "<contactID>"));
-            rxs.add(new ReplaceRx(Pattern.compile("with referenceId (\\d+)"), 1, "<refID>"));
-            rxs.add(new ReplaceRx(Pattern.compile("found [([^\\]]+)] documents"), 1, "<num>"));
-            rxs.add(new ReplaceRx(Pattern.compile("foundDocuments=([^,\\s]+),"), 1, "<num>"));
-            rxs.add(new ReplaceRx(Pattern.compile("sessions for (\\w+)"), 1, "<session>"));
-            rxs.add(new ReplaceRx(Pattern.compile(" client ([\\w\\-]+)"), 1, "<client>"));
-            rxs.add(new ReplaceRx(Pattern.compile("userToken=(\\w+)"), 1, "<userID?>"));
-            rxs.add(new ReplaceRx(Pattern.compile("referenceId (\\d+)"), 1, "<refID>"));
-            rxs.add(new ReplaceRx(Pattern.compile("universalcontactserver\\.tasks\\.UpdateUcsInteractionTaskV2@(\\w+)"), 1, "<instanceID>"));
-            rxs.add(new ReplaceRx(Pattern.compile(", index=(\\d+),"), 1, "<ID>"));
-            rxs.add(new ReplaceRx(Pattern.compile("﻿AgentState operation name \\[([^\\]]+)\\]"), 1, "<ACW>"));
-            rxs.add(new ReplaceRx(Pattern.compile("Extracted ReasonCode \\[([^\\]]+)\\]"), 1, "<ACW>"));
-            rxs.add(new ReplaceRx(Pattern.compile("﻿operationName=([^\\],]+)"), 1, "<ACW>"));
-            rxs.add(new ReplaceRx(Pattern.compile("Found \\[(\\d+)\\]"), 1, "<NUM>"));
-
-        }
-
-        public String cleanString(String s) {
-            String ret = s;
-            for (ICleanString rx : rxs) {
-                Pair<String, String> ret1 = rx.cleanString1(ret);
-                if (ret1 != null) {
-                    ret = ret1.getValue();
-                    if (rx.isStopIfFound()) {
-                        break;
-                    }
-                }
-            }
-
-            return ret;
-        }
-
-    }
-    private static final WWEMessageCleanTool msgCleaner = new WWEMessageCleanTool();
-
-//05/30/2019 13:35:39.159 DEBUG [graham.saludares@outreach.airbnb.com] [Ca6138neMXSzsR6ccjA7eA1ekz4a2zuirypscugq9fj67a1] [7c3316db-ae59-43a8-aa67-4990fe4506cc] [hystrix-ApiOperationPool-483] 203.153.14.144 /api/v2/me  c.g.c.v.a.t.u.o.StartContactCenterSessionApiTaskV2 https://esv1-cvt-gws-p.airbnb.biz/ui/crm-workspace/index.html?sfdcIFrameOrigin=https%3A%2F%2Fairbnb.my.salesforce.com&nonce=b205c3a50141a2989a23ce1abfc1f8c7bb46bf0dfa5da4bf898c3257d12dc8ee&isAdapterUrl=true&isdtp=vw& Place: [Configuration object: type = CfgPlace, properties = {
-    private static final Pattern regConfigObjectRead = Pattern.compile("Configuration object: type = (\\S+), properties = \\{");
-
     private class WWEBayeuxSMsg extends WWEDebugMsg {
 
         private boolean msgParsed = false;
@@ -1926,16 +1900,20 @@ public class WWEParser extends WebParser {
         private String channel;
         private String msgType;
 
+        private WWEBayeuxSMsg() {
+            super(TableType.WWEBayeuxMessage);
+        }
+
+        private WWEBayeuxSMsg(WWEDebugMsg entry) {
+            super(TableType.WWEBayeuxMessage, entry);
+        }
+
         public String getChannel() {
             return channel;
         }
 
         public String getMsgType() {
             return msgType;
-        }
-
-        private WWEBayeuxSMsg() {
-            super(TableType.WWEBayeuxMessage);
         }
 
         void setBayeuxId(String rx) {
@@ -1962,10 +1940,6 @@ public class WWEParser extends WebParser {
             action = rx;
         }
 
-        private WWEBayeuxSMsg(WWEDebugMsg entry) {
-            super(TableType.WWEBayeuxMessage, entry);
-        }
-
         private void setAdditionalLines(ArrayList<String> m_MessageContents) {
             addMessageLines(m_MessageLines);
         }
@@ -1973,10 +1947,10 @@ public class WWEParser extends WebParser {
         @Override
         public String getMsgText() {
 //            parserMessageText();
-            return super.getMsgText(); //To change body of generated methods, choose Tools | Templates.
+return super.getMsgText(); //To change body of generated methods, choose Tools | Templates.
         }
 
-//        private void parserMessageText() {
+        //        private void parserMessageText() {
 //            if (!msgParsed) {
 //                String txt = super.getMsgText();
 //                if (txt != null && !txt.isEmpty()) {
@@ -2021,7 +1995,6 @@ public class WWEParser extends WebParser {
         private void setMessageType(String rx) {
             this.msgType = rx;
         }
-
     }
 
     private class WWEBayeuxSMsgTable extends DBTable {
@@ -2122,7 +2095,7 @@ public class WWEParser extends WebParser {
 
             try {
                 stmt.setTimestamp(1, new Timestamp(rec.GetAdjustedUsecTime()));
-                stmt.setInt(2, rec.getFileId());
+                stmt.setInt(2, WWEBayeuxSMsg.getFileId());
                 stmt.setLong(3, rec.m_fileOffset);
                 stmt.setLong(4, rec.getM_FileBytes());
                 stmt.setLong(5, rec.m_line);
@@ -2252,7 +2225,7 @@ public class WWEParser extends WebParser {
 
             try {
                 stmt.setTimestamp(1, new Timestamp(rec.GetAdjustedUsecTime()));
-                stmt.setInt(2, rec.getFileId());
+                stmt.setInt(2, WWEUCSMsg.getFileId());
                 stmt.setLong(3, rec.m_fileOffset);
                 stmt.setLong(4, rec.getM_FileBytes());
                 stmt.setLong(5, rec.m_line);
@@ -2278,8 +2251,6 @@ public class WWEParser extends WebParser {
 
     }
 //</editor-fold>
-
-//<editor-fold defaultstate="collapsed" desc="WWEIxnServerMsg">
     private class WWEIxnServerMsg extends Message {
 
         private String ip;
@@ -2296,6 +2267,8 @@ public class WWEParser extends WebParser {
         private String className;
         private String msgText;
         private final String msgName;
+        private String UUID;
+        private String ixnID;
 
         private WWEIxnServerMsg(String group) {
             super(TableType.WWEIxnMessage);
@@ -2320,7 +2293,6 @@ public class WWEParser extends WebParser {
             this.deviceID = deviceID;
         }
 
-        private String UUID;
 
         /**
          * Get the value of UUID
@@ -2340,7 +2312,6 @@ public class WWEParser extends WebParser {
             this.UUID = UUID;
         }
 
-        private String ixnID;
 
         /**
          * Get the value of ixnID
@@ -2509,7 +2480,7 @@ public class WWEParser extends WebParser {
 
             try {
                 stmt.setTimestamp(1, new Timestamp(rec.GetAdjustedUsecTime()));
-                stmt.setInt(2, rec.getFileId());
+                stmt.setInt(2, WWEIxnServerMsg.getFileId());
                 stmt.setLong(3, rec.m_fileOffset);
                 stmt.setLong(4, rec.getM_FileBytes());
                 stmt.setLong(5, rec.m_line);
@@ -2617,7 +2588,7 @@ public class WWEParser extends WebParser {
 
             try {
                 stmt.setTimestamp(1, new Timestamp(rec.GetAdjustedUsecTime()));
-                stmt.setInt(2, rec.getFileId());
+                stmt.setInt(2, WWEUCSConfigMsg.getFileId());
                 stmt.setLong(3, rec.m_fileOffset);
                 stmt.setLong(4, rec.getM_FileBytes());
                 stmt.setLong(5, rec.m_line);

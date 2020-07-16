@@ -15,14 +15,14 @@ public class IxnSS extends Ixn {
     final private static Pattern regIxnMessage = Pattern.compile("^Server: IxnEvent '([^']+)'");
     final private static Pattern regIxnCustomEvent = Pattern.compile("'([^']+)'$");
 
-    final private static Pattern regParentIxnID0 = Pattern.compile("^\\s+attr_prnt_itx_id.+ \"([^\"]+)\"$");
-    final private static Pattern regParentIxnID = Pattern.compile("^\\s+'attr_itx_prnt_itx_id'.+= \"([^\"]+)\"$");
-    final private static Pattern regParentIxnIDID = Pattern.compile("^\\s+'Parent' .+\"([^\"]+)\"$");
 
     final private static Pattern regConnID = Pattern.compile("^\\s+AttributeConnID .+ (\\w+)$");
     final private static Pattern regConnIDCustom = Pattern.compile("^\\s+ConnID\\s+(\\w+)");
+    final private static Pattern regService = Pattern.compile("^\\s+'Service'.+= \"([^\"]+)\"$");
+    final private static Pattern regMethod = Pattern.compile("^\\s+'Method'.+= \"([^\"]+)\"$");
+    final private static Pattern regClientRef = Pattern.compile("^\\s+attr_esp_client_refid.+ = (\\d+)$");
+    final private static Pattern regServerRef = Pattern.compile("^\\s+attr_esp_server_refid.+ = (\\d+)$");
 
-    private String clientName = null;
     private final String messageName;
     private boolean customEvent = false;
 
@@ -93,7 +93,6 @@ public class IxnSS extends Ixn {
         }
     }
 
-    final private static Pattern regService = Pattern.compile("^\\s+'Service'.+= \"([^\"]+)\"$");
 
     String GetService() {
         if (!customEvent) {
@@ -104,7 +103,6 @@ public class IxnSS extends Ixn {
 
     }
 
-    final private static Pattern regMethod = Pattern.compile("^\\s+'Method'.+= \"([^\"]+)\"$");
 
     String GetMethod() {
         if (!customEvent) {
@@ -114,7 +112,6 @@ public class IxnSS extends Ixn {
         }
     }
 
-    final private static Pattern regClientRef = Pattern.compile("^\\s+attr_esp_client_refid.+ = (\\d+)$");
 
     Integer GetClientRef() {
         if (!customEvent) {
@@ -125,7 +122,6 @@ public class IxnSS extends Ixn {
 
     }
 
-    final private static Pattern regServerRef = Pattern.compile("^\\s+attr_esp_server_refid.+ = (\\d+)$");
 
     Integer GetServerRef() {
         if (!customEvent) {

@@ -19,6 +19,8 @@ import java.util.Properties;
  * @author ssydoruk
  */
 public class AggrORSDuration extends IAggregateQuery {
+    private static final String TMP_TABLE = "tmp1";
+//    private static final String TMP_TABLE_OUT = "tmp2";
 
     public AggrORSDuration() throws SQLException {
         setJpConfig(new AggrORSDurationConfig());
@@ -65,8 +67,6 @@ public class AggrORSDuration extends IAggregateQuery {
         return null;
     }
 
-    private static final String TMP_TABLE = "tmp1";
-//    private static final String TMP_TABLE_OUT = "tmp2";
 
     private void runDurationReport(AggrORSDurationConfig cfg, int appID) throws SQLException {
         DynamicTreeNode<OptionNode> attrRoot = cfg.getAttrRoot();

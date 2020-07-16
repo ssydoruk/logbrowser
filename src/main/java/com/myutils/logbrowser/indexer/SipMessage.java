@@ -20,6 +20,9 @@ public class SipMessage extends Message {
     private static final Pattern regSIPUserPart = Pattern.compile("([^@:]+)@");
     private static final Pattern regSIPRequest = Pattern.compile("^(\\w+)");
     private static final Pattern regSIPResponse = Pattern.compile("(\\w+)$");
+    private static final Pattern patternPeer
+            = Pattern.compile("(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}):(\\d{1,5})");
+    private final static HashSet<String> nonCalls = new HashSet<String>(Arrays.asList("OPTIONS", "NOTIFY", "SUBSCRIBE", "REGISTER"));
 
     String m_Sendername;
     String m_Receivername;
@@ -31,90 +34,9 @@ public class SipMessage extends Message {
     private String peerPort = null;
     private String via;
 
-    Integer getHandlerInProgress() {
-        return (m_handlerInProgress ? m_handlerId : 0);
-    }
 
-    public static class ExtentionCall {
-
-        private static ExtentionCall findCall(ArrayList<ExtentionCall> ret, int parseInt) {
-            for (ExtentionCall extentionCall : ret) {
-                Integer callIdx1 = extentionCall.getCallIdx();
-                if (callIdx1 != null && callIdx1.equals(parseInt)) {
-                    return extentionCall;
-                }
-            }
-            return null;
-        }
-
-        private String ConnID;
-
-        public String getConnID() {
-            return ConnID;
-        }
-
-        public String getUUID() {
-            return UUID;
-        }
-        private Integer callIdx;
-
-        public Integer getCallIdx() {
-            return callIdx;
-        }
-        private String UUID;
-
-        public ExtentionCall(Integer callIdx, String ConnID, String UUID) {
-            this.callIdx = callIdx;
-            this.ConnID = ConnID;
-            this.UUID = UUID;
-        }
-
-        private static final Pattern regConn = Pattern.compile("^\\s+'conn-(\\d)+'\\s+'(\\w+)'$");
-        private static final Pattern regUUID = Pattern.compile("^\\s+'call-uuid-(\\d)+'\\s+'(\\w+)'$");
-
-        public static ArrayList<SipMessage.ExtentionCall> getExtentionCalls(ArrayList<String> m_MessageContents) {
-            ArrayList<ExtentionCall> ret = null;
-            ArrayList<String> ext = Message.getAllExtentions(m_MessageContents);
-            if (ext != null) {
-                ret = new ArrayList<>();
-                for (int i = 0; i < ext.size(); i++) {
-                    String get = ext.get(i);
-                    Matcher m;
-                    if (get != null && !get.isEmpty() && (m = regConn.matcher(get)).find()) {
-                        try {
-                            ret.add(new ExtentionCall(Integer.parseInt(m.group(1)), m.group(2), null));
-                        } catch (NumberFormatException numberFormatException) {
-                            Main.logger.error("getExtentionCalls: cannot parse number from [" + m.group(1) + "] (" + get + ")");
-                        }
-                    }
-                }
-
-                for (int i = 0; i < ext.size(); i++) {
-                    String get = ext.get(i);
-                    Matcher m;
-                    if (get != null && !get.isEmpty() && (m = regUUID.matcher(get)).find()) {
-                        try {
-                            int parseInt = Integer.parseInt(m.group(1));
-                            ExtentionCall ec = findCall(ret, parseInt);
-                            if (ec != null) {
-                                ec.setUUID(m.group(2));
-                            } else {
-                                ret.add(new ExtentionCall(parseInt, null, m.group(2)));
-                            }
-                        } catch (NumberFormatException numberFormatException) {
-                            Main.logger.error("getExtentionCalls: cannot parse number from [" + m.group(1) + "] (" + get + ")");
-                        }
-                    }
-                }
-            }
-            return ret;
-        }
-
-        private void setUUID(String group) {
-            this.UUID = group;
-        }
-    }
-
+    private String sipURI = null;
+    String peerIp = null;
     public SipMessage(ArrayList contents, TableType t) {
         super(t);
         m_MessageLines.clear();
@@ -151,8 +73,9 @@ public class SipMessage extends Message {
         }
 
     }
-
-    private String sipURI = null;
+    Integer getHandlerInProgress() {
+        return (m_handlerInProgress ? m_handlerId : 0);
+    }
 
     public String getSipURI() {
         return transformSIPURL(sipURI);
@@ -447,7 +370,6 @@ const char* GSIP_HDRNAME_REPLACES				="Replaces";
         return "";
     }
 
-    String peerIp = null;
 
     public String getPeerIp() {
         return peerIp;
@@ -457,8 +379,6 @@ const char* GSIP_HDRNAME_REPLACES				="Replaces";
         this.peerIp = peerIp;
     }
 
-    private static final Pattern patternPeer
-            = Pattern.compile("(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}):(\\d{1,5})");
 
     private void parsePeer() {
         if (peerIp == null) {
@@ -507,7 +427,6 @@ const char* GSIP_HDRNAME_REPLACES				="Replaces";
         this.peerPort = peerPort;
     }
 
-    private final static HashSet<String> nonCalls = new HashSet<String>(Arrays.asList("OPTIONS", "NOTIFY", "SUBSCRIBE", "REGISTER"));
 
     boolean isCallRelated() {
         String cSeq = GetCSeq();
@@ -532,6 +451,85 @@ const char* GSIP_HDRNAME_REPLACES				="Replaces";
             return ret;
         }
         return null;
+    }
+
+    public static class ExtentionCall {
+
+        private static final Pattern regConn = Pattern.compile("^\\s+'conn-(\\d)+'\\s+'(\\w+)'$");
+        private static final Pattern regUUID = Pattern.compile("^\\s+'call-uuid-(\\d)+'\\s+'(\\w+)'$");
+
+        private static ExtentionCall findCall(ArrayList<ExtentionCall> ret, int parseInt) {
+            for (ExtentionCall extentionCall : ret) {
+                Integer callIdx1 = extentionCall.getCallIdx();
+                if (callIdx1 != null && callIdx1.equals(parseInt)) {
+                    return extentionCall;
+                }
+            }
+            return null;
+        }
+
+        public static ArrayList<SipMessage.ExtentionCall> getExtentionCalls(ArrayList<String> m_MessageContents) {
+            ArrayList<ExtentionCall> ret = null;
+            ArrayList<String> ext = Message.getAllExtentions(m_MessageContents);
+            if (ext != null) {
+                ret = new ArrayList<>();
+                for (int i = 0; i < ext.size(); i++) {
+                    String get = ext.get(i);
+                    Matcher m;
+                    if (get != null && !get.isEmpty() && (m = regConn.matcher(get)).find()) {
+                        try {
+                            ret.add(new ExtentionCall(Integer.parseInt(m.group(1)), m.group(2), null));
+                        } catch (NumberFormatException numberFormatException) {
+                            Main.logger.error("getExtentionCalls: cannot parse number from [" + m.group(1) + "] (" + get + ")");
+                        }
+                    }
+                }
+                
+                for (int i = 0; i < ext.size(); i++) {
+                    String get = ext.get(i);
+                    Matcher m;
+                    if (get != null && !get.isEmpty() && (m = regUUID.matcher(get)).find()) {
+                        try {
+                            int parseInt = Integer.parseInt(m.group(1));
+                            ExtentionCall ec = findCall(ret, parseInt);
+                            if (ec != null) {
+                                ec.setUUID(m.group(2));
+                            } else {
+                                ret.add(new ExtentionCall(parseInt, null, m.group(2)));
+                            }
+                        } catch (NumberFormatException numberFormatException) {
+                            Main.logger.error("getExtentionCalls: cannot parse number from [" + m.group(1) + "] (" + get + ")");
+                        }
+                    }
+                }
+            }
+            return ret;
+        }
+        private String ConnID;
+        private Integer callIdx;
+        private String UUID;
+
+        public ExtentionCall(Integer callIdx, String ConnID, String UUID) {
+            this.callIdx = callIdx;
+            this.ConnID = ConnID;
+            this.UUID = UUID;
+        }
+
+        public String getConnID() {
+            return ConnID;
+        }
+
+        public String getUUID() {
+            return UUID;
+        }
+
+        public Integer getCallIdx() {
+            return callIdx;
+        }
+
+        private void setUUID(String group) {
+            this.UUID = group;
+        }
     }
 
 }

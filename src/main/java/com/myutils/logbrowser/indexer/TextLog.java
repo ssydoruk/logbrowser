@@ -18,9 +18,10 @@ import org.apache.logging.log4j.LogManager;
  *
  * @author Stepan
  */
-public class TextLog extends LogFileWrapper {
+public final class TextLog extends LogFileWrapper {
 
     private static final org.apache.logging.log4j.Logger logger = LogManager.getLogger();
+    private FileInputStream stream = null;
 
     public TextLog(File file) throws IOException {
         super(file);
@@ -59,7 +60,6 @@ public class TextLog extends LogFileWrapper {
         return stream;
     }
 
-    private FileInputStream stream = null;
 
     @Override
     void startParsing() throws Exception {

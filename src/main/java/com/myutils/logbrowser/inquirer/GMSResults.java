@@ -19,8 +19,30 @@ import org.apache.logging.log4j.LogManager;
 public class GMSResults extends IQueryResults {
 
     private static final org.apache.logging.log4j.Logger logger = LogManager.getLogger();
+    private final static String GMSWEB_WEBREQID = "webReqID";
+    private final static String FIELD_REFID = "Refid";
+    private final static String FIELD_ID = "id";
 
     private IDsFinder _cidFinder;
+    ArrayList<NameID> appsType = null;
+    private UTCTimeRange timeRange = null;
+    /**
+     *
+     */
+    public GMSResults(QueryDialogSettings qdSettings) {
+        super(qdSettings);
+        if (repComponents.isEmpty()) {
+            loadStdOptions();
+        }
+        addSelectionType(SelectionType.NO_SELECTION);
+        addSelectionType(SelectionType.GUESS_SELECTION);
+        addSelectionType(SelectionType.GMSSESSION);
+        addSelectionType(SelectionType.CONNID);
+        addSelectionType(SelectionType.UUID);
+        addSelectionType(SelectionType.IXN);
+        addSelectionType(SelectionType.SESSION);
+        addSelectionType(SelectionType.ANYPARAM);
+    }
 
     @Override
     public void Retrieve(QueryDialog dlg, SelectionType key, String searchID) throws SQLException {
@@ -114,23 +136,6 @@ public class GMSResults extends IQueryResults {
         return "GMS";
     }
 
-    /**
-     *
-     */
-    public GMSResults(QueryDialogSettings qdSettings) {
-        super(qdSettings);
-        if (repComponents.isEmpty()) {
-            loadStdOptions();
-        }
-        addSelectionType(SelectionType.NO_SELECTION);
-        addSelectionType(SelectionType.GUESS_SELECTION);
-        addSelectionType(SelectionType.GMSSESSION);
-        addSelectionType(SelectionType.CONNID);
-        addSelectionType(SelectionType.UUID);
-        addSelectionType(SelectionType.IXN);
-        addSelectionType(SelectionType.SESSION);
-        addSelectionType(SelectionType.ANYPARAM);
-    }
 
     private void addGMStoURS(DynamicTreeNode<OptionNode> root) {
         DynamicTreeNode<OptionNode> nd = new DynamicTreeNode<>(new OptionNode(DialogItem.GMStoURS));
@@ -256,7 +261,6 @@ public class GMSResults extends IQueryResults {
         DoneSTDOptions();
     }
 
-    ArrayList<NameID> appsType = null;
 
     @Override
     public ArrayList<NameID> getApps() throws SQLException {
@@ -271,7 +275,6 @@ public class GMSResults extends IQueryResults {
     void SetConfig(InquirerCfg cr) {
 //        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
-    private UTCTimeRange timeRange = null;
 
     @Override
     public void Retrieve(QueryDialog dlg) throws SQLException {
@@ -370,7 +373,6 @@ public class GMSResults extends IQueryResults {
 
     }
 
-    private final static String GMSWEB_WEBREQID = "webReqID";
 
     private void retrieveGMSWEBRequests(QueryDialog dlg, DynamicTreeNode<OptionNode> eventsSettings, IDsFinder cidFinder) throws SQLException {
         if (isChecked(eventsSettings) && DatabaseConnector.TableExist(TableType.GMSWebClientMessage.toString())) {
@@ -729,8 +731,6 @@ public class GMSResults extends IQueryResults {
 
     }
 
-    private final static String FIELD_REFID = "Refid";
-    private final static String FIELD_ID = "id";
 
     private void retrieveGMSIxn(QueryDialog dlg, DynamicTreeNode<OptionNode> eventsSettings, IDsFinder cidFinder) throws SQLException {
         Integer[] iDs = null;

@@ -21,6 +21,7 @@ public class OCSPAEventInfo extends Message {
     final private static Pattern regAgentSessionState = Pattern.compile("\\s*SessionState:\\s+(\\S[^;]+);");
     final private static Pattern regAgentCallType = Pattern.compile("\\sCallType:\\s+(\\S[^;]+);");
     final private static Pattern regRecHandle = Pattern.compile("RecHandle: (\\d+);");
+    final private static Pattern regCallResult = Pattern.compile("CallResult: ([1-9][^;]*);$");
 
     public OCSPAEventInfo(ArrayList messageLines) {
         super(TableType.OCSPAEventInfo, messageLines);
@@ -66,7 +67,6 @@ public class OCSPAEventInfo extends Message {
         return FindByRx(regAgentCallType, 1, "");
     }
 
-    final private static Pattern regCallResult = Pattern.compile("CallResult: ([1-9][^;]*);$");
 
     int CallResult() {
         return FindByRx(regCallResult, 1, 0);

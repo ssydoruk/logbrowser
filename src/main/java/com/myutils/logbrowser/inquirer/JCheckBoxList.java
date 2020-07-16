@@ -6,7 +6,7 @@ import javax.swing.*;
 import javax.swing.border.*;
 
 @SuppressWarnings("serial")
-public class JCheckBoxList extends JList<JCheckBox> {
+public final class JCheckBoxList extends JList<JCheckBox> {
 
     protected static Border noFocusBorder = new EmptyBorder(1, 1, 1, 1);
 

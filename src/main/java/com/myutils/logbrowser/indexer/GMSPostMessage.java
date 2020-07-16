@@ -14,12 +14,15 @@ import java.util.regex.Pattern;
  * @author terry The class Replicates TLibMessage
  */
 public class GMSPostMessage extends Message {
+    final private static Pattern regService = Pattern.compile("/service/callback/([^,\\s]+)");
+    final private static Pattern regPOSTMessage = Pattern.compile("^\\(POST\\) Client IP Address: ([0-9\\.]+),.+(http[^,]+)");
 
     String m_MessageName;
 
-    private boolean isTServerReq = false;
+    private final boolean isTServerReq = false;
     private String clientIP;
     private boolean POSTParsed = false;
+    private Pair<String, String> parseORSURI = null;
 
     GMSPostMessage(ArrayList<String> m_MessageContents) {
         super(TableType.GMSPOST, m_MessageContents);
@@ -62,7 +65,6 @@ public class GMSPostMessage extends Message {
         return getGMSAttributeString(new String[]{"callback_type", "serviceType"});
     }
 
-    final private static Pattern regService = Pattern.compile("/service/callback/([^,\\s]+)");
 
     String GMSService() {
         String ret = getGMSAttributeString("service_id");
@@ -70,7 +72,6 @@ public class GMSPostMessage extends Message {
         return ret;
     }
 
-    final private static Pattern regPOSTMessage = Pattern.compile("^\\(POST\\) Client IP Address: ([0-9\\.]+),.+(http[^,]+)");
 
     String ORSSessionID() {
         parsePOST();
@@ -90,7 +91,6 @@ public class GMSPostMessage extends Message {
         }
     }
 
-    private Pair<String, String> parseORSURI = null;
 
     private void parsePOST() {
         if (!this.POSTParsed) {

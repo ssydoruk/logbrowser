@@ -23,6 +23,11 @@ public class EditorWindows extends ExternalEditor {
 
     protected ActiveXComponent vim;
 
+
+    private WinDef.HWND hwnd;
+    public EditorWindows() throws IOException {
+        InitDLL();
+    }
     private int getTabNo(int fileBufNo) {
         Variant invoke;
         int parseInt = 0;
@@ -38,8 +43,6 @@ public class EditorWindows extends ExternalEditor {
         inquirer.logger.trace("Found tab: " + parseInt);
         return parseInt;
     }
-
-    private WinDef.HWND hwnd;
 
     private void setLocation() {
         Variant vx = vim.invoke("Eval", "getwinposx()");
@@ -111,9 +114,6 @@ public class EditorWindows extends ExternalEditor {
 
     }
 
-    public EditorWindows() throws IOException {
-        InitDLL();
-    }
 
     private int getFileBufNo(String fileName) throws IOException {
         Variant invoke;

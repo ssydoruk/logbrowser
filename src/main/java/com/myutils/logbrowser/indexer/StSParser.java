@@ -2,7 +2,7 @@ package com.myutils.logbrowser.indexer;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -29,8 +29,8 @@ public class StSParser extends Parser {
     private static final Pattern regTMessageStart = Pattern.compile("^Int 04543");
     private static final Pattern regNotParseMessage = Pattern.compile("^(04543"
             + ")");
+    private static final Pattern ptServerName = Pattern.compile("^Application\\s+name:\\s+(\\S+)");
     long m_CurrentFilePos;
-    int m_CurrentLine;
     final int MSG_STRING_LIMIT = 200;
     // parse state contants
 
@@ -47,16 +47,14 @@ public class StSParser extends Parser {
     int m_rHistId = 0;
     int m_actionId = 0;
     int m_dbRecords = 0;
-    private final int m_lastMsgType;
-    private final Hashtable m_BlockNamesToIgnoreHash;
+    private final HashMap m_BlockNamesToIgnoreHash;
     private final FileInfoType m_fileFilterId;
     private String m_LastLine;
     private boolean customEvent = false;
 
     public StSParser(HashMap<TableType, DBTable> m_tables) {
         super(FileInfoType.type_StatServer, m_tables);
-        m_lastMsgType = -1;
-        m_BlockNamesToIgnoreHash = new Hashtable();
+        m_BlockNamesToIgnoreHash = new HashMap();
 
         m_fileFilterId = FileInfoType.type_StatServer;
 //        for (int i = 0; i < BlockNamesToIgnoreArray.length; i++) {
@@ -123,7 +121,7 @@ public class StSParser extends Parser {
             ParseLine("", null); // to complete the parsing of the last line/last message
 
         } catch (Exception e) {
-            e.printStackTrace();
+            Main.logger.error(e);  
             return m_CurrentLine - line;
         }
 
@@ -159,12 +157,12 @@ public class StSParser extends Parser {
 
                 if ((m = regInit.matcher(s)).find()) {
                     AddConfigMessage(s.substring(m.end()));
-                } else if ((m = regStatusMultiLine.matcher(s)).find()) {
+                } else if ((regStatusMultiLine.matcher(s)).find()) {
                     m_HeaderOffset = m_CurrentFilePos;
                     m_Header = s;
                     setSavedFilePos(getFilePos());
                     m_ParserState = ParserState.STATE_CAPACITY;
-                } else if ((m = regTMessageStart.matcher(s)).find()) {//starts on clear line
+                } else if ((regTMessageStart.matcher(s)).find()) {//starts on clear line
                     setSavedFilePos(getFilePos());
                     m_MessageContents.add(s);
                     m_ParserState = ParserState.STATE_TMESSAGESTART;
@@ -281,12 +279,12 @@ public class StSParser extends Parser {
                     m_Header = s;
                     m_ParserState = ParserState.STATE_ACTION_MESSAGE;
                     break;
-                } else if ((m = regJavaStart.matcher(s)).find()) {
+                } else if (( regJavaStart.matcher(s)).find()) {
                     Main.logger.debug("Java");
                     setSavedFilePos(getFilePos());
                     m_Header = s;
                     m_MessageContents.add(s);
-                    if ((m = regJavaOnData.matcher(s)).find()) {
+                    if (( regJavaOnData.matcher(s)).find()) {
                         m_ParserState = ParserState.STATE_JAVA_ON_DATA1;
                     } else {
                         AddJavaMessage();
@@ -309,7 +307,7 @@ public class StSParser extends Parser {
 //<editor-fold defaultstate="collapsed" desc="STATE_CAPACITY">
             case STATE_CAPACITY:
                 if (str.length() > 0
-                        && ((m = regCapacityContinue.matcher(str)).find())) {
+                        && (( regCapacityContinue.matcher(str)).find())) {
                     m_MessageContents.add(str);
                 } else {
                     AddCapacityMessage(m_Header, m_MessageContents);
@@ -322,7 +320,7 @@ public class StSParser extends Parser {
 
 //<editor-fold defaultstate="collapsed" desc="STATE_JAVA_ON_DATA1">
             case STATE_JAVA_ON_DATA1:
-                if ((m = regJava1.matcher(str)).find()) {
+                if (( regJava1.matcher(str)).find()) {
                     m_ParserState = ParserState.STATE_JAVA_ON_DATA2;
                 } else {
                     Main.logger.debug("strange in state " + m_ParserState + "]: " + str);
@@ -333,7 +331,7 @@ public class StSParser extends Parser {
 //</editor-fold>
 //<editor-fold defaultstate="collapsed" desc="STATE_JAVA_ON_DATA2">
             case STATE_JAVA_ON_DATA2:
-                if (s.length() == 0 || (m = regJavaContinue.matcher(s)).find()) {
+                if (s.length() == 0 || (regJavaContinue.matcher(s)).find()) {
                     m_MessageContents.add(s);
                 } else {
                     AddJavaMessage();
@@ -370,7 +368,7 @@ public class StSParser extends Parser {
 //<editor-fold defaultstate="collapsed" desc="STATE_SERVER_MESSAGE">
             case STATE_SERVER_MESSAGE: {
                 if (str.length() > 0
-                        && ((m = regServerContinue.matcher(str)).find())) {
+                        && (( regServerContinue.matcher(str)).find())) {
                     m_MessageContents.add(str);
                 } else {
                     AddServerMessage();
@@ -419,7 +417,6 @@ public class StSParser extends Parser {
         return null;
     }
 
-    private static final Pattern ptServerName = Pattern.compile("^Application\\s+name:\\s+(\\S+)");
 
     protected void ParseServerName(String str) {
 
@@ -435,7 +432,7 @@ public class StSParser extends Parser {
 
     protected void AddClientMessage(ArrayList contents, String header) throws Exception {
         String[] headerList = header.split(" ");
-        StSRequestHistoryMessage msg = null;
+        StSRequestHistoryMessage msg ;
 
         if ((headerList.length == 6) && headerList[3].startsWith("Creating")) {
             String event = headerList[3];
@@ -447,8 +444,7 @@ public class StSParser extends Parser {
             return;
         }
 
-        if ((msg != null)
-                && (msg.GetMessageName().equals("OpenStat")
+        if ( (msg.GetMessageName().equals("OpenStat")
                 || msg.GetMessageName().equals("GetStat")
                 || msg.GetMessageName().equals("PeekStat")
                 || msg.GetMessageName().equals("Current")
@@ -489,9 +485,6 @@ public class StSParser extends Parser {
         SetStdFieldsAndAdd(msg);
     }
 
-    private static final Pattern regCfgObjectName = Pattern.compile("(?:name|userName)='([^']+)'");
-    private static final Pattern regCfgObjectType = Pattern.compile("^Cfg([^=]+)=\\{DBID=(\\d+)");
-    private static final Pattern regCfgOp = Pattern.compile("^(Creating|Adding\\s[\\w]+)");
 
     private void AddConfigMessage(String substring) {
         ConfigUpdateRecord msg = new ConfigUpdateRecord(substring);

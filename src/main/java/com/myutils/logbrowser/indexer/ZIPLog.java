@@ -21,12 +21,14 @@ import org.apache.logging.log4j.LogManager;
  *
  * @author Stepan
  */
-public class ZIPLog extends LogFileWrapper {
+public final class ZIPLog extends LogFileWrapper {
 
     private static final org.apache.logging.log4j.Logger logger = LogManager.getLogger();
 
     private int filesProcessed;
     private InputStream curStream = null;
+    int filesToProcess = 0;
+    ZipFile logArchive = null;
 
     public ZIPLog(File file) throws IOException {
         super(file);
@@ -47,24 +49,25 @@ public class ZIPLog extends LogFileWrapper {
 
     @Override
     public void open() throws IOException {
-        ZipFile logArchive = new ZipFile(getFile(), ZipFile.OPEN_READ);
-        Enumeration e = logArchive.entries();
-        boolean goodFileFound = false;
-        while (e.hasMoreElements()) {
-            ZipEntry entry = (ZipEntry) e.nextElement();
-            if (!entry.isDirectory()) {
-                FileInfo fi = new FileInfo(logArchive, entry, this);
-                try (InputStream inputStream = logArchive.getInputStream(entry)) {
-                    if (fi.CheckLog(inputStream) != FileInfoType.type_Unknown) {
-                        goodFileFound = true;
-                        addFileInfo(fi, null);
-                    } else {
-                        Main.logger.info("Ignored " + getFile() + " / " + entry.getName());
+        boolean goodFileFound;
+        try (ZipFile theArchive = new ZipFile(getFile(), ZipFile.OPEN_READ)) {
+            Enumeration e = theArchive.entries();
+            goodFileFound = false;
+            while (e.hasMoreElements()) {
+                ZipEntry entry = (ZipEntry) e.nextElement();
+                if (!entry.isDirectory()) {
+                    FileInfo fi = new FileInfo(theArchive, entry, this);
+                    try (InputStream inputStream = theArchive.getInputStream(entry)) {
+                        if (fi.CheckLog(inputStream) != FileInfoType.type_Unknown) {
+                            goodFileFound = true;
+                            addFileInfo(fi, null);
+                        } else {
+                            Main.logger.info("Ignored " + getFile() + " / " + entry.getName());
+                        }
                     }
                 }
             }
         }
-        logArchive.close();
         setIgnoreLog(goodFileFound);
     }
 
@@ -74,7 +77,7 @@ public class ZIPLog extends LogFileWrapper {
         if (entry == null) {
             throw new FileNotFoundException("No file: " + aThis.getM_name());
         }
-        ;
+
         try {
             curStream = IOUtils.buffer(logArchive.getInputStream(entry));
         } catch (IOException ex) {
@@ -84,8 +87,6 @@ public class ZIPLog extends LogFileWrapper {
         return curStream;
 
     }
-
-    int filesToProcess = 0;
 
     @Override
     void startParsing() throws Exception {
@@ -101,8 +102,6 @@ public class ZIPLog extends LogFileWrapper {
         }
 
     }
-
-    ZipFile logArchive = null;
 
     @Override
     void doneParsing() throws Exception {

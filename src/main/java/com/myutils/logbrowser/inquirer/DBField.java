@@ -15,6 +15,12 @@ public class DBField {
     private String dbField;
     private String dbOutField;
     private String refTable;
+    public DBField(String screenLabel, String dbField, String dbOutField, String refTable) {
+        this.screenLabel = screenLabel;
+        this.dbField = dbField;
+        this.dbOutField = dbOutField;
+        this.refTable = refTable;
+    }
 
     public String getScreenLabel() {
         return screenLabel;
@@ -32,11 +38,5 @@ public class DBField {
         return refTable;
     }
 
-    public DBField(String screenLabel, String dbField, String dbOutField, String refTable) {
-        this.screenLabel = screenLabel;
-        this.dbField = dbField;
-        this.dbOutField = dbOutField;
-        this.refTable = refTable;
-    }
 
 }

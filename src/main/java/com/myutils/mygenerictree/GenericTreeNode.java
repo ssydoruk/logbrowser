@@ -27,6 +27,11 @@ public class GenericTreeNode<T> implements Serializable{
         setData(dataSrc);
     }
     
+    
+    public GenericTreeNode(GenericTreeNode<T> src) {
+        this();
+        NodeCopy(src);
+    }
     protected void NodeCopy(GenericTreeNode<T> src){
         if (src != null) {
             TClonable d = src.getData();
@@ -38,11 +43,6 @@ public class GenericTreeNode<T> implements Serializable{
             }
         }
         
-    }
-    
-    public GenericTreeNode(GenericTreeNode<T> src) {
-        this();
-        NodeCopy(src);
     }
     
     public GenericTreeNode<T> getParent() {

@@ -22,6 +22,8 @@ import org.apache.logging.log4j.LogManager;
 public abstract class ExternalEditor {
 
     private static final org.apache.logging.log4j.Logger logger = LogManager.getLogger();
+    private static ExternalEditor editor = null;
+    final private static Pattern regNum = Pattern.compile("(\\d+)");
 
     public static void editFiles(ArrayList<String> shortFileNames) {
         for (String name : shortFileNames) {
@@ -34,6 +36,71 @@ public abstract class ExternalEditor {
             }
         }
     }
+    static public boolean editorOpened() {
+        return editor == null;
+    }
+    static public ExternalEditor getEditor() throws IOException, com.jacob.com.ComFailException {
+        if (editor == null) {
+
+            if (Utils.Util.getOS() == Util.OS.WINDOWS) {
+                inquirer.logger.debug("is windows");
+                editor = new EditorWindows();
+            } else {
+                inquirer.logger.debug("is not windows");
+                editor = new EditorUnix();
+            }
+        }
+        return editor;
+    }
+    static public void openTextpad(String fileName, int line) {
+        String[] cmd = {
+            "C:\\Program Files\\TextPad 7\\TextPad.exe",
+            "-q",
+            "-u",
+            fileName + "(" + line + ")"
+        };
+        try {
+            Runtime.getRuntime().exec(cmd, null, null);
+        } catch (IOException ex) {
+            logger.log(org.apache.logging.log4j.Level.FATAL, ex);
+            inquirer.ExceptionHandler.handleException("cannot run notepad", ex);
+        }
+    }
+    static public void execCMD(String[] cmd) {
+        try {
+            if (logger.isDebugEnabled()) {
+                StringBuilder s = new StringBuilder();
+                for (String string : cmd) {
+                    if (!string.isEmpty()) {
+                        s.append(", ");
+                    }
+                    s.append(string);
+                }
+                logger.debug("Executing: " + s);
+            }
+            Runtime.getRuntime().exec(cmd, null, null);
+        } catch (IOException ex) {
+            logger.log(org.apache.logging.log4j.Level.FATAL, ex);
+            inquirer.ExceptionHandler.handleException("cannot run notepad", ex);
+        }
+
+    }
+    static public void openNotepad(String fileName, int line) {
+
+        String[] cmd = {
+            "C:\\Program Files\\Notepad++\\notepad++.exe",
+            "-n" + line,
+            fileName
+        };
+        try {
+            Runtime.getRuntime().exec(cmd, null, null);
+        } catch (IOException ex) {
+            logger.log(org.apache.logging.log4j.Level.FATAL, ex);
+            inquirer.ExceptionHandler.handleException("cannot run notepad", ex);
+        }
+        
+    }
+    HashMap<String, Integer> loadedFiles = new HashMap<>();
 
     abstract void ediFile(LogFile lf) throws IOException;
 
@@ -64,29 +131,6 @@ public abstract class ExternalEditor {
         }
     }
 
-    private static ExternalEditor editor = null;
-
-    static public boolean editorOpened() {
-        return editor == null;
-    }
-
-    static public ExternalEditor getEditor() throws IOException, com.jacob.com.ComFailException {
-        if (editor == null) {
-
-            if (Utils.Util.getOS() == Util.OS.WINDOWS) {
-                inquirer.logger.debug("is windows");
-                editor = new EditorWindows();
-            } else {
-                inquirer.logger.debug("is not windows");
-                editor = new EditorUnix();
-            }
-        }
-        return editor;
-    }
-
-    HashMap<String, Integer> loadedFiles = new HashMap<>();
-
-    final private static Pattern regNum = Pattern.compile("(\\d+)");
 
     protected int getIntFromArray(String s, int idx, int errValue) {
         if (s != null && !s.isEmpty()) {
@@ -102,55 +146,5 @@ public abstract class ExternalEditor {
         return errValue;
     }
 
-    static public void openTextpad(String fileName, int line) {
-        String[] cmd = {
-            "C:\\Program Files\\TextPad 7\\TextPad.exe",
-            "-q",
-            "-u",
-            fileName + "(" + line + ")"
-        };
-        try {
-            Runtime.getRuntime().exec(cmd, null, null);
-        } catch (IOException ex) {
-            logger.log(org.apache.logging.log4j.Level.FATAL, ex);
-            inquirer.ExceptionHandler.handleException("cannot run notepad", ex);
-        }
-    }
-
-    static public void execCMD(String[] cmd) {
-        try {
-            if (logger.isDebugEnabled()) {
-                StringBuilder s = new StringBuilder();
-                for (String string : cmd) {
-                    if (!string.isEmpty()) {
-                        s.append(", ");
-                    }
-                    s.append(string);
-                }
-                logger.debug("Executing: " + s);
-            }
-            Runtime.getRuntime().exec(cmd, null, null);
-        } catch (IOException ex) {
-            logger.log(org.apache.logging.log4j.Level.FATAL, ex);
-            inquirer.ExceptionHandler.handleException("cannot run notepad", ex);
-        }
-
-    }
-
-    static public void openNotepad(String fileName, int line) {
-
-        String[] cmd = {
-            "C:\\Program Files\\Notepad++\\notepad++.exe",
-            "-n" + line,
-            fileName
-        };
-        try {
-            Runtime.getRuntime().exec(cmd, null, null);
-        } catch (IOException ex) {
-            logger.log(org.apache.logging.log4j.Level.FATAL, ex);
-            inquirer.ExceptionHandler.handleException("cannot run notepad", ex);
-        }
-
-    }
 
 }

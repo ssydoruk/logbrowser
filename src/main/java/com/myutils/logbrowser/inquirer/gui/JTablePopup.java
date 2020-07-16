@@ -34,9 +34,21 @@ import org.apache.logging.log4j.Logger;
  * @author ssydoruk
  */
 public abstract class JTablePopup extends JTable {
+    private static final Logger logger = LogManager.getLogger();
 
     protected final JPopupMenu popupMenu;
-    private static final Logger logger = LogManager.getLogger();
+    protected int popupRow;
+    protected int popupCol;
+    private EnterRegexDialog findDlg = null;
+    private SearchExtract searchExtract = null;
+    public JTablePopup() {
+        super();
+        popupMenu = new JPopupMenu();
+        
+        addMouseListener(new JTableCommon.MyMouseAdapter() {
+        });
+//        setComponentPopupMenu(popupMenu);
+    }
 
     public JPopupMenu getPopupMenu() {
         return popupMenu;
@@ -58,14 +70,6 @@ public abstract class JTablePopup extends JTable {
         return popupCol;
     }
 
-    public JTablePopup() {
-        super();
-        popupMenu = new JPopupMenu();
-
-        addMouseListener(new JTableCommon.MyMouseAdapter() {
-        });
-//        setComponentPopupMenu(popupMenu);
-    }
 
     void copyAll() {
         StringBuilder out = new StringBuilder(getRowCount() * 120);
@@ -113,20 +117,6 @@ public abstract class JTablePopup extends JTable {
         }
     }
 
-    class MyMouseAdapter extends MouseAdapter {
-
-        @Override
-        public void mousePressed(MouseEvent e) {
-            theMousePressed1(e);
-        }
-
-        @Override
-        public void mouseReleased(MouseEvent e) {
-
-            theMouseRelesed(e);
-        }
-
-    }
 
     private void theMousePressed1(MouseEvent e) {
 //        logger.debug("click at " + e.getPoint() + (e.isPopupTrigger() ? " popup!" : ""));
@@ -192,8 +182,6 @@ public abstract class JTablePopup extends JTable {
 
     abstract void callingPopup();
 
-    protected int popupRow;
-    protected int popupCol;
 
     void showFindDialog() {
         if (findDlg == null) {
@@ -237,8 +225,6 @@ public abstract class JTablePopup extends JTable {
 
     }
 
-    private EnterRegexDialog findDlg = null;
-    private SearchExtract searchExtract = null;
 
     protected EnterRegexDialog showFind() {
         if (findDlg == null) {
@@ -340,6 +326,20 @@ public abstract class JTablePopup extends JTable {
         Point pt = viewport.getViewPosition();
         rect.setLocation(rect.x - pt.x, rect.y - pt.y);
         viewport.scrollRectToVisible(rect);
+    }
+    class MyMouseAdapter extends MouseAdapter {
+        
+        @Override
+        public void mousePressed(MouseEvent e) {
+            theMousePressed1(e);
+        }
+        
+        @Override
+        public void mouseReleased(MouseEvent e) {
+            
+            theMouseRelesed(e);
+        }
+        
     }
 
 }

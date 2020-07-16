@@ -17,6 +17,8 @@ public class OCSRecCreate extends Message {
     private static final Pattern regRecHandle = Pattern.compile("^\\s*RecordHandle = (\\d+)\\s+ChainID = (\\d+)\\s+ChainNum = (\\d+)");
     private static final Pattern regCampaignName = Pattern.compile("^\\s*CampaignName = (.+)");
     private static final Pattern regRecordType = Pattern.compile("^\\s*tRecordType = (\\d+)");
+    private static final Pattern regListTab = Pattern.compile("^\\s*ListName = (.+) TableName = (.+)");
+    private static final Pattern regPhone = Pattern.compile("^\\s*Phone = (.+)");
 
     private int recHandle = -2;
     private int chanID = -2;
@@ -26,9 +28,6 @@ public class OCSRecCreate extends Message {
     private String tabName;
     private boolean isCreate = true;
 
-    public void setIsCreate(boolean isCreate) {
-        this.isCreate = isCreate;
-    }
 
     public OCSRecCreate(ArrayList newMessageLines) {
         this();
@@ -45,6 +44,9 @@ public class OCSRecCreate extends Message {
 
     OCSRecCreate() {
         super(TableType.OCSRecCreate);
+    }
+    public void setIsCreate(boolean isCreate) {
+        this.isCreate = isCreate;
     }
 
     int getrecHandle() {
@@ -71,7 +73,6 @@ public class OCSRecCreate extends Message {
         return -1;
     }
 
-    private static final Pattern regListTab = Pattern.compile("^\\s*ListName = (.+) TableName = (.+)");
 
     String getCallingList() {
         findListTab();
@@ -98,7 +99,6 @@ public class OCSRecCreate extends Message {
         }
     }
 
-    private static final Pattern regPhone = Pattern.compile("^\\s*Phone = (.+)");
 
     String getDN() {
         return FindByRx(regPhone, 1, null);

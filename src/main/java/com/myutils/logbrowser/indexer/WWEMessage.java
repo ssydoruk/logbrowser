@@ -16,8 +16,6 @@ public class WWEMessage extends Message {
     String m_MessageName;
     private final String m_TserverSRC;
 
-    private String m_refID;
-    private String m_ThisDN;
     private boolean isTServerReq = false;
 
     /**

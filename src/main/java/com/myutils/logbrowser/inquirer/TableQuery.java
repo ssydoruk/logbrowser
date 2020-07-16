@@ -21,6 +21,8 @@ public class TableQuery extends IQuery {
     private boolean addAll;
 //    private Class<ILogRecord> resultClass;
     private Class<TLibEvent> myClass;
+    private WhereType whereType = WhereType.WhereNone;
+    private ArrayList<String> whereFields = new ArrayList<>();
 
     public TableQuery(MsgType msgType, String _tabName, String _idName, String _addWhere) {
         this(msgType, _tabName, _addWhere);
@@ -51,19 +53,18 @@ public class TableQuery extends IQuery {
         this(msgType, tableType.toString());
     }
 
-    public String fldName(String fld) {
-        return getTabAlias() + "." + fld;
-    }
 
     TableQuery(String tmpTable) {
         this(MsgType.UNKNOWN, tmpTable);
+    }
+    public String fldName(String fld) {
+        return getTabAlias() + "." + fld;
     }
 
     public String getTabAlias() {
         return tabName.substring(0, 2) + "01";
     }
 
-    private WhereType whereType = WhereType.WhereNone;
 
     public void setWhereType(WhereType whereType) {
         this.whereType = whereType;
@@ -111,13 +112,6 @@ public class TableQuery extends IQuery {
         this.myClass = aClass;
     }
 
-    enum WhereType {
-
-        WhereNone,
-        WhereExists;
-    }
-
-    private ArrayList<String> whereFields = new ArrayList<>();
 
     public void addWhereField(String field) {
         whereFields.add(field);
@@ -297,6 +291,11 @@ public class TableQuery extends IQuery {
     @Override
     public String getQuery() {
         return query;
+    }
+    enum WhereType {
+        
+        WhereNone,
+        WhereExists;
     }
 
 }

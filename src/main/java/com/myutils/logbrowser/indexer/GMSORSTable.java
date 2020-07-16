@@ -71,7 +71,7 @@ public class GMSORSTable extends DBTable {
         try {
 
             stmt.setTimestamp(1, new Timestamp(gmsRec.GetAdjustedUsecTime()));
-            stmt.setInt(2, gmsRec.getFileId());
+            stmt.setInt(2, GMSORSMessage.getFileId());
             stmt.setLong(3, gmsRec.m_fileOffset);
             stmt.setLong(4, gmsRec.getM_FileBytes());
             stmt.setLong(5, gmsRec.m_line);

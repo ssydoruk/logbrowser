@@ -25,6 +25,15 @@ public class ConfServParser extends Parser {
     private static final Pattern regNewClientAuth = Pattern.compile("^\\s*Extended info : Client (\\d+) authorized, name \\[([^\\]]+)\\], type \\[([^\\]]+)\\], user name \\[([^\\]]+)\\], protocol \\[([^\\]]+)\\], address \\[([^\\]]+)\\]");
     private static final Pattern regClientDisconn = Pattern.compile("^\\s*Extended info : Client \\[([^\\]]+)\\] disconnected, application \\[([^\\]]+)\\], type \\[([^\\]]+)\\]");
     private static final Pattern regClientDisconn1 = Pattern.compile("^\\s*Client '(\\w+)' disconnected");
+    private static final Pattern regNotParseMessage = Pattern.compile("^("
+            + "04541|"
+            + "04524|"
+            + "24215|"
+            + "24308|"
+            + "24200|"
+            + "04542"
+            + ")");
+    final static Pattern ptOp = Pattern.compile("(MSGCFG\\S+)");
 
     long m_CurrentFilePos;
     // parse state contants
@@ -81,20 +90,12 @@ public class ConfServParser extends Parser {
             ParseLine("", null); // to complete the parsing of the last line/last message
 
         } catch (Exception e) {
-            e.printStackTrace();
+            Main.logger.error(e);
             return m_CurrentLine - line;
         }
 
         return m_CurrentLine - line;
     }
-    private static final Pattern regNotParseMessage = Pattern.compile("^("
-            + "04541|"
-            + "04524|"
-            + "24215|"
-            + "24308|"
-            + "24200|"
-            + "04542"
-            + ")");
 
     String ParseGenesysLocal(String str) throws Exception {
         return ParseGenesys(str, TableType.MsgConfServer, regNotParseMessage);
@@ -250,7 +251,7 @@ public class ConfServParser extends Parser {
 //</editor-fold>
 
             case STATE_AUTH1:
-                if ((m = regAuthStart.matcher(s)).find()) {
+                if ((regAuthStart.matcher(s)).find()) {
                     m_MessageContents.add(str);
                 } else {
                     m_MessageContents.add(str);
@@ -259,7 +260,7 @@ public class ConfServParser extends Parser {
                 break;
 
             case STATE_AUTH2:
-                if ((m = regAuthCont.matcher(s)).find()) {
+                if ((regAuthCont.matcher(s)).find()) {
                     m_MessageContents.add(str);
                 } else {
                     m_MessageContents.add(str);
@@ -333,9 +334,9 @@ public class ConfServParser extends Parser {
 
     @Override
     void init(HashMap<TableType, DBTable> m_tables) {
-        m_tables.put(TableType.CSUpdate, new CSClientRequestTable1(Main.getMain().getM_accessor(), TableType.CSUpdate));
-        m_tables.put(TableType.CSClientConf, new CSConfToClientTable(Main.getMain().getM_accessor(), TableType.CSClientConf));
-        m_tables.put(TableType.CSClientConnect, new CSClientConnectTable(Main.getMain().getM_accessor(), TableType.CSClientConnect));
+        m_tables.put(TableType.CSUpdate, new CSClientRequestTable1(Main.getM_accessor(), TableType.CSUpdate));
+        m_tables.put(TableType.CSClientConf, new CSConfToClientTable(Main.getM_accessor(), TableType.CSClientConf));
+        m_tables.put(TableType.CSClientConnect, new CSClientConnectTable(Main.getM_accessor(), TableType.CSClientConnect));
 
     }
 
@@ -345,7 +346,6 @@ public class ConfServParser extends Parser {
         STATE_COMMENTS,
         STATE_UPDATE, STATE_AUTH1, STATE_AUTH2
     }
-    final static Pattern ptOp = Pattern.compile("(MSGCFG\\S+)");
 
     private class CSClientRequest1 extends Message {
 
@@ -362,6 +362,9 @@ public class ConfServParser extends Parser {
             this.op = req;
             this.clientType = appType;
             this.appName = appName;
+        }
+        private CSClientRequest1(ArrayList<String> m_MessageContents) {
+            super(TableType.CSUpdate, m_MessageContents);
         }
 
         public String getObjType() {
@@ -396,9 +399,6 @@ public class ConfServParser extends Parser {
             return userName;
         }
 
-        private CSClientRequest1(ArrayList<String> m_MessageContents) {
-            super(TableType.CSUpdate, m_MessageContents);
-        }
 
         private void setObjType(String group) {
             this.ObjType = group;
@@ -522,7 +522,7 @@ public class ConfServParser extends Parser {
 
             try {
                 stmt.setTimestamp(1, new Timestamp(rec.GetAdjustedUsecTime()));
-                stmt.setInt(2, rec.getFileId());
+                stmt.setInt(2, CSClientRequest1.getFileId());
                 stmt.setLong(3, rec.m_fileOffset);
                 stmt.setLong(4, rec.getM_FileBytes());
                 stmt.setLong(5, rec.m_line);
@@ -552,6 +552,12 @@ public class ConfServParser extends Parser {
         private String appName;
         private Integer objectsNumber;
         private int socket;
+        private CSConfToClient() {
+            super(TableType.CSClientConf);
+        }
+        private CSConfToClient(ArrayList<String> m_MessageContents) {
+            super(TableType.CSClientConf, m_MessageContents);
+        }
 
         public String getObjType() {
             return ObjType;
@@ -565,13 +571,6 @@ public class ConfServParser extends Parser {
             return appName;
         }
 
-        private CSConfToClient() {
-            super(TableType.CSClientConf);
-        }
-
-        private CSConfToClient(ArrayList<String> m_MessageContents) {
-            super(TableType.CSClientConf, m_MessageContents);
-        }
 
         private void setObjType(String group) {
             this.ObjType = group;
@@ -662,7 +661,7 @@ public class ConfServParser extends Parser {
 
             try {
                 stmt.setTimestamp(1, new Timestamp(rec.GetAdjustedUsecTime()));
-                stmt.setInt(2, rec.getFileId());
+                stmt.setInt(2, CSConfToClient.getFileId());
                 stmt.setLong(3, rec.m_fileOffset);
                 stmt.setLong(4, rec.getM_FileBytes());
                 stmt.setLong(5, rec.m_line);
@@ -689,6 +688,9 @@ public class ConfServParser extends Parser {
         private String userName;
         private String clientAddr;
         private Integer socket;
+        private CSClientConnect() {
+            super(TableType.CSClientConnect);
+        }
 
         public String getClientType() {
             return clientType;
@@ -698,9 +700,6 @@ public class ConfServParser extends Parser {
             return appName;
         }
 
-        private CSClientConnect() {
-            super(TableType.CSClientConnect);
-        }
 
         private void setClientType(String group) {
             this.clientType = group;
@@ -805,7 +804,7 @@ public class ConfServParser extends Parser {
 
             try {
                 stmt.setTimestamp(1, new Timestamp(rec.GetAdjustedUsecTime()));
-                stmt.setInt(2, rec.getFileId());
+                stmt.setInt(2, CSClientConnect.getFileId());
                 stmt.setLong(3, rec.m_fileOffset);
                 stmt.setLong(4, rec.getM_FileBytes());
                 stmt.setLong(5, rec.m_line);

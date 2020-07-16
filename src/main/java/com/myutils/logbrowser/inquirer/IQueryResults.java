@@ -41,6 +41,46 @@ import static org.sqlite.SQLiteErrorCode.SQLITE_INTERRUPT;
 public abstract class IQueryResults extends QueryTools
         implements ActionListener,
         PropertyChangeListener {
+    private static final org.apache.logging.log4j.Logger logger = LogManager.getLogger();
+    final private static Pattern regFileName = Pattern.compile("([^\\\\/]+)$");
+    private static final String FILENO = "fileno";
+    private static final String APPSTARTTIME = "app_starttime";
+    public final static String KEY_ID_FIELD = "keyid";
+    public static ArrayList<NameID> getAllApps(Object owner, FileInfoType fileInfoType) throws SQLException {
+        if (fileInfoType == null) {
+            return getRefNameIDs(owner, ReferenceType.App, "id in (select distinct appnameid from file_logbr)", true);
+        } else {
+            return getRefNameIDs(owner, ReferenceType.App, "id in (select distinct appnameid from file_logbr"
+                    + " where apptypeid = (select id from "
+                    + ReferenceType.AppType.toString() + " where name =\""
+                    + FileInfoType.getFileType(fileInfoType) + "\"))", true);
+        }
+    }
+    static public ArrayList<NameID> getAllApps(Object owner) throws Exception {
+        return getAllApps(owner, null);
+    }
+    static public void addUnique(HashSet<Long> idDNs, long thisDNID, long otherDNID) {
+        addUnique(idDNs, thisDNID);
+        addUnique(idDNs, otherDNID);
+        
+    }
+    static public void addUnique(HashSet<Long> ids, Long id) {
+        if (id != null && id > 0 && !ids.contains(id)) {
+            ids.add(id);
+            
+        }
+    }
+    static public void addUnique(HashSet<Integer> ids, int id1, int id2) {
+        addUnique(ids, id1);
+        addUnique(ids, id2);
+        
+    }
+    static public void addUnique(HashSet<Integer> ids, Integer id) {
+        if (id != null && id > 0 && !ids.contains(id)) {
+            ids.add(id);
+            
+        }
+    }
 
     protected String m_startTime;
     protected String m_endTime;
@@ -49,12 +89,45 @@ public abstract class IQueryResults extends QueryTools
     PrintStream os = null;
     private int objectsFound;
     private ArrayList<IAggregateQuery> reportAggregates = null;
+    AggregatesPanel aggregateParams = null;
+    protected DynamicTree<OptionNode> repComponents;
+    private DynamicTreeNode<OptionNode> savedRoot;
+    protected ArrayList<SelectionType> selectionTypes = new ArrayList<>();
+    private ProgressMonitor progressMonitor;
+    private JTextArea taskOutput;
+    private Task task;
+    private boolean suppressConfirms = true;
+    protected ArrayList<Pair<String, Integer>> getAllResults = new ArrayList<>();
+    //</editor-fold>
+    CustomStorage cs;
+    HashMap<MsgType, ArrayList<OutputSpecFormatter.Parameter>> addOutParams = new HashMap<>();
+    //    public void getGenesysMessages(TableType t, UTCTimeRange timeRange) throws SQLException {
+//        getGenesysMessages(t, null, timeRange, null);
+//    }
+//    public void getGenesysMessages(TableType t) throws SQLException {
+//        getGenesysMessages(t, null, null, null);
+//    }
+    public IQueryResults(QueryDialogSettings qdSettings) {
+        this();
+        if (qdSettings != null) {
+            DynamicTree tree = qdSettings.getQParams(this.getClass().getName());
+            if (tree != null) {
+                DynamicTreeNode<OptionNode> rootA = tree.getRoot();
+                if (rootA != null) {
+                    repComponents.setRoot(rootA);
+                    return;
+                }
+            }
+        }
+    }
+    public IQueryResults() {
+        repComponents = new DynamicTree<>();
+    }
 
     public int getObjectsFound() {
         return objectsFound;
     }
 
-    private static final org.apache.logging.log4j.Logger logger = LogManager.getLogger();
 
     protected DynamicTreeNode<Object> getNode(DialogItem dialogItem, String tabName) throws SQLException {
         if (DatabaseConnector.TableExist(tabName)) {
@@ -68,7 +141,6 @@ public abstract class IQueryResults extends QueryTools
 
     protected abstract ArrayList<IAggregateQuery> loadReportAggregates() throws SQLException;
 
-    AggregatesPanel aggregateParams = null;
 
     public AggregatesPanel getAggregatesPanel() throws SQLException {
         if (aggregateParams == null) {
@@ -133,20 +205,6 @@ public abstract class IQueryResults extends QueryTools
                 + FileInfoType.getFileType(fileInfoType) + "\"))", true);
     }
 
-    public static ArrayList<NameID> getAllApps(Object owner, FileInfoType fileInfoType) throws SQLException {
-        if (fileInfoType == null) {
-            return getRefNameIDs(owner, ReferenceType.App, "id in (select distinct appnameid from file_logbr)", true);
-        } else {
-            return getRefNameIDs(owner, ReferenceType.App, "id in (select distinct appnameid from file_logbr"
-                    + " where apptypeid = (select id from "
-                    + ReferenceType.AppType.toString() + " where name =\""
-                    + FileInfoType.getFileType(fileInfoType) + "\"))", true);
-        }
-    }
-
-    static public ArrayList<NameID> getAllApps(Object owner) throws Exception {
-        return getAllApps(owner, null);
-    }
 
     public void printDBRecords(PrintStreams ps) throws Exception {
         this.Print(ps);
@@ -299,32 +357,6 @@ public abstract class IQueryResults extends QueryTools
         query.Reset();
     }
 
-//    public void getGenesysMessages(TableType t, UTCTimeRange timeRange) throws SQLException {
-//        getGenesysMessages(t, null, timeRange, null);
-//    }
-//    public void getGenesysMessages(TableType t) throws SQLException {
-//        getGenesysMessages(t, null, null, null);
-//    }
-    public IQueryResults(QueryDialogSettings qdSettings) {
-        this();
-        if (qdSettings != null) {
-            DynamicTree tree = qdSettings.getQParams(this.getClass().getName());
-            if (tree != null) {
-                DynamicTreeNode<OptionNode> rootA = tree.getRoot();
-                if (rootA != null) {
-                    repComponents.setRoot(rootA);
-                    return;
-                }
-            }
-        }
-    }
-
-    public IQueryResults() {
-        repComponents = new DynamicTree<>();
-    }
-
-    protected DynamicTree<OptionNode> repComponents;
-    private DynamicTreeNode<OptionNode> savedRoot;
 
     protected void DoneSTDOptions() {
         DynamicTreeNode.setBlockLoad(true);
@@ -349,14 +381,13 @@ public abstract class IQueryResults extends QueryTools
     public ArrayList<SelectionType> getSelectionTypes() {
         return selectionTypes;
     }
-    protected ArrayList<SelectionType> selectionTypes = new ArrayList<>();
 
     void setQParams(GenericTree qParams) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
 
     }
 
-    public void addSelectionType(SelectionType id) {
+    public final void addSelectionType(SelectionType id) {
         selectionTypes.add(id);
     }
 
@@ -372,9 +403,6 @@ public abstract class IQueryResults extends QueryTools
         });
     }
 
-    private ProgressMonitor progressMonitor;
-    private JTextArea taskOutput;
-    private Task task;
 
     public void setObjectsFound(int objectsFound) {
         this.objectsFound = objectsFound;
@@ -410,10 +438,6 @@ public abstract class IQueryResults extends QueryTools
         m_results.clear();
         setSuppressConfirms(false);
     }
-    final private static Pattern regFileName = Pattern.compile("([^\\\\/]+)$");
-
-    private static final String FILENO = "fileno";
-    private static final String APPSTARTTIME = "app_starttime";
 
     FullTableColors getFileTable(String query) throws Exception {
 
@@ -539,14 +563,9 @@ public abstract class IQueryResults extends QueryTools
         return IDsFinder.RequestLevel.Level3;
     }
 
-    public static abstract class ProgressNotifications {
-
-        abstract void sayProgress(String s);
-    }
 
     abstract SearchFields getSearchField();
 
-    private boolean suppressConfirms = true;
 
     public boolean isSuppressConfirms() {
         return suppressConfirms;
@@ -563,58 +582,6 @@ public abstract class IQueryResults extends QueryTools
         inquirer.logger.info("Retrieved " + m_results.size() + " records. Took " + Utils.Util.pDuration(time4 - time3));
     }
 
-    public static class SearchFields {
-
-        private HashMap<com.myutils.logbrowser.indexer.FileInfoType, Pair<SelectionType, String>> recMap;
-        private String typeField = null;
-
-        public String getTypeField() {
-            return typeField;
-        }
-
-        public void setTypeField(String typeField) {
-            this.typeField = typeField;
-        }
-
-        public Pair<SelectionType, String> getSearchFieldName(com.myutils.logbrowser.indexer.FileInfoType type) {
-            return recMap.get(type);
-        }
-
-        public Pair<SelectionType, String> getSearchFieldName() {
-            if (!recMap.isEmpty()) {
-                return recMap.values().iterator().next();
-            }
-            return null;
-        }
-
-        public SearchFields() {
-            recMap = new HashMap<>();
-        }
-
-        public void addRecMap(com.myutils.logbrowser.indexer.FileInfoType type, Pair<SelectionType, String> t) {
-            recMap.put(type, t);
-        }
-    }
-
-    class Task extends SwingWorker<Void, Void> {
-
-        @Override
-        public Void doInBackground() {
-            try {
-                doPrinting(null);
-            } catch (InterruptedException ignore) {
-            } catch (Exception ex) {
-                inquirer.logger.error("Interrupted", ex);
-            }
-            return null;
-        }
-
-        @Override
-        public void done() {
-            Toolkit.getDefaultToolkit().beep();
-            progressMonitor.setProgress(0);
-        }
-    }
 
     private void createAndShowGUI() {
         progressMonitor = new ProgressMonitor(null,
@@ -737,7 +704,6 @@ public abstract class IQueryResults extends QueryTools
         inquirer.logger.info("Printing took " + Utils.Util.pDuration(timePrintEnd - timePrintStart));
     }
 
-    protected ArrayList<Pair<String, Integer>> getAllResults = new ArrayList<>();
 
     protected void showAllResults(ArrayList<Pair<String, Integer>> allResults) {
 //        DefaultTableModel infoTableModel = new DefaultTableModel();
@@ -766,41 +732,6 @@ public abstract class IQueryResults extends QueryTools
 
     }
 
-    public static class CustomOptionNode extends OptionNode {
-
-        private final String fld;
-
-        private CustomOptionNode(boolean b, CustomStorage.CustomComponent customItem, String key) {
-            this(b, customItem.getFieldName(), customItem.getId(), key);
-            setData(customItem);
-        }
-
-        public String getFld() {
-            return fld;
-        }
-
-        public Integer getId() {
-            return id;
-        }
-
-        private final Integer id;
-
-        CustomOptionNode(boolean isChecked, String fld, Integer id, String val) {
-            super(isChecked, val);
-            this.fld = fld;
-            this.id = id;
-        }
-
-        @Override
-        public String toString() {
-            return super.toString();
-        }
-
-        String getIdsClause() {
-            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-        }
-
-    }
 
     protected void addCustom(DynamicTreeNode<OptionNode> node, FileInfoType fileInfoType) throws SQLException {
         if (!DatabaseConnector.TableExist(Parser.getCustomTab(fileInfoType))) {
@@ -959,163 +890,6 @@ public abstract class IQueryResults extends QueryTools
 //</editor-fold>      
     }
 
-    public final static String KEY_ID_FIELD = "keyid";
-
-//<editor-fold defaultstate="collapsed" desc="CustomStorage">
-    class CustomStorage {
-
-        private final int keyIdx;
-
-        private CustomStorage(FullTable fullTable) throws Exception {
-            keyIdx = fullTable.getColumnIdx(KEY_ID_FIELD);
-            for (ArrayList<Object> row : fullTable.getData()) {
-                addRow(fullTable, row);
-            }
-        }
-
-        private CustomComponent newRow(String component, Integer id, String fieldName) {
-            CustomComponent item = items.get(id);
-            if (item == null) {
-                item = new CustomComponent(id, component, fieldName);
-                items.put(id, item);
-            }
-            return item;
-        }
-
-//<editor-fold defaultstate="collapsed" desc="CustomComponent">
-        class CustomComponent {
-
-            public HashMap<String, KeyValues> getKeyValues() {
-                return keyValues;
-            }
-
-            private Integer id;
-//            private String value;
-            private String name;
-
-//            public String getValue() {
-//                return value;
-//            }
-            public Integer getId() {
-                return id;
-            }
-
-            public String getFieldName() {
-                return fieldName;
-            }
-            private String fieldName = null;
-
-            private CustomComponent(Integer valueID) {
-                this.keyValues = new HashMap<>();
-                id = valueID;
-            }
-
-            private CustomComponent(Integer id, String name, String fieldName) {
-                this(id);
-                this.name = name;
-                this.fieldName = fieldName;
-            }
-
-//            private void setValue(String value) {
-//                this.value = value;
-//            }
-            public String getName() {
-                return name;
-            }
-
-            class KeyValues extends HashMap<Integer, HashSet<Integer>> {
-
-                private void putKeyValue(Integer keyID, Integer valueID) {
-                    HashSet<Integer> hsValues = get(keyID);
-                    if (hsValues == null) {
-                        hsValues = new HashSet<>();
-                        put(keyID, hsValues);
-                    }
-                    hsValues.add(valueID);
-                }
-            }
-
-            // keyfield1->val1,val2,val3,...
-            private HashMap<String, KeyValues> keyValues;
-
-            private void fillRow(FullTable fullTable, ArrayList<Object> row) throws Exception {
-                for (int i = 1; i <= MAX_CUSTOM_FIELDS; i++) {
-                    String keyFieldName = Parser.fldName(i);
-                    Integer keyID = (Integer) row.get(fullTable.getColumnIdx(keyFieldName));
-//                    String key = DatabaseConnector.getDatabaseConnector(null).persistentRef(
-//                            ReferenceType.CUSTKKEY,
-//                            (Integer) row.get(fullTable.getColumnIdx(keyFieldName))
-//                    );
-                    String valueFieldName = Parser.valName(i);
-                    Integer valueID = (Integer) row.get(fullTable.getColumnIdx(valueFieldName));
-
-//                    String value = DatabaseConnector.getDatabaseConnector(null).persistentRef(
-//                            ReferenceType.CUSTVALUE,
-//                            valueID
-//                    );
-                    if (keyID != null && keyID > 0 && valueID != null && valueID > 0) {
-                        //using valueFieldName to be used later for search parameter
-                        putKeyValue(valueFieldName, keyID, valueID);
-                    }
-                }
-
-//                for (int i = 1; i <= MAX_CUSTOM_FIELDS; i++) {
-//                    String keyFieldName = Parser.fldName(i);
-//                    String key = DatabaseConnector.getDatabaseConnector(null).persistentRef(
-//                            ReferenceType.CUSTKKEY,
-//                            (Integer) row.get(fullTable.getColumnIdx(keyFieldName))
-//                    );
-//                    String valueFieldName = Parser.valName(i);
-//                    Integer valueID = (Integer) row.get(fullTable.getColumnIdx(valueFieldName));
-//                    
-//                    String value = DatabaseConnector.getDatabaseConnector(null).persistentRef(
-//                            ReferenceType.CUSTVALUE,
-//                            valueID
-//                    );
-//                    
-//                    if (value != null && !value.isEmpty()
-//                            && key != null && !key.isEmpty()) {
-//                        ArrayList<CustomItem> val = getPair(valueFieldName, key);
-//                        if (!valuePresent(val, valueID)) {
-//                            CustomComponent customItem = new CustomComponent(valueID);
-//                            customItem.setValue(value);
-//                            val.add(customItem);
-//                        }
-//                    }
-//                }
-            }
-
-            private void putKeyValue(String keyFieldName, Integer keyID, Integer valueID) {
-                KeyValues ret = keyValues.get(keyFieldName);
-                if (ret == null) {
-                    ret = new KeyValues();
-                    keyValues.put(keyFieldName, ret);
-                }
-                ret.putKeyValue(keyID, valueID);
-            }
-
-        };
-
-//</editor-fold>//</editor-fold>
-        public HashMap<Integer, CustomComponent> getItems() {
-            return items;
-        }
-
-        HashMap<Integer, CustomComponent> items = new HashMap<>();
-
-        private void addRow(FullTable fullTable, ArrayList<Object> row) throws Exception {
-            Integer id = (Integer) row.get(keyIdx);
-            String component = DatabaseConnector.getDatabaseConnector(null).persistentRef(
-                    ReferenceType.CUSTCOMP,
-                    id
-            );
-            CustomComponent customComponent = newRow(component, id, KEY_ID_FIELD);
-            customComponent.fillRow(fullTable, row);
-        }
-
-    }
-//</editor-fold>
-    CustomStorage cs;
 
     private void fillCustom(FileInfoType fileType) {
         try {
@@ -1172,7 +946,6 @@ public abstract class IQueryResults extends QueryTools
         }
     }
 
-    HashMap<MsgType, ArrayList<OutputSpecFormatter.Parameter>> addOutParams = new HashMap<>();
 
     protected void addParameter(MsgType msgType, OutputSpecFormatter.Parameter prm) {
         ArrayList<Parameter> get = addOutParams.get(msgType);
@@ -1185,29 +958,242 @@ public abstract class IQueryResults extends QueryTools
 
     abstract boolean callRelatedSearch(IDsFinder cidFinder) throws SQLException;
 
-    static public void addUnique(HashSet<Long> idDNs, long thisDNID, long otherDNID) {
-        addUnique(idDNs, thisDNID);
-        addUnique(idDNs, otherDNID);
-
+    public static abstract class ProgressNotifications {
+        
+        abstract void sayProgress(String s);
     }
 
-    static public void addUnique(HashSet<Long> ids, Long id) {
-        if (id != null && id > 0 && !ids.contains(id)) {
-            ids.add(id);
+    public static class SearchFields {
 
+        private HashMap<com.myutils.logbrowser.indexer.FileInfoType, Pair<SelectionType, String>> recMap;
+        private String typeField = null;
+
+        public SearchFields() {
+            recMap = new HashMap<>();
+        }
+
+        public String getTypeField() {
+            return typeField;
+        }
+
+        public void setTypeField(String typeField) {
+            this.typeField = typeField;
+        }
+
+        public Pair<SelectionType, String> getSearchFieldName(com.myutils.logbrowser.indexer.FileInfoType type) {
+            return recMap.get(type);
+        }
+
+        public Pair<SelectionType, String> getSearchFieldName() {
+            if (!recMap.isEmpty()) {
+                return recMap.values().iterator().next();
+            }
+            return null;
+        }
+
+        public void addRecMap(com.myutils.logbrowser.indexer.FileInfoType type, Pair<SelectionType, String> t) {
+            recMap.put(type, t);
         }
     }
 
-    static public void addUnique(HashSet<Integer> ids, int id1, int id2) {
-        addUnique(ids, id1);
-        addUnique(ids, id2);
+    public static class CustomOptionNode extends OptionNode {
 
+        private final String fld;
+        private final Integer id;
+
+        private CustomOptionNode(boolean b, CustomStorage.CustomComponent customItem, String key) {
+            this(b, customItem.getFieldName(), customItem.getId(), key);
+            setData(customItem);
+        }
+
+        CustomOptionNode(boolean isChecked, String fld, Integer id, String val) {
+            super(isChecked, val);
+            this.fld = fld;
+            this.id = id;
+        }
+
+        public String getFld() {
+            return fld;
+        }
+
+        public Integer getId() {
+            return id;
+        }
+
+        @Override
+        public String toString() {
+            return super.toString();
+        }
+
+        String getIdsClause() {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+    }
+    class Task extends SwingWorker<Void, Void> {
+        
+        @Override
+        public Void doInBackground() {
+            try {
+                doPrinting(null);
+            } catch (InterruptedException ignore) {
+            } catch (Exception ex) {
+                inquirer.logger.error("Interrupted", ex);
+            }
+            return null;
+        }
+        
+        @Override
+        public void done() {
+            Toolkit.getDefaultToolkit().beep();
+            progressMonitor.setProgress(0);
+        }
     }
 
-    static public void addUnique(HashSet<Integer> ids, Integer id) {
-        if (id != null && id > 0 && !ids.contains(id)) {
-            ids.add(id);
+    class CustomStorage {
 
+        private final int keyIdx;
+        HashMap<Integer, CustomComponent> items = new HashMap<>();
+
+        private CustomStorage(FullTable fullTable) throws Exception {
+            keyIdx = fullTable.getColumnIdx(KEY_ID_FIELD);
+            for (ArrayList<Object> row : fullTable.getData()) {
+                addRow(fullTable, row);
+            }
+        }
+
+        private CustomComponent newRow(String component, Integer id, String fieldName) {
+            CustomComponent item = items.get(id);
+            if (item == null) {
+                item = new CustomComponent(id, component, fieldName);
+                items.put(id, item);
+            }
+            return item;
+        }
+
+        //</editor-fold>//</editor-fold>
+        public HashMap<Integer, CustomComponent> getItems() {
+            return items;
+        }
+
+        private void addRow(FullTable fullTable, ArrayList<Object> row) throws Exception {
+            Integer id = (Integer) row.get(keyIdx);
+            String component = DatabaseConnector.getDatabaseConnector(null).persistentRef(
+                    ReferenceType.CUSTCOMP,
+                    id
+            );
+            CustomComponent customComponent = newRow(component, id, KEY_ID_FIELD);
+            customComponent.fillRow(fullTable, row);
+        }
+
+        class CustomComponent {
+
+            private Integer id;
+            //            private String value;
+            private String name;
+            private String fieldName = null;
+            // keyfield1->val1,val2,val3,...
+            private HashMap<String, KeyValues> keyValues;
+
+            private CustomComponent(Integer valueID) {
+                this.keyValues = new HashMap<>();
+                id = valueID;
+            }
+
+            private CustomComponent(Integer id, String name, String fieldName) {
+                this(id);
+                this.name = name;
+                this.fieldName = fieldName;
+            }
+
+            public HashMap<String, KeyValues> getKeyValues() {
+                return keyValues;
+            }
+
+            //            public String getValue() {
+//                return value;
+//            }
+            public Integer getId() {
+                return id;
+            }
+
+            public String getFieldName() {
+                return fieldName;
+            }
+
+            //            private void setValue(String value) {
+//                this.value = value;
+//            }
+            public String getName() {
+                return name;
+            }
+
+            private void fillRow(FullTable fullTable, ArrayList<Object> row) throws Exception {
+                for (int i = 1; i <= MAX_CUSTOM_FIELDS; i++) {
+                    String keyFieldName = Parser.fldName(i);
+                    Integer keyID = (Integer) row.get(fullTable.getColumnIdx(keyFieldName));
+//                    String key = DatabaseConnector.getDatabaseConnector(null).persistentRef(
+//                            ReferenceType.CUSTKKEY,
+//                            (Integer) row.get(fullTable.getColumnIdx(keyFieldName))
+//                    );
+String valueFieldName = Parser.valName(i);
+Integer valueID = (Integer) row.get(fullTable.getColumnIdx(valueFieldName));
+
+//                    String value = DatabaseConnector.getDatabaseConnector(null).persistentRef(
+//                            ReferenceType.CUSTVALUE,
+//                            valueID
+//                    );
+if (keyID != null && keyID > 0 && valueID != null && valueID > 0) {
+    //using valueFieldName to be used later for search parameter
+    putKeyValue(valueFieldName, keyID, valueID);
+}
+                }
+
+//                for (int i = 1; i <= MAX_CUSTOM_FIELDS; i++) {
+//                    String keyFieldName = Parser.fldName(i);
+//                    String key = DatabaseConnector.getDatabaseConnector(null).persistentRef(
+//                            ReferenceType.CUSTKKEY,
+//                            (Integer) row.get(fullTable.getColumnIdx(keyFieldName))
+//                    );
+//                    String valueFieldName = Parser.valName(i);
+//                    Integer valueID = (Integer) row.get(fullTable.getColumnIdx(valueFieldName));
+//                    
+//                    String value = DatabaseConnector.getDatabaseConnector(null).persistentRef(
+//                            ReferenceType.CUSTVALUE,
+//                            valueID
+//                    );
+//                    
+//                    if (value != null && !value.isEmpty()
+//                            && key != null && !key.isEmpty()) {
+//                        ArrayList<CustomItem> val = getPair(valueFieldName, key);
+//                        if (!valuePresent(val, valueID)) {
+//                            CustomComponent customItem = new CustomComponent(valueID);
+//                            customItem.setValue(value);
+//                            val.add(customItem);
+//                        }
+//                    }
+//                }
+            }
+
+            private void putKeyValue(String keyFieldName, Integer keyID, Integer valueID) {
+                KeyValues ret = keyValues.get(keyFieldName);
+                if (ret == null) {
+                    ret = new KeyValues();
+                    keyValues.put(keyFieldName, ret);
+                }
+                ret.putKeyValue(keyID, valueID);
+            }
+
+            class KeyValues extends HashMap<Integer, HashSet<Integer>> {
+                
+                private void putKeyValue(Integer keyID, Integer valueID) {
+                    HashSet<Integer> hsValues = get(keyID);
+                    if (hsValues == null) {
+                        hsValues = new HashSet<>();
+                        put(keyID, hsValues);
+                    }
+                    hsValues.add(valueID);
+                }
+            }
         }
     }
 }

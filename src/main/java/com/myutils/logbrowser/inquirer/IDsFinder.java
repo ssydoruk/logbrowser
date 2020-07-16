@@ -15,15 +15,19 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 
 public final class IDsFinder extends QueryTools {
+    private static final Pattern regCampName = Pattern.compile("^([^@]+)@");
+    private static int arrLen(Object[] arr) {
+        if (arr != null) {
+            return arr.length;
+        } else {
+            return 0;
+        }
+    }
 
     private Integer[] refIDs;
     private int queryLevel;
     private boolean maxLevelSet = false;
 
-//    private Object m_callIdHash;
-    public String getSelection() {
-        return selection;
-    }
 
     private HashSet<Integer> m_callIdHash = new HashSet<>();
 
@@ -37,25 +41,48 @@ public final class IDsFinder extends QueryTools {
     private Integer[] peerIDs = null;
     private Integer[] peerIPs = null;
 
-    public Integer[] getAgentIDs() {
-        return agentIDs;
-    }
     private Integer[] agentIDs = null;
     ArrayList<Integer> searchApps = null;
     UTCTimeRange timeRange = null;
 
+    private boolean idsFound = false;
+    //    boolean initOutbound() {
+//        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+//    }
+    private HashMap<IDType, Integer[]> CallIDs = new HashMap<>();
+    private SearchType searchType = SearchType.UNKNOWN;
+    private HashSet<Integer> m_connIdHash = new HashSet<>();
+    private final int MAX_DEPTH = 10;
+
+    IDsFinder(QueryDialog dlg, SelectionType key, String searchID) throws SQLException {
+        selection = searchID;
+        regex = false;
+        selectionType = key;
+        searchApps = dlg.getSearchApps();
+        timeRange = dlg.getTimeRange();
+        setQueryLevel(dlg.getRequestLevel());
+    }
+
+    IDsFinder(QueryDialog dlg) throws SQLException {
+        selection = dlg.getSelection();
+        regex = dlg.isRegex();
+        selectionType = dlg.getSelectionType();
+        searchApps = dlg.getSearchApps();
+        timeRange = dlg.getTimeRange();
+        setQueryLevel(dlg.getRequestLevel());
+    }
+    public IDsFinder() {
+    }
+    //    private Object m_callIdHash;
+    public String getSelection() {
+        return selection;
+    }
+    public Integer[] getAgentIDs() {
+        return agentIDs;
+    }
     public Integer[] getSearchApps() {
         return (Integer[]) searchApps.toArray(new Integer[searchApps.size()]);
     }
-
-    private static int arrLen(Object[] arr) {
-        if (arr != null) {
-            return arr.length;
-        } else {
-            return 0;
-        }
-    }
-
     public int getObjectsFound() {
         int ret = 0;
         if (!m_connIdHash.isEmpty()) {
@@ -81,30 +108,10 @@ public final class IDsFinder extends QueryTools {
         return ret;
     }
 
-    IDsFinder(QueryDialog dlg, SelectionType key, String searchID) throws SQLException {
-        selection = searchID;
-        regex = false;
-        selectionType = key;
-        searchApps = dlg.getSearchApps();
-        timeRange = dlg.getTimeRange();
-        setQueryLevel(dlg.getRequestLevel());
-    }
-
-    IDsFinder(QueryDialog dlg) throws SQLException {
-        selection = dlg.getSelection();
-        regex = dlg.isRegex();
-        selectionType = dlg.getSelectionType();
-        searchApps = dlg.getSearchApps();
-        timeRange = dlg.getTimeRange();
-        setQueryLevel(dlg.getRequestLevel());
-    }
-
     public UTCTimeRange getTimeRange() throws SQLException {
         return timeRange;
     }
 
-    private boolean idsFound = false;
-    private static final Pattern regCampName = Pattern.compile("^([^@]+)@");
 
     private boolean getOutboundIDType() throws SQLException {
         String[] sIDs = {selection};
@@ -309,10 +316,6 @@ public final class IDsFinder extends QueryTools {
         return false;
     }
 
-//    boolean initOutbound() {
-//        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-//    }
-    private HashMap<IDType, Integer[]> CallIDs = new HashMap<>();
 
     public Integer[] findIDs(IDType idType) {
         if (CallIDs.containsKey(idType)) {
@@ -2317,21 +2320,6 @@ public final class IDsFinder extends QueryTools {
         }
     }
 
-    private static enum SearchType {
-        UNKNOWN,
-        ROUTING,
-        OUTBOUND,
-        TSERVER_SIP,
-        INTERACTION,
-        STATSERVER,
-        GMS,
-        WWE,
-        MediaServer,
-        ApacheWeb,
-        CONFSERV
-    }
-
-    private SearchType searchType = SearchType.UNKNOWN;
 
     boolean initRouting() throws SQLException {
         searchType = SearchType.ROUTING;
@@ -2396,72 +2384,6 @@ public final class IDsFinder extends QueryTools {
 
     }
 
-    private static class WhereBuilder {
-
-        private ArrayList<String> components;
-
-        public WhereBuilder() {
-            this.components = new ArrayList<>();
-        }
-
-        private WhereBuilder addOpenBracket() {
-            components.add("(");
-            return this;
-        }
-
-        private WhereBuilder addCond(String where) {
-            if (StringUtils.isNoneEmpty(where)) {
-                components.add(where);
-            }
-            return this;
-        }
-
-        private WhereBuilder addCond(boolean cond, String AndOr, String where) {
-            if (cond) {
-                if (!components.isEmpty()) {
-                    addAnd();
-                }
-                components.add(where);
-            }
-            return this;
-        }
-
-        private WhereBuilder addAnd() {
-            if (!components.isEmpty()) {
-                components.add("AND");
-            }
-            return this;
-
-        }
-
-        private WhereBuilder addCloseBracket() {
-            components.add(")");
-            return this;
-        }
-
-        private String build(boolean addWhere) {
-            StringBuilder ret = new StringBuilder();
-            if (addWhere) {
-                ret.append("where");
-            }
-            for (String component : components) {
-                ret.append(" ");
-                ret.append(component);
-            }
-            return ret.toString();
-        }
-    }
-
-    class IDFound {
-
-        private Integer[] ids = null;
-
-        public IDFound(IDType idType, Integer[] _ids) {
-            this.idType = idType;
-            this.ids = _ids;
-        }
-        public IDType idType;
-    }
 
     /*
     init search for TServer objects
@@ -2663,12 +2585,6 @@ public final class IDsFinder extends QueryTools {
 
     }
 
-    protected enum LoopState {
-        NEW_CONNIDS,
-        NEW_CALLIDS_FROM_CONNIDS,
-        NEW_CONNIDS_FROM_CONNIDS,
-        NEW_CALLIDS_FROM_BLOCKS
-    }
 
     public HashSet<Integer> getCallIds() {
         return m_callIdHash;
@@ -2678,12 +2594,6 @@ public final class IDsFinder extends QueryTools {
         return m_connIdHash;
     }
 
-    private HashSet<Integer> m_connIdHash = new HashSet<>();
-
-    private final int MAX_DEPTH = 10;
-
-    public IDsFinder() {
-    }
 
     private boolean GuessCallIDs() throws SQLException {
         Integer[] ConnIDs = null;
@@ -2784,30 +2694,6 @@ public final class IDsFinder extends QueryTools {
 
     }
 
-    class TReqTabs {
-
-        private final String[] tabs;
-        private final String req;
-
-        public String getReq() {
-            return req;
-        }
-
-        public TReqTabs(String req, String[] tabs) {
-            this.req = req;
-            this.tabs = tabs;
-        }
-
-        private boolean allTabsExist() throws SQLException {
-            for (String tab : tabs) {
-                if (!DatabaseConnector.TableExist(tab)) {
-                    return false;
-                }
-            }
-            return true;
-        }
-
-    };
 
     protected void Loop(ArrayList<Integer> newConnIds,
             ArrayList<Integer> newCallIds,
@@ -3176,6 +3062,74 @@ public final class IDsFinder extends QueryTools {
         }
         return ret;
     }
+    private static enum SearchType {
+        UNKNOWN,
+        ROUTING,
+        OUTBOUND,
+        TSERVER_SIP,
+        INTERACTION,
+        STATSERVER,
+        GMS,
+        WWE,
+        MediaServer,
+        ApacheWeb,
+        CONFSERV
+    }
+    private static class WhereBuilder {
+        
+        private ArrayList<String> components;
+        
+        public WhereBuilder() {
+            this.components = new ArrayList<>();
+        }
+        
+        private WhereBuilder addOpenBracket() {
+            components.add("(");
+            return this;
+        }
+        
+        private WhereBuilder addCond(String where) {
+            if (StringUtils.isNoneEmpty(where)) {
+                components.add(where);
+            }
+            return this;
+        }
+        
+        private WhereBuilder addCond(boolean cond, String AndOr, String where) {
+            if (cond) {
+                if (!components.isEmpty()) {
+                    addAnd();
+                }
+                components.add(where);
+            }
+            return this;
+        }
+        
+        private WhereBuilder addAnd() {
+            if (!components.isEmpty()) {
+                components.add("AND");
+            }
+            return this;
+            
+        }
+        
+        private WhereBuilder addCloseBracket() {
+            components.add(")");
+            return this;
+        }
+        
+        private String build(boolean addWhere) {
+            StringBuilder ret = new StringBuilder();
+            if (addWhere) {
+                ret.append("where");
+            }
+            for (String component : components) {
+                ret.append(" ");
+                ret.append(component);
+            }
+            return ret.toString();
+        }
+    }
 
     public static enum RequestLevel {
         LevelMax("Maximum"),
@@ -3201,6 +3155,47 @@ public final class IDsFinder extends QueryTools {
             return this.name.toLowerCase();
         }
 
+    }
+
+    class IDFound {
+
+        private Integer[] ids = null;
+        public IDType idType;
+
+        public IDFound(IDType idType, Integer[] _ids) {
+            this.idType = idType;
+            this.ids = _ids;
+        }
+    }
+    protected enum LoopState {
+        NEW_CONNIDS,
+        NEW_CALLIDS_FROM_CONNIDS,
+        NEW_CONNIDS_FROM_CONNIDS,
+        NEW_CALLIDS_FROM_BLOCKS
+    }
+
+    class TReqTabs {
+
+        private final String[] tabs;
+        private final String req;
+
+        public TReqTabs(String req, String[] tabs) {
+            this.req = req;
+            this.tabs = tabs;
+        }
+
+        public String getReq() {
+            return req;
+        }
+
+        private boolean allTabsExist() throws SQLException {
+            for (String tab : tabs) {
+                if (!DatabaseConnector.TableExist(tab)) {
+                    return false;
+                }
+            }
+            return true;
+        }
     }
 
 }

@@ -19,12 +19,12 @@ public class InquirerCfgNonSerial {
 
     private final HashMap<ReferenceType, ArrayList<OptionNode>> refsChecked = new HashMap<>(20);
 
-    public Set<ReferenceType> getRefTypes() {
-        return refsChecked.keySet();
-    }
 
     public InquirerCfgNonSerial() {
         LoadRefs();
+    }
+    public Set<ReferenceType> getRefTypes() {
+        return refsChecked.keySet();
     }
 
     public HashMap<String, Boolean> getRefsHash(ReferenceType refType) {

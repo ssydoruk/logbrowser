@@ -27,6 +27,7 @@ public class IxnServerParser extends Parser {
 //        2016-04-29T16:26:11.580 Trc 50002 TEvent: EventAttachedDataChanged
     private static final Pattern regTMessageEnd = Pattern.compile("^([^\\s\"]+|$)");
     //	private DBAccessor m_accessor;
+    private static final HashSet<String> nonIxnMsg = getNonIxnMsg();
 
     private static HashSet<String> getNonIxnMsg() {
         HashSet<String> ret = new HashSet<>();
@@ -37,7 +38,6 @@ public class IxnServerParser extends Parser {
     HashMap<String, String> prevSeqno = new HashMap();
     private ParserState m_ParserState;
 
-    private String m_LastLine = "";
 
     IxnServerParser(HashMap<TableType, DBTable> m_tables) {
         super(FileInfoType.type_IxnServer, m_tables);
@@ -54,7 +54,6 @@ public class IxnServerParser extends Parser {
         }
     }
 
-    private static final HashSet<String> nonIxnMsg = getNonIxnMsg();
 
 //    private static Class<? extends Record>[] avail = new Class[]{Ixn.class};
     @Override
@@ -93,7 +92,7 @@ public class IxnServerParser extends Parser {
                     int l = input.getLastBytesConsumed();
                     setEndFilePos(getFilePos() + l); // to calculate file bytes
                     m_CurrentLine++;
-                    m_LastLine = str; // store previous line for server name
+//                    m_LastLine = str; // store previous line for server name
                     Main.logger.trace("l: " + m_CurrentLine + " [" + str + "]");
 
                     while (str != null) {
@@ -110,7 +109,7 @@ public class IxnServerParser extends Parser {
             }
             ParseLine("", null); // to complete the parsing of the last line/last message
         } catch (Exception e) {
-            e.printStackTrace();
+           Main.logger.error(e);
             return m_CurrentLine - line;
         }
 //        for (Class<? extends Record> class1 : avail) {
@@ -155,7 +154,7 @@ public class IxnServerParser extends Parser {
 
 //                Main.logger.debug("using s:["+s+"]");
                 GenesysMsg lastLogMsg;
-                if ((lastLogMsg = getLastLogMsg()) != null && (m = regTmessage.matcher(lastLogMsg.getLastGenesysMsgID())).find()) {//starts on clear line
+                if ((lastLogMsg = getLastLogMsg()) != null && (regTmessage.matcher(lastLogMsg.getLastGenesysMsgID())).find()) {//starts on clear line
                     setSavedFilePos(getFilePos());
                     m_MessageContents.add(s);
                     m_ParserState = ParserState.STATE_TMESSAGE;
@@ -388,7 +387,7 @@ public class IxnServerParser extends Parser {
 
     @Override
     void init(HashMap<TableType, DBTable> m_tables) {
-        m_tables.put(TableType.IxnNonIxn, new IxnNonIxnTable(Main.getMain().getM_accessor(), TableType.IxnNonIxn));
+        m_tables.put(TableType.IxnNonIxn, new IxnNonIxnTable(Main.getM_accessor(), TableType.IxnNonIxn));
 
     }
 

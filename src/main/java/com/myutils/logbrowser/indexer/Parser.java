@@ -25,20 +25,14 @@ import org.w3c.dom.NodeList;
 
 /**
  *
- * @author kvoroshi
+ * @author ssydoruk
  */
 public abstract class Parser {
+    private static final boolean parseTimeDiff = "true".equalsIgnoreCase(System.getProperty("timediff.parse"));
 
-//    protected static final Pattern regGenesysMessage = Pattern.compile(" (None|Debug|Trace|Interaction|Standard|Alarm|Unknown|Non|Dbg|Trc|Int|Std|Alr|Unk) (\\d{5}) ");
-    int m_CurrentLine;
-
-    protected void logError(String s) {
-        Main.logger.error("l" + m_CurrentLine + ": " + s);
-    }
-
-    public int getM_CurrentLine() {
-        return m_CurrentLine;
-    }
+    public static final int MAX_CUSTOM_FIELDS = 3;
+    private static final int BASE_CUSTOM_FIELDS = 8;
+    private static final Pattern regORSSessionID = Pattern.compile("^[~\\w]{32}$");
 
     public static String getQueryKey(HashMap<String, List<String>> splitQuery, String[] keys) {
         for (String key : keys) {
@@ -113,6 +107,16 @@ public abstract class Parser {
     public static String valNameFull(int i) {
         return "value" + i;
     }
+    public static boolean isParseTimeDiff() {
+        return Main.clr.isParseTDiff() | parseTimeDiff;
+    }
+    static public boolean isSessionID(String resp) {
+        return (resp != null && !resp.isEmpty())
+                ? regORSSessionID.matcher(resp).find()
+                : false;
+    }
+    //    protected static final Pattern regGenesysMessage = Pattern.compile(" (None|Debug|Trace|Interaction|Standard|Alarm|Unknown|Non|Dbg|Trc|Int|Std|Alr|Unk) (\\d{5}) ");
+    int m_CurrentLine;
 
     DBAccessor m_accessor;
     protected HashMap<TableType, DBTable> m_tables;
@@ -124,12 +128,6 @@ public abstract class Parser {
     private final String m_StringType;
     private boolean foundBodyDates;
 
-    public DateParsed getCurrentTimestamp() {
-        if (dp == null) {
-            return m_LastTimeStamp;
-        }
-        return dp;
-    }
 
     protected int m_LineStarted; // line where expression (TMessage) started
     private long bytesConsumed;
@@ -145,6 +143,20 @@ public abstract class Parser {
     private Date lastKnownDate = null;
     Calendar cal;
 
+
+    private FilesParseSettings.FileParseSettings fileParseSettings;
+    private int lastChangeValue = 0;
+    private String lastMatch;
+
+    private FilesParseSettings.FileParseCustomSearch lastCustomSearch;
+    private GenesysMsg lastLogMsg;
+    private ArrayList<DateFmt> currentAppDates; //unlikely to have more than 3 date formats in single app
+    private HashMap<String, ArrayList<DateFmt>> appPreferedFormats = new HashMap<>();
+    private DateDiff dateDiff = null;
+    private ArrayList<CustomRegexLine> printedCustomLines = new ArrayList<>();
+    //</editor-fold>
+    private CustomAttributeTable custAttrTab = null;
+    private CustomLineTable custLineTab = null;
     public Parser(FileInfoType type, HashMap<TableType, DBTable> tables) {
         super();
         cal = Calendar.getInstance();
@@ -156,7 +168,7 @@ public abstract class Parser {
 
         /*
         adding default formats for date
-         */
+        */
         fileParseSettings = Main.getMain().xmlCfg.getFileParseSettings(type);
         if (fileParseSettings != null) {
             ArrayList<Parser.DateFmt> formats = fileParseSettings.getAllFormats();
@@ -174,12 +186,18 @@ public abstract class Parser {
             dateDiff = new DateDiff(type);
         }
     }
-
-    private FilesParseSettings.FileParseSettings fileParseSettings;
-    private int lastChangeValue = 0;
-    private String lastMatch;
-
-    private FilesParseSettings.FileParseCustomSearch lastCustomSearch;
+    protected void logError(String s) {
+        Main.logger.error("l" + m_CurrentLine + ": " + s);
+    }
+    public int getM_CurrentLine() {
+        return m_CurrentLine;
+    }
+    public DateParsed getCurrentTimestamp() {
+        if (dp == null) {
+            return m_LastTimeStamp;
+        }
+        return dp;
+    }
 
     public FilesParseSettings.FileParseCustomSearch getLastCustomSearch() {
         return lastCustomSearch;
@@ -226,11 +244,6 @@ public abstract class Parser {
         return true;
     }
 
-    private static final boolean parseTimeDiff = "true".equalsIgnoreCase(System.getProperty("timediff.parse"));
-
-    public static boolean isParseTimeDiff() {
-        return Main.clr.isParseTDiff() | parseTimeDiff;
-    }
 
     protected DateParsed getLastTimeStamp() {
         return m_LastTimeStamp;
@@ -320,7 +333,6 @@ public abstract class Parser {
         }
     }
 
-    private GenesysMsg lastLogMsg;
 
     public GenesysMsg getLastLogMsg() {
         return lastLogMsg;
@@ -576,8 +588,6 @@ public abstract class Parser {
         }
     }
 
-    private ArrayList<DateFmt> currentAppDates; //unlikely to have more than 3 date formats in single app
-    private HashMap<String, ArrayList<DateFmt>> appPreferedFormats = new HashMap<>();
 
     void setFileInfo(FileInfo _fileInfo) {
         this.fileInfo = _fileInfo;
@@ -626,7 +636,6 @@ public abstract class Parser {
         }
     }
 
-    private DateDiff dateDiff = null;
 
     private DateParsed adjustDay(DateParsed parseDate, DateParsed fileLocalDate) {
         if (parseDate != null) {
@@ -688,7 +697,6 @@ public abstract class Parser {
 
     abstract void init(HashMap<TableType, DBTable> m_tables);
 
-    private ArrayList<CustomRegexLine> printedCustomLines = new ArrayList<>();
 
     void doneParsingFile() {
         if (!foundBodyDates) {
@@ -699,8 +707,116 @@ public abstract class Parser {
     protected void pError(org.apache.logging.log4j.Logger logger, String string) {
         logger.error("l:" + m_CurrentLine + " " + string);
     }
+    private void insertIntoCustom(Matcher m, String key, ArrayList<FilesParseSettings.FileParseCustomSearch.SearchComponent> value, int changeValue,
+            FilesParseSettings.FileParseCustomSearch fileParseCustomSearch) throws Exception {
+        if (custLineTab == null) {
+            custLineTab = new CustomLineTable(m_type);
+            custLineTab.InitDB();
+        }
+        CustomRegexLine cl = new CustomRegexLine();
+        cl.setParams(m, key, value);
+//        int lastPrintedIdx = cl.lastPrintedIdx(fileParseCustomSearch);
+//        Main.logger.info("insertIntoCustom custom [" + lastPrintedIdx + "]");
+//        if (lastPrintedIdx < 0) {
+SaveTime(cl);
+cl.SetOffset(getFilePos());
+cl.SetFileBytes(getEndFilePos() - getFilePos());
+cl.SetLine(m_LineStarted);
+cl.handlerID(changeValue);
+custLineTab.AddToDB(cl);
+//        }
+//        cl.setPrinted(lastPrintedIdx);
+//        for (Pair<String, Integer> pair : value) {
+//            CustomAttribute ca = new CustomAttribute(key, pair.getComp(), pair.getValue());
+//            ca.setMatcher(m);
+//            custAttrTab.AddToDB(ca);
+//
+//        }
+    }
+
+    public static class DateFmt {
+
+        Pattern pattern;
+
+        String fmt;
+        private SimpleDateFormat formatter = null;
+        ArrayList<Pair<String, String>> repl = null;
+        public DateFmt(String p, String fmt) {
+            this.pattern = Pattern.compile(p);
+            this.fmt = fmt;
+            if (fmt != null) {
+                formatter = new SimpleDateFormat(fmt);
+                formatter.setLenient(true);
+                Calendar cal = Calendar.getInstance(Locale.US);
+                cal.set(2000, 0, 1);
+                formatter.set2DigitYearStart(cal.getTime());
+            }
+        }
+        DateFmt(String p, String fmt, Element el) {
+            this(p, fmt);
+            
+            NodeList nl = el.getChildNodes();
+            if (nl != null && nl.getLength() > 0) {
+                for (int i = 0; i < nl.getLength(); i++) {
+                    if (nl.item(i).getNodeType() == Node.ELEMENT_NODE) {
+                        Element spec = (Element) nl.item(i);
+//                        Main.logger.info("Type: " + type + " attr[" + spec.getNodeName() + "]");
+if (spec.getNodeName().equalsIgnoreCase("replace")) {
+    String from = spec.getAttribute("from");
+    String to = spec.getAttribute("to");
+    addReplace(from, to);
+}
+                    }
+                }
+            }
+        }
+        public int getFmtLength() {
+            return fmt.length();
+        }
+        @Override
+        public String toString() {
+            return "pattern: [" + pattern.pattern() + "] fmt: [" + fmt + "] fmt: ["
+                    + ((formatter == null) ? "(null)" : formatter.toString()
+                    + "] ");
+        }
+        private void addReplace(String from, String to) {
+            if (repl == null) {
+                repl = new ArrayList<>();
+            }
+            repl.add(new Pair(from, to));
+        }
+        public boolean isReplNull() {
+            return repl == null;
+        }
+        public Date parseDate(String d) throws ParseException {
+            return formatter.parse(d);
+        }
+        Date parseDate(String d, Matcher m) throws ParseException {
+            if (repl == null) {
+                return parseDate(d);
+            } else {
+                StringBuilder s = new StringBuilder(d);
+                for (Pair<String, String> pair : repl) {
+                    if (pair.getKey().equals(m.group(1))) {
+                        s.replace(m.start(1), m.end(1), pair.getValue());
+                        break;
+                    }
+                }
+                Main.logger.trace("ParseDate replaced src[" + d + "] res[" + s.toString() + "]");
+                return parseDate(s.toString());
+            }
+        }
+
+
+    }
 
     class CustomRegexLine extends Message {
+
+        private boolean mustChange;
+        private String key;
+        private Matcher m;
+        private Integer handlerID = null;
+        private ArrayList<FilesParseSettings.FileParseCustomSearch.SearchComponent> value;
 
         @Override
         public String toString() {
@@ -710,8 +826,6 @@ public abstract class Parser {
             }
             return "Custom{" + "keys=" + s.toString() + '}';
         }
-
-        private boolean mustChange;
 
         public int lastPrintedIdx(FilesParseSettings.FileParseCustomSearch fileParseCustomSearch) {
             for (int j = 0; j < printedCustomLines.size(); j++) {
@@ -723,19 +837,19 @@ public abstract class Parser {
                     FilesParseSettings.FileParseCustomSearch.SearchComponent savedSearch = crl.getValue().get(i);
                     FilesParseSettings.FileParseCustomSearch.SearchComponent curSearch = value.get(i);
 //                    Main.logger.info("compare "+savedSearch.toString()+" | "+curSearch.toString());
-                    String value1 = crl.getValue(i);
-                    String value2 = getValue(i);
-                    if (savedSearch.isMustChange() && curSearch.isMustChange()) {
-                        if (value1 != null && value2 != null && !value1.equalsIgnoreCase(value2)) {
-                            valueEqual = false;
-                        }
-
-                    } else {
-                        if (value1 != null && value2 != null && !value1.equalsIgnoreCase(value2)) {
-                            // unrelated keys
-                            otherEqual = false;
-                        }
-                    }
+String value1 = crl.getValue(i);
+String value2 = getValue(i);
+if (savedSearch.isMustChange() && curSearch.isMustChange()) {
+    if (value1 != null && value2 != null && !value1.equalsIgnoreCase(value2)) {
+        valueEqual = false;
+    }
+    
+} else {
+    if (value1 != null && value2 != null && !value1.equalsIgnoreCase(value2)) {
+        // unrelated keys
+        otherEqual = false;
+    }
+}
                 }
                 if (j > 0 && otherEqual) {
                     return (valueEqual) ? j : -1;
@@ -752,10 +866,6 @@ public abstract class Parser {
             return value;
         }
 
-        private String key;
-        private Matcher m;
-        private Integer handlerID = null;
-
         public Integer getHandlerID() {
             return handlerID;
         }
@@ -763,7 +873,6 @@ public abstract class Parser {
         public String getComp() {
             return key;
         }
-        private ArrayList<FilesParseSettings.FileParseCustomSearch.SearchComponent> value;
 
         private String getKey(int i) {
             if (i < value.size()) {
@@ -845,11 +954,7 @@ public abstract class Parser {
                 return val;
             }
         }
-
     }
-
-    public static final int MAX_CUSTOM_FIELDS = 3;
-    private static final int BASE_CUSTOM_FIELDS = 8;
 
     private class CustomLineTable extends DBTable {
 
@@ -921,7 +1026,7 @@ public abstract class Parser {
 
             try {
                 stmt.setTimestamp(1, new Timestamp(rec.GetAdjustedUsecTime()));
-                stmt.setInt(2, rec.getFileId());
+                stmt.setInt(2, CustomRegexLine.getFileId());
                 stmt.setLong(3, rec.m_fileOffset);
                 stmt.setLong(4, rec.getM_FileBytes());
                 stmt.setLong(5, rec.m_line);
@@ -1034,126 +1139,5 @@ public abstract class Parser {
             }
         }
 
-    }
-//</editor-fold>
-    private CustomAttributeTable custAttrTab = null;
-    private CustomLineTable custLineTab = null;
-
-    private void insertIntoCustom(Matcher m, String key, ArrayList<FilesParseSettings.FileParseCustomSearch.SearchComponent> value, int changeValue,
-            FilesParseSettings.FileParseCustomSearch fileParseCustomSearch) throws Exception {
-        if (custLineTab == null) {
-            custLineTab = new CustomLineTable(m_type);
-            custLineTab.InitDB();
-        }
-        CustomRegexLine cl = new CustomRegexLine();
-        cl.setParams(m, key, value);
-//        int lastPrintedIdx = cl.lastPrintedIdx(fileParseCustomSearch);
-//        Main.logger.info("insertIntoCustom custom [" + lastPrintedIdx + "]");
-//        if (lastPrintedIdx < 0) {
-        SaveTime(cl);
-        cl.SetOffset(getFilePos());
-        cl.SetFileBytes(getEndFilePos() - getFilePos());
-        cl.SetLine(m_LineStarted);
-        cl.handlerID(changeValue);
-        custLineTab.AddToDB(cl);
-//        }
-//        cl.setPrinted(lastPrintedIdx);
-//        for (Pair<String, Integer> pair : value) {
-//            CustomAttribute ca = new CustomAttribute(key, pair.getComp(), pair.getValue());
-//            ca.setMatcher(m);
-//            custAttrTab.AddToDB(ca);
-//
-//        }
-    }
-
-//    private static final Date twoDigitDate = Calendar.getInstance(Locale.US).set(1900, 0, 1).getTime();
-    public static class DateFmt {
-
-        Pattern pattern;
-        String fmt;
-        private SimpleDateFormat formatter = null;
-
-        public DateFmt(String p, String fmt) {
-            this.pattern = Pattern.compile(p);
-            this.fmt = fmt;
-            if (fmt != null) {
-                formatter = new SimpleDateFormat(fmt);
-                formatter.setLenient(true);
-                Calendar cal = Calendar.getInstance(Locale.US);
-                cal.set(2000, 0, 1);
-                formatter.set2DigitYearStart(cal.getTime());
-            }
-        }
-
-        public int getFmtLength() {
-            return fmt.length();
-        }
-
-        DateFmt(String p, String fmt, Element el) {
-            this(p, fmt);
-
-            NodeList nl = el.getChildNodes();
-            if (nl != null && nl.getLength() > 0) {
-                for (int i = 0; i < nl.getLength(); i++) {
-                    if (nl.item(i).getNodeType() == Node.ELEMENT_NODE) {
-                        Element spec = (Element) nl.item(i);
-//                        Main.logger.info("Type: " + type + " attr[" + spec.getNodeName() + "]");
-                        if (spec.getNodeName().equalsIgnoreCase("replace")) {
-                            String from = spec.getAttribute("from");
-                            String to = spec.getAttribute("to");
-                            addReplace(from, to);
-                        }
-                    }
-                }
-            }
-        }
-
-        @Override
-        public String toString() {
-            return "pattern: [" + pattern.pattern() + "] fmt: [" + fmt + "] fmt: ["
-                    + ((formatter == null) ? "(null)" : formatter.toString()
-                            + "] ");
-        }
-
-        ArrayList<Pair<String, String>> repl = null;
-
-        private void addReplace(String from, String to) {
-            if (repl == null) {
-                repl = new ArrayList<>();
-            }
-            repl.add(new Pair(from, to));
-        }
-
-        public boolean isReplNull() {
-            return repl == null;
-        }
-
-        public Date parseDate(String d) throws ParseException {
-            return formatter.parse(d);
-        }
-
-        Date parseDate(String d, Matcher m) throws ParseException {
-            if (repl == null) {
-                return parseDate(d);
-            } else {
-                StringBuilder s = new StringBuilder(d);
-                for (Pair<String, String> pair : repl) {
-                    if (pair.getKey().equals(m.group(1))) {
-                        s.replace(m.start(1), m.end(1), pair.getValue());
-                        break;
-                    }
-                }
-                Main.logger.trace("ParseDate replaced src[" + d + "] res[" + s.toString() + "]");
-                return parseDate(s.toString());
-            }
-        }
-    }
-
-    private static final Pattern regORSSessionID = Pattern.compile("^[~\\w]{32}$");
-
-    static public boolean isSessionID(String resp) {
-        return (resp != null && !resp.isEmpty())
-                ? regORSSessionID.matcher(resp).find()
-                : false;
     }
 }

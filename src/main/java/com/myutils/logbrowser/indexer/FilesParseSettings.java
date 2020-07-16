@@ -8,6 +8,7 @@ package com.myutils.logbrowser.indexer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -16,6 +17,7 @@ import java.util.regex.Pattern;
  * @author ssydoruk
  */
 public class FilesParseSettings {
+    private final HashMap<String, FileParseSettings> fileSettings = new HashMap<>();
 
     /**
      *
@@ -53,12 +55,12 @@ public class FilesParseSettings {
 
     static class FileParseSettings {
 
-        private ArrayList<Parser.DateFmt> dateSettings = new ArrayList<>();
+        private final ArrayList<Parser.DateFmt> dateSettings = new ArrayList<>();
 
+        private final ArrayList<FileParseCustomSearch> customSearch = new ArrayList<>();
         public ArrayList<FileParseCustomSearch> getCustomSearch() {
             return customSearch;
         }
-        private ArrayList<FileParseCustomSearch> customSearch = new ArrayList<>();
 
         private void addDateFmt(Parser.DateFmt df) {
             dateSettings.add(df);
@@ -83,6 +85,10 @@ public class FilesParseSettings {
         private boolean handlerOnly = false;
         private boolean parseRest;
         private String name;
+        private boolean ignoreCase;
+        private String ptString;
+        private String[] groups;
+        private final HashMap<String, ArrayList<SearchComponent>> components = new HashMap<>();
 
         public boolean isParseRest() {
             return parseRest;
@@ -95,8 +101,6 @@ public class FilesParseSettings {
         public String getPtString() {
             return ptString;
         }
-        private boolean ignoreCase;
-        private String ptString;
 
         public Matcher parseCustom(String str, int handlerID) {
             if (!handlerOnly || handlerID > 0) {
@@ -145,7 +149,6 @@ public class FilesParseSettings {
         public void setGroups(String[] groups) {
             this.groups = groups;
         }
-        private String[] groups;
 
         void setName(String attribute, String defName) {
             if (attribute != null && !attribute.isEmpty()) {
@@ -177,54 +180,6 @@ public class FilesParseSettings {
             return "{" + " name=" + name + ", " + ", components=" + comps() + '}';
         }
 
-        class SearchComponent {
-
-            @Override
-            public String toString() {
-                return "{" + "name=" + attrName + ", val=" + val + '}';
-            }
-
-            @Override
-            public int hashCode() {
-                return super.hashCode(); //To change body of generated methods, choose Tools | Templates.
-            }
-
-            private final String attrName;
-            private final Integer val;
-            private final boolean mustChange;
-            private HashMap<Pattern, String> modifications = null;
-
-            public boolean isMustChange() {
-                return mustChange;
-            }
-
-            public String getAttrName() {
-                return attrName;
-            }
-
-            public Integer getVal() {
-                return val;
-            }
-
-            private SearchComponent(String key, int parseInt, String mustChange) {
-                attrName = key;
-                val = parseInt;
-                this.mustChange = Boolean.parseBoolean(mustChange);
-            }
-
-            public HashMap<Pattern, String> getModifications() {
-                return modifications;
-            }
-
-            void addModification(String search, String replace) {
-                if (modifications == null) {
-                    modifications = new HashMap<>();
-                }
-                Pattern p = Pattern.compile(search);
-                modifications.put(p, replace);
-            }
-        }
-        private HashMap<String, ArrayList<SearchComponent>> components = new HashMap<>();
 
         public HashMap<String, ArrayList<SearchComponent>> getComponents() {
             return components;
@@ -293,8 +248,72 @@ public class FilesParseSettings {
 
         }
 
+        class SearchComponent {
+
+            private final String attrName;
+            private final Integer val;
+            private final boolean mustChange;
+            private HashMap<Pattern, String> modifications = null;
+
+            private SearchComponent(String key, int parseInt, String mustChange) {
+                attrName = key;
+                val = parseInt;
+                this.mustChange = Boolean.parseBoolean(mustChange);
+            }
+
+            @Override
+            public String toString() {
+                return "{" + "name=" + attrName + ", val=" + val + '}';
+            }
+
+            @Override
+            public int hashCode() {
+                return super.hashCode(); //To change body of generated methods, choose Tools | Templates.
+            }
+
+            @Override
+            public boolean equals(Object obj) {
+                if (this == obj) {
+                    return true;
+                }
+                if (obj == null) {
+                    return false;
+                }
+                if (getClass() != obj.getClass()) {
+                    return false;
+                }
+                final SearchComponent other = (SearchComponent) obj;
+                
+                
+                return true;
+            }
+
+            public boolean isMustChange() {
+                return mustChange;
+            }
+
+            public String getAttrName() {
+                return attrName;
+            }
+
+            public Integer getVal() {
+                return val;
+            }
+
+            public HashMap<Pattern, String> getModifications() {
+                return modifications;
+            }
+
+            void addModification(String search, String replace) {
+                if (modifications == null) {
+                    modifications = new HashMap<>();
+                }
+                Pattern p = Pattern.compile(search);
+                modifications.put(p, replace);
+            }
+        }
+
     }
 
-    private HashMap<String, FileParseSettings> fileSettings = new HashMap<>();
 
 }

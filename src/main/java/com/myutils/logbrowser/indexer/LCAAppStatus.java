@@ -11,13 +11,15 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class LCAAppStatus extends Message {
+    private static final Pattern reqCreateApplication = Pattern.compile("CREATE Application <(\\d+), ([^,]+), pid=(\\d+),");
+    private static final Pattern reqRequestor = Pattern.compile("^([^:]+):"); // implying that timestamp for first line is cut out
+    private static final Pattern reqModeChange = Pattern.compile("to (\\w+) for App<(\\d+), (.+), pid=(\\d+), ([^,]+), (\\w+)>$");
+    private static final Pattern reqApp = Pattern.compile("App\\s*<(\\d+), (.+), pid=(\\d+),");
+    private static final Pattern reqEvent = Pattern.compile("\\[(\\w+)"); // implying that timestamp for first line is cut out
 
     private String event = null;
     private String requestor;
 
-    public String getHost() {
-        return host;
-    }
 
     private String newMode;
     private int appDBID;
@@ -33,6 +35,9 @@ public class LCAAppStatus extends Message {
 
     LCAAppStatus(ArrayList<String> m_MessageContents) {
         super(TableType.LCAAppStatus, m_MessageContents);
+    }
+    public String getHost() {
+        return host;
     }
 
     void setMode(String group) {
@@ -98,7 +103,6 @@ public class LCAAppStatus extends Message {
         event = request_change_RUNMODE;
     }
 
-    private static final Pattern reqCreateApplication = Pattern.compile("CREATE Application <(\\d+), ([^,]+), pid=(\\d+),");
 
     void parseStart() {
         requestor = FindByRx(reqRequestor, m_MessageLines.get(0), 1, null);
@@ -111,8 +115,6 @@ public class LCAAppStatus extends Message {
         setEvent("RequestStartApplication");
     }
 
-    private static final Pattern reqRequestor = Pattern.compile("^([^:]+):"); // implying that timestamp for first line is cut out
-    private static final Pattern reqModeChange = Pattern.compile("to (\\w+) for App<(\\d+), (.+), pid=(\\d+), ([^,]+), (\\w+)>$");
 
     void parseChangeRunMode() {
         requestor = FindByRx(reqRequestor, m_MessageLines.get(0), 1, null);
@@ -128,9 +130,6 @@ public class LCAAppStatus extends Message {
         setEvent("RequestChangeAppRunMode");
     }
 
-    private static final Pattern reqApp = Pattern.compile("App\\s*<(\\d+), (.+), pid=(\\d+),");
-
-    private static final Pattern reqEvent = Pattern.compile("\\[(\\w+)"); // implying that timestamp for first line is cut out
 
     void parseOtherRequest() {
         requestor = FindByRx(reqRequestor, m_MessageLines.get(0), 1, null);

@@ -10,7 +10,6 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.commons.lang3.ArrayUtils;
@@ -18,12 +17,30 @@ import org.apache.commons.lang3.StringUtils;
 
 /**
  *
- * @author kvoroshi
+ * @author ssydoruk
  */
 public class MCPParser extends Parser {
 
     static final String[] BlockNamesToIgnoreArray = {"SIP:CTI:callSync::0",
         "SIP:CTI:sipStackSync:0"};
+    private final static Pattern regSIPResp = Pattern.compile("Response sent: SIP\\/2\\.0\\s+(.+)$");
+    private final static Pattern regSIPReq = Pattern.compile("Request received: (\\w+) (.+) SIP\\/2\\.0$");
+    private static final Pattern regHeaderEnd = Pattern.compile("^File:\\s+\\(");
+    private static final Pattern ptSkip = Pattern.compile("^[:\\s]*");
+    private final static Pattern SIPHeaderContinue = Pattern.compile("^\\S");
+    private static final Pattern regSIPHeader = Pattern.compile(" (Request received:|Response sent:) ");
+//    15:22:50.980: Sending  [0,UDP] 3384 bytes to 10.82.10.146:5060 >>>>>
+    private static final Pattern regNotParseMessage = Pattern.compile("^(33009|49005"
+            + ")");
+    private static final Pattern regCfgObjectName = Pattern.compile("(?:name|userName|number|loginCode)='([^']+)'");
+    private static final Pattern regCfgObjectDBID = Pattern.compile("DBID=(\\d+)");
+    private static final Pattern regCfgObjectType = Pattern.compile("object Cfg(\\w+)=");
+    private static final Pattern regCfgOp = Pattern.compile("\\(type Object(\\w+)\\)");
+    private static final Pattern regSIPServerStartDN = Pattern.compile("^\\s*DN added \\(dbid (\\d+)\\) \\(number ([^\\(]+)\\) ");
+    private static final Pattern ptGVPCallID = Pattern.compile("^\\w{8}-\\w{8}$");
+    private static final Pattern ptFile = Pattern.compile("^(\\S+:\\d+)\\s");
+    private static final Pattern ptFirstWord = Pattern.compile("^(\\S+)\\s");
+    private static final HashMap<String, String> FunctionMap = getFunctionMap();
 
     private static HashMap<String, String> getFunctionMap() {
         HashMap<String, String> ret = new HashMap<>();
@@ -31,16 +48,13 @@ public class MCPParser extends Parser {
         ret.put("RuntimeHelper::GetStringProperty()", "expression");
         return ret;
     }
-    Hashtable m_BlockNamesToIgnoreHash;
+    HashMap m_BlockNamesToIgnoreHash;
 
     StringBuilder sipBuf = new StringBuilder();
 
     long m_CurrentFilePos;
     long m_HeaderOffset;
 
-    private final static Pattern regSIPResp = Pattern.compile("Response sent: SIP\\/2\\.0\\s+(.+)$");
-    private final static Pattern regSIPReq = Pattern.compile("Request received: (\\w+) (.+) SIP\\/2\\.0$");
-    private static final Pattern regHeaderEnd = Pattern.compile("^File:\\s+\\(");
 
     private ParserState m_ParserState;
     int m_PacketLength;
@@ -49,20 +63,15 @@ public class MCPParser extends Parser {
     int m_headerLine;
     boolean m_isContentLengthUnknown;
 
-    private DateParsed dpHeader;
-    private static final Pattern ptSkip = Pattern.compile("^[:\\s]*");
-
-    private final static Pattern regProxy = Pattern.compile("^Proxy\\((\\w+):");
-    private final static Pattern SIPHeaderContinue = Pattern.compile("^\\S");
-    private ArrayList<String> extraBuff;
+    private final ArrayList<String> extraBuff;
 
     public MCPParser(HashMap<TableType, DBTable> m_tables) {
         super(FileInfoType.type_MCP, m_tables);
         this.extraBuff = new ArrayList<>();
         //m_accessor = accessor;
-        m_BlockNamesToIgnoreHash = new Hashtable();
-        for (int i = 0; i < BlockNamesToIgnoreArray.length; i++) {
-            m_BlockNamesToIgnoreHash.put(BlockNamesToIgnoreArray[i], 0);
+        m_BlockNamesToIgnoreHash = new HashMap();
+        for (String BlockNamesToIgnoreArray1 : BlockNamesToIgnoreArray) {
+            m_BlockNamesToIgnoreHash.put(BlockNamesToIgnoreArray1, 0);
         }
     }
 
@@ -127,7 +136,7 @@ public class MCPParser extends Parser {
 
             ParseLine(input, "", fi); // to complete the parsing of the last line/last message
         } catch (Exception e) {
-            e.printStackTrace();
+            Main.logger.error(e);
             return m_CurrentLine - line;
         }
 
@@ -135,7 +144,7 @@ public class MCPParser extends Parser {
     }
 
     void ContinueParsing(String initial, FileInfo fi) {
-        String str = "";
+        String str ;
         BufferedReaderCrLf input = Main.getMain().GetNextFile();
         if (input == null) {
             return;
@@ -152,11 +161,9 @@ public class MCPParser extends Parser {
             if (notFound) {
                 return;
             }
-            notFound = true;
             while ((str = input.readLine()) != null) {
                 Main.logger.trace("l: " + m_CurrentLine + " [" + str + "]");
                 if (str.trim().isEmpty()) {
-                    notFound = false;
                     break;
                 }
             }
@@ -173,15 +180,10 @@ public class MCPParser extends Parser {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            Main.logger.error(e);
         }
     }
 
-    private static final Pattern regSIPHeader = Pattern.compile(" (Request received:|Response sent:) ");
-//    15:22:50.980: Sending  [0,UDP] 3384 bytes to 10.82.10.146:5060 >>>>>
-
-    private static final Pattern regNotParseMessage = Pattern.compile("^(33009|49005"
-            + ")");
 
     String ParseLine(BufferedReaderCrLf input, String str, FileInfo fi) throws Exception {
         String s = str;
@@ -214,8 +216,6 @@ public class MCPParser extends Parser {
                 if (s != null) {
                     if ((regSIPHeader.matcher(s)).find()) {
                         m_Header = s;
-
-                        dpHeader = dp; // so time of the message correctly set in AddSipMessage
 
                         m_HeaderOffset = m_CurrentFilePos;
                         m_headerLine = m_CurrentLine;
@@ -372,7 +372,7 @@ public class MCPParser extends Parser {
         Matcher m;
 
         // Populate our class representation of the message
-        SipMessage msg = null;
+        SipMessage msg ;
 
         msg = new SipMessage(contents, TableType.SIPMS);
 
@@ -394,11 +394,6 @@ public class MCPParser extends Parser {
         }
     }
 
-    private static final Pattern regCfgObjectName = Pattern.compile("(?:name|userName|number|loginCode)='([^']+)'");
-    private static final Pattern regCfgObjectDBID = Pattern.compile("DBID=(\\d+)");
-    private static final Pattern regCfgObjectType = Pattern.compile("object Cfg(\\w+)=");
-    private static final Pattern regCfgOp = Pattern.compile("\\(type Object(\\w+)\\)");
-    private static final Pattern regSIPServerStartDN = Pattern.compile("^\\s*DN added \\(dbid (\\d+)\\) \\(number ([^\\(]+)\\) ");
 
     private void AddConfigMessage(ArrayList<String> m_MessageContents) {
         ConfigUpdateRecord msg = new ConfigUpdateRecord(m_MessageContents);
@@ -424,18 +419,13 @@ public class MCPParser extends Parser {
 
     @Override
     void init(HashMap<TableType, DBTable> m_tables) {
-        m_tables.put(TableType.VXMLIntStepsTable, new VXMLIntStepTable(Main.getMain().getM_accessor(), TableType.VXMLIntStepsTable));
+        m_tables.put(TableType.VXMLIntStepsTable, new VXMLIntStepTable(Main.getM_accessor(), TableType.VXMLIntStepsTable));
     }
 
     private void noCallMessage(String[] split, int initalIndex) {
 //        Main.logger.debug("noCallMessage "+StringUtils.join(split, ", ")+" "+initalIndex);
     }
 
-    private static final Pattern ptGVPCallID = Pattern.compile("^\\w{8}-\\w{8}$");
-    private static final Pattern ptFile = Pattern.compile("^(\\S+:\\d+)\\s");
-    private static final Pattern ptFirstWord = Pattern.compile("^(\\S+)\\s");
-
-    private static final HashMap<String, String> FunctionMap = getFunctionMap();
 
     private void callMessage(String callID, String messageText) {
         if (ptGVPCallID.matcher(callID).find()) {
@@ -516,23 +506,25 @@ public class MCPParser extends Parser {
         STATE_CONFIG,
         STATE_SIP_HEADER1
     }
-
-//</editor-fold>
     private class VXMLIntSteps extends Message {
 
         private String command;
 
-        public String getCommand() {
-            return command;
-        }
-
-        public String getMcpCallID() {
-            return mcpCallID;
-        }
         private String mcpCallID;
+        private String params;
+        private String sipCallID;
+        private String GVPSession;
+        private String Tenant;
+        private String IVRProfile;
 
         private VXMLIntSteps() {
             super(TableType.VXMLIntStepsTable);
+        }
+        public String getCommand() {
+            return command;
+        }
+        public String getMcpCallID() {
+            return mcpCallID;
         }
 
         private void setMCPCallID(String callID) {
@@ -543,7 +535,6 @@ public class MCPParser extends Parser {
             this.command = msgParam;
         }
 
-        private String params;
 
         /**
          * Get the value of params
@@ -563,7 +554,6 @@ public class MCPParser extends Parser {
             this.params = params;
         }
 
-        private String sipCallID;
 
         /**
          * Get the value of sipCallID
@@ -583,7 +573,6 @@ public class MCPParser extends Parser {
             this.sipCallID = sipCallID;
         }
 
-        private String GVPSession;
 
         /**
          * Get the value of GVPSession
@@ -603,7 +592,6 @@ public class MCPParser extends Parser {
             this.GVPSession = GVPSession;
         }
 
-        private String Tenant;
 
         /**
          * Get the value of Tenant
@@ -623,7 +611,6 @@ public class MCPParser extends Parser {
             this.Tenant = Tenant;
         }
 
-        private String IVRProfile;
 
         /**
          * Get the value of IVRProfile

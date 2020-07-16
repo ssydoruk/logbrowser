@@ -9,13 +9,9 @@ import java.sql.SQLException;
 
 /**
  *
- * @author kvoroshi
+ * @author ssydoruk
  */
 public class AllProxyQuery extends IQuery {
-
-    private ResultSet m_resultSet;
-    private DatabaseConnector m_connector;
-    private int recCnt;
 
     @Override
     public void Execute() throws SQLException {

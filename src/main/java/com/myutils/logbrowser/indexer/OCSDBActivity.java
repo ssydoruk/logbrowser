@@ -17,6 +17,7 @@ public class OCSDBActivity extends Message {
     private static final Pattern regDBServerReqIDError = Pattern.compile("\\[ReqID=([0-9]+)\\]");
     private static final Pattern regDBServerReq = Pattern.compile(
             "DBServer\\s+'(\\S+) for (\\S+) \\(\\d+\\)'");
+    private static final DBAction dbAction = new DBAction();
 
     private long listDBID = -1;
     private long campaignDBID = -1;
@@ -27,7 +28,6 @@ public class OCSDBActivity extends Message {
     private String dbact = null;
     private boolean DBParsed = false;
 
-    private static final DBAction dbAction = new DBAction();
     private String listName;
 
     public OCSDBActivity(String listDBID, String campaignDBID, String groupDBID, String line) {

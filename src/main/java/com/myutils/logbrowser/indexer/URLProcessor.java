@@ -61,7 +61,7 @@ public class URLProcessor {
                 }
                 String uriPath = uri.getPath();
                 for (Pair<String, Pattern> entry : pathProcessing) {
-                    Utils.Pair<String, String> rxReplace = null;
+                    Utils.Pair<String, String> rxReplace ;
                     if ((rxReplace = Message.getRxReplace(uriPath, entry.getValue(), 1, entry.getKey())) != null) {
                         uriPath = rxReplace.getValue();
                         pathValues.put(entry.getKey(), rxReplace.getKey());

@@ -14,6 +14,13 @@ import java.util.regex.Pattern;
  */
 public class WSMessage extends Message {
 
+    final private static Pattern regConnID = Pattern.compile("^AttributeConnID .+= (\\w+)$");
+    final private static Pattern regThisDN = Pattern.compile("^AttributeThisDN .+= \\\"([^\\\"]*)\\\"$");
+    final private static Pattern regOtherDN = Pattern.compile("^AttributeOtherDN .+= \\\"([^\\\"]*)\\\"$");
+    final private static Pattern regTransferConnID = Pattern.compile("^AttributeTransferConnID .+= (\\S+)$");
+    final private static Pattern regUUID = Pattern.compile("^AttributeCallUuid .+= \\\"([^\\\"]*)\\\"$");
+    final private static Pattern regAgentID = Pattern.compile("^AttributeAgentID .+= \\\"([^\\\"]*)\\\"$");
+    final private static Pattern regSeqNo = Pattern.compile("^AttributeEventSequenceNumber .+= (\\w+)$");
     private final String m_MessageName;
     private final String server;
     private final String fileHandle;
@@ -37,14 +44,6 @@ public class WSMessage extends Message {
     public String GetMessageName() {
         return m_MessageName;
     }
-
-    final private static Pattern regConnID = Pattern.compile("^AttributeConnID .+= (\\w+)$");
-    final private static Pattern regThisDN = Pattern.compile("^AttributeThisDN .+= \\\"([^\\\"]*)\\\"$");
-    final private static Pattern regOtherDN = Pattern.compile("^AttributeOtherDN .+= \\\"([^\\\"]*)\\\"$");
-    final private static Pattern regTransferConnID = Pattern.compile("^AttributeTransferConnID .+= (\\S+)$");
-    final private static Pattern regUUID = Pattern.compile("^AttributeCallUuid .+= \\\"([^\\\"]*)\\\"$");
-    final private static Pattern regAgentID = Pattern.compile("^AttributeAgentID .+= \\\"([^\\\"]*)\\\"$");
-    final private static Pattern regSeqNo = Pattern.compile("^AttributeEventSequenceNumber .+= (\\w+)$");
 
     public String GetAgentID() {
         return SingleQuotes(FindByRx(regAgentID, 1, ""));

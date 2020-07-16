@@ -22,8 +22,34 @@ import org.apache.logging.log4j.LogManager;
 public class WWEResults extends IQueryResults {
 
     private static final org.apache.logging.log4j.Logger logger = LogManager.getLogger();
+    private static String[] RequestsToShow = {"RequestMakePredictiveCall", "RequestMakeCall"};
+    private static String[] EventsToShow = {"EventDialing", "EventNetworkReached"};
 
     private Object cidFinder;
+    private String m_tlibFilter;
+    ArrayList<NameID> appsType = null;
+    private UTCTimeRange timeRange = null;
+    /**
+     *
+     */
+    public WWEResults(QueryDialogSettings qdSettings) {
+        super(qdSettings);
+        if (repComponents.isEmpty()) {
+            createFilterMenus();
+        }
+        addSelectionType(SelectionType.NO_SELECTION);
+        addSelectionType(SelectionType.GUESS_SELECTION);
+        addSelectionType(SelectionType.CALLID);
+        addSelectionType(SelectionType.DN);
+        addSelectionType(SelectionType.PEERIP);
+        addSelectionType(SelectionType.AGENTID);
+        addSelectionType(SelectionType.UUID);
+        addSelectionType(SelectionType.JSESSIONID);
+        addSelectionType(SelectionType.IXN);
+        addSelectionType(SelectionType.GWS_DEVICEID);
+        addSelectionType(SelectionType.GWS_USERID);
+        
+    }
 
     @Override
     public void Retrieve(QueryDialog dlg, SelectionType key, String searchID) throws SQLException {
@@ -107,7 +133,6 @@ public class WWEResults extends IQueryResults {
         return refreshTimeRange(null);
     }
 
-    private String m_tlibFilter;
 
     @Override
     public String getReportSummary() {
@@ -119,27 +144,6 @@ public class WWEResults extends IQueryResults {
         return "WS Web";
     }
 
-    /**
-     *
-     */
-    public WWEResults(QueryDialogSettings qdSettings) {
-        super(qdSettings);
-        if (repComponents.isEmpty()) {
-            createFilterMenus();
-        }
-        addSelectionType(SelectionType.NO_SELECTION);
-        addSelectionType(SelectionType.GUESS_SELECTION);
-        addSelectionType(SelectionType.CALLID);
-        addSelectionType(SelectionType.DN);
-        addSelectionType(SelectionType.PEERIP);
-        addSelectionType(SelectionType.AGENTID);
-        addSelectionType(SelectionType.UUID);
-        addSelectionType(SelectionType.JSESSIONID);
-        addSelectionType(SelectionType.IXN);
-        addSelectionType(SelectionType.GWS_DEVICEID);
-        addSelectionType(SelectionType.GWS_USERID);
-
-    }
 
     public void SetConfig(Properties config) {
         if (config != null && !config.isEmpty()) {
@@ -147,8 +151,6 @@ public class WWEResults extends IQueryResults {
         }
     }
 
-    private static String[] RequestsToShow = {"RequestMakePredictiveCall", "RequestMakeCall"};
-    private static String[] EventsToShow = {"EventDialing", "EventNetworkReached"};
 
     public void addTLibReportType(DynamicTreeNode<OptionNode> root) {
         DynamicTreeNode<OptionNode> nd = new DynamicTreeNode<>(new OptionNode(DialogItem.TLIB_CALLS_TEVENT));
@@ -300,7 +302,6 @@ public class WWEResults extends IQueryResults {
         DoneSTDOptions();
     }
 
-    ArrayList<NameID> appsType = null;
 
     @Override
     public ArrayList<NameID> getApps() throws Exception {
@@ -316,7 +317,6 @@ public class WWEResults extends IQueryResults {
     void SetConfig(InquirerCfg cr) {
 //        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
-    private UTCTimeRange timeRange = null;
 
     @Override
     public void Retrieve(QueryDialog dlg) throws SQLException {

@@ -12,7 +12,7 @@ import org.json.JSONObject;
 
 /**
  *
- * @author kvoroshi
+ * @author ssydoruk
  */
 public class OrsUrsMessage extends Message {
 

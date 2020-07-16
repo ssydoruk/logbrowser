@@ -24,14 +24,15 @@ import org.apache.logging.log4j.LogManager;
  * @author ssydoruk
  */
 public class QueryAllJTable extends QueryJTable {
+    private static final org.apache.logging.log4j.Logger logger = LogManager.getLogger();
 
     private final IQueryResults qry;
     private IQueryResults.SearchFields searchField;
     private final QueryDialog qd;
     private boolean followLog = false;
-    private static final org.apache.logging.log4j.Logger logger = LogManager.getLogger();
 
     ListSelectionChanged listSelectionChanged = null;
+    ReportFrameQuery frm = null;
 
     public QueryAllJTable(IQueryResults qry, QueryDialog qd, FullTableColors all) throws Exception {
         super(all);
@@ -78,27 +79,6 @@ public class QueryAllJTable extends QueryJTable {
         }
     }
 
-    ReportFrameQuery frm = null;
-
-    class MyMouseAdapter extends MouseAdapter {
-
-        @Override
-        public void mousePressed(MouseEvent e) {
-//            inquirer.logger.trace("pressed");
-            if (e.getClickCount() == 2) { // on doubleclick open in editor
-
-                QueryAllJTable source = (QueryAllJTable) e.getSource();
-
-//                source.showCall(source.convertRowIndexToModel(source.rowAtPoint(e.getPoint())), true);
-                int rowAtPoint = source.rowAtPoint(e.getPoint());
-                int convertRowIndexToModel = source.convertRowIndexToModel(source.rowAtPoint(e.getPoint()));
-                source.showCall(source.rowAtPoint(e.getPoint()), true, false);
-
-            } else {
-            }
-        }
-
-    }
 
     /**
      *
@@ -135,6 +115,25 @@ public class QueryAllJTable extends QueryJTable {
                 logger.log(org.apache.logging.log4j.Level.FATAL, ex);
             }
         }
+    }
+    class MyMouseAdapter extends MouseAdapter {
+        
+        @Override
+        public void mousePressed(MouseEvent e) {
+//            inquirer.logger.trace("pressed");
+if (e.getClickCount() == 2) { // on doubleclick open in editor
+    
+    QueryAllJTable source = (QueryAllJTable) e.getSource();
+    
+//                source.showCall(source.convertRowIndexToModel(source.rowAtPoint(e.getPoint())), true);
+int rowAtPoint = source.rowAtPoint(e.getPoint());
+int convertRowIndexToModel = source.convertRowIndexToModel(source.rowAtPoint(e.getPoint()));
+source.showCall(source.rowAtPoint(e.getPoint()), true, false);
+
+} else {
+}
+        }
+        
     }
 
     class ListSelectionChanged implements ListSelectionListener {

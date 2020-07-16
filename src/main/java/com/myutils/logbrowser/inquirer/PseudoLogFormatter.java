@@ -105,7 +105,7 @@ public class PseudoLogFormatter implements ILogRecordFormatter {
             m_fileWriter.write("\n\n");
             m_lineCount += 2;
         } catch (Exception e) {
-            e.printStackTrace();
+            inquirer.logger.error(e);;
             // ignore exceptions for now
         }
 

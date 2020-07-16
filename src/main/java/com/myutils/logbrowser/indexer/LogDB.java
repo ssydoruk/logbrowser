@@ -15,7 +15,7 @@ import java.sql.Statement;
 
 /**
  *
- * @author kvoroshi
+ * @author ssydoruk
  */
 public class LogDB {
 
@@ -59,15 +59,15 @@ public class LogDB {
         try {
             m_lastFile = file.getCanonicalPath();
             m_prepFind.setString(1, m_lastFile);
-            ResultSet res = m_prepFind.executeQuery();
-            Main.logger.debug("Checking for " + m_lastFile + " sql:" + m_prepFind.toString());
-            if (res.next()) {
-                fe.Offset = res.getLong("offset");
-                fe.Line = res.getInt("line");
-                m_wasFound = true;
-                Main.logger.debug("Found file " + m_lastFile + " off: " + fe.Offset + " line: " + fe.Line);
+            try (ResultSet res = m_prepFind.executeQuery()) {
+                Main.logger.debug("Checking for " + m_lastFile + " sql:" + m_prepFind.toString());
+                if (res.next()) {
+                    fe.Offset = res.getLong("offset");
+                    fe.Line = res.getInt("line");
+                    m_wasFound = true;
+                    Main.logger.debug("Found file " + m_lastFile + " off: " + fe.Offset + " line: " + fe.Line);
+                }
             }
-            res.close();
         } catch (IOException | SQLException e) {
             Main.logger.error("Could not fetch info for file " + file.getName()
                     + ": " + e, e);
@@ -77,15 +77,15 @@ public class LogDB {
 
     public void SetInfo(File file, FileEntry info) {
         try {
-            boolean use_update = false;
+            boolean use_update;
             if (file.getCanonicalPath() == null ? m_lastFile == null : file.getCanonicalPath().equals(m_lastFile)) {
                 use_update = m_wasFound;
             } else {
                 // this should be never called
                 m_prepFind.setString(1, file.getCanonicalPath());
-                ResultSet res = m_prepFind.executeQuery();
-                use_update = res.next();
-                res.close();
+                try (ResultSet res = m_prepFind.executeQuery()) {
+                    use_update = res.next();
+                }
             }
 
             if (use_update) {

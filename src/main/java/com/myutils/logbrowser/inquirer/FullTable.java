@@ -20,19 +20,19 @@ public class FullTable {
 
     private ArrayList<ArrayList<Object>> data;
 
-    public ArrayList<ArrayList<Object>> getData() {
-        return data;
-    }
 
-//    public ArrayList<String> getColumnNames() {
+    private HashMap<String, Pair<Integer, Integer>> columnNames = null;
+//    private ArrayList<Integer> columnTypes = null;
+    private HashSet<String> hiddenFields = new HashSet<>();
+    //    public ArrayList<String> getColumnNames() {
 //        return columnNames;
 //    }
     public FullTable() {
         data = new ArrayList<>();
     }
-
-    private HashMap<String, Pair<Integer, Integer>> columnNames = null;
-//    private ArrayList<Integer> columnTypes = null;
+    public ArrayList<ArrayList<Object>> getData() {
+        return data;
+    }
 
     public void setMetaData(ResultSetMetaData rsmd) throws SQLException {
         columnNames = new HashMap<>(rsmd.getColumnCount());
@@ -63,7 +63,6 @@ public class FullTable {
         return -1;
     }
 
-    private HashSet<String> hiddenFields = new HashSet<>();
 
     void setHiddenField(String rowType) {
         hiddenFields.add(rowType);

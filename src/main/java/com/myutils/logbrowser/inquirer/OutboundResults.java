@@ -35,16 +35,10 @@ final class OutboundResults extends IQueryResults {
 
     private ArrayList<NameID> appType = null;
 
-    @Override
-    public String getSearchString() {
-        if (cidFinder != null) {
-            return cidFinder.getSelection(); //To change body of generated methods, choose Tools | Templates.
-        } else {
-            return super.getSearchString();
-        }
-    }
 
-//    private DynamicTreeNode<OptionNode> repComponents=new DynamicTreeNode<OptionNode>();
+    private UTCTimeRange timeRange = null;
+    IDsFinder cidFinder;
+    //    private DynamicTreeNode<OptionNode> repComponents=new DynamicTreeNode<OptionNode>();
     OutboundResults() throws SQLException {
         DynamicTreeNode<OptionNode> rootA = new DynamicTreeNode<>(null);
         repComponents.setRoot(rootA);
@@ -69,11 +63,17 @@ final class OutboundResults extends IQueryResults {
 //        repComponents.add("Campaign Group");
 //        repComponents.add("Agent");
 //        repComponents.add("Call");
-        DoneSTDOptions();
+DoneSTDOptions();
 
     }
-
-    private UTCTimeRange timeRange = null;
+    @Override
+    public String getSearchString() {
+        if (cidFinder != null) {
+            return cidFinder.getSelection(); //To change body of generated methods, choose Tools | Templates.
+        } else {
+            return super.getSearchString();
+        }
+    }
 
 //    private void GeneralRequest() throws SQLException {
 //        // report on all running campaigns
@@ -457,7 +457,6 @@ final class OutboundResults extends IQueryResults {
         return repComponents;
     }
 
-    IDsFinder cidFinder;
 
     @Override
     public void Retrieve(QueryDialog dlg) throws SQLException {

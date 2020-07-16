@@ -10,14 +10,16 @@ import java.util.regex.Pattern;
 
 /**
  *
- * @author kvoroshi
+ * @author ssydoruk
  */
 public class IsccMessage extends Message {
 
     final private static Pattern regRefID = Pattern.compile("\\s*ISCCAttributeReferenceID\\s*(\\d+)");
+    final private static Pattern regSrcSwitch = Pattern.compile("(?:from|to)\\s+server\\s+([^\\@]+)\\@([^/:\\s]+)");
     String m_MessageName;
     private String sw = null;
     private String app = null;
+    private String connID = null;
 
     public IsccMessage(String event, ArrayList newMessageLines) {
         super(TableType.ISCC);
@@ -43,7 +45,6 @@ public class IsccMessage extends Message {
         return GetAttribute(new String[]{"ISCCAttributeDestinationDN", "SDAttributeDestinationDN", "ISCCAttributeCallDataXferResource"});
     }
 
-    private String connID = null;
 
     public String GetConnID() {
         if (connID == null) {
@@ -58,7 +59,6 @@ public class IsccMessage extends Message {
 //        theRec.getAttributeLong("ISCCAttributeReferenceID")
     }
 
-    final private static Pattern regSrcSwitch = Pattern.compile("(?:from|to)\\s+server\\s+([^\\@]+)\\@([^/:\\s]+)");
 
     String GetSrcApp() {
         parseSrcSwitch();

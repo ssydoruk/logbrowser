@@ -25,6 +25,38 @@ public class PrintStreams {
 
     private int nrows;
 
+    private boolean isAggregate;
+    private boolean blockFilePrint;
+    private String queryName = null;
+    private String searchString = null;
+    private TabResultDataModel tabDataModel;
+    ArrayList<String> memStorage = null;
+    ArrayList<PrintStreamStorage> shortStreams = new ArrayList<>(2);
+    ArrayList<PrintStreamStorage> fullStreams = new ArrayList<>(1);
+
+    public PrintStreams() {
+        this.blockFilePrint = false;
+        this.tabDataModel = new TabResultDataModel();
+        nrows = 0;
+    }
+
+    public PrintStreams(InquirerCfg cfg) throws FileNotFoundException {
+        this();
+        if (cfg.isSaveFileLong()) {
+            String fileName = cfg.getFileNameLong();
+            inquirer.logger.info("Long output goes to " + fileName);
+            addFullStream(fileName, -1, cfg.isAddShortToFull());
+        }
+        if (cfg.isSaveFileShort()) {
+            String fileName = cfg.getFileNameShort();
+            inquirer.logger.info("Short output goes to " + fileName);
+            addShortStream(fileName, -1);
+        }
+        tabDataModel.setFullFileNames(getFullStreamsFileNames());
+        tabDataModel.setShortFileNames(getShortStreamsFileNames());
+        tabDataModel.setShortAbsoluteFileNames(getShortStreamsFullFileNames());
+    }
+
     public String getQueryName() {
         return queryName;
     }
@@ -32,11 +64,6 @@ public class PrintStreams {
     public String getSearchString() {
         return searchString;
     }
-
-    private boolean isAggregate;
-    private boolean blockFilePrint;
-    private String queryName = null;
-    private String searchString = null;
 
     private void printShort(String shorRec, ArrayList<PrintStreamStorage> streams, int i) {
         if (!blockFilePrint) {
@@ -65,8 +92,6 @@ public class PrintStreams {
         }
     }
 
-    private TabResultDataModel tabDataModel;
-
     private ArrayList<String> getFileNames(ArrayList<PrintStreamStorage> streams) {
         ArrayList<String> ret = null;
         if (streams.size() > 0) {
@@ -77,7 +102,7 @@ public class PrintStreams {
                     ret.add(pss.getFileName());
                 }
             }
-            if (ret.size() == 0) {
+            if (ret.isEmpty()) {
                 return null;
             }
         }
@@ -139,8 +164,6 @@ public class PrintStreams {
         addField("Type", GetType.toString());
     }
 
-    ArrayList<String> memStorage = null;
-
     public void addMemoryPrint() {
         memStorage = new ArrayList<>();
     }
@@ -181,46 +204,16 @@ public class PrintStreams {
         this.searchString = searchString;
     }
 
-    interface PrintStorage {
-
-    };
-
-    ArrayList<PrintStreamStorage> shortStreams = new ArrayList<>(2);
-    ArrayList<PrintStreamStorage> fullStreams = new ArrayList<>(1);
-
-    void addFullStream(String fileName, int MaxRecords, boolean addShort) throws FileNotFoundException {
+    final void addFullStream(String fileName, int MaxRecords, boolean addShort) throws FileNotFoundException {
         fullStreams.add(new PrintStreamStorage(fileName, MaxRecords, addShort, this));
     }
 
-    void addShortStream(String fileName, int MaxRecords) throws FileNotFoundException {
+    final void addShortStream(String fileName, int MaxRecords) throws FileNotFoundException {
         shortStreams.add(new PrintStreamStorage(fileName, MaxRecords, false, this));
     }
 
     void addShortStream(PrintStream out, int MaxRecords) {
         shortStreams.add(new PrintStreamStorage(out, MaxRecords, this));
-    }
-
-    public PrintStreams() {
-        this.blockFilePrint = false;
-        this.tabDataModel = new TabResultDataModel();
-        nrows = 0;
-    }
-
-    public PrintStreams(InquirerCfg cfg) throws FileNotFoundException {
-        this();
-        if (cfg.isSaveFileLong()) {
-            String fileName = cfg.getFileNameLong();
-            inquirer.logger.info("Long output goes to " + fileName);
-            addFullStream(fileName, -1, cfg.isAddShortToFull());
-        }
-        if (cfg.isSaveFileShort()) {
-            String fileName = cfg.getFileNameShort();
-            inquirer.logger.info("Short output goes to " + fileName);
-            addShortStream(fileName, -1);
-        }
-        tabDataModel.setFullFileNames(getFullStreamsFileNames());
-        tabDataModel.setShortFileNames(getShortStreamsFileNames());
-        tabDataModel.setShortAbsoluteFileNames(getShortStreamsFullFileNames());
     }
 
     public void closeStreams() {
@@ -258,7 +251,7 @@ public class PrintStreams {
     }
 
     void printFull(String format, String shorRec, ArrayList<Pattern> filters) {
-        int lines = 0;
+        int lines;
         printShort(shorRec, fullStreams, 1);
         if (!blockFilePrint) {
             if (filters == null) {
@@ -311,6 +304,10 @@ public class PrintStreams {
                 }
             }
         }
+
+    }
+
+    interface PrintStorage {
 
     }
 

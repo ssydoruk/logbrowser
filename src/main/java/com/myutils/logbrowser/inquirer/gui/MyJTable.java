@@ -52,6 +52,94 @@ public class MyJTable extends JTableCommon {
     private String queryName = null;
     private final ShowInfo infoAction;
     private final JMenuItem hideColumnRTMenu;
+    private String searchString = null;
+    JMenuItem deleteItem;
+    protected ShowFullMessage fullMsg;
+    private boolean followLog = false;
+    HideColumn hideColumn;
+    ShowAllColumns showAllColumns;
+    ShowMessage showMessage;
+    ArrayList<AbstractAction> copyMenus = new ArrayList();
+    ArrayList<AbstractAction> filterMenus = new ArrayList();
+    JMenu jmAddFields;
+    JMenu jmOpenIn;
+    public MyJTable() {
+        super();
+        
+//       sorter = new TableRowSorter<TabResultDataModel>((TabResultDataModel) getModel());
+//        setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+//        setTableHeader(null);
+setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+//        setCellSelectionEnabled(true);
+setRowSelectionAllowed(true);
+
+//        deleteItem = new JMenuItem("Delete");
+//
+//        deleteItem.addActionListener(new ActionListener() {
+//            @Override
+//            public void actionPerformed(ActionEvent e) {
+//                Component c = (Component) e.getSource();
+//                JPopupMenu popup = (JPopupMenu) c.getParent();
+//                JTable table = (JTable) popup.getInvoker();
+//                inquirer.logger.debug(table.getSelectedRow() + " : " + table.getSelectedColumn());
+//            }
+//        });
+//        popupMenu.add(deleteItem);
+////        JCheckBoxMenuItem followSource = new JCheckBoxMenuItem("Follow source");
+////        followSource.setSelected(followLog);
+////        followSource.addActionListener(new ActionListener() {
+////            @Override
+////            public void actionPerformed(ActionEvent e) {
+////                followLog = ((JCheckBoxMenuItem) e.getSource()).getModel().isSelected();
+////
+////            }
+////        });
+//        popupMenu.add(followSource);
+//        setComponentPopupMenu(popupMenu);
+Font font = this.getFont();
+
+setDefaultRenderer(Object.class, new CustomTableCellRenderer(new Font(font.getName(), Font.BOLD, font.getSize())));
+//        showMessage = new ShowMessage();
+//        popupMenu.insert(showMessage, copyItemsIdx);
+
+//        popupMenu.insert(new SearchCell(this), copyItemsIdx);
+popupMenu.insert(new RegexField(this), copyItemsIdx);
+
+jmAddFields = new JMenu();
+popupMenu.insert(jmAddFields, copyItemsIdx);
+showAllColumns = new ShowAllColumns();
+popupMenu.insert(showAllColumns, copyItemsIdx);
+hideColumn = new HideColumn();
+popupMenu.insert(hideColumn, copyItemsIdx);
+hideColumnRTMenu = new JMenuItem(new HideColumnRecordType());
+popupMenu.insert(hideColumnRTMenu, copyItemsIdx);
+changeHiddenState(false);
+
+copyMenus.add(new CopyRecord());
+copyMenus.add(new AppendRecord());
+copyMenus.add(new CopyAllRecords());
+copyMenus.add(new CopyAllShortRecords());
+copyMenus.add(new CopyAllJiraRecords());
+
+popupMenu.insert(new JPopupMenu.Separator(), copyItemsIdx);
+for (int i = copyMenus.size() - 1; i >= 0; i--) {
+    popupMenu.insert(copyMenus.get(i), copyItemsIdx);
+    
+}
+
+//        popupMenu.add(new CopyRecord());
+//        popupMenu.add(new AppendRecord());
+//        popupMenu.add(new CopyAllRecords());
+//        popupMenu.add(new CopyAllShortRecords());
+popupMenu.addSeparator();
+infoAction = new ShowInfo();
+popupMenu.add(infoAction);
+
+jmOpenIn = new JMenu("Open record in...");
+popupMenu.add(jmOpenIn);
+jmOpenIn.add(new OpenNotepad());
+jmOpenIn.add(new OpenTextPad());
+    }
 
     public ShowInfo getInfoAction() {
         return infoAction;
@@ -64,7 +152,6 @@ public class MyJTable extends JTableCommon {
     public String getSearchString() {
         return searchString;
     }
-    private String searchString = null;
 
     void setMaxColumnWidth(int i) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
@@ -206,6 +293,20 @@ public class MyJTable extends JTableCommon {
 
     void copyData(MyJTable tableView) {
         setModel(new TabResultDataModel((TabResultDataModel) tableView.getModel()));
+    }
+    public ShowFullMessage getFullMsg() {
+        return fullMsg;
+    }
+    public void setFullMsg(ShowFullMessage fullMsg) {
+        this.fullMsg = fullMsg;
+        getSelectionModel().addListSelectionListener(new ListSelectionChanged());
+        
+    }
+    public boolean isFollowLog() {
+        return followLog;
+    }
+    public void setFollowLog(boolean followLog) {
+        this.followLog = followLog;
     }
 
     class CopyRecord extends AbstractAction {
@@ -452,114 +553,6 @@ public class MyJTable extends JTableCommon {
         }
     }
 
-    JMenuItem deleteItem;
-
-    public ShowFullMessage getFullMsg() {
-        return fullMsg;
-    }
-
-    public void setFullMsg(ShowFullMessage fullMsg) {
-        this.fullMsg = fullMsg;
-        getSelectionModel().addListSelectionListener(new ListSelectionChanged());
-
-    }
-    protected ShowFullMessage fullMsg;
-    private boolean followLog = false;
-
-    public boolean isFollowLog() {
-        return followLog;
-    }
-
-    public void setFollowLog(boolean followLog) {
-        this.followLog = followLog;
-    }
-    HideColumn hideColumn;
-    ShowAllColumns showAllColumns;
-    ShowMessage showMessage;
-
-    ArrayList<AbstractAction> copyMenus = new ArrayList();
-    ArrayList<AbstractAction> filterMenus = new ArrayList();
-
-    JMenu jmAddFields;
-    JMenu jmOpenIn;
-
-    public MyJTable() {
-        super();
-
-//       sorter = new TableRowSorter<TabResultDataModel>((TabResultDataModel) getModel());
-//        setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-//        setTableHeader(null);
-        setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-//        setCellSelectionEnabled(true);
-        setRowSelectionAllowed(true);
-
-//        deleteItem = new JMenuItem("Delete");
-//
-//        deleteItem.addActionListener(new ActionListener() {
-//            @Override
-//            public void actionPerformed(ActionEvent e) {
-//                Component c = (Component) e.getSource();
-//                JPopupMenu popup = (JPopupMenu) c.getParent();
-//                JTable table = (JTable) popup.getInvoker();
-//                inquirer.logger.debug(table.getSelectedRow() + " : " + table.getSelectedColumn());
-//            }
-//        });
-//        popupMenu.add(deleteItem);
-////        JCheckBoxMenuItem followSource = new JCheckBoxMenuItem("Follow source");
-////        followSource.setSelected(followLog);
-////        followSource.addActionListener(new ActionListener() {
-////            @Override
-////            public void actionPerformed(ActionEvent e) {
-////                followLog = ((JCheckBoxMenuItem) e.getSource()).getModel().isSelected();
-////
-////            }
-////        });
-//        popupMenu.add(followSource);
-//        setComponentPopupMenu(popupMenu);
-        Font font = this.getFont();
-
-        setDefaultRenderer(Object.class, new CustomTableCellRenderer(new Font(font.getName(), Font.BOLD, font.getSize())));
-//        showMessage = new ShowMessage();
-//        popupMenu.insert(showMessage, copyItemsIdx);
-
-//        popupMenu.insert(new SearchCell(this), copyItemsIdx);
-        popupMenu.insert(new RegexField(this), copyItemsIdx);
-
-        jmAddFields = new JMenu();
-        popupMenu.insert(jmAddFields, copyItemsIdx);
-        showAllColumns = new ShowAllColumns();
-        popupMenu.insert(showAllColumns, copyItemsIdx);
-        hideColumn = new HideColumn();
-        popupMenu.insert(hideColumn, copyItemsIdx);
-        hideColumnRTMenu = new JMenuItem(new HideColumnRecordType());
-        popupMenu.insert(hideColumnRTMenu, copyItemsIdx);
-        changeHiddenState(false);
-
-        copyMenus.add(new CopyRecord());
-        copyMenus.add(new AppendRecord());
-        copyMenus.add(new CopyAllRecords());
-        copyMenus.add(new CopyAllShortRecords());
-        copyMenus.add(new CopyAllJiraRecords());
-
-        popupMenu.insert(new JPopupMenu.Separator(), copyItemsIdx);
-        for (int i = copyMenus.size() - 1; i >= 0; i--) {
-            popupMenu.insert(copyMenus.get(i), copyItemsIdx);
-
-        }
-
-//        popupMenu.add(new CopyRecord());
-//        popupMenu.add(new AppendRecord());
-//        popupMenu.add(new CopyAllRecords());
-//        popupMenu.add(new CopyAllShortRecords());
-        popupMenu.addSeparator();
-        infoAction = new ShowInfo();
-        popupMenu.add(infoAction);
-
-        jmOpenIn = new JMenu("Open record in...");
-        popupMenu.add(jmOpenIn);
-        jmOpenIn.add(new OpenNotepad());
-        jmOpenIn.add(new OpenTextPad());
-    }
 
 //    @Override
 //    public Component prepareRenderer(TableCellRenderer renderer, int row, int column) {

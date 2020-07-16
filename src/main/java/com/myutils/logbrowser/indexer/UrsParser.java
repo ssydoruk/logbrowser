@@ -4,6 +4,7 @@ import java.io.UnsupportedEncodingException;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.regex.Matcher;
@@ -76,6 +77,23 @@ public class UrsParser extends Parser {
     private static final Pattern regEventAttachedData = Pattern.compile("dn=([^,]+), refid=\\d+\\)$");
     private static final Pattern regSentTo = Pattern.compile("^send to ts (.+) (Request\\w+)");
     private static final Pattern regReqTo = Pattern.compile("^request to (\\d+).+message (Request\\w+)");
+    private static final Pattern regStrategy = Pattern.compile("strategy:.+\\*+(\\S+)");
+    //[14:33] strategy: **ORS (1085200831) is attached to the call
+    private static final Pattern regRequestRef = Pattern.compile("request (\\d+) sent to");
+    private static final Pattern regRequestURL = Pattern.compile("session/([^/]+)/(.+)$");
+    private static final Pattern regWebResponse = Pattern.compile("^(^.+) is received from server.+ refid=(\\d+)");
+    private static final Pattern regWebResponseBody = Pattern.compile("^HTTPBody \\{(.+)\\}$");
+    private static final Pattern regWebNotifURL = Pattern.compile("^web notification <(.+)> ");
+    private static final Pattern regCfgObjectName = Pattern.compile("(?:name|userName|number|loginCode)='([^']+)'");
+    private static final Pattern regCfgObjectType = Pattern.compile("^Cfg([^=]+)=.*\\{DBID=(\\d+)");
+    //    private static final Pattern regCfgAGType = Pattern.compile("^Cfg([^=]+)=\\{DBID=(\\d+)");
+    private static final Pattern regCfgOp = Pattern.compile("PopCfg.+\\s(\\w+)$");
+    private static final Pattern regCfgAgentGroup = Pattern.compile("^CfgAgentGroup=.+agentDBIDs=\\[([^\\]]+)");
+    //09:24:35.821_M_I_ [10:15] SO(7f0021ca4cb8 -1 2) ten=Resources name=?BLD_Billing_AG:Chat_SK>0@hc1_statsrvr_urs_p.GA: content updated #503 <>
+//CURRENT CONTENT(32): shilpa.c@hc1_statsrvr_urs_p.A,shruthi.p@hc1_statsrvr_urs_p.A...
+    private static final Pattern regline1015 = Pattern.compile("name=(.+): content");
+    private static final Pattern regCheckRoutingStates = Pattern.compile("^check call routing.+(true|false)$");
+    public static final HashMap<String, String> targetCode = getTargetCodes();
 
     private static HashMap<String, String> getTargetCodes() {
         HashMap<String, String> ret = new HashMap<>();
@@ -102,6 +120,7 @@ public class UrsParser extends Parser {
     ParserState m_ParserState;
     String m_Header;
     int m_dbRecords = 0;
+    private Message msgTmp; // storage for message in progress
 
     public UrsParser(HashMap<TableType, DBTable> m_tables) {
         super(FileInfoType.type_URS, m_tables);
@@ -128,14 +147,11 @@ public class UrsParser extends Parser {
         }
     }
 
-    private static final Pattern regStrategy = Pattern.compile("strategy:.+\\*+(\\S+)");
-    //[14:33] strategy: **ORS (1085200831) is attached to the call
-
     //17:42:51.895_I_I_00d202972e8c2ebc [01:08] call (252087-104e77cd0) deleting truly
 //                addStep("01:08", null, "call deleting truly");
     private void AddStrategyMessageLine(String line, String FileLine) {
         Matcher m;
-        Message msg = null;
+        Message msg;
         if ((FileLine.equals("14:33") || FileLine.equals("1B:01")) && (m = regStrategy.matcher(line)).find()) {
             msg = new URSStrategyInit(line, lastConnID, m.group(1), "strategy is attached to the call");
         } else if (FileLine.equals("01:08")) {
@@ -233,9 +249,6 @@ public class UrsParser extends Parser {
         }
     }
 
-    private static final Pattern regRequestRef = Pattern.compile("request (\\d+) sent to");
-    private static final Pattern regRequestURL = Pattern.compile("session/([^/]+)/(.+)$");
-
     private boolean processHTTPBridgeRequest(String s) {
         URSRI msg = new URSRI();
         msg.setRefid(Message.getRx((String) m_MessageContents.get(0), regRequestRef, 1, null));
@@ -256,9 +269,6 @@ public class UrsParser extends Parser {
         return true;
     }
 
-    private static final Pattern regWebResponse = Pattern.compile("^(^.+) is received from server.+ refid=(\\d+)");
-    private static final Pattern regWebResponseBody = Pattern.compile("^HTTPBody \\{(.+)\\}$");
-
     private boolean processWebResponse() {
         URSRI msg = new URSRI();
         Matcher m;
@@ -266,7 +276,7 @@ public class UrsParser extends Parser {
             msg.setSubFunc(m.group(1));
             msg.setRefid(m.group(2));
         }
-        String body = Message.FindByRx(m_MessageContents, regWebResponseBody, 1, (String)null);
+        String body = Message.FindByRx(m_MessageContents, regWebResponseBody, 1, (String) null);
         if (body == null || body.isEmpty()) {
             msg.setFunc(msg.getFunc());
         } else {
@@ -277,8 +287,6 @@ public class UrsParser extends Parser {
         SetStdFieldsAndAdd(msg);
         return true;
     }
-
-    private static final Pattern regWebNotifURL = Pattern.compile("^web notification <(.+)> ");
 
     private boolean processWebNotification(String URSRest, String lastConnID) {
         URSRI msg = new URSRI();
@@ -295,8 +303,6 @@ public class UrsParser extends Parser {
         SetStdFieldsAndAdd(msg);
         return true;
     }
-
-    private Message msgTmp; // storage for message in progress
 
     private void ProcessRI(String s) throws UnsupportedEncodingException, Exception {
         Main.logger.trace("ProcessRI [" + s + "]");
@@ -419,7 +425,7 @@ public class UrsParser extends Parser {
             }
             ParseLine(""); // to complete the parsing of the last line/last message
         } catch (Exception e) {
-            e.printStackTrace();
+            Main.logger.error(e);
             return m_CurrentLine - line;
         }
 
@@ -448,12 +454,12 @@ public class UrsParser extends Parser {
                 try {
                     s = ParseGenesys(str, TableType.MsgURServer);
                 } catch (Exception exception) {
-                    if (!(m = regVitalik.matcher(str)).find()) {
+                    if (!(regVitalik.matcher(str)).find()) {
                         throw exception;
                     }
                 }
 
-                if ((m = regCfgUpdate.matcher(s)).find()) {
+                if ((regCfgUpdate.matcher(s)).find()) {
                     setSavedFilePos(getFilePos());
                     m_MessageContents.add(s);
                     m_ParserState = ParserState.STATE_CONFIG;
@@ -465,7 +471,7 @@ public class UrsParser extends Parser {
                     ProcessRI(s.substring(m.end(0)));
                 } else if ((m = regCONNID_UUID.matcher(s)).find()) {
                     AddConnIDUUID(m.group(1), m.group(2));
-                } else if ((m = regRLibMessage.matcher(s)).find()) {
+                } else if ((regRLibMessage.matcher(s)).find()) {
                     m_HeaderOffset = m_CurrentFilePos;
                     setSavedFilePos(getFilePos());
                     m_ParserState = ParserState.STATE_RLIB;
@@ -544,7 +550,7 @@ public class UrsParser extends Parser {
                     } else {
                         AddStrategyMessageLine(s, URSFileID);
                     }
-                } else if ((m = regTMessageToStart.matcher(s)).find()) {
+                } else if ((regTMessageToStart.matcher(s)).find()) {
                     m_HeaderOffset = m_CurrentFilePos;
                     m_ParserState = ParserState.STATE_TLIB_MESSAGE_OUT;
                     m_MessageContents.add(str);
@@ -563,7 +569,7 @@ public class UrsParser extends Parser {
             }
 
             case STATE_ROUTING_TARGET: {
-                if ((m = regTargetInformation.matcher(str)).find()) {
+                if ((regTargetInformation.matcher(str)).find()) {
                     addStrategyTarget(m_MessageContents);
                     m_MessageContents.clear();
                     m_ParserState = ParserState.STATE_COMMENTS;
@@ -576,7 +582,7 @@ public class UrsParser extends Parser {
             }
 
             case STATE_HTTP_RESPONSE: {
-                if ((m = regHTTPResponse.matcher(str)).find()) {
+                if ((regHTTPResponse.matcher(str)).find()) {
                     m_MessageContents.add(str);
                 } else {
                     processWebResponse();
@@ -725,11 +731,11 @@ public class UrsParser extends Parser {
             break;
 
             case STATE_CONFIG:
-                if ((m = regCfgUnknownOption.matcher(str)).find()) {
+                if ((regCfgUnknownOption.matcher(str)).find()) {
 //    _C_W_ [0D:07] unknown option 'Loaded' for server 'urs_ursvr_81_ad_dev'
                     break; // ignoring 
 
-                } else if ((m = regCfgNotification.matcher(str)).find()) {
+                } else if ((regCfgNotification.matcher(str)).find()) {
                     m_MessageContents.add(str);
                     AddConfigMessage(m_MessageContents);
                     m_MessageContents.clear();
@@ -742,7 +748,7 @@ public class UrsParser extends Parser {
                 break;
 
             case STATE_STRATEGY_MULTILINE:
-                if ((m = MLPattern.matcher(str)).find()) {
+                if ((MLPattern.matcher(str)).find()) {
                     m_MessageContents.add(str);
                 } else {
                     AddStrategyMessage(URSFileID, URSRest);
@@ -753,7 +759,7 @@ public class UrsParser extends Parser {
                 break;
 
             case STATE_RLIB:
-                if ((m = regStartsFromSpace.matcher(str)).find()) {
+                if ((regStartsFromSpace.matcher(str)).find()) {
                     m_MessageContents.add(str);
                 } else {
                     AddRLibMessage();
@@ -765,7 +771,7 @@ public class UrsParser extends Parser {
 
             case STATE_TLIB_MESSAGE_IN:
                 boolean endFound = false;
-                if ((m = regTMessageInFinal.matcher(str)).find() || str.contains("[14:32]")) {
+                if ((regTMessageInFinal.matcher(str)).find() || str.contains("[14:32]")) {
                     m_MessageContents.add(str);
                     endFound = true;
                 } else if (regTMessageAttribute.matcher(str).find()) {
@@ -783,7 +789,7 @@ public class UrsParser extends Parser {
                 break;
 
             case STATE_TLIB_MESSAGE_OUT:
-                if ((m = regTMessageOutFinal.matcher(str)).find()) {
+                if ((regTMessageOutFinal.matcher(str)).find()) {
                     AddUrsMessage(m_MessageContents, null, str);
                     m_ParserState = ParserState.STATE_COMMENTS;
                     m_MessageContents.clear();
@@ -817,7 +823,6 @@ public class UrsParser extends Parser {
     protected void AddUrsMessage(ArrayList<String> contents, String header, String urs_message) throws Exception {
         Matcher m;
         String server = null;
-        DateParsed dp = null;
         String event = null;
         String fileHandle = null;
         String refID = null;
@@ -869,12 +874,6 @@ public class UrsParser extends Parser {
         m_dbRecords++;
     }
 
-    private static final Pattern regCfgObjectName = Pattern.compile("(?:name|userName|number|loginCode)='([^']+)'");
-    private static final Pattern regCfgObjectType = Pattern.compile("^Cfg([^=]+)=.*\\{DBID=(\\d+)");
-//    private static final Pattern regCfgAGType = Pattern.compile("^Cfg([^=]+)=\\{DBID=(\\d+)");
-    private static final Pattern regCfgOp = Pattern.compile("PopCfg.+\\s(\\w+)$");
-    private static final Pattern regCfgAgentGroup = Pattern.compile("^CfgAgentGroup=.+agentDBIDs=\\[([^\\]]+)");
-
     private void AddConfigMessage(ArrayList<String> m_MessageContents) {
         ConfigUpdateRecord msg = new ConfigUpdateRecord(m_MessageContents);
         try {
@@ -903,7 +902,7 @@ public class UrsParser extends Parser {
                     }
                 }
             }
-        } catch (Exception e) {
+        } catch (NumberFormatException e) {
             Main.logger.error("Not added \"" + msg.getM_type() + "\" record:" + e.getMessage(), e);
         }
     }
@@ -911,9 +910,7 @@ public class UrsParser extends Parser {
     private void processWaitingCalls(String ag, String[] split) {
         HashSet<String> hs = new HashSet();
 
-        for (String string : split) { //hashset would guarantee unique connIDs if multiple target blocks hit
-            hs.add(string);
-        }
+        hs.addAll(Arrays.asList(split)); //hashset would guarantee unique connIDs if multiple target blocks hit
         for (String h : hs) {
             URSWaiting msg = new URSWaiting(ag, h);
             SetStdFieldsAndAdd(msg);
@@ -932,10 +929,6 @@ public class UrsParser extends Parser {
 
         }
     }
-
-//09:24:35.821_M_I_ [10:15] SO(7f0021ca4cb8 -1 2) ten=Resources name=?BLD_Billing_AG:Chat_SK>0@hc1_statsrvr_urs_p.GA: content updated #503 <>
-//CURRENT CONTENT(32): shilpa.c@hc1_statsrvr_urs_p.A,shruthi.p@hc1_statsrvr_urs_p.A...
-    private static final Pattern regline1015 = Pattern.compile("name=(.+): content");
 
     private void groupUpdated(String agentList, String line1015) {
         Matcher m;
@@ -959,14 +952,12 @@ public class UrsParser extends Parser {
 
     private void AddStrategySCXMLMessage(String FileLine) {
         Matcher m;
-        URSStrategy msg = null;
+        URSStrategy msg;
         msg = new URSStrategy(lastConnID, FileLine, m_MessageContents);
         msg.parseSCXMLAttributes();
         SetStdFieldsAndAdd(msg);
 
     }
-
-    private static final Pattern regCheckRoutingStates = Pattern.compile("^check call routing.+(true|false)$");
 
     private void addStrategyTarget(ArrayList<String> contents) {
         URSStrategy msg = null;
@@ -1000,7 +991,7 @@ public class UrsParser extends Parser {
 
     @Override
     void init(HashMap<TableType, DBTable> m_tables) {
-        m_tables.put(TableType.URSAgentGroupTable, new URSAgentGroupTable(Main.getMain().getM_accessor(), TableType.URSAgentGroupTable));
+        m_tables.put(TableType.URSAgentGroupTable, new URSAgentGroupTable(Main.getM_accessor(), TableType.URSAgentGroupTable));
     }
 
 // parse state contants
@@ -1198,5 +1189,4 @@ public class UrsParser extends Parser {
 
     }
 
-    public static final HashMap<String, String> targetCode = getTargetCodes();
 }

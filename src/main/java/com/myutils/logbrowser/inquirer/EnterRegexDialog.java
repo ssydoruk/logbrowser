@@ -27,7 +27,7 @@ import javax.swing.SwingUtilities;
  *
  * @author ssydoruk
  */
-public class EnterRegexDialog extends javax.swing.JDialog {
+public final class EnterRegexDialog extends javax.swing.JDialog {
 
     /**
      * A return status code - returned if Cancel button has been pressed

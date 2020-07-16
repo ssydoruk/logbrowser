@@ -28,12 +28,38 @@ import org.apache.commons.io.FilenameUtils;
  * @author ssydoruk
  */
 public class InquirerCfg implements Serializable {
+    private static final long serialVersionUID = 1L;
+    private static final HashSet<Character> filenameProhibited = new HashSet<Character>(
+            Arrays.asList(new Character[]{
+                ':',
+                '\"',
+                '/',
+                '\\',
+                '|',
+                '?',
+                '*',
+                '<',
+                '>'}));
+    public static String getFileUnique(String name) {
+        Integer currFileIdx = 0;
+        
+        String baseName = FilenameUtils.getBaseName(name);
+        String extension = FilenameUtils.getExtension(name);
+        String ret;
+        while (true) {
+            ret = inquirer.getLogBrDir() + File.separator + baseName + "_" + String.format("%1$03d", currFileIdx) + "." + extension;
+            File f = new File(ret);
+            if (!f.exists()) {
+                return ret;
+            }
+            currFileIdx++;
+        }
+    }
 
     private HashMap<ReferenceType, ArrayList<OptionNode>> refsChecked = new HashMap<>(20);
     private HashMap<TableType, ArrayList<OptionNode>> logMessages = new HashMap<>();
     private int maxRecords;
 
-    private static final long serialVersionUID = 1L;
     private boolean LimitQueryResults;
     private int MaxQueryLines;
     private String titleRegex;
@@ -44,30 +70,6 @@ public class InquirerCfg implements Serializable {
     private boolean refsLoaded;
     private boolean newTlibSearch;
 
-    private GenesysConstants1 getConsts() {
-        if (constants == null) {
-            constants = new GenesysConstants1();
-        }
-        return constants;
-    }
-
-    public GenesysConstants getConstants() {
-        return getConsts().toConstants();
-    }
-
-    public void setConstants(GenesysConstants constants) {
-        this.getConsts().fromConstants(constants);
-    }
-
-    public Set<ReferenceType> getRefTypes() {
-        checkRefsLoaded();
-        return refsChecked.keySet();
-    }
-
-    public Set<TableType> getLogTypes() {
-        checkMessagesLoaded();
-        return logMessages.keySet();
-    }
 
     private boolean saveFileShort;
     private boolean saveFileLong;
@@ -80,6 +82,54 @@ public class InquirerCfg implements Serializable {
     private boolean printLogFileName;
     private boolean ignoreFormatting;
     private boolean ignorePatternForDBFields;
+    private String FileNameShort;
+    private String FileNameLong;
+    private HashMap<String, String> printFilters = new HashMap<>(2);
+    private boolean messagesLoaded = false;
+    HashSet<RegexFieldSettings> regexFieldsSettings = null;
+    HashMap<MsgType, ArrayList<RegexFieldSettings>> rxFieldsSettings = null;
+    public InquirerCfg() {
+        this.constants = new GenesysConstants1();
+        FileNameShort = ".logbr_short.txt";
+        FileNameLong = ".logbr_full.txt";
+        saveFileShort = false;
+        saveFileLong = false;
+        applyFullFilter = true;
+        addShortToFull = true;
+        maxRecords = 100;
+        MaxQueryLines = 3000;
+        LimitQueryResults = true;
+        accessLogFiles = true;
+        sorting = true;
+        addOrderBy = true;
+        printLogFileName = true;
+        ignoreFormatting = false;
+        titleRegex = "";
+        fullTimeStamp = false;
+        refsLoaded = false;
+        messagesLoaded = false;
+        newTlibSearch = false;
+    }
+    private GenesysConstants1 getConsts() {
+        if (constants == null) {
+            constants = new GenesysConstants1();
+        }
+        return constants;
+    }
+    public GenesysConstants getConstants() {
+        return getConsts().toConstants();
+    }
+    public void setConstants(GenesysConstants constants) {
+        this.getConsts().fromConstants(constants);
+    }
+    public Set<ReferenceType> getRefTypes() {
+        checkRefsLoaded();
+        return refsChecked.keySet();
+    }
+    public Set<TableType> getLogTypes() {
+        checkMessagesLoaded();
+        return logMessages.keySet();
+    }
 
     public boolean isAddOrderBy() {
         return addOrderBy;
@@ -96,9 +146,6 @@ public class InquirerCfg implements Serializable {
     public void setAccessLogFiles(boolean accessLogFiles) {
         this.accessLogFiles = accessLogFiles;
     }
-    private String FileNameShort;
-    private String FileNameLong;
-    private HashMap<String, String> printFilters = new HashMap<>(2);
 
     public boolean isSaveFileShort() {
         return saveFileShort;
@@ -130,21 +177,6 @@ public class InquirerCfg implements Serializable {
         this.FileNameShort = FileNameShort;
     }
 
-    public static String getFileUnique(String name) {
-        Integer currFileIdx = 0;
-
-        String baseName = FilenameUtils.getBaseName(name);
-        String extension = FilenameUtils.getExtension(name);
-        String ret;
-        while (true) {
-            ret = inquirer.getLogBrDir() + File.separator + baseName + "_" + String.format("%1$03d", currFileIdx) + "." + extension;
-            File f = new File(ret);
-            if (!f.exists()) {
-                return ret;
-            }
-            currFileIdx++;
-        }
-    }
 
     public String getFileNameLong() {
         return getFileUnique(FileNameLong);
@@ -154,28 +186,6 @@ public class InquirerCfg implements Serializable {
         this.FileNameLong = FileNameLong;
     }
 
-    public InquirerCfg() {
-        this.constants = new GenesysConstants1();
-        FileNameShort = ".logbr_short.txt";
-        FileNameLong = ".logbr_full.txt";
-        saveFileShort = false;
-        saveFileLong = false;
-        applyFullFilter = true;
-        addShortToFull = true;
-        maxRecords = 100;
-        MaxQueryLines = 3000;
-        LimitQueryResults = true;
-        accessLogFiles = true;
-        sorting = true;
-        addOrderBy = true;
-        printLogFileName = true;
-        ignoreFormatting = false;
-        titleRegex = "";
-        fullTimeStamp = false;
-        refsLoaded = false;
-        messagesLoaded = false;
-        newTlibSearch = false;
-    }
 
     public boolean isFullTimeStamp() {
         return fullTimeStamp;
@@ -453,17 +463,6 @@ public class InquirerCfg implements Serializable {
         return getFileNameLong(tab.getQueryName(), tab.getSearchString());
     }
 
-    private static final HashSet<Character> filenameProhibited = new HashSet<Character>(
-            Arrays.asList(new Character[]{
-        ':',
-        '\"',
-        '/',
-        '\\',
-        '|',
-        '?',
-        '*',
-        '<',
-        '>'}));
 
     private String cleanNonFileChars(String queryName) {
         StringBuilder ret = new StringBuilder(queryName.length());
@@ -545,7 +544,6 @@ public class InquirerCfg implements Serializable {
         }
     }
 
-    private boolean messagesLoaded = false;
 
     private void checkMessagesLoaded() {
         if (!messagesLoaded) {
@@ -628,29 +626,43 @@ public class InquirerCfg implements Serializable {
         rxFieldsSettings.put(t, l);
     }
 
+
+    public ArrayList<RegexFieldSettings> getRegexFieldsSettings(MsgType t) {
+        if (rxFieldsSettings == null) {
+            rxFieldsSettings = new HashMap<>();
+            if (inquirer.isDbg()) {
+                ArrayList<RegexFieldSettings> lst = new ArrayList<>();
+                lst.add(new RegexFieldSettings("TypeName1", "TypeSearch1", "retValue1", false, false));
+                lst.add(new RegexFieldSettings("TypeName2", "TypeSearch2", "retValue2", true, false));
+                rxFieldsSettings.put(t, lst);
+            }
+        }
+        return rxFieldsSettings.get(t);
+    }
+
+    public HashSet<RegexFieldSettings> getRegexFieldsSettings() {
+        if (regexFieldsSettings == null) {
+            regexFieldsSettings = new HashSet<>();
+            if (inquirer.isDbg()) {
+                regexFieldsSettings.add(new RegexFieldSettings("TypeName1", "TypeSearch1", "retValue1", false, false));
+                regexFieldsSettings.add(new RegexFieldSettings("TypeName2", "TypeSearch2", "retValue2", true, false));
+            }
+        }
+        return regexFieldsSettings;
+    }
+
+//    RegexFieldSettings saveRegexField(String name, String searchString, String returnValue, boolean isCaseSensitive, boolean isWholeWorld) {
+//        HashSet<RegexFieldSettings> ret = getRegexFieldsSettings();
+//        RegexFieldSettings regexFieldSettings = new RegexFieldSettings(name, searchString, returnValue, isWholeWorld, isCaseSensitive);
+//        ret.add(regexFieldSettings);
+//        return regexFieldSettings;
+//    }
+
     public static class GenesysConstant implements Serializable {
 
         private static final long serialVersionUID = 1L;
-
-        @Override
-        public String toString() {
-            return name;
-        }
-
         private String name;
-
-        public String getName() {
-            return name;
-        }
-
-        public void setName(String name) {
-            this.name = name;
-        }
         private ArrayList<Pair<String, Integer>> values;
-
-        public int size() {
-            return values.size();
-        }
 
         public GenesysConstant() {
             this.values = new ArrayList<>();
@@ -659,7 +671,24 @@ public class InquirerCfg implements Serializable {
         public GenesysConstant(String n) {
             this();
             name = n;
+            
+        }
 
+        @Override
+        public String toString() {
+            return name;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public int size() {
+            return values.size();
         }
 
         public Integer getKey(int idx) {
@@ -719,8 +748,11 @@ public class InquirerCfg implements Serializable {
     public static class GenesysConstants implements Serializable {
 
         private static final long serialVersionUID = 1L;
-
         private ArrayList<GenesysConstant> constants;
+
+        public GenesysConstants() {
+            this.constants = new ArrayList<>();
+        }
 
         public ArrayList<Pair<String, Integer>> getValues(String constName) {
             for (GenesysConstant constant : constants) {
@@ -738,17 +770,16 @@ public class InquirerCfg implements Serializable {
         public boolean add(GenesysConstant e) {
             return constants.add(e);
         }
-
-        public GenesysConstants() {
-            this.constants = new ArrayList<>();
-        }
-    };
+    }
 
     public static class GenesysConstants1 implements Serializable {
 
         private static final long serialVersionUID = 1L;
-
         private HashMap<String, HashMap<Integer, String>> constants;
+
+        public GenesysConstants1() {
+            this.constants = new HashMap<>();
+        }
 
         public HashMap<Integer, String> getValues(String constName) {
             return constants.get(constName);
@@ -762,10 +793,6 @@ public class InquirerCfg implements Serializable {
             HashMap<Integer, String> hashMap = new HashMap<>();
             constants.put(name, hashMap);
             return hashMap;
-        }
-
-        public GenesysConstants1() {
-            this.constants = new HashMap<>();
         }
 
         private GenesysConstants toConstants() {
@@ -824,31 +851,13 @@ public class InquirerCfg implements Serializable {
                 return ret;
             }
         }
-    };
+    }
 
     public static class GenesysConstant1 implements Serializable {
 
         private static final long serialVersionUID = 1L;
-
-        @Override
-        public String toString() {
-            return name;
-        }
-
         private String name;
-
-        public String getName() {
-            return name;
-        }
-
-        public void setName(String name) {
-            this.name = name;
-        }
         private ArrayList<Pair<String, Integer>> values;
-
-        public int size() {
-            return values.size();
-        }
 
         public GenesysConstant1() {
             this.values = new ArrayList<>();
@@ -857,7 +866,24 @@ public class InquirerCfg implements Serializable {
         public GenesysConstant1(String n) {
             this();
             name = n;
+            
+        }
 
+        @Override
+        public String toString() {
+            return name;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public int size() {
+            return values.size();
         }
 
         public Integer getKey(int idx) {
@@ -910,6 +936,11 @@ public class InquirerCfg implements Serializable {
     public static class RegexFieldSettings implements Serializable {
 
         private static final long serialVersionUID = 1L;
+        private String name;
+        private String searchString;
+        private String retValue;
+        private boolean makeWholeWorld;
+        private boolean caseSensitive;
 
         public RegexFieldSettings(String name, String searchString, String retValue, boolean makeWholeWorld, boolean caseSensitive) {
             this.name = name;
@@ -972,52 +1003,11 @@ public class InquirerCfg implements Serializable {
             this.caseSensitive = caseSensitive;
         }
 
-        private String name;
-        private String searchString;
-        private String retValue;
-        private boolean makeWholeWorld;
-        private boolean caseSensitive;
-
         void updateParams(String rx, String retVal, boolean isCase, boolean isWord) {
             searchString = rx;
             retValue = retVal;
             caseSensitive = isCase;
             makeWholeWorld = isWord;
         }
-
     }
-
-    HashSet<RegexFieldSettings> regexFieldsSettings = null;
-    HashMap<MsgType, ArrayList<RegexFieldSettings>> rxFieldsSettings = null;
-
-    public ArrayList<RegexFieldSettings> getRegexFieldsSettings(MsgType t) {
-        if (rxFieldsSettings == null) {
-            rxFieldsSettings = new HashMap<>();
-            if (inquirer.isDbg()) {
-                ArrayList<RegexFieldSettings> lst = new ArrayList<>();
-                lst.add(new RegexFieldSettings("TypeName1", "TypeSearch1", "retValue1", false, false));
-                lst.add(new RegexFieldSettings("TypeName2", "TypeSearch2", "retValue2", true, false));
-                rxFieldsSettings.put(t, lst);
-            }
-        }
-        return rxFieldsSettings.get(t);
-    }
-
-    public HashSet<RegexFieldSettings> getRegexFieldsSettings() {
-        if (regexFieldsSettings == null) {
-            regexFieldsSettings = new HashSet<>();
-            if (inquirer.isDbg()) {
-                regexFieldsSettings.add(new RegexFieldSettings("TypeName1", "TypeSearch1", "retValue1", false, false));
-                regexFieldsSettings.add(new RegexFieldSettings("TypeName2", "TypeSearch2", "retValue2", true, false));
-            }
-        }
-        return regexFieldsSettings;
-    }
-
-//    RegexFieldSettings saveRegexField(String name, String searchString, String returnValue, boolean isCaseSensitive, boolean isWholeWorld) {
-//        HashSet<RegexFieldSettings> ret = getRegexFieldsSettings();
-//        RegexFieldSettings regexFieldSettings = new RegexFieldSettings(name, searchString, returnValue, isWholeWorld, isCaseSensitive);
-//        ret.add(regexFieldSettings);
-//        return regexFieldSettings;
-//    }
 }

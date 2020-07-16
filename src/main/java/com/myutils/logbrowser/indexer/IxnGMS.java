@@ -10,14 +10,12 @@ import static Utils.Util.intOrDef;
 import java.util.ArrayList;
 import java.util.regex.Pattern;
 
-public class IxnGMS extends Message {
+public final class IxnGMS extends Message {
 
 //    final private static Pattern regGSW_RECORD_HANDLE = Pattern.compile("^\\s*\'GSW_RECORD_HANDLE\'.+= (\\d+)");
     final private static Pattern regIxnActor = Pattern.compile("^\\s*attr_actor_router_id .+ \"([^\"]+)\"$");
     final private static Pattern regIxnSubmitted = Pattern.compile("^\\s*attr_itx_submitted_by .+ \"([^\"]+)\"$");
 
-    private String clientName = null;
-    private String messageName = null;
 
     private static final Regexs AgentIDs = new Regexs(new Pair[]{
         new Pair("^\\s*attr_agent_id.+ \"([^\"]+)\"$", 1),
@@ -65,6 +63,11 @@ public class IxnGMS extends Message {
     private static final Regexs reConnID = new Regexs(new Pair[]{
         new Pair("^\\s*AttributeConnID .+ (\\w+)$", 1)}
     );
+    final private static Pattern regService = Pattern.compile("^\\s*'Service'.+= \"([^\"]+)\"$");
+    final private static Pattern regMethod = Pattern.compile("^\\s*'Method'.+= \"([^\"]+)\"$");
+    final private static Pattern regRouteType = Pattern.compile("^\\s*AttributeRouteType.+ = (\\d+)");
+    private String clientName = null;
+    private String messageName = null;
 
 //    private static final Regexs reContact = new Regexs(new Pair[]{
 //        new Pair("^\\s*\'GSW_PHONE\'.+= \"([^\"]+)\"", 1),
@@ -81,6 +84,33 @@ public class IxnGMS extends Message {
     private RegExAttribute connID = new RegExAttribute(reConnID);
 
     MessageAttributes attrs = new MessageAttributes();
+    Attribute ixnID = new Attribute() {
+        @Override
+                String getValue() {
+                    return FindByRx(IxnIDs);
+                }
+    };
+    Attribute attr1 = new Attribute() {
+        @Override
+                String getValue() {
+                    String retService = FindByRx(regService, 1, null);
+                    String retMethod = FindByRx(regMethod, 1, null);
+                    StringBuilder ret = new StringBuilder(50);
+                    if (retService != null) {
+                        ret.append(retService);
+                    }
+                    if (retMethod != null) {
+                        if (ret.length() > 0) {
+                            ret.append("|");
+                        }
+                        ret.append(retMethod);
+                    }
+                    if (ret.length() > 0) {
+                        return ret.toString();
+                    }
+                    return null;
+                }
+    };
 
     public IxnGMS(TableType t) {
         super(t);
@@ -121,12 +151,6 @@ public class IxnGMS extends Message {
 
     }
 
-    Attribute ixnID = new Attribute() {
-        @Override
-        String getValue() {
-            return FindByRx(IxnIDs);
-        }
-    };
 
     String GetIxnID() {
         return ixnID.toString();
@@ -175,36 +199,11 @@ public class IxnGMS extends Message {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
-    final private static Pattern regService = Pattern.compile("^\\s*'Service'.+= \"([^\"]+)\"$");
-    final private static Pattern regMethod = Pattern.compile("^\\s*'Method'.+= \"([^\"]+)\"$");
-
-    Attribute attr1 = new Attribute() {
-        @Override
-        String getValue() {
-            String retService = FindByRx(regService, 1, null);
-            String retMethod = FindByRx(regMethod, 1, null);
-            StringBuilder ret = new StringBuilder(50);
-            if (retService != null) {
-                ret.append(retService);
-            }
-            if (retMethod != null) {
-                if (ret.length() > 0) {
-                    ret.append("|");
-                }
-                ret.append(retMethod);
-            }
-            if (ret.length() > 0) {
-                return ret.toString();
-            }
-            return null;
-        }
-    };
 
     String getAttr1() {
         return attr1.toString();
     }
 
-    final private static Pattern regRouteType = Pattern.compile("^\\s*AttributeRouteType.+ = (\\d+)");
 
     String getAttr2() {
         String msgName = GetMessageName();

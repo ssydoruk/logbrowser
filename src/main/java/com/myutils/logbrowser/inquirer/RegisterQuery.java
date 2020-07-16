@@ -9,14 +9,11 @@ import java.sql.SQLException;
 
 /**
  *
- * @author kvoroshi
+ * @author ssydoruk
  */
 public class RegisterQuery extends IQuery {
 
-    private String m_dn;
-    private ResultSet m_resultSet;
-    private DatabaseConnector m_connector;
-    private int recCnt;
+    private final String m_dn;
 
     public RegisterQuery(String dn) {
         m_dn = dn;

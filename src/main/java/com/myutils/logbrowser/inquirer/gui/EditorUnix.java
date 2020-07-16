@@ -26,95 +26,10 @@ public class EditorUnix extends ExternalEditor {
 
     private static final org.apache.logging.log4j.Logger logger = LogManager.getLogger();
 
-    private void show() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    void ediFile(LogFile lf) throws IOException {
-        loadFile(lf.getFileName(), lf.getFileName());
-    }
-
-    protected boolean loadFile(String fileName, String fileModified) throws IOException {
-//        runServer();
-        Integer bufNumber = getBufNumber(fileName, fileModified);
-        if (bufNumber != null) {
-            setActive(bufNumber);
-        } else {
-            execReturn(Arrays.asList(new String[]{
-                //                "+",
-                //                "+':set nomodifiable'" //                                        + " | set hlsearch | set wrap | set noconfirm"
-                //                ,
-                "--remote-tab-silent",
-                fileModified,}), false);
-            confirmServer();
-
-            long startTime = System.currentTimeMillis();
-            long endTime;
-            bufNumber = null;
-            while (bufNumber == null) {
-
-                bufNumber = getBufNumber(fileName, fileModified);
-                if (bufNumber != null && bufNumber > 0) {
-                    logger.debug("Loaded: " + bufNumber.toString());
-                    setActive(bufNumber);
-                } else {
-                    bufNumber = null;
-                    logger.debug("Not loaded yet: " + ((errBuf != null) ? errBuf : ""));
-                }
-
-                try {
-                    Thread.sleep(100);
-                } catch (InterruptedException ex) {
-                }
-
-                logger.debug("Waiting for file to load: [" + fileName + "]");
-                endTime = System.currentTimeMillis();
-                if (endTime - startTime > 10000) //  300 seconds hardcoded time to load file
-                {
-                    break;
-                }
-            }
-            if (bufNumber != null) {
-                setActive(bufNumber);
-            } else {
-                logger.error("Did not get buffer after 5 seconds");
-            }
-//
-//            bufNumber = getBufNumber(fileName, fileModified);
-//            if (bufNumber != null) {
-//                logger.debug("Loaded: " + bufNumber.toString());
-//                setActive(bufNumber);
-//            } else {
-//                logger.debug("Not loaded?: ");
-//            }
-            sendInitCommands();
-
-        }
-        return true;
-    }
-
-    @Override
-    public boolean jumpToFile(String fileName, String fModified, int line, boolean makeActive, boolean modifiable) throws IOException {
-        if (loadFile(fileName, fModified)) {
-            sendCommand("<ESC>:"
-                    + line + "<CR>");
-            sendCommand("<ESC>m" + getNextLowerCaseBookmark(fileName)
-                    + "<CR>");
-
-//            sendCommand("<C-\\><C-N>:set nomodifiable<CR>"
-//                    + ":set nomodifiable<CR>"
-//                    + ":set ic<CR>"
-//                    + ":set hlsearch<CR>"
-//                    + ":set wrap<CR>"
-//                    + ":set noconfirm<CR>"
-//                    + ":" + line + "<CR>");
-            return true;
-        }
-        return false;
-    }
 
     private static ArrayList<String> errBuf;
+    private static final String gvim = "/usr/local/bin/gvim";
+    private static final String gvimServer = "LOGBROWSER";
 
     /**
      * Executes external command and returns stdout
@@ -199,9 +114,91 @@ public class EditorUnix extends ExternalEditor {
         params.add(expr);
         execReturn(params, true);
     }
+    HashMap<String, Character> lastBookmark = new HashMap<>();
+    private void show() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+    @Override
+            void ediFile(LogFile lf) throws IOException {
+                loadFile(lf.getFileName(), lf.getFileName());
+            }
+            protected boolean loadFile(String fileName, String fileModified) throws IOException {
+//        runServer();
+Integer bufNumber = getBufNumber(fileName, fileModified);
+if (bufNumber != null) {
+    setActive(bufNumber);
+} else {
+    execReturn(Arrays.asList(new String[]{
+        //                "+",
+        //                "+':set nomodifiable'" //                                        + " | set hlsearch | set wrap | set noconfirm"
+        //                ,
+        "--remote-tab-silent",
+        fileModified,}), false);
+    confirmServer();
+    
+    long startTime = System.currentTimeMillis();
+    long endTime;
+    bufNumber = null;
+    while (bufNumber == null) {
+        
+        bufNumber = getBufNumber(fileName, fileModified);
+        if (bufNumber != null && bufNumber > 0) {
+            logger.debug("Loaded: " + bufNumber.toString());
+            setActive(bufNumber);
+        } else {
+            bufNumber = null;
+            logger.debug("Not loaded yet: " + ((errBuf != null) ? errBuf : ""));
+        }
+        
+        try {
+            Thread.sleep(100);
+        } catch (InterruptedException ex) {
+        }
+        
+        logger.debug("Waiting for file to load: [" + fileName + "]");
+        endTime = System.currentTimeMillis();
+        if (endTime - startTime > 10000) //  300 seconds hardcoded time to load file
+        {
+            break;
+        }
+    }
+    if (bufNumber != null) {
+        setActive(bufNumber);
+    } else {
+        logger.error("Did not get buffer after 5 seconds");
+    }
+//
+//            bufNumber = getBufNumber(fileName, fileModified);
+//            if (bufNumber != null) {
+//                logger.debug("Loaded: " + bufNumber.toString());
+//                setActive(bufNumber);
+//            } else {
+//                logger.debug("Not loaded?: ");
+//            }
+sendInitCommands();
 
-    private static final String gvim = "/usr/local/bin/gvim";
-    private static final String gvimServer = "LOGBROWSER";
+}
+return true;
+            }
+            @Override
+            public boolean jumpToFile(String fileName, String fModified, int line, boolean makeActive, boolean modifiable) throws IOException {
+                if (loadFile(fileName, fModified)) {
+                    sendCommand("<ESC>:"
+                            + line + "<CR>");
+                    sendCommand("<ESC>m" + getNextLowerCaseBookmark(fileName)
+                            + "<CR>");
+                    
+//            sendCommand("<C-\\><C-N>:set nomodifiable<CR>"
+//                    + ":set nomodifiable<CR>"
+//                    + ":set ic<CR>"
+//                    + ":set hlsearch<CR>"
+//                    + ":set wrap<CR>"
+//                    + ":set noconfirm<CR>"
+//                    + ":" + line + "<CR>");
+return true;
+                }
+                return false;
+            }
 
     private void sendCommand(String cmd) throws IOException {
         execReturn(Arrays.asList(new String[]{
@@ -255,7 +252,6 @@ public class EditorUnix extends ExternalEditor {
         );
     }
 
-    HashMap<String, Character> lastBookmark = new HashMap<>();
 
     private char getNextLowerCaseBookmark(String fileName) {
         Character get = lastBookmark.get(fileName);

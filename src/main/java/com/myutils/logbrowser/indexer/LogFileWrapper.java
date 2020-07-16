@@ -17,41 +17,6 @@ import java.util.Set;
  * @author Stepan
  */
 public abstract class LogFileWrapper {
-
-    private final File file;
-
-    public File getFile() {
-        return file;
-    }
-
-    LogFileWrapper(File file) throws IOException {
-        this.file = file;
-    }
-
-    public abstract void close();
-
-    public abstract void open() throws IOException;
-
-    private boolean ignoreLog = false;
-
-    public boolean isIgnoreLog() {
-        return ignoreLog;
-    }
-
-    public void setIgnoreLog(boolean ignoreLog) {
-        this.ignoreLog = ignoreLog;
-    }
-
-    protected void addFileInfo(FileInfo fi, File file) {
-        fileInfoFileMap.put(fi, file);
-    }
-
-    private HashMap<FileInfo, Object> fileInfoFileMap = new HashMap<>();
-
-    public Set<FileInfo> getFileInfos() {
-        return fileInfoFileMap.keySet();
-    }
-
     public static LogFileWrapper getContainer(File file) {
         LogFileWrapper ret = null;
         try {
@@ -68,9 +33,44 @@ public abstract class LogFileWrapper {
         if (ret != null && !ret.isIgnoreLog()) {
             return ret;
         }
-
+        
         return null;
     }
+
+    private final File file;
+
+    private boolean ignoreLog = false;
+    private final HashMap<FileInfo, Object> fileInfoFileMap = new HashMap<>();
+
+    LogFileWrapper(File file) throws IOException {
+        this.file = file;
+    }
+    public File getFile() {
+        return file;
+    }
+
+    public abstract void close();
+
+    public abstract void open() throws IOException;
+
+
+    public boolean isIgnoreLog() {
+        return ignoreLog;
+    }
+
+    public void setIgnoreLog(boolean ignoreLog) {
+        this.ignoreLog = ignoreLog;
+    }
+
+    protected void addFileInfo(FileInfo fi, File file) {
+        fileInfoFileMap.put(fi, file);
+    }
+
+
+    public Set<FileInfo> getFileInfos() {
+        return fileInfoFileMap.keySet();
+    }
+
 
     abstract InputStream getInputStream(FileInfo aThis) throws FileNotFoundException;
 

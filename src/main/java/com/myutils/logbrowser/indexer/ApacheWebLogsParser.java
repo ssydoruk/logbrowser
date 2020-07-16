@@ -19,6 +19,12 @@ import org.apache.logging.log4j.LogManager;
 public class ApacheWebLogsParser extends WebParser {
 
     private static final org.apache.logging.log4j.Logger logger = LogManager.getLogger();
+    private final static Pattern ptJSessionID = Pattern
+            .compile("JSESSIONID=([^;\\s\"\\.]+)");
+    private final static Pattern ptBrowserClientID = Pattern
+            .compile("BAYEUX_BROWSER=([^;\\s\"\\.]+)");
+    private final static Pattern ENTRY_BEGIN_PATTERN = Pattern
+            .compile("^(.*?) - (.*?) \\[(.*?)\\] \"((\\S+)(?:\\s+)(.+)?(?:\\s+)(HTTP/\\S+)?)?\" (\\d+) (.*)\\s+(\\d+)$");
 
     public static Pattern getENTRY_BEGIN_PATTERN() {
         return ENTRY_BEGIN_PATTERN;
@@ -75,19 +81,13 @@ public class ApacheWebLogsParser extends WebParser {
 
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            Main.logger.error(e);;
             return m_CurrentLine - line;
         }
 
         return m_CurrentLine - line;
     }
 
-    private final static Pattern ptJSessionID = Pattern
-            .compile("JSESSIONID=([^;\\s\"\\.]+)");
-    private final static Pattern ptBrowserClientID = Pattern
-            .compile("BAYEUX_BROWSER=([^;\\s\"\\.]+)");
-    private final static Pattern ENTRY_BEGIN_PATTERN = Pattern
-            .compile("^(.*?) - (.*?) \\[(.*?)\\] \"((\\S+)(?:\\s+)(.+)?(?:\\s+)(HTTP/\\S+)?)?\" (\\d+) (.*)\\s+(\\d+)$");
 
     String ParseLine(String str) throws Exception {
         Matcher m;
@@ -143,7 +143,7 @@ public class ApacheWebLogsParser extends WebParser {
 
     @Override
     void init(HashMap<TableType, DBTable> m_tables) {
-        m_tables.put(TableType.ApacheWeb, new ApacheWebTab(Main.getMain().getM_accessor(), TableType.ApacheWeb));
+        m_tables.put(TableType.ApacheWeb, new ApacheWebTab(Main.getM_accessor(), TableType.ApacheWeb));
 
     }
 
@@ -157,8 +157,6 @@ public class ApacheWebLogsParser extends WebParser {
         STATE_HTTPHANDLEREQUEST,
         STATE_TMESSAGE_ATTRIBUTES, STATE_EXCEPTION, STATE_AUTHRESULT
     }
-
-//<editor-fold defaultstate="collapsed" desc="WWECloudLogMsg">
     private class ApacheWebMsg extends Message {
 
         private String ip;
@@ -173,6 +171,11 @@ public class ApacheWebLogsParser extends WebParser {
         private String userName;
         private String browserClientID;
         private Integer executionTime = null;
+        private String UUID;
+        private String ixnID;
+        private ApacheWebMsg() {
+            super(TableType.ApacheWeb);
+        }
 
         /**
          * Get the value of deviceID
@@ -192,7 +195,6 @@ public class ApacheWebLogsParser extends WebParser {
             this.deviceID = deviceID;
         }
 
-        private String UUID;
 
         /**
          * Get the value of UUID
@@ -214,7 +216,6 @@ public class ApacheWebLogsParser extends WebParser {
             }
         }
 
-        private String ixnID;
 
         /**
          * Get the value of ixnID
@@ -234,9 +235,6 @@ public class ApacheWebLogsParser extends WebParser {
             this.ixnID = ixnID;
         }
 
-        private ApacheWebMsg() {
-            super(TableType.ApacheWeb);
-        }
 
         public String getHttpCode() {
 
@@ -414,7 +412,7 @@ public class ApacheWebLogsParser extends WebParser {
 
             try {
                 stmt.setTimestamp(1, new Timestamp(rec.GetAdjustedUsecTime()));
-                stmt.setInt(2, rec.getFileId());
+                stmt.setInt(2, ApacheWebMsg.getFileId());
                 stmt.setLong(3, rec.m_fileOffset);
                 stmt.setLong(4, rec.getM_FileBytes());
                 stmt.setLong(5, rec.m_line);

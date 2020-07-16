@@ -14,7 +14,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class URSRlib extends Message {
+public final class URSRlib extends Message {
 
     final private static Pattern regrefid = Pattern.compile("^\\srefid.+\\s(\\d+)");
 
@@ -29,6 +29,8 @@ public class URSRlib extends Message {
 
     final private static Pattern regSid = Pattern.compile("^\\ssessionid.+\\s'\\**([\\w~]+)'");
     final private static Pattern regSource = Pattern.compile("RLIB: (request to|received from) \\d+\\((\\w+)\\) message (\\w+)");
+    final private static Pattern prnResult = Pattern.compile("^\\s*result\\(1000000004\\)\\s+'(.+)'$");
+    final private static Pattern prnParam = Pattern.compile("^\\s*args\\(1000000003\\)\\s+'(.+)'$");
     private String CallID = null;
     private String sid = null;
     private String source;
@@ -55,7 +57,6 @@ public class URSRlib extends Message {
     int GetRefId() {
         return FindByRx(regrefid, 1, -1);
     }
-    final private static Pattern prnResult = Pattern.compile("^\\s*result\\(1000000004\\)\\s+'(.+)'$");
 
     private void parseParams() {
 
@@ -166,7 +167,6 @@ public class URSRlib extends Message {
         return result;
     }
 
-    final private static Pattern prnParam = Pattern.compile("^\\s*args\\(1000000003\\)\\s+'(.+)'$");
 
     String getParam() {
         return FindByRx(prnParam, 1, "");

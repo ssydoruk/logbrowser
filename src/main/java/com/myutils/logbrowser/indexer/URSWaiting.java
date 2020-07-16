@@ -10,11 +10,21 @@ import java.util.regex.Pattern;
 
 public class URSWaiting extends Message {
 
-    private String connID;
 
     private static final Pattern regMedia = Pattern.compile("\\<([^\\>]+)\\> type \\<([^\\>]+)\\>");
+    private final String connID;
     private String agent;
     private String targetType;
+    public URSWaiting(String ag, String connID) {
+        super(TableType.URSWaiting);
+        this.connID = connID;
+        Matcher m;
+        if ((m = regMedia.matcher(ag)).find()) {
+            this.agent = m.group(1);
+            this.targetType = m.group(2);
+        }
+        
+    }
 
     public String getConnID() {
         return connID;
@@ -28,15 +38,5 @@ public class URSWaiting extends Message {
         return targetType;
     }
 
-    public URSWaiting(String ag, String connID) {
-        super(TableType.URSWaiting);
-        this.connID = connID;
-        Matcher m;
-        if ((m = regMedia.matcher(ag)).find()) {
-            this.agent = m.group(1);
-            this.targetType = m.group(2);
-        }
-
-    }
 
 }

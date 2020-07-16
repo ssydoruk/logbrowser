@@ -10,7 +10,7 @@ import java.util.regex.Pattern;
 
 /**
  *
- * @author kvoroshi
+ * @author ssydoruk
  */
 public abstract class Record implements Cloneable {
 
@@ -19,23 +19,6 @@ public abstract class Record implements Cloneable {
     static String m_alias;
     static int fileId = 0;
 
-    public static void setFileId(int m_fileId) {
-        Record.fileId = m_fileId;
-    }
-
-    @Override
-    protected Object clone() throws CloneNotSupportedException {
-        Record ret = (Record) super.clone(); //To change body of generated methods, choose Tools | Templates.
-//        ret.m_type=this.m_type;
-//        ret.m_FileBytes=m_FileBytes;
-        return ret;
-    }
-
-    /*initial value - 1 because when record is inserted into
-    file_logbr, initial ID is also 1. Bad design, sure, correct it next time*/
-    public static int getFileId() {
-        return fileId;
-    }
     static int m_handlerId = 0;
     static int m_sipId = 0;
     static int m_tlibId = 0;
@@ -43,15 +26,22 @@ public abstract class Record implements Cloneable {
     static int m_proxiedId = 0;
     private static int objCreated;
 
-    public static Integer getObjCreated() {
-        return new Integer(objCreated);
+    private static final Pattern regAllQuotes = Pattern.compile("^(['\"]).+\\1$");
+    private static final Pattern regNoQuotes = Pattern.compile("^(['\"])(.+)\\1$");
+    public static void setFileId(int m_fileId) {
+        Record.fileId = m_fileId;
     }
-
+    /*initial value - 1 because when record is inserted into
+    file_logbr, initial ID is also 1. Bad design, sure, correct it next time*/
+    public static int getFileId() {
+        return fileId;
+    }
+    public static Integer getObjCreated() {
+        return objCreated;
+    }
     public static void resetCounter() {
         objCreated = 0;
     }
-    private static final Pattern regAllQuotes = Pattern.compile("^(['\"]).+\\1$");
-    private static final Pattern regNoQuotes = Pattern.compile("^(['\"])(.+)\\1$");
 
     public static String NoQuotes(String key) {
 
@@ -106,14 +96,11 @@ public abstract class Record implements Cloneable {
     int m_line;
     private TableType m_type;
 //    protected Date m_Timestamp = null;
-    protected DateParsed m_TimestampDP = null;
+    private DateParsed m_TimestampDP = null;
 
     protected long m_FileBytes;
     private int lastID = 0;
 
-    public int getLastID() {
-        return lastID;
-    }
 
     public Record(TableType type) {
         this();
@@ -124,6 +111,16 @@ public abstract class Record implements Cloneable {
 
     public Record() {
 
+    }
+    @Override
+    protected Object clone() throws CloneNotSupportedException {
+        Record ret = (Record) super.clone(); //To change body of generated methods, choose Tools | Templates.
+//        ret.m_type=this.m_type;
+//        ret.m_FileBytes=m_FileBytes;
+return ret;
+    }
+    public int getLastID() {
+        return lastID;
     }
 
     @Override
