@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<actions>
+        <action>
+            <actionName>run</actionName>
+            <packagings>
+                <packaging>jar</packaging>
+            </packagings>
+            <goals>
+                <goal>process-classes</goal>
+                <goal>org.codehaus.mojo:exec-maven-plugin:1.5.0:exec</goal>
+            </goals>
+            <properties>
+                <exec.args>-Dall=1  -Dlog4j.configurationFile=/Users/stepan_sydoruk/GCTI/etc/logbrowser/logbr.log4j2.inquirer.xml  -Dlog4j.logPath=/Users/stepan_sydoruk/GCTI/Work/test/tmp  -Dlogbr.dir=.tmp  -Dsqlite.pragma=true  -Dsun.java2d.d3d=false  -Dtimediff.parse=false  -Dtlib.norequest=false  -Xms8000m  -Xmx8000m -classpath %classpath com.myutils.logbrowser.indexer.Main --dbname=/Users/stepan_sydoruk/GCTI/Work/test/logbr --basedir=/Users/stepan_sydoruk/GCTI/Work/test --cfgxml /Users/stepan_sydoruk/GCTI/etc/logbrowser/backend.xml</exec.args>
+                <exec.executable>java</exec.executable>
+                <exec.workingdir>/Users/stepan_sydoruk/GCTI/Work/test</exec.workingdir>
+            </properties>
+        </action>
+        <action>
+            <actionName>debug</actionName>
+            <packagings>
+                <packaging>jar</packaging>
+            </packagings>
+            <goals>
+                <goal>process-classes</goal>
+                <goal>org.codehaus.mojo:exec-maven-plugin:1.5.0:exec</goal>
+            </goals>
+            <properties>
+                <exec.args>-agentlib:jdwp=transport=dt_socket,server=n,address=${jpda.address} -Dall=1  -Dlog4j.configurationFile=/Users/stepan_sydoruk/GCTI/etc/logbrowser/logbr.log4j2.inquirer.xml  -Dlog4j.logPath=/Users/stepan_sydoruk/GCTI/Work/test/tmp  -Dlogbr.dir=.tmp  -Dsqlite.pragma=true  -Dsun.java2d.d3d=false  -Dtimediff.parse=false  -Dtlib.norequest=false  -Xms8000m  -Xmx8000m -classpath %classpath com.myutils.logbrowser.indexer.Main --dbname=/Users/stepan_sydoruk/GCTI/Work/test/logbr --basedir=/Users/stepan_sydoruk/GCTI/Work/test --cfgxml /Users/stepan_sydoruk/GCTI/etc/logbrowser/backend.xml</exec.args>
+                <exec.executable>java</exec.executable>
+                <jpda.listen>true</jpda.listen>
+                <exec.workingdir>/Users/stepan_sydoruk/GCTI/Work/test</exec.workingdir>
+            </properties>
+        </action>
+        <action>
+            <actionName>profile</actionName>
+            <packagings>
+                <packaging>jar</packaging>
+            </packagings>
+            <goals>
+                <goal>process-classes</goal>
+                <goal>org.codehaus.mojo:exec-maven-plugin:1.5.0:exec</goal>
+            </goals>
+            <properties>
+                <exec.args>-Dall=1  -Dlog4j.configurationFile=/Users/stepan_sydoruk/GCTI/etc/logbrowser/logbr.log4j2.inquirer.xml  -Dlog4j.logPath=/Users/stepan_sydoruk/GCTI/Work/test/tmp  -Dlogbr.dir=.tmp  -Dsqlite.pragma=true  -Dsun.java2d.d3d=false  -Dtimediff.parse=false  -Dtlib.norequest=false  -Xms8000m  -Xmx8000m -classpath %classpath com.myutils.logbrowser.indexer.Main --dbname=/Users/stepan_sydoruk/GCTI/Work/test/logbr --basedir=/Users/stepan_sydoruk/GCTI/Work/test --cfgxml /Users/stepan_sydoruk/GCTI/etc/logbrowser/backend.xml</exec.args>
+                <exec.executable>java</exec.executable>
+                <exec.workingdir>/Users/stepan_sydoruk/GCTI/Work/test</exec.workingdir>
+            </properties>
+        </action>
+    </actions>

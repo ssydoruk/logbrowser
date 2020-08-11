@@ -12,6 +12,10 @@ import java.util.regex.Pattern;
 
 public class GenericTreeNode<T> implements Serializable {
 
+    /**
+     *
+     */
+    private static final long serialVersionUID = 1L;
     private TClonable data;
     private List<GenericTreeNode<T>> children;
     private GenericTreeNode<T> parent;

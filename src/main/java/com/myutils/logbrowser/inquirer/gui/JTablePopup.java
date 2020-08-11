@@ -35,6 +35,11 @@ import org.apache.logging.log4j.Logger;
  */
 public abstract class JTablePopup extends JTable {
 
+    /**
+     *
+     */
+    private static final long serialVersionUID = 1L;
+
     private static final Logger logger = LogManager.getLogger();
 
     protected final JPopupMenu popupMenu;

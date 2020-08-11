@@ -5,16 +5,6 @@
  */
 package com.myutils.logbrowser.inquirer.gui;
 
-import Utils.Pair;
-import Utils.TableColumnAdjuster;
-import Utils.UTCTimeRange;
-import com.jidesoft.dialog.ButtonPanel;
-import com.jidesoft.dialog.StandardDialog;
-import static com.jidesoft.dialog.StandardDialog.RESULT_CANCELLED;
-import com.myutils.logbrowser.inquirer.DatabaseConnector;
-import com.myutils.logbrowser.inquirer.MsgType;
-import com.myutils.logbrowser.inquirer.gui.AColumnFilter.PositionalFilter;
-import com.myutils.logbrowser.inquirer.inquirer;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -38,8 +28,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
+
 import javax.swing.AbstractAction;
-import static javax.swing.Action.SHORT_DESCRIPTION;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -63,11 +53,27 @@ import javax.swing.table.TableColumn;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 
+import com.jidesoft.dialog.ButtonPanel;
+import com.jidesoft.dialog.StandardDialog;
+import com.myutils.logbrowser.inquirer.DatabaseConnector;
+import com.myutils.logbrowser.inquirer.MsgType;
+import com.myutils.logbrowser.inquirer.inquirer;
+import com.myutils.logbrowser.inquirer.gui.AColumnFilter.PositionalFilter;
+
+import Utils.Pair;
+import Utils.TableColumnAdjuster;
+import Utils.UTCTimeRange;
+
 /**
  *
  * @author ssydoruk
  */
 abstract class JTableCommon extends JTablePopup {
+
+    /**
+     *
+     */
+    private static final long serialVersionUID = 1L;
 
     static final String RECORD_EMPTY = "<(Empty)>";
 
@@ -81,7 +87,6 @@ abstract class JTableCommon extends JTablePopup {
     private final JMenuItem miCancelColumnFilter;
 
     JMenuItem miCancelFilters;
-    private final JMenuItem showInfo = null;
     protected int copyItemsIdx = 0;
     private final TableColumnAdjuster tca;
     private JTablePopup uniquePopup = null;
@@ -278,15 +283,6 @@ abstract class JTableCommon extends JTablePopup {
         return ret;
     }
 
-    private JMenu directionFilter() {
-        JMenu sectionsMenu = new JMenu("Directional filter");
-        JMenuItem menuItem1 = new JMenuItem(new DirectionalFilterMenu("Current and above", true));
-        sectionsMenu.add(menuItem1);
-        JMenuItem menuItem2 = new JMenuItem(new DirectionalFilterMenu("Current and below", false));
-        sectionsMenu.add(menuItem2);
-        return sectionsMenu;
-    }
-
     private void applyFilter() {
 
         ArrayList<RowSetFilter> andFilters = new ArrayList<>();
@@ -358,7 +354,10 @@ abstract class JTableCommon extends JTablePopup {
 
     protected class DirectionalFilterMenu extends AbstractAction {
 
-        private jdNumberFilter flt;
+        /**
+         *
+         */
+        private static final long serialVersionUID = 1L;
         private final boolean isUp;
 
         private DirectionalFilterMenu(String current_and_above, boolean b) {
@@ -591,11 +590,9 @@ abstract class JTableCommon extends JTablePopup {
     protected class DateFilterMenu extends AbstractAction {
 
         jdDateTimeFilter flt = null;
-        private final Container theParent;
-
+        
         private DateFilterMenu(Container f) {
             super("Date filter");
-            theParent = f;
         }
 
         @Override
@@ -667,6 +664,11 @@ abstract class JTableCommon extends JTablePopup {
     }
 
     class CopyAll extends AbstractAction {
+
+        /**
+         *
+         */
+        private static final long serialVersionUID = 1L;
 
         public CopyAll() {
             super("Copy all rows");

@@ -18,7 +18,6 @@ public class SipMessage extends Message {
     private static final String _suffix = "\r";
     private static final Pattern regSIPMessage = Pattern.compile("^(?:SIP[^ ]+ (.+)|(\\w+)\\s(\\S+)\\s)", Pattern.CASE_INSENSITIVE);
     private static final Pattern regSIPUserPart = Pattern.compile("([^@:]+)@");
-    private static final Pattern regSIPRequest = Pattern.compile("^(\\w+)");
     private static final Pattern regSIPResponse = Pattern.compile("(\\w+)$");
     private static final Pattern patternPeer
             = Pattern.compile("(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}):(\\d{1,5})");
@@ -37,7 +36,7 @@ public class SipMessage extends Message {
     private String sipURI = null;
     String peerIp = null;
 
-    public SipMessage(ArrayList contents, TableType t) {
+    public SipMessage(ArrayList<String> contents, TableType t) {
         super(t);
         m_MessageLines.clear();
         for (Object content : contents) {
@@ -150,7 +149,6 @@ public class SipMessage extends Message {
             }
 
             String dlg_type = "";
-            int t = sig & 0xFE00;
             switch (sig & 0xFE00) {
                 case 0x200:
                     dlg_type = "RP ";

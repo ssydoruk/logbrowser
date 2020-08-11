@@ -833,7 +833,7 @@ public class SingleThreadParser extends Parser {
         return null;
     }
 
-    protected void AddSipMessage(ArrayList contents, String header) throws Exception {
+    protected void AddSipMessage(ArrayList<String> contents, String header) throws Exception {
         String str;
         Matcher m;
 
@@ -1098,7 +1098,7 @@ public class SingleThreadParser extends Parser {
         }
     }
 
-    protected void AddJsonMessage(ArrayList contents, String header) {
+    protected void AddJsonMessage(ArrayList<String> contents, String header) {
         int i = 0;
         while (!((String) contents.get(i)).isEmpty()) {
             i++;

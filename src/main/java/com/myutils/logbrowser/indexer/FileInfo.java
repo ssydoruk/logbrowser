@@ -33,6 +33,7 @@ public final class FileInfo extends Record {
 
     static HashMap m_runIds;
     private static final Pattern regAppType = Pattern.compile("^Application type:\\s+([^\\(]+)", Pattern.CASE_INSENSITIVE);
+    private static final Pattern RegAppCommandLine = Pattern.compile("^Command line:.+[/\\\\\\s]confserv", Pattern.CASE_INSENSITIVE);
     private static final Pattern regGWS = Pattern.compile("^GWS\\s+(\\w+)", Pattern.CASE_INSENSITIVE);
     private static final Pattern regGWSPIDHost = Pattern.compile("^PID@host: \\[(\\d+)@(.+)\\]$", Pattern.CASE_INSENSITIVE);
     private static final Pattern regGWSStart = Pattern.compile("Start time: \\[(.+)\\]$", Pattern.CASE_INSENSITIVE);
@@ -96,6 +97,7 @@ public final class FileInfo extends Record {
     private boolean ignoring = false;
     private byte buf[] = null;
     private int bufRead = 0;
+    private FileInfoType m_componentTypeSuspect = FileInfoType.type_Unknown;
 
     FileInfo(File file, LogFileWrapper wrapper) throws IOException {
         this(file);
@@ -534,6 +536,8 @@ public final class FileInfo extends Record {
                             }
                         } else if ((ApacheWebLogsParser.getENTRY_BEGIN_PATTERN().matcher(str)).find()) {
                             parserState = ParserState.APACHE_LOG_SUSPECT;
+                        } else if (RegAppCommandLine.matcher(str).find()) { // New configServer log does not have Application Type clause
+                            m_componentTypeSuspect = FileInfoType.type_ConfServer;
                         } else if (m_componentType == FileInfoType.type_Unknown) {
                             if (suspectedWWECloudLines > 5) {
                                 // not sure about the difference between WWE and WWECloud files. Assuming they are all WWE
@@ -607,10 +611,17 @@ public final class FileInfo extends Record {
             Main.logger.error("Error checking file " + m_name + ": ", e);
         }
 
-        if (m_componentType == FileInfoType.type_Unknown && appType.equals("0") && (m_app != null && m_app.equals("InteractionWorkspaceSIPEndpoint.exe"))) {
-            m_componentType = FileInfoType.type_SIPEP;
-            appType = FileInfoType.getFileType(m_componentType);
-            logFileName = m_name;
+        if (m_componentType == FileInfoType.type_Unknown) {
+            if (appType.equals("0") && (m_app != null && m_app.equals("InteractionWorkspaceSIPEndpoint.exe"))) {
+                m_componentType = FileInfoType.type_SIPEP;
+                appType = FileInfoType.getFileType(m_componentType);
+                logFileName = m_name;
+            } else if (m_componentTypeSuspect != FileInfoType.type_Unknown) {
+                m_componentType = m_componentTypeSuspect;
+                if(m_app==null && m_componentType==FileInfoType.type_ConfServer)
+                    m_app="confserv";
+                    
+            }
         }
 
         return m_componentType;

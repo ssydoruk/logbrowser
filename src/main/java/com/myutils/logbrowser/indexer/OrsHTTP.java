@@ -35,7 +35,7 @@ public class OrsHTTP extends Message {
     private String httpMessageBody = null;
     JSONObject _jsonBody = null;
 
-    public OrsHTTP(ArrayList messageLines) {
+    public OrsHTTP(ArrayList<String> messageLines) {
         super(TableType.ORSHTTP, messageLines);
     }
 

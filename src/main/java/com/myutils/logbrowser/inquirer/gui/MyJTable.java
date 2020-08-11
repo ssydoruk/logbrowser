@@ -48,6 +48,11 @@ import org.apache.logging.log4j.LogManager;
  */
 public class MyJTable extends JTableCommon {
 
+    /**
+     *
+     */
+    private static final long serialVersionUID = 1L;
+
     private static final org.apache.logging.log4j.Logger logger = LogManager.getLogger();
 
     private String queryName = null;
@@ -368,6 +373,11 @@ public class MyJTable extends JTableCommon {
 
     class HideColumn extends AbstractAction {
 
+        /**
+         *
+         */
+        private static final long serialVersionUID = 1L;
+
         public HideColumn() {
             super("Hide whole column");
         }
@@ -428,6 +438,11 @@ public class MyJTable extends JTableCommon {
 
     class ShowMessage extends AbstractAction {
 
+        /**
+         *
+         */
+        private static final long serialVersionUID = 1L;
+
         public ShowMessage() {
             super("Show message");
         }
@@ -448,6 +463,11 @@ public class MyJTable extends JTableCommon {
     }
 
     class AppendRecord extends AbstractAction {
+
+        /**
+         *
+         */
+        private static final long serialVersionUID = 1L;
 
         public AppendRecord() {
             super("Append log record");
@@ -488,6 +508,11 @@ public class MyJTable extends JTableCommon {
 
     class CopyAllShortRecords extends AbstractAction {
 
+        /**
+         *
+         */
+        private static final long serialVersionUID = 1L;
+
         public CopyAllShortRecords() {
             super("Copy all (short Excel format)");
         }
@@ -511,6 +536,11 @@ public class MyJTable extends JTableCommon {
     }
 
     class CopyAllJiraRecords extends AbstractAction {
+
+        /**
+         *
+         */
+        private static final long serialVersionUID = 1L;
 
         public CopyAllJiraRecords() {
             super("Copy all (Jira table format)");
@@ -709,6 +739,10 @@ public class MyJTable extends JTableCommon {
 
 class CustomTableCellRenderer extends DefaultTableCellRenderer {
 
+    /**
+     *
+     */
+    private static final long serialVersionUID = 1L;
     private static final DefaultTableCellRenderer DEFAULT_RENDERER = new DefaultTableCellRenderer();
     private final Font selectFont;
 

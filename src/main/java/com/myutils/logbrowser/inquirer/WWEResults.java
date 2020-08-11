@@ -1,13 +1,7 @@
 package com.myutils.logbrowser.inquirer;
 
-import Utils.Pair;
-import Utils.UTCTimeRange;
-import com.myutils.logbrowser.indexer.FileInfoType;
-import com.myutils.logbrowser.indexer.ReferenceType;
-import com.myutils.logbrowser.indexer.TableType;
-import com.myutils.logbrowser.inquirer.IQuery.FieldType;
-import static com.myutils.logbrowser.inquirer.QueryTools.getWhere;
-import static com.myutils.logbrowser.inquirer.QueryTools.isChecked;
+import static org.apache.commons.lang3.ArrayUtils.isEmpty;
+
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
 import java.sql.SQLException;
@@ -15,9 +9,18 @@ import java.util.ArrayList;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import javax.swing.JOptionPane;
-import static org.apache.commons.lang3.ArrayUtils.isEmpty;
+
+import com.myutils.logbrowser.indexer.FileInfoType;
+import com.myutils.logbrowser.indexer.ReferenceType;
+import com.myutils.logbrowser.indexer.TableType;
+import com.myutils.logbrowser.inquirer.IQuery.FieldType;
+
 import org.apache.logging.log4j.LogManager;
+
+import Utils.Pair;
+import Utils.UTCTimeRange;
 
 public class WWEResults extends IQueryResults {
 

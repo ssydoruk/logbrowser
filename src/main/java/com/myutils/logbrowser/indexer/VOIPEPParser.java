@@ -4,12 +4,20 @@
  */
 package com.myutils.logbrowser.indexer;
 
-import static com.myutils.logbrowser.indexer.VOIPEPParser.ParserState.*;
+import static com.myutils.logbrowser.indexer.VOIPEPParser.ParserState.STATE_COMMENTS;
+import static com.myutils.logbrowser.indexer.VOIPEPParser.ParserState.STATE_CONFIG;
+import static com.myutils.logbrowser.indexer.VOIPEPParser.ParserState.STATE_HEADER;
+import static com.myutils.logbrowser.indexer.VOIPEPParser.ParserState.STATE_JSON_HEADER;
+import static com.myutils.logbrowser.indexer.VOIPEPParser.ParserState.STATE_SIP_BODY;
+import static com.myutils.logbrowser.indexer.VOIPEPParser.ParserState.STATE_SIP_HEADER;
+import static com.myutils.logbrowser.indexer.VOIPEPParser.ParserState.STATE_SIP_HEADER_GSIPLIB;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 import org.apache.commons.lang3.StringUtils;
 
 /**

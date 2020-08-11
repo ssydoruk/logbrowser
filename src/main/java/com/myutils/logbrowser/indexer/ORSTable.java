@@ -79,7 +79,6 @@ public class ORSTable extends DBTable {
      */
     @Override
     public void FinalizeDB() throws Exception {
-        ResultSet ORSrecs;
 
 //        getM_dbAccessor().runQuery("create index if not exists ors_time_" + getM_dbAccessor().getM_alias() +" on ors_" + getM_dbAccessor().getM_alias() + " (time);");
         createIndexes();

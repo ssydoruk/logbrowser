@@ -22,7 +22,7 @@ public class WSConf extends Message {
     private final String fileHandle;
     private final String refID;
 
-    public WSConf(String event, String server, String fileHandle, String _refID, ArrayList newMessageLines) {
+    public WSConf(String event, String server, String fileHandle, String _refID, ArrayList<String> newMessageLines) {
         super(TableType.WSConf);
         Main.logger.trace("event=[" + event + "] " + "server=[" + server + "] " + "fileHandle=[" + fileHandle + "] " + "newMessageLines=[" + newMessageLines + "] ");
         m_MessageLines = newMessageLines;

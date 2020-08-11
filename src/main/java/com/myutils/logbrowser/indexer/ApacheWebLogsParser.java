@@ -20,12 +20,10 @@ import org.apache.logging.log4j.LogManager;
 public class ApacheWebLogsParser extends WebParser {
 
     private static final org.apache.logging.log4j.Logger logger = LogManager.getLogger();
-    private final static Pattern ptJSessionID = Pattern
-            .compile("JSESSIONID=([^;\\s\"\\.]+)");
-    private final static Pattern ptBrowserClientID = Pattern
-            .compile("BAYEUX_BROWSER=([^;\\s\"\\.]+)");
-    private final static Pattern ENTRY_BEGIN_PATTERN = Pattern
-            .compile("^(.*?) - (.*?) \\[(.*?)\\] \"((\\S+)(?:\\s+)(.+)?(?:\\s+)(HTTP/\\S+)?)?\" (\\d+) (.*)\\s+(\\d+)$");
+    private final static Pattern ptJSessionID = Pattern.compile("JSESSIONID=([^;\\s\"\\.]+)");
+    private final static Pattern ptBrowserClientID = Pattern.compile("BAYEUX_BROWSER=([^;\\s\"\\.]+)");
+    private final static Pattern ENTRY_BEGIN_PATTERN = Pattern.compile(
+            "^(.*?) - (.*?) \\[(.*?)\\] \"((\\S+)(?:\\s+)(.+)?(?:\\s+)(HTTP/\\S+)?)?\" (\\d+) (.*)\\s+(\\d+)$");
 
     public static Pattern getENTRY_BEGIN_PATTERN() {
         return ENTRY_BEGIN_PATTERN;
@@ -38,8 +36,6 @@ public class ApacheWebLogsParser extends WebParser {
     String m_Header;
 
     int m_dbRecords = 0;
-
-    private Object msg;
 
     public ApacheWebLogsParser(HashMap<TableType, DBTable> m_tables) {
         super(FileInfoType.type_WWECloud, m_tables);
@@ -67,7 +63,7 @@ public class ApacheWebLogsParser extends WebParser {
 
                 try {
                     int l = input.getLastBytesConsumed();
-//                    SetBytesConsumed(input.getLastBytesConsumed());
+                    // SetBytesConsumed(input.getLastBytesConsumed());
                     setEndFilePos(getFilePos() + l); // to calculate file bytes
 
                     while (str != null) {
@@ -76,8 +72,7 @@ public class ApacheWebLogsParser extends WebParser {
                     setFilePos(getFilePos() + l);
 
                 } catch (Exception e) {
-                    Main.logger.error("Failure parsing line " + m_CurrentLine + ":"
-                            + str + "\n" + e, e);
+                    Main.logger.error("Failure parsing line " + m_CurrentLine + ":" + str + "\n" + e, e);
                 }
 
             }
@@ -108,8 +103,8 @@ public class ApacheWebLogsParser extends WebParser {
                     entry.setDate(m.group(3));
                     entry.setMethod(m.group(5)); // HTTP Command like GET, POST, HEAD, PUT, DELETE, ...
                     String u = m.group(6);
-//                    URL url = new URL(u);
-//                    String query = url.getQuery();
+                    // URL url = new URL(u);
+                    // String query = url.getQuery();
 
                     entry.setURL(urlProcessor.processURL(u));
 
@@ -148,14 +143,7 @@ public class ApacheWebLogsParser extends WebParser {
     }
 
     enum ParserState {
-        STATE_HEADER,
-        STATE_TMESSAGE_REQUEST,
-        STATE_COMMENT,
-        STATE_TMESSAGE_EVENT,
-        STATE_CLUSTER,
-        STATE_HTTPIN,
-        STATE_HTTPHANDLEREQUEST,
-        STATE_TMESSAGE_ATTRIBUTES, STATE_EXCEPTION, STATE_AUTHRESULT
+        STATE_COMMENT, 
     }
 
     private class ApacheWebMsg extends Message {
@@ -326,7 +314,7 @@ public class ApacheWebLogsParser extends WebParser {
         }
 
         private void setUserID(String u) {
-            //!!not currently put into the database
+            // !!not currently put into the database
         }
     }
 
@@ -355,43 +343,17 @@ public class ApacheWebLogsParser extends WebParser {
             dropIndexes();
 
             String query = "create table if not exists " + getTabName() + " (id INTEGER PRIMARY KEY ASC"
-                    + ",time timestamp"
-                    + ",FileId INTEGER"
-                    + ",FileOffset bigint"
-                    + ",FileBytes int"
-                    + ",line int"
+                    + ",time timestamp" + ",FileId INTEGER" + ",FileOffset bigint" + ",FileBytes int" + ",line int"
                     /* standard first */
-                    + ",IPID int"
-                    + ",JSessionIDID int"
-                    + ",httpCode int"
-                    + ",methodID int"
-                    + ",urlID int"
-                    + ",keyID int"
-                    + ",UUIDID int"
-                    + ",IxnIDID int"
-                    + ",DeviceIDID int"
-                    + ",userNameID int"
-                    + ",browserClientID int"
-                    + ",executionTime int"
-                    + ");";
+                    + ",IPID int" + ",JSessionIDID int" + ",httpCode int" + ",methodID int" + ",urlID int"
+                    + ",keyID int" + ",UUIDID int" + ",IxnIDID int" + ",DeviceIDID int" + ",userNameID int"
+                    + ",browserClientID int" + ",executionTime int" + ");";
             getM_dbAccessor().runQuery(query);
 
-            m_InsertStatementId = getM_dbAccessor().PrepareStatement("INSERT INTO " + getTabName() + " VALUES(NULL,?,?,?,?,?"
-                    /*standard first*/
-                    + ",?"
-                    + ",?"
-                    + ",?"
-                    + ",?"
-                    + ",?"
-                    + ",?"
-                    + ",?"
-                    + ",?"
-                    + ",?"
-                    + ",?"
-                    + ",?"
-                    + ",?"
-                    + ");"
-            );
+            m_InsertStatementId = getM_dbAccessor()
+                    .PrepareStatement("INSERT INTO " + getTabName() + " VALUES(NULL,?,?,?,?,?"
+                    /* standard first */
+                            + ",?" + ",?" + ",?" + ",?" + ",?" + ",?" + ",?" + ",?" + ",?" + ",?" + ",?" + ",?" + ");");
 
         }
 
@@ -436,6 +398,6 @@ public class ApacheWebLogsParser extends WebParser {
         }
 
     }
-//</editor-fold>
+    // </editor-fold>
 
 }

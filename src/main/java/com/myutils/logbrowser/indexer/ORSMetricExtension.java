@@ -34,7 +34,7 @@ public class ORSMetricExtension extends Message {
         FindSID();
     }
 
-    ORSMetricExtension(ArrayList m_MessageContents) {
+    ORSMetricExtension(ArrayList<String> m_MessageContents) {
         super(TableType.ORSMetricExtension, m_MessageContents);
         FindSID();
     }
