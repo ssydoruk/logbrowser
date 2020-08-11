@@ -5,6 +5,15 @@
  */
 package com.myutils.logbrowser.inquirer.gui;
 
+import Utils.Pair;
+import Utils.TableColumnAdjuster;
+import Utils.UTCTimeRange;
+import com.jidesoft.dialog.ButtonPanel;
+import com.jidesoft.dialog.StandardDialog;
+import com.myutils.logbrowser.inquirer.DatabaseConnector;
+import com.myutils.logbrowser.inquirer.MsgType;
+import com.myutils.logbrowser.inquirer.gui.AColumnFilter.PositionalFilter;
+import com.myutils.logbrowser.inquirer.inquirer;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -28,12 +37,10 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
-
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComponent;
-import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -52,17 +59,6 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
-
-import com.jidesoft.dialog.ButtonPanel;
-import com.jidesoft.dialog.StandardDialog;
-import com.myutils.logbrowser.inquirer.DatabaseConnector;
-import com.myutils.logbrowser.inquirer.MsgType;
-import com.myutils.logbrowser.inquirer.inquirer;
-import com.myutils.logbrowser.inquirer.gui.AColumnFilter.PositionalFilter;
-
-import Utils.Pair;
-import Utils.TableColumnAdjuster;
-import Utils.UTCTimeRange;
 
 /**
  *

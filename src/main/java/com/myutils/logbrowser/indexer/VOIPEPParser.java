@@ -11,13 +11,11 @@ import static com.myutils.logbrowser.indexer.VOIPEPParser.ParserState.STATE_JSON
 import static com.myutils.logbrowser.indexer.VOIPEPParser.ParserState.STATE_SIP_BODY;
 import static com.myutils.logbrowser.indexer.VOIPEPParser.ParserState.STATE_SIP_HEADER;
 import static com.myutils.logbrowser.indexer.VOIPEPParser.ParserState.STATE_SIP_HEADER_GSIPLIB;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import org.apache.commons.lang3.StringUtils;
 
 /**

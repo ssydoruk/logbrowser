@@ -5,7 +5,6 @@
 package com.myutils.logbrowser.inquirer;
 
 import com.myutils.logbrowser.indexer.ReferenceType;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 
 /**

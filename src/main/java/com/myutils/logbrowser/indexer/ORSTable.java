@@ -6,7 +6,6 @@ package com.myutils.logbrowser.indexer;
 
 import static Utils.Util.StripQuotes;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 
