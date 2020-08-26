@@ -170,8 +170,8 @@ public class ORSTable extends DBTable {
             stmt.setTimestamp(1, new Timestamp(orsRec.GetAdjustedUsecTime()));
 
             setFieldInt(stmt, 2, Main.getRef(ReferenceType.TEvent, orsRec.GetMessageName()));
-            setFieldInt(stmt, 3, Main.getRef(ReferenceType.DN, orsRec.getM_ThisDN()));
-            setFieldInt(stmt, 4, Main.getRef(ReferenceType.DN, orsRec.getAttribute("AttributeOtherDN")));
+            setFieldInt(stmt, 3, Main.getRef(ReferenceType.DN, Record.cleanDN(orsRec.getM_ThisDN())));
+            setFieldInt(stmt, 4, Main.getRef(ReferenceType.DN, Record.cleanDN(orsRec.getAttribute("AttributeOtherDN"))));
             setFieldInt(stmt, 5, Main.getRef(ReferenceType.Agent, orsRec.getHeaderTrim("AttributeAgentID")));
 
             setFieldInt(stmt, 6, Main.getRef(ReferenceType.ConnID, orsRec.GetConnID()));
@@ -191,8 +191,8 @@ public class ORSTable extends DBTable {
             setFieldInt(stmt, 20, Main.getRef(ReferenceType.TLIBATTR1, orsRec.getAttr1()));
             setFieldInt(stmt, 21, Main.getRef(ReferenceType.TLIBATTR2, orsRec.getAttr2()));
             setFieldInt(stmt, 22, orsRec.getORSCallID());
-            setFieldInt(stmt, 23, Main.getRef(ReferenceType.DN, orsRec.getDNIS()));
-            setFieldInt(stmt, 24, Main.getRef(ReferenceType.DN, orsRec.getANI()));
+            setFieldInt(stmt, 23, Main.getRef(ReferenceType.DN, Record.cleanDN(orsRec.getDNIS())));
+            setFieldInt(stmt, 24, Main.getRef(ReferenceType.DN, Record.cleanDN(orsRec.getANI())));
 
             getM_dbAccessor().SubmitStatement(m_InsertStatementId);
         } catch (SQLException e) {

@@ -105,7 +105,7 @@ public class IxnTable extends DBTable {
             setFieldInt(stmt, 6, Main.getRef(ReferenceType.TEvent, rec.GetMessageName()));
             setFieldInt(stmt, 7, Main.getRef(ReferenceType.IxnID, rec.GetIxnID()));
             setFieldInt(stmt, 8, Main.getRef(ReferenceType.IxnMedia, rec.GetMedia()));
-            setFieldInt(stmt, 9, Main.getRef(ReferenceType.DN, rec.GetIxnQueue()));
+            setFieldInt(stmt, 9, Main.getRef(ReferenceType.DN, Record.cleanDN(rec.GetIxnQueue())));
             stmt.setLong(10, rec.getM_refID());
             setFieldInt(stmt, 11, Main.getRef(ReferenceType.ConnID, rec.GetConnID()));
             stmt.setBoolean(12, rec.isInbound());

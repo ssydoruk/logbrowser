@@ -456,12 +456,12 @@ public class WWECloudParser extends Parser {
                 setFieldInt(stmt, 8, Main.getRef(ReferenceType.UUID, wweRec.getUUID()));
                 setFieldInt(stmt, 9, wweRec.getM_refID());
                 stmt.setBoolean(10, wweRec.isInbound());
-                setFieldInt(stmt, 11, Main.getRef(ReferenceType.DN, wweRec.getThisDN()));
+                setFieldInt(stmt, 11, Main.getRef(ReferenceType.DN, Record.cleanDN(wweRec.getThisDN())));
                 setFieldInt(stmt, 12, Main.getRef(ReferenceType.TEvent, wweRec.getEventName()));
                 setFieldInt(stmt, 13, wweRec.getSeqNo());
                 setFieldInt(stmt, 14, Main.getRef(ReferenceType.TEvent, wweRec.getIxnID()));
                 setFieldInt(stmt, 15, Main.getRef(ReferenceType.App, wweRec.getServerID()));
-                setFieldInt(stmt, 16, Main.getRef(ReferenceType.DN, wweRec.getOtherDN()));
+                setFieldInt(stmt, 16, Main.getRef(ReferenceType.DN, Record.cleanDN(wweRec.getOtherDN())));
                 setFieldInt(stmt, 17, Main.getRef(ReferenceType.Agent, wweRec.getAgent()));
 
                 getM_dbAccessor().SubmitStatement(m_InsertStatementId);

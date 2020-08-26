@@ -90,8 +90,8 @@ public class URSTlibTable extends DBTable {
         try {
             stmt.setTimestamp(1, new Timestamp(theRec.GetAdjustedUsecTime()));
             setFieldInt(stmt, 2, Main.getRef(ReferenceType.TEvent, theRec.GetMessageName()));
-            setFieldInt(stmt, 3, Main.getRef(ReferenceType.DN, theRec.getThisDN()));
-            setFieldInt(stmt, 4, Main.getRef(ReferenceType.DN, theRec.getOtherDN()));
+            setFieldInt(stmt, 3, Main.getRef(ReferenceType.DN, Record.cleanDN(theRec.getThisDN())));
+            setFieldInt(stmt, 4, Main.getRef(ReferenceType.DN, Record.cleanDN(theRec.getOtherDN())));
             setFieldInt(stmt, 5, Main.getRef(ReferenceType.Agent, theRec.getHeaderTrim("AttributeAgentID")));
             setFieldInt(stmt, 6, Main.getRef(ReferenceType.ConnID, theRec.GetConnID()));
             setFieldInt(stmt, 7, Main.getRef(ReferenceType.ConnID, theRec.GetTransferConnID()));
@@ -109,8 +109,8 @@ public class URSTlibTable extends DBTable {
             setFieldInt(stmt, 19, Main.getRef(ReferenceType.TLIBERROR, theRec.getErrorMessage(theRec.GetMessageName())));
             setFieldInt(stmt, 20, Main.getRef(ReferenceType.TLIBATTR1, theRec.getAttr1()));
             setFieldInt(stmt, 21, Main.getRef(ReferenceType.TLIBATTR2, theRec.getAttr2()));
-            setFieldInt(stmt, 22, Main.getRef(ReferenceType.DN, theRec.getDNIS()));
-            setFieldInt(stmt, 23, Main.getRef(ReferenceType.DN, theRec.getANI()));
+            setFieldInt(stmt, 22, Main.getRef(ReferenceType.DN, Record.cleanDN(theRec.getDNIS())));
+            setFieldInt(stmt, 23, Main.getRef(ReferenceType.DN,Record.cleanDN( theRec.getANI())));
 
             getM_dbAccessor().SubmitStatement(m_InsertStatementId);
         } catch (SQLException e) {

@@ -86,7 +86,7 @@ public class ProxiedTable extends DBTable {
             setFieldInt(stmt, 7, Main.getRef(ReferenceType.TEvent, rec.getEvent()));
             setFieldInt(stmt, 8, Main.getRef(ReferenceType.App, rec.getTo()));
             setFieldInt(stmt, 9, Main.getRef(ReferenceType.App, rec.getFrom()));
-            setFieldInt(stmt, 10, Main.getRef(ReferenceType.DN, rec.getDn()));
+            setFieldInt(stmt, 10, Main.getRef(ReferenceType.DN, Record.cleanDN(rec.getDn())));
             stmt.setInt(11, ProxiedMessage.m_tlibId);
             stmt.setInt(12, ProxiedMessage.m_handlerId);
             m_proxiedId++;

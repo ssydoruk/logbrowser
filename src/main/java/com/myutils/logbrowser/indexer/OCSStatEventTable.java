@@ -94,7 +94,7 @@ public class OCSStatEventTable extends DBTable {
             stmt.setInt(8, rec.getAgentDBID());
             setFieldInt(stmt, 9, Main.getRef(ReferenceType.Place, rec.getPlaceName()));
             stmt.setInt(10, rec.getPlaceDBID());
-            setFieldInt(stmt, 11, Main.getRef(ReferenceType.DN, OCSStatEvent.SingleQuotes(rec.getDN())));
+            setFieldInt(stmt, 11, Main.getRef(ReferenceType.DN, Record.cleanDN(rec.getDN())));
             setFieldInt(stmt, 12, Main.getRef(ReferenceType.StatType, rec.getStatType()));
 
             getM_dbAccessor().SubmitStatement(m_InsertStatementId);

@@ -93,7 +93,7 @@ public class OCSRecCreateTable extends DBTable {
             stmt.setInt(10, rec.getrecType());
             setFieldInt(stmt, 11, Main.getRef(ReferenceType.OCSCallList, rec.getCallingList()));
             setFieldInt(stmt, 12, Main.getRef(ReferenceType.OCSCallListTable, rec.getTabName()));
-            setFieldInt(stmt, 13, Main.getRef(ReferenceType.DN, rec.getDN()));
+            setFieldInt(stmt, 13, Main.getRef(ReferenceType.DN, Record.cleanDN(rec.getDN())));
             setFieldInt(stmt, 14, Main.getRef(ReferenceType.OCSRecordAction, rec.getAction()));
 
             getM_dbAccessor().SubmitStatement(m_InsertStatementId);

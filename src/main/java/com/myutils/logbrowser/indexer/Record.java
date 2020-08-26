@@ -7,6 +7,7 @@ package com.myutils.logbrowser.indexer;
 import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  *
@@ -45,6 +46,23 @@ public abstract class Record implements Cloneable {
 
     public static void resetCounter() {
         objCreated = 0;
+    }
+
+    private static final Pattern regDNWithHost = Pattern.compile("^(\\w+)\\.");
+
+    public static String cleanDN(String key) {
+        Matcher m;
+        String ret = NoQuotes(key);
+        if (StringUtils.isNotBlank(ret)) {
+            if (ret.startsWith("+")) {
+                ret = ret.substring(1);
+            }
+            if ((m = regDNWithHost.matcher(ret)).find()) {
+                ret = m.group(1);
+            }
+        }
+
+        return ret;
     }
 
     public static String NoQuotes(String key) {

@@ -111,7 +111,7 @@ public class IxnNonIxnTable extends DBTable {
             setFieldInt(stmt, 6, Main.getRef(ReferenceType.TEvent, rec.GetMessageName()));
             setFieldInt(stmt, 7, Main.getRef(ReferenceType.IxnID, rec.GetIxnID()));
             setFieldInt(stmt, 8, Main.getRef(ReferenceType.IxnMedia, rec.GetMedia()));
-            setFieldInt(stmt, 9, Main.getRef(ReferenceType.DN, rec.GetIxnQueue()));
+            setFieldInt(stmt, 9, Main.getRef(ReferenceType.DN, Record.cleanDN(rec.GetIxnQueue())));
             stmt.setLong(10, rec.getM_refID());
             setFieldInt(stmt, 11, Main.getRef(ReferenceType.ConnID, rec.GetConnID()));
             stmt.setBoolean(12, rec.isInbound());
@@ -122,7 +122,7 @@ public class IxnNonIxnTable extends DBTable {
             setFieldInt(stmt, 17, Main.getRef(ReferenceType.TLIBATTR1, rec.getAttr1()));
             setFieldInt(stmt, 18, Main.getRef(ReferenceType.TLIBATTR2, rec.getAttr2()));
             setFieldInt(stmt, 19, Main.getRef(ReferenceType.TEvent, rec.getUserEvent()));
-            setFieldInt(stmt, 20, Main.getRef(ReferenceType.DN, rec.getThisDN()));
+            setFieldInt(stmt, 20, Main.getRef(ReferenceType.DN, Record.cleanDN(rec.getThisDN())));
             getM_dbAccessor().SubmitStatement(m_InsertStatementId);
         } catch (SQLException e) {
             Main.logger.error("Could not add record type " + m_type.toString() + ": " + e, e);

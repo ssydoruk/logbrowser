@@ -84,7 +84,6 @@ class TableReference {
     }
 
     int getRef(String key, int wordsToCompare) {
-        CIString cis = new CIString(key);
         String[] split = StringUtils.split(key);
         Integer ref = null;
         for (Map.Entry<CIString, Integer> entry : valRef.entrySet()) {
@@ -100,9 +99,9 @@ class TableReference {
                 break;
             }
         }
-//        Main.logger.trace("getRef1 for " + type.toString() + " key [" + key + "] ret: " + ((ref == null) ? "NULL" : ref));
+        Main.logger.trace("getRef1 key [" + key + "] ret: " + ((ref == null) ? "NULL" : ref));
         if (ref == null) {
-            return putRef(cis);
+            return putRef(new CIString(key));
         } else {
             return ref;
         }
@@ -111,7 +110,7 @@ class TableReference {
     int getRef(String key) {
         CIString cis = new CIString(key);
         Integer ref = valRef.get(cis);
-//        Main.logger.trace("getRef1 for " + type.toString() + " key [" + key + "] ret: " + ((ref == null) ? "NULL" : ref));
+        Main.logger.trace("getRef key[" + key + "] ret[" + ((ref == null) ? "NULL" : ref) + "]");
         if (ref == null) {
             return putRef(cis);
         } else {
@@ -120,11 +119,10 @@ class TableReference {
     }
 
     private int putRef(CIString key) {
-//        Main.logger.trace("putRef1 for " + type.toString() + " key [" + key);
         if (key != null && key.length() > 0) {
             maxID++;
             valRef.put(key, maxID);
-            Main.logger.trace("putRef done " + maxID + " key [" + key.toString() + "]");
+            Main.logger.trace("putRef  key[" + key + "] id: " + maxID);
             return maxID;
         } else {
             return 0;

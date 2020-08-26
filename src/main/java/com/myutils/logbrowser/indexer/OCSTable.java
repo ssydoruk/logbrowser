@@ -107,8 +107,8 @@ public class OCSTable extends DBTable {
             setFieldInt(stmt, 5, rec.m_line);
 
             setFieldInt(stmt, 6, Main.getRef(ReferenceType.TEvent, rec.GetMessageName()));
-            setFieldInt(stmt, 7, Main.getRef(ReferenceType.DN, OcsMessage.SingleQuotes(rec.getM_ThisDN())));
-            setFieldInt(stmt, 8, Main.getRef(ReferenceType.DN, OcsMessage.SingleQuotes(rec.getOtherDN())));
+            setFieldInt(stmt, 7, Main.getRef(ReferenceType.DN, Record.cleanDN(rec.getM_ThisDN())));
+            setFieldInt(stmt, 8, Main.getRef(ReferenceType.DN, Record.cleanDN(rec.getOtherDN())));
 
             setFieldString(stmt, 9, "");//+ "agentID char(32),"
             setFieldInt(stmt, 10, Main.getRef(ReferenceType.ConnID, rec.GetConnID()));

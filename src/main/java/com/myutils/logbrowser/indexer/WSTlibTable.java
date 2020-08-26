@@ -74,8 +74,8 @@ public class WSTlibTable extends DBTable {
         try {
             stmt.setTimestamp(1, new Timestamp(theRec.GetAdjustedUsecTime()));
             setFieldInt(stmt, 2, Main.getRef(ReferenceType.TEvent, theRec.GetMessageName()));
-            setFieldInt(stmt, 3, Main.getRef(ReferenceType.DN, theRec.GetThisDN()));
-            setFieldInt(stmt, 4, Main.getRef(ReferenceType.DN, theRec.GetOtherDN()));
+            setFieldInt(stmt, 3, Main.getRef(ReferenceType.DN, Record.cleanDN(theRec.GetThisDN())));
+            setFieldInt(stmt, 4, Main.getRef(ReferenceType.DN, Record.cleanDN(theRec.GetOtherDN())));
             setFieldInt(stmt, 5, Main.getRef(ReferenceType.Agent, theRec.GetAgentID()));
             setFieldInt(stmt, 6, Main.getRef(ReferenceType.ConnID, theRec.GetConnID()));
             setFieldInt(stmt, 7, Main.getRef(ReferenceType.ConnID, theRec.GetTransferConnID()));

@@ -239,7 +239,7 @@ public class SIPProxyParser extends Parser {
                 m_LineStarted = m_CurrentLine;
 
                 if ((m = regConfigOneLineDN.matcher(str)).find()) {
-                    Main.logger.trace("-1-");
+//                    Main.logger.trace("-1-");
                     ConfigUpdateRecord msg = new ConfigUpdateRecord(str);
                     try {
                         msg.setObjectType("DN");
@@ -252,12 +252,12 @@ public class SIPProxyParser extends Parser {
                     }
 
                 } else if ((m = regConfigUpdate.matcher(s)).find()) {
-                    Main.logger.trace("-2-");
+//                    Main.logger.trace("-2-");
                     setSavedFilePos(getFilePos());
                     m_MessageContents.add(s.substring(m.end()));
                     m_ParserState = STATE_CONFIG;
                 } else if ((m = regProxy.matcher(s)).find()) {
-                    Main.logger.trace("-4-");
+//                    Main.logger.trace("-4-");
                     ProxiedMessage msg = new ProxiedMessage(m.group(1), s.substring(m.end()));
                     SetStdFieldsAndAdd(msg);
 
@@ -351,7 +351,7 @@ public class SIPProxyParser extends Parser {
 
 //</editor-fold>
                 } else if (s.endsWith(" <<<") || s.endsWith(" >>>")) {
-                    Main.logger.trace("-11-");
+//                    Main.logger.trace("-11-");
                     m_Header = s;
                     dpHeader = dp;
 
@@ -386,7 +386,7 @@ public class SIPProxyParser extends Parser {
                     break;
 
                 } else if (s.length() >= 12) {
-                    Main.logger.trace("-12-");
+//                    Main.logger.trace("-12-");
                     m_lastTime = s.substring(0, 12);
                     // !!!TODO: this is a hack based on knowledge that line before http message
                     // has a timestamp. VERY DANGEROUS

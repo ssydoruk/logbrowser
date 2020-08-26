@@ -259,13 +259,13 @@ public class SingleThreadParser extends Parser {
         Matcher m;
         GenesysMsg lastLogMsg;
 
+        Main.logger.trace("l:" + m_CurrentLine + "-" + m_ParserState + " s[" + str + "]");
         String s = str;
         switch (fileType) {
             case SIP_1536:
                 return ParseLine1536(input, str);
         }
 
-        Main.logger.trace("Parser state: " + m_ParserState);
         ParseCustom(str, (SipMessage.m_handlerInProgress ? SipMessage.m_handlerId : 0));
         switch (m_ParserState) {
             case STATE_HEADER: {
@@ -288,7 +288,6 @@ public class SingleThreadParser extends Parser {
                 m_LineStarted = m_CurrentLine;
 
                 if ((m = regConfigOneLineDN.matcher(str)).find()) {
-                    Main.logger.trace("-1-");
                     ConfigUpdateRecord msg = new ConfigUpdateRecord(str);
                     try {
                         msg.setObjectType("DN");
@@ -301,22 +300,18 @@ public class SingleThreadParser extends Parser {
                     }
 
                 } else if ((m = regConfigUpdate.matcher(s)).find()) {
-                    Main.logger.trace("-2-");
                     setSavedFilePos(getFilePos());
                     m_MessageContents.add(s.substring(m.end()));
                     m_ParserState = STATE_CONFIG;
                 } else if ((m = regTriggerStart.matcher(s)).find()) {
-                    Main.logger.trace("-3-");
                     HandleBlock(m.group(1), s.substring(m.end()));
 //                } else if (trimmed.contains(" Proxy(") || str.startsWith("Proxy(")) {
                 } else if ((m = regProxy.matcher(s)).find()) {
-                    Main.logger.trace("-4-");
                     ProxiedMessage msg = new ProxiedMessage(m.group(1), s.substring(m.end()));
                     SetStdFieldsAndAdd(msg);
 
                     return null;
                 } else if (s.contains("{tscp.call")) {
-                    Main.logger.trace("-5-");
                     HandleConnId(s);
                     return null;
                 } //<editor-fold defaultstate="collapsed" desc="reading sip">
@@ -408,7 +403,6 @@ public class SingleThreadParser extends Parser {
 
 //</editor-fold>
                 } else if ((regTBackupMessage.matcher(s)).find()) {
-                    Main.logger.trace("-7-");
 //                    setSavedFilePos(getFilePos());
 //                    m_MessageContents.add(s);
                     m_ParserState = STATE_TLIB_BACKUP_MESSAGE;
@@ -417,7 +411,7 @@ public class SingleThreadParser extends Parser {
 //                        && (str.contains("message ISCCEvent") || str.contains("message ISCCRequest"))) {
 
                 } else if ((m = regISCCHead.matcher(s)).find()) {
-                    Main.logger.trace("-8-");
+//                    Main.logger.trace("-8-");
                     String act = m.group(1);
                     inbound = (act.charAt(0) == 'R');
                     msgName = m.group(2);
@@ -451,7 +445,7 @@ public class SingleThreadParser extends Parser {
                     setSavedFilePos(getFilePos());
                     break;
                 } else if (s.contains("ConnectionId changed")) {
-                    Main.logger.trace("-19-");
+//                    Main.logger.trace("-19-");
                     m_MessageContents.clear();
                     m_MessageContents.add(s);
                     m_ParserState = STATE_CONNID_RECORD;
@@ -459,7 +453,7 @@ public class SingleThreadParser extends Parser {
                     break;
 
                 } else if (s.endsWith(" <<<") || s.endsWith(" >>>")) {
-                    Main.logger.trace("-11-");
+//                    Main.logger.trace("-11-");
                     m_Header = s;
                     dpHeader = dp;
 
@@ -514,7 +508,7 @@ public class SingleThreadParser extends Parser {
                     break;
 
                 } else if (s.length() >= 12) {
-                    Main.logger.trace("-12-");
+//                    Main.logger.trace("-12-");
                     m_lastTime = s.substring(0, 12);
                     // !!!TODO: this is a hack based on knowledge that line before http message
                     // has a timestamp. VERY DANGEROUS
@@ -1725,7 +1719,7 @@ public class SingleThreadParser extends Parser {
                 stmt.setLong(3, rec.m_fileOffset);
                 stmt.setLong(4, rec.getM_FileBytes());
                 stmt.setLong(5, rec.m_line);
-                setFieldInt(stmt, 6, Main.getRef(ReferenceType.DN, rec.getTrunk()));
+                setFieldInt(stmt, 6, Main.getRef(ReferenceType.DN, Record.cleanDN(rec.getTrunk())));
 
                 int baseRecNo = 7;
                 Map<String, String> attrs = rec.getAttrs();

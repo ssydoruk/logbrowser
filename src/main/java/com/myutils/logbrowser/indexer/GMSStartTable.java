@@ -85,7 +85,7 @@ public class GMSStartTable extends DBTable {
             setFieldInt(stmt, 7, Main.getRef(ReferenceType.GMSCallbackType, gmsRec.CallBackType()));
             setFieldInt(stmt, 8, Main.getRef(ReferenceType.GMSService, gmsRec.GMSService()));
             setFieldInt(stmt, 9, Main.getRef(ReferenceType.ORSSID, gmsRec.ORSSessionID()));
-            setFieldInt(stmt, 10, Main.getRef(ReferenceType.DN, gmsRec.getPhone()));
+            setFieldInt(stmt, 10, Main.getRef(ReferenceType.DN, Record.cleanDN(gmsRec.getPhone())));
             stmt.setBoolean(11, gmsRec.isInbound());
             setFieldInt(stmt, 12, Main.getRef(ReferenceType.ORSREQ, gmsRec.ORSURI()));
 

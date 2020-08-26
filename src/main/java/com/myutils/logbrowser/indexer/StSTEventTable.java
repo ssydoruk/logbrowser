@@ -76,7 +76,7 @@ public class StSTEventTable extends DBTable {
             setFieldInt(stmt, 3, Main.getRef(ReferenceType.DN, StSTEventMessage.SingleQuotes(theRec.getThisDN())));
             setFieldInt(stmt, 4, Main.getRef(ReferenceType.Switch, theRec.getSwitch()));
             setFieldInt(stmt, 5, Main.getRef(ReferenceType.App, theRec.getTServer()));
-            setFieldInt(stmt, 6, Main.getRef(ReferenceType.DN, theRec.getAttributeDN("AttributeOtherDN")));
+            setFieldInt(stmt, 6, Main.getRef(ReferenceType.DN, Record.cleanDN(theRec.getAttributeDN("AttributeOtherDN"))));
             setFieldInt(stmt, 7, Main.getRef(ReferenceType.Agent, theRec.getAgent()));
             setFieldInt(stmt, 8, Main.getRef(ReferenceType.ConnID, theRec.GetConnID()));
             setFieldInt(stmt, 9, Main.getRef(ReferenceType.ConnID, theRec.getAttributeTrim("AttributeFirstTransferConnID")));

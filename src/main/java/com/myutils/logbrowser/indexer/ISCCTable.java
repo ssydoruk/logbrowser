@@ -75,8 +75,8 @@ public class ISCCTable extends DBTable {
         try {
             stmt.setTimestamp(1, new Timestamp(theRec.GetAdjustedUsecTime()));
             setFieldInt(stmt, 2, Main.getRef(ReferenceType.ISCCEvent, theRec.GetMessageName()));
-            setFieldInt(stmt, 3, Main.getRef(ReferenceType.DN, IsccMessage.SingleQuotes(theRec.getThisDN())));
-            setFieldInt(stmt, 4, Main.getRef(ReferenceType.DN, IsccMessage.SingleQuotes(theRec.getOtherDN())));
+            setFieldInt(stmt, 3, Main.getRef(ReferenceType.DN, Record.cleanDN(theRec.getThisDN())));
+            setFieldInt(stmt, 4, Main.getRef(ReferenceType.DN, Record.cleanDN(theRec.getOtherDN())));
             setFieldInt(stmt, 5, Main.getRef(ReferenceType.ConnID, theRec.GetConnID()));
             stmt.setLong(6, theRec.getRefID());
             stmt.setBoolean(7, theRec.isInbound());

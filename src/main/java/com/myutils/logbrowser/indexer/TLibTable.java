@@ -7,6 +7,7 @@ package com.myutils.logbrowser.indexer;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  *
@@ -90,11 +91,18 @@ public class TLibTable extends DBTable {
         try {
             generateID(stmt, 1, theRec);
             stmt.setTimestamp(2, new Timestamp(theRec.GetAdjustedUsecTime()));
+
+            String agentID = Record.NoQuotes(theRec.getAttributeTrim("AttributeAgentID"));
+            String thisDN = Record.cleanDN(theRec.getThisDN());
+            if (StringUtils.equals(thisDN, agentID)) {
+                agentID = null;
+            }
+
             setFieldInt(stmt, 3, Main.getRef(ReferenceType.TEvent, theRec.GetMessageName()));
-            setFieldInt(stmt, 4, Main.getRef(ReferenceType.DN, theRec.getThisDN()));
-            setFieldInt(stmt, 5, Main.getRef(ReferenceType.DN, theRec.getAttributeDN("AttributeOtherDN")));
-            setFieldInt(stmt, 6, Main.getRef(ReferenceType.Agent, Record.NoQuotes(theRec.getAttributeTrim("AttributeAgentID"))));
-            setFieldInt(stmt, 7, Main.getRef(ReferenceType.DN, Record.SingleQuotes(theRec.getAttribute("AttributeANI"))));
+            setFieldInt(stmt, 4, Main.getRef(ReferenceType.DN, thisDN));
+            setFieldInt(stmt, 5, Main.getRef(ReferenceType.DN, Record.cleanDN(theRec.getAttributeDN("AttributeOtherDN"))));
+            setFieldInt(stmt, 6, Main.getRef(ReferenceType.Agent, agentID));
+            setFieldInt(stmt, 7, Main.getRef(ReferenceType.DN, Record.cleanDN((theRec.getAttribute("AttributeANI")))));
             setFieldInt(stmt, 8, Main.getRef(ReferenceType.ConnID, theRec.getConnID()));
             setFieldInt(stmt, 9, Main.getRef(ReferenceType.ConnID, theRec.GetTransferConnID()));
             setFieldLong(stmt, 10, theRec.getRefID());
@@ -116,7 +124,7 @@ public class TLibTable extends DBTable {
             setFieldInt(stmt, 24, Main.getRef(ReferenceType.TLIBERROR, theRec.getErrorMessage(theRec.GetMessageName())));
             setFieldInt(stmt, 25, Main.getRef(ReferenceType.TLIBATTR1, theRec.getAttr1()));
             setFieldInt(stmt, 26, Main.getRef(ReferenceType.TLIBATTR2, theRec.getAttr2()));
-            setFieldInt(stmt, 27, Main.getRef(ReferenceType.DN, theRec.getAttributeDN("AttributeDNIS")));
+            setFieldInt(stmt, 27, Main.getRef(ReferenceType.DN, Record.cleanDN(theRec.getAttributeDN("AttributeDNIS"))));
             setFieldInt(stmt, 28, Main.getRef(ReferenceType.Place, theRec.getAttributeDN("AttributePlace")));
             TLibMessage.SetTlibId(getCurrentID());
 

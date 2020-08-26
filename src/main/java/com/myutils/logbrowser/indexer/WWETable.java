@@ -106,15 +106,15 @@ public class WWETable extends DBTable {
             setFieldInt(stmt, 8, Main.getRef(ReferenceType.UUID, wweRec.getUUID()));
             setFieldInt(stmt, 9, wweRec.getM_refID());
             stmt.setBoolean(10, wweRec.isInbound());
-            setFieldInt(stmt, 11, Main.getRef(ReferenceType.DN, wweRec.getThisDN()));
+            setFieldInt(stmt, 11, Main.getRef(ReferenceType.DN, Record.cleanDN(wweRec.getThisDN())));
             setFieldInt(stmt, 12, Main.getRef(ReferenceType.TEvent, wweRec.getEventName()));
             setFieldInt(stmt, 13, wweRec.getSeqNo());
             setFieldInt(stmt, 14, Main.getRef(ReferenceType.TEvent, wweRec.getIxnID()));
             setFieldInt(stmt, 15, Main.getRef(ReferenceType.App, wweRec.getServerID()));
-            setFieldInt(stmt, 16, Main.getRef(ReferenceType.DN, wweRec.getOtherDN()));
+            setFieldInt(stmt, 16, Main.getRef(ReferenceType.DN, Record.cleanDN(wweRec.getOtherDN())));
             setFieldInt(stmt, 17, Main.getRef(ReferenceType.Agent, wweRec.getAgentID()));
-            setFieldInt(stmt, 18, Main.getRef(ReferenceType.DN, wweRec.getDNIS()));
-            setFieldInt(stmt, 19, Main.getRef(ReferenceType.DN, wweRec.getANI()));
+            setFieldInt(stmt, 18, Main.getRef(ReferenceType.DN, Record.cleanDN(wweRec.getDNIS())));
+            setFieldInt(stmt, 19, Main.getRef(ReferenceType.DN, Record.cleanDN(wweRec.getANI())));
 
             getM_dbAccessor().SubmitStatement(m_InsertStatementId);
         } catch (SQLException e) {

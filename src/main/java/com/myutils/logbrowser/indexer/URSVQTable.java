@@ -74,7 +74,7 @@ public class URSVQTable extends DBTable {
 
             setFieldInt(stmt, 6, Main.getRef(ReferenceType.ConnID, rec.GetConnID()));
             setFieldInt(stmt, 7, Main.getRef(ReferenceType.VQID, rec.getVQID()));
-            setFieldInt(stmt, 8, Main.getRef(ReferenceType.DN, rec.getVqName()));
+            setFieldInt(stmt, 8, Main.getRef(ReferenceType.DN, Record.cleanDN(rec.getVqName())));
             setFieldInt(stmt, 9, Main.getRef(ReferenceType.URSTarget, rec.getTarget()));
 //                setFieldString(stmt,11, rec.getCgMsg());
 

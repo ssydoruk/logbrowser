@@ -52,7 +52,7 @@ public class StSActionTable extends DBTable {
 
         try {
             stmt.setTimestamp(1, new Timestamp(theRec.GetAdjustedUsecTime()));
-            setFieldInt(stmt, 2, Main.getRef(ReferenceType.DN, StSActionMessage.SingleQuotes(theRec.GetName())));
+            setFieldInt(stmt, 2, Main.getRef(ReferenceType.DN, Record.cleanDN(theRec.GetName())));
             setFieldInt(stmt, 3, Main.getRef(ReferenceType.DNTYPE, theRec.GetType()));
             setFieldInt(stmt, 4, Main.getRef(ReferenceType.StatEvent, theRec.GetValue()));
             setFieldInt(stmt, 5, Main.getRef(ReferenceType.ConnID, theRec.GetConnID()));

@@ -100,8 +100,8 @@ public class OCSIxnTable extends DBTable {
             setFieldInt(stmt, 6, Main.getRef(ReferenceType.TEvent, rec.GetMessageName()));
             setFieldInt(stmt, 7, Main.getRef(ReferenceType.IxnID, rec.GetIxnID()));
             setFieldInt(stmt, 8, Main.getRef(ReferenceType.IxnMedia, rec.GetMedia()));
-            setFieldInt(stmt, 9, Main.getRef(ReferenceType.DN, rec.GetIxnQueue()));
-            setFieldInt(stmt, 10, Main.getRef(ReferenceType.DN, rec.GetOutPhone()));
+            setFieldInt(stmt, 9, Main.getRef(ReferenceType.DN, Record.cleanDN(rec.GetIxnQueue())));
+            setFieldInt(stmt, 10, Main.getRef(ReferenceType.DN, Record.cleanDN(rec.GetOutPhone())));
             stmt.setLong(11, rec.getRecHandle());
             stmt.setLong(12, rec.getM_refID());
             stmt.setLong(13, rec.getChainID());
