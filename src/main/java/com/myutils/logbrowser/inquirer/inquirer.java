@@ -2,7 +2,7 @@ package com.myutils.logbrowser.inquirer;
 
 import Utils.ScreenInfo;
 import com.google.gson.Gson;
-import com.google.gson.stream.JsonReader;
+import com.google.gson.GsonBuilder;
 import com.jidesoft.dialog.ButtonPanel;
 import com.jidesoft.dialog.StandardDialog;
 import com.myutils.logbrowser.indexer.FileInfoType;
@@ -18,6 +18,7 @@ import java.beans.XMLDecoder;
 import java.beans.XMLEncoder;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -25,6 +26,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.URISyntaxException;
@@ -45,6 +47,7 @@ import java.util.Iterator;
 import java.util.jar.Attributes;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
+import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
@@ -280,29 +283,43 @@ public class inquirer {
 
     }
 
-    static public void saveCR() {
+    static public void saveCR() throws IOException {
         FileOutputStream fos = null;
         ObjectOutputStream out = null;
+        boolean jsonWritten = false;
 
-        try {
-            fos = new FileOutputStream(config);
-            if (useXMLSerializer) {
-                try (XMLEncoder encoder = new XMLEncoder(new BufferedOutputStream(fos))) {
-                    encoder.writeObject(cr);
-                }
-            } else {
-                GZIPOutputStream gz = new GZIPOutputStream(fos);
-                out = new ObjectOutputStream(gz);
-                out.writeObject(cr);
-                out.close();
+        if (config.toLowerCase().endsWith(".json")) {
+            try (BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(config), "UTF-8"))) {
+                Gson gson = new GsonBuilder().enableComplexMapKeySerialization().setPrettyPrinting().create();
+                gson.toJson(cr, bufferedWriter);
+                jsonWritten = true;
+
+            } catch (IOException ex) {
+                java.util.logging.Logger.getLogger(inquirer.class.getName()).log(Level.SEVERE, null, ex);
             }
+        }
+
+        if (!jsonWritten) {
+            try {
+                fos = new FileOutputStream(config);
+                if (useXMLSerializer) {
+                    try (XMLEncoder encoder = new XMLEncoder(new BufferedOutputStream(fos))) {
+                        encoder.writeObject(cr);
+                    }
+                } else {
+                    GZIPOutputStream gz = new GZIPOutputStream(fos);
+                    out = new ObjectOutputStream(gz);
+                    out.writeObject(cr);
+                    out.close();
+                }
 
 //            fos = new FileOutputStream(configXML);
 //            XMLEncoder encoder = new XMLEncoder(new BufferedOutputStream(fos));
 //            encoder.writeObject(cr);
 //            encoder.close();
-        } catch (IOException ex) {
-            ExceptionHandler.handleException("error saving settings", ex);
+            } catch (IOException ex) {
+                ExceptionHandler.handleException("error saving settings", ex);
+            }
         }
 
     }
@@ -615,42 +632,50 @@ public class inquirer {
         if (cr == null) {
             File f = new File(file);
             if (f.exists()) {
-                FileInputStream fis = null;
-                ObjectInputStream in = null;
-                try {
-                    fis = new FileInputStream(f);
-                    if (f.getAbsolutePath().toLowerCase().endsWith(".json")) {
-                        try (JsonReader reader = new JsonReader(new InputStreamReader(fis, "UTF-8"))) {
-                            cr = new Gson().fromJson(reader, com.myutils.logbrowser.inquirer.InquirerCfg.class);
-                        }
+                boolean crRead = false;
+                if (f.getAbsolutePath().toLowerCase().endsWith(".json")) {
 
-                    } else if (useXMLSerializer) {
-                        XMLDecoder decoder = null;
-                        decoder = new XMLDecoder(new BufferedInputStream(fis));
-                        cr = (com.myutils.logbrowser.inquirer.InquirerCfg) decoder.readObject();
-                        decoder.close();
-                    } else {
-                        GZIPInputStream gz = new GZIPInputStream(fis);
-                        in = new ObjectInputStream(gz);
-                        cr = (com.myutils.logbrowser.inquirer.InquirerCfg) in.readObject();
-                        in.close();
+                    try (InputStreamReader streamReader = new InputStreamReader(new FileInputStream(file), "UTF-8")) {
+                        Gson gson = new GsonBuilder().enableComplexMapKeySerialization().setPrettyPrinting()
+                                .create();
+                        cr = gson.fromJson(streamReader, com.myutils.logbrowser.inquirer.InquirerCfg.class);
+                        crRead = true;
+
+                    } catch (IOException | com.google.gson.JsonSyntaxException ex) {
+                        logger.error("", ex);
                     }
-                } catch (IOException ex) {
-                    ExceptionHandler.handleException("IOException reading settings", ex);
-                    queryDialogSettings = null;
+                    if (!crRead) {
+                        try {
+                            if (useXMLSerializer) {
+                                try (XMLDecoder decoder = new XMLDecoder(new BufferedInputStream(new FileInputStream(f)))) {
+                                    cr = (com.myutils.logbrowser.inquirer.InquirerCfg) decoder.readObject();
+                                }
+                            } else {
+                                try (GZIPInputStream gz = new GZIPInputStream(new FileInputStream(f))) {
+                                    ObjectInputStream in = new ObjectInputStream(gz);
+                                    cr = (com.myutils.logbrowser.inquirer.InquirerCfg) in.readObject();
+                                }
+                            }
+                        } catch (IOException ex) {
+                            ExceptionHandler.handleException("IOException reading settings", ex);
+                            queryDialogSettings = null;
 //            } catch (ClassNotFoundException ex) {
 //                logger.error("ClassNotFoundException reading settings", ex);
 //                queryDialigSettings = null;
-                } catch (ClassNotFoundException ex) {
-                    ExceptionHandler.handleException("Exception reading settings", ex);
-                    queryDialogSettings = null;
+                        } catch (ClassNotFoundException ex) {
+                            ExceptionHandler.handleException("Exception reading settings", ex);
+                            queryDialogSettings = null;
+                        }
+                    }
+
                 }
-            }
-            if (cr == null) {//default hardcoded settings
-                cr = new InquirerCfg();
+                if (cr == null) {//default hardcoded settings
+                    cr = new InquirerCfg();
+                }
             }
         }
         return cr;
+
     }
 
     public static void getRefSettings() {

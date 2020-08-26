@@ -8,7 +8,6 @@ import com.jidesoft.dialog.JideOptionPane;
 import com.jidesoft.dialog.StandardDialog;
 import static com.jidesoft.dialog.StandardDialog.RESULT_AFFIRMED;
 import static com.jidesoft.dialog.StandardDialog.RESULT_CANCELLED;
-import com.jidesoft.plaf.LookAndFeelFactory;
 import com.jidesoft.swing.JideTabbedPane;
 import com.jidesoft.swing.TabEditingValidator;
 import com.myutils.logbrowser.indexer.FileInfoType;
@@ -112,19 +111,23 @@ public class QueryDialog extends javax.swing.JFrame {
         this.queries = queries;
         jpTabs.setLayout(new BoxLayout(jpTabs, BoxLayout.LINE_AXIS));
 //        jpTabs.add(new TabbedPaneDemo(),BorderLayout.CENTER);
-        LookAndFeelFactory.installDefaultLookAndFeelAndExtension();
+//        LookAndFeelFactory.installDefaultLookAndFeelAndExtension();
 
-        jpTabs.add(createTabbedPane());
+        try {
+            jpTabs.add(createTabbedPane());
 //        jcbSelection.setText(id);
-        reSetSelection();
-        inquirer.getCr();
-        setTitle(inquirer.getDialogTitle(getTitle()));
+            reSetSelection();
+            inquirer.getCr();
+            setTitle(inquirer.getDialogTitle(getTitle()));
 
-        aggregatePanel = new JPanel();
+            aggregatePanel = new JPanel();
 //        scrollPane.setPreferredSize(new Dimension(800, 512));
-        aggregatePanel.setLayout(new BorderLayout());
-        tabbedPane.addTab("Aggregates", aggregatePanel);
-        pack();
+            aggregatePanel.setLayout(new BorderLayout());
+            tabbedPane.addTab("Aggregates", aggregatePanel);
+            pack();
+        } catch (Exception e) {
+            logger.error("Cannot create dialog, ", e);
+        }
     }
 
     private JPanel aggregatePanel;
