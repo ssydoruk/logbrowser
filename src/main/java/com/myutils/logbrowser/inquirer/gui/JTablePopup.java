@@ -16,6 +16,7 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.regex.Pattern;
 import javax.swing.JOptionPane;
@@ -241,7 +242,7 @@ public abstract class JTablePopup extends JTable {
         return null;
     }
 
-    protected SearchExtract findExtract(MsgType t) {
+    protected SearchExtract findExtract(MsgType t) throws IOException {
         if (searchExtract == null) {
             searchExtract = new SearchExtract(null, true);
         }

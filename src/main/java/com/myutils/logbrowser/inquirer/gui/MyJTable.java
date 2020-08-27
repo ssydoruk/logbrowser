@@ -618,78 +618,82 @@ public class MyJTable extends JTableCommon {
         @Override
         public void actionPerformed(ActionEvent e) {
 
-            TabResultDataModel model = (TabResultDataModel) tab.getModel();
+            try {
+                TabResultDataModel model = (TabResultDataModel) tab.getModel();
 
-            SearchExtract showFind = null;
-            boolean addRows = false;
-            int sampleRowsCnt = 3;
-            boolean cancelled = false;
-            int rowNo = tab.convertRowIndexToModel(popupRow);
-            TabResultDataModel.TableRow tableRow = ((TabResultDataModel) getModel()).getRow(rowNo);
+                SearchExtract showFind = null;
+                boolean addRows = false;
+                int sampleRowsCnt = 3;
+                boolean cancelled = false;
+                int rowNo = tab.convertRowIndexToModel(popupRow);
+                TabResultDataModel.TableRow tableRow = ((TabResultDataModel) getModel()).getRow(rowNo);
 
-            while (!cancelled && (showFind = findExtract(tableRow.getRowType())) != null) {
-                if (showFind.isMultipleRows()) {
-                    addMultipleRows(model, showFind);
-                    cancelled = true;
-                } else {
-
-                    ArrayList<SearchExtract.SearchSample> sampleRows = model.getSampleRows(showFind, rowNo, sampleRowsCnt);
-                    if (sampleRows == null) {
-                        int showConfirmDialog = inquirer.showConfirmDialog(null, "Nothing found", "Do you want to change search parameters", JOptionPane.YES_NO_OPTION);
-                        if (showConfirmDialog == JOptionPane.NO_OPTION) {
-                            cancelled = true;
-
-                        } else {
-
-                        }
+                while (!cancelled && (showFind = findExtract(tableRow.getRowType())) != null) {
+                    if (showFind.isMultipleRows()) {
+                        addMultipleRows(model, showFind);
+                        cancelled = true;
                     } else {
-                        DefaultTableModel infoTableModel = new DefaultTableModel();
-                        infoTableModel.addColumn("Matched string");
-                        infoTableModel.addColumn("result string");
-                        for (SearchExtract.SearchSample entry : sampleRows) {
-                            infoTableModel.addRow(new Object[]{entry.getKey(), entry.getValue()});
-                        }
 
-                        JTable tab = new JTable(infoTableModel);
-                        tab.getTableHeader().setVisible(true);
+                        ArrayList<SearchExtract.SearchSample> sampleRows = model.getSampleRows(showFind, rowNo, sampleRowsCnt);
+                        if (sampleRows == null) {
+                            int showConfirmDialog = inquirer.showConfirmDialog(null, "Nothing found", "Do you want to change search parameters", JOptionPane.YES_NO_OPTION);
+                            if (showConfirmDialog == JOptionPane.NO_OPTION) {
+                                cancelled = true;
 
-                        Dimension d = tab.getPreferredSize();
-                        JPanel jScrollPane = new JPanel(new BorderLayout());
-                        jScrollPane.add(tab);
-                        jScrollPane.setPreferredSize(d);
+                            } else {
 
-                        JPanel infoPanel = new JPanel(new BorderLayout());
-                        JTextArea lb = new JTextArea();
-                        lb.setText("Below are samples found by specified expression.\n\n"
-                                + "Please make sure that it is what you want\n"
-                                + "Press\n"
-                                + "Yes - you want add these rows to the table\n"
-                                + "No - you want to change search expression\n"
-                                + "Cancel - you want to terminate the dialog");
-                        lb.setFocusable(false);
+                            }
+                        } else {
+                            DefaultTableModel infoTableModel = new DefaultTableModel();
+                            infoTableModel.addColumn("Matched string");
+                            infoTableModel.addColumn("result string");
+                            for (SearchExtract.SearchSample entry : sampleRows) {
+                                infoTableModel.addRow(new Object[]{entry.getKey(), entry.getValue()});
+                            }
 
-                        infoPanel.add(lb, BorderLayout.NORTH);
+                            JTable tab = new JTable(infoTableModel);
+                            tab.getTableHeader().setVisible(true);
+
+                            Dimension d = tab.getPreferredSize();
+                            JPanel jScrollPane = new JPanel(new BorderLayout());
+                            jScrollPane.add(tab);
+                            jScrollPane.setPreferredSize(d);
+
+                            JPanel infoPanel = new JPanel(new BorderLayout());
+                            JTextArea lb = new JTextArea();
+                            lb.setText("Below are samples found by specified expression.\n\n"
+                                    + "Please make sure that it is what you want\n"
+                                    + "Press\n"
+                                    + "Yes - you want add these rows to the table\n"
+                                    + "No - you want to change search expression\n"
+                                    + "Cancel - you want to terminate the dialog");
+                            lb.setFocusable(false);
+
+                            infoPanel.add(lb, BorderLayout.NORTH);
 //                     infoPanel.setPreferredSize(new Dimension(640, 480));
-                        switch (inquirer.showYesNoPanel((Window) getRootPane().getParent(),
-                                "Found following rows ( out of sample " + sampleRowsCnt + ")", infoPanel, jScrollPane, JOptionPane.YES_NO_CANCEL_OPTION)) {
-                            case JOptionPane.CANCEL_OPTION:
-                                cancelled = true;
-                                break;
+                            switch (inquirer.showYesNoPanel((Window) getRootPane().getParent(),
+                                    "Found following rows ( out of sample " + sampleRowsCnt + ")", infoPanel, jScrollPane, JOptionPane.YES_NO_CANCEL_OPTION)) {
+                                case JOptionPane.CANCEL_OPTION:
+                                    cancelled = true;
+                                    break;
 
-                            case JOptionPane.NO_OPTION:
-                                break;
+                                case JOptionPane.NO_OPTION:
+                                    break;
 
-                            case JOptionPane.YES_OPTION:
-                                cancelled = true;
-                                addRows = true;
-                                break;
-                        };
+                                case JOptionPane.YES_OPTION:
+                                    cancelled = true;
+                                    addRows = true;
+                                    break;
+                            };
 
+                        }
+                    }
+                    if (addRows && showFind != null) {
+                        model.addRegexRow(showFind, rowNo);
                     }
                 }
-                if (addRows && showFind != null) {
-                    model.addRegexRow(showFind, rowNo);
-                }
+            } catch (IOException ex) {
+                logger.fatal("", ex);
             }
         }
 
