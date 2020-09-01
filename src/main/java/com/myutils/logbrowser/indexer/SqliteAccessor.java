@@ -14,8 +14,9 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -516,7 +517,7 @@ public final class SqliteAccessor extends Thread implements DBAccessor {
     }
 
     public ResultSet executeQuery(String query) throws Exception {
-        long timeStart = new Date().getTime();
+        Instant timeStart = Instant.now();
 
         Statement stmt = getM_conn().createStatement();
         stmt.closeOnCompletion();
@@ -526,8 +527,7 @@ public final class SqliteAccessor extends Thread implements DBAccessor {
 //            Explain(stmt, query);
 //        }
         ResultSet ret = stmt.executeQuery(query);
-        long timeEnd = new Date().getTime();
-        Main.logger.debug("\tExecuteQuery execution took " + pDuration(timeEnd - timeStart));
+        Main.logger.debug("\tExecuteQuery execution took " + pDuration(Duration.between(Instant.now(), timeStart).toMillis()));
         return ret;
 
     }
@@ -535,14 +535,13 @@ public final class SqliteAccessor extends Thread implements DBAccessor {
     public Integer[] getIDs(String query) throws Exception {
         ArrayList<Integer> ret = new ArrayList();
 
-        long timeStart = new Date().getTime();
+        Instant timeStart = Instant.now();
 
         try (Statement stmt = getM_conn().createStatement()) {
             Main.logger.debug("[" + query + "]");
 
             try (ResultSet rs = stmt.executeQuery(query)) {
-                long timeEnd = new Date().getTime();
-                Main.logger.debug("\t Execution took " + pDuration(timeEnd - timeStart));
+                Main.logger.debug("\t Execution took " + pDuration(Duration.between(Instant.now(), timeStart).toMillis()));
 
                 ResultSetMetaData rsmd = rs.getMetaData();
 

@@ -7,9 +7,7 @@ package com.myutils.logbrowser.indexer;
 import Utils.Pair;
 import static Utils.Util.StripQuotes;
 import static Utils.Util.intOrDef;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.regex.Matcher;
@@ -77,13 +75,7 @@ public abstract class Message extends Record {
         return ret;
     }
 
-    public static void AdjustTimestamps(long time) {
-        Date dateTime = new Date();
-        dateTime.setTime(time);
-        m_CurrentDate = (new SimpleDateFormat("yyyy-MM-dd")).format(dateTime);
-        m_CurrentDateStartTime = (new SimpleDateFormat("HH:mm:ss.SSS")).format(dateTime);
-    }
-
+ 
     public static void SetTimezone(long offset) {
         m_timezone = offset;
     }
@@ -793,7 +785,7 @@ public abstract class Message extends Record {
     public long GetAdjustedUsecTime() {
         DateParsed m_TimestampDP1 = getM_TimestampDP();
         if (m_TimestampDP1 != null) {
-            return m_TimestampDP1.fmtDate.getTime();
+            return m_TimestampDP1.getUTCms();
         }
         return 0;
     }

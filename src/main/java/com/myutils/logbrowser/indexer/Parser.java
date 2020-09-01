@@ -6,15 +6,17 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.ResolverStyle;
+import java.time.temporal.TemporalAccessor;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -142,8 +144,7 @@ public abstract class Parser {
     private FileInfoType m_type;
     private DateParsers dateParsers = new DateParsers();
     protected FileInfo fileInfo;
-    private Date lastKnownDate = null;
-    Calendar cal;
+    private LocalDateTime lastKnownDate = null;
 
     private FilesParseSettings.FileParseSettings fileParseSettings;
     private int lastChangeValue = 0;
@@ -161,7 +162,6 @@ public abstract class Parser {
 
     public Parser(FileInfoType type, HashMap<TableType, DBTable> tables) {
         super();
-        cal = Calendar.getInstance();
 
         m_MessageContents = new ArrayList<>();
         m_tables = tables;
@@ -550,32 +550,15 @@ public abstract class Parser {
 //        return ret;
 //    }
     public DateParsed ParseFormatDate(String s) throws Exception {
-        DateParsed ret = adjustDay(dateParsers.parseFormatDate(s), fileInfo.getFileLocalTime());
-        commitDateParsers();
-        return ret;
-    }
+        DateParsed ret = dateParsers.parseFormatDate(s, lastKnownDate);
 
-    public int CharOccurences(StringBuilder s, char c) {
-        int ret = 0;
-        for (int i = 0; i < s.length(); i++) {
-            if (s.charAt(i) == c) {
-                ret++;
-            }
-        }
-        return ret;
-    }
-
-    public int CountStrings(StringBuilder sipBuf, String search) {
-        int ret = 0, idx = 0;
-
-        while (true) {
-            if ((idx = sipBuf.indexOf(search, idx)) >= 0) {
-                ret++;
-                idx += search.length();
-            } else {
-                break;
+        if (ret != null) {
+            lastKnownDate = ret.fmtDate;
+            if (isParseTimeDiff()) {
+                dateDiff.newDate(ret, FileInfo.getFileId(), fileInfo.getAppNameID(), getFilePos(), getEndFilePos() - getFilePos(), m_LineStarted);
             }
 
+            commitDateParsers();
         }
         return ret;
     }
@@ -640,39 +623,36 @@ public abstract class Parser {
 
     private DateParsed adjustDay(DateParsed parseDate, DateParsed fileLocalDate) {
         if (parseDate != null) {
-            cal.setTime(parseDate.fmtDate);
-            if (cal.get(Calendar.YEAR) == 1970) {
-                if (lastKnownDate == null) {
-                    lastKnownDate = fileLocalDate.fmtDate;
-                }
-                if (lastKnownDate == null) {
-                    Main.logger.error("No last known date");
-                } else {
-                    cal.setTime(lastKnownDate);
-                    int year = cal.get(Calendar.YEAR);
-                    int month = cal.get(Calendar.MONTH);
-                    int day = cal.get(Calendar.DAY_OF_MONTH);
-                    cal.setTime(parseDate.fmtDate);
-                    cal.set(year, month, day);
-                    parseDate.fmtDate = cal.getTime();
-                    long timeLastKnown = lastKnownDate.getTime();
-                    long timeNew = parseDate.fmtDate.getTime();
-                    if (timeNew - timeLastKnown < -36000) {// 10 hours; means we crossed the day while in file
-                        parseDate.addDay();
-                    }
-                    lastKnownDate = parseDate.fmtDate;
-                }
-            } else {
-                lastKnownDate = parseDate.fmtDate;
-            }
-
-            if (isParseTimeDiff()) {
-                dateDiff.newDate(parseDate, FileInfo.getFileId(), fileInfo.getAppNameID(), getFilePos(), getEndFilePos() - getFilePos(), m_LineStarted);
-            }
-            return parseDate;
+//            cal.setTime(parseDate.fmtDate);
+//            if (cal.get(Calendar.YEAR) == 1970) {
+//                if (lastKnownDate == null) {
+//                    lastKnownDate = fileLocalDate.fmtDate;
+//                }
+//                if (lastKnownDate == null) {
+//                    Main.logger.error("No last known date");
+//                } else {
+//                    cal.setTime(lastKnownDate);
+//                    int year = cal.get(Calendar.YEAR);
+//                    int month = cal.get(Calendar.MONTH);
+//                    int day = cal.get(Calendar.DAY_OF_MONTH);
+//                    cal.setTime(parseDate.fmtDate);
+//                    cal.set(year, month, day);
+//                    parseDate.fmtDate = cal.getTime();
+//                    long timeLastKnown = lastKnownDate.getTime();
+//                    long timeNew = parseDate.fmtDate.getTime();
+//                    if (timeNew - timeLastKnown < -36000) {// 10 hours; means we crossed the day while in file
+//                        parseDate.addDay();
+//                    }
+//                    lastKnownDate = parseDate.fmtDate;
+//                }
         } else {
-            return null;
+            lastKnownDate = parseDate.fmtDate;
         }
+
+        if (isParseTimeDiff()) {
+            dateDiff.newDate(parseDate, FileInfo.getFileId(), fileInfo.getAppNameID(), getFilePos(), getEndFilePos() - getFilePos(), m_LineStarted);
+        }
+        return parseDate;
     }
 
     private boolean ignoreFileDates(FileInfo fileInfo) {
@@ -733,6 +713,7 @@ public abstract class Parser {
 //            custAttrTab.AddToDB(ca);
 //
 //        }
+
     }
 
     public static class DateFmt {
@@ -740,23 +721,21 @@ public abstract class Parser {
         Pattern pattern;
 
         String fmt;
-        private SimpleDateFormat formatter = null;
+        private DateTimeFormatter formatter = null;
         ArrayList<Pair<String, String>> repl = null;
+        DateIncluded isDateIncluded;
 
-        public DateFmt(String p, String fmt) {
+        public DateFmt(String p, String fmt, DateIncluded dateIncluded) {
             this.pattern = Pattern.compile(p);
             this.fmt = fmt;
+            isDateIncluded = dateIncluded;
             if (fmt != null) {
-                formatter = new SimpleDateFormat(fmt);
-                formatter.setLenient(true);
-                Calendar cal = Calendar.getInstance(Locale.US);
-                cal.set(2000, 0, 1);
-                formatter.set2DigitYearStart(cal.getTime());
+                formatter = DateTimeFormatter.ofPattern(fmt).withResolverStyle(ResolverStyle.LENIENT);
             }
         }
 
         DateFmt(String p, String fmt, Element el) {
-            this(p, fmt);
+            this(p, fmt, DateIncluded.DATE_UNKNOWN);
 
             NodeList nl = el.getChildNodes();
             if (nl != null && nl.getLength() > 0) {
@@ -796,13 +775,32 @@ public abstract class Parser {
             return repl == null;
         }
 
-        public Date parseDate(String d) throws ParseException {
-            return formatter.parse(d);
+        public LocalDateTime parseDate(String d, LocalDateTime lastKnownDate) throws ParseException {
+//            LocalDateTime parse = formatter.parse(fmt, query);
+            switch (isDateIncluded) {
+                case DATE_INCUDED:
+                    return LocalDateTime.parse(d, formatter);
+
+                default:
+                    TemporalAccessor parse = formatter.parse(d);
+                    if (parse.isSupported(java.time.temporal.ChronoField.YEAR)) {
+                        return LocalDateTime.from(parse);
+                    } else {
+                        LocalTime t = LocalTime.from(parse);
+                        if (lastKnownDate == null) {
+                            lastKnownDate = LocalDateTime.now();
+                        }
+                        LocalDateTime ret = LocalDateTime.of(lastKnownDate.toLocalDate(), t);
+                        return (Duration.between(lastKnownDate, ret).toHours() <= -10) ? ret.plusDays(1) : ret;
+
+                    }
+
+            }
         }
 
-        Date parseDate(String d, Matcher m) throws ParseException {
+        LocalDateTime parseDate(String d, Matcher m, LocalDateTime lastKnownDate) throws ParseException {
             if (repl == null) {
-                return parseDate(d);
+                return parseDate(d, lastKnownDate);
             } else {
                 StringBuilder s = new StringBuilder(d);
                 for (Pair<String, String> pair : repl) {
@@ -812,10 +810,9 @@ public abstract class Parser {
                     }
                 }
                 Main.logger.trace("ParseDate replaced src[" + d + "] res[" + s.toString() + "]");
-                return parseDate(s.toString());
+                return parseDate(s.toString(), lastKnownDate);
             }
         }
-
     }
 
     class CustomRegexLine extends Message {
@@ -1057,7 +1054,7 @@ public abstract class Parser {
 
     }
 
-    //<editor-fold defaultstate="collapsed" desc="comment">
+//<editor-fold defaultstate="collapsed" desc="comment">
     class CustomAttribute extends Record {
 
         private CustomAttribute(String key, String key0, Integer value) {
@@ -1148,4 +1145,26 @@ public abstract class Parser {
         }
 
     }
+
+    public static void main(String[] args) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss.SSS");
+//        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss.SSS").withResolverStyle(ResolverStyle.SMART);
+//            LocalDateTime parse = formatter.parse("20:22:45.234");
+//        TemporalAccessor parse = formatter.parse("2020/12/13 20:22:45.234", LocalDateTime::from);
+//        Instant i = Instant.from(parse);
+
+//            if (parse.isSupported(java.time.temporal.ChronoField.YEAR)) {
+//                LocalDateTime dt = LocalDateTime.from(parse);
+//            }
+//            System.out.println(parse.isSupported(java.time.temporal.ChronoField.YEAR));
+//            LocalDateTime dt = LocalDateTime.from(parse);
+//            System.out.println("d: " + parse.toString() + " dt:" + dt.toString());
+    }
+
+    public static enum DateIncluded {
+        DATE_INCUDED,
+        DATE_NOT_INCLUDED,
+        DATE_UNKNOWN
+    }
+
 }

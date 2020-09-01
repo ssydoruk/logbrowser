@@ -280,9 +280,9 @@ public class SIPEPParser extends Parser {
 //                    setSavedFilePos(getFilePos());
                         sipBuf.append(input.readBytes(m_PacketLength - 2)); // SIP EP logger truncates trailing new line
                         int bytesRead = input.getLastBytesConsumed();
-                        int addBytes = CountStrings(sipBuf, "\r\r");
-                        int nR = CharOccurences(sipBuf, '\r');
-                        int nN = CharOccurences(sipBuf, '\n');
+                        int addBytes = Utils.StringUtils.CountStrings(sipBuf, "\r\r");
+                        int nR = Utils.StringUtils.CharOccurences(sipBuf, '\r');
+                        int nN = Utils.StringUtils.CharOccurences(sipBuf, '\n');
                         if (addBytes > 0) {
                             sipBuf.append(input.readBytes(addBytes));
                             bytesRead += input.getLastBytesConsumed();

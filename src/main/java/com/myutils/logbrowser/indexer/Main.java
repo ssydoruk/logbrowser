@@ -16,10 +16,11 @@ import java.io.StringWriter;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.SQLException;
+import java.time.Duration;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
@@ -232,7 +233,7 @@ public class Main {
         
         if (alias.isEmpty()) {
         DateFormat dateFormat = new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss");
-        Date date = new Date();
+        LocalDateTime date = new LocalDateTime();
         alias = dateFormat.format(date);
         }
 
@@ -529,7 +530,7 @@ public class Main {
     }
 
     private void Parse(FileInfo fileInfo) {
-        Date fileStart = new Date();
+        Instant fileStart = Instant.now();
         Parser parser;
         DBTable tab = null;
         FileInfoType componentType = fileInfo.getM_componentType();
@@ -563,10 +564,11 @@ public class Main {
                 logger.error("Uncought exception while parsing: " + exception);
             }
 
-            Date fileEnd = new Date();
             totalBytes += fileInfo.getSize();
             totalFiles++;
-            logger.info("\tParsed " + lines + " lines, " + formatSize(fileInfo.getSize()) + ". Took " + pDuration(fileEnd.getTime() - fileStart.getTime()));
+            logger.info("\tParsed " + lines + " lines, " + formatSize(fileInfo.getSize()) + ". Took "
+                    + pDuration(Duration.between(fileStart, Instant.now()).toMillis())
+            );
         } else {
             if (ifAll()) {
                 logger.error("No parser for file [" + fileInfo.m_path + "] type: " + componentType + "; file skippped");
@@ -743,7 +745,7 @@ public class Main {
         }
         String startDir = ".";
 
-        Date start = new Date();
+        Instant start = Instant.now();
 
         File f = new File(startDir);
         if (f.isDirectory()) {
@@ -877,8 +879,7 @@ public class Main {
         tabRefs.Finalize();
 
         try {
-            Date stopParsing = new Date();
-            logger.info("Parsing took " + pDuration(stopParsing.getTime() - start.getTime()) + ".");
+            logger.info("Parsing took " + pDuration(Duration.between(start, Instant.now()).toMillis()) + ".");
             if (FileInfoTable.getFilesAdded() == 0 || totalFiles == 0) {
                 logger.info("No Genesys logs found.");
             } else {
@@ -898,8 +899,7 @@ public class Main {
             m_accessor.Commit();
             m_accessor.Close(true);
 
-            Date stop = new Date();
-            logger.info("All done. Completed in " + pDuration(stop.getTime() - start.getTime()) + "; processed " + totalFiles + " files (" + formatSize(totalBytes) + ")");
+            logger.info("All done. Completed in " + pDuration(Duration.between(start,Instant.now()).toMillis()) + "; processed " + totalFiles + " files (" + formatSize(totalBytes) + ")");
         } catch (Exception e) {
             logger.error("Exit exception " + e, e);
         }

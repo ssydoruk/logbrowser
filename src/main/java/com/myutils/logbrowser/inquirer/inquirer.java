@@ -36,12 +36,12 @@ import java.nio.file.Paths;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.jar.Attributes;
@@ -994,11 +994,10 @@ public class inquirer {
 
         ILogRecord.resetTotalBytes();
 
-        long time3 = new Date().getTime();
+        Instant time3 = Instant.now();
 
         queryResults.Retrieve(dlg);
-        long time4 = new Date().getTime();
-        inquirer.logger.info("Retrieved " + queryResults.m_results.size() + " records. Took " + Utils.Util.pDuration(time4 - time3));
+        inquirer.logger.info("Retrieved " + queryResults.m_results.size() + " records. Took " + Utils.Util.pDuration(Duration.between(time3, Instant.now()).toMillis()));
     }
 
     public void doPrint(IQueryResults queryResults, QueryDialog dlg, InquirerCfg cfg) throws Exception {
@@ -1016,7 +1015,8 @@ public class inquirer {
             }
         }
 
-        long timePrintStart = new Date().getTime();
+        Instant timePrintStart = Instant.now();
+
         if (doPrint) {
 
             if (dialogResult != JOptionPane.NO_OPTION) {
@@ -1040,8 +1040,9 @@ public class inquirer {
             ((ILogRecordFormatter) formatters.get(i)).Close();
         }
         if (doPrint) {
-            long timePrintEnd = new Date().getTime();
-            inquirer.logger.info("Printing took " + Utils.Util.pDuration(timePrintEnd - timePrintStart));
+            inquirer.logger.info("Printing took " + Utils.Util.pDuration(
+                    Duration.between(timePrintStart, Instant.now()).toMillis()
+            ));
         }
         ps.OpenNotepad("openfiles.bat");
     }

@@ -32,7 +32,7 @@ public class DateDiff {
     }
 
     long newDate(DateParsed parseDate, int fileId, int appID, long filePos, long fileBytes, int fileLine) {
-        long time = parseDate.fmtDate.getTime();
+        long time = parseDate.getUTCms();
         long diff = 0;
         if (prevAppID != appID) //new app, init
         {

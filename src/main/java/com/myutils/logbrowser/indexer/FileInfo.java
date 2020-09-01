@@ -9,9 +9,9 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.regex.Matcher;
@@ -67,7 +67,7 @@ public final class FileInfo extends Record {
     private static final Pattern regFileNameTypeSIP = Pattern.compile("-(\\d+)\\.\\d{8}_\\d{6}_\\d{3}\\.log$");
     public static final int WORKSPACE_BYTES = 1024;
     private static final Pattern regFileNameDate = Pattern.compile("\\.(\\d{8}_\\d{6}_\\d{3})\\.log");
-    static private DateFormat formatFileNameDate = new SimpleDateFormat("yyyyMMdd_HHmmss_SSS");
+    static private DateTimeFormatter workSpaceDateTime = DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss_SSS");
     private LogFileWrapper logFile;
     private String archiveName;
     private String filePath;
@@ -618,9 +618,10 @@ public final class FileInfo extends Record {
                 logFileName = m_name;
             } else if (m_componentTypeSuspect != FileInfoType.type_Unknown) {
                 m_componentType = m_componentTypeSuspect;
-                if(m_app==null && m_componentType==FileInfoType.type_ConfServer)
-                    m_app="confserv";
-                    
+                if (m_app == null && m_componentType == FileInfoType.type_ConfServer) {
+                    m_app = "confserv";
+                }
+
             }
         }
 
@@ -711,7 +712,7 @@ public final class FileInfo extends Record {
 
     long getStartTime() {
         if (fileStartTime != null && fileStartTime.fmtDate != null) {
-            return fileStartTime.fmtDate.getTime();
+            return fileStartTime.getUTCms();
         }
         return 0;
     }
@@ -725,14 +726,14 @@ public final class FileInfo extends Record {
 
     long getEndTime() {
         if (fileEndTime != null && fileEndTime.fmtDate != null) {
-            return fileEndTime.fmtDate.getTime();
+            return fileEndTime.getUTCms();
         }
         return 0;
     }
 
     long getFileStartTimeLong() {
         if (fileLocalTime != null && fileLocalTime.fmtDate != null) {
-            return fileLocalTime.fmtDate.getTime();
+            return fileLocalTime.getUTCms();
         }
         return 0;
     }
@@ -810,8 +811,8 @@ public final class FileInfo extends Record {
             String d = m.group(1);
 
             try {
-                fileStartTime = new DateParsed(logFileName, d, "", formatFileNameDate.parse(d));
-            } catch (ParseException ex) {
+                fileStartTime = new DateParsed(logFileName, d, "", LocalDateTime.parse(d, workSpaceDateTime));
+            } catch (DateTimeParseException ex) {
                 fileStartTime = null;
                 logger.log(org.apache.logging.log4j.Level.FATAL, ex);
             }
