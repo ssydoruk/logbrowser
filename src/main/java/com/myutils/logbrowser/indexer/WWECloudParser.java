@@ -15,11 +15,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.apache.logging.log4j.LogManager;
 
 public class WWECloudParser extends Parser {
 
-    private static final org.apache.logging.log4j.Logger logger = LogManager.getLogger();
+    private static final org.apache.logging.log4j.Logger logger = Main.logger;
 
     private static final HashMap<Pattern, String> IGNORE_LOG_WORDS = new HashMap<Pattern, String>() {
         {

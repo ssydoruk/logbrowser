@@ -18,7 +18,6 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
-import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 /**
@@ -27,7 +26,7 @@ import org.apache.logging.log4j.Logger;
  */
 public final class SqliteAccessor extends Thread implements DBAccessor {
 
-    private static final Logger logger = LogManager.getLogger("indexer");
+    private static final Logger logger = Main.logger;
     /**
      *
      * @param dbname database file name

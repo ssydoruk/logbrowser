@@ -16,7 +16,6 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.logging.log4j.LogManager;
 
 /**
  *
@@ -24,7 +23,7 @@ import org.apache.logging.log4j.LogManager;
  */
 public class URShttpinterfaceParser extends WebParser {
 
-    private static final org.apache.logging.log4j.Logger logger = LogManager.getLogger();
+    private static final org.apache.logging.log4j.Logger logger = Main.logger;
 
     private static final Pattern regReqReceived = Pattern.compile("^\\[HTTP Server (\\w+)\\] Received (\\d+) bytes from client on socket (\\d+):");
     private static final Pattern regRespSent = Pattern.compile("^\\[HTTP Server (\\w+)\\] Response");

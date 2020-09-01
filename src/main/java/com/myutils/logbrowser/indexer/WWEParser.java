@@ -14,11 +14,8 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.apache.logging.log4j.LogManager;
 
 /**
  *
@@ -26,7 +23,7 @@ import org.apache.logging.log4j.LogManager;
  */
 public class WWEParser extends WebParser {
 
-    private static final org.apache.logging.log4j.Logger logger = LogManager.getLogger();
+    private static final org.apache.logging.log4j.Logger logger = Main.logger;
 
     private static final Pattern regMsgStart = Pattern.compile("Handling update message:$");
     private static final Pattern regMsgRequest = Pattern.compile("(?: |=|\\[)'(\\w+)' \\(\\d+\\) attributes:\\s*$");
@@ -1294,8 +1291,8 @@ public class WWEParser extends WebParser {
                 try {
                     url = URLDecoder.decode(group, "UTF-8");
                 } catch (UnsupportedEncodingException ex) {
-                    Logger.getLogger(ApacheWebLogsParser.class.getName()).log(Level.SEVERE, null, ex);
-                    url = group;
+Main.logger.error("", ex);
+url = group;
                 }
             }
         }
@@ -1677,7 +1674,7 @@ public class WWEParser extends WebParser {
                 try {
                     url = URLDecoder.decode(group, "UTF-8");
                 } catch (UnsupportedEncodingException ex) {
-                    Logger.getLogger(ApacheWebLogsParser.class.getName()).log(Level.SEVERE, null, ex);
+                    Main.logger.error("", ex);
                     url = group;
                 }
             }
@@ -2387,7 +2384,7 @@ public class WWEParser extends WebParser {
                 try {
                     url = URLDecoder.decode(group, "UTF-8");
                 } catch (UnsupportedEncodingException ex) {
-                    Logger.getLogger(ApacheWebLogsParser.class.getName()).log(Level.SEVERE, null, ex);
+                    Main.logger.error("", ex);
                     url = group;
                 }
             }

@@ -8,10 +8,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.logging.log4j.LogManager;
 
 /**
  *
@@ -19,7 +16,7 @@ import org.apache.logging.log4j.LogManager;
  */
 public abstract class DBTable {
 
-    private static final org.apache.logging.log4j.Logger logger = LogManager.getLogger();
+    private static final org.apache.logging.log4j.Logger logger =Main.logger;
 
     static public void setFieldString(PreparedStatement stmt, int i, String ref) throws SQLException {
         if (ref != null) {
@@ -122,7 +119,7 @@ public abstract class DBTable {
                 }
             }
         } catch (Exception ex) {
-            Logger.getLogger(DBTable.class.getName()).log(Level.INFO, "error dropping table " + tabName, ex);
+            logger.error( "error dropping table " + tabName, ex);
         }
     }
 

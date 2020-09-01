@@ -16,13 +16,11 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.logging.log4j.LogManager;
 
 public abstract class URSRIBase extends Message {
 
     public static final int MAX_WEB_PARAMS = 5;
     private static final HashMap<String, Integer> keysPos = new HashMap<>(MAX_WEB_PARAMS);
-    private static final org.apache.logging.log4j.Logger logger = LogManager.getLogger();
 
     static void addIndexes(DBTable tab) {
         for (int i = 1; i <= MAX_WEB_PARAMS; i++) {

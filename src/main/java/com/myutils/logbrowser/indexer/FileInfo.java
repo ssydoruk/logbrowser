@@ -19,7 +19,6 @@ import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import org.apache.commons.io.FilenameUtils;
-import org.apache.logging.log4j.LogManager;
 
 /**
  *
@@ -27,7 +26,7 @@ import org.apache.logging.log4j.LogManager;
  */
 public final class FileInfo extends Record {
 
-    private static final org.apache.logging.log4j.Logger logger = LogManager.getLogger();
+    private static final org.apache.logging.log4j.Logger logger = Main.logger;
 
     private static final int BUF_SIZE = 1024;
 

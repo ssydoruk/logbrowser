@@ -16,15 +16,12 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.apache.logging.log4j.LogManager;
 
 /**
  *
  * @author ssydoruk
  */
 public class WWEParserTemplate extends WebParser {
-
-    private static final org.apache.logging.log4j.Logger logger = LogManager.getLogger();
 
     private static final Pattern regMsgStart = Pattern.compile("Handling update message:$");
 

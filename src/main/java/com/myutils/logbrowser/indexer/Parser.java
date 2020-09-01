@@ -730,7 +730,7 @@ public abstract class Parser {
             this.fmt = fmt;
             isDateIncluded = dateIncluded;
             if (fmt != null) {
-                formatter = DateTimeFormatter.ofPattern(fmt).withResolverStyle(ResolverStyle.LENIENT);
+                formatter = DateTimeFormatter.ofPattern(fmt).withResolverStyle(ResolverStyle.STRICT);
             }
         }
 

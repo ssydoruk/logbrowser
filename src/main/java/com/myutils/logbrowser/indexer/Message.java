@@ -13,7 +13,6 @@ import java.util.Iterator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.logging.log4j.LogManager;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -113,7 +112,7 @@ public abstract class Message extends Record {
                 return null;
             }
         } catch (Exception e) {
-            LogManager.getLogger().error("s[" + s + "] reg[" + reg.toString() + "] i:" + i + " replace[" + replace + "] m:" + ((m == null) ? "<null>" : m.groupCount() + " st:" + m.start(i) + " e:" + m.end(i)));
+            Main.logger.error("s[" + s + "] reg[" + reg.toString() + "] i:" + i + " replace[" + replace + "] m:" + ((m == null) ? "<null>" : m.groupCount() + " st:" + m.start(i) + " e:" + m.end(i)));
             return null;
         }
     }

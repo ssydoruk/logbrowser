@@ -8,7 +8,6 @@ package com.myutils.logbrowser.indexer;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import org.apache.logging.log4j.LogManager;
 
 /**
  *
@@ -16,7 +15,7 @@ import org.apache.logging.log4j.LogManager;
  */
 public class DateDiff {
 
-    private static final org.apache.logging.log4j.Logger logger = LogManager.getLogger();
+    private static final org.apache.logging.log4j.Logger logger = Main.logger;
 
     private final FileInfoType type;
     private final DateDiffTable dateDiffTable;

@@ -11,15 +11,12 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.HashMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.apache.logging.log4j.LogManager;
 
 public class ApacheWebLogsParser extends WebParser {
 
-    private static final org.apache.logging.log4j.Logger logger = LogManager.getLogger();
+    private static final org.apache.logging.log4j.Logger logger = Main.logger;
     private final static Pattern ptJSessionID = Pattern.compile("JSESSIONID=([^;\\s\"\\.]+)");
     private final static Pattern ptBrowserClientID = Pattern.compile("BAYEUX_BROWSER=([^;\\s\"\\.]+)");
     private final static Pattern ENTRY_BEGIN_PATTERN = Pattern.compile(
@@ -280,7 +277,7 @@ public class ApacheWebLogsParser extends WebParser {
             try {
                 url = URLDecoder.decode(group, "UTF-8");
             } catch (UnsupportedEncodingException ex) {
-                Logger.getLogger(ApacheWebLogsParser.class.getName()).log(Level.SEVERE, null, ex);
+                logger.fatal( "", ex);
                 url = group;
             }
         }

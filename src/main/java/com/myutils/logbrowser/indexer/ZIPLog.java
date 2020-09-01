@@ -10,12 +10,9 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Enumeration;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import org.apache.commons.io.IOUtils;
-import org.apache.logging.log4j.LogManager;
 
 /**
  *
@@ -23,7 +20,7 @@ import org.apache.logging.log4j.LogManager;
  */
 public final class ZIPLog extends LogFileWrapper {
 
-    private static final org.apache.logging.log4j.Logger logger = LogManager.getLogger();
+    private static final org.apache.logging.log4j.Logger logger =Main.logger;
 
     private int filesProcessed;
     private InputStream curStream = null;
@@ -41,7 +38,7 @@ public final class ZIPLog extends LogFileWrapper {
             try {
                 curStream.close();
             } catch (IOException ex) {
-                Logger.getLogger(ZIPLog.class.getName()).log(Level.SEVERE, null, ex);
+                Main.logger.fatal("", ex);
             }
             curStream = null;
         }
