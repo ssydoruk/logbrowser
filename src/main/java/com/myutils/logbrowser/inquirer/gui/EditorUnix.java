@@ -7,15 +7,16 @@ package com.myutils.logbrowser.inquirer.gui;
 
 import Utils.UnixProcess.ExtProcess;
 import Utils.Util;
+import com.hazelcast.util.CollectionUtil;
 import com.myutils.logbrowser.inquirer.LogFile;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 
 /**
@@ -27,7 +28,7 @@ public class EditorUnix extends ExternalEditor {
     private static final org.apache.logging.log4j.Logger logger = LogManager.getLogger();
 
     private static ArrayList<String> errBuf;
-    private static final String gvim = "/usr/local/bin/gvim";
+    private static final String gvim = "/usr/local/bin/mvim";
     private static final String gvimServer = "LOGBROWSER";
 
     /**
@@ -42,7 +43,21 @@ public class EditorUnix extends ExternalEditor {
         ep.startProcess(true, true);
         List<String> execOuts = ep.execOuts();
         errBuf = ep.getErrBuf();
-        LogManager.getLogger("").debug("results: " + execOuts);
+        try {
+//            logger.info("Waiting for process to stop");
+            ep.waitFor();
+        } catch (InterruptedException ex) {
+            logger.error("", ex);
+        }
+
+        if (CollectionUtil.isNotEmpty(errBuf)) {
+            logger.error("stdErr: [" + StringUtils.join(errBuf, ",") + "]");
+            if (errBuf.get(0).startsWith("E247:")) {
+                logger.error("E247: [" + StringUtils.join(errBuf, ",") + "]");
+                return null;
+            }
+        }
+        logger.debug("results: " + execOuts);
         return execOuts;
     }
 
@@ -76,10 +91,10 @@ public class EditorUnix extends ExternalEditor {
 //        if (startInThread) {
 //            ep.startThread();
 //        } else {
-        ep.startProcess();
+        ep.runProcess();
         try {
             if (waitForEnd) {
-                ep.waitFor(2, TimeUnit.SECONDS);
+                ep.waitFor();
             }
 //        }
         } catch (InterruptedException ex) {
@@ -97,21 +112,20 @@ public class EditorUnix extends ExternalEditor {
      * @throws IOException
      */
     private static Integer remoteExprInt(String expr) throws IOException {
-        ArrayList<String> params = new ArrayList<>(Arrays.asList(new String[]{
+        List<String> execOuts = execWaitSTDOut(new ArrayList<>(Arrays.asList(new String[]{
             "--remote-expr",
-            expr}));
-        List<String> execOuts = execWaitSTDOut(params);
+            expr})));
         if (execOuts != null && !execOuts.isEmpty()) {
             return Util.intOrDef(execOuts.get(0), (Integer) null);
         }
         return null;
     }
 
-    private static void remoteSend(String expr) throws IOException {
-        ArrayList<String> params = new ArrayList<>(2);
-        params.add("--remote-send");
-        params.add(expr);
-        execReturn(params, true);
+    private static List<String> remoteSend(String expr) throws IOException {
+
+        return execWaitSTDOut(Arrays.asList(new String[]{
+            "--remote-send",
+            expr}));
     }
     HashMap<String, Character> lastBookmark = new HashMap<>();
 
@@ -130,11 +144,12 @@ public class EditorUnix extends ExternalEditor {
         if (bufNumber != null) {
             setActive(bufNumber);
         } else {
+
             execReturn(Arrays.asList(new String[]{
                 //                "+",
                 //                "+':set nomodifiable'" //                                        + " | set hlsearch | set wrap | set noconfirm"
                 //                ,
-                "--remote-tab-silent",
+                "--remote-tab-wait-silent",
                 fileModified,}), false);
             confirmServer();
 
@@ -203,11 +218,12 @@ public class EditorUnix extends ExternalEditor {
         return false;
     }
 
-    private void sendCommand(String cmd) throws IOException {
-        execReturn(Arrays.asList(new String[]{
+    private List<String> sendCommand(String cmd) throws IOException {
+
+        return execWaitSTDOut(Arrays.asList(new String[]{
             "--remote-send",
-            cmd
-        }), true);
+            cmd}));
+
     }
 
     private Integer getBufNumber(String fileName, String fileModified) throws IOException {
@@ -234,7 +250,7 @@ public class EditorUnix extends ExternalEditor {
             } else {
                 LogManager.getLogger("").trace("Sleeping 20 ");
                 try {
-                    Thread.sleep(20);
+                    Thread.sleep(100);
                 } catch (InterruptedException ex) {
                     LogManager.getLogger("").trace("Sleeping 20 ");
                 }

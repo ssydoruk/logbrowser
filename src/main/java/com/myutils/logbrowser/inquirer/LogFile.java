@@ -28,22 +28,23 @@ public class LogFile {
     private String arcName;
 
     public LogFile(final String _fileName, final String _arcName) {
-        this.fileName = FilenameUtils.separatorsToSystem(_fileName);
+        this.fileName = inquirer.getFullLogName(_fileName);
         if (_arcName == null || _arcName.isEmpty()) {
             this.arcName = null;
         } else {
-            this.arcName = FilenameUtils.separatorsToSystem(_arcName);
+            this.arcName = inquirer.getFullLogName(_arcName);
         }
-        if (Files.exists(Paths.get(this.fileName))
-                && arcName != null) {
-            inquirer.logger.debug(this.toString() + ": archive in DB but file exists. Ignored archive");
-            arcName = null;
+        if (Files.isRegularFile(Paths.get(this.fileName))) {
+            if (arcName != null) {
+                inquirer.logger.info(this.toString() + ": archive in DB but file exists. Ignored archive");
+                arcName = null;
+            }
         } else {
             if (arcName != null) {
-                if (!Files.exists(Paths.get(this.arcName))) {
+                if (!Files.isRegularFile(Paths.get(this.arcName))) {
                     //assume archive was unzipped
                     String name = FilenameUtils.getFullPath(arcName) + Paths.get(fileName).getFileName();
-                    if (Files.exists(Paths.get(name))) {
+                    if (Files.isRegularFile(Paths.get(name))) {
                         arcName = null;
                         fileName = name;
 
@@ -56,7 +57,7 @@ public class LogFile {
                     StringBuilder a = new StringBuilder();
                     a.append(fileName).append(".").append(ext);
                     boolean arcFound = false;
-                    if (Files.exists(Paths.get(a.toString()))) {
+                    if (Files.isRegularFile(Paths.get(a.toString()))) {
                         fileName = Paths.get(fileName).getFileName().toString();
                         arcName = a.toString();
                         arcFound = true;

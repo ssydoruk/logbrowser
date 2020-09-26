@@ -442,6 +442,10 @@ public class inquirer {
         return logBrDirAbs;
     }
 
+    public static String getFullLogName(String _fileName) {
+        return FilenameUtils.normalize(FilenameUtils.concat(getCurDirectory(), _fileName));
+    }
+
     public static String getCurDirectory() {
         return curDirectory;
     }
