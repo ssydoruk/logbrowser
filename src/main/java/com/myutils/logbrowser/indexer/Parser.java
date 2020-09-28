@@ -10,7 +10,6 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import java.time.format.ResolverStyle;
 import java.time.temporal.TemporalAccessor;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -730,7 +729,7 @@ public abstract class Parser {
             this.fmt = fmt;
             isDateIncluded = dateIncluded;
             if (fmt != null) {
-                formatter = DateTimeFormatter.ofPattern(fmt).withResolverStyle(ResolverStyle.STRICT);
+                formatter = DateTimeFormatter.ofPattern(fmt);
             }
         }
 
@@ -1147,12 +1146,15 @@ public abstract class Parser {
     }
 
     public static void main(String[] args) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss.SSS");
-//        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss.SSS").withResolverStyle(ResolverStyle.SMART);
+//        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss.SSS");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS");
 //            LocalDateTime parse = formatter.parse("20:22:45.234");
-//        TemporalAccessor parse = formatter.parse("2020/12/13 20:22:45.234", LocalDateTime::from);
-//        Instant i = Instant.from(parse);
+        String d = "2020-09-28T03:41:37.895";
+//        TemporalAccessor parse = formatter.parse(d, LocalDateTime::from);
 
+        LocalDateTime parse1 = LocalDateTime.parse(d, formatter);
+        System.out.println("-1-");
+//        Instant i = Instant.from(parse);
 //            if (parse.isSupported(java.time.temporal.ChronoField.YEAR)) {
 //                LocalDateTime dt = LocalDateTime.from(parse);
 //            }
