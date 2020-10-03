@@ -173,9 +173,8 @@ public class MediaServerResults extends IQueryResults {
         nd = new DynamicTreeNode<>(new OptionNode(true, DialogItem.MCP_STRATEGY));
         root.addChild(nd);
         nd.addDynamicRef(DialogItem.MCP_STRATEGY_STEPS, ReferenceType.VXMLCommand);
-        nd.addDynamicRef(DialogItem.MCP_STRATEGY_STEPSPARAMS, ReferenceType.VXMLCommandParams);
-//                strategySteps.addRef("commandId", "command", ReferenceType.VXMLCommand.toString(), IQuery.FieldType.Mandatory);
-//                strategySteps.addRef("paramsID", "params", ReferenceType.VXMLCommandParams.toString(), IQuery.FieldType.Optional);
+        nd.addDynamicRef(DialogItem.MCP_STRATEGY_STEPSPARAMS1, ReferenceType.VXMLCommandParams, TableType.VXMLIntStepsTable.toString(), "param1ID");
+        nd.addDynamicRef(DialogItem.MCP_STRATEGY_STEPSPARAMS2, ReferenceType.VXMLCommandParams, TableType.VXMLIntStepsTable.toString(), "param2ID");
 
     }
 
@@ -328,7 +327,9 @@ public class MediaServerResults extends IQueryResults {
                 TableQuery strategySteps = new TableQuery(MsgType.VXMLStrategySteps, TableType.VXMLIntStepsTable.toString());
                 tellProgress("Retrieving VXMLStrategy steps");
                 strategySteps.addRef("commandId", "command", ReferenceType.VXMLCommand.toString(), IQuery.FieldType.Mandatory);
-                strategySteps.addRef("paramsID", "params", ReferenceType.VXMLCommandParams.toString(), IQuery.FieldType.Optional);
+                strategySteps.addRef("param1ID", "param1", ReferenceType.VXMLCommandParams.toString(), IQuery.FieldType.Optional);
+                strategySteps.addRef("param2ID", "param2", ReferenceType.VXMLCommandParams.toString(), IQuery.FieldType.Optional);
+
                 strategySteps.addRef("mcpCallIDID", "mcpCall", ReferenceType.VXMLMCPCallID.toString(), IQuery.FieldType.Optional);
                 strategySteps.addRef("SIPCallID", "SIPCall", ReferenceType.SIPCALLID.toString(), IQuery.FieldType.Optional);
                 strategySteps.addRef("GVPSessionID", "GVPSession", ReferenceType.GVPSessionID.toString(), IQuery.FieldType.Optional);
@@ -345,6 +346,19 @@ public class MediaServerResults extends IQueryResults {
                         strategyStepsSettings,
                         "AND",
                         DialogItem.MCP_STRATEGY_STEPS);
+
+                strategySteps.AddCheckedWhere(strategySteps.getTabAlias() + ".param1ID",
+                        ReferenceType.VXMLCommandParams,
+                        strategyStepsSettings,
+                        "AND",
+                        DialogItem.MCP_STRATEGY_STEPSPARAMS1);
+
+                strategySteps.AddCheckedWhere(strategySteps.getTabAlias() + ".param2ID",
+                        ReferenceType.VXMLCommandParams,
+                        strategyStepsSettings,
+                        "AND",
+                        DialogItem.MCP_STRATEGY_STEPSPARAMS2);
+
                 strategySteps.setCommonParams(this, dlg);
 
                 getRecords(strategySteps);

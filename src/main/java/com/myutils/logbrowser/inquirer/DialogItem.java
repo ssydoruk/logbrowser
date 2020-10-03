@@ -214,7 +214,8 @@ public enum DialogItem {
     URS_RI_PARAM3("Function param 3"),
     URS_RI_PARAM4("Function param 4"),
     URS_RI_PARAM5("Function param 5"),
-    MCP_STRATEGY_STEPSPARAMS("Strategy parameters"),
+    MCP_STRATEGY_STEPSPARAMS1("Strategy parameters 1"),
+    MCP_STRATEGY_STEPSPARAMS2("Strategy parameters 2"),
     URS_HTTP("HTTP requests to URS"),
     URS_HTTP_METHOD("HTTP method"),
     URS_HTTP_URI("HTTP URI"),;

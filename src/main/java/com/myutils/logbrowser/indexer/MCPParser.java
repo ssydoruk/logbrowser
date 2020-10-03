@@ -10,6 +10,7 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.commons.lang3.ArrayUtils;
@@ -448,9 +449,9 @@ public class MCPParser extends Parser {
                             steps.setCommand("execution step");
 
                         }
-                        steps.setParams(noFirstWord);
+                        steps.setParam1(noFirstWord);
                     } else {
-                        steps.setParams(noFile);
+                        steps.setParam1(noFile);
                     }
 
 //                        steps.setStepParams(StringUtils.split(split[initalIndex], null));
@@ -503,12 +504,514 @@ public class MCPParser extends Parser {
         STATE_SIP_HEADER1
     }
 
+    private static final Pattern ptInitURL = Pattern.compile("INIT_URL=([^\\|]+)");
+    private static final Pattern ptValidateURL = Pattern.compile("\\((\\w+)\\):(.+)$");
+
+    private static class VXMLStepsParams {
+
+        private Map<String, IParamParseProc> initSplitSteps() {
+            HashMap<String, IParamParseProc> ret = new HashMap<>();
+            ret.put("call_reference", new IParamParseProc() {
+                /**
+                 * msgParams is always not null and contains at least one
+                 * element msgParams[0] is command
+                 */
+                @Override
+                public void proc(VXMLIntSteps msg, String[] msgParams, String orig) {
+                    msg.setCommand(msgParams[0]);
+                    String params1 = msgParams[1];
+                    if (params1 != null && !params1.isEmpty()) {
+                        String[] split = StringUtils.split(params1, "|");
+                        if (split != null && split.length > 3) {
+                            msg.setSipCallID(split[0]);
+                            msg.setGVPSession(split[1]);
+                            msg.setTenant(split[2]);
+                            msg.setIVRProfile(split[3]);
+                        }
+                    }
+                }
+            });
+            ret.put("form_select", new IParamParseProc() {
+                @Override
+                public void proc(VXMLIntSteps msg, String[] msgParams, String orig) {
+                    msg.setCommand(msgParams[0]);
+                }
+            });
+
+            ret.put("form_enter", new IParamParseProc() {
+                @Override
+                public void proc(VXMLIntSteps msg, String[] msgParams, String orig) {
+                    msg.setCommand(msgParams[0]);
+                    if (msgParams.length > 1) {
+                        msg.setParam1(clearParam(msgParams[1]));
+                    }
+                }
+            });
+
+            ret.put("dtmf", new IParamParseProc() {
+                @Override
+                public void proc(VXMLIntSteps msg, String[] msgParams, String orig) {
+                    msg.setCommand(msgParams[0]);
+                    if (msgParams.length > 1) {
+                        msg.setParam1(clearParam(msgParams[1]));
+                    }
+                }
+            });
+
+            ret.put("dtmf_input", new IParamParseProc() {
+                @Override
+                public void proc(VXMLIntSteps msg, String[] msgParams, String orig) {
+                    msg.setCommand(msgParams[0]);
+                    if (msgParams.length > 1) {
+                        msg.setParam1(clearParam(msgParams[1]));
+                    }
+                }
+            });
+
+            ret.put("form_exit", new IParamParseProc() {
+                @Override
+                public void proc(VXMLIntSteps msg, String[] msgParams, String orig) {
+                    msg.setCommand(msgParams[0]);
+                }
+            });
+            ret.put("prompt_start", new IParamParseProc() {
+                @Override
+                public void proc(VXMLIntSteps msg, String[] msgParams, String orig) {
+                    msg.setCommand(msgParams[0]);
+                }
+            });
+            ret.put("prompt_stop", new IParamParseProc() {
+                @Override
+                public void proc(VXMLIntSteps msg, String[] msgParams, String orig) {
+                    msg.setCommand(msgParams[0]);
+                }
+            });
+            ret.put("prompt_end", new IParamParseProc() {
+                @Override
+                public void proc(VXMLIntSteps msg, String[] msgParams, String orig) {
+                    msg.setCommand(msgParams[0]);
+                }
+            });
+            ret.put("prompt_type", new IParamParseProc() {
+                @Override
+                public void proc(VXMLIntSteps msg, String[] msgParams, String orig) {
+                    msg.setCommand(msgParams[0]);
+                    if (msgParams.length > 0) {
+                        msg.setParam1(StringUtils.join(msgParams, " "));
+                    }
+                }
+            });
+
+            ret.put("wf_lookup", new IParamParseProc() {
+                @Override
+                public void proc(VXMLIntSteps msg, String[] msgParams, String orig) {
+                    msg.setCommand(msgParams[0]);
+                    if (msgParams.length > 0) {
+                        msg.setParam1(msgParams[1]);
+                    }
+                }
+            });
+            ret.put("asr_open", new IParamParseProc() {
+                @Override
+                public void proc(VXMLIntSteps msg, String[] msgParams, String orig) {
+                    msg.setCommand(msgParams[0]);
+//                    msg.setParam1(msgParams[1]);
+                }
+            });
+            ret.put("asr_close", new IParamParseProc() {
+                @Override
+                public void proc(VXMLIntSteps msg, String[] msgParams, String orig) {
+                    msg.setCommand(msgParams[0]);
+//                    msg.setParam1(msgParams[1]);
+                }
+            });
+            ret.put("asr_start", new IParamParseProc() {
+                @Override
+                public void proc(VXMLIntSteps msg, String[] msgParams, String orig) {
+                    msg.setCommand(msgParams[0]);
+//                    msg.setParam1(msgParams[1]);
+                }
+            });
+            ret.put("asr_end", new IParamParseProc() {
+                @Override
+                public void proc(VXMLIntSteps msg, String[] msgParams, String orig) {
+                    msg.setCommand(msgParams[0]);
+                    if (msgParams.length > 0) {
+                        msg.setParam1(StringUtils.join(msgParams, " "));
+                    }
+//                    msg.setParam1(msgParams[1]);
+                }
+            });
+            ret.put("asr_trace", new IParamParseProc() {
+                @Override
+                public void proc(VXMLIntSteps msg, String[] msgParams, String orig) {
+                    msg.setCommand(msgParams[0]);
+                    if (msgParams.length > 0) {
+                        String[] split = StringUtils.split(msgParams[1], ":", 2);
+                        if (ArrayUtils.isNotEmpty(split)) {
+                            msg.setParam1(split[0]);
+                        }
+                    }
+                }
+            });
+
+            ret.put("event", new IParamParseProc() {
+                @Override
+                public void proc(VXMLIntSteps msg, String[] msgParams, String orig) {
+                    msg.setCommand(msgParams[0]);
+                    if (msgParams.length > 0) {
+                        String[] split = StringUtils.split(msgParams[1], ":", 2);
+                        if (ArrayUtils.isNotEmpty(split)) {
+                            msg.setParam1("event_" + split[0]);
+                        }
+                    }
+                }
+            });
+
+            ret.put("event_handler_exit", new IParamParseProc() {
+                @Override
+                public void proc(VXMLIntSteps msg, String[] msgParams, String orig) {
+                    msg.setCommand(msgParams[0]);
+                    if (msgParams.length > 1) {
+                        msg.setParam1(clearParam(msgParams[1]));
+                    }
+                }
+            });
+
+            ret.put("event_handler_enter", new IParamParseProc() {
+                @Override
+                public void proc(VXMLIntSteps msg, String[] msgParams, String orig) {
+                    msg.setCommand(msgParams[0]);
+                    if (msgParams.length > 0) {
+                        String[] split = StringUtils.split(msgParams[1], "|", 2);
+                        if (ArrayUtils.isNotEmpty(split)) {
+                            msg.setParam1("event_" + split[0]);
+                        }
+                    }
+                }
+            });
+
+            ret.put("filling", new IParamParseProc() {
+                @Override
+                public void proc(VXMLIntSteps msg, String[] msgParams, String orig) {
+                    msg.setCommand(msgParams[0]);
+                    if (msgParams.length > 0) {
+                        String[] split = StringUtils.split(msgParams[1], ":", 2);
+                        if (ArrayUtils.isNotEmpty(split)) {
+                            msg.setParam1(split[0]);
+                        }
+                    }
+                }
+            });
+
+            ret.put("fetch_end", new IParamParseProc() {
+                @Override
+                public void proc(VXMLIntSteps msg, String[] msgParams, String orig) {
+                    msg.setCommand(msgParams[0]);
+                    Matcher m = ptValidateURL.matcher(orig);
+                    if (m.find()) {
+                        msg.setParam1(m.group(2));
+                        msg.setParam2(m.group(1));
+                    } else {
+                        msg.setParam1(orig);
+                    }
+                }
+            });
+
+            ret.put("appl_begin", new IParamParseProc() {
+                @Override
+                public void proc(VXMLIntSteps msg, String[] msgParams, String orig) {
+                    msg.setCommand(msgParams[0]);
+                    if (msgParams.length > 1) {
+                        Matcher m = ptInitURL.matcher(msgParams[1]);
+
+                        if (m.find()) {
+                            msg.setParam1(m.group(1));
+                        }
+                    }
+                }
+            });
+            ret.put("appl_end", new IParamParseProc() {
+                @Override
+                public void proc(VXMLIntSteps msg, String[] msgParams, String orig) {
+                    msg.setCommand(msgParams[0]);
+                }
+            });
+
+            ret.put("incall_begin", new IParamParseProc() {
+                @Override
+                public void proc(VXMLIntSteps msg, String[] msgParams, String orig) {
+                    msg.setCommand(msgParams[0]);
+                }
+            });
+            ret.put("incall_end", new IParamParseProc() {
+                @Override
+                public void proc(VXMLIntSteps msg, String[] msgParams, String orig) {
+                    msg.setCommand(msgParams[0]);
+                    if (msgParams.length > 0) {
+                        msg.setParam1(StringUtils.join(msgParams, " "));
+                    }
+                }
+            });
+            ret.put("input_end", new IParamParseProc() {
+                @Override
+                public void proc(VXMLIntSteps msg, String[] msgParams, String orig) {
+                    msg.setCommand(msgParams[0]);
+                    if (msgParams.length > 0) {
+                        String[] split = StringUtils.split(msgParams[1], "|", 2);
+                        if (ArrayUtils.isNotEmpty(split)) {
+                            msg.setParam1(split[0]);
+                        }
+                    }
+
+                }
+            });
+
+            ret.put("route_result", new IParamParseProc() {
+                @Override
+                public void proc(VXMLIntSteps msg, String[] msgParams, String orig) {
+                    msg.setCommand(msgParams[0]);
+                }
+            });
+            ret.put("subdialog_return", new IParamParseProc() {
+                @Override
+                public void proc(VXMLIntSteps msg, String[] msgParams, String orig) {
+                    msg.setCommand(msgParams[0]);
+                }
+            });
+            ret.put("subdialog_start", new IParamParseProc() {
+                @Override
+                public void proc(VXMLIntSteps msg, String[] msgParams, String orig) {
+                    msg.setCommand(msgParams[0]);
+                }
+            });
+
+            ret.put("CMCall", new IParamParseProc() {
+                @Override
+                public void proc(VXMLIntSteps msg, String[] msgParams, String orig) {
+                    if (msgParams.length > 1 && msgParams[1].endsWith("deleted")) {
+                        msg.setCommand(StringUtils.join(msgParams[0], " ", msgParams[1]));
+                    } else {
+                        msg.setCommand(msgParams[0]);
+                    }
+                }
+            });
+            ret.put("CMCallLeg", new IParamParseProc() {
+                @Override
+                public void proc(VXMLIntSteps msg, String[] msgParams, String orig) {
+                    if (msgParams.length > 1 && msgParams[1].endsWith("deleted")) {
+                        msg.setCommand(StringUtils.join(msgParams[0], " ", msgParams[1]));
+                    } else {
+                        msg.setCommand(msgParams[0]);
+                    }
+                }
+            });
+
+            ret.put("input_start", new IParamParseProc() {
+                @Override
+                public void proc(VXMLIntSteps msg, String[] msgParams, String orig) {
+                    msg.setCommand(msgParams[0]);
+                    msg.setParam1(StringUtils.join(msgParams, " "));
+                }
+            });
+
+            ret.put("incall_initiated", new IParamParseProc() {
+                @Override
+                public void proc(VXMLIntSteps msg, String[] msgParams, String orig) {
+                    msg.setCommand(msgParams[0]);
+                }
+            });
+            ret.put("filled_exit", new IParamParseProc() {
+                @Override
+                public void proc(VXMLIntSteps msg, String[] msgParams, String orig) {
+                    msg.setCommand(msgParams[0]);
+                }
+            });
+            ret.put("prompt", new IParamParseProc() {
+                @Override
+                public void proc(VXMLIntSteps msg, String[] msgParams, String orig) {
+                    msg.setCommand(msgParams[0]);
+                }
+            });
+
+            ret.put("filled_enter", new IParamParseProc() {
+                @Override
+                public void proc(VXMLIntSteps msg, String[] msgParams, String orig) {
+                    msg.setCommand(msgParams[0]);
+                    if (msgParams.length > 1) {
+                        msg.setParam1(msgParams[1]);
+                    }
+                }
+
+            });
+            ret.put("DTMF:", new IParamParseProc() {
+                @Override
+                public void proc(VXMLIntSteps msg, String[] msgParams, String orig) {
+                    msg.setCommand(msgParams[0]);
+                    if (msgParams.length > 1) {
+                        msg.setParam1(StringUtils.join(msgParams, " "));
+                    }
+                }
+
+            });
+
+            ret.put("Error", new IParamParseProc() {
+                @Override
+                public void proc(VXMLIntSteps msg, String[] msgParams, String orig) {
+                    msg.setCommand(msgParams[0]);
+                    if (msgParams.length > 1) {
+                        msg.setParam1(StringUtils.join(msgParams, " "));
+                    }
+                }
+
+            });
+
+            ret.put("root_appl", new IParamParseProc() {
+                @Override
+                public void proc(VXMLIntSteps msg, String[] msgParams, String orig) {
+                    msg.setCommand(msgParams[0]);
+                    if (msgParams.length > 1) {
+                        msg.setParam1(msgParams[1]);
+                    }
+                }
+
+            });
+
+            ret.put("log", new IParamParseProc() {
+                @Override
+                public void proc(VXMLIntSteps msg, String[] msgParams, String orig) {
+                    msg.setCommand(msgParams[0]);
+                }
+            });
+
+            ret.put("goto", new IParamParseProc() {
+                @Override
+                public void proc(VXMLIntSteps msg, String[] msgParams, String orig) {
+                    msg.setCommand(msgParams[0]);
+                    if (msgParams.length > 1) {
+                        msg.setParam1(clearParam(msgParams[1]));
+                    }
+                }
+
+            });
+            ret.put("compile_done", new IParamParseProc() {
+                @Override
+                public void proc(VXMLIntSteps msg, String[] msgParams, String orig) {
+                    msg.setCommand(msgParams[0]);
+                    if (msgParams.length > 1) {
+                        msg.setParam1(clearParam(msgParams[1]));
+                    }
+                }
+
+            });
+
+            ret.put("prompt_play", new IParamParseProc() {
+                @Override
+                public void proc(VXMLIntSteps msg, String[] msgParams, String orig) {
+                    msg.setCommand(msgParams[0]);
+                    String[] split = StringUtils.split(msgParams[1], "|");
+                    if (ArrayUtils.isNotEmpty(split)) {
+                        if (split.length > 1) {
+                            msg.setParam1(split[1]);
+                            msg.setParam2(split[0]);
+                        } else {
+                            msg.setParam1(split[0]);
+                        }
+                    } else {
+                        msg.setParam1(msgParams[1]);
+                    }
+                }
+            });
+
+            return ret;
+        }
+
+        private String clearParam(String p) {
+            return StringUtils.stripStart(p, ":#");
+        }
+
+        private Map<Pattern, IPatternProc> initPatternSteps() {
+            HashMap<Pattern, IPatternProc> ret = new HashMap<>();
+            ret.put(Pattern.compile("^\\|\\d+ms$"), new IPatternProc() {
+                @Override
+                public void proc(VXMLIntSteps msg, Matcher m) {
+                    msg.setCommand(null); // setting command to null ignores record
+                }
+            });
+
+            ret.put(Pattern.compile("^((?:Fetching|Compile) Done).+\\|([^\\|]+)$"), new IPatternProc() {
+                @Override
+                public void proc(VXMLIntSteps msg, Matcher m) {
+                    msg.setCommand(m.group(1)); // setting command to null ignores record
+                    msg.setParam1(m.group(2));
+                }
+            });
+            return ret;
+        }
+
+        private interface IParamParseProc {
+
+            void proc(VXMLIntSteps msg, String[] msgParams, String strOrig);
+        };
+
+        private interface IPatternProc {
+
+            void proc(VXMLIntSteps msg, Matcher m);
+        };
+
+        private final Map<String, IParamParseProc> procSplitSteps;
+        private final Map<Pattern, IPatternProc> procPatternSteps;
+
+        public VXMLStepsParams() {
+            this.procSplitSteps = initSplitSteps();
+            this.procPatternSteps = initPatternSteps();
+        }
+
+        public void processRequestParams(VXMLIntSteps msg, String msgParam) {
+            if (msgParam != null) {
+                String[] msgParams = StringUtils.split(msgParam, null);
+                if (msgParams.length > 0) {
+                    IParamParseProc proc = procSplitSteps.get(msgParams[0]);
+                    if (proc != null) {
+                        proc.proc(msg, msgParams, msgParam);
+                        return;
+                    }
+                }
+                for (Map.Entry<Pattern, IPatternProc> entry : procPatternSteps.entrySet()) {
+                    Pattern rx = entry.getKey();
+                    IPatternProc proc = entry.getValue();
+                    Matcher m;
+                    if ((m = rx.matcher(msgParam)).find()) {
+                        proc.proc(msg, m);
+                        return;
+                    }
+
+                }
+                msg.setCommand("message");
+                msg.setParam1("__ " + msgParam);
+
+            }
+
+        }
+    };
+
+    private static final VXMLStepsParams vXMLStepsParams = new VXMLStepsParams();
+
     private class VXMLIntSteps extends Message {
 
         private String command;
 
         private String mcpCallID;
-        private String params;
+        private String param1;
+        private String param2;
+
+        public String getParam2() {
+            return param2;
+        }
+
+        public void setParam2(String param2) {
+            this.param2 = param2;
+        }
         private String sipCallID;
         private String GVPSession;
         private String Tenant;
@@ -539,8 +1042,8 @@ public class MCPParser extends Parser {
          *
          * @return the value of params
          */
-        public String getParams() {
-            return params;
+        public String getParam1() {
+            return param1;
         }
 
         /**
@@ -548,8 +1051,8 @@ public class MCPParser extends Parser {
          *
          * @param params new value of params
          */
-        public void setParams(String params) {
-            this.params = params;
+        public void setParam1(String params) {
+            this.param1 = params;
         }
 
         /**
@@ -624,51 +1127,38 @@ public class MCPParser extends Parser {
             this.IVRProfile = IVRProfile;
         }
 
-        private void setStepParams(String[] msgParams) {
-            if (msgParams != null) {
-                setCommand(msgParams[0]);
-                if (msgParams.length > 1) {
-                    if (getCommand().equals("call_reference")) {
-                        String params1 = msgParams[1];
-                        if (params1 != null && !params1.isEmpty()) {
-                            String[] split = StringUtils.split(params1, "|");
-                            if (split != null && split.length > 3) {
-                                setSipCallID(split[0]);
-                                setGVPSession(split[1]);
-                                setTenant(split[2]);
-                                setIVRProfile(split[3]);
-                            }
-                        }
-                    } else {
-                        setParams(StringUtils.join(ArrayUtils.subarray(msgParams, 1, msgParams.length), " "));
-
-                    }
-                }
-            }
+//        private void setStepParams(String[] msgParams) {
+//            if (msgParams != null) {
+//                setCommand(msgParams[0]);
+//                if (msgParams.length > 1) {
+//                    if (getCommand().equals("call_reference")) {
+//                        String params1 = msgParams[1];
+//                        if (params1 != null && !params1.isEmpty()) {
+//                            String[] split = StringUtils.split(params1, "|");
+//                            if (split != null && split.length > 3) {
+//                                setSipCallID(split[0]);
+//                                setGVPSession(split[1]);
+//                                setTenant(split[2]);
+//                                setIVRProfile(split[3]);
+//                            }
+//                        }
+//                    } else {
+//                        setParams(StringUtils.join(ArrayUtils.subarray(msgParams, 1, msgParams.length), " "));
+//
+//                    }
+//                }
+//            }
+//        }
+        private void setRequestParams(String msgParam) {
+            vXMLStepsParams.processRequestParams(this, msgParam);
         }
 
-        private void setRequestParams(String msgParam) {
-            if (msgParam != null) {
-                String[] msgParams = StringUtils.split(msgParam, null);
-                if (msgParams.length > 1 && msgParams[0].equals("call_reference")) {
-                    setCommand(msgParams[0]);
-                    String params1 = msgParams[1];
-                    if (params1 != null && !params1.isEmpty()) {
-                        String[] split = StringUtils.split(params1, "|");
-                        if (split != null && split.length > 3) {
-                            setSipCallID(split[0]);
-                            setGVPSession(split[1]);
-                            setTenant(split[2]);
-                            setIVRProfile(split[3]);
-                        }
-                    }
-                } else {
-                    setCommand("message");
-                    setParams(msgParam);
+        private String getParamValue1() {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
 
-                }
-            }
-
+        private String getParamValue2() {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
         }
 
     }
@@ -682,7 +1172,8 @@ public class MCPParser extends Parser {
         @Override
         public void InitDB() {
             addIndex("commandId");
-            addIndex("paramsID");
+            addIndex("param1ID");
+            addIndex("param2ID");
             addIndex("mcpCallIDID");
             addIndex("SIPCallID");
             addIndex("GVPSessionID");
@@ -701,7 +1192,8 @@ public class MCPParser extends Parser {
                     + ",line int"
                     /* standard first */
                     + ",commandId INTEGER"
-                    + ",paramsID INTEGER"
+                    + ",param1ID INTEGER"
+                    + ",param2ID INTEGER"
                     + ",mcpCallIDID INTEGER"
                     + ",SIPCallID INTEGER"
                     + ",GVPSessionID INTEGER"
@@ -711,6 +1203,7 @@ public class MCPParser extends Parser {
             getM_dbAccessor().runQuery(query);
             m_InsertStatementId = getM_dbAccessor().PrepareStatement("INSERT INTO " + getTabName() + " VALUES(NULL,?,?,?,?,?"
                     /*standard first*/
+                    + ",?"
                     + ",?"
                     + ",?"
                     + ",?"
@@ -738,26 +1231,31 @@ public class MCPParser extends Parser {
             PreparedStatement stmt = getM_dbAccessor().GetStatement(m_InsertStatementId);
 
             try {
-                stmt.setTimestamp(1, new Timestamp(rec.GetAdjustedUsecTime()));
-                stmt.setInt(2, SCSAppStatus.getFileId());
-                stmt.setLong(3, rec.m_fileOffset);
-                stmt.setLong(4, rec.getM_FileBytes());
-                stmt.setLong(5, rec.m_line);
+                String command = rec.getCommand();
+                if (StringUtils.isNotEmpty(command)) {
+                    stmt.setTimestamp(1, new Timestamp(rec.GetAdjustedUsecTime()));
+                    stmt.setInt(2, SCSAppStatus.getFileId());
+                    stmt.setLong(3, rec.m_fileOffset);
+                    stmt.setLong(4, rec.getM_FileBytes());
+                    stmt.setLong(5, rec.m_line);
 
-                setFieldInt(stmt, 6, Main.getRef(ReferenceType.VXMLCommand, rec.getCommand()));
-                setFieldInt(stmt, 7, Main.getRef(ReferenceType.VXMLCommandParams, rec.getParams()));
-                setFieldInt(stmt, 8, Main.getRef(ReferenceType.VXMLMCPCallID, rec.getMcpCallID()));
-                setFieldInt(stmt, 9, Main.getRef(ReferenceType.SIPCALLID, rec.getSipCallID()));
-                setFieldInt(stmt, 10, Main.getRef(ReferenceType.GVPSessionID, rec.getGVPSession()));
-                setFieldInt(stmt, 11, Main.getRef(ReferenceType.Tenant, rec.getTenant()));
-                setFieldInt(stmt, 12, Main.getRef(ReferenceType.GVPIVRProfile, rec.getIVRProfile()));
+                    setFieldInt(stmt, 6, Main.getRef(ReferenceType.VXMLCommand, command));
+                    setFieldInt(stmt, 7, Main.getRef(ReferenceType.VXMLCommandParams, rec.getParam1()));
+                    setFieldInt(stmt, 8, Main.getRef(ReferenceType.VXMLCommandParams, rec.getParam2()));
+                    setFieldInt(stmt, 9, Main.getRef(ReferenceType.VXMLMCPCallID, rec.getMcpCallID()));
+                    setFieldInt(stmt, 10, Main.getRef(ReferenceType.SIPCALLID, rec.getSipCallID()));
+                    setFieldInt(stmt, 11, Main.getRef(ReferenceType.GVPSessionID, rec.getGVPSession()));
+                    setFieldInt(stmt, 12, Main.getRef(ReferenceType.Tenant, rec.getTenant()));
+                    setFieldInt(stmt, 13, Main.getRef(ReferenceType.GVPIVRProfile, rec.getIVRProfile()));
 
-                getM_dbAccessor().SubmitStatement(m_InsertStatementId);
+                    getM_dbAccessor().SubmitStatement(m_InsertStatementId);
+                } else {
+                    logger.debug(getTabName() + " command empty, record ignored");
+                }
             } catch (SQLException e) {
                 Main.logger.error("Could not add record type " + m_type.toString() + ": " + e, e);
             }
         }
-
     }
-
+    private static final org.apache.logging.log4j.Logger logger = Main.logger;
 }
