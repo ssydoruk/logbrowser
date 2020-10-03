@@ -675,6 +675,8 @@ public class inquirer {
                 }
                 if (cr == null) {//default hardcoded settings
                     cr = new InquirerCfg();
+                } else {
+                    cr.LoadRefs();
                 }
             }
         }

@@ -257,6 +257,26 @@ public class InquirerCfg implements Serializable {
     }
 
     public void LoadRefs() {
+        LoadRef(ReferenceType.TEvent);
+        LoadRef(ReferenceType.METRIC);
+        LoadRef(ReferenceType.SIPMETHOD);
+        LoadRef(ReferenceType.ORSMETHOD);
+        LoadRef(ReferenceType.ORSMODULE);
+        LoadRef(ReferenceType.StatType);
+        LoadRef(ReferenceType.ISCCEvent);
+        LoadRef(ReferenceType.URSStrategyMsg);
+        LoadRef(ReferenceType.MSGLEVEL);
+        LoadRef(ReferenceType.METRICFUNC);
+        LoadRef(ReferenceType.AgentStatType);
+        LoadRef(ReferenceType.DBRequest);
+        LoadRef(ReferenceType.OCSIconEvent);
+        LoadRef(ReferenceType.OCSIconCause);
+        LoadRef(ReferenceType.OCSClientRequest);
+        LoadRef(ReferenceType.GMSEvent);
+        LoadRef(ReferenceType.ORSREQ);
+        LoadRef(ReferenceType.VXMLCommand);
+
+        LoadPrintFilters();
     }
 
     private void LoadRef(ReferenceType refType) {
@@ -568,26 +588,7 @@ public class InquirerCfg implements Serializable {
 
     private void checkRefsLoaded() {
         if (!refsLoaded) {
-            LoadRef(ReferenceType.TEvent);
-            LoadRef(ReferenceType.METRIC);
-            LoadRef(ReferenceType.SIPMETHOD);
-            LoadRef(ReferenceType.ORSMETHOD);
-            LoadRef(ReferenceType.ORSMODULE);
-            LoadRef(ReferenceType.StatType);
-            LoadRef(ReferenceType.ISCCEvent);
-            LoadRef(ReferenceType.URSStrategyMsg);
-            LoadRef(ReferenceType.MSGLEVEL);
-            LoadRef(ReferenceType.METRICFUNC);
-            LoadRef(ReferenceType.AgentStatType);
-            LoadRef(ReferenceType.DBRequest);
-            LoadRef(ReferenceType.OCSIconEvent);
-            LoadRef(ReferenceType.OCSIconCause);
-            LoadRef(ReferenceType.OCSClientRequest);
-            LoadRef(ReferenceType.GMSEvent);
-            LoadRef(ReferenceType.ORSREQ);
-            LoadRef(ReferenceType.VXMLCommand);
-
-            LoadPrintFilters();
+            LoadRefs();
             refsLoaded = true;
         }
     }
