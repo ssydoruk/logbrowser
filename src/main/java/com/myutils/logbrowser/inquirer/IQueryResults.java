@@ -30,7 +30,6 @@ import java.util.regex.Pattern;
 import javax.swing.JTextArea;
 import javax.swing.ProgressMonitor;
 import javax.swing.SwingWorker;
-import org.apache.logging.log4j.LogManager;
 import static org.sqlite.SQLiteErrorCode.SQLITE_INTERRUPT;
 
 /**
@@ -42,7 +41,7 @@ public abstract class IQueryResults extends QueryTools
         implements ActionListener,
         PropertyChangeListener {
 
-    private static final org.apache.logging.log4j.Logger logger = LogManager.getLogger();
+    private static final org.apache.logging.log4j.Logger logger = inquirer.logger;
     final private static Pattern regFileName = Pattern.compile("([^\\\\/]+)$");
     private static final String FILENO = "fileno";
     private static final String APPSTARTTIME = "app_starttime";

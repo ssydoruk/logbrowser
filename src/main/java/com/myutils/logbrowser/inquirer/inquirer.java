@@ -5,6 +5,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.jidesoft.dialog.ButtonPanel;
 import com.jidesoft.dialog.StandardDialog;
+import com.jidesoft.plaf.LookAndFeelFactory;
 import com.myutils.logbrowser.indexer.FileInfoType;
 import com.myutils.logbrowser.indexer.Main;
 import static com.myutils.logbrowser.indexer.Main.setCurrentDirectory;
@@ -60,6 +61,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.UIManager;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
@@ -499,7 +501,8 @@ public class inquirer {
     }
 
     private static void ShowGui() throws Exception {
-
+        UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName()); // you need to catch the exceptions on this call.
+        LookAndFeelFactory.installJideExtension();
 //        queryDialigSettings = readObject(serFile, <T>o);
         queryDialogSettings = geLocaltQuerySettings();
 
@@ -556,7 +559,12 @@ public class inquirer {
             }
         }
 
-        dlg = new QueryDialog(queries);
+        try {
+            dlg = new QueryDialog(queries);
+        } catch (Exception e) {
+            logger.error("error creating dialog", e);
+        }
+
         logger.info("Created dlgs");
 //        /*invokeAndWait - synchronous so that dlg is initialized and we can wait for it in main thread*/
 //        SwingUtilities.invokeAndWait(new Runnable() {
@@ -1088,10 +1096,12 @@ public class inquirer {
                 if (isCancelled()) {
                     JOptionPane.showMessageDialog(null, "Query was cancelled", "Error", JOptionPane.ERROR_MESSAGE);
                 } else {
-                    dlg.CenterWindow();
+                    if (dlg != null) {
+                        dlg.CenterWindow();
 //        dlg.setModal(false);
 
-                    ScreenInfo.setVisible(dlg, true);
+                        ScreenInfo.setVisible(dlg, true);
+                    }
 //                    dlg.setVisible(true);
 
                 }
@@ -1105,9 +1115,11 @@ public class inquirer {
         tsk.setRp(rp);
         tsk.execute();
         rp.doShow();
-        //        ShowGui(id);
-        synchronized (dlg) {
-            dlg.wait();
+//        //        ShowGui(id);
+        if (dlg != null) {
+            synchronized (dlg) {
+                dlg.wait();
+            }
         }
         saveObject(getSerFile(), queryDialogSettings);
     }

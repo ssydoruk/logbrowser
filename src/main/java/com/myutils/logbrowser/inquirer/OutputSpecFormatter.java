@@ -117,6 +117,8 @@ public abstract class OutputSpecFormatter extends DefaultFormatter {
         }
     }
 
+    private static final org.apache.logging.log4j.Logger logger = inquirer.logger;
+
     @Override
     public void ProcessLayout() {
         for (RecordLayout lo : outSpec.values()) {
@@ -156,6 +158,8 @@ public abstract class OutputSpecFormatter extends DefaultFormatter {
         private String m_format;
         private boolean isStatus;
         private String prevValue = "";
+        private String cond; // condition assigned to parameter. If defined
+                            // condition is evaluated. If false, value is not evaluated
 
         Parameter(String title) {
             this.m_Title = title;
@@ -273,7 +277,9 @@ public abstract class OutputSpecFormatter extends DefaultFormatter {
                     isStatus = Boolean.parseBoolean(e.getAttribute("status"));
                     m_format = e.getAttribute("format");
                     m_ShortFormat = e.getAttribute("shortFormat");
+                    cond = e.getAttribute("cond");
                 } catch (Exception ex) {
+                    logger.error("Cannot parse parameter", ex);
                 }
                 if (!ignorePatternForDBFields) {
                     ArrayList<Element> els = getElementsChildByName(e, "pattern");
@@ -365,6 +371,11 @@ public abstract class OutputSpecFormatter extends DefaultFormatter {
         abstract public String GetValue(ILogRecord record) throws Exception;
 
         abstract public String FormatValue(ILogRecord record) throws Exception;
+
+        private String evalValue(ILogRecord record) throws Exception {
+            return (hasFormat()) ? FormatValue(record) : GetValue(record);
+
+        }
 
         class RegexParam {
 
@@ -856,20 +867,13 @@ public abstract class OutputSpecFormatter extends DefaultFormatter {
 //                StringBuilder outString = new StringBuilder(512);
 //                ArrayList<String> paramValues = new ArrayList<>(parameters.size());
             for (Parameter param : parameters) {
-                if (!param.hasFormat()) {
-                    String s = param.GetValue(record);
-                    if (s == null) { //ignore record
-                        return "";
-                    } else {
-//                            paramValues.add(s);
-                    }
-                    ps.addField(param, s);
+
+                String s = param.evalValue(record);
+
+                if (s == null) { //ignore record
+                    return "";
                 } else {
-                    String s1 = param.FormatValue(record);
-                    if (s1 == null) {
-                        return "";
-                    }
-                    ps.addField(param, s1);
+                    ps.addField(param, s);
                 }
             }
             ArrayList<Parameter> addOutParams = qr.getAddOutParams(record.GetType());

@@ -114,9 +114,11 @@ public class QueryDialog extends javax.swing.JFrame {
 //        LookAndFeelFactory.installDefaultLookAndFeelAndExtension();
 
         try {
+
             jpTabs.add(createTabbedPane());
 //        jcbSelection.setText(id);
             reSetSelection();
+
             inquirer.getCr();
             setTitle(inquirer.getDialogTitle(getTitle()));
 
@@ -1135,7 +1137,12 @@ public class QueryDialog extends javax.swing.JFrame {
     }//GEN-LAST:event_btRunSaveActionPerformed
 
     private JideTabbedPane createTabbedPane() throws Exception {
-        tabbedPane = new JideTabbedPane(JideTabbedPane.TOP);
+
+        try {
+            tabbedPane = new JideTabbedPane(JideTabbedPane.TOP);
+        } catch (Exception e) {
+            logger.error("--", e);
+        }
         tabbedPane.setOpaque(true);
 
         for (IQueryResults q : queries) {
