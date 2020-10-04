@@ -12,6 +12,10 @@ import java.util.MissingFormatArgumentException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.*;
+import org.apache.commons.lang3.StringUtils;
+import org.graalvm.polyglot.Context;
+import org.graalvm.polyglot.HostAccess;
+import org.graalvm.polyglot.Value;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -159,7 +163,7 @@ public abstract class OutputSpecFormatter extends DefaultFormatter {
         private boolean isStatus;
         private String prevValue = "";
         private String cond; // condition assigned to parameter. If defined
-                            // condition is evaluated. If false, value is not evaluated
+        // condition is evaluated. If false, value is not evaluated
 
         Parameter(String title) {
             this.m_Title = title;
@@ -277,7 +281,10 @@ public abstract class OutputSpecFormatter extends DefaultFormatter {
                     isStatus = Boolean.parseBoolean(e.getAttribute("status"));
                     m_format = e.getAttribute("format");
                     m_ShortFormat = e.getAttribute("shortFormat");
-                    cond = e.getAttribute("cond");
+                    String _cond = e.getAttribute("cond");
+                    if (StringUtils.isNotBlank(_cond)) {
+                        cond = "var Inquirer = Java.type('" + Inquirer_CLASS + "');\n" + _cond;
+                    }
                 } catch (Exception ex) {
                     logger.error("Cannot parse parameter", ex);
                 }
@@ -373,6 +380,20 @@ public abstract class OutputSpecFormatter extends DefaultFormatter {
         abstract public String FormatValue(ILogRecord record) throws Exception;
 
         private String evalValue(ILogRecord record) throws Exception {
+            if (cond != null) {
+                try {
+                    Inquirer.setCurrentRec(record);
+                    Value eval = condContext.eval("js", cond);
+                    if (eval.asBoolean() == false) {
+                        return "";
+                    }
+                } catch (Exception e) {
+                    logger.error("", e);
+                } finally {
+                    Inquirer.setCurrentRec(null);
+                }
+
+            }
             return (hasFormat()) ? FormatValue(record) : GetValue(record);
 
         }
@@ -947,6 +968,27 @@ public abstract class OutputSpecFormatter extends DefaultFormatter {
                 inquirer.logger.error("error printing record type " + record.GetType().toString(), e);
             }
             return "";
+        }
+    }
+
+    static final private Context condContext = Context.newBuilder().allowAllAccess(true).build();
+    static final private String Inquirer_CLASS = Inquirer.class.getName();
+
+    public static class Inquirer {
+
+        private static ILogRecord curRec;
+
+        @HostAccess.Export
+        public static String recordField(String fld) {
+            if (curRec != null) {
+                return curRec.GetField(fld);
+            } else {
+                return "";
+            }
+        }
+
+        public static void setCurrentRec(ILogRecord record) {
+            curRec = record;
         }
     }
 }
