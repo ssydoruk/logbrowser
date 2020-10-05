@@ -74,7 +74,6 @@ public abstract class Message extends Record {
         return ret;
     }
 
- 
     public static void SetTimezone(long offset) {
         m_timezone = offset;
     }

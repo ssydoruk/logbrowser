@@ -293,7 +293,7 @@ public class GMSResults extends IQueryResults {
 //    private void retrieveSIP
     private void doRetrieve(QueryDialog dlg, SelectionType selectionType, String selection, boolean isRegex) throws SQLException {
         ILogRecord record = null;
-        IDsFinder cidFinder ;
+        IDsFinder cidFinder;
 
         if (selection != null && (selectionType == SelectionType.CONNID
                 || selectionType == SelectionType.CALLID)) {
@@ -316,7 +316,6 @@ public class GMSResults extends IQueryResults {
 
     }
 
-//    private static final boolean TLIBNowRequests = "true".equals(System.getProperty("tlib.norequest"));
     private void runSelectionQuery(QueryDialog dlg, SelectionType selectionType, IDsFinder cidFinder) throws SQLException {
         this._cidFinder = cidFinder;
         if (selectionType != SelectionType.NO_SELECTION) {

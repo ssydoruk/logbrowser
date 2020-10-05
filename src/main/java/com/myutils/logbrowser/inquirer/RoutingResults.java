@@ -1400,7 +1400,7 @@ final public class RoutingResults extends IQueryResults {
         }
 
         if (isChecked(FindNode(orsReportSettings, DialogItem.ORS_SESSION, null, null))) {
-            TableQuery OrsSess ;
+            TableQuery OrsSess;
             if (DatabaseConnector.TableExist("orssess_logbr")) {
                 if (cidFinder == null
                         || cidFinder.getSearchType() == SelectionType.NO_SELECTION
@@ -1444,7 +1444,7 @@ final public class RoutingResults extends IQueryResults {
         if (isChecked(FindNode(orsReportSettings, DialogItem.ORS_HTTP, null, null))) {
             if (DatabaseConnector.TableExist("orshttp")) {
                 Integer[] GMSIDs = cidFinder.getIDs(IDType.GMSSESSION);
-                if ( cidFinder.getSearchType() == SelectionType.NO_SELECTION
+                if (cidFinder.getSearchType() == SelectionType.NO_SELECTION
                         || !isEmpty(SIDID)
                         || !isEmpty(GMSIDs)) {
                     TableQuery OrsHTTP = new TableQuery(MsgType.ORSHTTP, "orshttp");

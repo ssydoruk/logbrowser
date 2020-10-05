@@ -23,7 +23,7 @@ public abstract class LogFileWrapper {
         try {
             if (file.getName().toLowerCase().endsWith(".log")) {
                 ret = new TextLog(file);
-            } else if (!Main.isIgnoreZIP()) {
+            } else if (!Main.ee.isIgnoreZIP()) {
                 if (file.getName().toLowerCase().endsWith(".zip")) {
                     return new ZIPLog(file);
                 }

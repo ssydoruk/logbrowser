@@ -307,7 +307,7 @@ public class DatabaseConnector {
             }
             return true;
         } catch (SQLException ex) {
-           Main.logger.error("", ex);
+            Main.logger.error("", ex);
         }
         return false;
     }

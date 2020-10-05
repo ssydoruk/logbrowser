@@ -52,7 +52,7 @@ public class InquirerFileIo {
                         bytes);
             } catch (IOException iOException) {
                 inquirer.logger.debug("Exception accessing file", iOException);
-                if (!inquirer.getInq().isIgnoreFileAccessErrors()) {
+                if (!inquirer.getEe().isIgnoreFileAccessErrors()) {
                     throw iOException;
                 } else {
                     GetLogBytes = new byte[0];

@@ -176,7 +176,7 @@ final class DateParsed {
         Main.logger.trace("added day to " + this);
     }
 
-    private static final ZoneId zo =ZoneId.systemDefault();
+    private static final ZoneId zo = ZoneId.systemDefault();
 
     long getUTCms() {
         return fmtDate.atZone(zo).toEpochSecond() * 1000 + fmtDate.getNano() / 1000 / 1000;

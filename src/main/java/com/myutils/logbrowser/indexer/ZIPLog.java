@@ -20,7 +20,7 @@ import org.apache.commons.io.IOUtils;
  */
 public final class ZIPLog extends LogFileWrapper {
 
-    private static final org.apache.logging.log4j.Logger logger =Main.logger;
+    private static final org.apache.logging.log4j.Logger logger = Main.logger;
 
     private int filesProcessed;
     private InputStream curStream = null;

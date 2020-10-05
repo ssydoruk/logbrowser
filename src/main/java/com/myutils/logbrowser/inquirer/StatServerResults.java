@@ -10,7 +10,6 @@ import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Properties;
 import javax.swing.JOptionPane;
 import org.apache.logging.log4j.LogManager;
 
@@ -23,8 +22,6 @@ public class StatServerResults extends IQueryResults {
     public static final int TC = 0x04;
     public static final int SIP = 0x08;
     public static final int PROXY = 0x10;
-
-    private String m_tlibFilter;
 
     private int m_componentFilter;
     private ArrayList<NameID> appType = null;
@@ -103,42 +100,6 @@ public class StatServerResults extends IQueryResults {
         m_componentFilter = m_componentFilter | filter;
     }
 
-    public void SetConfig(Properties config) {
-        if (config != null && !config.isEmpty()) {
-            m_tlibFilter = config.getProperty("TlibFilter");
-        }
-    }
-
-//    private void addSIPReportType(DynamicTreeNode<OptionNode> root) {
-//        DynamicTreeNode<OptionNode> nd = new DynamicTreeNode<OptionNode>(new OptionNode(true, "SIP"));
-//        root.addChild(nd);
-//        
-//        DynamicTreeNode<OptionNode> ComponentNode;
-//        ComponentNode = new DynamicTreeNode<OptionNode>(new OptionNode("Messages"));
-//        nd.addChild(ComponentNode);
-//        
-//        /********************/
-//        ComponentNode.addDynamicRef( "Name", ReferenceType.SIPMETHOD);
-//        ComponentNode.addDynamicRef( "Call-ID", ReferenceType.SIPCALLID);
-//        
-//        DynamicTreeNode<OptionNode> AttrValue;
-//        
-//        DynamicTreeNode<OptionNode> Attr;
-////        AttrValue = new DynamicTreeNode<OptionNode>(new OptionNode(false, "EventQueued"));      
-////        Attr.addChild(AttrValue);
-////        AttrValue = new DynamicTreeNode<OptionNode>(new OptionNode(false, "EventRouteRequested"));      
-////        Attr.addChild(AttrValue);
-//        
-//        Attr = new DynamicTreeNode<OptionNode>(new OptionNode(false, "CallType"));
-//        ComponentNode.addChild(Attr);        
-//        AttrValue = new DynamicTreeNode<OptionNode>(new OptionNode(false, "Inbound"));      
-//        Attr.addChild(AttrValue);
-//        AttrValue = new DynamicTreeNode<OptionNode>(new OptionNode(false, "Outbound"));      
-//        Attr.addChild(AttrValue);
-//
-//         
-//    }
-//
     private void addLogMessagesReportType(DynamicTreeNode<OptionNode> root, TableType tableType) {
         DynamicTreeNode<OptionNode> nd = new DynamicTreeNode<>(new OptionNode(false, "Log messages"));
         root.addChild(nd);

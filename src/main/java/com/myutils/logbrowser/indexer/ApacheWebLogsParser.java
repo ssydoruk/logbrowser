@@ -140,7 +140,7 @@ public class ApacheWebLogsParser extends WebParser {
     }
 
     enum ParserState {
-        STATE_COMMENT, 
+        STATE_COMMENT,
     }
 
     private class ApacheWebMsg extends Message {
@@ -277,7 +277,7 @@ public class ApacheWebLogsParser extends WebParser {
             try {
                 url = URLDecoder.decode(group, "UTF-8");
             } catch (UnsupportedEncodingException ex) {
-                logger.fatal( "", ex);
+                logger.fatal("", ex);
                 url = group;
             }
         }
@@ -349,7 +349,7 @@ public class ApacheWebLogsParser extends WebParser {
 
             m_InsertStatementId = getM_dbAccessor()
                     .PrepareStatement("INSERT INTO " + getTabName() + " VALUES(NULL,?,?,?,?,?"
-                    /* standard first */
+                            /* standard first */
                             + ",?" + ",?" + ",?" + ",?" + ",?" + ",?" + ",?" + ",?" + ",?" + ",?" + ",?" + ",?" + ");");
 
         }

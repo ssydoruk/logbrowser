@@ -30,8 +30,6 @@ import org.w3c.dom.NodeList;
  */
 public abstract class Parser {
 
-    private static final boolean parseTimeDiff = "true".equalsIgnoreCase(System.getProperty("timediff.parse"));
-
     public static final int MAX_CUSTOM_FIELDS = 3;
     private static final int BASE_CUSTOM_FIELDS = 8;
     private static final Pattern regORSSessionID = Pattern.compile("^[~\\w]{32}$");
@@ -111,7 +109,7 @@ public abstract class Parser {
     }
 
     public static boolean isParseTimeDiff() {
-        return Main.clr.isParseTDiff() | parseTimeDiff;
+        return Main.ee.isParseTDiff();
     }
 
     static public boolean isSessionID(String resp) {

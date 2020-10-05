@@ -16,7 +16,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Properties;
 import javax.swing.JOptionPane;
 import static org.apache.commons.lang3.ArrayUtils.isEmpty;
 
@@ -354,12 +353,6 @@ public class CallFlowResults extends IQueryResults {
 
     }
 
-    public void SetConfig(Properties config) {
-        if (config != null && !config.isEmpty()) {
-//            m_tlibFilter = config.getProperty("TlibFilter");
-        }
-    }
-
     private void addSIPReportType(DynamicTreeNode<OptionNode> root) {
         DynamicTreeNode<OptionNode> nd = new DynamicTreeNode<>(new OptionNode(true, DialogItem.TLIB_CALLS_SIP));
         root.addChild(nd);
@@ -554,7 +547,6 @@ public class CallFlowResults extends IQueryResults {
         }
     }
 
-//    public static final boolean TLIBNowRequests = "true".equals(System.getProperty("tlib.norequest"));
     private void RetrieveTLib(QueryDialog dlg, DynamicTreeNode<OptionNode> eventsSettings, IDsFinder cidFinder) throws SQLException {
         if (isChecked(eventsSettings) && DatabaseConnector.TableExist("tlib_logbr")) {
 

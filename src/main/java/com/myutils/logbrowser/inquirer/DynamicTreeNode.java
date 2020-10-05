@@ -117,7 +117,7 @@ public class DynamicTreeNode<T> extends GenericTreeNode implements Serializable 
                 try {
 
                     // quick shortcut to make it run faster. Need to add option to check reference 
-                    if (inquirer.isRefSyncDisabled()) {
+                    if (inquirer.ee.isRefSyncDisabled()) {
                         return QueryTools.getRefNamesNameID(this, referenceType, null, null, null);
                     } else {
                         return QueryTools.getRefNamesNameID(this, referenceType, CheckTab, CheckIDField1, CheckIDField2);

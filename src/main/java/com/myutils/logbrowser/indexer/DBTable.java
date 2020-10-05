@@ -16,7 +16,7 @@ import org.apache.commons.lang3.StringUtils;
  */
 public abstract class DBTable {
 
-    private static final org.apache.logging.log4j.Logger logger =Main.logger;
+    private static final org.apache.logging.log4j.Logger logger = Main.logger;
 
     static public void setFieldString(PreparedStatement stmt, int i, String ref) throws SQLException {
         if (ref != null) {
@@ -119,7 +119,7 @@ public abstract class DBTable {
                 }
             }
         } catch (Exception ex) {
-            logger.error( "error dropping table " + tabName, ex);
+            logger.error("error dropping table " + tabName, ex);
         }
     }
 

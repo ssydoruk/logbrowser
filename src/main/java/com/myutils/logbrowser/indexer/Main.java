@@ -4,6 +4,7 @@
  */
 package com.myutils.logbrowser.indexer;
 
+import static Utils.FileUtils.setCurrentDirectory;
 import static Utils.Util.pDuration;
 import java.io.File;
 import java.io.FileInputStream;
@@ -18,13 +19,9 @@ import java.nio.file.Paths;
 import java.sql.SQLException;
 import java.time.Duration;
 import java.time.Instant;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.List;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 import java.util.zip.ZipEntry;
@@ -35,13 +32,6 @@ import javax.swing.JTextArea;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.DefaultParser;
-import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.Option;
-import org.apache.commons.cli.Options;
-import org.apache.commons.cli.ParseException;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
@@ -65,12 +55,9 @@ public class Main {
     static String m_component = "all";
     static String m_executableName = "indexer.jar";
     public static Logger logger;
-    private static String logBrDir;
-    private static boolean ignoreZIP = false;
-    public static ExecutionEnvironment clr;
+    public static EnvIndexer ee;
     static long totalBytes = 0;
     private static final Pattern regFilesNotGood = Pattern.compile("(^\\.logbr|logbr.db)");
-    static Boolean isAll = null;
 
     static String lookupConstant(GenesysConstants constName, Integer intOrDef) {
         if (intOrDef != null) {
@@ -98,17 +85,6 @@ public class Main {
         return m_accessor;
     }
 
-    public static void PrintUsage() {
-        System.out.print("Usage: " + m_executableName
-                + " -DbName name"
-                + " [-Alias alias]"
-                + " [-Regexp regexp]"
-                + " [-Logdb name]"
-                + " [-component sc | tc | sip | all ]"
-                + " [-config config]"
-                + " file1|dir1 [file2|dir2 ...]\n");
-    }
-
     public static String getVersion() throws IOException {
 //        try {
 //            String name = Main.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath().substring(1);
@@ -123,174 +99,39 @@ public class Main {
         return "";
     }
 
-    static void theTest() {
-        String s = "20/02/2018 11:41:03 a.m..557_I_I_017302afa531b580 [09:06] >>>>>>>>>>>>start interp()";
-        Pattern p = Pattern.compile("^\\d{2}/\\d{2}/\\d{4} \\d{2}:\\d{2}:\\d{2} ([am\\.]+)\\.\\d{3}");
-        Matcher m = p.matcher(s);
-        System.out.println(m.replaceFirst("$1"));
-
-        DateTimeFormatter formatter
-                = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss a.SSS");
-        LocalDate date = LocalDate.parse("20/02/2018 11:41:03 a.m..557", formatter);
-        System.out.printf("%s%n", date);
-
-        System.exit(0);
-    }
-
     public static void main(String[] args) throws IOException, ParserConfigurationException, SAXException, Exception {
 
-        /*
-        //<editor-fold defaultstate="collapsed" desc="standard log parsing">
-        for (int i = 0; i < args.length;) {
-        String currentStr = args[i];
-        if (currentStr.equalsIgnoreCase("/alias")
-        || currentStr.equalsIgnoreCase("-alias")) {
-        if (i + 1 == args.length || !alias.isEmpty()) {
-        System.out.println("Invalid alias.");
-        PrintUsage();
-        return;
-        }
-        alias = args[i + 1];
-        i += 2;
-        
-        } else if (currentStr.equalsIgnoreCase("/dbname")
-        || currentStr.equalsIgnoreCase("-dbname")) {
-        if (i + 1 == args.length || !dbname.isEmpty()) {
-        System.out.println("Invalid DbName.");
-        PrintUsage();
-        return;
-        }
-        dbname = args[i + 1];
-        i += 2;
-        
-        } else if (currentStr.equalsIgnoreCase("/cfgxml")
-        || currentStr.equalsIgnoreCase("-cfgxml")) {
-        if (i + 1 == args.length || !xmlCFG.isEmpty()) {
-        System.out.println("Invalid xmlCFG.");
-        PrintUsage();
-        return;
-        }
-        xmlCFG = args[i + 1];
-        i += 2;
-        
-        } else if (currentStr.equalsIgnoreCase("/logdb")
-        || currentStr.equalsIgnoreCase("-logdb")) {
-        if (i + 1 == args.length || !logdb.isEmpty()) {
-        System.out.println("Invalid logs database file.");
-        PrintUsage();
-        return;
-        }
-        logdb = args[i + 1];
-        i += 2;
-        
-        } else if (currentStr.equalsIgnoreCase("/component")
-        || currentStr.equalsIgnoreCase("-component")) {
-        if (i + 1 != args.length) {
-        m_component = args[i + 1];
-        if (!m_component.equalsIgnoreCase("all")
-        && !m_component.equalsIgnoreCase("sip")
-        && !m_component.equalsIgnoreCase("sc")
-        && !m_component.equalsIgnoreCase("tc")
-        && !m_component.equalsIgnoreCase("proxy")) {
-        PrintUsage();
-        return;
-        }
-        }
-        i += 2;
-        } else if (currentStr.equalsIgnoreCase("/config")
-        || currentStr.equalsIgnoreCase("-config")) {
-        if (i + 1 == args.length) {
-        PrintUsage();
-        return;
-        }
-        String configFile = args[i + 1];
-        try {
-        if (!configFile.isEmpty()) {
-        Properties config = new Properties();
-        FileInputStream file = new FileInputStream(configFile);
-        config.load(file);
-        file.close();
-        
-        //                        String dirs = config.getProperty("ScanSubdirs");
-        //                        if (dirs != null && dirs.equalsIgnoreCase("on")) {
-        //                            m_scanDir = true;
-        //                        }
-        //
-        //                        String zip = config.getProperty("ParseZip");
-        //                        if (zip != null && zip.equalsIgnoreCase("on")) {
-        //                            m_parseZip = true;
-        //                        }
-        }
-        } catch (IOException e) {
-        }
-        i += 2;
-        
-        } else {
-        scanDir = currentStr;
-        i++;
-        }
-        }
-        
-        if (alias.isEmpty()) {
-        DateFormat dateFormat = new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss");
-        LocalDateTime date = new LocalDateTime();
-        alias = dateFormat.format(date);
-        }
+        ee = new EnvIndexer();
+        ee.parserCommandLine(args);
 
-        if (dbname.isEmpty()) {
-        System.out.println("DbName required.");
-        PrintUsage();
-        return;
-        }
-
-        if (scanDir == null || scanDir.isEmpty()) {
-        System.out.println("File or dir required.");
-        PrintUsage();
-        return;
-        }
-
-        if (logdb.isEmpty()) {
-        logdb = "logdb"; //default value
-        }
-        //</editor-fold>
-         */
         Thread.setDefaultUncaughtExceptionHandler(new ExceptionHandler());
         System.setProperty("sun.awt.exception.handler",
                 ExceptionHandler.class.getName());
 
-        clr = new ExecutionEnvironment();
+        System.setProperty("logPath", ee.getLogbrowserDir());
+
+//            logBrDirAbs = Paths.get(logBrDir).toAbsolutePath().normalize().toString();
+        System.setProperty("log4j2.saveDirectory", "true");
+
         logger = LogManager.getLogger("indexer");
+        logger.info("starting");
+        StringBuilder s = new StringBuilder();
+        s.append("Command line: ").append(StringUtils.join(args, " "));
+        s.append("\n\tBase directory: ").append(ee.getBaseDir());
+        s.append("\n\tCurrent directory: ").append(Utils.FileUtils.getCurrentDirectory());
+        s.append("\n\talias: ").append(ee.getAlias());
+        s.append("\n\tdbname: ").append(ee.getDbname());
+        s.append("\n\tlogBrDir: ").append(ee.getLogbrowserDir());
+        s.append("\n\txmlCFG: ").append(ee.getXmlCFG());
+        s.append("\n\tIgnoreZIP: ").append(ee.isIgnoreZIP());
+        s.append("\n\tParseTDiff: ").append(ee.isParseTDiff());
+        s.append("\n\tSqlPragma: ").append(ee.isSqlPragma());
+        logger.info(s);
 
-        String cmdLine = "";
-        for (String arg : args) {
-            cmdLine += arg + " ";
-        }
-        logger.info("parameters:" + cmdLine);
-        logger.info("working directory: " + Paths.get(".").toAbsolutePath().normalize().toString());
+        theParser = new Main(ee.getDbname(), ee.getXmlCFG());
 
-        clr.parserCommandLine(args);
-        logger.info("params: parsing timediff: " + Parser.isParseTimeDiff());
-
-        String alias = clr.getAlias();
-        String dbname = clr.getDBName();
-        File f = new File(dbname);
-        if (!f.isAbsolute()) {
-            dbname = f.getAbsolutePath();
-        }
-
-        ignoreZIP = clr.isIgnoreZIP();
-
-        String xmlCFG = clr.getXmlCfg();
-        String baseDir = clr.getBaseDir();
-
-        theParser = new Main(dbname, xmlCFG);
-
-        theParser.parseAll(baseDir, dbname, alias);
+        theParser.parseAll(ee.getBaseDir(), ee.getDbname(), ee.getAlias());
 //        Thread.sleep(3000);
-    }
-
-    public static String getLogBrDir() {
-        return logBrDir;
     }
 
     public static String formatSize(long v) {
@@ -377,36 +218,12 @@ public class Main {
         Record.m_jsonId = m_accessor.getID("select max(JsonId) from trigger_" + m_accessor.getM_alias() + ";", "trigger_" + m_accessor.getM_alias(), 0) + 1;
     }
 
-    public static boolean setCurrentDirectory(String directory_name) {
-        boolean result = false;  // Boolean indicating whether directory was set
-        File directory;       // Desired current working directory
-
-        directory = new File(directory_name).getAbsoluteFile();
-        if (directory.exists() || directory.mkdirs()) {
-            result = (System.setProperty("user.dir", directory.getAbsolutePath()) != null);
-        }
-
-        return result;
-    }
-
     public static boolean ifSIPLines() {
         String isAll = (String) System.getProperties().get("SIPLINES");
         if (isAll == null || isAll.length() == 0 || !isAll.equals("1")) {
             return false;
         }
         return true;
-    }
-
-    public static boolean isIgnoreZIP() {
-        return ignoreZIP;
-    }
-
-    public static boolean ifAll() {
-        if (isAll == null) {
-            String sIsAll = (String) System.getProperties().get("all");
-            isAll = (sIsAll != null && sIsAll.equals("1"));
-        }
-        return isAll;
     }
 
     private static void ParseZip(File file) {
@@ -416,74 +233,13 @@ public class Main {
             while (e.hasMoreElements()) {
                 ZipEntry entry = (ZipEntry) e.nextElement();
                 InputStreamReader reader = new InputStreamReader(logArchive.getInputStream(entry));
-                /*                BufferedReaderCrLf input = new BufferedReaderCrLf(reader);
-                FileInfo fileInfo = new FileInfo();
-                fileInfo.m_path = entry.getName();
-                fileInfo.m_name = entry.getName();
-                fileInfo.setFileFilter(m_component);
-                Parser parser = null;
-                int componentType = fileInfo.CheckLog(input);
-                switch (componentType) {
-                case FileInfo.type_SessionController:
-                case FileInfo.type_InteractionProxy:
-                case FileInfo.type_tController:
-                parser = m_parsers.get(0);
-                break;
-                
-                case FileInfo.type_SipProxy:
-                case FileInfo.type_CallManager:
-                case FileInfo.type_TransportLayer:
-                if(m_component.equalsIgnoreCase("all")) {
-                parser = m_parsers.get(0);
-                } else {
-                parser = m_parsers.get(1);
-                }
-                break;
-                
-                case FileInfo.type_URS:
-                parser = m_parsers.get(2);
-                break;
-                
-                case FileInfo.type_StatServer:
-                parser = m_parsers.get(3);
-                break;
-                
-                case FileInfo.type_ICON:
-                parser = m_parsers.get(4);
-                break;
-                
-                case FileInfo.type_ORS:
-                parser = m_parsers.get(5);
-                break;
-                
-                default:
-                return;
-                }
-                
-                fileInfo.AddToDB(m_accessor);
-                LogDB.FileEntry logEntry = m_logDB.GetInfo(file);
-                if (logEntry.Offset >= entry.getSize()) {
-                System.out.println("Nothing new to parse: " + entry.getName());
-                return;
-                }
-                InputStreamReader parsingReader = new InputStreamReader(logArchive.getInputStream(entry));
-                BufferedReaderCrLf parsingInput = new BufferedReaderCrLf(parsingReader);
-                int lines = parser.ParseFrom(parsingInput, logEntry.Offset, logEntry.Line);
-                parsingInput.close();
-                logEntry.Line += lines;
-                logEntry.Offset = entry.getSize();
-                m_logDB.SetInfo(file, logEntry);
-                System.out.println("Parsed " + lines + " lines in " + entry.getName());
-                
-                input.close();
-                 */
+
             }
         } catch (IOException e) {
             System.out.println("ERROR parsing zip archive: " + e);
             return;
         }
     }
-    private final String dbname;
     private int totalFiles = 0;
     private boolean dbExisted = false;
 
@@ -506,7 +262,6 @@ public class Main {
 
     public Main(String dbname, String xmlCFG) throws IOException, Exception {
         setXMLCfg(xmlCFG);
-        this.dbname = dbname;
     }
 
     private void ScanDir(File file) throws IOException {
@@ -570,9 +325,7 @@ public class Main {
                     + pDuration(Duration.between(fileStart, Instant.now()).toMillis())
             );
         } else {
-            if (ifAll()) {
-                logger.error("No parser for file [" + fileInfo.m_path + "] type: " + componentType + "; file skippped");
-            }
+            logger.error("No parser for file [" + fileInfo.m_path + "] type: " + componentType + "; file skippped");
 
         }
     }
@@ -598,15 +351,6 @@ public class Main {
 
         m_tables = new HashMap<>();
 
-//        DBTable dbt = new ORSTable(m_accessor);
-//        dbt.InitDB();
-//        m_tables.add(dbt);
-//        ORSTable tab1 = new ORSTable(m_accessor);
-//        try {
-//            tab1.FinalizeDB();
-//        } catch (Exception ex) {
-//            logger.log(org.apache.logging.log4j.Level.FATAL, ex);
-//        }
         m_tables.put(TableType.ConfigUpdate, new ConfigUpdateTable(m_accessor, TableType.ConfigUpdate));
 
         t = new TLibTable(m_accessor, TableType.TLib);
@@ -728,7 +472,7 @@ public class Main {
             return m_parsers.get(type);
         } else {
             Parser parser = initParser(type);
-            if (parser == null && ifAll()) {
+            if (parser == null) {
                 logger.error("Parser not yet implemented for " + type.toString());
                 return null;
             }
@@ -899,7 +643,7 @@ public class Main {
             m_accessor.Commit();
             m_accessor.Close(true);
 
-            logger.info("All done. Completed in " + pDuration(Duration.between(start,Instant.now()).toMillis()) + "; processed " + totalFiles + " files (" + formatSize(totalBytes) + ")");
+            logger.info("All done. Completed in " + pDuration(Duration.between(start, Instant.now()).toMillis()) + "; processed " + totalFiles + " files (" + formatSize(totalBytes) + ")");
         } catch (Exception e) {
             logger.error("Exit exception " + e, e);
         }
@@ -928,21 +672,15 @@ public class Main {
         Parser ret = null;
         switch (type) {
             case type_SipProxy:
-                if (ifAll()) {
-                    ret = new SIPProxyParser(m_tables);
-                }
+                ret = new SIPProxyParser(m_tables);
                 break;
 
             case type_VOIPEP:
-                if (ifAll()) {
-                    ret = new VOIPEPParser(m_tables);
-                }
+                ret = new VOIPEPParser(m_tables);
                 break;
 
             case type_URS:
-                if (ifAll()) {
-                    ret = new UrsParser(m_tables);
-                }
+                ret = new UrsParser(m_tables);
                 break;
 
             case type_SessionController:
@@ -950,105 +688,73 @@ public class Main {
                 break;
 
             case type_StatServer:
-                if (ifAll()) {
-                    ret = new StSParser(m_tables);
-                }
+                ret = new StSParser(m_tables);
                 break;
 
             case type_ORS:
-                if (ifAll()) {
-                    ret = new OrsParser(m_tables);
-                }
+                ret = new OrsParser(m_tables);
                 break;
 
             case type_OCS:
-                if (ifAll()) {
-                    ret = new OCSParser(m_tables);
-                }
+                ret = new OCSParser(m_tables);
                 break;
 
             case type_IxnServer:
-                if (ifAll()) {
-                    ret = new IxnServerParser(m_tables);
-                }
+                ret = new IxnServerParser(m_tables);
                 break;
 
             case type_RM:
-                if (ifAll()) {
-                    ret = new RMParser(m_tables);
-                }
+                ret = new RMParser(m_tables);
                 break;
 
             case type_MCP:
-                if (ifAll()) {
-                    ret = new MCPParser(m_tables);
-                }
+                ret = new MCPParser(m_tables);
                 break;
 
             case type_WorkSpace:
-                if (ifAll()) {
-                    ret = new WorkspaceParser(m_tables);
-                }
+                ret = new WorkspaceParser(m_tables);
                 break;
 
             case type_SIPEP:
-                if (ifAll()) {
-                    ret = new SIPEPParser(m_tables);
-                }
+                ret = new SIPEPParser(m_tables);
                 break;
 
             case type_SCS:
-                if (ifAll()) {
-                    ret = new SCSParser(m_tables);
-                }
+                ret = new SCSParser(m_tables);
                 break;
 
             case type_LCA:
-                if (ifAll()) {
-                    ret = new LCAParser(m_tables);
-                }
+                ret = new LCAParser(m_tables);
                 break;
 
             case type_WWE:
-                if (ifAll()) {
-                    ret = new WWEParser(m_tables);
-                }
+                ret = new WWEParser(m_tables);
                 break;
 
             case type_URSHTTP:
-                if (ifAll()) {
-                    ret = new URShttpinterfaceParser(m_tables);
-                }
+                ret = new URShttpinterfaceParser(m_tables);
                 break;
 
             case type_WWECloud:
-                if (ifAll()) {
-                    ret = new WWECloudParser(m_tables);
-                }
+                ret = new WWECloudParser(m_tables);
                 break;
 
             case type_DBServer:
-                if (ifAll()) {
-                    ret = new DBServerParser(m_tables);
-                }
+                ret = new DBServerParser(m_tables);
                 break;
 
             case type_GMS:
-                if (ifAll()) {
-                    ret = new GMSParser(m_tables);
-                }
+                ret = new GMSParser(m_tables);
                 break;
+
             case type_ConfServer:
-                if (ifAll()) {
-                    ret = new ConfServParser(m_tables);
-                }
+                ret = new ConfServParser(m_tables);
                 break;
 
             case type_ApacheWeb:
-                if (ifAll()) {
-                    ret = new ApacheWebLogsParser(m_tables);
-                }
+                ret = new ApacheWebLogsParser(m_tables);
                 break;
+
         }
         if (ret != null) {
             ret.init(m_tables);
@@ -1071,7 +777,7 @@ public class Main {
 
     private boolean isLogBRDir(File file) {
         return FilenameUtils.normalizeNoEndSeparator(file.getAbsolutePath())
-                .equalsIgnoreCase(logBrDir);
+                .equalsIgnoreCase(ee.getLogbrowserDir());
     }
 
     static class Constants extends HashMap<GenesysConstants, HashMap<Integer, String>> {
@@ -1516,171 +1222,6 @@ public class Main {
                     }
                 }
             }
-        }
-
-    }
-
-    public static class ExecutionEnvironment {
-
-        private final Option optXMLCfg;
-        private final Option optAlias;
-        private final Option optDBName;
-        private final Option optLogsBaseDir;
-        private final Option optIgnoreZIP;
-        private CommandLine cmd;
-        private final CommandLineParser parser;
-        private final Option optTDiffParse;
-        private boolean parseTDiff = false;
-
-        private Options options = null;
-
-        Option optHelp;
-
-        ExecutionEnvironment() {
-            options = new Options();
-
-            optHelp = Option.builder("h")
-                    .hasArg(false)
-                    .required(false)
-                    .desc("Show help and exit")
-                    .longOpt("help")
-                    .build();
-            options.addOption(optHelp);
-
-            optXMLCfg = Option.builder("x")
-                    .hasArg(true)
-                    .required(false)
-                    .desc("XML config file for parser")
-                    .longOpt("cfgxml")
-                    .build();
-            options.addOption(optXMLCfg);
-
-            optAlias = Option.builder("a")
-                    .hasArg(true)
-                    .required(false)
-                    .desc("Alias to use")
-                    .longOpt("alias")
-                    .build();
-            options.addOption(optAlias);
-
-            optDBName = Option.builder("d")
-                    .hasArg(true)
-                    .required(false)
-                    .desc("Name of the SQLite database file")
-                    .longOpt("dbname")
-                    .build();
-            options.addOption(optDBName);
-
-            optLogsBaseDir = Option.builder("b")
-                    .hasArg(true)
-                    .required(false)
-                    .desc("Basic directory for logs. Default to current")
-                    .longOpt("basedir")
-                    .build();
-            options.addOption(optLogsBaseDir);
-
-            optTDiffParse = Option.builder()
-                    .hasArg(false)
-                    .required(false)
-                    .desc("If set, means parse difference between timestamps")
-                    .longOpt("timediff")
-                    .build();
-            options.addOption(optTDiffParse);
-
-            optIgnoreZIP = Option.builder()
-                    .hasArg(false)
-                    .required(false)
-                    .desc("If specified, ZIP files are ignored while parsing")
-                    .longOpt("ignore-zip")
-                    .build();
-            options.addOption(optIgnoreZIP);
-
-            parser = new DefaultParser();
-
-            //        theTest();
-            String s = System.getProperty("logbr.dir");
-            if (s == null || s.isEmpty()) {
-                s = ".";
-            }
-            File f = new File(s);
-            logBrDir = FilenameUtils.normalizeNoEndSeparator(f.getAbsolutePath());
-            System.setProperty("logPath", logBrDir);
-            System.setProperty("log4j2.saveDirectory", "true");
-
-        }
-
-        public String[] getArgs() {
-            return cmd.getArgs();
-        }
-
-        public List<String> getArgList() {
-            return cmd.getArgList();
-        }
-
-        public void printHelp() {
-            HelpFormatter hf = new HelpFormatter();
-            hf.printHelp("indexer [params] <working directory>", "header", options, "footer");
-        }
-
-        private void showHelpExit(Options options) {
-            HelpFormatter formatter = new HelpFormatter();
-            formatter.printHelp("utility-name", options);
-
-            System.exit(0);
-        }
-
-        private String getAlias() {
-            return getStringOrDef(optAlias, "logbr");
-        }
-
-        public boolean isParseTDiff() {
-            return parseTDiff;
-        }
-
-        private String getDBName() {
-            return getStringOrDef(optDBName, "logbr");
-        }
-
-        private String getXmlCfg() {
-            return getStringOrDef(optXMLCfg, ".");
-        }
-
-        private String getBaseDir() {
-            return getStringOrDef(optLogsBaseDir, Paths.get(".").toAbsolutePath().normalize().toString());
-        }
-
-        private String getStringOrDef(Option opt, String def) {
-            String ret = null;
-            try {
-                ret = (String) cmd.getParsedOptionValue(opt.getLongOpt());
-            } catch (ParseException ex) {
-                logger.log(org.apache.logging.log4j.Level.FATAL, ex);
-            }
-            if (ret == null || ret.isEmpty()) {
-                return def;
-            } else {
-                return ret;
-            }
-        }
-
-        private void parserCommandLine(String[] args) {
-            try {
-                cmd = parser.parse(options, args, true);
-            } catch (ParseException e) {
-                System.out.println(e.getMessage());
-                showHelpExit(options);
-            }
-
-            if (cmd.hasOption(optHelp.getLongOpt())) {
-                showHelpExit(options);
-            }
-
-            this.parseTDiff = cmd.hasOption(optTDiffParse.getLongOpt());
-        }
-
-        private boolean isIgnoreZIP() {
-            return cmd.hasOption(optIgnoreZIP.getLongOpt());
-
         }
 
     }

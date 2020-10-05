@@ -6,7 +6,6 @@
 package com.myutils.logbrowser.inquirer.gui;
 
 import static Utils.Util.pDuration;
-import com.myutils.logbrowser.inquirer.inquirer;
 import java.util.List;
 import javax.swing.SwingWorker;
 import javax.swing.text.DefaultCaret;
@@ -98,7 +97,7 @@ public class RequestProgress extends javax.swing.JDialog {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jbCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbCancelActionPerformed
-        inquirer.logger.info("interrupt process selected");
+        logger.info("interrupt process selected");
         wrk.myCancel(true);
 
     }//GEN-LAST:event_jbCancelActionPerformed
@@ -180,7 +179,7 @@ public class RequestProgress extends javax.swing.JDialog {
 
     public void addProgress(List<String> chunks) {
         for (String chunk : chunks) {
-            inquirer.logger.trace("Displaying progress: " + chunk);
+            logger.trace("Displaying progress: " + chunk);
             taMessages.append(chunk + "\n");
         }
     }

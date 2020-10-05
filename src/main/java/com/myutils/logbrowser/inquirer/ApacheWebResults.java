@@ -12,7 +12,6 @@ import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Properties;
 import javax.swing.JOptionPane;
 import org.apache.logging.log4j.LogManager;
 
@@ -26,8 +25,6 @@ public class ApacheWebResults extends IQueryResults {
     public static final int SIP = 0x08;
     public static final int PROXY = 0x10;
     private Object cidFinder;
-
-    private String m_tlibFilter;
 
     private int m_componentFilter;
     ArrayList<NameID> appsType = null;
@@ -141,12 +138,6 @@ public class ApacheWebResults extends IQueryResults {
         return "Apache Web";
     }
 
-    public void SetConfig(Properties config) {
-        if (config != null && !config.isEmpty()) {
-            m_tlibFilter = config.getProperty("TlibFilter");
-        }
-    }
-
     private void loadStdOptions() {
         DynamicTreeNode<OptionNode> rootA = new DynamicTreeNode<>(null);
         repComponents.setRoot(rootA);
@@ -196,7 +187,6 @@ public class ApacheWebResults extends IQueryResults {
         doSort();
     }
 
-//    private static final boolean TLIBNowRequests = "true".equals(System.getProperty("tlib.norequest"));
     private void runSelectionQuery(QueryDialog dlg, SelectionType selectionType, IDsFinder cidFinder) throws SQLException {
         this.cidFinder = cidFinder;
         if (selectionType != SelectionType.NO_SELECTION) {

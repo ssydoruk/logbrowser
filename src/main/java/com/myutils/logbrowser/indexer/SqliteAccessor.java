@@ -32,7 +32,6 @@ public final class SqliteAccessor extends Thread implements DBAccessor {
      * @param dbname database file name
      * @param alias postfix for table names
      */
-    private static final boolean SQLitePragmasFast = "true".equals(System.getProperty("sqlite.pragma"));
     private static final HashMap<String, Boolean> tabExists = new HashMap<String, Boolean>();
 
     String m_alias;
@@ -72,7 +71,7 @@ public final class SqliteAccessor extends Thread implements DBAccessor {
                     //                    + "PRAGMA main.cache_size=5000;\n"
                     + "PRAGMA main.automatic_index=false;\n";
 
-            if (SQLitePragmasFast) {
+            if (Main.ee.isSqlPragma()) {
                 s += "PRAGMA main.journal_mode=MEMORY;\n";
             } else {
                 logger.info("SQLite pragmas not turned");

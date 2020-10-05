@@ -1226,26 +1226,26 @@ public class QueryDialog extends javax.swing.JFrame {
         if (tabbedPane.getSelectedIndex() == tabbedPane.getTabCount() - 1) {
             if (aggrParams == null) {
                 try {
-                    if (inquirer.ifAll() && DatabaseConnector.fileExits(FileInfoType.type_CallManager)) {
+                    if (DatabaseConnector.fileExits(FileInfoType.type_CallManager)) {
                         addAggregate(new AggrTLibAllCalls());
                     }
                     addAggregate(new AggrTimestampDelays());
-                    if (inquirer.ifAll() && DatabaseConnector.fileExits(FileInfoType.type_CallManager)) {
+                    if (DatabaseConnector.fileExits(FileInfoType.type_CallManager)) {
                         addAggregate(new AggrSIPRetransmits());
                     }
-                    if (inquirer.ifAll() && DatabaseConnector.fileExits(FileInfoType.type_CallManager)) {
+                    if (DatabaseConnector.fileExits(FileInfoType.type_CallManager)) {
                         addAggregate(new AggrJSONDuration());
                     }
                     if (DatabaseConnector.fileExits(FileInfoType.type_CallManager)) {
                         addAggregate(new AggrSIPServerCallsPerSecond(DatabaseConnector.TableExist("sip_logbr")));
                     }
-                    if (inquirer.ifAll() && DatabaseConnector.fileExits(FileInfoType.type_ORS)) {
+                    if (DatabaseConnector.fileExits(FileInfoType.type_ORS)) {
                         addAggregate(new AggrORSDuration());
                     }
-                    if (inquirer.ifAll() && DatabaseConnector.fileExits(FileInfoType.type_CallManager)) {
+                    if (DatabaseConnector.fileExits(FileInfoType.type_CallManager)) {
                         addAggregate(new AggrORSPerSecond());
                     }
-                    if (inquirer.ifAll() && DatabaseConnector.fileExits(FileInfoType.type_OCS)) {
+                    if (DatabaseConnector.fileExits(FileInfoType.type_OCS)) {
                         addAggregate(new AggrOCSDBServerDelays());
                     }
 

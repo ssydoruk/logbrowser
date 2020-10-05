@@ -11,7 +11,6 @@ import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Properties;
 import javax.swing.JOptionPane;
 import org.apache.logging.log4j.LogManager;
 
@@ -26,11 +25,8 @@ public class WorkspaceResults extends IQueryResults {
     public static final int PROXY = 0x10;
     private static final String[] RequestsToShow = {"RequestMakePredictiveCall", "RequestMakeCall"};
     private static final String[] EventsToShow = {"EventDialing", "EventNetworkReached"};
-    private static final boolean TLIBNowRequests = "true".equals(System.getProperty("tlib.norequest"));
     private Object cidFinder;
     private ArrayList<NameID> appsType;
-
-    private String m_tlibFilter;
 
     private int m_componentFilter;
     private final UTCTimeRange timeRange = null;
@@ -201,12 +197,6 @@ public class WorkspaceResults extends IQueryResults {
 
     public void AddComponent(int filter) {
         m_componentFilter = m_componentFilter | filter;
-    }
-
-    public void SetConfig(Properties config) {
-        if (config != null && !config.isEmpty()) {
-            m_tlibFilter = config.getProperty("TlibFilter");
-        }
     }
 
     private void addSIPReportType(DynamicTreeNode<OptionNode> root) {
@@ -414,7 +404,7 @@ public class WorkspaceResults extends IQueryResults {
             WSTLibQuery tlibQuery = new WSTLibQuery(eventsSettings, cidFinder);
             tlibQuery.setCommonParams(this, dlg);
 
-            if (cidFinder != null && !TLIBNowRequests) {
+            if (cidFinder != null && !inquirer.ee.isNoTLibRequest()) {
                 Integer[] connIDs = cidFinder.getConnIDs();
                 if (connIDs != null && connIDs.length > 0 && DatabaseConnector.TableExist(ReferenceType.TEvent.toString())) {
                     TableQuery TLibReq = MakeTLibReq();

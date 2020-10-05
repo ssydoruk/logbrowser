@@ -1291,8 +1291,8 @@ public class WWEParser extends WebParser {
                 try {
                     url = URLDecoder.decode(group, "UTF-8");
                 } catch (UnsupportedEncodingException ex) {
-Main.logger.error("", ex);
-url = group;
+                    Main.logger.error("", ex);
+                    url = group;
                 }
             }
         }

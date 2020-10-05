@@ -50,7 +50,7 @@ public class InquirerCfg implements Serializable {
         String extension = FilenameUtils.getExtension(name);
         String ret;
         while (true) {
-            ret = inquirer.getLogBrDir() + File.separator + baseName + "_" + String.format("%1$03d", currFileIdx) + "." + extension;
+            ret = inquirer.getEe().getLogBrDir() + File.separator + baseName + "_" + String.format("%1$03d", currFileIdx) + "." + extension;
             File f = new File(ret);
             if (!f.exists()) {
                 return ret;
@@ -633,12 +633,6 @@ public class InquirerCfg implements Serializable {
     public ArrayList<RegexFieldSettings> getRegexFieldsSettings(MsgType t) {
         if (rxFieldsSettings == null) {
             rxFieldsSettings = new HashMap<>();
-            if (inquirer.isDbg()) {
-                ArrayList<RegexFieldSettings> lst = new ArrayList<>();
-                lst.add(new RegexFieldSettings("TypeName1", "TypeSearch1", "retValue1", false, false));
-                lst.add(new RegexFieldSettings("TypeName2", "TypeSearch2", "retValue2", true, false));
-                rxFieldsSettings.put(t, lst);
-            }
         }
         return rxFieldsSettings.get(t);
     }
@@ -646,10 +640,6 @@ public class InquirerCfg implements Serializable {
     public HashSet<RegexFieldSettings> getRegexFieldsSettings() {
         if (regexFieldsSettings == null) {
             regexFieldsSettings = new HashSet<>();
-            if (inquirer.isDbg()) {
-                regexFieldsSettings.add(new RegexFieldSettings("TypeName1", "TypeSearch1", "retValue1", false, false));
-                regexFieldsSettings.add(new RegexFieldSettings("TypeName2", "TypeSearch2", "retValue2", true, false));
-            }
         }
         return regexFieldsSettings;
     }

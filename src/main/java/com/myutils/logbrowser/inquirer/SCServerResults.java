@@ -9,14 +9,11 @@ import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Properties;
 import org.apache.logging.log4j.LogManager;
 
 public class SCServerResults extends IQueryResults {
 
     private static final org.apache.logging.log4j.Logger logger = LogManager.getLogger();
-
-    private String m_tlibFilter;
 
     private int m_componentFilter;
     private ArrayList<NameID> appType = null;
@@ -66,12 +63,6 @@ public class SCServerResults extends IQueryResults {
 
     public void AddComponent(int filter) {
         m_componentFilter = m_componentFilter | filter;
-    }
-
-    public void SetConfig(Properties config) {
-        if (config != null && !config.isEmpty()) {
-            m_tlibFilter = config.getProperty("TlibFilter");
-        }
     }
 
     private void addLogMessagesReportType(DynamicTreeNode<OptionNode> root, TableType tableType) {

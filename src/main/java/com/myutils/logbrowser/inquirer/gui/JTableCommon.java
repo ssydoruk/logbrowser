@@ -586,7 +586,7 @@ abstract class JTableCommon extends JTablePopup {
     protected class DateFilterMenu extends AbstractAction {
 
         jdDateTimeFilter flt = null;
-        
+
         private DateFilterMenu(Container f) {
             super("Date filter");
         }

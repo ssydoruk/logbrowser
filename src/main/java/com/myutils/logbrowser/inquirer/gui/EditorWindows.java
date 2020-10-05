@@ -108,7 +108,7 @@ public class EditorWindows extends ExternalEditor {
         //        vim.invoke("SendKeys", ":e ++ff=dos<Enter>");
         // hide toolbar
         vim.invoke("SendKeys", ":set guioptions -=T<Enter>");
-        vim.invoke("SendKeys", ":cd " + inquirer.getWD() + "<Enter>");
+        vim.invoke("SendKeys", ":cd " + Utils.FileUtils.getCurrentDirectory() + "<Enter>");
         vim.invoke("SendKeys", ":nmap<C-F> promptfind<Enter>");
         vim.invoke("SendKeys", "x!<Enter>");
 //        vim.invoke("SendKeys", ":set switchbuf=usetab<Enter>");

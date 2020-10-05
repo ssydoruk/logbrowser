@@ -12,7 +12,6 @@ import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Properties;
 import javax.swing.JOptionPane;
 import org.apache.logging.log4j.LogManager;
 
@@ -28,8 +27,6 @@ public class WWECloudResults extends IQueryResults {
     private static final String[] RequestsToShow = {"RequestMakePredictiveCall", "RequestMakeCall"};
     private static final String[] EventsToShow = {"EventDialing", "EventNetworkReached"};
     private Object cidFinder;
-
-    private String m_tlibFilter;
 
     private int m_componentFilter;
     ArrayList<NameID> appsType = null;
@@ -142,12 +139,6 @@ public class WWECloudResults extends IQueryResults {
     @Override
     public String getName() {
         return "WS Cloud Web";
-    }
-
-    public void SetConfig(Properties config) {
-        if (config != null && !config.isEmpty()) {
-            m_tlibFilter = config.getProperty("TlibFilter");
-        }
     }
 
     public void addTLibReportType(DynamicTreeNode<OptionNode> root) {
@@ -312,7 +303,6 @@ public class WWECloudResults extends IQueryResults {
         return TLibReq;
     }
 
-//    private static final boolean TLIBNowRequests = "true".equals(System.getProperty("tlib.norequest"));
     private void runSelectionQuery(QueryDialog dlg, SelectionType selectionType, IDsFinder cidFinder) throws SQLException {
         this.cidFinder = cidFinder;
         if (selectionType != SelectionType.NO_SELECTION) {

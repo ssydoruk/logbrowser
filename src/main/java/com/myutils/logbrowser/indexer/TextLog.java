@@ -17,7 +17,7 @@ import java.io.InputStream;
  */
 public final class TextLog extends LogFileWrapper {
 
-    private static final org.apache.logging.log4j.Logger logger =Main.logger;
+    private static final org.apache.logging.log4j.Logger logger = Main.logger;
     private FileInputStream stream = null;
 
     public TextLog(File file) throws IOException {

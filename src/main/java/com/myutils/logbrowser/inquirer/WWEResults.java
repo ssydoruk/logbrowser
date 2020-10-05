@@ -10,7 +10,6 @@ import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
@@ -24,7 +23,6 @@ public class WWEResults extends IQueryResults {
     private static final String[] EventsToShow = {"EventDialing", "EventNetworkReached"};
 
     private Object cidFinder;
-    private String m_tlibFilter;
     ArrayList<NameID> appsType = null;
     private final UTCTimeRange timeRange = null;
 
@@ -140,12 +138,6 @@ public class WWEResults extends IQueryResults {
     @Override
     public String getName() {
         return "WS Web";
-    }
-
-    public void SetConfig(Properties config) {
-        if (config != null && !config.isEmpty()) {
-            m_tlibFilter = config.getProperty("TlibFilter");
-        }
     }
 
     public void addTLibReportType(DynamicTreeNode<OptionNode> root) {
@@ -358,7 +350,6 @@ public class WWEResults extends IQueryResults {
 
     }
 
-//    private static final boolean TLIBNowRequests = "true".equals(System.getProperty("tlib.norequest"));
     private void runSelectionQuery(QueryDialog dlg, SelectionType selectionType, IDsFinder cidFinder) throws SQLException {
         this.cidFinder = cidFinder;
         if (selectionType != SelectionType.NO_SELECTION) {

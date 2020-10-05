@@ -13,11 +13,8 @@ import java.beans.PropertyChangeEvent;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Properties;
 
 public class ConfServerResults extends IQueryResults {
-
-    private String m_tlibFilter;
 
     private int m_componentFilter;
     private ArrayList<NameID> appsType;
@@ -69,12 +66,6 @@ public class ConfServerResults extends IQueryResults {
 
     public void AddComponent(int filter) {
         m_componentFilter = m_componentFilter | filter;
-    }
-
-    public void SetConfig(Properties config) {
-        if (config != null && !config.isEmpty()) {
-            m_tlibFilter = config.getProperty("TlibFilter");
-        }
     }
 
     private void addLogMessagesReportType(DynamicTreeNode<OptionNode> root, TableType tableType) {

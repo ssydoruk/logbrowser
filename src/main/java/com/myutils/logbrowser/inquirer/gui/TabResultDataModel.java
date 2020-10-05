@@ -594,7 +594,7 @@ public class TabResultDataModel extends AbstractTableModel {
     private void exportShort(MyJTable tab, Writer out) throws Exception {
         for (int i = 0; i < tab.getRowCount(); i++) {
             TableRow row = getRow(tab.convertRowIndexToModel(i));
-            int fileID ;
+            int fileID;
             int fileIDPrev = 0;
             ArrayList<Pattern> filters = null;
             if (row != null) {

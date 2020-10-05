@@ -110,7 +110,7 @@ public class URSTlibTable extends DBTable {
             setFieldInt(stmt, 20, Main.getRef(ReferenceType.TLIBATTR1, theRec.getAttr1()));
             setFieldInt(stmt, 21, Main.getRef(ReferenceType.TLIBATTR2, theRec.getAttr2()));
             setFieldInt(stmt, 22, Main.getRef(ReferenceType.DN, Record.cleanDN(theRec.getDNIS())));
-            setFieldInt(stmt, 23, Main.getRef(ReferenceType.DN,Record.cleanDN( theRec.getANI())));
+            setFieldInt(stmt, 23, Main.getRef(ReferenceType.DN, Record.cleanDN(theRec.getANI())));
 
             getM_dbAccessor().SubmitStatement(m_InsertStatementId);
         } catch (SQLException e) {
