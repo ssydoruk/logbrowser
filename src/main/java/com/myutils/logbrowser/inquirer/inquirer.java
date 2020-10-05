@@ -340,7 +340,6 @@ public class inquirer {
 
             // parse command line parameters, then
             // create proper classes and invoke corresponding
-
             ee = new EnvInquirer();
             ee.parserCommandLine(args);
 
@@ -368,7 +367,7 @@ public class inquirer {
             s.append("\n\tignoreFileAccessErrors: ").append(ee.isIgnoreFileAccessErrors());
             s.append("\n\tlogBrDir: ").append(ee.getLogBrDir());
             s.append("\n\tnoTLibRequest: ").append(ee.isNoTLibRequest());
-            
+
             logger.info(s);
 
             if (!inq.initReport()) {
@@ -377,11 +376,9 @@ public class inquirer {
 
             inq.RunGUI();
 
-        } 
-        catch (Exception e){
+        } catch (Exception e) {
             System.out.println(StringUtils.join(e.getStackTrace(), "\n"));
-        }
-        finally {
+        } finally {
             WindowsSystemUtility.closeApp();
             DatabaseConnector.GracefulClose();
 //            inq.lfm.clear();

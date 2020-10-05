@@ -9,6 +9,7 @@ import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  *
@@ -28,12 +29,9 @@ public class LogFile {
     private String arcName;
 
     public LogFile(final String _fileName, final String _arcName) {
-        this.fileName = inquirer.getFullLogName(_fileName);
-        if (_arcName == null || _arcName.isEmpty()) {
-            this.arcName = null;
-        } else {
-            this.arcName = inquirer.getFullLogName(_arcName);
-        }
+        this.fileName = _fileName;
+        this.arcName = (StringUtils.isBlank(_arcName)) ? null : inquirer.getFullLogName(_arcName);
+
         if (Files.isRegularFile(Paths.get(this.fileName))) {
             if (arcName != null) {
                 inquirer.logger.info(this.toString() + ": archive in DB but file exists. Ignored archive");
