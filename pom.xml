@@ -152,6 +152,27 @@
                     <debug>true</debug>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.graalvm.nativeimage</groupId>
+                <artifactId>native-image-maven-plugin</artifactId>
+                <version>20.2.0</version>
+                <configuration>
+                    <mainClass>com.myutils.logbrowser.indexer.Main</mainClass>
+                    <imageName>indexer</imageName>
+                    <buildArgs>
+                       -Dsun.java2d.d3d=false --language:js 
+                    </buildArgs>
+                    <skip>true</skip>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>native-image</goal>
+                        </goals>
+                        <phase>package</phase>
+                    </execution>
+                </executions>
+            </plugin>       
         </plugins>
     </build>
     <properties>

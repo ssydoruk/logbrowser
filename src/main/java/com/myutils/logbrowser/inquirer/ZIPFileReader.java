@@ -11,6 +11,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 
 /**
@@ -31,7 +32,7 @@ public class ZIPFileReader extends RandomFileReader {
         inquirer.logger.debug("ZIPFileReader: " + logFile);
         try {
             logArchive = new ZipFile(new File(logFile.getArcName()), ZipFile.OPEN_READ);
-            entry = logArchive.getEntry(logFile.getFileName());
+            entry = logArchive.getEntry(FilenameUtils.getName(logFile.getFileName()));
             openZIPStream();
         } catch (FileNotFoundException e) {
             inquirer.logger.error("File [" + fileName + "] not found", e);
