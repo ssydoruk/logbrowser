@@ -45,6 +45,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.concurrent.CountDownLatch;
 import java.util.jar.Attributes;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
@@ -793,8 +794,11 @@ public class inquirer {
         class QueryTask extends MySwingWorker<Void, String> {
 
             private RequestProgress rp = null;
+            private final CountDownLatch latch;
 
-            public QueryTask() {
+
+            private QueryTask(CountDownLatch latch) {
+                this.latch=latch;
             }
 
             @Override
@@ -826,19 +830,26 @@ public class inquirer {
                         ScreenInfo.setVisible(dlg, true);
                     }
                     // dlg.setVisible(true);
-
                 }
+                latch.countDown();
+            }
+
+            private void setLatch(CountDownLatch latch) {
+                
             }
         }
         ;
         // </editor-fold>
         QueryTools.queryMessagesClear();
-        QueryTask tsk = new QueryTask();
+        CountDownLatch latch = new CountDownLatch(1);
+        QueryTask tsk = new QueryTask(latch);
         RequestProgress rp = new RequestProgress(null, true, tsk);
+        
+        
         tsk.setRp(rp);
         tsk.execute();
         rp.doShow();
-        // // ShowGui(id);
+        latch.await();
         if (dlg != null) {
             synchronized (dlg) {
                 dlg.wait();
