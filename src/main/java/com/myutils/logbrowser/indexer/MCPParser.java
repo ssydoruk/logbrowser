@@ -24,12 +24,11 @@ public class MCPParser extends Parser {
 
     static final String[] BlockNamesToIgnoreArray = {"SIP:CTI:callSync::0",
         "SIP:CTI:sipStackSync:0"};
-    private final static Pattern regSIPResp = Pattern.compile("Response sent: SIP\\/2\\.0\\s+(.+)$");
-    private final static Pattern regSIPReq = Pattern.compile("Request received: (\\w+) (.+) SIP\\/2\\.0$");
+    private final static Pattern reqSIPRequest = Pattern.compile("Request (sent|received): (\\w+) (.+) SIP\\/2\\.0\\s*$");
+    private final static Pattern reqSIPResponse = Pattern.compile("Response (received|sent): SIP\\/2\\.0\\s+(.+)$");
     private static final Pattern regHeaderEnd = Pattern.compile("^File:\\s+\\(");
     private static final Pattern ptSkip = Pattern.compile("^[:\\s]*");
     private final static Pattern SIPHeaderContinue = Pattern.compile("^\\S");
-    private static final Pattern regSIPHeader = Pattern.compile(" (Request received:|Response sent:) ");
 //    15:22:50.980: Sending  [0,UDP] 3384 bytes to 10.82.10.146:5060 >>>>>
     private static final Pattern regNotParseMessage = Pattern.compile("^(33009|49005"
             + ")");
@@ -59,11 +58,13 @@ public class MCPParser extends Parser {
     private ParserState m_ParserState;
     int m_PacketLength;
     int m_ContentLength;
-    String m_Header;
     int m_headerLine;
     boolean m_isContentLengthUnknown;
 
     private final ArrayList<String> extraBuff;
+    private boolean isInbound;
+    private String SIPMessage;
+    private String SIPURI;
 
     public MCPParser(HashMap<TableType, DBTable> m_tables) {
         super(FileInfoType.type_MCP, m_tables);
@@ -213,9 +214,13 @@ public class MCPParser extends Parser {
 
                 m_LineStarted = m_CurrentLine;
                 if (s != null) {
-                    if ((regSIPHeader.matcher(s)).find()) {
-                        m_Header = s;
-
+                    if ((m = reqSIPRequest.matcher(s)).find()
+                            || (m = reqSIPResponse.matcher(s)).find()) {
+                        isInbound = m.group(1).startsWith("r");
+                        SIPMessage = m.group(2);
+                        if (m.groupCount() > 2) {
+                            SIPURI = m.group(3);
+                        }
                         m_HeaderOffset = m_CurrentFilePos;
                         m_headerLine = m_CurrentLine;
                         m_MessageContents.clear();
@@ -270,16 +275,6 @@ public class MCPParser extends Parser {
                                     genesysMsg.AddToDB(m_tables);
                                 }
                             }
-
-//                            if (split[0].equals("DBUG")) {
-//                                if (split[callIDIdx].equals("00000000-00000000")) {
-//                                    noCallMessage(split, 2);
-//                                } else {
-//                                    callMessage(split[callIDIdx], split, 2);
-//                                }
-//                            } else {
-//                                intMessage(split[callIDIdx], split, maxSplit - 1);
-//                            }
                         }
                     }
                 }
@@ -306,7 +301,7 @@ public class MCPParser extends Parser {
                     } else {
                         m_ParserState = STATE_COMMENTS;
                         m_MessageContents.add("");
-                        AddSipMessage(m_MessageContents, m_Header);
+                        AddSipMessage(m_MessageContents);
                         m_MessageContents.clear();
                     }
                 }
@@ -329,7 +324,7 @@ public class MCPParser extends Parser {
                 }
                 if (endFound) {
                     m_ParserState = STATE_COMMENTS;
-                    AddSipMessage(m_MessageContents, m_Header);
+                    AddSipMessage(m_MessageContents);
                     m_MessageContents.clear();
                     return str;
                 } else {
@@ -367,7 +362,7 @@ public class MCPParser extends Parser {
         return null;
     }
 
-    protected void AddSipMessage(ArrayList contents, String header) throws Exception {
+    protected void AddSipMessage(ArrayList contents) throws Exception {
         Matcher m;
 
         // Populate our class representation of the message
@@ -375,14 +370,14 @@ public class MCPParser extends Parser {
 
         msg = new SipMessage(contents, TableType.SIPMS);
 
-        if ((m = regSIPReq.matcher(header)).find()) {
-            msg.SetInbound(true);
-            msg.SetName(m.group(1));
-            msg.setSipURI(m.group(2));
-        } else if ((m = regSIPResp.matcher(header)).find()) {
-            msg.SetInbound(false);
-            msg.SetName(m.group(1));
-
+        if (StringUtils.isNotEmpty(SIPMessage)) {
+            msg.SetInbound(isInbound);
+            msg.SetName(SIPMessage);
+            if (StringUtils.isNotBlank(SIPURI)) {
+                msg.setSipURI(SIPURI);
+            }
+            SIPMessage = null;
+            SIPURI = null;
         }
 
         try {

@@ -7,7 +7,6 @@ package com.myutils.logbrowser.inquirer.gui;
 
 import Utils.UnixProcess.ExtProcess;
 import Utils.Util;
-import com.hazelcast.util.CollectionUtil;
 import com.myutils.logbrowser.inquirer.LogFile;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -50,7 +49,7 @@ public class EditorUnix extends ExternalEditor {
             logger.error("", ex);
         }
 
-        if (CollectionUtil.isNotEmpty(errBuf)) {
+        if (errBuf != null && !errBuf.isEmpty()) {
             logger.error("stdErr: [" + StringUtils.join(errBuf, ",") + "]");
             if (errBuf.get(0).startsWith("E247:")) {
                 logger.error("E247: [" + StringUtils.join(errBuf, ",") + "]");

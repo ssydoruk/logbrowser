@@ -111,8 +111,8 @@ public class Main {
         System.setProperty("logPath", ee.getLogbrowserDir());
 
 //            logBrDirAbs = Paths.get(logBrDir).toAbsolutePath().normalize().toString();
-        System.setProperty("log4j2.saveDirectory", "true");
-
+        System.setProperty("log4j2.saveDirectory", ee.getLogbrowserDir());
+        
         logger = LogManager.getLogger("indexer");
         logger.info("starting");
         StringBuilder s = new StringBuilder();

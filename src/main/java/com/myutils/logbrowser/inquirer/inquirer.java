@@ -2,6 +2,7 @@ package com.myutils.logbrowser.inquirer;
 
 import static Utils.FileUtils.setCurrentDirectory;
 import Utils.ScreenInfo;
+import Utils.Util;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.jidesoft.dialog.ButtonPanel;
@@ -60,7 +61,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
-import javax.swing.UIManager;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -347,11 +347,12 @@ public class inquirer {
             System.setProperty("sun.awt.exception.handler", ExceptionHandler.class.getName());
 
             inq = new inquirer();
+            Utils.FileUtils.mkDir(ee.getLogBrDir());
 
             System.setProperty("logPath", ee.getLogBrDir());
 
 //            logBrDirAbs = Paths.get(logBrDir).toAbsolutePath().normalize().toString();
-            System.setProperty("log4j2.saveDirectory", "true");
+            System.setProperty("log4j2.saveDirectory", ee.getLogBrDir());
 
             logger = LogManager.getLogger("inquirer");
             logger.info("starting");
@@ -379,7 +380,13 @@ public class inquirer {
         } catch (Exception e) {
             System.out.println(StringUtils.join(e.getStackTrace(), "\n"));
         } finally {
-            WindowsSystemUtility.closeApp();
+            if (Utils.Util.getOS() == Util.OS.WINDOWS) {
+                try {
+                    WindowsSystemUtility.closeApp();
+                } catch (Exception e) {
+                }
+            }
+
             DatabaseConnector.GracefulClose();
 //            inq.lfm.clear();
         }
@@ -439,7 +446,7 @@ public class inquirer {
     }
 
     private static void ShowGui() throws Exception {
-        UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName()); // you need to catch the exceptions
+//        UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName()); // you need to catch the exceptions
         // on this call.
         LookAndFeelFactory.installJideExtension();
         // queryDialigSettings = readObject(serFile, <T>o);

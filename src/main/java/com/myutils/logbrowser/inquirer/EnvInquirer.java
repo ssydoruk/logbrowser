@@ -215,9 +215,12 @@ public class EnvInquirer extends ExecutionEnvironment {
 
     private String getLogbrowserDir() {
         String ret = getStringOrDef(optLogBrowserDir, null);
-        if (ret == null) {
+        if (StringUtils.isEmpty(ret)) {
             ret = System.getProperty("logbr.dir");
         }
-        return StringUtils.defaultIfEmpty(ret, ".logbr");
+        if (StringUtils.isEmpty(ret)) {
+            ret = ".logbr";
+        }
+        return  (new File(ret).isAbsolute())?ret:FilenameUtils.concat(getBaseDir(), ret);
     }
 }

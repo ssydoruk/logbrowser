@@ -17,11 +17,6 @@
             <version>2.11.2</version>
         </dependency>
         <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>log4j-over-slf4j</artifactId>
-            <version>1.7.30</version>
-        </dependency>
-        <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
             <version>3.7</version>
@@ -62,13 +57,11 @@
                     <groupId>org.jetbrains.kotlin</groupId>
                     <artifactId>kotlin-stdlib-common</artifactId>
                 </exclusion>
+                <exclusion>
+                    <groupId>com.squareup.okio</groupId>
+                    <artifactId>okio</artifactId>
+                </exclusion>
             </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>com.hazelcast</groupId>
-            <artifactId>hazelcast</artifactId>
-            <version>3.9.4</version>
-            <type>jar</type>
         </dependency>
         <dependency>
             <groupId>com.eclipsesource.minimal-json</groupId>
@@ -123,6 +116,11 @@
             <artifactId>truffle-api</artifactId>
             <version>20.2.0</version>
         </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <version>1.7.30</version>
+        </dependency>
     </dependencies>
     <build>
         <plugins>
@@ -157,10 +155,14 @@
                 <artifactId>native-image-maven-plugin</artifactId>
                 <version>20.2.0</version>
                 <configuration>
-                    <mainClass>com.myutils.logbrowser.indexer.Main</mainClass>
-                    <imageName>indexer</imageName>
+                    <mainClass>com.myutils.logbrowser.common.Start</mainClass>
+                    <imageName>logbrowser</imageName>
                     <buildArgs>
-                       -Dsun.java2d.d3d=false --language:js 
+                      --verbose --no-server -H:+TraceClassInitialization --report-unsupported-elements-at-runtime 
+                        --initialize-at-run-time=java.utils.prefs 
+                        --initialize-at-build-time=com.myutils.logbrowser,org.apache.logging.log4j
+                        --initialize-at-build-time=com.sun.jmx.defaults.JmxProperties,com.sun.jmx.mbeanserver.MBeanInstantiator,com.sun.jmx.mbeanserver.MXBeanLookup,com.sun.jmx.mbeanserver.Introspector,jdk.management.jfr.SettingDescriptorInfo
+                        --initialize-at-build-time=java.awt.Color,sun.awt.AWTAccessor,java.awt.Toolkit,com.sun.jna
                     </buildArgs>
                     <skip>true</skip>
                 </configuration>
@@ -177,7 +179,7 @@
     </build>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.source>11</maven.compiler.source>
-        <maven.compiler.target>11</maven.compiler.target>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
     </properties>
 </project>

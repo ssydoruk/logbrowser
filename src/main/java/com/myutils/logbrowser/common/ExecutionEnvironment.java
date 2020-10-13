@@ -12,11 +12,9 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.logging.log4j.Level;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 /**
+ * This class should not contain Logger!!!
  *
  * @author stepan_sydoruk
  */
@@ -41,11 +39,9 @@ public class ExecutionEnvironment {
                 ret = (String) cmd.getParsedOptionValue(opt.getOpt());
             }
         } catch (ParseException ex) {
-            logger.log(Level.FATAL, ex);
+            System.out.println(ex);
         }
         return (StringUtils.isNotBlank(ret)) ? ret : def;
     }
-
-    private static final Logger logger = LogManager.getLogger("");
 
 }
