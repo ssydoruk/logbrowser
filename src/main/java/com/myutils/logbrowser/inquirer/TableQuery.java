@@ -243,7 +243,7 @@ public class TableQuery extends IQuery {
                         recLoaded(ret);
                         return ret;
                     } catch (InstantiationException | IllegalAccessException ex) {
-                        logger.log(org.apache.logging.log4j.Level.FATAL, ex);
+                        logger.error("fatal: ",  ex);
                         throw new SQLException(ex);
                     }
                 }

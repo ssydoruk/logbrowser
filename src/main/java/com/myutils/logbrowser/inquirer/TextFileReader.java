@@ -64,7 +64,7 @@ public class TextFileReader extends RandomFileReader {
             reader.close();
 
         } catch (IOException ex) {
-            logger.log(org.apache.logging.log4j.Level.FATAL, ex);
+            logger.error("fatal: ",  ex);
         }
 
     }

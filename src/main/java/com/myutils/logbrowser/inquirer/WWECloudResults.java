@@ -222,7 +222,7 @@ public class WWECloudResults extends IQueryResults {
         try {
             addCustom(rootA, FileInfoType.type_WWECloud);
         } catch (SQLException ex) {
-            logger.log(org.apache.logging.log4j.Level.FATAL, ex);
+            logger.error("fatal: ",  ex);
         }
         nd = new DynamicTreeNode<>(new OptionNode(DialogItem.WWELOGMESSAGE));
         rootA.addChild(nd);
@@ -530,7 +530,7 @@ public class WWECloudResults extends IQueryResults {
             try {
                 return cidFinder.AnythingTLibRelated();
             } catch (SQLException ex) {
-                logger.log(org.apache.logging.log4j.Level.FATAL, ex);
+                logger.error("fatal: ",  ex);
             }
         }
         return true;

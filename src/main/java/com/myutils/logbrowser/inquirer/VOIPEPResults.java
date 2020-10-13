@@ -248,7 +248,7 @@ public class VOIPEPResults extends IQueryResults {
         try {
             addCustom(rootA, FileInfoType.type_VOIPEP);
         } catch (SQLException ex) {
-            logger.log(org.apache.logging.log4j.Level.FATAL, ex);
+            logger.error("fatal: ",  ex);
         }
         addConfigUpdates(rootA);
 

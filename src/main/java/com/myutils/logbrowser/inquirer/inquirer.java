@@ -70,6 +70,11 @@ import org.apache.logging.log4j.Logger;
 
 public class inquirer {
 
+    public inquirer() {
+        // Init different static. This is unsave but efficient
+        OutputSpecFormatter.initStatic();
+    }
+
     static XmlCfg cfg;
     private static String curDirectory;
 
@@ -137,7 +142,7 @@ public class inquirer {
         // try {
         // RequestProgress.dialogStarted.wait(500);
         // } catch (InterruptedException ex) {
-        // java.util.logging.logger.log(org.apache.logging.log4j.Level.FATAL, ex);
+        // java.util.logging.logger.error("fatal: ",  ex);
         // }
         return JOptionPane.showConfirmDialog(object, string, title, YES_NO_CANCEL_OPTION);
         // }
@@ -347,7 +352,6 @@ public class inquirer {
             Thread.setDefaultUncaughtExceptionHandler(new ExceptionHandler());
             System.setProperty("sun.awt.exception.handler", ExceptionHandler.class.getName());
 
-            inq = new inquirer();
             Utils.FileUtils.mkDir(ee.getLogBrDir());
 
             System.setProperty("logPath", ee.getLogBrDir());
@@ -371,6 +375,8 @@ public class inquirer {
             s.append("\n\tnoTLibRequest: ").append(ee.isNoTLibRequest());
 
             logger.info(s);
+
+            inq = new inquirer();
 
             if (!inq.initReport()) {
                 return;
@@ -519,7 +525,7 @@ public class inquirer {
         // dlg = new QueryDialog(queries, id);
         // logger.info("Created dlgs");
         // } catch (Exception ex) {
-        // java.util.logging.logger.log(org.apache.logging.log4j.Level.FATAL, ex);
+        // java.util.logging.logger.error("fatal: ",  ex);
         // }
         // }
         // });
@@ -796,9 +802,8 @@ public class inquirer {
             private RequestProgress rp = null;
             private final CountDownLatch latch;
 
-
             private QueryTask(CountDownLatch latch) {
-                this.latch=latch;
+                this.latch = latch;
             }
 
             @Override
@@ -835,7 +840,7 @@ public class inquirer {
             }
 
             private void setLatch(CountDownLatch latch) {
-                
+
             }
         }
         ;
@@ -844,8 +849,7 @@ public class inquirer {
         CountDownLatch latch = new CountDownLatch(1);
         QueryTask tsk = new QueryTask(latch);
         RequestProgress rp = new RequestProgress(null, true, tsk);
-        
-        
+
         tsk.setRp(rp);
         tsk.execute();
         rp.doShow();

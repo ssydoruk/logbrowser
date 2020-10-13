@@ -42,7 +42,7 @@ public class OrsSidUuid extends Message {
             setFieldString(stmt,9,UUID); 
             accessor.SubmitStatement(m_batchId);
         } catch (SQLException ex) {
-            logger.log(org.apache.logging.log4j.Level.FATAL, ex);
+            logger.error("fatal: ",  ex);
         }
     }
      */

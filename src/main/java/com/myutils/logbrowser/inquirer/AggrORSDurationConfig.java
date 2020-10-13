@@ -91,7 +91,7 @@ public class AggrORSDurationConfig extends javax.swing.JPanel {
                     try {
                         timeRange.setTimeRange(DatabaseConnector.getTimeRangeByAppID(item.getId()));
                     } catch (SQLException ex) {
-                        logger.log(org.apache.logging.log4j.Level.FATAL, ex);
+                        logger.error("fatal: ",  ex);
                     }
                 }
             }

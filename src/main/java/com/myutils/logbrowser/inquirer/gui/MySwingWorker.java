@@ -74,7 +74,7 @@ public abstract class MySwingWorker<T, V> extends SwingWorker<T, V> {
             }
 
         } catch (InterruptedException ex) {
-            logger.log(org.apache.logging.log4j.Level.FATAL, ex);
+            logger.error("fatal: ",  ex);
         }
         return true;
     }

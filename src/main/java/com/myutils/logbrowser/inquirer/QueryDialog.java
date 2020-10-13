@@ -548,7 +548,7 @@ public class QueryDialog extends javax.swing.JFrame {
 //                try {
 //                    Excel.reportEdit(files);
 //                } catch (IOException ex) {
-//                    logger.log(org.apache.logging.log4j.Level.FATAL, ex);
+//                    logger.error("fatal: ",  ex);
 //                }
 //            }
         }
@@ -671,7 +671,7 @@ public class QueryDialog extends javax.swing.JFrame {
                             try {
                                 this.allCalls = new QueryAllJTable(qry, frm, all);
                             } catch (Exception ex) {
-                                logger.log(org.apache.logging.log4j.Level.FATAL, ex);
+                                logger.error("fatal: ",  ex);
                             }
                             Dimension d = allCalls.getPreferredSize();
                             d.height = 400;

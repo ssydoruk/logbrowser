@@ -249,7 +249,7 @@ public class MyJTable extends JTableCommon {
                             JOptionPane.showMessageDialog(getParent(), "Cannot jump to file [" + tableRow.getFileName() + "]", "Error opening file in VIM", ERROR_MESSAGE);
                         }
                     } catch (com.jacob.com.ComFailException ex) {
-                        logger.log(org.apache.logging.log4j.Level.FATAL, ex);
+                        logger.error("fatal: ",  ex);
 
                         JOptionPane.showMessageDialog(getParent(), "Exception loading file [" + tableRow.getFileName() + "]: \n"
                                 + ex.getMessage() + "\n\nCheck that you have gvim installed or get one (http://www.vim.org/)", "Error opening file in VIM", ERROR_MESSAGE);
@@ -265,7 +265,7 @@ public class MyJTable extends JTableCommon {
 //                try {
 //                    fullMsg.showMessage(InquirerFileIo.GetFileBytes(tableRow.getFileName(), tableRow.getOffset(), tableRow.getFileBytes()));
 //                } catch (Exception ex) {
-//                    java.util.logging.logger.log(org.apache.logging.log4j.Level.FATAL, ex);
+//                    java.util.logging.logger.error("fatal: ",  ex);
 ////                    }
 //                }
         }

@@ -9,10 +9,9 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.MissingFormatArgumentException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.regex.*;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
 import org.graalvm.polyglot.Context;
 import org.graalvm.polyglot.HostAccess;
 import org.graalvm.polyglot.Value;
@@ -65,9 +64,14 @@ public abstract class OutputSpecFormatter extends DefaultFormatter {
             return ret;
         }
     }
+
+    public static void initStatic() {
+        condContext = Context.newBuilder("js").allowAllAccess(true).build();
+        condContext.eval("js", "true"); // to test javascript engine init. 
+//        System.out.println("static inited");
+    }
     private final XmlCfg cfg;
 
-    private HashSet<String> m_filter;
     private HashMap<String, RecordLayout> outSpec = new HashMap<>();
 
     public OutputSpecFormatter(XmlCfg cfg,
@@ -121,7 +125,7 @@ public abstract class OutputSpecFormatter extends DefaultFormatter {
         }
     }
 
-    private static final org.apache.logging.log4j.Logger logger = inquirer.logger;
+    private static final org.apache.logging.log4j.Logger logger = LogManager.getLogger();
 
     @Override
     public void ProcessLayout() {
@@ -146,11 +150,6 @@ public abstract class OutputSpecFormatter extends DefaultFormatter {
         }
     }
 
-    public void SetTlibFilter(String filter) {
-        m_filter = new HashSet<>();
-        String[] fList = filter.split(",");
-        m_filter.addAll(Arrays.asList(fList));
-    }
 
     public static abstract class Parameter {
 
@@ -383,7 +382,10 @@ public abstract class OutputSpecFormatter extends DefaultFormatter {
             if (cond != null) {
                 try {
                     Inquirer.setCurrentRec(record);
+                    logger.debug("before eval");
+
                     Value eval = condContext.eval("js", cond);
+                    logger.debug("after eval [" + cond + "]: " + eval);
                     if (eval.asBoolean() == false) {
                         return "";
                     }
@@ -473,7 +475,7 @@ public abstract class OutputSpecFormatter extends DefaultFormatter {
 //                    try {
                     return DatabaseConnector.getValue(expr, s);
 //                    } catch (Exception ex) {
-//                        logger.log(org.apache.logging.log4j.Level.FATAL, ex);
+//                        logger.error("fatal: ",  ex);
 //                    }
                 }
                 return s;
@@ -577,7 +579,7 @@ public abstract class OutputSpecFormatter extends DefaultFormatter {
                         return ret.toString();
                     }
                 } catch (Exception ex) {
-                    Logger.getLogger(OutputSpecFormatter.class.getName()).log(Level.SEVERE, null, ex);
+                    logger.error("", ex);
                 }
                 return "";
 
@@ -971,7 +973,7 @@ public abstract class OutputSpecFormatter extends DefaultFormatter {
         }
     }
 
-    static final private Context condContext = Context.newBuilder().allowAllAccess(true).build();
+    static private Context condContext = null;
     static final private String Inquirer_CLASS = Inquirer.class.getName();
 
     public static class Inquirer {

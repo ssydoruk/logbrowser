@@ -60,7 +60,7 @@ class TableReference {
                     this.initialID = maxID;
                 }
             } catch (Exception ex) {
-                logger.log(org.apache.logging.log4j.Level.FATAL, ex);
+                logger.error("fatal: ",  ex);
             }
         }
     }

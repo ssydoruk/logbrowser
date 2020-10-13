@@ -912,7 +912,7 @@ public abstract class IQueryResults extends QueryTools
             cs = new CustomStorage(fullTable);
 
         } catch (Exception ex) {
-            logger.log(org.apache.logging.log4j.Level.FATAL, ex);
+            logger.error("fatal: ",  ex);
         }
     }
 

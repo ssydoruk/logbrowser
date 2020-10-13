@@ -137,7 +137,7 @@ public class ConfServerResults extends IQueryResults {
 //        try {
 //            addCustom(rootA, FileInfoType.type_SCS);
 //        } catch (Exception ex) {
-//            logger.log(org.apache.logging.log4j.Level.FATAL, ex);
+//            logger.error("fatal: ",  ex);
 //        }
 //
 //        app.addDynamicRef(DialogItem.SCS_Application_NAME, ReferenceType.App, "scs_appstatus", "theAppNameID");

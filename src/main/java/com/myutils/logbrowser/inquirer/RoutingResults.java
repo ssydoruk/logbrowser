@@ -46,13 +46,13 @@ final public class RoutingResults extends IQueryResults {
         try {
             isORS = (DatabaseConnector.fileExits(new FileInfoType[]{FileInfoType.type_ORS}));
         } catch (SQLException e) {
-            logger.log(org.apache.logging.log4j.Level.FATAL, e);
+            logger.error("fatal: ",  e);
 
         }
         try {
             isURS = (DatabaseConnector.fileExits(new FileInfoType[]{FileInfoType.type_URS, FileInfoType.type_URSHTTP}));
         } catch (SQLException e) {
-            logger.log(org.apache.logging.log4j.Level.FATAL, e);
+            logger.error("fatal: ",  e);
         }
 
         addSelectionType(SelectionType.NO_SELECTION);
@@ -88,7 +88,7 @@ final public class RoutingResults extends IQueryResults {
                 addCustom(rootA, FileInfoType.type_URS);
             }
         } catch (SQLException ex) {
-            logger.log(org.apache.logging.log4j.Level.FATAL, ex);
+            logger.error("fatal: ",  ex);
         }
         if (isURS) {
             msgUrsConfig = rootA.getLogMessagesReportType(TableType.MsgURServer, URS_LOG_MSG);
@@ -156,7 +156,7 @@ final public class RoutingResults extends IQueryResults {
 
             }
         } catch (SQLException ex) {
-            logger.log(org.apache.logging.log4j.Level.FATAL, ex);
+            logger.error("fatal: ",  ex);
         }
         try {
             if (DatabaseConnector.TableExist("ursstat")) {
@@ -167,7 +167,7 @@ final public class RoutingResults extends IQueryResults {
                 tEventsNode.addDynamicRef(DialogItem.URS_AGENTDN_AGENT, ReferenceType.Agent, "ursstat", "AgentNameID");
             }
         } catch (SQLException ex) {
-            logger.log(org.apache.logging.log4j.Level.FATAL, ex);
+            logger.error("fatal: ",  ex);
         }
         tEventsNode = new DynamicTreeNode<>(new OptionNode(true, DialogItem.URS_STRATEGY));
         reportTypeURSStrategy.addChild(tEventsNode);
@@ -181,7 +181,7 @@ final public class RoutingResults extends IQueryResults {
                 tEventsNode.addDynamicRef(DialogItem.URS_RLIB_METHOD, ReferenceType.ORSMETHOD);
             }
         } catch (SQLException ex) {
-            logger.log(org.apache.logging.log4j.Level.FATAL, ex);
+            logger.error("fatal: ",  ex);
         }
         try {
             if (DatabaseConnector.TableExist("ursri")) {
@@ -197,7 +197,7 @@ final public class RoutingResults extends IQueryResults {
 //                tEventsNode.addDynamicRef(DialogItem.URS_RI_SUBFUNCTION, ReferenceType.URSMETHOD, "ursri", "subfuncID");
             }
         } catch (SQLException ex) {
-            logger.log(org.apache.logging.log4j.Level.FATAL, ex);
+            logger.error("fatal: ",  ex);
         }
         try {
             if (DatabaseConnector.TableExist(TableType.URSHTTP)) {
@@ -214,7 +214,7 @@ final public class RoutingResults extends IQueryResults {
 //                tEventsNode.addDynamicRef(DialogItem.URS_RI_SUBFUNCTION, ReferenceType.URSMETHOD, "ursri", "subfuncID");
             }
         } catch (SQLException ex) {
-            logger.log(org.apache.logging.log4j.Level.FATAL, ex);
+            logger.error("fatal: ",  ex);
         }
 
         tEventsNode = new DynamicTreeNode<>(new OptionNode(true, DialogItem.URS_VQ));
@@ -631,7 +631,7 @@ final public class RoutingResults extends IQueryResults {
 //</editor-fold>
             return currTable; //To change body of generated methods, choose Tools | Templates.
 //        } catch (Exception ex) {
-//            logger.log(org.apache.logging.log4j.Level.FATAL, ex);
+//            logger.error("fatal: ",  ex);
         } finally {
             DynamicTreeNode.setNoRefNoLoad(false);
 
@@ -1561,7 +1561,7 @@ final public class RoutingResults extends IQueryResults {
 
             return ret;
         } catch (Exception ex) {
-            logger.log(org.apache.logging.log4j.Level.FATAL, ex);
+            logger.error("fatal: ",  ex);
         }
         return null;
     }

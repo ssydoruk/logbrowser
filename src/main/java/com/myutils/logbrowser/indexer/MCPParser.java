@@ -442,11 +442,10 @@ public class MCPParser extends Parser {
                             steps.setCommand(get);
                         } else {
                             steps.setCommand("execution step");
-
                         }
-                        steps.setParam1(noFirstWord);
+                        //steps.setParam1(noFirstWord);
                     } else {
-                        steps.setParam1(noFile);
+                        //steps.setParam1(noFile);
                     }
 
 //                        steps.setStepParams(StringUtils.split(split[initalIndex], null));
@@ -504,6 +503,42 @@ public class MCPParser extends Parser {
 
     private static class VXMLStepsParams {
 
+        private static void setMsgParams(VXMLIntSteps msg, String[] msgParams, int startingParamIdx) {
+            setMsgParams(msg, msgParams, startingParamIdx, true);
+        }
+
+        private static void setMsgParams(VXMLIntSteps msg, String[] msgParams, int startingParamIdx, boolean checkDigits) {
+            int paramIdx = 1;
+            if (ArrayUtils.isNotEmpty(msgParams)) {
+                for (int i = startingParamIdx; i < msgParams.length; i++) {
+                    String s = msgParams[i];
+                    StringBuilder b = new StringBuilder();
+                    String[] split = StringUtils.split(s, " |:#");
+
+                    for (String string : split) {
+                        if (StringUtils.isNotBlank(string) && !StringUtils.contains(string, msg.getMcpCallID())
+                                && (!checkDigits || !Utils.StringUtils.isNumeric(string))) {
+                            if (b.length() > 0) {
+                                b.append(" ");
+                            }
+                            b.append(string);
+                        }
+                    }
+                    if (b.length() > 0) {
+                        switch (paramIdx) {
+                            case 1:
+                                msg.setParam1(b.toString());
+                                break;
+
+                            default:
+                                msg.setParam2(b.toString());
+                        }
+                        paramIdx++;
+                    }
+                }
+            }
+        }
+
         private Map<String, IParamParseProc> initSplitSteps() {
             HashMap<String, IParamParseProc> ret = new HashMap<>();
             ret.put("call_reference", new IParamParseProc() {
@@ -537,9 +572,7 @@ public class MCPParser extends Parser {
                 @Override
                 public void proc(VXMLIntSteps msg, String[] msgParams, String orig) {
                     msg.setCommand(msgParams[0]);
-                    if (msgParams.length > 1) {
-                        msg.setParam1(clearParam(msgParams[1]));
-                    }
+                    setMsgParams(msg, msgParams, 1);
                 }
             });
 
@@ -557,8 +590,9 @@ public class MCPParser extends Parser {
                 @Override
                 public void proc(VXMLIntSteps msg, String[] msgParams, String orig) {
                     msg.setCommand(msgParams[0]);
+                    setMsgParams(msg, msgParams, 1, false);
                     if (msgParams.length > 1) {
-                        msg.setParam1(clearParam(msgParams[1]));
+                        msg.setParam1(msgParams[1]);
                     }
                 }
             });
@@ -567,33 +601,36 @@ public class MCPParser extends Parser {
                 @Override
                 public void proc(VXMLIntSteps msg, String[] msgParams, String orig) {
                     msg.setCommand(msgParams[0]);
+                    setMsgParams(msg, msgParams, 1);
                 }
             });
             ret.put("prompt_start", new IParamParseProc() {
                 @Override
                 public void proc(VXMLIntSteps msg, String[] msgParams, String orig) {
                     msg.setCommand(msgParams[0]);
+                    setMsgParams(msg, msgParams, 1);
                 }
             });
             ret.put("prompt_stop", new IParamParseProc() {
                 @Override
                 public void proc(VXMLIntSteps msg, String[] msgParams, String orig) {
                     msg.setCommand(msgParams[0]);
+                    setMsgParams(msg, msgParams, 1);
                 }
             });
             ret.put("prompt_end", new IParamParseProc() {
                 @Override
                 public void proc(VXMLIntSteps msg, String[] msgParams, String orig) {
                     msg.setCommand(msgParams[0]);
+                    setMsgParams(msg, msgParams, 1);
+
                 }
             });
             ret.put("prompt_type", new IParamParseProc() {
                 @Override
                 public void proc(VXMLIntSteps msg, String[] msgParams, String orig) {
                     msg.setCommand(msgParams[0]);
-                    if (msgParams.length > 0) {
-                        msg.setParam1(StringUtils.join(msgParams, " "));
-                    }
+                    setMsgParams(msg, msgParams, 1);
                 }
             });
 
@@ -601,52 +638,45 @@ public class MCPParser extends Parser {
                 @Override
                 public void proc(VXMLIntSteps msg, String[] msgParams, String orig) {
                     msg.setCommand(msgParams[0]);
-                    if (msgParams.length > 0) {
-                        msg.setParam1(msgParams[1]);
-                    }
+                    setMsgParams(msg, msgParams, 1);
                 }
             });
             ret.put("asr_open", new IParamParseProc() {
                 @Override
                 public void proc(VXMLIntSteps msg, String[] msgParams, String orig) {
                     msg.setCommand(msgParams[0]);
+                    setMsgParams(msg, msgParams, 1);
 //                    msg.setParam1(msgParams[1]);
                 }
+
             });
             ret.put("asr_close", new IParamParseProc() {
                 @Override
                 public void proc(VXMLIntSteps msg, String[] msgParams, String orig) {
                     msg.setCommand(msgParams[0]);
-//                    msg.setParam1(msgParams[1]);
+                    setMsgParams(msg, msgParams, 1);
                 }
             });
             ret.put("asr_start", new IParamParseProc() {
                 @Override
                 public void proc(VXMLIntSteps msg, String[] msgParams, String orig) {
                     msg.setCommand(msgParams[0]);
-//                    msg.setParam1(msgParams[1]);
+                    setMsgParams(msg, msgParams, 1);
                 }
             });
             ret.put("asr_end", new IParamParseProc() {
                 @Override
                 public void proc(VXMLIntSteps msg, String[] msgParams, String orig) {
                     msg.setCommand(msgParams[0]);
-                    if (msgParams.length > 0) {
-                        msg.setParam1(StringUtils.join(msgParams, " "));
-                    }
-//                    msg.setParam1(msgParams[1]);
+                    setMsgParams(msg, msgParams, 1);
                 }
             });
             ret.put("asr_trace", new IParamParseProc() {
                 @Override
                 public void proc(VXMLIntSteps msg, String[] msgParams, String orig) {
                     msg.setCommand(msgParams[0]);
-                    if (msgParams.length > 0) {
-                        String[] split = StringUtils.split(msgParams[1], ":", 2);
-                        if (ArrayUtils.isNotEmpty(split)) {
-                            msg.setParam1(split[0]);
-                        }
-                    }
+                    setMsgParams(msg, msgParams, 1);
+
                 }
             });
 
@@ -667,9 +697,8 @@ public class MCPParser extends Parser {
                 @Override
                 public void proc(VXMLIntSteps msg, String[] msgParams, String orig) {
                     msg.setCommand(msgParams[0]);
-                    if (msgParams.length > 1) {
-                        msg.setParam1(clearParam(msgParams[1]));
-                    }
+                    setMsgParams(msg, msgParams, 1);
+
                 }
             });
 
@@ -690,12 +719,8 @@ public class MCPParser extends Parser {
                 @Override
                 public void proc(VXMLIntSteps msg, String[] msgParams, String orig) {
                     msg.setCommand(msgParams[0]);
-                    if (msgParams.length > 0) {
-                        String[] split = StringUtils.split(msgParams[1], ":", 2);
-                        if (ArrayUtils.isNotEmpty(split)) {
-                            msg.setParam1(split[0]);
-                        }
-                    }
+                    setMsgParams(msg, msgParams, 1);
+
                 }
             });
 
@@ -730,6 +755,8 @@ public class MCPParser extends Parser {
                 @Override
                 public void proc(VXMLIntSteps msg, String[] msgParams, String orig) {
                     msg.setCommand(msgParams[0]);
+                    setMsgParams(msg, msgParams, 1);
+
                 }
             });
 
@@ -743,21 +770,15 @@ public class MCPParser extends Parser {
                 @Override
                 public void proc(VXMLIntSteps msg, String[] msgParams, String orig) {
                     msg.setCommand(msgParams[0]);
-                    if (msgParams.length > 0) {
-                        msg.setParam1(StringUtils.join(msgParams, " "));
-                    }
+                    setMsgParams(msg, msgParams, 1);
+
                 }
             });
             ret.put("input_end", new IParamParseProc() {
                 @Override
                 public void proc(VXMLIntSteps msg, String[] msgParams, String orig) {
                     msg.setCommand(msgParams[0]);
-                    if (msgParams.length > 0) {
-                        String[] split = StringUtils.split(msgParams[1], "|", 2);
-                        if (ArrayUtils.isNotEmpty(split)) {
-                            msg.setParam1(split[0]);
-                        }
-                    }
+                    setMsgParams(msg, msgParams, 1);
 
                 }
             });
@@ -766,18 +787,24 @@ public class MCPParser extends Parser {
                 @Override
                 public void proc(VXMLIntSteps msg, String[] msgParams, String orig) {
                     msg.setCommand(msgParams[0]);
+                    setMsgParams(msg, msgParams, 1);
+
                 }
             });
             ret.put("subdialog_return", new IParamParseProc() {
                 @Override
                 public void proc(VXMLIntSteps msg, String[] msgParams, String orig) {
                     msg.setCommand(msgParams[0]);
+                    setMsgParams(msg, msgParams, 1);
+
                 }
             });
             ret.put("subdialog_start", new IParamParseProc() {
                 @Override
                 public void proc(VXMLIntSteps msg, String[] msgParams, String orig) {
                     msg.setCommand(msgParams[0]);
+                    setMsgParams(msg, msgParams, 1);
+
                 }
             });
 
@@ -806,7 +833,7 @@ public class MCPParser extends Parser {
                 @Override
                 public void proc(VXMLIntSteps msg, String[] msgParams, String orig) {
                     msg.setCommand(msgParams[0]);
-                    msg.setParam1(StringUtils.join(msgParams, " "));
+                    setMsgParams(msg, msgParams, 1);
                 }
             });
 
@@ -814,18 +841,24 @@ public class MCPParser extends Parser {
                 @Override
                 public void proc(VXMLIntSteps msg, String[] msgParams, String orig) {
                     msg.setCommand(msgParams[0]);
+                    setMsgParams(msg, msgParams, 1);
+
                 }
             });
             ret.put("filled_exit", new IParamParseProc() {
                 @Override
                 public void proc(VXMLIntSteps msg, String[] msgParams, String orig) {
                     msg.setCommand(msgParams[0]);
+                    setMsgParams(msg, msgParams, 1);
+
                 }
             });
             ret.put("prompt", new IParamParseProc() {
                 @Override
                 public void proc(VXMLIntSteps msg, String[] msgParams, String orig) {
                     msg.setCommand(msgParams[0]);
+                    setMsgParams(msg, msgParams, 1);
+
                 }
             });
 
@@ -833,9 +866,8 @@ public class MCPParser extends Parser {
                 @Override
                 public void proc(VXMLIntSteps msg, String[] msgParams, String orig) {
                     msg.setCommand(msgParams[0]);
-                    if (msgParams.length > 1) {
-                        msg.setParam1(msgParams[1]);
-                    }
+                    setMsgParams(msg, msgParams, 1);
+
                 }
 
             });
@@ -843,9 +875,8 @@ public class MCPParser extends Parser {
                 @Override
                 public void proc(VXMLIntSteps msg, String[] msgParams, String orig) {
                     msg.setCommand(msgParams[0]);
-                    if (msgParams.length > 1) {
-                        msg.setParam1(StringUtils.join(msgParams, " "));
-                    }
+                    setMsgParams(msg, msgParams, 1);
+
                 }
 
             });
@@ -854,9 +885,8 @@ public class MCPParser extends Parser {
                 @Override
                 public void proc(VXMLIntSteps msg, String[] msgParams, String orig) {
                     msg.setCommand(msgParams[0]);
-                    if (msgParams.length > 1) {
-                        msg.setParam1(StringUtils.join(msgParams, " "));
-                    }
+                    setMsgParams(msg, msgParams, 1);
+
                 }
 
             });
@@ -865,9 +895,8 @@ public class MCPParser extends Parser {
                 @Override
                 public void proc(VXMLIntSteps msg, String[] msgParams, String orig) {
                     msg.setCommand(msgParams[0]);
-                    if (msgParams.length > 1) {
-                        msg.setParam1(msgParams[1]);
-                    }
+                    setMsgParams(msg, msgParams, 1);
+
                 }
 
             });
@@ -883,9 +912,8 @@ public class MCPParser extends Parser {
                 @Override
                 public void proc(VXMLIntSteps msg, String[] msgParams, String orig) {
                     msg.setCommand(msgParams[0]);
-                    if (msgParams.length > 1) {
-                        msg.setParam1(clearParam(msgParams[1]));
-                    }
+                    setMsgParams(msg, msgParams, 1);
+
                 }
 
             });
@@ -893,9 +921,8 @@ public class MCPParser extends Parser {
                 @Override
                 public void proc(VXMLIntSteps msg, String[] msgParams, String orig) {
                     msg.setCommand(msgParams[0]);
-                    if (msgParams.length > 1) {
-                        msg.setParam1(clearParam(msgParams[1]));
-                    }
+                    setMsgParams(msg, msgParams, 1);
+
                 }
 
             });
@@ -922,7 +949,7 @@ public class MCPParser extends Parser {
         }
 
         private String clearParam(String p) {
-            return StringUtils.stripStart(p, ":#");
+            return StringUtils.stripStart(p, ":");
         }
 
         private Map<Pattern, IPatternProc> initPatternSteps() {

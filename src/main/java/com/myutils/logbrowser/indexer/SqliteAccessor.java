@@ -469,7 +469,7 @@ public final class SqliteAccessor extends Thread implements DBAccessor {
                 return iDs[0];
             }
         } catch (Exception ex) {
-            logger.log(org.apache.logging.log4j.Level.FATAL, ex);
+            logger.error("fatal: ",  ex);
         }
 
         return def;

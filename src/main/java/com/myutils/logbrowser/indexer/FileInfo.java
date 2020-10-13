@@ -462,7 +462,7 @@ public final class FileInfo extends Record {
                                 Main.logger.debug("local time: " + fileLocalTime);
 
                             } catch (Exception ex) {
-                                logger.log(org.apache.logging.log4j.Level.FATAL, ex);
+                                logger.error("fatal: ",  ex);
                             }
                         } else if ((startTimePatternGMS.matcher(str)).find()) {
                             numParamsToRead++;
@@ -471,7 +471,7 @@ public final class FileInfo extends Record {
                                 Main.logger.debug("start time: " + fileStartTime);
 
                             } catch (Exception ex) {
-                                logger.log(org.apache.logging.log4j.Level.FATAL, ex);
+                                logger.error("fatal: ",  ex);
                             }
                         } else if ((m = startTimePattern.matcher(str)).find()) {
                             numParamsToRead++;
@@ -484,7 +484,7 @@ public final class FileInfo extends Record {
                                 Main.logger.debug("start time: " + fileStartTime);
 
                             } catch (Exception ex) {
-                                logger.log(org.apache.logging.log4j.Level.FATAL, ex);
+                                logger.error("fatal: ",  ex);
                             }
                         } else if ((m = startTimeSIPEP.matcher(str)).find()) {
                             numParamsToRead++;
@@ -494,7 +494,7 @@ public final class FileInfo extends Record {
                                 Main.logger.debug("start time: " + fileStartTime);
 
                             } catch (Exception ex) {
-                                logger.log(org.apache.logging.log4j.Level.FATAL, ex);
+                                logger.error("fatal: ",  ex);
                             }
                         } else if ((m = regTimezone.matcher(str)).find()) {
                             numParamsToRead++;
@@ -527,7 +527,7 @@ public final class FileInfo extends Record {
                             try {
                                 fileStartTime = dateParsers.parseFormatDate(m.group(1));
                             } catch (Exception ex) {
-                                logger.log(org.apache.logging.log4j.Level.FATAL, ex);
+                                logger.error("fatal: ",  ex);
                             }
                         } else if (m_componentType == FileInfoType.type_WWE) {
                             if (str.startsWith("+++++++++++++++++++++++++++++++++++++++++")) {
@@ -566,7 +566,7 @@ public final class FileInfo extends Record {
                                 doBreak = true;
                             }
                         } catch (Exception ex) {
-                            logger.log(org.apache.logging.log4j.Level.FATAL, ex);
+                            logger.error("fatal: ",  ex);
                             doBreak = true;
                         }
                         break;
@@ -813,7 +813,7 @@ public final class FileInfo extends Record {
                 fileStartTime = new DateParsed(logFileName, d, "", LocalDateTime.parse(d, workSpaceDateTime));
             } catch (DateTimeParseException ex) {
                 fileStartTime = null;
-                logger.log(org.apache.logging.log4j.Level.FATAL, ex);
+                logger.error("fatal: ",  ex);
             }
         }
 

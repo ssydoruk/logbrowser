@@ -182,7 +182,7 @@ public abstract class DBTable {
 //                    Main.logger.info("Table " + tabName1 + ": currentID: " + currentID);
                 } catch (Exception ex) {
                     currentID = 0;
-                    logger.log(org.apache.logging.log4j.Level.FATAL, ex);
+                    logger.error("fatal: ",  ex);
                 }
             }
             tabCreated = true;

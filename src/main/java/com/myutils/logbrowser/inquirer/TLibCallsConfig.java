@@ -52,7 +52,7 @@ public class TLibCallsConfig extends javax.swing.JPanel {
                             _model.addElement(s);
                         }
                     } catch (SQLException ex) {
-                        logger.log(org.apache.logging.log4j.Level.FATAL, ex);
+                        logger.error("fatal: ",  ex);
                     }
 
                 }

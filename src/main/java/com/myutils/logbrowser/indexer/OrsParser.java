@@ -859,7 +859,7 @@ public class OrsParser extends Parser {
         } catch (NumberFormatException numberFormatException) {
             Main.logger.error("Parsing HTTP failed for " + dp.orig, numberFormatException);
         } catch (IOException ex) {
-            logger.log(org.apache.logging.log4j.Level.FATAL, ex);
+            logger.error("fatal: ",  ex);
         }
         return null;
     }

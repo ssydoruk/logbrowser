@@ -274,7 +274,7 @@ public class WWEResults extends IQueryResults {
         try {
             addCustom(rootA, FileInfoType.type_ApacheWeb);
         } catch (SQLException ex) {
-            logger.log(org.apache.logging.log4j.Level.FATAL, ex);
+            logger.error("fatal: ",  ex);
         }
 
         nd = new DynamicTreeNode<>(new OptionNode(false, DialogItem.WWEEXCEPTIONS));
@@ -284,7 +284,7 @@ public class WWEResults extends IQueryResults {
         try {
             addCustom(rootA, FileInfoType.type_WWE);
         } catch (SQLException ex) {
-            logger.log(org.apache.logging.log4j.Level.FATAL, ex);
+            logger.error("fatal: ",  ex);
         }
         rootA.addLogMessagesReportType(TableType.MsgWWE);
         DoneSTDOptions();
@@ -571,7 +571,7 @@ public class WWEResults extends IQueryResults {
             try {
                 return cidFinder.AnythingTLibRelated();
             } catch (SQLException ex) {
-                logger.log(org.apache.logging.log4j.Level.FATAL, ex);
+                logger.error("fatal: ",  ex);
             }
         }
         return true;

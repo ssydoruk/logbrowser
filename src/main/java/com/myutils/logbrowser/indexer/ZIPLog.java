@@ -78,7 +78,7 @@ public final class ZIPLog extends LogFileWrapper {
         try {
             curStream = IOUtils.buffer(logArchive.getInputStream(entry));
         } catch (IOException ex) {
-            logger.log(org.apache.logging.log4j.Level.FATAL, ex);
+            logger.error("fatal: ",  ex);
             return null;
         }
         return curStream;

@@ -66,7 +66,7 @@ public abstract class ExternalEditor {
         try {
             Runtime.getRuntime().exec(cmd, null, null);
         } catch (IOException ex) {
-            logger.log(org.apache.logging.log4j.Level.FATAL, ex);
+            logger.error("fatal: ",  ex);
             inquirer.ExceptionHandler.handleException("cannot run notepad", ex);
         }
     }
@@ -85,7 +85,7 @@ public abstract class ExternalEditor {
             }
             Runtime.getRuntime().exec(cmd, null, null);
         } catch (IOException ex) {
-            logger.log(org.apache.logging.log4j.Level.FATAL, ex);
+            logger.error("fatal: ",  ex);
             inquirer.ExceptionHandler.handleException("cannot run notepad", ex);
         }
 
@@ -101,7 +101,7 @@ public abstract class ExternalEditor {
         try {
             Runtime.getRuntime().exec(cmd, null, null);
         } catch (IOException ex) {
-            logger.log(org.apache.logging.log4j.Level.FATAL, ex);
+            logger.error("fatal: ",  ex);
             inquirer.ExceptionHandler.handleException("cannot run notepad", ex);
         }
 

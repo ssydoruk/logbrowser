@@ -269,7 +269,7 @@ public class WWECloudParser extends Parser {
             WWECloudAuthMsg theMsg = new WWECloudAuthMsg(m_MessageContents);
             SetStdFieldsAndAdd(theMsg);
         } catch (Exception ex) {
-            logger.log(org.apache.logging.log4j.Level.FATAL, ex);
+            logger.error("fatal: ",  ex);
         }
     }
 

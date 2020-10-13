@@ -55,7 +55,7 @@ public class DateDiff {
         try {
             dateDiffTable.FinalizeDB();
         } catch (Exception ex) {
-            logger.log(org.apache.logging.log4j.Level.FATAL, ex);
+            logger.error("fatal: ",  ex);
         }
     }
 

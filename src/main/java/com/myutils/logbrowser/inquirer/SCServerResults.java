@@ -92,7 +92,7 @@ public class SCServerResults extends IQueryResults {
         try {
             addCustom(rootA, FileInfoType.type_SCS);
         } catch (SQLException ex) {
-            logger.log(org.apache.logging.log4j.Level.FATAL, ex);
+            logger.error("fatal: ",  ex);
         }
 
         subNode.addDynamicRef(DialogItem.SCS_Application_NAME, ReferenceType.App, "scs_appstatus", "theAppNameID");

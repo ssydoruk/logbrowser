@@ -30,7 +30,7 @@ public class OutputSpecFormatterScreen extends OutputSpecFormatter {
             try {
                 lo.PrintRecord(record, ps, qr);
             } catch (Exception ex) {
-                logger.log(org.apache.logging.log4j.Level.FATAL, ex);
+                logger.error("fatal: ",  ex);
             }
         } else {
             printAll(record, ps, qr);

@@ -53,4 +53,11 @@
                 <goal>package</goal>
             </goals>
         </action>
+    <action>
+            <actionName>CUSTOM-appassembler:assemble</actionName>
+            <displayName>appassembler:assemble</displayName>
+            <goals>
+                <goal>appassembler:assemble</goal>
+            </goals>
+        </action>
 </actions>

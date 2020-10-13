@@ -112,14 +112,14 @@
             <version>20.2.0</version>
         </dependency>
         <dependency>
-            <groupId>org.graalvm.truffle</groupId>
-            <artifactId>truffle-api</artifactId>
-            <version>20.2.0</version>
-        </dependency>
-        <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-simple</artifactId>
             <version>1.7.30</version>
+        </dependency>
+        <dependency>
+            <groupId>org.graalvm.truffle</groupId>
+            <artifactId>truffle-api</artifactId>
+            <version>20.2.0</version>
         </dependency>
     </dependencies>
     <build>
@@ -150,31 +150,7 @@
                     <debug>true</debug>
                 </configuration>
             </plugin>
-            <plugin>
-                <groupId>org.graalvm.nativeimage</groupId>
-                <artifactId>native-image-maven-plugin</artifactId>
-                <version>20.2.0</version>
-                <configuration>
-                    <mainClass>com.myutils.logbrowser.common.Start</mainClass>
-                    <imageName>logbrowser</imageName>
-                    <buildArgs>
-                      --verbose --no-server -H:+TraceClassInitialization --report-unsupported-elements-at-runtime 
-                        --initialize-at-run-time=java.utils.prefs 
-                        --initialize-at-build-time=com.myutils.logbrowser,org.apache.logging.log4j
-                        --initialize-at-build-time=com.sun.jmx.defaults.JmxProperties,com.sun.jmx.mbeanserver.MBeanInstantiator,com.sun.jmx.mbeanserver.MXBeanLookup,com.sun.jmx.mbeanserver.Introspector,jdk.management.jfr.SettingDescriptorInfo
-                        --initialize-at-build-time=java.awt.Color,sun.awt.AWTAccessor,java.awt.Toolkit,com.sun.jna
-                    </buildArgs>
-                    <skip>true</skip>
-                </configuration>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>native-image</goal>
-                        </goals>
-                        <phase>package</phase>
-                    </execution>
-                </executions>
-            </plugin>       
+                   
         </plugins>
     </build>
     <properties>

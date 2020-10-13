@@ -291,7 +291,7 @@ public class WorkspaceResults extends IQueryResults {
             addCustom(rootA, FileInfoType.type_WorkSpace);
             addCustom(rootA, FileInfoType.type_SIPEP);
         } catch (SQLException ex) {
-            logger.log(org.apache.logging.log4j.Level.FATAL, ex);
+            logger.error("fatal: ",  ex);
         }
         addConfigUpdates(rootA);
 
@@ -536,7 +536,7 @@ public class WorkspaceResults extends IQueryResults {
             try {
                 return cidFinder.AnythingTLibRelated();
             } catch (SQLException ex) {
-                logger.log(org.apache.logging.log4j.Level.FATAL, ex);
+                logger.error("fatal: ",  ex);
             }
         }
         return true;

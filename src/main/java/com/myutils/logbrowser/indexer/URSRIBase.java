@@ -211,7 +211,7 @@ public abstract class URSRIBase extends Message {
         }
 //        } catch (UnsupportedEncodingException ex) {
 //            this.URL = null;
-//            logger.log(org.apache.logging.log4j.Level.FATAL, ex);
+//            logger.error("fatal: ",  ex);
 //        }
     }
 

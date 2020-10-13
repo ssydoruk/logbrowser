@@ -549,7 +549,7 @@ public class GMSParser extends Parser {
 
                 }
             } catch (Exception ex) {
-                logger.log(org.apache.logging.log4j.Level.FATAL, ex);
+                logger.error("fatal: ",  ex);
             }
         }
         GMSORSMessage _msg = new GMSORSMessage(threadID, dp.rest);
@@ -608,7 +608,7 @@ public class GMSParser extends Parser {
             msgResp.AddToDB(m_tables);
 
         } catch (Exception ex) {
-            logger.log(org.apache.logging.log4j.Level.FATAL, ex);
+            logger.error("fatal: ",  ex);
         }
         threadReqs.remove(savedThreadID);
         savedThreadID = null;

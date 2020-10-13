@@ -775,7 +775,7 @@ public class TabResultDataModel extends AbstractTableModel {
                     showFind.addRxColumns(InquirerFileIo.GetFileBytes(tableRow.getFileName(), tableRow.getOffset(), tableRow.getFileBytes()),
                             tableRow, colPrefix + "rx_", maxColumn + 1);
                 } catch (Exception ex) {
-                    logger.log(org.apache.logging.log4j.Level.FATAL, ex);
+                    logger.error("fatal: ",   ex);
                 }
             }
         }

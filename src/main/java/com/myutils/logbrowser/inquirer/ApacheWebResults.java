@@ -155,7 +155,7 @@ public class ApacheWebResults extends IQueryResults {
         try {
             addCustom(rootA, FileInfoType.type_ApacheWeb);
         } catch (SQLException ex) {
-            logger.log(org.apache.logging.log4j.Level.FATAL, ex);
+            logger.error("fatal: ",  ex);
         }
 
         DoneSTDOptions();
@@ -297,7 +297,7 @@ public class ApacheWebResults extends IQueryResults {
             try {
                 return cidFinder.AnythingTLibRelated();
             } catch (SQLException ex) {
-                logger.log(org.apache.logging.log4j.Level.FATAL, ex);
+                logger.error("fatal: ",  ex);
             }
         }
         return true;

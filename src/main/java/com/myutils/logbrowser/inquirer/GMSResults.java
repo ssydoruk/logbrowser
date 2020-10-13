@@ -254,7 +254,7 @@ public class GMSResults extends IQueryResults {
         try {
             addCustom(rootA, FileInfoType.type_GMS);
         } catch (SQLException ex) {
-            logger.log(org.apache.logging.log4j.Level.FATAL, ex);
+            logger.error("fatal: ",  ex);
         }
         rootA.addLogMessagesReportType(TableType.MsgGMS);
         DoneSTDOptions();

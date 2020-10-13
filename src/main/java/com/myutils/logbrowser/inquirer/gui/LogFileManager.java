@@ -77,7 +77,7 @@ public class LogFileManager {
             try {
                 FileUtils.deleteDirectory(new File(FilenameUtils.getFullPathNoEndSeparator(usedArchive)));
             } catch (IOException ex) {
-//                logger.log(org.apache.logging.log4j.Level.FATAL, ex);
+//                logger.error("fatal: ",  ex);
             }
         }
     }

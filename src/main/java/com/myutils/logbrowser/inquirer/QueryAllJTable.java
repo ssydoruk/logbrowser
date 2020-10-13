@@ -112,7 +112,7 @@ public final class QueryAllJTable extends QueryJTable {
                 theFrm.showReport(qry, qd, sc.getKey(), sc.getValue());
                 theFrm.doShow(isDblClick);
             } catch (Exception ex) {
-                logger.log(org.apache.logging.log4j.Level.FATAL, ex);
+                logger.error("fatal: ",  ex);
             }
         }
     }

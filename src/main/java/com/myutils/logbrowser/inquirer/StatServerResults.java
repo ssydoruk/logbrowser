@@ -156,7 +156,7 @@ public class StatServerResults extends IQueryResults {
         try {
             addCustom(rootA, FileInfoType.type_StatServer);
         } catch (SQLException ex) {
-            logger.log(org.apache.logging.log4j.Level.FATAL, ex);
+            logger.error("fatal: ",  ex);
         }
         addConfigUpdates(rootA);
         rootA.addLogMessagesReportType(TableType.MsgStatServer);

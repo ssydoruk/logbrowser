@@ -1360,7 +1360,7 @@ public final class QuerySetting extends javax.swing.JDialog {
                 mod.fireTableDataChanged();
             }
         } catch (Exception ex) {
-            logger.log(org.apache.logging.log4j.Level.FATAL, ex);
+            logger.error("fatal: ",  ex);
         }
 
     }//GEN-LAST:event_jbTheConstantPasteActionPerformed

@@ -62,7 +62,7 @@ public final class TextLog extends LogFileWrapper {
         try {
             stream = new FileInputStream(getFile());
         } catch (FileNotFoundException ex) {
-            logger.log(org.apache.logging.log4j.Level.FATAL, ex);
+            logger.error("fatal: ",  ex);
             stream = null;
         }
     }
@@ -73,7 +73,7 @@ public final class TextLog extends LogFileWrapper {
             try {
                 stream.close();
             } catch (IOException ex) {
-                logger.log(org.apache.logging.log4j.Level.FATAL, ex);
+                logger.error("fatal: ",  ex);
             }
         }
     }

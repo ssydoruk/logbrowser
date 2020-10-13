@@ -995,7 +995,7 @@ public class DatabaseConnector {
         try {
             Class.forName("org.sqlite.JDBC");
         } catch (ClassNotFoundException ex) {
-            logger.log(org.apache.logging.log4j.Level.FATAL, ex);
+            logger.error("fatal: ",  ex);
             throw new SQLException(ex);
         }
         String name = dbName + ".db";
