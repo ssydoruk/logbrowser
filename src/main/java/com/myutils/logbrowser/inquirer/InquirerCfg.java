@@ -83,13 +83,11 @@ public class InquirerCfg implements Serializable {
 
     private boolean printLogFileName;
     private boolean ignoreFormatting;
-    private boolean ignorePatternForDBFields;
     private String FileNameShort;
     private String FileNameLong;
     private HashMap<String, String> printFilters = new HashMap<>(2);
     private boolean messagesLoaded = false;
-    HashSet<RegexFieldSettings> regexFieldsSettings = null;
-    HashMap<MsgType, ArrayList<RegexFieldSettings>> rxFieldsSettings = null;
+    HashMap<MsgType, ArrayList<CustomField>> customFieldsSettings = null;
 
     public InquirerCfg() {
         this.constants = new GenesysConstants1();
@@ -609,47 +607,21 @@ public class InquirerCfg implements Serializable {
         newTlibSearch = selected;
     }
 
-//    RegexFieldSettings saveRegexField(String name, RegexFieldSettings currentRegexSetting) {
-//        HashSet<RegexFieldSettings> ret = getRegexFieldsSettings();
-//        RegexFieldSettings regexFieldSettings = new RegexFieldSettings(name, currentRegexSetting);
-//        ret.add(regexFieldSettings);
-//        return regexFieldSettings;
-//    }
-    public void setRegexSearches(Object[] toArray) {
-        regexFieldsSettings = new HashSet<>(toArray.length);
-        for (Object object : toArray) {
-            regexFieldsSettings.add((RegexFieldSettings) object);
-        }
-    }
-
     public void setRegexSearches(MsgType t, Object[] toArray) {
-        ArrayList<RegexFieldSettings> l = new ArrayList<>(toArray.length);
+        ArrayList<CustomField> l = new ArrayList<>(toArray.length);
         for (Object object : toArray) {
-            l.add((RegexFieldSettings) object);
+            l.add((CustomField) object);
         }
-        rxFieldsSettings.put(t, l);
+        customFieldsSettings.put(t, l);
     }
 
-    public ArrayList<RegexFieldSettings> getRegexFieldsSettings(MsgType t) {
-        if (rxFieldsSettings == null) {
-            rxFieldsSettings = new HashMap<>();
+    public ArrayList<CustomField> getRegexFieldsSettings(MsgType t) {
+        if (customFieldsSettings == null) {
+            customFieldsSettings = new HashMap<>();
         }
-        return rxFieldsSettings.get(t);
+        return customFieldsSettings.get(t);
     }
 
-    public HashSet<RegexFieldSettings> getRegexFieldsSettings() {
-        if (regexFieldsSettings == null) {
-            regexFieldsSettings = new HashSet<>();
-        }
-        return regexFieldsSettings;
-    }
-
-//    RegexFieldSettings saveRegexField(String name, String searchString, String returnValue, boolean isCaseSensitive, boolean isWholeWorld) {
-//        HashSet<RegexFieldSettings> ret = getRegexFieldsSettings();
-//        RegexFieldSettings regexFieldSettings = new RegexFieldSettings(name, searchString, returnValue, isWholeWorld, isCaseSensitive);
-//        ret.add(regexFieldSettings);
-//        return regexFieldSettings;
-//    }
     public static class GenesysConstant implements Serializable {
 
         private static final long serialVersionUID = 1L;
@@ -925,81 +897,4 @@ public class InquirerCfg implements Serializable {
         }
     }
 
-    public static class RegexFieldSettings implements Serializable {
-
-        private static final long serialVersionUID = 1L;
-        private String name;
-        private String searchString;
-        private String retValue;
-        private boolean makeWholeWorld;
-        private boolean caseSensitive;
-
-        public RegexFieldSettings(String name, String searchString, String retValue, boolean makeWholeWorld, boolean caseSensitive) {
-            this.name = name;
-            this.searchString = searchString;
-            this.retValue = retValue;
-            this.makeWholeWorld = makeWholeWorld;
-            this.caseSensitive = caseSensitive;
-        }
-
-        public RegexFieldSettings(String name, RegexFieldSettings currentRegexSetting) {
-            this.name = name;
-            this.searchString = currentRegexSetting.getSearchString();
-            this.retValue = currentRegexSetting.getRetValue();
-            this.makeWholeWorld = currentRegexSetting.isMakeWholeWorld();
-            this.caseSensitive = currentRegexSetting.isCaseSensitive();
-        }
-
-        @Override
-        public String toString() {
-            return name;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public void setName(String name) {
-            this.name = name;
-        }
-
-        public String getSearchString() {
-            return searchString;
-        }
-
-        public void setSearchString(String searchString) {
-            this.searchString = searchString;
-        }
-
-        public String getRetValue() {
-            return retValue;
-        }
-
-        public void setRetValue(String retValue) {
-            this.retValue = retValue;
-        }
-
-        public boolean isMakeWholeWorld() {
-            return makeWholeWorld;
-        }
-
-        public void setMakeWholeWorld(boolean makeWholeWorld) {
-            this.makeWholeWorld = makeWholeWorld;
-        }
-
-        public boolean isCaseSensitive() {
-            return caseSensitive;
-        }
-
-        public void setCaseSensitive(boolean caseSensitive) {
-            this.caseSensitive = caseSensitive;
-        }
-
-        void updateParams(String rx, String retVal, boolean isCase, boolean isWord) {
-            searchString = rx;
-            retValue = retVal;
-            caseSensitive = isCase;
-            makeWholeWorld = isWord;
-        }
-    }
 }

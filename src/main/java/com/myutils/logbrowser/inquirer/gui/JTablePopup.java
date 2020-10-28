@@ -7,10 +7,10 @@ package com.myutils.logbrowser.inquirer.gui;
 
 import Utils.Pair;
 import Utils.ScreenInfo;
+import com.myutils.logbrowser.inquirer.EditRegexFields;
 import com.myutils.logbrowser.inquirer.EnterRegexDialog;
 import static com.myutils.logbrowser.inquirer.EnterRegexDialog.RET_OK;
 import com.myutils.logbrowser.inquirer.MsgType;
-import com.myutils.logbrowser.inquirer.SearchExtract;
 import com.myutils.logbrowser.inquirer.inquirer;
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -47,7 +47,7 @@ public abstract class JTablePopup extends JTable {
     protected int popupRow;
     protected int popupCol;
     private EnterRegexDialog findDlg = null;
-    private SearchExtract searchExtract = null;
+    private EditRegexFields searchExtract = null;
 
     public JTablePopup() {
         super();
@@ -242,11 +242,17 @@ public abstract class JTablePopup extends JTable {
         return null;
     }
 
-    protected SearchExtract findExtract(MsgType t) throws IOException {
+    protected EditRegexFields editRegexFields(MsgType t) throws IOException {
+        return editRegexFields(t, null);
+
+    }
+    
+        protected EditRegexFields editRegexFields(MsgType t, String fullMsg) throws IOException {
         if (searchExtract == null) {
-            searchExtract = new SearchExtract(null, true);
+            searchExtract = new EditRegexFields(null, true);
         }
-        SearchExtract ret = searchExtract.doShow(this, true, t);
+        
+        EditRegexFields ret = searchExtract.doShow(this, true, t, fullMsg);
         if (ret != null) {
             inquirer.getCr().setRegexSearches(t, ret.toArray());
             inquirer.saveCR();

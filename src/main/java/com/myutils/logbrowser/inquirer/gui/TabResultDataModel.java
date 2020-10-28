@@ -1,12 +1,13 @@
 package com.myutils.logbrowser.inquirer.gui;
 
 import Utils.Pair;
+import com.myutils.logbrowser.inquirer.CustomField;
+import com.myutils.logbrowser.inquirer.EditRegexFields;
 import com.myutils.logbrowser.inquirer.InquirerCfg;
 import com.myutils.logbrowser.inquirer.InquirerFileIo;
 import com.myutils.logbrowser.inquirer.LogFile;
 import com.myutils.logbrowser.inquirer.MsgType;
 import com.myutils.logbrowser.inquirer.OutputSpecFormatter;
-import com.myutils.logbrowser.inquirer.SearchExtract;
 import static com.myutils.logbrowser.inquirer.gui.TabResultDataModel.TableRow.colPrefix;
 import com.myutils.logbrowser.inquirer.inquirer;
 import java.awt.Color;
@@ -281,6 +282,16 @@ public class TabResultDataModel extends AbstractTableModel {
                 Integer adjustedCol = realColIdx(colIdx, row.getRowType());
 
                 if (adjustedCol != null) {
+//                    HashMap<Integer, CustomField> customField = customFields.get(row.getRowType());
+//                    if (customField != null) {
+//                        logger.debug("customField: " + customField + "colIdx:" + colIdx + " adj:" + adjustedCol);
+//                        CustomField fld = customField.get(adjustedCol);
+////                        logger.debug("fld: " + fld);
+//                        if (fld != null) {
+//                            return fld.getCustomValue(
+//                                    InquirerFileIo.GetFileBytes(row.getFileName(), row.getOffset(), row.getFileBytes()));
+//                        }
+//                    }
                     return row.getColumn(adjustedCol);
                 }
             }
@@ -761,7 +772,49 @@ public class TabResultDataModel extends AbstractTableModel {
         return ret;
     }
 
-    void addRegexRow(SearchExtract showFind, int popupRow) {
+    ArrayList<CustomField> searchParams = new ArrayList<>();
+
+    public void addRxColumns(String GetFileBytes, TabResultDataModel.TableRow tableRow, String colPrefix, int startIdx) {
+        int i = 0;
+        for (CustomField searchParam : searchParams) {
+            String ret = searchParam.getCustomValue(GetFileBytes);
+            inquirer.logger.debug("Found val[" + ret + "] rowSize:" + tableRow.size());
+            tableRow.addCell(colPrefix + startIdx + i, (StringUtils.isNotBlank(ret)) ? ret : "");
+            i++;
+        }
+    }
+
+    private HashMap<MsgType, HashMap<Integer, CustomField>> customFields = new HashMap<>();
+
+    void addCustomColumn(CustomField regexFieldsSetting, int popupRow) {
+        TableRow row = getRow(popupRow);
+        if (row == null) {
+            inquirer.logger.info("Empty row");
+            return;
+        }
+        MsgType rowType = row.getRowType();
+        HashMap<Integer, CustomField> rowMapping;
+        if ((rowMapping = customFields.get(rowType)) == null) {
+            rowMapping = new HashMap<>();
+            customFields.put(rowType, rowMapping);
+        }
+        int maxColumn = row.getMaxColumn() + 1; // this assumes that all rows of the same type has the same number of columns
+        rowMapping.put(maxColumn, regexFieldsSetting);
+
+        for (TableRow tableRow : tableData) {
+            if (tableRow.getRowType() == rowType) {
+                try {
+                    tableRow.addCell(rowType.toString() + "_c" + maxColumn, regexFieldsSetting.getCustomValue(tableRow.getBytes()));
+
+                } catch (Exception ex) {
+                    logger.error("fatal: ", ex);
+                }
+            }
+        }
+        refreshTable();
+    }
+
+    void addCustomColumn(EditRegexFields showFind, int popupRow) {
         TableRow row = getRow(popupRow);
         if (row == null) {
             inquirer.logger.info("Empty row");
@@ -772,49 +825,65 @@ public class TabResultDataModel extends AbstractTableModel {
         for (TableRow tableRow : tableData) {
             if (tableRow.getRowType() == rowType) {
                 try {
-                    showFind.addRxColumns(InquirerFileIo.GetFileBytes(tableRow.getFileName(), tableRow.getOffset(), tableRow.getFileBytes()),
+                    addRxColumns(InquirerFileIo.GetFileBytes(tableRow.getFileName(), tableRow.getOffset(), tableRow.getFileBytes()),
                             tableRow, colPrefix + "rx_", maxColumn + 1);
                 } catch (Exception ex) {
-                    logger.error("fatal: ",   ex);
+                    logger.error("fatal: ", ex);
                 }
             }
         }
         refreshTable();
     }
 
-    ArrayList<SearchExtract.SearchSample> getSampleRows(SearchExtract showFind, int popupRow, int maxRows) {
-        TableRow row = getRow(popupRow);
-        if (row == null) {
+    /**
+     *
+     * @param row - adjusted for table.convertRowIndexToModel(row)
+     * @return
+     */
+    public String getFullRecord(int row) {
+
+        TableRow tableRow = getRow(row);
+        if (tableRow == null) {
             inquirer.logger.info("Empty row");
             return null;
         }
-        MsgType rowType = row.getRowType();
-        ArrayList<SearchExtract.SearchSample> r = new ArrayList<>();
-        for (TableRow tableRow : tableData) {
-            if (tableRow.getRowType() == rowType) {
-                try {
-                    SearchExtract.SearchSample ret = showFind.findRxSample(InquirerFileIo.GetFileBytes(row.getFileName(), row.getOffset(), row.getFileBytes()));
-                    inquirer.logger.debug("Found val[" + ret + "]");
-                    if (ret != null) {
-                        r.add(ret);
-                        maxRows--;
-                        if (maxRows <= 0) {
-                            break;
-                        }
-                    }
-                } catch (Exception ex) {
-                    inquirer.ExceptionHandler.handleException("Failure to generate sample rows", ex);
-                }
-            }
-        }
-        if (r.isEmpty()) {
-            return null;
-        } else {
-            return r;
-        }
+
+        return InquirerFileIo.GetFileBytes(tableRow.getFileName(), tableRow.getOffset(), tableRow.getFileBytes());
 
     }
 
+//    ArrayList<EditRegexFields.SearchSample> getSampleRows(EditRegexFields showFind, int popupRow, int maxRows) {
+//        TableRow row = getRow(popupRow);
+//        if (row == null) {
+//            inquirer.logger.info("Empty row");
+//            return null;
+//        }
+//        MsgType rowType = row.getRowType();
+//        ArrayList<EditRegexFields.SearchSample> r = new ArrayList<>();
+//        for (TableRow tableRow : tableData) {
+//            if (tableRow.getRowType() == rowType) {
+//                try {
+//                    EditRegexFields.SearchSample ret = showFind.findRxSample(InquirerFileIo.GetFileBytes(row.getFileName(), row.getOffset(), row.getFileBytes()));
+//                    inquirer.logger.debug("Found val[" + ret + "]");
+//                    if (ret != null) {
+//                        r.add(ret);
+//                        maxRows--;
+//                        if (maxRows <= 0) {
+//                            break;
+//                        }
+//                    }
+//                } catch (Exception ex) {
+//                    inquirer.ExceptionHandler.handleException("Failure to generate sample rows", ex);
+//                }
+//            }
+//        }
+//        if (r.isEmpty()) {
+//            return null;
+//        } else {
+//            return r;
+//        }
+//
+//    }
     ArrayList<ColumnParam> getHidden(MsgType rowType) {
         if (rowType != null) {
             return columnParams.getHidden(rowType);
@@ -1003,7 +1072,11 @@ public class TabResultDataModel extends AbstractTableModel {
         private int fileID = 0;
         private HashMap<Integer, Object> rowData;
         private MsgType rowType;
-        private int columntIdx;
+        private int maxColumn;
+
+        public int getMaxColumn() {
+            return maxColumn;
+        }
         private LogFile FileName;
         private int fileBytes;
         private int line;
@@ -1021,12 +1094,16 @@ public class TabResultDataModel extends AbstractTableModel {
 
         public TableRow() {
             this.rowData = new HashMap<>();
-            columntIdx = 0;
+            maxColumn = 0;
+        }
+
+        public String getBytes() {
+            return InquirerFileIo.GetFileBytes(getFileName(), getOffset(), getFileBytes());
         }
 
         @Override
         public String toString() {
-            return "TableRow{" + "fileID=" + fileID + ", rowData=" + rowData + ", rowType=" + rowType + ", columntIdx=" + columntIdx + ", FileName=" + FileName + ", fileBytes=" + fileBytes + ", line=" + line + ", offset=" + offset + ", cellColor=" + cellColor + '}';
+            return "TableRow{" + "fileID=" + fileID + ", rowData=" + rowData + ", rowType=" + rowType + ", columntIdx=" + maxColumn + ", FileName=" + FileName + ", fileBytes=" + fileBytes + ", line=" + line + ", offset=" + offset + ", cellColor=" + cellColor + '}';
         }
 
         public int getFileID() {
@@ -1074,29 +1151,29 @@ public class TabResultDataModel extends AbstractTableModel {
                     if (title != null && !title.isEmpty()) {
                         t = title;
                     } else {
-                        t = colPrefix + columntIdx;
+                        t = colPrefix + maxColumn;
                     }
 //                    t = colPrefix + columntIdx;
-
-                    if (data != null && !data.isEmpty()) {
-                        columnIdx = getTitleIdx(t);
-                        String curData = (String) rowData.get(columnIdx);
-                        if (curData == null || curData.isEmpty()) {
-                            putRowData(columnIdx, t, data);
-                        } else {
-                            putRowData(columnIdx, t, curData + " | " + data);
-
-                        }
-                        HashSet hm = columnsWithDataType.get(getRowType());
-                        if (hm == null) {
-                            hm = new HashSet();
-                            columnsWithDataType.put(getRowType(), hm);
-                        }
-                        if (!hm.contains(columnIdx)) {
-                            hm.add(columnIdx);
-                        }
+                    if (data == null) {
+                        data = "";
                     }
-                    columntIdx++;
+                    columnIdx = getTitleIdx(t);
+                    String curData = (String) rowData.get(columnIdx);
+                    if (curData == null || curData.isEmpty()) {
+                        putRowData(columnIdx, t, data);
+                    } else {
+                        putRowData(columnIdx, t, curData + " | " + data);
+
+                    }
+                    HashSet hm = columnsWithDataType.get(getRowType());
+                    if (hm == null) {
+                        hm = new HashSet();
+                        columnsWithDataType.put(getRowType(), hm);
+                    }
+                    if (!hm.contains(columnIdx)) {
+                        hm.add(columnIdx);
+                    }
+                    maxColumn++;
                 }
             }
             return columnIdx;

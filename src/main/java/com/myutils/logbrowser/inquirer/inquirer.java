@@ -595,7 +595,10 @@ public class inquirer {
                 if (f.getAbsolutePath().toLowerCase().endsWith(".json")) {
 
                     try (InputStreamReader streamReader = new InputStreamReader(new FileInputStream(file), "UTF-8")) {
-                        Gson gson = new GsonBuilder().enableComplexMapKeySerialization().setPrettyPrinting().create();
+                        Gson gson = new GsonBuilder()
+                                .enableComplexMapKeySerialization()
+                                .setPrettyPrinting()
+                                .create();
                         cr = gson.fromJson(streamReader, com.myutils.logbrowser.inquirer.InquirerCfg.class);
                         crRead = true;
 
