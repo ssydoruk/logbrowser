@@ -323,7 +323,7 @@ public class MyJTable extends JTableCommon {
         jmRegexFields.removeAll();
         JTable tab = this;
 
-        jmRegexFields.setText("Regex fields for \"" + rowType.toString() + "\"");
+        jmRegexFields.setText("Custom fields for \"" + rowType.toString() + "\"");
 
         ArrayList<CustomField> regexFieldsSettings = inquirer.getCr().getRegexFieldsSettings(rowType);
         if (regexFieldsSettings != null && !regexFieldsSettings.isEmpty()) {
@@ -645,7 +645,7 @@ public class MyJTable extends JTableCommon {
             boolean addRows = false;
             int rowNo = tab.convertRowIndexToModel(popupRow);
 
-            if ((showFind = editRegexFields(model.getRow(rowNo).getRowType(), model.getFullRecord(rowNo))) != null) {
+            if ((showFind = editRegexFields(model.getRow(rowNo))) != null) {
                 model.addCustomColumn(showFind, rowNo);
             }
         } catch (IOException ex) {

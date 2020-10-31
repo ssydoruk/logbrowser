@@ -10,7 +10,7 @@ import Utils.ScreenInfo;
 import com.myutils.logbrowser.inquirer.EditRegexFields;
 import com.myutils.logbrowser.inquirer.EnterRegexDialog;
 import static com.myutils.logbrowser.inquirer.EnterRegexDialog.RET_OK;
-import com.myutils.logbrowser.inquirer.MsgType;
+import com.myutils.logbrowser.inquirer.gui.TabResultDataModel.TableRow;
 import com.myutils.logbrowser.inquirer.inquirer;
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -242,19 +242,19 @@ public abstract class JTablePopup extends JTable {
         return null;
     }
 
-    protected EditRegexFields editRegexFields(MsgType t) throws IOException {
-        return editRegexFields(t, null);
+//    protected EditRegexFields editRegexFields(MsgType t) throws IOException {
+//        return editRegexFields(t, null);
+//
+//    }
 
-    }
-    
-        protected EditRegexFields editRegexFields(MsgType t, String fullMsg) throws IOException {
+    protected EditRegexFields editRegexFields(TableRow row) throws IOException {
         if (searchExtract == null) {
             searchExtract = new EditRegexFields(null, true);
         }
-        
-        EditRegexFields ret = searchExtract.doShow(this, true, t, fullMsg);
+
+        EditRegexFields ret = searchExtract.doShow(this, true, row);
         if (ret != null) {
-            inquirer.getCr().setRegexSearches(t, ret.toArray());
+            inquirer.getCr().setRegexSearches(row.getRowType(), ret.toArray());
             inquirer.saveCR();
         }
         return ret;

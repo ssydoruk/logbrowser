@@ -5,6 +5,8 @@
  */
 package com.myutils.logbrowser.inquirer;
 
+import Utils.TableDialog;
+import com.myutils.logbrowser.inquirer.gui.TabResultDataModel;
 import java.awt.Component;
 import java.awt.Point;
 import java.awt.Window;
@@ -12,7 +14,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
 import javax.swing.DefaultListModel;
@@ -52,21 +56,21 @@ public class EditRegexFields extends javax.swing.JDialog {
     private String savedReplace;
     private DocumentListener listener;
     private MsgType msgType;
+    private TabResultDataModel.TableRow curRow;
     private String curRec;
+    private TableDialog showLDAP;
 
     public Object[] toArray() {
         return lmSavedList.toArray();
     }
 
-    public EditRegexFields doShow(Component _parent, boolean b, MsgType t, String curRec) {
-        this.curRec = curRec;
+    public EditRegexFields doShow(Component _parent, boolean b, TabResultDataModel.TableRow row) {
+        this.curRow = row;
+        curRec = row.getBytes();
+
         jlEvalText.setText(null);
         taCurrentRecord.setText(curRec);
-        return doShow(_parent, b, t);
-    }
-
-    public EditRegexFields doShow(Component _parent, boolean b, MsgType t) {
-        msgType = t;
+        msgType = row.getRowType();
         if (lSavedList == null) {
             // JPanel pRefTypes = new JPanel(new BorderLayout());
             lmSavedList = new DefaultListModel();
@@ -74,7 +78,7 @@ public class EditRegexFields extends javax.swing.JDialog {
         }
         lmSavedList.clear();
 
-        ArrayList<CustomField> regexFieldsSettings = inquirer.getCr().getRegexFieldsSettings(t);
+        ArrayList<CustomField> regexFieldsSettings = inquirer.getCr().getRegexFieldsSettings(msgType);
         if (regexFieldsSettings != null) {
 
             for (CustomField regexFieldsSetting : regexFieldsSettings) {
@@ -82,8 +86,8 @@ public class EditRegexFields extends javax.swing.JDialog {
 
             }
         }
-
-        ScreenInfo.setVisible(_parent, this, true);
+        ScreenInfo.CenterWindow(this);
+        this.setVisible(true);
 
         if (getReturnStatus() == RET_OK) {
             return this;
@@ -117,8 +121,12 @@ public class EditRegexFields extends javax.swing.JDialog {
     }
 
     private String inputName() {
+        return inputName(null);
+    }
+
+    private String inputName(String name) {
         String newName = JOptionPane.showInputDialog(this, "Enter search name",
-                (currentCustomField == null) ? "" : currentCustomField.getName());
+                name);
         return (StringUtils.isBlank(newName)) ? null : newName;
     }
 
@@ -359,19 +367,17 @@ public class EditRegexFields extends javax.swing.JDialog {
     }
 
     private void evalPressed() {
-        if (StringUtils.isNotBlank(curRec)) {
-            try {
-                if (pRegex.isVisible()) {
-                    jlEvalText.setText((new CustomField("", new RegexFieldSettings(jtfRegex.getText(), jtfRetValue.getText(), isMatchWholeWordSelected(), isMatchWholeWordSelected())).getCustomValue(curRec)));
-                } else {
-                    jlEvalText.setText((new CustomField("", new JSFieldSettings(taJSScript.getText(), rbApplyPerLine.isSelected())).getCustomValue(curRec)));
-                }
-                jlEvalText.invalidate();
-            } catch (Exception e) {
-                JOptionPane.showMessageDialog(this, "Exception while eval:" + e.toString() + "\n" + StringUtils.join(ArrayUtils.subarray(e.getStackTrace(), 0, 5), "\n") + "\n...", "Error", JOptionPane.ERROR_MESSAGE);
-                logger.error("", e);
-                //TODO: handle exception
+        try {
+            if (tpCustomFieldType.getSelectedComponent() == pRegex) {
+                jlEvalText.setText((new CustomField("", new RegexFieldSettings(jtfRegex.getText(), jtfRetValue.getText(), isMatchWholeWordSelected(), isMatchWholeWordSelected())).getCustomValue(curRec)));
+            } else {
+                jlEvalText.setText((new CustomField("", new JSFieldSettings(taJSScript.getText(), rbApplyPerLine.isSelected())).getCustomValue(curRow.getRecord())));
             }
+            jlEvalText.invalidate();
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Exception while eval:" + e.toString() + "\n" + StringUtils.join(ArrayUtils.subarray(e.getStackTrace(), 0, 5), "\n") + "\n...", "Error", JOptionPane.ERROR_MESSAGE);
+            logger.error("", e);
+            //TODO: handle exception
         }
     }
 
@@ -432,6 +438,7 @@ public class EditRegexFields extends javax.swing.JDialog {
         jPanel4 = new javax.swing.JPanel();
         jPanel10 = new javax.swing.JPanel();
         btEval = new javax.swing.JButton();
+        btRecFields = new javax.swing.JButton();
         cancelButton = new javax.swing.JButton();
         okButton = new javax.swing.JButton();
 
@@ -637,6 +644,14 @@ public class EditRegexFields extends javax.swing.JDialog {
         });
         jPanel10.add(btEval);
 
+        btRecFields.setText("Fields");
+        btRecFields.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btRecFieldsActionPerformed(evt);
+            }
+        });
+        jPanel10.add(btRecFields);
+
         cancelButton.setText("Cancel");
         cancelButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -664,6 +679,24 @@ public class EditRegexFields extends javax.swing.JDialog {
     private void bAddSavedActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bAddSavedActionPerformed
         setCurrentField(null);
     }//GEN-LAST:event_bAddSavedActionPerformed
+
+    private void btRecFieldsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btRecFieldsActionPerformed
+        if (showLDAP == null) {
+            showLDAP = new TableDialog(this, JOptionPane.OK_OPTION);
+        }
+
+        ArrayList<String[]> kvps = new ArrayList<>();
+        for (Map.Entry<Object, Object> entry : curRow.getRecord().m_fieldsAll.entrySet()) {
+            kvps.add(new String[]{entry.getKey().toString(), entry.getValue().toString()});
+        }
+//        for (Map.Entry<Object, Object> entry : curRow.getRecord().m_fields.entrySet()) {
+//            kvps.add(new String[]{entry.getKey().toString(), entry.getValue().toString()});
+//        }
+        Collections.sort(kvps, (o1, o2) -> {
+            return ((String[]) o1)[0].compareToIgnoreCase(((String[]) o2)[0]); //To change body of generated lambdas, choose Tools | Templates.
+        });
+        showLDAP.shouldProceed(new String[]{"Field", "Value"}, kvps, "All record fields (" + kvps.size() + ")");
+    }//GEN-LAST:event_btRecFieldsActionPerformed
 
     /**
      * Closes the dialog
@@ -723,6 +756,7 @@ public class EditRegexFields extends javax.swing.JDialog {
     private javax.swing.JButton bAddSaved;
     private javax.swing.ButtonGroup bgJSapplicationType;
     private javax.swing.JButton btEval;
+    private javax.swing.JButton btRecFields;
     private javax.swing.JButton cancelButton;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
@@ -779,31 +813,54 @@ public class EditRegexFields extends javax.swing.JDialog {
                     if (!checkRegExSettings()) {
                         return;
                     }
-                    if ((newName = inputName()) == null) {
-                        return;
-                    }
+                    if (currentCustomField == null) {
+                        if ((newName = inputName()) == null) {
+                            return;
+                        }
 
-                    addSetting(new CustomField(newName, new RegexFieldSettings(jtfRegex.getText(), jtfRetValue.getText(),
-                            jcbCaseSensitive.isSelected(), jcbMatchWholeWord.isSelected())));
+                        addSetting(new CustomField(newName, new RegexFieldSettings(jtfRegex.getText(), jtfRetValue.getText(),
+                                jcbCaseSensitive.isSelected(), jcbMatchWholeWord.isSelected())));
+                    } else {
+                        currentCustomField.getRxFieldSettings().updateParams(jtfRegex.getText(), jtfRetValue.getText(),
+                                jcbCaseSensitive.isSelected(), jcbMatchWholeWord.isSelected());
+                    }
                 } else {
                     if (!checkJSSettings()) {
                         return;
                     }
-                    if ((newName = inputName()) == null) {
-                        return;
+                    if (currentCustomField == null) {
+                        if ((newName = inputName()) == null) {
+                            return;
+                        }
+                        addSetting(new CustomField(newName, new JSFieldSettings(taJSScript.getText(), rbApplyPerLine.isSelected())));
+                    } else {
+                        currentCustomField.getJsFieldSettings().updateParams(taJSScript.getText(), rbApplyPerLine.isSelected());
                     }
-                    addSetting(new CustomField(newName, new JSFieldSettings(taJSScript.getText(), rbApplyPerLine.isSelected())));
                 }
                 break;
             case SAVEAS:
-
-                break;
-            case RENAME:
-                if ((newName = inputName()) == null) {
-                    return;
+                if (currentCustomField != null) {
+                    if ((newName = inputName(currentCustomField.getName())) == null) {
+                        return;
+                    }
+                    if (tpCustomFieldType.getSelectedComponent() == pRegex) {
+                        addSetting(new CustomField(newName,
+                                new RegexFieldSettings(currentCustomField.getRxFieldSettings())));
+                    } else {
+                        addSetting(new CustomField(newName,
+                                new JSFieldSettings(currentCustomField.getJsFieldSettings())));
+                    }
                 }
-                currentCustomField.setName(newName);
-                setCurrentField(currentCustomField);
+                break;
+
+            case RENAME:
+                if (currentCustomField != null) {
+                    if ((newName = inputName(currentCustomField.getName())) == null) {
+                        return;
+                    }
+                    currentCustomField.setName(newName);
+                    setCurrentField(currentCustomField);
+                }
 
                 break;
         }
@@ -881,7 +938,7 @@ public class EditRegexFields extends javax.swing.JDialog {
 //            tpCustomFieldType.add
             if (currentCustomField.isJSField()) {
                 tpCustomFieldType.add(pJSScript);
-                                taJSScript.setText(currentCustomField.getJsFieldSettings().getJsScript());
+                taJSScript.setText(currentCustomField.getJsFieldSettings().getJsScript());
                 rbApplyPerLine.setSelected(currentCustomField.getJsFieldSettings().isPerLine());
 
             }

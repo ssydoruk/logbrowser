@@ -6,6 +6,7 @@
 package com.myutils.logbrowser.inquirer;
 
 import java.io.Serializable;
+import org.apache.logging.log4j.LogManager;
 
 /**
  *
@@ -53,10 +54,20 @@ public class CustomField implements Serializable {
     public void setName(String n) {
         name = n;
     }
+    private static final org.apache.logging.log4j.Logger logger = LogManager.getLogger();
 
     @Override
     public String toString() {
         return name;
+    }
+
+    public String getCustomValue(ILogRecord rec) {
+        if (jsFieldSettings != null) {
+            return jsFieldSettings.evalValue(rec);
+        } else {
+            logger.info("calling custom field without input. Allowed only on js custom field");
+            return "";
+        }
     }
 
     public String getCustomValue(String bytes) {

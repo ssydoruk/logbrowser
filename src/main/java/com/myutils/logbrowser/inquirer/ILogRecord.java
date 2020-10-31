@@ -4,18 +4,14 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.Properties;
+import org.graalvm.polyglot.HostAccess;
 
 public abstract class ILogRecord {
 
     private static long totalBytes = 0;
-    private static final HashSet<String> stdFields = new HashSet<String>(Arrays.asList(
-            new String[]{"id", "time",
-                "fileid", "fileOffset", "filebytes", "line",
-                "filename", "time", "app", "component"}));
+
     private static String[] sInboundFieldNames = {"inbound"
     };
 
@@ -77,10 +73,6 @@ public abstract class ILogRecord {
      */
     public void getAllFields(ResultSet rs) throws Exception {
 
-    }
-
-    private boolean IsStdField(String name) {
-        return stdFields.contains(name.toLowerCase());
     }
 
     public ICalculatedFields getCalcFields() {
@@ -244,6 +236,16 @@ public abstract class ILogRecord {
 
     public String GetField(String fieldName) {
         return GetField(fieldName.toLowerCase(), false);
+    }
+
+    @HostAccess.Export
+    public String getField(String fieldName) {
+        return GetField(fieldName.toLowerCase(), true);
+    }
+
+    @HostAccess.Export
+    public String getBytes() {
+        return InquirerFileIo.GetFileBytes(GetFileName(), GetFileOffset(), GetFileBytes());
     }
 
     public String GetField(String fieldName, boolean ignoreException) {

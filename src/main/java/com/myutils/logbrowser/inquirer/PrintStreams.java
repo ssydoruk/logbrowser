@@ -178,6 +178,7 @@ public class PrintStreams {
 
     void newRow(ILogRecord record) {
         TabResultDataModel.TableRow newRow = newRow();
+        newRow.setRecord(record);
         newRow.setType(record.GetType());
         newRow.setFileInfo(record.GetFileName(),
                 record.GetFileBytes(),

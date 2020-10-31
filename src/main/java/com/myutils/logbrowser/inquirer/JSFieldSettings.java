@@ -5,7 +5,10 @@
  */
 package com.myutils.logbrowser.inquirer;
 
+import com.myutils.logbrowser.common.JSRunner;
 import java.io.Serializable;
+import org.apache.logging.log4j.LogManager;
+import org.graalvm.polyglot.Value;
 
 /**
  *
@@ -18,9 +21,7 @@ public class JSFieldSettings implements Serializable {
 
     private boolean perLine;
 
-
-
-    public JSFieldSettings( String jsScript, boolean perLine) {
+    public JSFieldSettings(String jsScript, boolean perLine) {
         this.jsScript = jsScript;
         this.perLine = perLine;
 
@@ -45,7 +46,19 @@ public class JSFieldSettings implements Serializable {
         this.perLine = perLine;
     }
 
+    public void setJsScript(String jsScript) {
+        this.jsScript = jsScript;
+    }
+
+    private static final org.apache.logging.log4j.Logger logger = LogManager.getLogger();
+
     public String evalValue(String bytes) {
-        return "hello world";
+        Value eval = JSRunner.getInstance().getCondContext().eval("js", jsScript);
+        logger.debug("eval [" + eval + "]");
+        return JSRunner.getInstance().getCondContext().eval("js", jsScript).asString();
+    }
+
+    public String evalValue(ILogRecord rec) {
+        return JSRunner.execString(jsScript, rec);
     }
 }

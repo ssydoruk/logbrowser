@@ -1,5 +1,6 @@
 package com.myutils.logbrowser.inquirer;
 
+import com.myutils.logbrowser.common.JSRunner;
 import com.myutils.logbrowser.inquirer.gui.TabResultDataModel;
 import java.sql.CallableStatement;
 import java.sql.SQLException;
@@ -150,7 +151,6 @@ public abstract class OutputSpecFormatter extends DefaultFormatter {
         }
     }
 
-
     public static abstract class Parameter {
 
         private String m_ShortFormat;
@@ -269,7 +269,7 @@ public abstract class OutputSpecFormatter extends DefaultFormatter {
             m_format = format;
         }
 
-        protected void ParseParam(Element e) {
+        final protected void ParseParam(Element e) {
             ParseParam(e, false);
         }
 
@@ -282,7 +282,7 @@ public abstract class OutputSpecFormatter extends DefaultFormatter {
                     m_ShortFormat = e.getAttribute("shortFormat");
                     String _cond = e.getAttribute("cond");
                     if (StringUtils.isNotBlank(_cond)) {
-                        cond = "var Inquirer = Java.type('" + Inquirer_CLASS + "');\n" + _cond;
+                        cond = _cond;
                     }
                 } catch (Exception ex) {
                     logger.error("Cannot parse parameter", ex);
@@ -382,10 +382,10 @@ public abstract class OutputSpecFormatter extends DefaultFormatter {
             if (cond != null) {
                 try {
                     Inquirer.setCurrentRec(record);
-                    logger.debug("before eval");
+                    condContext.getBindings("js").putMember("record", record);
 
                     Value eval = condContext.eval("js", cond);
-                    logger.debug("after eval [" + cond + "]: " + eval);
+                    logger.debug("evaluated [" + cond + "]: " + eval);
                     if (eval.asBoolean() == false) {
                         return "";
                     }
@@ -716,10 +716,6 @@ public abstract class OutputSpecFormatter extends DefaultFormatter {
     static class DatabaseParameter extends Parameter {
 
         String m_id;
-//        String m_match = null;
-//        int m_group;
-//        boolean m_ignoreCase;
-//        Pattern m_matchPattern = null;
 
         DatabaseParameter(Element e, String defaultFieldName) throws SQLException {
             super(defaultFieldName);
@@ -747,6 +743,41 @@ public abstract class OutputSpecFormatter extends DefaultFormatter {
         @Override
         public String getType() {
             return "database";
+        }
+
+    }
+
+    static class ScriptParameter extends Parameter {
+
+        String m_id;
+        private String script;
+
+        ScriptParameter(Element e, String defaultFieldName) throws SQLException {
+            super(defaultFieldName);
+            script = e.getTextContent();
+
+            ParseParam(e);
+        }
+
+        ScriptParameter(String id, String alias) throws SQLException {
+            super(alias);
+            m_id = id;
+        }
+
+        @Override
+        public String GetValue(ILogRecord rec) throws SQLException {
+            return JSRunner.execString(script, rec);
+
+        }
+
+        @Override
+        public String FormatValue(ILogRecord record) throws Exception {
+            return GetValue(record);
+        }
+
+        @Override
+        public String getType() {
+            return "script";
         }
 
     }
@@ -782,7 +813,8 @@ public abstract class OutputSpecFormatter extends DefaultFormatter {
 
         embedded("embedded"),
         database("database"),
-        file("file");
+        file("file"),
+        script("script");
 
         private final String name;
 
@@ -843,6 +875,9 @@ public abstract class OutputSpecFormatter extends DefaultFormatter {
 
                         case embedded:
                             parameter = new EmbeddedParameter(paramElement, fieldName);
+                            break;
+                        case script:
+                            parameter = new ScriptParameter(paramElement, fieldName);
                             break;
 
                     }

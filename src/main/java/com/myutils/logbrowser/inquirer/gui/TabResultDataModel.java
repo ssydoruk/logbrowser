@@ -3,6 +3,7 @@ package com.myutils.logbrowser.inquirer.gui;
 import Utils.Pair;
 import com.myutils.logbrowser.inquirer.CustomField;
 import com.myutils.logbrowser.inquirer.EditRegexFields;
+import com.myutils.logbrowser.inquirer.ILogRecord;
 import com.myutils.logbrowser.inquirer.InquirerCfg;
 import com.myutils.logbrowser.inquirer.InquirerFileIo;
 import com.myutils.logbrowser.inquirer.LogFile;
@@ -801,16 +802,30 @@ public class TabResultDataModel extends AbstractTableModel {
         int maxColumn = row.getMaxColumn() + 1; // this assumes that all rows of the same type has the same number of columns
         rowMapping.put(maxColumn, regexFieldsSetting);
 
-        for (TableRow tableRow : tableData) {
-            if (tableRow.getRowType() == rowType) {
-                try {
-                    tableRow.addCell(rowType.toString() + "_c" + maxColumn, regexFieldsSetting.getCustomValue(tableRow.getBytes()));
+        if (regexFieldsSetting.isJSField()) {
+            for (TableRow tableRow : tableData) {
+                if (tableRow.getRowType() == rowType) {
+                    try {
+                        tableRow.addCell(rowType.toString() + "_c" + maxColumn, regexFieldsSetting.getCustomValue(tableRow.getRecord()));
 
-                } catch (Exception ex) {
-                    logger.error("fatal: ", ex);
+                    } catch (Exception ex) {
+                        logger.error("fatal: ", ex);
+                    }
+                }
+            }
+        } else {
+            for (TableRow tableRow : tableData) {
+                if (tableRow.getRowType() == rowType) {
+                    try {
+                        tableRow.addCell(rowType.toString() + "_c" + maxColumn, regexFieldsSetting.getCustomValue(tableRow.getBytes()));
+
+                    } catch (Exception ex) {
+                        logger.error("fatal: ", ex);
+                    }
                 }
             }
         }
+
         refreshTable();
     }
 
@@ -1073,6 +1088,7 @@ public class TabResultDataModel extends AbstractTableModel {
         private HashMap<Integer, Object> rowData;
         private MsgType rowType;
         private int maxColumn;
+        private ILogRecord record;
 
         public int getMaxColumn() {
             return maxColumn;
@@ -1106,6 +1122,10 @@ public class TabResultDataModel extends AbstractTableModel {
             return "TableRow{" + "fileID=" + fileID + ", rowData=" + rowData + ", rowType=" + rowType + ", columntIdx=" + maxColumn + ", FileName=" + FileName + ", fileBytes=" + fileBytes + ", line=" + line + ", offset=" + offset + ", cellColor=" + cellColor + '}';
         }
 
+        public ILogRecord getRecord() {
+            return record;
+        }
+
         public int getFileID() {
             return fileID;
         }
@@ -1134,10 +1154,12 @@ public class TabResultDataModel extends AbstractTableModel {
             return rowData.size();
         }
 
-        public int addCell(String title, String data) {
+        public int addCell(String title, String _data) {
             int columnIdx = 0;
+            String data = StringUtils.defaultIfBlank(StringUtils.trimToEmpty(_data.replaceAll("\\P{Print}", "")), "");
+
             if (isAggregate) {
-                if (data != null && !data.isEmpty() && (title == null || !title.equals("filename"))) {
+                if (!data.isEmpty() && (title == null || !title.equals("filename"))) {
                     columnIdx = getTitleIdx(title);
                     rowData.put(columnIdx, data);
                 }
@@ -1148,23 +1170,18 @@ public class TabResultDataModel extends AbstractTableModel {
 //                    columnIdx = getTitleIdx("col" + columntIdx);
                     String t;
 
-                    if (title != null && !title.isEmpty()) {
-                        t = title;
-                    } else {
-                        t = colPrefix + maxColumn;
-                    }
+                    t = StringUtils.defaultIfBlank(title, colPrefix + maxColumn);
 //                    t = colPrefix + columntIdx;
-                    if (data == null) {
-                        data = "";
-                    }
+
                     columnIdx = getTitleIdx(t);
                     String curData = (String) rowData.get(columnIdx);
-                    if (curData == null || curData.isEmpty()) {
-                        putRowData(columnIdx, t, data);
-                    } else {
-                        putRowData(columnIdx, t, curData + " | " + data);
 
+                    if (StringUtils.isBlank(curData)) {
+                        putRowData(columnIdx, t, data);
+                    } else if (data.length() > 0) {
+                        putRowData(columnIdx, t, StringUtils.join(new String[]{curData, data}, " | "));
                     }
+
                     HashSet hm = columnsWithDataType.get(getRowType());
                     if (hm == null) {
                         hm = new HashSet();
@@ -1217,6 +1234,10 @@ public class TabResultDataModel extends AbstractTableModel {
             } else {
                 rowData.put(columnIdx, data);
             }
+        }
+
+        public void setRecord(ILogRecord record) {
+            this.record = record;
         }
     }
 
