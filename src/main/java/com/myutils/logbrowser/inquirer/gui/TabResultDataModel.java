@@ -1156,7 +1156,7 @@ public class TabResultDataModel extends AbstractTableModel {
 
         public int addCell(String title, String _data) {
             int columnIdx = 0;
-            String data = StringUtils.defaultIfBlank(StringUtils.trimToEmpty(_data.replaceAll("\\P{Print}", "")), "");
+            String data = StringUtils.trimToEmpty(StringUtils.defaultIfBlank(_data, "").replaceAll("\\P{Print}", ""));
 
             if (isAggregate) {
                 if (!data.isEmpty() && (title == null || !title.equals("filename"))) {
