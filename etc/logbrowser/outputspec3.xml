@@ -5,6 +5,31 @@
 	<!-- SIP messages -->
 	 <!--spec MsgType="Sip" format="filelink timestamp %8s f:%4s|t:%4s|%-8s|callidalias/*%s via:%18s br:*%s peer:%s|%s|%s|%s %s"-->
 	 <spec MsgType="Sip" format="filelink timestamp">
+<initScript>
+	// evaluate SDP parameters
+	for(var s of record.getBytes().split('\n')){
+		if( (m=s.match(/^content-length:\s+(.+)/i))!=undefined
+		   || (m=s.match(/^l:\s(.+)/i))!=undefined) {
+			if(parseInt(m[1])==0){
+				break;
+			}
+		}
+		
+		if( (m=s.match(/(m=audio.+)/))!=undefined){
+			fields.put('sdp', m[1]);
+		}
+		else if( (m=s.match(/User-Agent:\s*(.+)/))!=undefined){
+			fields.put('peer', m[1]);
+		}
+		else if( (m=s.match(/a=(inactive|recvonly|sendrecv|sendonly)/))!=undefined){
+			fields.put('sdp attributes', m[1]);
+		}
+		else if( (m=s.match(/^(c=.+)/))!=undefined){
+			fields.put('c line', m[1]);
+		}
+	}
+</initScript>
+
 	  <param1 type="embedded" id="filelink" name="filename" >
 		<pattern match="(log)" group="1"/>
 	  </param1>
@@ -38,7 +63,7 @@
 	  </param5>
 	  <param6 type="database" id="cseq" format="|%-8s"  name="seqn">
 	  </param6>
-    	  <param7 type="database" id="uuid" format=" uuid=%s" name="uuid">
+    	  <param7 type="database" id="uuid" format=" uuid=%s" hidden="true" name="uuid">
 		<!--pattern match="(\w+)" group="1" ignorecase="true" /-->
 	  </param7>
 	  <param3 type="database" id="requestURIDN" format="|reqDN:%s" name="thisdn" hidden="true"/>
@@ -50,23 +75,7 @@
 		<pattern match="(\S{3})$" group="1" ignorecase="true" />
 	  </param8>    
 	  <param9 type="database" id="peeraddr" format="|peer:%s" name="peer"/>
-	  <param10 type="file" format="|%s">
-		<pattern match="^(c=.+)" group="1" ignorecase="true" />
-	  </param10>
-	  <param11 type="file" format="|%s" name="sdp">
-		   <pattern match="(m=audio.+)" group="1" ignorecase="true" />
-	  </param11>
-	  <param12 type="file" format="|%s" name="sdp attributes" >
-		<pattern match="a=(inactive|recvonly|sendrecv|sendonly)" group="1" ignorecase="true" />
-	  </param12>
-    
-	  <param12 type="file" format="|%s" name="peer">
-		<pattern match="User-Agent:(.+)" group="1" ignorecase="true" />
-	  </param12>
-    
-	  <!--param13 type="file" format="|%s">
-		<pattern match="^\w+ sip:(\S+) SIP/2\.0$" group="1" ignorecase="true" />
-	  </param13-->
+	  
 	  </spec>
     
     
@@ -210,7 +219,22 @@
 
 	<!-- TLibrary events -->
 	 <spec MsgType="tlib" format="filelink timestamp" >
-
+		<initScript>
+			for(var s of record.getBytes().split('\n')){
+				if( (m=s.match(/AttributePrivateMsgID\s*(\d*)$"/i))!=undefined){
+					fields.put('PrivateMsgID', 'msgid='+m[1]);
+				}
+				else if( (m=s.match(/AttributeLocation\s(\S*)$/i))!=undefined){
+					fields.put('otherdn', 'loc='+m[1]);
+				}
+				else if( (m=s.match(/(from ISCC):/))!=undefined){
+					fields.put('source', m[1]);
+				}
+				else if( (m=s.match(/AttributeCallState\s(\d*)$/))!=undefined){
+					fields.put('callParams', 'state: '+record.constToStr('CallState', parseInt(m[1])) );
+				}
+			}
+		</initScript>
 	  <param1 type="embedded" id="filelink" name="filename" >
 		<pattern match="(log)" group="1"/>
 	  </param1>
@@ -223,7 +247,6 @@
 	  	<pattern match="0" ignorecase="true" return=" ==&gt;"/>
 	  </param>
 
-    
 	  <param3 type="database" id="name" name="name">
 	   <!--pattern match="(Event.+|Request.+)" group="1" ignorecase="true" /-->
 	   	<!--filter match="(EventCallCreated)" ignorecase="true" /-->
@@ -232,7 +255,6 @@
 	  <param4 type="database" id="source" format=" server{%s}" name="source">
 	  	<!--pattern match="(\w+)" group="1" ignorecase="true" /-->
     </param4>    
-    
 
 	  <param6 type="database" id="seqnoHex" format="|seqn=%s" name="seqn" hidden='true'>
 	   <!--pattern match="AttributeEventSequenceNumber[\s0]*(\S*)$" group="1" ignorecase="true" /-->
@@ -266,43 +288,20 @@
 	  <param7 type="database" id="ixnid" format=" ixn=%s"  name="ixnid" >
 		<pattern match="(\w+)" group="1" ignorecase="true" />
 	  </param7>
-    
 
 	  <param8 type="database" id="TransferID" format=" prConnID=%s" >
 	  </param8>
 
-	  <param8 type="database" id="typestr" format="|type=%s" name="callParams" >
-	   <!--pattern match="AttributeCallType\s(\d*)$" group="1" ignorecase="true" /-->
+	  <!--param8 type="database" id="typestr" format="|type=%s" name="callParams" >
+	  </param8-->
+	  <param8 type="script" name="callParams" >
+		'type: '+record.constToStr('CallType', record.getField('calltype'))
 	  </param8>
-
-	  <param8 type="file" format="|state=%s" name="callParams">
-	   <pattern match="AttributeCallState\s(\d*)$" group="1" expression="select constToStr('CallState', $1)" ignorecase="true" />
-	  </param8>
-    
-
 
 	  <param8 type="database" id="referenceid" format="|refID:%s" name="refid" hidden='true'>
-    <pattern match="([1-9]\d*)$" group="1" ignorecase="true" />
+    		<pattern match="([1-9]\d*)$" group="1" ignorecase="true" />
 	  </param8>
-    
-	  <param9 type="file" format=" msgid=%s" hidden='true'>
-	   <pattern match="AttributePrivateMsgID\s*(\d*)$" group="1" ignorecase="true" />
-	  </param9>
-	  <param8 type="file" format=" loc=%s" name="otherdn" >
-	   <pattern match="AttributeLocation\s(\S*)$" group="1" ignorecase="true" />
-	  </param8>
-	  <!--param11 type="file" format="from %s">
-	   <pattern match="from.+\(\d+\s+(.+)\s\d" group="1" ignorecase="true" />
-	  </param11-->
-	  <param3 type="file" format=" %s" name="source" >
-	   <pattern match="(from ISCC):" group="1" ignorecase="true" />
-	  </param3>
-    
-	  <!--param6 type="file" format="|s %s|m %s">
-	   <pattern match="\s+'Service'\s+'(.+)'" ignorecase="true" groups="1" />
-	   <pattern match="\s+'Method'\s+'(.+)'" ignorecase="true" groups="1" />
-	  </param6-->
-
+	
  	  <param8 type="database" id="err" format="err: %s" name="errorCode" >
       <pattern match="([1-9]\d*)" group="1" ignorecase="true" />
     </param8>
@@ -1899,9 +1898,25 @@
 	  <param6 type="database" id="command" format="%s" name="name" />
 	  <param6 type="database" id="param1" format="%s"  name="name" />
 	  <param6 type="database" id="param2" format="%s"  hidden="true" />
-	  <param10 type="file" cond="Inquirer.recordField('command')=='log'" format="%s" name="name">
+	  <param10 type="file" cond="record.getField('command')=='log'" format="%s" name="name">
 		<pattern match="log (.+)" group="1" ignorecase="true" />
 	  </param10>
+
+	  <param10 type="script" name="name">
+		var fld= record.getField('command'); 
+		var ret='';
+		if( fld=='expression' || fld=='execution step') {
+			var m=record.getBytes().match(/\(\):* (.+)/);
+			if(m!=undefined){
+				ret='orig: '+m[1];
+			}
+			else {
+				ret="";
+			}
+		}
+	  </param10>
+
+
 	  <param8 type="database" id="ivrprofile" format="%s" />
 	  <param8 type="database" id="sipcall" format="call-id:%s" name="callid"/>
 	  <param8 type="database" id="gvpsession" format="gvpsess%s" />

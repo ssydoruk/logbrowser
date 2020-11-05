@@ -45,7 +45,7 @@ public final class TlibForScCmQuery extends IQuery {
         addRef("PlaceID", "Place", ReferenceType.Place.toString(), FieldType.Optional);
 
         addNullField("ixnid");
-        addOutField("constToStr(\"CallType \", calltype) typestr"); // bug in SQLite lib; does not accept full word
+//        addOutField("constToStr(\"CallType \", calltype) typestr"); // bug in SQLite lib; does not accept full word
         addOutField("intToHex( seqno) seqnoHex"); // bug in SQLite lib; does not accept full word
         addRef("attr1id", "attr1", ReferenceType.TLIBATTR1.toString(), FieldType.Optional);
         addRef("attr2id", "attr2", ReferenceType.TLIBATTR2.toString(), FieldType.Optional);

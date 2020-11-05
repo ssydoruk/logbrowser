@@ -9,13 +9,12 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.MissingFormatArgumentException;
 import java.util.regex.*;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
-import org.graalvm.polyglot.Context;
 import org.graalvm.polyglot.HostAccess;
-import org.graalvm.polyglot.Value;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -66,11 +65,7 @@ public abstract class OutputSpecFormatter extends DefaultFormatter {
         }
     }
 
-    public static void initStatic() {
-        condContext = Context.newBuilder("js").allowAllAccess(true).build();
-        condContext.eval("js", "true"); // to test javascript engine init. 
-//        System.out.println("static inited");
-    }
+
     private final XmlCfg cfg;
 
     private HashMap<String, RecordLayout> outSpec = new HashMap<>();
@@ -381,12 +376,7 @@ public abstract class OutputSpecFormatter extends DefaultFormatter {
         private String evalValue(ILogRecord record) throws Exception {
             if (cond != null) {
                 try {
-                    Inquirer.setCurrentRec(record);
-                    condContext.getBindings("js").putMember("record", record);
-
-                    Value eval = condContext.eval("js", cond);
-                    logger.debug("evaluated [" + cond + "]: " + eval);
-                    if (eval.asBoolean() == false) {
+                    if (JSRunner.execBoolean(cond, record) == false) {
                         return "";
                     }
                 } catch (Exception e) {
@@ -837,6 +827,8 @@ public abstract class OutputSpecFormatter extends DefaultFormatter {
         ArrayList<Parameter> parameters;
         String formatString;
         String formatStringFromXml;
+        private String initScript = null;
+        private HashMap<String, String> scriptFields = new HashMap<>();
 
         private RecordLayout(org.w3c.dom.Element el, String msgType) throws Exception {
             // get format attribute, save format string
@@ -859,32 +851,35 @@ public abstract class OutputSpecFormatter extends DefaultFormatter {
             for (int i = 0; i < nl.getLength(); i++) {
                 if (nl.item(i).getNodeType() == Node.ELEMENT_NODE) {
                     Element paramElement = (Element) nl.item(i);
-                    Parameter parameter = null;
+                    if (paramElement.getTagName().equalsIgnoreCase("initScript")) {
+                        addInitScript(paramElement);
+                    } else {
+                        Parameter parameter = null;
 
-                    ParamType paramType = ParamType.valueOf(paramElement.getAttribute("type"));
-                    String fieldName = getAttribute(paramElement, "name", TabResultDataModel.TableRow.colPrefix + i);
+                        ParamType paramType = ParamType.valueOf(paramElement.getAttribute("type"));
+                        String fieldName = getAttribute(paramElement, "name", TabResultDataModel.TableRow.colPrefix + i);
 
-                    switch (paramType) {
-                        case database:
-                            parameter = new DatabaseParameter(paramElement, fieldName);
-                            break;
+                        switch (paramType) {
+                            case database:
+                                parameter = new DatabaseParameter(paramElement, fieldName);
+                                break;
 
-                        case file:
-                            parameter = new FileParameter(paramElement, fieldName);
-                            break;
+                            case file:
+                                parameter = new FileParameter(paramElement, fieldName);
+                                break;
 
-                        case embedded:
-                            parameter = new EmbeddedParameter(paramElement, fieldName);
-                            break;
-                        case script:
-                            parameter = new ScriptParameter(paramElement, fieldName);
-                            break;
+                            case embedded:
+                                parameter = new EmbeddedParameter(paramElement, fieldName);
+                                break;
+                            case script:
+                                parameter = new ScriptParameter(paramElement, fieldName);
+                                break;
 
+                        }
+                        parameter.setHidden(getAttribute(paramElement, "hidden", false));
+
+                        parameters.add(parameter);
                     }
-                    parameter.setHidden(getAttribute(paramElement, "hidden", false));
-
-                    parameters.add(parameter);
-
                 }
             }
         }
@@ -922,8 +917,16 @@ public abstract class OutputSpecFormatter extends DefaultFormatter {
         }
 
         public String PrintRecord(ILogRecord record, PrintStreams ps, IQueryResults qr) throws Exception {
-//                StringBuilder outString = new StringBuilder(512);
-//                ArrayList<String> paramValues = new ArrayList<>(parameters.size());
+
+            if (initScript != null) {
+                scriptFields.clear();
+                JSRunner.evalFields(initScript, record, scriptFields);
+                if (!scriptFields.isEmpty()) {
+                    for (Map.Entry<String, String> entry : scriptFields.entrySet()) {
+                        ps.addField(entry.getKey(), entry.getValue());
+                    }
+                }
+            }
             for (Parameter param : parameters) {
 
                 String s = param.evalValue(record);
@@ -1006,10 +1009,19 @@ public abstract class OutputSpecFormatter extends DefaultFormatter {
             }
             return "";
         }
-    }
 
-    static private Context condContext = null;
-    static final private String Inquirer_CLASS = Inquirer.class.getName();
+        private void addInitScript(Element paramElement) throws Exception {
+            String s = paramElement.getTextContent();
+            if (StringUtils.isNotBlank(s)) {
+                s = StringUtils.trimToNull(s);
+            }
+            if (s != null) {
+                this.initScript = s;
+            } else {
+                throw new Exception("initScript specified but body is empty");
+            }
+        }
+    }
 
     public static class Inquirer {
 

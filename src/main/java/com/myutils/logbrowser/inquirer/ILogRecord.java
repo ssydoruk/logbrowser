@@ -6,6 +6,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Properties;
+import org.apache.commons.lang3.StringUtils;
 import org.graalvm.polyglot.HostAccess;
 
 public abstract class ILogRecord {
@@ -246,6 +247,29 @@ public abstract class ILogRecord {
     @HostAccess.Export
     public String getBytes() {
         return InquirerFileIo.GetFileBytes(GetFileName(), GetFileOffset(), GetFileBytes());
+    }
+
+    @HostAccess.Export
+    public String constToStr(String s, int val) {
+        if (StringUtils.isNotBlank(s)) {
+            String ret = inquirer.getCr().lookupConst(s, val);
+            if (StringUtils.isNotBlank(ret)) {
+                return ret + " (" + val + ")";
+            }
+        }
+        return Integer.toString(val);
+    }
+
+    @HostAccess.Export
+    public String constToStr(String s, String _val) {
+        int val = Integer.parseInt(StringUtils.defaultIfBlank(_val, "0"));
+        if (StringUtils.isNotBlank(s)) {
+            String ret = inquirer.getCr().lookupConst(s, val);
+            if (StringUtils.isNotBlank(ret)) {
+                return ret + " (" + val + ")";
+            }
+        }
+        return Integer.toString(val);
     }
 
     public String GetField(String fieldName, boolean ignoreException) {

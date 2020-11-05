@@ -6,6 +6,7 @@
 package com.myutils.logbrowser.common;
 
 import com.myutils.logbrowser.inquirer.ILogRecord;
+import java.util.HashMap;
 import org.apache.logging.log4j.LogManager;
 import org.graalvm.polyglot.Context;
 import org.graalvm.polyglot.HostAccess;
@@ -62,12 +63,29 @@ public class JSRunner {
     }
     private static final org.apache.logging.log4j.Logger logger = LogManager.getLogger();
 
+    public static void evalFields(String script, ILogRecord rec, HashMap<String, String> scriptFields) {
+        Context cont = getInstance().getCondContext();
+        cont.getBindings("js").putMember("record", rec);
+        cont.getBindings("js").putMember("fields", scriptFields);
+        cont.eval("js", script);
+        logger.debug("evalFields [" + scriptFields + "] - result of [" + script + "]");
+    }
+
     public static String execString(String script, ILogRecord rec) {
-        Context condContext = getInstance().getCondContext();
-        condContext.getBindings("js").putMember("record", rec);
-        Value eval = JSRunner.getInstance().getCondContext().eval("js", script);
+        Context cont = getInstance().getCondContext();
+        cont.getBindings("js").putMember("record", rec);
+        Value eval = cont.eval("js", script);
         logger.debug("eval [" + eval + "] - result of [" + script + "]");
         return eval.asString();
+
+    }
+
+    public static boolean execBoolean(String script, ILogRecord rec) {
+        Context cont = getInstance().getCondContext();
+        cont.getBindings("js").putMember("record", rec);
+        Value eval = cont.eval("js", script);
+        logger.debug("eval [" + eval + "] - result of [" + script + "]");
+        return eval.asBoolean();
 
     }
 

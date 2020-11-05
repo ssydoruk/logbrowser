@@ -8,6 +8,7 @@ import com.google.gson.GsonBuilder;
 import com.jidesoft.dialog.ButtonPanel;
 import com.jidesoft.dialog.StandardDialog;
 import com.jidesoft.plaf.LookAndFeelFactory;
+import com.myutils.logbrowser.common.JSRunner;
 import com.myutils.logbrowser.indexer.FileInfoType;
 import com.myutils.logbrowser.inquirer.gui.LogFileManager;
 import com.myutils.logbrowser.inquirer.gui.MySwingWorker;
@@ -72,7 +73,7 @@ public class inquirer {
 
     public inquirer() {
         // Init different static. This is unsave but efficient
-        OutputSpecFormatter.initStatic();
+        JSRunner.getInstance().getCondContext().eval("js", "2");
     }
 
     static XmlCfg cfg;
