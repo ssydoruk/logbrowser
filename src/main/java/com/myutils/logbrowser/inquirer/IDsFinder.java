@@ -2262,6 +2262,12 @@ public final class IDsFinder extends QueryTools {
                 break;
             case Level5:
                 queryLevel = 5;
+            case Level6:
+                queryLevel = 6;
+            case Level7:
+                queryLevel = 7;
+            case Level8:
+                queryLevel = 8;
                 break;
             case LevelMax:
                 queryLevel = MAX_DEPTH;
@@ -3033,7 +3039,10 @@ public final class IDsFinder extends QueryTools {
         Level2("Level 2"),
         Level3("Level 3"),
         Level4("Level 4"),
-        Level5("Level 5"),;
+        Level5("Level 5"),
+        Level6("Level 6"),
+        Level7("Level 7"),
+        Level8("Level 8"),;
 
         private final String name;
 
