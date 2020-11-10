@@ -65,7 +65,6 @@ public abstract class OutputSpecFormatter extends DefaultFormatter {
         }
     }
 
-
     private final XmlCfg cfg;
 
     private HashMap<String, RecordLayout> outSpec = new HashMap<>();
@@ -920,7 +919,11 @@ public abstract class OutputSpecFormatter extends DefaultFormatter {
 
             if (initScript != null) {
                 scriptFields.clear();
-                JSRunner.evalFields(initScript, record, scriptFields);
+                if (JSRunner.evalFields(initScript, record, scriptFields))// ignore record 
+                {
+                    ps.ignoreRecord();
+                    return "";
+                }
                 if (!scriptFields.isEmpty()) {
                     for (Map.Entry<String, String> entry : scriptFields.entrySet()) {
                         ps.addField(entry.getKey(), entry.getValue());

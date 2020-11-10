@@ -308,6 +308,10 @@ public class PrintStreams {
 
     }
 
+    void ignoreRecord() {
+        tabDataModel.ignoreRecord();
+    }
+
     interface PrintStorage {
 
     }

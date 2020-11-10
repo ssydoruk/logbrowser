@@ -51,3 +51,4 @@ airlib.code-workspace
 package-lock.json
 .factorypath
 .classpath
+etc/logbrowser/aa.js

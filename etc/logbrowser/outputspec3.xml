@@ -5,30 +5,7 @@
 	<!-- SIP messages -->
 	 <!--spec MsgType="Sip" format="filelink timestamp %8s f:%4s|t:%4s|%-8s|callidalias/*%s via:%18s br:*%s peer:%s|%s|%s|%s %s"-->
 	 <spec MsgType="Sip" format="filelink timestamp">
-<initScript>
-	// evaluate SDP parameters
-	for(var s of record.getBytes().split('\n')){
-		if( (m=s.match(/^content-length:\s+(.+)/i))!=undefined
-		   || (m=s.match(/^l:\s(.+)/i))!=undefined) {
-			if(parseInt(m[1])==0){
-				break;
-			}
-		}
-		
-		if( (m=s.match(/(m=audio.+)/))!=undefined){
-			fields.put('sdp', m[1]);
-		}
-		else if( (m=s.match(/User-Agent:\s*(.+)/))!=undefined){
-			fields.put('peer', m[1]);
-		}
-		else if( (m=s.match(/a=(inactive|recvonly|sendrecv|sendonly)/))!=undefined){
-			fields.put('sdp attributes', m[1]);
-		}
-		else if( (m=s.match(/^(c=.+)/))!=undefined){
-			fields.put('c line', m[1]);
-		}
-	}
-</initScript>
+/
 
 	  <param1 type="embedded" id="filelink" name="filename" >
 		<pattern match="(log)" group="1"/>
@@ -220,18 +197,18 @@
 	<!-- TLibrary events -->
 	 <spec MsgType="tlib" format="filelink timestamp" >
 		<initScript>
-			for(var s of record.getBytes().split('\n')){
+			for(var s of RECORD.getBytes().split('\n')){
 				if( (m=s.match(/AttributePrivateMsgID\s*(\d*)$"/i))!=undefined){
-					fields.put('PrivateMsgID', 'msgid='+m[1]);
+					FIELDS.put('PrivateMsgID', 'msgid='+m[1]);
 				}
 				else if( (m=s.match(/AttributeLocation\s(\S*)$/i))!=undefined){
-					fields.put('otherdn', 'loc='+m[1]);
+					FIELDS.put('otherdn', 'loc='+m[1]);
 				}
 				else if( (m=s.match(/(from ISCC):/))!=undefined){
-					fields.put('source', m[1]);
+					FIELDS.put('source', m[1]);
 				}
 				else if( (m=s.match(/AttributeCallState\s(\d*)$/))!=undefined){
-					fields.put('callParams', 'state: '+record.constToStr('CallState', parseInt(m[1])) );
+					FIELDS.put('callParams', 'state: '+RECORD.constToStr('CallState', parseInt(m[1])) );
 				}
 			}
 		</initScript>
@@ -295,7 +272,7 @@
 	  <!--param8 type="database" id="typestr" format="|type=%s" name="callParams" >
 	  </param8-->
 	  <param8 type="script" name="callParams" >
-		'type: '+record.constToStr('CallType', record.getField('calltype'))
+		'type: '+RECORD.constToStr('CallType', RECORD.getField('calltype'))
 	  </param8>
 
 	  <param8 type="database" id="referenceid" format="|refID:%s" name="refid" hidden='true'>
@@ -1246,6 +1223,108 @@
 	<!-- ORSINTERACTION -->
 	<!-- Orchestration METRIC -->
 	 <spec MsgType="orsm" format="filelink timestamp sid %s">
+		<initScript>
+			switch (RECORD.getField('metric')) {
+				case 'eval_expr': {
+					var s = RECORD.getBytes();
+					var m;
+					var expr;
+					if ((m = s.match(/expression='([^\']+)' /)) != undefined) {
+						expr = m[1];
+						FIELDS.put("param", expr);
+					}
+					if (expr != undefined &amp;&amp; !(
+							expr.startsWith('storeEvent') ||
+							expr.startsWith('storeUnhandledEvent'))) {
+			
+						if ((m = s.match(/type='([^\']+)' /)) != undefined) {
+							FIELDS.put("param1", 'type:' + m[1]);
+						}
+						if ((m = s.match(/result='([^\']+)' /)) != undefined) {
+							FIELDS.put("param2", 'result:' + m[1]);
+						}
+					}
+					break;
+				}
+
+				case 'eval_condition': {
+					var s = RECORD.getBytes();
+					var m;
+					if ((m = s.match(/condition='(.+)' result='([^\']+)' /)) != undefined ) {
+						FIELDS.put("param", m[1]);
+						FIELDS.put("param1", 'result:'+m[2]);
+					}
+					break;
+				}
+			
+				case 'transition': {
+					var s = RECORD.getBytes();
+					var m;
+					if ((m = s.match(/name='([^\']+)' event='([^\']+)'/)) != undefined) {
+						FIELDS.put('param', m[1]);
+						var p1 = m[2];
+						FIELDS.put('param1', m[2]);
+						if (p1 != '*') {
+							if ((m = s.match(/target='([^\']+)' /)) != undefined) {
+								FIELDS.put('param2', m[1]);
+							}
+						}
+					}
+					break;
+				}
+			
+				case 'log': {
+					var s = RECORD.getBytes();
+					var m;
+					if ((m = s.match(/expr='(.+)' lab/)) != undefined) {
+						var p = m[1];
+						if (p.startsWith('done.state.') || 
+						p.startsWith('Running ') || 
+						p.startsWith('RelativePathURL =') || 
+						p.startsWith('Entry1.done event') || 
+						p.endsWith('End of this session') || 
+
+						p.startsWith('return values = (') || 
+						p.includes('script.done event')) {
+							IGNORE_RECORD=true;
+						}
+						else {
+							FIELDS.put("param", p);
+						}
+					}
+					break;
+				}
+			
+				case 'onentry':
+				case 'state_enter':
+				case 'state_exit':
+				case 'event_queued':
+				case 'event_processed':
+				case 'onexit': {
+					var m;
+					if ((m = RECORD.getBytes().match(/name='([^\']+)' /)) != undefined) {
+						FIELDS.put("param", m[1]);
+					}
+					break;
+			
+				}
+			
+				case 'fm_exec_error':
+				case 'exec_error': {
+					var m;
+					if ((m = RECORD.getBytes().match(/error='([^\']+)' /)) != undefined) {
+						FIELDS.put("param", m[1]);
+					}
+					break;
+				}
+			
+				default:
+					break;
+			}
+			
+			
+		</initScript>
+
 	  <param1 type="embedded" id="filelink" name="filename" >
 		<pattern match="(log)" group="1"/>
 	  </param1>
@@ -1262,12 +1341,13 @@
 	  	   <!--filter match="(eval_expr|state_exit|log|eval_condition|event_queued|event_processed)" ignorecase="true" /-->
          <!--pattern match="^(?!state_enter|extension$)(.*)" group="1" /-->
 	  </param4>    
-	  <param4 type="database" id="metric" >
+	  <!--param4 type="database" id="metric" >
       		<pattern match="(log)" filematch="log .+ expr='(.+)' label" retgroup="1" />
       		<pattern match="(eval_condition)" filematch="((?:condition|result)='.+') " retgroup="1" />
-	  </param4>   
+	  </param4-->   
 	  <param4 type="database" id="param1" />
 
+	  <!--
 	  <param5 type="file" format="|%s" name="params">
 	   <pattern match="name=([&quot;&apos;][^&quot;&apos;]+[&quot;&apos;])" group="1" ignorecase="true" />
 	  </param5>
@@ -1283,6 +1363,7 @@
 	  <param5 type="file" format="|%s" name ="thread" hidden="true">
 	   <pattern match="\[(T:\d+)\]" group="1" ignorecase="true" />
 	  </param5>
+	-->
 	 </spec>
 	<!-- Orchestration METRIC -->
   
@@ -1898,15 +1979,15 @@
 	  <param6 type="database" id="command" format="%s" name="name" />
 	  <param6 type="database" id="param1" format="%s"  name="name" />
 	  <param6 type="database" id="param2" format="%s"  hidden="true" />
-	  <param10 type="file" cond="record.getField('command')=='log'" format="%s" name="name">
+	  <param10 type="file" cond="RECORD.getField('command')=='log'" format="%s" name="name">
 		<pattern match="log (.+)" group="1" ignorecase="true" />
 	  </param10>
 
 	  <param10 type="script" name="name">
-		var fld= record.getField('command'); 
+		var fld= RECORD.getField('command'); 
 		var ret='';
 		if( fld=='expression' || fld=='execution step') {
-			var m=record.getBytes().match(/\(\):* (.+)/);
+			var m=RECORD.getBytes().match(/\(\):* (.+)/);
 			if(m!=undefined){
 				ret='orig: '+m[1];
 			}

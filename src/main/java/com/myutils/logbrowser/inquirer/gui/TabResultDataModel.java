@@ -1081,6 +1081,10 @@ public class TabResultDataModel extends AbstractTableModel {
         return currentRow;
     }
 
+    public void ignoreRecord() {
+        tableData.remove(currentRow);
+    }
+
     public final class TableRow {
 
         public final static String colPrefix = "$col$";
