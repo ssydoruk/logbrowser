@@ -75,7 +75,19 @@ public class SipForScCmQuery extends IQuery {
         m_connector = DatabaseConnector.getDatabaseConnector(this);
         String alias = m_connector.getAlias();
 
-        query = "SELECT sip.*,files.id as files_id,files.fileno as fileno, files.appnameid as appnameid, files.name as filename, files.arcname as arcname,  app00.name as app, "
+        query = "SELECT sip.id,"
+                + "sip.time,"
+                + "sip.inbound,"
+                + "sip.PeerPort,"
+                + "sip.FileOffset,"
+                + "sip.FileBytes,"
+                + "sip.callRelated,"
+                + "sip.line,"
+                + "sip.HandlerId,"
+                + "sip.callRelated,"
+                + "sip.FileId,"
+                + ""
+                + "files.id as files_id,files.fileno as fileno, files.appnameid as appnameid, files.name as filename, files.arcname as arcname,  app00.name as app, "
                 + "files.component as component \n"
                 + getRefFields()
                 + getNullFields()

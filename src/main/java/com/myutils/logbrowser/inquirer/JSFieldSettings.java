@@ -54,7 +54,7 @@ public class JSFieldSettings implements Serializable {
 
     public String evalValue(String bytes) {
         Value eval = JSRunner.getInstance().getCondContext().eval("js", jsScript);
-        logger.debug("eval [" + eval + "]");
+        logger.trace("eval [" + eval + "]");
         return JSRunner.getInstance().getCondContext().eval("js", jsScript).asString();
     }
 

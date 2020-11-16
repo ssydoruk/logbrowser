@@ -3,7 +3,6 @@ package com.myutils.logbrowser.inquirer;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.Properties;
 import org.apache.commons.lang3.StringUtils;
@@ -36,7 +35,6 @@ public abstract class ILogRecord {
     private String m_time;
     private MsgType m_type;
     private int m_component;
-    private ArrayList<String> timeStampFields = new ArrayList<>();
     private ICalculatedFields calcFields;
     private Date dateTime = null;
     private LogFile logFile = null;
@@ -59,9 +57,6 @@ public abstract class ILogRecord {
         return "ILogRecord{" + "m_fields=" + m_fields + ", m_fieldsAll=" + m_fieldsAll + ", m_isMarked=" + m_isMarked + ", m_id=" + getID() + ", m_unixtime=" + m_unixtime + ", m_fileOffset=" + m_fileOffset + ", m_fileBytes=" + m_fileBytes + ", m_fileId=" + GetFileId() + ", m_line=" + GetLine() + ", m_fileName=" + GetFileName() + ", m_time=" + m_time + ", m_appName=" + getM_appName() + ", m_type=" + m_type + ", m_component=" + m_component + '}';
     }
 
-    void setTimestampField(String prevTimestamp) {
-        timeStampFields.add(prevTimestamp);
-    }
 
     public int getM_component() {
         return m_component;

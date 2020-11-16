@@ -5,7 +5,30 @@
 	<!-- SIP messages -->
 	 <!--spec MsgType="Sip" format="filelink timestamp %8s f:%4s|t:%4s|%-8s|callidalias/*%s via:%18s br:*%s peer:%s|%s|%s|%s %s"-->
 	 <spec MsgType="Sip" format="filelink timestamp">
-/
+		<initScript>
+			// evaluate SDP parameters
+			for(var s of RECORD.getBytes().split('\n')){
+				if( (m=s.match(/^content-length:\s+(.+)/i))!=undefined
+				   || (m=s.match(/^l:\s(.+)/i))!=undefined) {
+					if(parseInt(m[1])==0){
+						break;
+					}
+				}
+				
+				if( (m=s.match(/(m=audio.+)/))!=undefined){
+					FIELDS.put('sdp', m[1]);
+				}
+				else if( (m=s.match(/User-Agent:\s*(.+)/))!=undefined){
+					FIELDS.put('peer', m[1]);
+				}
+				else if( (m=s.match(/a=(inactive|recvonly|sendrecv|sendonly)/))!=undefined){
+					FIELDS.put('sdp attributes', m[1]);
+				}
+				else if( (m=s.match(/^(c=.+)/))!=undefined){
+					FIELDS.put('c line', m[1]);
+				}
+			}
+		</initScript>
 
 	  <param1 type="embedded" id="filelink" name="filename" >
 		<pattern match="(log)" group="1"/>

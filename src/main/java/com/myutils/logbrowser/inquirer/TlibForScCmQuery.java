@@ -106,7 +106,22 @@ public final class TlibForScCmQuery extends IQuery {
 //        if (!inquirer.getCr().isNewTLibSearch() && DatabaseConnector.TableExist("HANDLER_logbr") && DatabaseConnector.TableExist("trigger_logbr")) {
 //            addTriggers = true;
 //        }
-        qString.append("SELECT tlib.*")
+        qString.append("SELECT tlib.id,"
+                + "tlib.Inbound,"
+                + "tlib.MsgID,"
+                + "tlib.FileId,"
+                + "tlib.FileOffset,"
+                + "tlib.FileBytes,"
+                + "tlib.line,"
+                + "tlib.seqno,"
+                + "tlib.err,"
+                + "tlib.HandlerId,"
+                + "tlib.ReferenceId,"
+                + "tlib.thisDNID,"
+                + "tlib.otherDNID,"
+                + "tlib.time,"
+                + "tlib.calltype"
+        )
                 .append(addedFieldString(true, true))
                 .append("files.fileno as fileno, files.appnameid as appnameid, files.name as filename, files.arcname as arcname,  files.component as component, app00.name as app, files.nodeId as nodeid");
 //        if((m_componentFilter & CallFlowResults.SIP) == 0)
@@ -116,9 +131,9 @@ public final class TlibForScCmQuery extends IQuery {
 //        else
 //        {
         if (addTriggers) {
-            qString.append(",\nSipId,0 as anchorId, trgr.fileid as trigfile, trgr.line as trigline \n");
+            qString.append(",\nSipId,trgr.fileid as trigfile, trgr.line as trigline \n");
         } else {
-            qString.append(",\n0 as SipId,0 as anchorId,0 as trigfile, 0 as trigline \n");
+            qString.append(",\n0 as SipId,0 as trigfile, 0 as trigline \n");
         }
 
 //        }

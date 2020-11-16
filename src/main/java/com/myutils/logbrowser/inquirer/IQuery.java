@@ -791,7 +791,7 @@ public abstract class IQuery extends QueryTools {
         }
     }
 
-    void addOutField(String fld) {
+    final void addOutField(String fld) {
         outFields.add(fld);
     }
 
@@ -915,7 +915,7 @@ public abstract class IQuery extends QueryTools {
         }
     }
 
-    public void addNullField(String fld) {
+    final public void addNullField(String fld) {
         nullFields.add(fld);
     }
 
@@ -1170,4 +1170,24 @@ public abstract class IQuery extends QueryTools {
             return "";
         }
     }
+
+    public String stdFields(String alias) {
+        StringBuilder ret = new StringBuilder();
+        for (String s : new String[]{
+            "id",
+            "time",
+            "FileId",
+            "FileOffset",
+            "FileBytes",
+            "line"
+        }) {
+            if (ret.length() > 0) {
+                ret.append(",");
+            }
+            ret.append(alias).append(".").append(s);
+
+        }
+        return ret.toString();
+    }
+
 }

@@ -45,6 +45,7 @@ public class OrsByConnIdQuery extends IQuery {
         addNullField("attr1");
         addNullField("attr2");
         addNullField("place");
+        addNullField("ixnid");
 
 //        addRef("ixnIDID", "IXNID", ReferenceType.IxnID.toString(), FieldType.Optional);
     }
@@ -88,7 +89,9 @@ public class OrsByConnIdQuery extends IQuery {
 //        }
 //        connIdCondition += ")";
         StringBuilder qString = new StringBuilder(512);
-        qString.append("SELECT ors.*,0 as SipId,null as CallId,null as IXNID, files.fileno as fileno, files.appnameid as appnameid, files.name as filename, files.arcname as arcname,  \n")
+        qString.append("SELECT ")
+                .append(stdFields("ors"))
+                .append(",ors.Inbound,ors.seqno,ors.HandlerId,ors.ReferenceId,ors.thisDNID,ors.otherDNID,files.fileno as fileno, files.appnameid as appnameid, files.name as filename, files.arcname as arcname,  \n")
                 .append("files.component as component, app00.name as app, files.nodeId as nodeid, null as anchorId \n")
                 .append(getRefFields())
                 .append(getNullFields())

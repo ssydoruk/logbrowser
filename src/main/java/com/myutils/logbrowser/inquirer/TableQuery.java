@@ -160,7 +160,7 @@ public class TableQuery extends IQuery {
         int emptyLen = qString.length();
 
         if (addAll) {
-            qString.append(getTabAlias()).append(".*");
+            qString.append(stdFields(getTabAlias()));
         }
 
         qString.append(addedFieldString(qString.length() > emptyLen, false));
@@ -243,7 +243,7 @@ public class TableQuery extends IQuery {
                         recLoaded(ret);
                         return ret;
                     } catch (InstantiationException | IllegalAccessException ex) {
-                        logger.error("fatal: ",  ex);
+                        logger.error("fatal: ", ex);
                         throw new SQLException(ex);
                     }
                 }

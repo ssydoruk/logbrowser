@@ -79,7 +79,7 @@ public class JSRunner {
         bindings.putMember("IGNORE_RECORD", false);
         cont.eval("js", script);
         boolean ret = bindings.getMember("IGNORE_RECORD").asBoolean();
-        logger.debug("evalFields [" + scriptFields + "], ignored:[" + ret + "] - result of [" + script + "]");
+        logger.trace("evalFields [" + scriptFields + "], ignored:[" + ret + "] - result of [" + script + "]");
         return ret;
     }
 
@@ -87,7 +87,7 @@ public class JSRunner {
         Context cont = getInstance().getCondContext();
         cont.getBindings("js").putMember("RECORD", rec);
         Value eval = cont.eval("js", script);
-        logger.debug("eval [" + eval + "] - result of [" + script + "]");
+        logger.trace("eval [" + eval + "] - result of [" + script + "]");
         return eval.asString();
 
     }
@@ -96,7 +96,7 @@ public class JSRunner {
         Context cont = getInstance().getCondContext();
         cont.getBindings("js").putMember("RECORD", rec);
         Value eval = cont.eval("js", script);
-        logger.debug("eval [" + eval + "] - result of [" + script + "]");
+        logger.trace("eval [" + eval + "] - result of [" + script + "]");
         return eval.asBoolean();
 
     }

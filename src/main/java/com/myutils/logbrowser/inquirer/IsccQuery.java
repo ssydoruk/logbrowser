@@ -68,7 +68,17 @@ final public class IsccQuery extends IQuery {
 
         StringBuilder qString = new StringBuilder();
 
-        qString.append("SELECT tlib.*,0 AS SipId,NULL AS CallId,0 as seqno,\n")
+        qString.append("SELECT tlib.id,"
+                + "tlib.time,"
+                + "tlib.FileId,"
+                + "tlib.FileOffset,"
+                + "tlib.FileBytes,"
+                + "tlib.line,"
+                + "tlib.Inbound,"
+                + "tlib.HandlerId,"
+                + "tlib.ReferenceId,"
+                + "tlib.thisDNID,"
+                + "tlib.otherDNID,")
                 .append(" file.name AS filename, file.arcname as arcname, file.fileno as fileno, file.appnameid as appnameid,\n")
                 .append(" 0 as anchorid,file.component as component, app00.name as app, file.nodeId as nodeid ")
                 .append(getRefFields())
