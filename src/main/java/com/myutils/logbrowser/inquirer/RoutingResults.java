@@ -1523,6 +1523,9 @@ final public class RoutingResults extends IQueryResults {
 //                            DialogItem.ORS_ORSURS);
 //                OrsUrs.AddCheckedWhere(OrsUrs.getTabAlias() + ".methodid", ReferenceType.ORSMETHOD, orsReportComponent, "AND", DialogItem.ORS_ORSURS_METHOD);
                         OrsUrs.setCommonParams(this, dlg);
+                        OrsUrs.addOutField("inbound");
+                        OrsUrs.addOutField("reqid");
+                        OrsUrs.addOutField("refid");
                         getRecords(OrsUrs);
 
                     }

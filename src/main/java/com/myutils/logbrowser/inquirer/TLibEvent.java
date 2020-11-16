@@ -76,7 +76,7 @@ public class TLibEvent extends ILogRecord {
 
         int iType = rs.getInt("component");
         FileInfoType type = FileInfoType.GetvalueOf(iType);
-        m_fields.put("comptype", new Integer(iType));
+        m_fields.put("comptype", iType);
         String nodeId = rs.getString("nodeid");
         String comp = "";
         String shortComp = "";
