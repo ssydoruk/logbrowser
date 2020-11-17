@@ -206,6 +206,7 @@ public class ConfServerResults extends IQueryResults {
 
             HashSet<Integer> refIDs = new HashSet<>();
             HashSet<Integer> appNameIDs = new HashSet<>();
+            HashSet<Long> ids = new HashSet<>();
 
             Integer[] iDs = cidFinder.getIDs(IDType.AGENT);
             if (iDs != null) {
@@ -218,6 +219,7 @@ public class ConfServerResults extends IQueryResults {
                 public void recordLoaded(ILogRecord rec) {
                     addUnique(refIDs, Util.intOrDef(rec.GetField("refID"), (Integer) null));
                     addUnique(appNameIDs, Util.intOrDef(rec.GetField("theAppNameID"), (Integer) null));
+                    addUnique(ids, rec.getID());
 //                            addUnique(idFiles, rec.GetFileId());
                 }
 
@@ -257,6 +259,8 @@ public class ConfServerResults extends IQueryResults {
                 Wheres wh = new Wheres();
                 wh.addWhere(getWhere("refID", refIDs.toArray(new Integer[refIDs.size()])), "AND");
                 wh.addWhere(getWhere("theAppNameID", appNameIDs.toArray(new Integer[appNameIDs.size()])), "AND");
+                wh.addWhere(getWhereNot(CSUpdates.fldName("id"), ids, false), "AND");
+
                 Wheres topWh = new Wheres();
                 topWh.addWhere(wh, "AND");
                 topWh.addWhere(CSUpdates.getTabAlias() + ".userNameID is null", "AND");
@@ -280,6 +284,7 @@ public class ConfServerResults extends IQueryResults {
         CSUpdates.addRef("opID", "op", ReferenceType.CfgOp.toString(), FieldType.Optional);
         CSUpdates.addRef("objNameID", "objName", ReferenceType.CfgObjName.toString(), FieldType.Optional);
         CSUpdates.addRef("msgID", "message", ReferenceType.CfgMsg.toString(), FieldType.Optional);
+        CSUpdates.setOutFields(new String[]{"refid", "theappnameid", "dbid"});
         CSUpdates.setCommonParams(this, dlg);
 
         return CSUpdates;

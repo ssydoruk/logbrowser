@@ -10,18 +10,18 @@ import org.apache.commons.lang3.StringUtils;
 import org.graalvm.polyglot.HostAccess;
 
 public abstract class ILogRecord {
-    
+
     private static String[] sInboundFieldNames = {"inbound"
     };
-    
+
     private int m_appid;
     private int appnameid;
     private int id;
-    
+
     public Properties m_fieldsAll;
-    
+
     private boolean m_isMarked;
-    
+
     private long m_unixtime;
     private long m_fileOffset;
     private int m_fileBytes;
@@ -33,13 +33,13 @@ public abstract class ILogRecord {
     private ICalculatedFields calcFields;
     private Date dateTime = null;
     private LogFile logFile = null;
-    
+
     protected StdFields stdFields = new StdFields();
-    
+
     public ILogRecord() {
         m_fieldsAll = new Properties();
     }
-    
+
     public ILogRecord(ResultSet rs, MsgType type) throws SQLException {
         this();
         if (Thread.currentThread().isInterrupted()) {
@@ -47,12 +47,12 @@ public abstract class ILogRecord {
         }
         initRecord(rs, type);
     }
-    
+
     @Override
     public String toString() {
         return "ILogRecord{" + ", m_fieldsAll=" + m_fieldsAll + ", m_isMarked=" + m_isMarked + ", m_id=" + getID() + ", m_unixtime=" + m_unixtime + ", m_fileOffset=" + m_fileOffset + ", m_fileBytes=" + m_fileBytes + ", m_fileId=" + GetFileId() + ", m_line=" + GetLine() + ", m_fileName=" + GetFileName() + ", m_time=" + m_time + ", m_appName=" + getM_appName() + ", m_type=" + m_type + ", m_component=" + m_component + '}';
     }
-    
+
     public int getM_component() {
         return m_component;
     }
@@ -63,32 +63,32 @@ public abstract class ILogRecord {
      * @throws Exception
      */
     public void getAllFields(ResultSet rs) throws Exception {
-        
+
     }
-    
+
     public ICalculatedFields getCalcFields() {
         return calcFields;
     }
-    
+
     final public void setCalcFields(ICalculatedFields calcFields) {
         this.calcFields = calcFields;
         m_fieldsAll.putAll(calcFields.calc(m_fieldsAll));
     }
-    
+
     private static final String FILEOFFSET = "fileoffset";
     private static final String FILEBYTES = "filebytes";
     private static final String APPNAMEID = "appnameid";
     private static final String COMPONENT = "component";
     private static final String ID = "id";
-    
+
     abstract void initCustomFields();
-    
+
     abstract HashMap<String, Object> initCalculatedFields(ResultSet rs) throws SQLException;
-    
+
     final public void initRecord(ResultSet rs, MsgType type) throws SQLException {
         try {
             m_type = type;
-            
+
             if (!rs.isClosed()) {
                 initCustomFields();
 
@@ -98,7 +98,7 @@ public abstract class ILogRecord {
                     public Object getValue() {
                         return m_fileOffset;
                     }
-                    
+
                     @Override
                     public void setValue(Object val) {
                         if (val instanceof Integer) {
@@ -107,14 +107,14 @@ public abstract class ILogRecord {
                             m_fileOffset = (long) val;
                         }
                     }
-                    
+
                 });
                 stdFields.fieldInit(FILEBYTES, new IValueAssessor() {
                     @Override
                     public Object getValue() {
                         return m_fileBytes;
                     }
-                    
+
                     @Override
                     public void setValue(Object val) {
                         m_fileBytes = (int) val;
@@ -125,7 +125,7 @@ public abstract class ILogRecord {
                     public Object getValue() {
                         return appnameid;
                     }
-                    
+
                     @Override
                     public void setValue(Object val) {
                         appnameid = (int) val;
@@ -136,7 +136,7 @@ public abstract class ILogRecord {
                     public Object getValue() {
                         return m_component;
                     }
-                    
+
                     @Override
                     public void setValue(Object val) {
                         m_component = (int) val;
@@ -147,19 +147,19 @@ public abstract class ILogRecord {
                     public Object getValue() {
                         return id;
                     }
-                    
+
                     @Override
                     public void setValue(Object val) {
                         id = (int) val;
                     }
                 });
-                
+
                 stdFields.fieldInit("time", new IValueAssessor() {
                     @Override
                     public Object getValue() {
                         return m_unixtime;
                     }
-                    
+
                     @Override
                     public void setValue(Object val) {
                         m_unixtime = (long) val;
@@ -169,7 +169,7 @@ public abstract class ILogRecord {
 
                 ResultSetMetaData meta = rs.getMetaData();
                 try {
-                    
+
                     for (int i = 1; i <= meta.getColumnCount(); i++) {
                         String cName = meta.getColumnName(i).toLowerCase();
                         Object obj = rs.getObject(i);
@@ -177,7 +177,7 @@ public abstract class ILogRecord {
                             cName = "";
                         }
                         String cVal;
-                        
+
                         if (!stdFields.setValue(cName, obj)) {
                             try {
                                 cVal = obj.toString();
@@ -191,7 +191,7 @@ public abstract class ILogRecord {
                     inquirer.logger.error("SQL Exception ", sQLException);
                 }
                 m_isMarked = false;
-                
+
                 dateTime = new Date();
                 dateTime.setTime(rs.getTimestamp("time").getTime());
                 m_time = DatabaseConnector.dateToString(dateTime);
@@ -200,92 +200,92 @@ public abstract class ILogRecord {
                     m_fieldsAll.putAll(initCalculatedFields);
                 }
             }
-            
+
         } catch (SQLException e) {
             inquirer.logger.error(this.getClass().toString() + " const: " + e.getMessage(), e);
             throw e;
         }
     }
-    
+
     public long getID() {
         return id;
     }
-    
+
     public int getAppnameid() {
         return appnameid;
     }
-    
+
     public int getM_appid() {
         return m_appid;
     }
-    
+
     public Date getDateTime() {
         return dateTime;
     }
-    
+
     public String getM_appName() {
         return GetField("app", "");
     }
-    
+
     public boolean isTLibType() {
         MsgType type = GetType();
         return type == MsgType.TLIB || type == MsgType.ORS || type == MsgType.OCS
                 || type == MsgType.CONNID;
     }
-    
+
     public MsgType GetType() {
         return m_type;
     }
-    
+
     public void SetType(MsgType theType) {
         m_type = theType;
     }
-    
+
     public long GetUnixTime() {
         return m_unixtime;
     }
-    
+
     public Integer GetFileId() {
         if (m_fileId <= 0) {
             m_fileId = GetField("fileid", 0);
         }
         return m_fileId;
     }
-    
+
     public long GetFileOffset() {
         return m_fileOffset;
     }
-    
+
     public int GetFileBytes() {
         return m_fileBytes;
     }
-    
+
     public int GetLine() {
         if (m_line <= 0) {
             m_line = GetField("line", 0);
         }
         return m_line;
     }
-    
+
     public LogFile GetFileName() {
         if (logFile == null) {
             logFile = inquirer.getInq().getLfm().getLogFile(GetField("filename", ""), GetField("arcname", null));
         }
         return logFile;
     }
-    
+
     public String GetTime() {
         return m_time;
     }
-    
+
     public void SetMark(boolean mark) {
         m_isMarked = mark;
     }
-    
+
     public boolean IsMarked() {
         return m_isMarked;
     }
-    
+
     public String GetField(String fieldName, String def) {
         try {
             return GetField(fieldName);
@@ -294,7 +294,7 @@ public abstract class ILogRecord {
             return def;
         }
     }
-    
+
     public int GetField(String fieldName, int def) {
         try {
             String value = GetField(fieldName);
@@ -307,21 +307,21 @@ public abstract class ILogRecord {
         }
         return def;
     }
-    
+
     public String GetField(String fieldName) {
         return GetField(fieldName.toLowerCase(), false);
     }
-    
+
     @HostAccess.Export
     public String getField(String fieldName) {
         return GetField(fieldName.toLowerCase(), true);
     }
-    
+
     @HostAccess.Export
     public String getBytes() {
         return InquirerFileIo.GetFileBytes(GetFileName(), GetFileOffset(), GetFileBytes());
     }
-    
+
     @HostAccess.Export
     public String constToStr(String s, int val) {
         if (StringUtils.isNotBlank(s)) {
@@ -332,7 +332,7 @@ public abstract class ILogRecord {
         }
         return Integer.toString(val);
     }
-    
+
     @HostAccess.Export
     public String constToStr(String s, String _val) {
         int val = Integer.parseInt(StringUtils.defaultIfBlank(_val, "0"));
@@ -344,7 +344,7 @@ public abstract class ILogRecord {
         }
         return Integer.toString(val);
     }
-    
+
     public String GetField(String fieldName, boolean ignoreException) {
         Object ret;
         if (stdFields.containsKey(fieldName)) {
@@ -353,7 +353,9 @@ public abstract class ILogRecord {
             ret = m_fieldsAll.get(fieldName);
         } else {
             if (!ignoreException) {
-                inquirer.logger.error("Error: \"" + fieldName + "\": no such field in " + GetType() + " message");
+                String s = "Error: \"" + fieldName + "\": no such field in " + GetType() + " message";
+                inquirer.logger.error(s);
+                inquirer.showError(null, s, "Field not found");
                 PrintFieldNames();
             }
             return "";
@@ -361,26 +363,28 @@ public abstract class ILogRecord {
         }
         return ret == null ? "" : ret.toString();
     }
-    
+
     public int GetFieldInt(String fieldName) {
         Object ret = null;
         if (m_fieldsAll != null) {
             ret = m_fieldsAll.get(fieldName);
         }
-        
+
         if (ret == null) {
-            inquirer.logger.error("Error: \"" + fieldName + "\": no such field in " + GetType() + " message");
+            String s = "Error: \"" + fieldName + "\": no such field in " + GetType() + " message";
+            inquirer.logger.error(s);
+            inquirer.showError(null, s, "Field not found");
             PrintFieldNames();
             return 0;
 //            throw new Exception("Cannot continue");
         }
         return Integer.parseInt(ret.toString());
     }
-    
+
     public int GetAnchorId() {
         return 0;
     }
-    
+
     private boolean getBool(Object obj) {
         try {
             return Integer.parseInt((String) obj) == 1;
@@ -388,7 +392,7 @@ public abstract class ILogRecord {
         }
         return false;
     }
-    
+
     public boolean IsInbound() {
         for (String fld : sInboundFieldNames) {
             if (m_fieldsAll.containsKey(fld)) {
@@ -397,7 +401,7 @@ public abstract class ILogRecord {
         }
         return false;
     }
-    
+
     private void PrintFieldNames() {
         inquirer.logger.info("Fields available:");
         StringBuilder s = new StringBuilder(255);
@@ -406,7 +410,7 @@ public abstract class ILogRecord {
         }
         inquirer.logger.info(s);
     }
-    
+
     boolean hasField(String fldName) {
         if (stdFields.containsKey(fldName)) {
             return true;
@@ -415,7 +419,7 @@ public abstract class ILogRecord {
         }
         return false;
     }
-    
+
     void debug() {
         if (inquirer.logger.isTraceEnabled()) {
             if (Thread.currentThread().isInterrupted()) {
@@ -429,33 +433,33 @@ public abstract class ILogRecord {
             }
         }
     }
-    
+
     protected String notNull(String val, String def) {
         if (val == null) {
             return def;
         }
         return val;
     }
-    
+
     protected String getString(ResultSet rs, String fld) throws SQLException {
         String ret = rs.getString(fld);
         return (ret == null) ? "" : ret;
-        
+
     }
-    
+
     protected Integer getInt(ResultSet rs, String fld) throws SQLException {
         int aInt = rs.getInt(fld);
         return aInt;
-        
+
     }
-    
+
     protected interface IValueAssessor {
-        
+
         void setValue(Object val);
-        
+
         Object getValue();
     }
-    
+
     public static class StdFields extends HashMap<String, IValueAssessor> {
 
         /**
@@ -467,7 +471,7 @@ public abstract class ILogRecord {
         public void fieldInit(String fieldName, IValueAssessor valueAccessor) {
             put(fieldName, valueAccessor);
         }
-        
+
         public boolean setValue(String fieldName, Object val) {
             if (containsKey(fieldName)) {
                 IValueAssessor get = get(fieldName);
@@ -481,7 +485,7 @@ public abstract class ILogRecord {
             return false;
         }
     }
-    
+
     protected long setLong(Object val) {
         if (val == null) {
             return 0;
@@ -491,7 +495,7 @@ public abstract class ILogRecord {
             return (long) val;
         }
     }
-    
+
     protected int setInt(Object val) {
         if (val == null) {
             return 0;
@@ -501,7 +505,7 @@ public abstract class ILogRecord {
             return (int) val;
         }
     }
-    
+
     protected boolean setBoolean(Object val) {
         if (val == null) {
             return false;
@@ -511,5 +515,5 @@ public abstract class ILogRecord {
             return (boolean) val;
         }
     }
-    
+
 }

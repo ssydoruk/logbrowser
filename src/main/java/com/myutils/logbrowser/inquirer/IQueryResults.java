@@ -69,7 +69,7 @@ public abstract class IQueryResults extends QueryTools
     }
 
     static public void addUnique(HashSet<Long> ids, Long id) {
-        if (id != null && id > 0 && !ids.contains(id)) {
+        if (id != null && id > 0) {
             ids.add(id);
 
         }
@@ -82,7 +82,7 @@ public abstract class IQueryResults extends QueryTools
     }
 
     static public void addUnique(HashSet<Integer> ids, Integer id) {
-        if (id != null && id > 0 && !ids.contains(id)) {
+        if (id != null && id > 0) {
             ids.add(id);
 
         }

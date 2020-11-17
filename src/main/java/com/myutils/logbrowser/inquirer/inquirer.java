@@ -739,8 +739,6 @@ public class inquirer {
             queryResults.AddFormatter((ILogRecordFormatter) formatters.get(i));
         }
 
-        ILogRecord.resetTotalBytes();
-
         Instant time3 = Instant.now();
 
         queryResults.Retrieve(dlg);
