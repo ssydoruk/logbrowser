@@ -6,6 +6,7 @@ package com.myutils.logbrowser.inquirer;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.HashMap;
 
 /**
  *
@@ -15,18 +16,21 @@ public class ProxyEvent extends ILogRecord {
 
     public ProxyEvent(ResultSet rs) throws SQLException {
         super(rs, MsgType.PROXY);
-        m_fields.put("name", rs.getString("name"));
-        String connId = rs.getString("connid");
-        m_fields.put("connid", connId == null ? "" : connId);
-        String dn = rs.getString("thisdn");
-        m_fields.put("thisdn", dn == null ? "" : dn);
-        String odn = rs.getString("otherdn");
-        m_fields.put("otherdn", odn == null ? "" : odn);
-        String dest = rs.getString("destination");
-        m_fields.put("destination", dest == null ? "" : dest);
 
+        
+
+    }
+
+    @Override
+    void initCustomFields() {
+
+    }
+
+    @Override
+    HashMap<String, Object> initCalculatedFields(ResultSet rs) throws SQLException {
+        HashMap<String, Object> ret = new HashMap<>();
         int type = rs.getInt("component");
-        m_fields.put("comptype", new Integer(type));
+        ret.put("comptype", new Integer(type));
         String nodeId = rs.getString("nodeid");
         String comp = "";
         String shortComp = "";
@@ -53,12 +57,9 @@ public class ProxyEvent extends ILogRecord {
                 shortComp = "ICON";
                 break;
         }
-        m_fields.put("component", comp);
-        m_fields.put("comp", shortComp);
-
-        m_fields.put("tlib_id", new Integer(rs.getInt("tlib_id")));
-        String refid = rs.getString("refid");
-        m_fields.put("refid", refid == null ? "" : refid);
+        ret.put("component", comp);
+        ret.put("comp", shortComp);
+        return ret;
     }
 
 }

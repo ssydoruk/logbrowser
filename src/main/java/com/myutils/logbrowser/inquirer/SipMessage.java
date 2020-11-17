@@ -2,6 +2,7 @@ package com.myutils.logbrowser.inquirer;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.HashMap;
 
 public class SipMessage extends ILogRecord {
 
@@ -13,65 +14,7 @@ public class SipMessage extends ILogRecord {
     public SipMessage(ResultSet rs) throws SQLException {
         super(rs, MsgType.SIP);
         String s;
-        handlerId = (Integer) rs.getInt("handlerId");
 
-        try {
-            m_isInbound = rs.getBoolean("inbound");
-            m_fields.put("name", rs.getString("name"));
-            if ((s = rs.getString("callid")) == null) {
-                s = "";
-            }
-            callId = notNull(rs.getString("callid"), "");
-            m_fields.put("callid", callId);
-            if ((s = rs.getString("cseq")) == null) {
-                s = "";
-            }
-            m_fields.put("cseq", s);
-            if ((s = rs.getString("touri")) == null) {
-                s = "";
-            }
-            m_fields.put("touri", s);
-            if ((s = rs.getString("fromuri")) == null) {
-                s = "";
-            }
-            m_fields.put("fromuri", s);
-            m_fields.put("handlerid", handlerId);
-
-            String peerIp = rs.getString("PeerIp");
-            if (peerIp == null) {
-                peerIp = "null";
-            }
-            String peerPort = rs.getString("PeerPort");
-            m_fields.put("peeraddr", peerIp + ":" + peerPort);
-
-            m_fields.put("component", rs.getInt("component"));
-            if ((s = rs.getString("ViaUri")) == null) {
-                s = "";
-            }
-            m_fields.put("via", s);
-
-            switch (rs.getInt("component")) {
-                case 1:
-                    m_fields.put("comp", "CM");
-                    break;
-                case 6:
-                    m_fields.put("comp", "SP");
-                    break;
-                default:
-                    m_fields.put("comp", "CM");
-            }
-
-            String anchorstr = callId;
-            anchorstr += rs.getString("name");
-            anchorstr += rs.getString("cseq");
-            anchorstr += rs.getString("fromuri");
-            anchorstr += rs.getString("touri");
-            anchorstr += rs.getLong("time");
-            m_anchorid = anchorstr.hashCode();
-        } catch (NullPointerException e) {
-            inquirer.logger.error("ERROR: mandatory field missing for SIP message with ID " + getID(), e);
-            throw new SQLException("Missing parameters");
-        }
     }
 
     public int getHandlerId() {
@@ -90,6 +33,91 @@ public class SipMessage extends ILogRecord {
     @Override
     public boolean IsInbound() {
         return m_isInbound;
+    }
+
+    @Override
+    void initCustomFields() {
+        stdFields.fieldInit("handlerid", new IValueAssessor() {
+            @Override
+            public Object getValue() {
+                return handlerId;
+            }
+
+            @Override
+            public void setValue(Object val) {
+                handlerId = (int) val;
+            }
+
+        });
+
+        stdFields.fieldInit("inbound", new IValueAssessor() {
+            @Override
+            public Object getValue() {
+                return m_isInbound;
+            }
+
+            @Override
+            public void setValue(Object val) {
+                m_isInbound = (int) val == 1;
+            }
+
+        });
+
+        stdFields.fieldInit("callid", new IValueAssessor() {
+            @Override
+            public Object getValue() {
+                return callId;
+            }
+
+            @Override
+            public void setValue(Object val) {
+                callId = (String) val;
+            }
+        });
+    }
+
+    @Override
+    HashMap<String, Object> initCalculatedFields(ResultSet rs) throws SQLException {
+        HashMap<String, Object> ret = new HashMap<>();
+        String s;
+
+        try {
+
+            String peerIp = rs.getString("PeerIp");
+            if (peerIp == null) {
+                peerIp = "null";
+            }
+            String peerPort = rs.getString("PeerPort");
+            ret.put("peeraddr", peerIp + ":" + peerPort);
+
+            if ((s = rs.getString("ViaUri")) == null) {
+                s = "";
+            }
+            ret.put("via", s);
+
+            switch (rs.getInt("component")) {
+                case 1:
+                    ret.put("comp", "CM");
+                    break;
+                case 6:
+                    ret.put("comp", "SP");
+                    break;
+                default:
+                    ret.put("comp", "CM");
+            }
+
+            String anchorstr = callId;
+            anchorstr += rs.getString("name");
+            anchorstr += rs.getString("cseq");
+            anchorstr += rs.getString("fromuri");
+            anchorstr += rs.getString("touri");
+            anchorstr += rs.getLong("time");
+            m_anchorid = anchorstr.hashCode();
+        } catch (NullPointerException e) {
+            inquirer.logger.error("ERROR: mandatory field missing for SIP message with ID " + getID(), e);
+            throw new SQLException("Missing parameters");
+        }
+        return ret;
     }
 
 }

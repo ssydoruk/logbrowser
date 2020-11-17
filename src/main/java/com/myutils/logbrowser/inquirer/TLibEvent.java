@@ -3,6 +3,7 @@ package com.myutils.logbrowser.inquirer;
 import com.myutils.logbrowser.indexer.FileInfoType;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.HashMap;
 import org.apache.commons.lang3.StringUtils;
 
 public class TLibEvent extends ILogRecord {
@@ -28,7 +29,6 @@ public class TLibEvent extends ILogRecord {
 
     public TLibEvent(ResultSet rs, MsgType msgType) throws SQLException {
         super(rs, msgType);
-        initRecord(rs, msgType);
     }
 
     public String getApp() {
@@ -41,94 +41,6 @@ public class TLibEvent extends ILogRecord {
 
     public int getHandlerId() {
         return handlerId;
-    }
-
-    @Override
-    public void initRecord(ResultSet rs, MsgType msgType) throws SQLException {
-        super.initRecord(rs, msgType);
-        handlerId = (Integer) rs.getInt("handlerId");
-//        int sipId = rs.getInt("sipId");
-//        String callId = rs.getString("CallId");
-//        m_anchorid = rs.getInt("anchorid");
-        String connId = rs.getString("ConnectionId");
-
-//        m_fields.put("name", rs.getString("name"));
-//        m_fields.put("referenceid", "refid-" + rs.getString("referenceid"));
-        seqNo = getInt(rs, "seqno", 10, -1);
-        m_fields.put("seqno", seqNo);
-
-        m_fields.put("handlerid", new Integer(handlerId));
-//        m_fields.put("sipid", new Integer(sipId));
-        m_isInbound = rs.getBoolean("inbound");
-//        m_fields.put("callid", callId == null ? "null" : callId);
-        m_fields.put("connid", connId == null ? "" : connId);
-        m_referenceId = rs.getLong("ReferenceId");
-
-        this.thisDn = StringUtils.defaultString(rs.getString("thisdn"));
-        m_fields.put("thisdn", thisDn);
-        this.thisDNID = rs.getInt("thisDNID");
-        this.otherDNID = rs.getInt("otherDNID");
-
-        this.otherDn = rs.getString("OtherDN");
-        m_fields.put("otherdn", otherDn == null ? "" : otherDn);
-
-        m_fields.put("source", StringUtils.defaultString(rs.getString("source")));
-
-        int iType = rs.getInt("component");
-        FileInfoType type = FileInfoType.GetvalueOf(iType);
-        m_fields.put("comptype", iType);
-        String nodeId = rs.getString("nodeid");
-        String comp = "";
-        String shortComp = "";
-        switch (type) {
-            case type_SessionController:
-                comp = nodeId + " sessionController";
-                shortComp = "SC";
-                break;
-            case type_InteractionProxy:
-                comp = nodeId + " interactionProxy";
-                shortComp = "IP";
-                break;
-            case type_tController:
-                comp = nodeId + " tController";
-                shortComp = "TC";
-                break;
-            case type_URS:
-                shortComp = "URS";
-                break;
-            case type_ORS:
-                shortComp = "ORS";
-                break;
-            case type_StatServer:
-                shortComp = "STS";
-                break;
-            case type_ICON:
-                shortComp = "ICON";
-                break;
-        }
-        m_fields.put("component", comp);
-        m_fields.put("comp", shortComp);
-
-        try {
-            m_triggerFileId = rs.getInt("trigfile");
-        } catch (SQLException e) {
-            m_triggerFileId = -1;
-        }
-        try {
-            m_fields.put("trigline", new Integer(rs.getInt("trigline")));
-        } catch (SQLException e) {
-            m_fields.put("trigline", new Integer(-1));
-        }
-        try {
-            m_fields.put("msgid", StringUtils.defaultString(rs.getString("msgid")));
-        } catch (SQLException e) {
-            m_fields.put("msgid", "");
-        }
-        try {
-            m_fields.put("location", StringUtils.defaultString(rs.getString("location")));
-        } catch (SQLException e) {
-            m_fields.put("location", "");
-        }
     }
 
     public int getThisDNID() {
@@ -204,6 +116,223 @@ public class TLibEvent extends ILogRecord {
         } else {
             return app;
         }
+    }
+
+    @Override
+    void initCustomFields() {
+
+        stdFields.fieldInit("seqno", new IValueAssessor() {
+            @Override
+            public Object getValue() {
+                return seqNo;
+            }
+
+            @Override
+            public void setValue(Object val) {
+                seqNo = setInt(val) ;
+            }
+
+        });
+
+        stdFields.fieldInit("handlerid", new IValueAssessor() {
+            @Override
+            public Object getValue() {
+                return handlerId;
+            }
+
+            @Override
+            public void setValue(Object val) {
+                handlerId = (int) val;
+            }
+
+        });
+
+        stdFields.fieldInit("inbound", new IValueAssessor() {
+            @Override
+            public Object getValue() {
+                return m_isInbound;
+            }
+
+            @Override
+            public void setValue(Object val) {
+                m_isInbound = setBoolean(val);
+
+            }
+
+        });
+
+        stdFields.fieldInit("referenceid", new IValueAssessor() {
+            @Override
+            public Object getValue() {
+                return m_referenceId;
+            }
+
+            @Override
+            public void setValue(Object val) {
+                m_referenceId = setLong(val);
+
+            }
+
+        });
+
+        stdFields.fieldInit("thisdn", new IValueAssessor() {
+            @Override
+            public Object getValue() {
+                return thisDn;
+            }
+
+            @Override
+            public void setValue(Object val) {
+                thisDn = StringUtils.defaultString((String) val);
+            }
+        });
+
+        stdFields.fieldInit("otherdn", new IValueAssessor() {
+            @Override
+            public Object getValue() {
+                return otherDn;
+            }
+
+            @Override
+            public void setValue(Object val) {
+                otherDn = StringUtils.defaultString((String) val);
+            }
+        });
+
+        stdFields.fieldInit("source", new IValueAssessor() {
+            @Override
+            public Object getValue() {
+                return source;
+            }
+
+            @Override
+            public void setValue(Object val) {
+                source = StringUtils.defaultString((String) val);
+            }
+        });
+
+        stdFields.fieldInit("thisDNID", new IValueAssessor() {
+            @Override
+            public Object getValue() {
+                return thisDNID;
+            }
+
+            @Override
+            public void setValue(Object val) {
+                thisDNID = (int) val;
+            }
+        });
+
+        stdFields.fieldInit("otherDNID", new IValueAssessor() {
+            @Override
+            public Object getValue() {
+                return otherDNID;
+            }
+
+            @Override
+            public void setValue(Object val) {
+                otherDNID = (int) val;
+            }
+        });
+
+        stdFields.fieldInit("trigfile", new IValueAssessor() {
+            @Override
+            public Object getValue() {
+                return m_triggerFileId;
+            }
+
+            @Override
+            public void setValue(Object val) {
+                m_triggerFileId = (int) val;
+            }
+        });
+
+        stdFields.fieldInit("trigline", new IValueAssessor() {
+            private Object val;
+
+            @Override
+            public Object getValue() {
+                return val;
+            }
+
+            @Override
+            public void setValue(Object _val) {
+                val = _val;
+            }
+        });
+
+        stdFields.fieldInit("msgid", new IValueAssessor() {
+            private Object val;
+
+            @Override
+            public Object getValue() {
+                return val;
+            }
+
+            @Override
+            public void setValue(Object _val) {
+                val = _val;
+            }
+        });
+
+        stdFields.fieldInit("location", new IValueAssessor() {
+            private Object val;
+
+            @Override
+            public Object getValue() {
+                return val;
+            }
+
+            @Override
+            public void setValue(Object _val) {
+                val = _val;
+            }
+        });
+
+    }
+
+    @Override
+    HashMap<String, Object> initCalculatedFields(ResultSet rs) throws SQLException {
+        HashMap<String, Object> ret = new HashMap<>();
+        int iType = rs.getInt("component");
+        FileInfoType type = FileInfoType.GetvalueOf(iType);
+        ret.put("comptype", iType);
+        String nodeId = rs.getString("nodeid");
+        String comp = "";
+        String shortComp = "";
+        switch (type) {
+            case type_SessionController:
+                comp = nodeId + " sessionController";
+                shortComp = "SC";
+                break;
+            case type_InteractionProxy:
+                comp = nodeId + " interactionProxy";
+                shortComp = "IP";
+                break;
+            case type_tController:
+                comp = nodeId + " tController";
+                shortComp = "TC";
+                break;
+            case type_URS:
+                shortComp = "URS";
+                break;
+            case type_ORS:
+                shortComp = "ORS";
+                break;
+            case type_StatServer:
+                shortComp = "STS";
+                break;
+            case type_ICON:
+                shortComp = "ICON";
+                break;
+        }
+        ret.put("component", comp);
+        ret.put("comp", shortComp);
+        String connId = rs.getString("ConnectionId");
+
+        ret.put("connid", connId == null ? "" : connId);
+
+        return ret;
     }
 
 }

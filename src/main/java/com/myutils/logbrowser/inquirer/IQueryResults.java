@@ -420,7 +420,6 @@ public abstract class IQueryResults extends QueryTools
     }
 
     public void doRetrieve(QueryDialog dlg) throws Exception {
-        ILogRecord.resetTotalBytes();
         long time3 = new Date().getTime();
         DynamicTreeNode.setNoRefNoLoad(true);
         Retrieve(dlg);
@@ -912,7 +911,7 @@ public abstract class IQueryResults extends QueryTools
             cs = new CustomStorage(fullTable);
 
         } catch (Exception ex) {
-            logger.error("fatal: ",  ex);
+            logger.error("fatal: ", ex);
         }
     }
 

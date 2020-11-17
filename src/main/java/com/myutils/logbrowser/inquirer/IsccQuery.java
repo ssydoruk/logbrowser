@@ -80,7 +80,7 @@ final public class IsccQuery extends IQuery {
                 + "tlib.thisDNID,"
                 + "tlib.otherDNID,")
                 .append(" file.name AS filename, file.arcname as arcname, file.fileno as fileno, file.appnameid as appnameid,\n")
-                .append(" 0 as anchorid,file.component as component, app00.name as app, file.nodeId as nodeid ")
+                .append(" 0 as anchorid,null as seqno, file.component as component, app00.name as app, file.nodeId as nodeid ")
                 .append(getRefFields())
                 .append(getNullFields())
                 .append("\nFROM iscc_").append(alias).append(" AS tlib\n")
