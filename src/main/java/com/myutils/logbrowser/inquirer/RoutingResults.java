@@ -1607,6 +1607,7 @@ final public class RoutingResults extends IQueryResults {
         URSRI.addRef("subfuncID", "subfunc", ReferenceType.URSMETHOD.toString(), IQuery.FieldType.Optional);
         URSRI.addRef("clientappID", "client", ReferenceType.App.toString(), IQuery.FieldType.Optional);
         URSRI.addRef("URLID", "URL", ReferenceType.HTTPRequest.toString(), IQuery.FieldType.Optional);
+        URSRI.addOutFields(new String[]{"ref", "clientno"});
 
         for (int i = 1; i <= com.myutils.logbrowser.indexer.URSRI.MAX_WEB_PARAMS; i++) {
             String fldName = "attr" + i;
@@ -1628,6 +1629,7 @@ final public class RoutingResults extends IQueryResults {
         UrsRLib.addRef("methodid", "method", ReferenceType.ORSMETHOD.toString(), IQuery.FieldType.Optional);
         UrsRLib.addRef("sourceid", "source", ReferenceType.App.toString(), IQuery.FieldType.Optional);
 
+        UrsRLib.addOutFields(new String[]{"refid", "reqid", "inbound"});
         String methodFilter = getCheckedWhere(UrsRLib.getTabAlias() + ".methodid",
                 ReferenceType.ORSMETHOD,
                 FindNode(ursReportSettings, DialogItem.URS_RLIB, null, null),

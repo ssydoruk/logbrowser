@@ -35,19 +35,8 @@
 	  </param1>
 	  <param2 type="embedded" id="timestamp" name="timestamp" />
     
-	  <!--param type="database" id="inbound" format=" &lt;-" name="direction">
-	  	<pattern match="1" ignorecase="true" />
-	  </param>
-	  <param type="database" id="inbound" format=" -&gt;" name="direction2">
-	  	<pattern match="0" ignorecase="true" />    
-    </param-->
-    
 	  <param type="database" id="app" name="app"/>
-	  <param type="database" id="inbound" name="direction">
-	  	<pattern match="1" ignorecase="true" return="&lt;-" />
-	  	<pattern match="0" ignorecase="true" return="-&gt;" />
-	  </param>
-    
+
 	  <param type="database" id="name" format =" %7s" name="name">
 	  	<pattern match="^(\w{1,7})" ignorecase="true" groups="1" />
 	  </param>
@@ -85,18 +74,11 @@
 	  </param1>
 	  <param2 type="embedded" id="timestamp" name="timestamp" />
     
-	  <!--param type="database" id="inbound" format=" &lt;-" name="direction">
-	  	<pattern match="1" ignorecase="true" />
-	  </param>
-	  <param type="database" id="inbound" format=" -&gt;" name="direction2">
-	  	<pattern match="0" ignorecase="true" />    
-    </param-->
-    
 	  <param type="database" id="app" name="app"/>
-	  <param type="database" id="inbound" name="direction">
-	  	<pattern match="1" ignorecase="true" return="&lt;-" />
-	  	<pattern match="0" ignorecase="true" return="-&gt;" />
-	  </param>
+
+	  <param8 type="script" name="direction" >
+		RECORD.getField('inbound')==1?'&lt;-':'-&gt;'
+	  </param8>
     
 	  <param type="database" id="name" format =" %7s" name="name">
 	  	<pattern match="^(\w{1,7})" ignorecase="true" groups="1" />
@@ -152,13 +134,9 @@
 	  </param1>
 	  <param2 type="embedded" id="timestamp" />
 
-	  <param type="database" id="inbound" format=" &lt;-" >
-	  	<pattern match="1" ignorecase="true" />
-	  </param>
-
-	  <param type="database" id="inbound" format=" -&gt;" >
-	  	<pattern match="0" ignorecase="true" />
-	  </param>
+	  <param8 type="script" name="direction" >
+		RECORD.getField('inbound')==1?'&lt;-':'-&gt;'
+	  </param8>
 
 	  <param3 type="database" id="name" format=" %8s"/>
 
@@ -242,10 +220,9 @@
 
 	  <param type="database" id="app" name="app"/>
     
-	  <param type="database" id="inbound" name="direction">
-	  	<pattern match="1" ignorecase="true" return=" &lt;==" />
-	  	<pattern match="0" ignorecase="true" return=" ==&gt;"/>
-	  </param>
+	  <param8 type="script" name="direction" >
+		RECORD.getField('inbound')==1?'&lt;-':'-&gt;'
+	  </param8>
 
 	  <param3 type="database" id="name" name="name">
 	   <!--pattern match="(Event.+|Request.+)" group="1" ignorecase="true" /-->
@@ -337,11 +314,9 @@
 
 	  <param type="database" id="app" name="app"/>
     
-	  <param type="database" id="inbound" name="direction">
-	  	<pattern match="1" ignorecase="true" return=" &lt;==" />
-	  	<pattern match="0" ignorecase="true" return=" ==&gt;"/>
-	  </param>
-
+	  <param8 type="script" name="direction" >
+		RECORD.getField('inbound')==1?'&lt;-':'-&gt;'
+	  </param8>
     
 	  <param3 type="database" id="name" format=" %s" name="name" >
 	   <!--pattern match="(Event.+|Request.+)" group="1" ignorecase="true" /-->
@@ -505,13 +480,10 @@
 
 	  <param type="database" id="app" name="app"/>
 
-
-
-	  <param type="database" id="inbound" name="direction">
-	  	<pattern match="1" ignorecase="true" return="&lt;-" />
-	  	<pattern match="0" ignorecase="true" return="-&gt;" />
-	  </param>
-    
+	  <param8 type="script" name="direction" >
+		RECORD.getField('inbound')==1?'&lt;-':'-&gt;'
+	  </param8>
+	      
 	  <!--param3 type="database" id="name" format="%s " >
 	   <pattern match="(Event.+|Request.+)" group="1" ignorecase="true" />
 	  </param3-->
@@ -832,10 +804,9 @@
 	  <param2 type="embedded" id="timestamp" name="timestamp" />
 	  <param type="database" id="app" name="app"/>
     
-	  <param type="database" id="isinbound" name="direction">
-	  	<pattern match="1" ignorecase="true" return="&lt;-" />
-	  	<pattern match="0" ignorecase="true" return="-&gt;" />
-	  </param>
+	  <param8 type="script" name="direction" >
+		RECORD.getField('isinbound')==1?'&lt;-':'-&gt;'
+	  </param8>
 
 	  <param6 type="database" id="reqname" format="|req: %s">
 	  </param6>
@@ -1065,12 +1036,10 @@
 		<pattern match="(log)" group="1"/>
 	  </param1>
 
-	  <param type="database" id="inbound" name="direction">
-	  	<pattern match="1" ignorecase="true" return="&lt;-" />
-	  	<pattern match="0" ignorecase="true" return="-&gt;" />
-	  </param>
-    
-    
+	  <param8 type="script" name="direction" >
+		RECORD.getField('inbound')==1?'&lt;-':'-&gt;'
+	  </param8>
+
 	  <param2 type="embedded" id="timestamp" name="timestamp" />
 
 	  <param type="database" id="app" name="app"/>
@@ -1119,10 +1088,9 @@
 	  <param2 type="embedded" id="timestamp" name="timestamp" />
 	  <param type="database" id="app" name="app"/>
     
-     <param type="database" id="inbound" name="direction">
-	  	<pattern match="1" ignorecase="true" return="&lt;-" />
-	  	<pattern match="0" ignorecase="true" return="-&gt;" />
-	  </param>    
+	  <param8 type="script" name="direction" >
+		RECORD.getField('inbound')==1?'&lt;-':'-&gt;'
+	  </param8>
     
 	  <param6 type="database" id="connid" format="|%s" name="connid">
 	  </param6>
@@ -1170,20 +1138,9 @@
 	  </param3>
 
     
-	   <param type="database" id="inbound" name="direction">
-	  	<pattern match="1" ignorecase="true" return="&lt;-" />
-	  	<pattern match="0" ignorecase="true" return="-&gt;" />
-	  </param>
-
-    
-	  <!--param type="database" id="inbound" format=" &lt;-" >
-	  	<pattern match="1" ignorecase="true" />
-	  </param>
-
-	  <param type="database" id="inbound" format=" -&gt;" >
-	  	<pattern match="0" ignorecase="true" />
-	  </param-->
-
+	  <param8 type="script" name="direction" >
+		RECORD.getField('inbound')==1?'&lt;-':'-&gt;'
+	  </param8>
 
 	  <param type="database" id="socket" format=" soc %s" >
 	  </param>
@@ -1247,104 +1204,116 @@
 	<!-- Orchestration METRIC -->
 	 <spec MsgType="orsm" format="filelink timestamp sid %s">
 		<initScript>
-			switch (RECORD.getField('metric')) {
-				case 'eval_expr': {
-					var s = RECORD.getBytes();
-					var m;
-					var expr;
-					if ((m = s.match(/expression='([^\']+)' /)) != undefined) {
-						expr = m[1];
-						FIELDS.put("param", expr);
-					}
-					if (expr != undefined &amp;&amp; !(
-							expr.startsWith('storeEvent') ||
-							expr.startsWith('storeUnhandledEvent'))) {
-			
-						if ((m = s.match(/type='([^\']+)' /)) != undefined) {
-							FIELDS.put("param1", 'type:' + m[1]);
+			switch (RECORD.getField("metric")) {
+				case "eval_expr": {
+				  var s = RECORD.getBytes();
+				  var m;
+				  var expr;
+				  if ((m = s.match(/expression='([^\']+)' /)) != undefined) {
+					expr = m[1];
+				  }
+				  if (expr != undefined) {
+					if (
+					  expr.startsWith("storeEvent") ||
+					  expr.startsWith("storeUnhandledEvent") 
+					) {
+						IGNORE_RECORD = true;
+					} else {
+						var type;
+						var result;
+			  
+						if ((m = s.match(/type=[']([^\']+)' /)) != undefined) {
+							type= m[1];
 						}
 						if ((m = s.match(/result='([^\']+)' /)) != undefined) {
-							FIELDS.put("param2", 'result:' + m[1]);
+							result=m[1];
 						}
-					}
-					break;
-				}
-
-				case 'eval_condition': {
-					var s = RECORD.getBytes();
-					var m;
-					if ((m = s.match(/condition='(.+)' result='([^\']+)' /)) != undefined ) {
-						FIELDS.put("param", m[1]);
-						FIELDS.put("param1", 'result:'+m[2]);
-					}
-					break;
-				}
-			
-				case 'transition': {
-					var s = RECORD.getBytes();
-					var m;
-					if ((m = s.match(/name='([^\']+)' event='([^\']+)'/)) != undefined) {
-						FIELDS.put('param', m[1]);
-						var p1 = m[2];
-						FIELDS.put('param1', m[2]);
-						if (p1 != '*') {
-							if ((m = s.match(/target='([^\']+)' /)) != undefined) {
-								FIELDS.put('param2', m[1]);
-							}
-						}
-					}
-					break;
-				}
-			
-				case 'log': {
-					var s = RECORD.getBytes();
-					var m;
-					if ((m = s.match(/expr='(.+)' lab/)) != undefined) {
-						var p = m[1];
-						if (p.startsWith('done.state.') || 
-						p.startsWith('Running ') || 
-						p.startsWith('RelativePathURL =') || 
-						p.startsWith('Entry1.done event') || 
-						p.endsWith('End of this session') || 
-
-						p.startsWith('return values = (') || 
-						p.includes('script.done event')) {
-							IGNORE_RECORD=true;
+						if(result != undefined &amp;&amp; result.endsWith('.script.done') ){
+							IGNORE_RECORD = true;
 						}
 						else {
-							FIELDS.put("param", p);
+							FIELDS.put("param2", "result:" + result);
+							FIELDS.put("param1", "type:" + type);
+							FIELDS.put("param", expr);
 						}
 					}
-					break;
+				  }
+				  break;
 				}
-			
-				case 'onentry':
-				case 'state_enter':
-				case 'state_exit':
-				case 'event_queued':
-				case 'event_processed':
-				case 'onexit': {
-					var m;
-					if ((m = RECORD.getBytes().match(/name='([^\']+)' /)) != undefined) {
-						FIELDS.put("param", m[1]);
+			  
+				case "eval_condition": {
+				  var s = RECORD.getBytes();
+				  var m;
+				  if ((m = s.match(/condition='(.+)' result='([^\']+)' /)) != undefined) {
+					FIELDS.put("param", m[1]);
+					FIELDS.put("param1", "result:" + m[2]);
+				  }
+				  break;
+				}
+			  
+				case "transition": {
+				  var s = RECORD.getBytes();
+				  var m;
+				  if ((m = s.match(/name='([^\']+)' event='([^\']+)'/)) != undefined) {
+					FIELDS.put("param", m[1]);
+					var p1 = m[2];
+					FIELDS.put("param1", m[2]);
+					if (p1 != "*") {
+					  if ((m = s.match(/target='([^\']+)' /)) != undefined) {
+						FIELDS.put("param2", m[1]);
+					  }
 					}
-					break;
-			
+				  }
+				  break;
 				}
-			
-				case 'fm_exec_error':
-				case 'exec_error': {
-					var m;
-					if ((m = RECORD.getBytes().match(/error='([^\']+)' /)) != undefined) {
-						FIELDS.put("param", m[1]);
+			  
+				case "log": {
+				  var s = RECORD.getBytes();
+				  var m;
+				  if ((m = s.match(/expr='(.+)' lab/)) != undefined) {
+					var p = m[1];
+					if (
+					  p.startsWith("done.state.") ||
+					  p.startsWith("Running ") ||
+					  p.startsWith("RelativePathURL =") ||
+					  p.startsWith("Entry1.done event") ||
+					  p.endsWith("End of this session") ||
+					  p.startsWith("return values = (") ||
+					  p.includes("script.done event")
+					) {
+					  IGNORE_RECORD = true;
+					} else {
+					  FIELDS.put("param", p);
 					}
-					break;
+				  }
+				  break;
 				}
-			
+			  
+				case "onentry":
+				case "state_enter":
+				case "state_exit":
+				case "event_queued":
+				case "event_processed":
+				case "onexit": {
+				  var m;
+				  if ((m = RECORD.getBytes().match(/name='([^\']+)' /)) != undefined) {
+					FIELDS.put("param", m[1]);
+				  }
+				  break;
+				}
+			  
+				case "fm_exec_error":
+				case "exec_error": {
+				  var m;
+				  if ((m = RECORD.getBytes().match(/error='([^\']+)' /)) != undefined) {
+					FIELDS.put("param", m[1]);
+				  }
+				  break;
+				}
+			  
 				default:
-					break;
-			}
-			
+				  break;
+			  }
 			
 		</initScript>
 
@@ -1442,27 +1411,18 @@
     <param3 type="database" id="sid" format="|%s" name="sid">
 	  </param3>
 
-	  <!--param type="database" id="inbound" format=" &lt;-  ORS-URS " >
-	  	<pattern match="1" ignorecase="true" />
-	  </param>
-	  <param type="database" id="inbound" format=" -&gt;  ORS-URS " >
-	  	<pattern match="0" ignorecase="true" />    
-    </param-->
-    
-    <param type="database" id="inbound" name="direction">
-	  	<pattern match="1" ignorecase="true" return="&lt;-" />
-	  	<pattern match="0" ignorecase="true" return="-&gt;" />
-	  </param>    
-    
-	  
-    <param3 type="database" id="module" format="mod %s">
+	  <param8 type="script" name="direction" >
+		RECORD.getField('inbound')==1?'&lt;-':'-&gt;'
+	  </param8>
+
+    <param3 type="database" id="module" format="mod %s" hidden="true" >
 	  </param3>
 
     <param3 type="database" id="method" format="|%s" name="name">
 	  </param3>
     
 
-    <param3 type="database" id="refid" format="|ref %s" name="refid">
+    <param3 type="database" id="refid" format="|ref %s" name="refid" hidden="true">
       <pattern match="^([0-9]+)" group="1"/>
 	  </param3>
     
@@ -1490,11 +1450,10 @@
 	  <param2 type="embedded" id="timestamp" name="timestamp" />
 
 	  <param type="database" id="app" name="app"/>
-	  <param type="database" id="inbound" name="direction">
-	  	<pattern match="1" ignorecase="true" return="&lt;-" />
-	  	<pattern match="0" ignorecase="true" return="-&gt;" />
-	  </param>
-    
+
+	  <param8 type="script" name="direction" >
+		RECORD.getField('inbound')==1?'&lt;-':'-&gt;'
+	  </param8>    
     
 	  <param6 type="database" id="name" format="|%s">
 	  </param6>
@@ -1553,12 +1512,11 @@
 	  <param2 type="embedded" id="timestamp" name="timestamp" />
 
 	  <param type="database" id="app" name="app"/>
-	  <param type="database" id="inbound" name="direction">
-	  	<pattern match="1" ignorecase="true" return="&lt;-" />
-	  	<pattern match="0" ignorecase="true" return="-&gt;" />
-	  </param>
-    
-    
+
+	  <param8 type="script" name="direction" >
+		RECORD.getField('inbound')==1?'&lt;-':'-&gt;'
+	  </param8>
+
 	  <param6 type="database" id="name" format="|%s">
 	  </param6>
 
@@ -1709,13 +1667,6 @@
 	  </param1>
 	  <param2 type="embedded" id="timestamp" name="timestamp" />
     
-	  <!--param type="database" id="inbound" format=" &lt;-" name="direction">
-	  	<pattern match="1" ignorecase="true" />
-	  </param>
-	  <param type="database" id="inbound" format=" -&gt;" name="direction2">
-	  	<pattern match="0" ignorecase="true" />    
-    </param-->
-    
 	  <param type="database" id="app" name="app"/>    
 	  <param type="database" id="operation" format ="op: %s"/>
 	  <param3 type="database" id="objtype" format="|type:%s"/>
@@ -1734,12 +1685,6 @@
 	  </param1>
 	  <param2 type="embedded" id="timestamp" name="timestamp" />
     
-	  <!--param type="database" id="inbound" format=" &lt;-" name="direction">
-	  	<pattern match="1" ignorecase="true" />
-	  </param>
-	  <param type="database" id="inbound" format=" -&gt;" name="direction2">
-	  	<pattern match="0" ignorecase="true" />    
-    </param-->    
 	  <param type="database" id="app" name="app"/>  
     
 	  <param type="database" id="agentName" format="|ag:%s" name="agent"/>
@@ -1791,10 +1736,9 @@
 	  </param1>
 	  <param2 type="embedded" id="timestamp" name="timestamp" />
 	  <param type="database" id="app" name="app"/>        
-	  <param type="database" id="inbound" name="direction">
-	  	<pattern match="1" ignorecase="true" return="&lt;-" />
-	  	<pattern match="0" ignorecase="true" return="-&gt;" />
-	  </param>    
+	  <param8 type="script" name="direction" >
+		RECORD.getField('inbound')==1?'&lt;-':'-&gt;'
+	  </param8>
 	  <param type="database" id="origUri" format="from: %s"/>        
 	  <param type="database" id="destUri" format="dest: %s"/>        
 	  <param type="database" id="SipsReqId" format="req: %s"/>        
@@ -1817,11 +1761,6 @@
 	  <param2 type="embedded" id="timestamp" name="timestamp" />
 
 	  <param type="database" id="app" name="app"/>
-	  <!--param type="database" id="inbound" name="direction">
-	  	<pattern match="1" ignorecase="true" return="&lt;-" />
-	  	<pattern match="0" ignorecase="true" return="-&gt;" />
-	  </param-->
-    
     
 	  <param6 type="database" id="InteractionID" format="|%s" name="ixnid">
 	  </param6>
@@ -1856,11 +1795,6 @@
 	  <param2 type="embedded" id="timestamp" name="timestamp" />
 
 	  <param type="database" id="app" name="app"/>
-	  <!--param type="database" id="inbound" name="direction">
-	  	<pattern match="1" ignorecase="true" return="&lt;-" />
-	  	<pattern match="0" ignorecase="true" return="-&gt;" />
-	  </param-->
-    
     
 	  <param6 type="database" id="connid" format="|%s" name="connid">
 	  </param6>
@@ -2048,12 +1982,10 @@
 	  </param1>
 	  <param2 type="embedded" id="timestamp" name="timestamp" />
 	  <param type="database" id="app" name="app"/>
-	  <param type="database" id="isinbound" format=" &lt;-" name="direction" >
-	  	<pattern match="0" ignorecase="true" />
-	  </param>
-	  <param type="database" id="isinbound" format=" -&gt;" name="direction">
-	  	<pattern match="1" ignorecase="true" />    
-    </param>
+
+	  <param8 type="script" name="direction" >
+		RECORD.getField('isinbound')==1?'&lt;-':'-&gt;'
+	  </param8>
     
 	  <param6 type="database" id="GMSService" format="%s" name="gmsservice" />
 	  <param6 type="database" id="ORSSession" format="%s" name="sid" />
@@ -2097,13 +2029,10 @@
 	  </param1>
 	  <param2 type="embedded" id="timestamp" name="timestamp" />
 	  <param type="database" id="app" name="app"/>
-	  <param type="database" id="isinbound" format=" &lt;-" name="direction">
-	  	<pattern match="0" ignorecase="true" />
-	  </param>
-	  <param type="database" id="isinbound" format=" -&gt;" name="direction">
-	  	<pattern match="1" ignorecase="true" />    
-    </param>
-    
+	  <param8 type="script" name="direction" >
+		RECORD.getField('inbound')==1?'&lt;-':'-&gt;'
+	  </param8>
+	  
 	  <param6 type="database" id="EventName" format="%s"  />
 	  <param6 type="database" id="CallBackType" format="%s"  />
 	  <param6 type="database" id="GMSService" format="%s" name="gmsservice" />
@@ -2483,10 +2412,10 @@
 	  <param2 type="embedded" id="timestamp" name="timestamp" />
 	  <param type="database" id="app" name="app"/>
     
-	  <param type="database" id="isinbound" name="direction">
-	  	<pattern match="1" ignorecase="true" return="&lt;-" />
-	  	<pattern match="0" ignorecase="true" return="-&gt;" />
-	  </param>
+	  <param8 type="script" name="direction" >
+		RECORD.getField('inbound')==1?'&lt;-':'-&gt;'
+	  </param8>
+
 	  <param type="database" id="refID" name="refid"/>
 
 	  <!--param6 type="database" id="reqname" format="|req: %s">

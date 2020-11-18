@@ -50,18 +50,19 @@ public class SipMessage extends ILogRecord {
 
         });
 
-        stdFields.fieldInit("inbound", new IValueAssessor() {
-            @Override
-            public Object getValue() {
-                return m_isInbound;
-            }
-
-            @Override
-            public void setValue(Object val) {
-                m_isInbound = (int) val == 1;
-            }
-
-        });
+//        stdFields.fieldInit("inbound", new IValueAssessor() {
+//            @Override
+//            public Object getValue() {
+//                return m_isInbound ? "<-" : "->";
+////                return m_isInbound;
+//            }
+//
+//            @Override
+//            public void setValue(Object val) {
+//                m_isInbound = (int) val == 1;
+//            }
+//
+//        });
 
         stdFields.fieldInit("callid", new IValueAssessor() {
             @Override

@@ -129,7 +129,7 @@ public class TLibEvent extends ILogRecord {
 
             @Override
             public void setValue(Object val) {
-                seqNo = setInt(val) ;
+                seqNo = setInt(val);
             }
 
         });
@@ -142,25 +142,24 @@ public class TLibEvent extends ILogRecord {
 
             @Override
             public void setValue(Object val) {
-                handlerId = (int) val;
+                handlerId = setInt(val);
             }
 
         });
 
-        stdFields.fieldInit("inbound", new IValueAssessor() {
-            @Override
-            public Object getValue() {
-                return m_isInbound;
-            }
-
-            @Override
-            public void setValue(Object val) {
-                m_isInbound = setBoolean(val);
-
-            }
-
-        });
-
+//        stdFields.fieldInit("inbound", new IValueAssessor() {
+//            @Override
+//            public Object getValue() {
+//                return m_isInbound ? "<-" : "->";
+//            }
+//
+//            @Override
+//            public void setValue(Object val) {
+//                m_isInbound = setBoolean(val);
+//
+//            }
+//
+//        });
         stdFields.fieldInit("referenceid", new IValueAssessor() {
             @Override
             public Object getValue() {

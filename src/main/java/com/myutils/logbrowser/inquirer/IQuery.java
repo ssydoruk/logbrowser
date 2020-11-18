@@ -785,7 +785,7 @@ public abstract class IQuery extends QueryTools {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
-    void setOutFields(String[] strings) {
+    void addOutFields(String[] strings) {
         for (String string : strings) {
             this.outFields.add(string);
         }

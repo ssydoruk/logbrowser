@@ -284,7 +284,7 @@ public class ConfServerResults extends IQueryResults {
         CSUpdates.addRef("opID", "op", ReferenceType.CfgOp.toString(), FieldType.Optional);
         CSUpdates.addRef("objNameID", "objName", ReferenceType.CfgObjName.toString(), FieldType.Optional);
         CSUpdates.addRef("msgID", "message", ReferenceType.CfgMsg.toString(), FieldType.Optional);
-        CSUpdates.setOutFields(new String[]{"refid", "theappnameid", "dbid"});
+        CSUpdates.addOutFields(new String[]{"refid", "theappnameid", "dbid"});
         CSUpdates.setCommonParams(this, dlg);
 
         return CSUpdates;
