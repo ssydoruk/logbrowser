@@ -11,7 +11,7 @@ import java.util.regex.Pattern;
 
 public class URSStat extends Message {
 
-    private static final Pattern regStatObject = Pattern.compile("^(?:STATOBJECT|SO)\\(\\S+ (\\d+) \\d+\\) .+name=([^@]+)@([^\\.]+)\\.\\S+: CHANGE OF STATE \\((\\S+)->(\\S+)\\)");
+    private static final Pattern regStatObject = Pattern.compile("^(?:STATOBJECT|SO)\\(\\S+ (\\d+) \\d+\\) .+name=([^@]+)@([^\\.]+)\\.\\S+: CHANGE OF STATE \\((\\S+)->([^\\)]+)\\)");
     private static final Pattern regVoiceDN = Pattern.compile("^[\\+\\-]ready DN ([^\\@]+) \\@ (\\S+) .+ for ag(?:ent)* ([^,]+), pl(?:ace)* ([^,]+), (\\S+)");
     private static final Pattern regMedia = Pattern.compile("^[\\+\\-]ready MEDIA (\\w+).+, (\\S+) time=");
 
