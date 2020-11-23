@@ -29,6 +29,9 @@
 				}
 			}
 		</initScript>
+		<param8 type="script" name="direction" >
+			RECORD.getField('inbound')==1?'&lt;-':'-&gt;'
+		  </param8>
 
 	  <param1 type="embedded" id="filelink" name="filename" >
 		<pattern match="(log)" group="1"/>
@@ -63,7 +66,7 @@
 	  <param8 type="database" id="viabranch" format="|br:*%s" name="refid" hidden="true">
 		<pattern match="(\S{3})$" group="1" ignorecase="true" />
 	  </param8>    
-	  <param9 type="database" id="peeraddr" format="|peer:%s" name="peer"/>
+	  <!--param9 type="database" id="peeraddr" format="|peer:%s" name="peer" hidden="true" /-->
 	  
 	  </spec>
     
@@ -209,7 +212,14 @@
 					FIELDS.put('source', m[1]);
 				}
 				else if( (m=s.match(/AttributeCallState\s(\d*)$/))!=undefined){
-					FIELDS.put('callParams', 'state: '+RECORD.constToStr('CallState', parseInt(m[1])) );
+					try {
+						var i=parseInt(m[1]);
+						if(i>0 || !RECORD.getField('name').toLowerCase().startsWith('request') ) {
+							FIELDS.put('callParams', 'state: '+RECORD.constToStr('CallState', i) );
+						}
+					}
+					catch(e) {
+					}
 				}
 			}
 		</initScript>
@@ -272,7 +282,13 @@
 	  <!--param8 type="database" id="typestr" format="|type=%s" name="callParams" >
 	  </param8-->
 	  <param8 type="script" name="callParams" >
-		'type: '+RECORD.constToStr('CallType', RECORD.getField('calltype'))
+		var i=parseInt(RECORD.getField('calltype'));
+		if(i>0 || !RECORD.getField('name').toLowerCase().startsWith('request') ) {
+			'type: '+RECORD.constToStr('CallType', RECORD.getField('calltype'));
+		}
+		else {
+			'';
+		}
 	  </param8>
 
 	  <param8 type="database" id="referenceid" format="|refID:%s" name="refid" hidden='true'>
