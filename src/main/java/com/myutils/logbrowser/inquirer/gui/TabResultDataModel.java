@@ -111,8 +111,8 @@ public class TabResultDataModel extends AbstractTableModel {
     private HashMap<MsgType, HashSet> columnsWithDataType;
 //    private HashMap<Integer, Integer> columnIdxAdjuster;
     private HashMap<MsgType, HashMap> columnIdxAdjusterType;
-    ColumnParams columnParams;
-    ColumnParams columnParamsOrig;
+    private ColumnParams columnParams;
+    private ColumnParams columnParamsOrig;
     private TableRow currentRow = null;
     //    private int rowTypes = 0;
     MsgType lastRowType = MsgType.UNKNOWN;
@@ -146,7 +146,7 @@ public class TabResultDataModel extends AbstractTableModel {
 
     }
 
-    public ColumnParams getColumnParams() {
+    final public ColumnParams getColumnParams() {
         return columnParams;
     }
 
@@ -899,7 +899,7 @@ public class TabResultDataModel extends AbstractTableModel {
 //        }
 //
 //    }
-    ArrayList<ColumnParam> getHidden(MsgType rowType) {
+    ArrayList<FieldParams> getHidden(MsgType rowType) {
         if (rowType != null) {
             return columnParams.getHidden(rowType);
         } else {
@@ -914,18 +914,6 @@ public class TabResultDataModel extends AbstractTableModel {
         } else {
             return null;
         }
-    }
-
-    ArrayList<ColumnParam> getHiddenOrig(MsgType t) {
-        if (t != null) {
-            return columnParamsOrig.getHidden(t);
-        } else {
-            return null;
-        }
-    }
-
-    void unHideColumn(int popupRow, ColumnParam cp) {
-        cp.setHidden(false);
     }
 
     public void refreshTable() {
@@ -951,11 +939,8 @@ public class TabResultDataModel extends AbstractTableModel {
 
     int numberStdHidden(int popupRow) {
         MsgType rowType = getRowType(popupRow);
-        if (rowType == null) {
-            return 0;
-        }
-        ArrayList<ColumnParam> hiddenOrig = getHiddenOrig(rowType);
-        return (hiddenOrig == null) ? 0 : hiddenOrig.size();
+        return (rowType == null) ? 0
+                : columnParamsOrig.countHidden(rowType);
     }
 
     void restoreHidden(int popupRow) {
@@ -963,26 +948,17 @@ public class TabResultDataModel extends AbstractTableModel {
         if (rowType == null) {
             return;
         }
-        ArrayList<ColumnParam> hiddenOrig = getHiddenOrig(rowType);
-//        ArrayList<ColumnParam> hidden = getHidden(rowType);
-//        if (hidden == null) {
-        ArrayList<ColumnParam> hidden = new ArrayList<>(hiddenOrig.size());
-        columnParams.put(rowType, hidden);
+        columnParams = new ColumnParams(columnParamsOrig);
+    }
+
+//    private void addIfNotFound(ArrayList<ColumnParam> hidden, ColumnParam colStd) {
+//        for (ColumnParam col : hidden) {
+//            if (col.equalCol(colStd)) {
+//                return;
+//            }
 //        }
-        for (ColumnParam columnParam : hiddenOrig) {
-            addIfNotFound(hidden, columnParam);
-        }
-    }
-
-    private void addIfNotFound(ArrayList<ColumnParam> hidden, ColumnParam colStd) {
-        for (ColumnParam col : hidden) {
-            if (col.equalCol(colStd)) {
-                return;
-            }
-        }
-        hidden.add(colStd);
-    }
-
+//        hidden.add(colStd);
+//    }
     void tempHide(int popupRow, int popupCol) {
         columnParams.tempHide(popupRow, popupCol);
 
@@ -1026,6 +1002,31 @@ public class TabResultDataModel extends AbstractTableModel {
         int columnIdx = addCell(param.getTitle(), data);
         columnParams.setParams(currentRow.getRowType(), columnIdx, param);
         columnParamsOrig.setParams(currentRow.getRowType(), columnIdx, param);
+    }
+
+    private static final String VALUE_KEY = "value";
+    private static final String HIDDEN_KEY = "hidden";
+
+    public void addCell(String title, Object s) {
+        if (s instanceof String) {
+            addCell(title, (String) s);
+        } else if (s instanceof Map) {
+            Map m = ((Map) s);
+            Object s1;
+            if ((s1 = m.get(VALUE_KEY)) != null) {
+                int columnIdx = addCell(title, (String) s1);
+                if ((s1 = m.get(HIDDEN_KEY)) != null) {
+                    boolean b = (s1 instanceof Boolean) ? (Boolean) s1 : Boolean.parseBoolean((String) s1);
+                    columnParams.setParams(currentRow.getRowType(), columnIdx, b, title, "js");
+                    columnParamsOrig.setParams(currentRow.getRowType(), columnIdx, b, title, "js");
+                }
+            } else {
+                inquirer.logger.error("'value' key in added fields needs to be specified");
+            }
+        } else {
+            inquirer.logger.error("Unknown type of object for [" + title + "] value[" + s + ']');
+
+        }
     }
 
     public int addCell(String title, String data) {
@@ -1247,13 +1248,15 @@ public class TabResultDataModel extends AbstractTableModel {
 
     class FieldParams {
 
+        public String menuName() {
+            return getTitle() + "(" + getType() + ")";
+        }
+
         private boolean hidden;
-        private boolean tempHidden;
         private String title;
         private String type;
 
         public FieldParams() {
-            tempHidden = false;
 
         }
 
@@ -1264,19 +1267,20 @@ public class TabResultDataModel extends AbstractTableModel {
             hidden = src.hidden;
         }
 
-        public FieldParams(OutputSpecFormatter.Parameter prm) {
+        public FieldParams(
+                boolean _hidden,
+                String _title,
+                String _type) {
             this();
-            this.hidden = prm.isHidden();
-            this.title = prm.getTitle();
-            this.type = prm.getType();
+            this.hidden = _hidden;
+            this.title = _title;
+            this.type = _type;
         }
 
-        public boolean isTempHidden() {
-            return tempHidden;
-        }
-
-        public void setTempHidden(boolean tempHidden) {
-            this.tempHidden = tempHidden;
+        public FieldParams(OutputSpecFormatter.Parameter prm) {
+            this(prm.isHidden(),
+                    prm.getTitle(),
+                    prm.getType());
         }
 
         public String getType() {
@@ -1284,7 +1288,7 @@ public class TabResultDataModel extends AbstractTableModel {
         }
 
         public boolean isHidden() {
-            return hidden || tempHidden;
+            return hidden;
         }
 
         public String getTitle() {
@@ -1293,72 +1297,109 @@ public class TabResultDataModel extends AbstractTableModel {
 
         public void setHidden(boolean isHidden) {
             hidden = isHidden;
-            tempHidden = isHidden;
         }
     }
 
-    class ColumnParam extends Pair<Integer, FieldParams> {
-
-        private ColumnParam(int columnIdx, OutputSpecFormatter.Parameter param) {
-            super(columnIdx, new FieldParams(param));
-        }
-
-        private ColumnParam(ColumnParam columnParam) {
-            super(columnParam.getKey(), new FieldParams(columnParam.getValue()));
-        }
-
-        String menuName() {
-            FieldParams value = getValue();
-            return value.getTitle() + "(" + value.getType() + ")";
-        }
-
-        private void setHidden(boolean isHidden) {
-            getValue().setHidden(isHidden);
-        }
-
-        private boolean equalCol(ColumnParam colStd) {
-            return getKey().intValue() == colStd.getKey().intValue();
-        }
-    }
-
-    private class ColumnParams extends HashMap<MsgType, ArrayList<ColumnParam>> {
+//    class ColumnParam extends Pair<Integer, FieldParams> {
+//
+//        private ColumnParam(int columnIdx,
+//                boolean _hidden,
+//                String _title,
+//                String _type
+//        ) {
+//            super(columnIdx, new FieldParams(
+//                    _hidden,
+//                    _title,
+//                    _type
+//            ));
+//        }
+//
+//        private ColumnParam(int columnIdx, OutputSpecFormatter.Parameter param) {
+//            super(columnIdx, new FieldParams(param));
+//        }
+//
+//        private ColumnParam(ColumnParam columnParam) {
+//            super(columnParam.getKey(), new FieldParams(columnParam.getValue()));
+//        }
+//
+//        String menuName() {
+//            FieldParams value = getValue();
+//            return value.getTitle() + "(" + value.getType() + ")";
+//        }
+//
+//        private void setHidden(boolean isHidden) {
+//            getValue().setHidden(isHidden);
+//        }
+//
+//        private boolean equalCol(ColumnParam colStd) {
+//            return getKey().intValue() == colStd.getKey().intValue();
+//        }
+//    }
+    private class ColumnParams extends HashMap<MsgType, HashMap<Integer, FieldParams>> {
 
         public ColumnParams() {
         }
 
         private ColumnParams(ColumnParams columnParams) {
             this();
-            for (Entry<MsgType, ArrayList<ColumnParam>> entry : columnParams.entrySet()) {
-                put(entry.getKey(), dupl(entry.getValue()));
+            for (Entry<MsgType, HashMap<Integer, FieldParams>> theColumn : columnParams.entrySet()) {
+                HashMap<Integer, FieldParams> value = theColumn.getValue();
+                HashMap<Integer, FieldParams> newVal = new HashMap<>(value.size());
+                for (Entry<Integer, FieldParams> theField : value.entrySet()) {
+                    newVal.put(theField.getKey(), new FieldParams(theField.getValue()));
+                }
+                put(theColumn.getKey(), newVal);
             }
         }
 
-        private ArrayList<ColumnParam> dupl(ArrayList<ColumnParam> src) {
-            ArrayList<ColumnParam> ret = new ArrayList<>(src.size());
-            for (ColumnParam columnParam : src) {
-                ret.add(new ColumnParam(columnParam));
-            }
-            return ret;
-
-        }
-
+//        private ArrayList<ColumnParam> dupl(ArrayList<ColumnParam> src) {
+//            ArrayList<ColumnParam> ret = new ArrayList<>(src.size());
+//            for (ColumnParam columnParam : src) {
+//                ret.add(new ColumnParam(columnParam));
+//            }
+//            return ret;
+//
+//        }
         private void setParams(MsgType rowType, int columnIdx, OutputSpecFormatter.Parameter param) {
-            ArrayList<ColumnParam> map = get(rowType);
-            if (map == null) {
-                map = new ArrayList<>();
+            HashMap<Integer, FieldParams> map = getFieldsMap(rowType);
+
+            if (!map.containsKey(columnIdx)) {
+                map.put(columnIdx, new FieldParams(param));
             }
-            addToMap(map, columnIdx, param);
-            put(rowType, map);
+        }
+
+        private HashMap<Integer, FieldParams> getFieldsMap(MsgType rowType) {
+            HashMap<Integer, FieldParams> map = get(rowType);
+            if (map == null) {
+                map = new HashMap<>();
+                put(rowType, map);
+            }
+            return map;
+        }
+
+        private void setParams(MsgType rowType, int columnIdx, boolean _hidden,
+                String _title,
+                String _type) {
+            HashMap<Integer, FieldParams> map = getFieldsMap(rowType);
+
+            if (!map.containsKey(columnIdx)) {
+                map.put(columnIdx, new FieldParams(
+                        _hidden,
+                        _title,
+                        _type
+                ));
+            }
         }
 
         private HashSet<Integer> hideHidden(MsgType key, HashSet<Integer> value) {
-            ArrayList<ColumnParam> paramMap = get(key);
+            HashMap<Integer, FieldParams> paramMap = get(key);
             if (paramMap == null) {
                 return value;
             } else {
                 HashSet<Integer> ret = new HashSet<>();
                 for (Integer colIdx : value) {
-                    if (!hidden(paramMap, colIdx)) {
+                    FieldParams get = paramMap.get(colIdx);
+                    if (get == null || !get.isHidden()) {
                         ret.add(colIdx);
                     }
                 }
@@ -1366,52 +1407,34 @@ public class TabResultDataModel extends AbstractTableModel {
             }
         }
 
-        ArrayList<ColumnParam> getHidden(MsgType rowType) {
-            ArrayList<ColumnParam> get = get(rowType);
-            if (get != null) {
-                ArrayList<ColumnParam> ret = new ArrayList<>();
-                for (ColumnParam pair : get) {
-                    if (pair.getValue().isHidden()) {
-                        ret.add(pair);
-                    }
-                }
-                if (!ret.isEmpty()) {
-                    return ret;
-                }
-            }
-            return null;
-        }
-
-        private void addToMap(ArrayList<ColumnParam> map, int columnIdx, OutputSpecFormatter.Parameter param) {
-            for (ColumnParam pair : map) {
-                if (pair.getKey() == columnIdx) {
-                    return;
-                }
-            }
-            map.add(new ColumnParam(columnIdx, param));
-        }
-
-        private boolean hidden(ArrayList<ColumnParam> paramMap, Integer colIdx) {
-            for (ColumnParam pair : paramMap) {
-                if (Objects.equals(pair.getKey(), colIdx)) {
-                    return pair.getValue().isHidden();
-                }
-            }
-            return false;
-        }
-
+//        private boolean addToMap(ArrayList<ColumnParam> map, int columnIdx, OutputSpecFormatter.Parameter param) {
+//            for (ColumnParam pair : map) {
+//                if (pair.getKey() == columnIdx) {
+//                    return false;
+//                }
+//            }
+//            map.add(new ColumnParam(columnIdx, param));
+//            return true;
+//        }
+//
+//        private boolean hidden(ArrayList<ColumnParam> paramMap, Integer colIdx) {
+//            for (ColumnParam pair : paramMap) {
+//                if (Objects.equals(pair.getKey(), colIdx)) {
+//                    return pair.getValue().isHidden();
+//                }
+//            }
+//            return false;
+//        }
         private void tempHide(int popupRow, int popupCol) {
             MsgType rowType = getRowType(popupRow);
             if (rowType != null) {
-                ArrayList<ColumnParam> colParams = get(rowType);
+                HashMap<Integer, FieldParams> colParams = get(rowType);
                 if (colParams != null) {
                     Integer realColIdx = realColIdx(popupCol, rowType);
                     if (realColIdx != null) {
-                        for (ColumnParam pair : colParams) {
-                            if (pair.getKey().intValue() == realColIdx.intValue()) {
-                                pair.getValue().setTempHidden(true);
-                                return;
-                            }
+                        FieldParams get = colParams.get(realColIdx);
+                        if (get != null) {
+                            get.setHidden(true);
                         }
                     }
                 }
@@ -1419,12 +1442,39 @@ public class TabResultDataModel extends AbstractTableModel {
         }
 
         private void unhideTemps() {
-            for (Entry<MsgType, ArrayList<ColumnParam>> entry : this.entrySet()) {
-                ArrayList<ColumnParam> value = entry.getValue();
-                for (ColumnParam columnParam : value) {
-                    columnParam.getValue().setTempHidden(false);
+            for (Entry<MsgType, HashMap<Integer, FieldParams>> entry : this.entrySet()) {
+                HashMap<Integer, FieldParams> value = entry.getValue();
+
+//                for ( columnParam : value.) {
+//                    columnParam.getValue().setTempHidden(false);
+//                }
+            }
+        }
+
+        private ArrayList<FieldParams> getHidden(MsgType rowType) {
+            HashMap<Integer, FieldParams> get = get(rowType);
+            ArrayList<FieldParams> ret = new ArrayList<>();
+            if (get != null) {
+                for (FieldParams value : get.values()) {
+                    if (value.isHidden()) {
+                        ret.add(value);
+                    }
                 }
             }
+            return ret;
+        }
+
+        public int countHidden(MsgType rowType) {
+            HashMap<Integer, FieldParams> get = get(rowType);
+            int ret = 0;
+            if (get != null) {
+                for (FieldParams value : get.values()) {
+                    if (value.isHidden()) {
+                        ret++;
+                    }
+                }
+            }
+            return ret;
         }
     }
 

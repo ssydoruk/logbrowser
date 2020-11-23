@@ -11,7 +11,7 @@ import com.myutils.logbrowser.inquirer.CustomField;
 import com.myutils.logbrowser.inquirer.EditRegexFields;
 import com.myutils.logbrowser.inquirer.InquirerFileIo;
 import com.myutils.logbrowser.inquirer.MsgType;
-import com.myutils.logbrowser.inquirer.gui.TabResultDataModel.ColumnParam;
+import com.myutils.logbrowser.inquirer.gui.TabResultDataModel.FieldParams;
 import com.myutils.logbrowser.inquirer.inquirer;
 import java.awt.Component;
 import java.awt.Font;
@@ -173,15 +173,15 @@ public class MyJTable extends JTableCommon {
                 hideColumnRTMenu.setText("Hide this column for \"" + rowType.toString() + "\"");
                 jmAddFields.setText("Hidden columns for \"" + rowType.toString() + "\"");
 
-                ArrayList<ColumnParam> hidden = model.getHidden(rowType);
+                ArrayList<TabResultDataModel.FieldParams> hidden = model.getHidden(rowType);
                 int menusAdded = 0;
                 if (hidden != null) {
-                    for (ColumnParam cp : hidden) {
+                    for (TabResultDataModel.FieldParams cp : hidden) {
                         menusAdded++;
                         jmAddFields.add(new AbstractAction(cp.menuName()) {
                             @Override
                             public void actionPerformed(ActionEvent e) {
-                                model.unHideColumn(popupRow, cp);
+                                cp.setHidden(false);
                                 model.refreshTable();
                             }
                         }
@@ -197,8 +197,8 @@ public class MyJTable extends JTableCommon {
                         @Override
                         public void actionPerformed(ActionEvent e) {
                             if (hidden != null) {
-                                for (ColumnParam cp : hidden) {
-                                    model.unHideColumn(popupRow, cp);
+                                for (FieldParams cp : hidden) {
+                                    cp.setHidden(false);
                                 }
                                 model.refreshTable();
                             }

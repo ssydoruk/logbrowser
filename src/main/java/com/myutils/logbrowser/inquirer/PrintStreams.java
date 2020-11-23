@@ -142,7 +142,7 @@ public class PrintStreams {
         tabDataModel.addCell(param, s);
     }
 
-    void addField(String title, String s) {
+    void addField(String title, Object s) {
         tabDataModel.addCell(title, s);
     }
 
@@ -310,6 +310,7 @@ public class PrintStreams {
 
     void ignoreRecord() {
         tabDataModel.ignoreRecord();
+
     }
 
     interface PrintStorage {

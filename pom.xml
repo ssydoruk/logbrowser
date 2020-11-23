@@ -120,6 +120,7 @@
             <groupId>org.graalvm.truffle</groupId>
             <artifactId>truffle-api</artifactId>
             <version>20.2.0</version>
+            <type>jar</type>
         </dependency>
         <dependency>
             <groupId>org.netbeans.external</groupId>

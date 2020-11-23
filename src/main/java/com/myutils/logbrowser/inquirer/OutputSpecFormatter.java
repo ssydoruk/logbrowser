@@ -827,7 +827,7 @@ public abstract class OutputSpecFormatter extends DefaultFormatter {
         String formatString;
         String formatStringFromXml;
         private String initScript = null;
-        private HashMap<String, String> scriptFields = new HashMap<>();
+        private HashMap<String, Object> scriptFields = new HashMap<>();
 
         private RecordLayout(org.w3c.dom.Element el, String msgType) throws Exception {
             // get format attribute, save format string
@@ -925,7 +925,7 @@ public abstract class OutputSpecFormatter extends DefaultFormatter {
                     return "";
                 }
                 if (!scriptFields.isEmpty()) {
-                    for (Map.Entry<String, String> entry : scriptFields.entrySet()) {
+                    for (Map.Entry<String, Object> entry : scriptFields.entrySet()) {
                         ps.addField(entry.getKey(), entry.getValue());
                     }
                 }
