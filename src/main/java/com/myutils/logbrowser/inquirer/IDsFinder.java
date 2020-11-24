@@ -2354,7 +2354,7 @@ public final class IDsFinder extends QueryTools {
                 }
             }
         }
-        inquirer.logger.info("initSerach: " + idsFound);
+        inquirer.logger.info("initSearch: " + idsFound);
 
         return idsFound;
     }

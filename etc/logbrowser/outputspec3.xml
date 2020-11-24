@@ -7,6 +7,7 @@
 	 <spec MsgType="Sip" format="filelink timestamp">
 		<initScript>
 			// evaluate SDP parameters
+
 			for(var s of RECORD.getBytes().split('\n')){
 				if( (m=s.match(/^content-length:\s+(.+)/i))!=undefined
 				   || (m=s.match(/^l:\s(.+)/i))!=undefined) {
@@ -19,7 +20,7 @@
 					FIELDS.put('sdp', {'value': m[1], 'hidden':true});
 				}
 				else if( (m=s.match(/User-Agent:\s*(.+)/))!=undefined){
-					FIELDS.put('peer', m[1]);
+					FIELDS.put('User-Agent (sip)', {'value': m[1], 'hidden':true});
 				}
 				else if( (m=s.match(/a=(inactive|recvonly|sendrecv|sendonly)/))!=undefined){
 					FIELDS.put('sdp attributes', m[1]);
@@ -28,6 +29,7 @@
 					FIELDS.put('c line', m[1]);
 				}
 			}
+
 		</initScript>
 		<param8 type="script" name="direction" >
 			RECORD.getField('inbound')==1?'&lt;-':'-&gt;'
@@ -202,11 +204,11 @@
 	 <spec MsgType="tlib" format="filelink timestamp" >
 		<initScript>
 			for(var s of RECORD.getBytes().split('\n')){
-				if( (m=s.match(/AttributePrivateMsgID\s*(\d*)$"/i))!=undefined){
+				if( (m=s.match(/AttributePrivateMsgID\s*(\d*)$/i))!=undefined){
 					FIELDS.put('PrivateMsgID', 'msgid='+m[1]);
 				}
 				else if( (m=s.match(/AttributeLocation\s(\S*)$/i))!=undefined){
-					FIELDS.put('otherdn', 'loc='+m[1]);
+					FIELDS.put('location', 'loc='+m[1]);
 				}
 				else if( (m=s.match(/(from ISCC):/))!=undefined){
 					FIELDS.put('source', m[1]);
@@ -221,6 +223,7 @@
 					catch(e) {
 					}
 				}
+
 			}
 		</initScript>
 	  <param1 type="embedded" id="filelink" name="filename" >
@@ -235,36 +238,28 @@
 	  </param8>
 
 	  <param3 type="database" id="name" name="name">
-	   <!--pattern match="(Event.+|Request.+)" group="1" ignorecase="true" /-->
-	   	<!--filter match="(EventCallCreated)" ignorecase="true" /-->
 	  </param3>
 
 	  <param4 type="database" id="source" format=" server{%s}" name="source">
-	  	<!--pattern match="(\w+)" group="1" ignorecase="true" /-->
     </param4>    
 
 	  <param6 type="database" id="seqnoHex" format="|seqn=%s" name="seqn" hidden='true'>
-	   <!--pattern match="AttributeEventSequenceNumber[\s0]*(\S*)$" group="1" ignorecase="true" /-->
 	  </param6>
 
-	  <param4 type="database" id="place" format=" place=%s" name="place">
-	  	<!--pattern match="('[^']+')" group="1" ignorecase="true" /-->
+	  <param4 type="database" id="place" format=" place=%s" name="place" hidden='true'>
     </param4>
 
 	  <param4 type="database" id="ani" format=" ani=%s" name="ani">
-	  	<!--pattern match="('[^']+')" group="1" ignorecase="true" /-->
     </param4>
 
 	  <param4 type="database" id="dnis" format=" dnis=%s" name="dnis">
-	  	<!--pattern match="('[^']+')" group="1" ignorecase="true" /-->
     </param4>
 
 	  <param4 type="database" id="thisdn" format=" dn=%s" name="thisdn">
-	  	<!--pattern match="('[^']+')" group="1" ignorecase="true" /-->
     </param4>
     
 	  <param5 type="database" id="otherdn" format=" odn=%s" name="otherdn">
-	  	<!--pattern match="('[^']+')" group="1" ignorecase="true" /-->
+	  	<!-- -->
           </param5>
  	  <param8 type="database" id="agentid" format="|ag:%s" name="agent" >
 	  </param8>
@@ -279,8 +274,6 @@
 	  <param8 type="database" id="TransferID" format=" prConnID=%s" >
 	  </param8>
 
-	  <!--param8 type="database" id="typestr" format="|type=%s" name="callParams" >
-	  </param8-->
 	  <param8 type="script" name="callParams" >
 		var i=parseInt(RECORD.getField('calltype'));
 		if(i>0 || !RECORD.getField('name').toLowerCase().startsWith('request') ) {
@@ -295,35 +288,50 @@
     		<pattern match="([1-9]\d*)$" group="1" ignorecase="true" />
 	  </param8>
 	
- 	  <param8 type="database" id="err" format="err: %s" name="errorCode" >
+ 	  <param8 type="database" id="err" format="err: %s" name="errorCode" hidden='true'>
       <pattern match="([1-9]\d*)" group="1" ignorecase="true" />
     </param8>
  	  <param8 type="database" id="ErrMessage" format="err: %s" name="errorCode" hidden='true'/>
 
  	  <param8 type="database" id="attr1" format="%s" name="attr1" hidden='true' />
     
-    	  <param7 type="database" id="uuid" format=" uuid=%s" name="uuid">
-		<!--pattern match="(\w+)" group="1" ignorecase="true" /-->
+   	  <param7 type="database" id="uuid" format=" uuid=%s" name="uuid">
 	  </param7>
-
-
-	  <!--***********************  use to show user data **********************}}}}}}}}}} -->
-	  <!--param6 type="file" format="|udata: %s">
-	   	<pattern match="^\t\t'(KVP_StrHoraDistrib)'" ignorecase="true" groups="1" />
-	  </param6>
-	  <param6 type="file" format="|udata: %s">
-	   	<pattern match="^\t\t'(Mensaje_Fin)'" ignorecase="true" groups="1" />
-	  </param6-->
-	  <!--{{{{{{{{{{{***********************  use to show user data ********************** -->
 
 	 </spec>
 	<!-- TLibrary events -->
 	
 
-	<!-- TLibrary events -->
+	<!-- tlib_ISCC events -->
 	 <spec MsgType="tlib_ISCC" format="filelink timestamp" >
+		<initScript>
+			for(var s of RECORD.getBytes().split('\n')){
+				if( (m=s.match(/AttributePrivateMsgID\s*(\d*)$/i))!=undefined){
+					FIELDS.put('PrivateMsgID', 'msgid='+m[1]);
+				}
+				else if( (m=s.match(/AttributeLocation\s(\S*)$/i))!=undefined){
+					FIELDS.put('location', 'loc='+m[1]);
+				}
+				else if( (m=s.match(/(from ISCC):/i))!=undefined){
+					FIELDS.put('source', m[1]);
+				}
+				else if( (m=s.match(/ISCCAttributeNetworkDestDN\s(\S*)$/i))!=undefined){
+					FIELDS.put('destDN', 'loc='+m[1]);
+				}
+				else if( (m=s.match(/ISCCAttributeCallDataXferType\s(\S*)$/i))!=undefined){
+					FIELDS.put('xferType', 'xfertype:'+m[1]);
+				}				
+				else if( (m=s.match(/ISCCAttributeCallType\s(\S*)$/i))!=undefined){
+					FIELDS.put('calltype', 'calltype:'+m[1]);
+				}				
+				else if( (m=s.match(/.+AttributeError(?:Message|Code)\t(.*)$/i))!=undefined){
+					FIELDS.put('calltype', 'calltype:'+m[1]);
+				}				
 
-	  <param1 type="embedded" id="filelink" name="filename" >
+			}
+		</initScript>
+
+		<param1 type="embedded" id="filelink" name="filename" >
 		<pattern match="(log)" group="1"/>
 	  </param1>
 	  <param2 type="embedded" id="timestamp" name="timestamp" />
@@ -343,7 +351,7 @@
 	  <param4 type="database" id="thisdn" format=" dn=%s" name="thisdn" >
     </param4>
     
-	  <param5 type="database" id="otherdn" format=" odn=%s" >
+	  <param5 type="database" id="otherdn" format=" odn=%s" hidden="true">
     </param5>
 	  <param7 type="database" id="ConnectionID" format=" connid=%s" name="connid">
 		<!--pattern match="(.{3})$" group="1" ignorecase="true" /-->
@@ -353,54 +361,18 @@
 		<!--pattern match="(.{3})$" group="1" ignorecase="true" /-->
 	  </param7>
 
-
-	  <param4 type="database" id="source" format=" |TS:%s" name="source" >
+	  <param4 type="database" id="source" format=" |ts:%s" name="source" >
     </param4>    
     
-	  <param8 type="database" id="sourceSwitch" format=" |sw: %s" name="location">
-	  </param8>
-    
-	  <param8 type="file" format="|dst=%s" name="location" >
-	   <pattern match="ISCCAttributeNetworkDestDN\s(\S*)$" group="1" ignorecase="true" />
-	  </param8>
-        
-   
-
-	  <param8 type="file" format=" type=%s" >
-	   <pattern match="AttributeCallType\s(\d*)$" group="1" ignorecase="true" />
+	  <param8 type="database" id="sourceSwitch" format=" |sw: %s" name="source">
 	  </param8>
 
-	  <param8 type="database" id="referenceid" format="|refID:%s" name="refid">
+	  <param8 type="database" id="referenceid" format="|refID:%s" name="refid" hidden="true">
 	  </param8>
-    
-	  <param9 type="file" format=" msgid=%s">
-	   <pattern match="AttributePrivateMsgID\s*(\d*)$" group="1" ignorecase="true" />
-	  </param9>
-	  <param10 type="file" format=" err: %s" name="message" >
-	   <pattern match=".+AttributeError(Message|Code)\t(.*)$" group="2" ignorecase="true" />
-	  </param10>
-	  <param8 type="file" format=" loc=%s" name="location">
-	   <pattern match="AttributeLocation\s(\S*)$" group="1" ignorecase="true" />
-	  </param8>
-	  <param11 type="file" format="from %s">
-	   <pattern match="from.+\(\d+\s+(.+)\s\d" group="1" ignorecase="true" />
-	  </param11>
-	  <param3 type="file" format=" %s" >
-	   <pattern match="(from ISCC):" group="1" ignorecase="true" name="source" />
-	  </param3>
-    
-
-	  <!--***********************  use to show user data **********************}}}}}}}}}} -->
-	  <!--param6 type="file" format="|udata: %s">
-	   	<pattern match="^\t\t'(KVP_StrHoraDistrib)'" ignorecase="true" groups="1" />
-	  </param6>
-	  <param6 type="file" format="|udata: %s">
-	   	<pattern match="^\t\t'(Mensaje_Fin)'" ignorecase="true" groups="1" />
-	  </param6-->
-	  <!--{{{{{{{{{{{***********************  use to show user data ********************** -->
+  
 
 	 </spec>
-	<!-- TLibrary events -->
+	<!-- tlib_ISCC events -->
   
   
   <!-- Genesys messages for TSCPCALL -->
@@ -416,25 +388,6 @@
 	  <param type="file" format="|%s" name="name">
 	  	<pattern match="tscp.call\s+\{([^\}]+)\}" ignorecase="true" groups="1" />
 	  </param>
-
-    
-    <!--param type="file" format="|connid: %s" name="connid">
-	  	<pattern match="connection-id (\w+)" ignorecase="true" groups="1" />
-	  </param-->
-
-
-	  <!--param type="file" format="uuid: %s">
-	  	<pattern match="uuid (\w+)" ignorecase="true" groups="1" />
-	  </param>
-    
-	  <param type="file" format="call-id: %s">
-	  	<pattern match="call-id (\w+)" ignorecase="true" groups="1" />
-	  </param>
-    
-    
-	  <param type="file" format=" new %s">
-	  	<pattern match="\s*\@ c:([^,]+)" ignorecase="true" groups="1" />
-	  </param-->
 
 	 </spec>
 	<!-- TSCPCALL -->

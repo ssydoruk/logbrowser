@@ -999,9 +999,11 @@ public class TabResultDataModel extends AbstractTableModel {
     }
 
     public void addCell(OutputSpecFormatter.Parameter param, String data) {
-        int columnIdx = addCell(param.getTitle(), data);
-        columnParams.setParams(currentRow.getRowType(), columnIdx, param);
-        columnParamsOrig.setParams(currentRow.getRowType(), columnIdx, param);
+        int columnIdx;
+        if ((columnIdx = addCell(param.getTitle(), data)) >= 0) {
+            columnParams.setParams(currentRow.getRowType(), columnIdx, param);
+            columnParamsOrig.setParams(currentRow.getRowType(), columnIdx, param);
+        }
     }
 
     private static final String VALUE_KEY = "value";
@@ -1014,8 +1016,8 @@ public class TabResultDataModel extends AbstractTableModel {
             Map m = ((Map) s);
             Object s1;
             if ((s1 = m.get(VALUE_KEY)) != null) {
-                int columnIdx = addCell(title, (String) s1);
-                if ((s1 = m.get(HIDDEN_KEY)) != null) {
+                int columnIdx;
+                if ((columnIdx = addCell(title, (String) s1)) > 0 && (s1 = m.get(HIDDEN_KEY)) != null) {
                     boolean b = (s1 instanceof Boolean) ? (Boolean) s1 : Boolean.parseBoolean((String) s1);
                     columnParams.setParams(currentRow.getRowType(), columnIdx, b, title, "js");
                     columnParamsOrig.setParams(currentRow.getRowType(), columnIdx, b, title, "js");
@@ -1160,7 +1162,10 @@ public class TabResultDataModel extends AbstractTableModel {
         }
 
         public int addCell(String title, String _data) {
-            int columnIdx = 0;
+            int columnIdx = -1;
+            if (StringUtils.isBlank(_data)) {
+                return -1;
+            }
             String data = StringUtils.trimToEmpty(StringUtils.defaultIfBlank(_data, "").replaceAll("\\P{Print}", ""));
 
             if (isAggregate) {
