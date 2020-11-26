@@ -6,7 +6,15 @@
 package com.myutils.logbrowser.common;
 
 import com.myutils.logbrowser.inquirer.ILogRecord;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PipedInputStream;
+import java.io.PipedOutputStream;
 import java.util.HashMap;
+import java.util.logging.Handler;
+import java.util.logging.LogRecord;
+import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.graalvm.polyglot.Context;
 import org.graalvm.polyglot.HostAccess;
@@ -19,8 +27,50 @@ import org.graalvm.polyglot.Value;
 public class JSRunner {
 
     private JSRunner() {
-        condContext = Context.newBuilder("js").allowAllAccess(true).build();
+        try {
+            init();
+        } catch (IOException ex) {
+            logger.error("exception in JSRunner: " + ex);
+        }
+    }
+
+    private void init() throws IOException {
+        PipedInputStream pipedStdOutReader = new PipedInputStream();
+        PipedInputStream pipedStdErrReader = new PipedInputStream();
+
+        OutReaderThread stdInReader = new OutReaderThread(pipedStdOutReader, Level.INFO);
+        OutReaderThread stdErrReader = new OutReaderThread(pipedStdErrReader, Level.ERROR);
+        PipedOutputStream stdOut = new PipedOutputStream(pipedStdOutReader);
+        PipedOutputStream stdErr = new PipedOutputStream(pipedStdErrReader);
+
+        Handler logHandler = new Handler() {
+            @Override
+            public void publish(LogRecord record) {
+                System.out.println("-- publish: " + record.getMessage());
+            }
+
+            @Override
+            public void flush() {
+                System.out.println("--flush");
+            }
+
+            @Override
+            public void close() throws SecurityException {
+                System.out.println("--close");
+            }
+        };
+        
+        logHandler.setLevel(java.util.logging.Level.INFO);
+        condContext = Context.newBuilder("js")
+                .allowAllAccess(true)
+                .err(stdErr)
+                .out(stdOut)
+                .logHandler(stdOut)
+                .build();
+        stdInReader.start();
+        stdErrReader.start();
         condContext.eval("js", "true"); // to test javascript engine init. 
+
     }
 
     public Context getCondContext() {
@@ -98,6 +148,33 @@ public class JSRunner {
         Value eval = cont.eval("js", script);
         logger.trace("eval [" + eval + "] - result of [" + script + "]");
         return eval.asBoolean();
+
+    }
+
+    class OutReaderThread extends Thread {
+
+        private final PipedInputStream pipedIn;
+        private final Level logLevel;
+
+        private OutReaderThread(PipedInputStream pipedStdIn, Level level) {
+            pipedIn = pipedStdIn;
+            logLevel = level;
+        }
+
+        @Override
+        public void run() {
+            logger.debug("started JSreader for log level " + logLevel);
+            try {
+                String s;
+                BufferedReader br = new BufferedReader(new InputStreamReader(pipedIn));
+                while ((s = br.readLine()) != null) {
+                    logger.log(logLevel, s);
+                }
+            } catch (IOException ex) {
+                logger.error("Exception while reading js output", ex);
+            }
+            logger.debug("JSreader thread done");
+        }
 
     }
 

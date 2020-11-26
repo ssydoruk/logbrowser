@@ -7,7 +7,7 @@
 	 <spec MsgType="Sip" format="filelink timestamp">
 		<initScript>
 			// evaluate SDP parameters
-
+			// console.log('log '+RECORD.getField('id'));
 			for(var s of RECORD.getBytes().split('\n')){
 				if( (m=s.match(/^content-length:\s+(.+)/i))!=undefined
 				   || (m=s.match(/^l:\s(.+)/i))!=undefined) {
