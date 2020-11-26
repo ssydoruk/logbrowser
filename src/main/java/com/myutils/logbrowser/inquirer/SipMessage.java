@@ -45,7 +45,9 @@ public class SipMessage extends ILogRecord {
 
             @Override
             public void setValue(Object val) {
-                handlerId = (int) val;
+                if (val != null) {
+                    handlerId = (int) val;
+                }
             }
 
         });
@@ -63,7 +65,6 @@ public class SipMessage extends ILogRecord {
 //            }
 //
 //        });
-
         stdFields.fieldInit("callid", new IValueAssessor() {
             @Override
             public Object getValue() {
