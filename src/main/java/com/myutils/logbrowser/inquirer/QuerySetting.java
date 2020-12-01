@@ -5,7 +5,6 @@
  */
 package com.myutils.logbrowser.inquirer;
 
-import Utils.TableColumnAdjuster;
 import com.jidesoft.swing.CheckBoxListSelectionModel;
 import com.jidesoft.swing.SearchableUtils;
 import com.myutils.logbrowser.indexer.ReferenceType;
@@ -16,6 +15,7 @@ import java.awt.Dimension;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
@@ -52,7 +52,6 @@ public final class QuerySetting extends javax.swing.JDialog {
     private CheckBoxListSettings clbLogMessages;
     private HashMap<ReferenceType, ArrayList<OptionNode>> savedRefs;
     private ReferenceType lastRefType;
-    private final TableColumnAdjuster tca = null;
 
     private void loadReferences() {
         lastRefType = ReferenceType.UNKNOWN;
@@ -87,8 +86,12 @@ public final class QuerySetting extends javax.swing.JDialog {
 //        spRefTypes.setLayout(new ScrollPaneLayout());
         jScrollPane = new JScrollPane(lReferenceType);
         pRefTypes.add(jScrollPane);
+        ArrayList<ReferenceType> ar = new ArrayList<>(savedRefs.keySet());
+         Collections.sort(ar, (o1, o2) -> {
+             return ((ReferenceType)o1).toString().compareToIgnoreCase(((ReferenceType)o2).toString());
+         });
 
-        for (ReferenceType rt : savedRefs.keySet()) {
+        for (ReferenceType rt : ar) {
             lm.addElement(rt);
         }
 
