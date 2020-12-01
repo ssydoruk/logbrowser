@@ -17,6 +17,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
+import java.util.HashMap;
 import javax.swing.AbstractAction;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultListModel;
@@ -33,6 +34,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.KeyStroke;
 import javax.swing.ListModel;
+import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.event.PopupMenuEvent;
@@ -241,6 +243,7 @@ public class MyCheckBoxList extends CheckBoxList {
         private CheckBoxList list;
         private JMenuItem jmCheckAll;
         private JMenuItem jmCheckByRegex;
+        private JMenuItem jmFindSelect;
         private JMenuItem jmUncheckAll;
         private JMenuItem jmUncheckByRegex;
         private JMenuItem jmShowAll;
@@ -277,6 +280,7 @@ public class MyCheckBoxList extends CheckBoxList {
 
                     jmCheckAll.setEnabled(allChecked);
                     jmCheckByRegex.setEnabled(allChecked);
+                    jmFindSelect.setEnabled(allChecked);
                     jmUncheckAll.setEnabled(anyChecked);
                     jmUncheckByRegex.setEnabled(anyChecked);
                     jmShowStat.setEnabled(!listEmpty);
@@ -399,55 +403,53 @@ public class MyCheckBoxList extends CheckBoxList {
             tab.getTableHeader().setVisible(false);
             tab.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 
-//            TableColumnAdjuster tca = new TableColumnAdjuster(tab);
-//            tca.setColumnDataIncluded(true);
-//            tca.setColumnHeaderIncluded(false);
-//            tca.setDynamicAdjustment(true);
-//            tca.adjustColumns();
             JPanel jp = new JPanel(new BorderLayout());
             jp.add(tab);
 
             inquirer.showInfoPanel(SwingUtilities.windowForComponent(jpo), "Statistic", jp, true);
         }
 
-        private void findAndCheck(ActionEvent evt, boolean shouldCheck) {
-            JMenuItem item = (JMenuItem) evt.getSource();
+        private HashMap< Integer, String> getMatchedItems() {
+
             if (dlg == null) {
                 dlg = new EnterRegexDialog(null, true);
             }
-//            Window windowAncestor = (Window) SwingUtilities.getWindowAncestor(w);
-//            Point location = windowAncestor.getMousePosition();
-//            dlg.setLocation(location);
             dlg.setRegex(inquirer.geLocaltQuerySettings().getSavedFilters());
             dlg.setShowUps(false);
             ScreenInfo.setVisible((Window) SwingUtilities.getWindowAncestor(this), dlg, true);
 
             inquirer.logger.debug(dlg.getReturnStatus());
             if (dlg.getReturnStatus() == RET_OK) {
+                HashMap<Integer, String> ret = new HashMap<>();
                 lastRegEx = dlg.getSearch();
                 inquirer.geLocaltQuerySettings().saveRegex(lastRegEx);
 
-                CheckBoxListSelectionModel checkBoxListSelectionModel = list.getCheckBoxListSelectionModel();
                 ListModel model = list.getModel();
 
-                ArrayList<String> changed = new ArrayList<>();
                 for (int i = 0; i < model.getSize(); i++) {
                     Object elementAt = model.getElementAt(i);
-                    if (!elementAt.equals(CheckBoxList.ALL_ENTRY)) {
-//                        DynamicTreeNode<OptionNode> node = (DynamicTreeNode<OptionNode>) elementAt;
-//                        inquirer.logger.trace("Matching [" + elementAt.toString() + "]" + " against " + pattern);
-                        if (dlg.checkMatch(elementAt.toString())) {
-//                        if (pattern.matcher(elementAt.toString()).matches()) {
-//                            inquirer.logger.trace("Matched [" + elementAt.toString() + "]" + " against " + pattern);
-                            if (shouldCheck) {
-                                checkBoxListSelectionModel.addSelectionInterval(i, i);
-
-                            } else {
-                                checkBoxListSelectionModel.removeSelectionInterval(i, i);
-                            }
-                            changed.add(elementAt.toString());
-                        }
+                    if (!elementAt.equals(CheckBoxList.ALL_ENTRY) && dlg.checkMatch(elementAt.toString())) {
+                        ret.put(i, elementAt.toString());
                     }
+                }
+                return ret;
+            }
+            return null;
+        }
+
+        private void findAndCheck(ActionEvent evt, boolean shouldCheck, ListSelectionModel theSelectionModel) {
+
+            HashMap<Integer, String> matchedItems = getMatchedItems();
+            if (matchedItems != null) {
+
+                for (Integer i : matchedItems.keySet()) {
+                    if (shouldCheck) {
+                        theSelectionModel.addSelectionInterval(i, i);
+
+                    } else {
+                        theSelectionModel.removeSelectionInterval(i, i);
+                    }
+
                 }
 
                 Window windowForComponent = SwingUtilities.windowForComponent(jpo);
@@ -474,10 +476,10 @@ public class MyCheckBoxList extends CheckBoxList {
                     jp.add(btCl);
                     jd.setSize(320, 420);
                 }
-                jd.setTitle(((shouldCheck) ? "Checked" : "Unchecked") + " " + changed.size() + " elements");
+                jd.setTitle(((shouldCheck) ? "Checked" : "Unchecked") + " " + matchedItems.size() + " elements");
                 DefaultListModel model1 = (DefaultListModel) jdList.getModel();
                 model1.clear();
-                for (String string : changed) {
+                for (String string : matchedItems.values()) {
                     model1.addElement(string);
                 }
                 ScreenInfo.CenterWindow(jd);
@@ -489,6 +491,7 @@ public class MyCheckBoxList extends CheckBoxList {
         private void InitItems() {
             jmCheckAll = new javax.swing.JMenuItem();
             jmCheckByRegex = new javax.swing.JMenuItem();
+            jmFindSelect = new javax.swing.JMenuItem();
             jmUncheckAll = new javax.swing.JMenuItem();
             jmUncheckByRegex = new javax.swing.JMenuItem();
             jmShowAll = new javax.swing.JMenuItem();
@@ -581,11 +584,22 @@ public class MyCheckBoxList extends CheckBoxList {
             jmCheckByRegex.addActionListener(new java.awt.event.ActionListener() {
                 @Override
                 public void actionPerformed(java.awt.event.ActionEvent evt) {
-                    findAndCheck(evt, true);
+                    findAndCheck(evt, true, list.getCheckBoxListSelectionModel());
                 }
 
             });
             add(jmCheckByRegex);
+
+            jmFindSelect.setText("Find and select");
+            jmFindSelect.addActionListener(new java.awt.event.ActionListener() {
+                @Override
+                public void actionPerformed(java.awt.event.ActionEvent evt) {
+                    findAndCheck(evt, true, list.getSelectionModel());
+                }
+
+            });
+            add(jmFindSelect);
+
             add(new javax.swing.JPopupMenu.Separator());
 
             jmUncheckAll.setText("Uncheck all");
@@ -602,7 +616,7 @@ public class MyCheckBoxList extends CheckBoxList {
             jmUncheckByRegex.addActionListener(new java.awt.event.ActionListener() {
                 @Override
                 public void actionPerformed(java.awt.event.ActionEvent evt) {
-                    findAndCheck(evt, false);
+                    findAndCheck(evt, false, list.getCheckBoxListSelectionModel());
                 }
 
             });
