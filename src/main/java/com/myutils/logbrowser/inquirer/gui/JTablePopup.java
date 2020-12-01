@@ -91,6 +91,14 @@ public abstract class JTablePopup extends JTable {
         SystemClipboard.copy(out.toString());
     }
 
+    void copyColumn(int col) {
+        StringBuilder out = new StringBuilder(getRowCount() * 120);
+        for (int i = 0; i < getRowCount(); i++) {
+            out.append(getValueAt(i, col).toString()).append('\n');
+        }
+        SystemClipboard.copy(out.toString());
+    }
+
     void copySelected() {
         int[] selectedRows = getSelectedRows();
 
@@ -246,7 +254,6 @@ public abstract class JTablePopup extends JTable {
 //        return editRegexFields(t, null);
 //
 //    }
-
     protected EditRegexFields editRegexFields(TableRow row) throws IOException {
         if (searchExtract == null) {
             searchExtract = new EditRegexFields(null, true);

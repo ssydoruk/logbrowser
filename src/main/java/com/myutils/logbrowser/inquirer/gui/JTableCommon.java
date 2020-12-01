@@ -106,6 +106,8 @@ abstract class JTableCommon extends JTablePopup {
         getActionMap().put(act, new FindBack(this));
 
         popupMenu.add(new CopyItem());
+        popupMenu.add(new CopyColumn());
+
         copyItemsIdx = popupMenu.getComponentCount();
         popupMenu.addSeparator();
         popupMenu.add(new UniqueColumnsShown());
@@ -655,6 +657,23 @@ abstract class JTableCommon extends JTablePopup {
             JTableCommon table = (JTableCommon) popup.getInvoker();
             TableModel model = table.getModel();
             SystemClipboard.copy((String) model.getValueAt(table.convertRowIndexToModel(popupRow), table.convertColumnIndexToModel(popupCol)));
+        }
+
+    }
+
+    class CopyColumn extends AbstractAction {
+
+        public CopyColumn() {
+            super("Copy column");
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+
+            Component c = (Component) e.getSource();
+            JPopupMenu popup = (JPopupMenu) c.getParent();
+
+            ((JTablePopup) popup.getInvoker()).copyColumn(popupCol);
         }
 
     }
