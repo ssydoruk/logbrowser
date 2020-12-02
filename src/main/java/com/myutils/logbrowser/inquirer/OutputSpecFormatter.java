@@ -1,7 +1,13 @@
 package com.myutils.logbrowser.inquirer;
 
+import Utils.FileWatcher;
 import com.myutils.logbrowser.common.JSRunner;
 import com.myutils.logbrowser.inquirer.gui.TabResultDataModel;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.CallableStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -9,6 +15,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.MissingFormatArgumentException;
 import java.util.regex.*;
@@ -132,7 +139,7 @@ public abstract class OutputSpecFormatter extends DefaultFormatter {
     private void doRefreshLayout() throws Exception {
         for (org.w3c.dom.Element el : cfg.getLayouts()) {
             String msgType = el.getAttribute("MsgType").toLowerCase();
-            outSpec.put(msgType, new RecordLayout(el, msgType));
+            outSpec.put(msgType, new RecordLayout(el, msgType, cfg.getXmlFile()));
         }
 
     }
@@ -828,9 +835,11 @@ public abstract class OutputSpecFormatter extends DefaultFormatter {
         String formatStringFromXml;
         private String initScript = null;
         private HashMap<String, Object> scriptFields = new HashMap<>();
+        private final String cfgFile;
 
-        private RecordLayout(org.w3c.dom.Element el, String msgType) throws Exception {
+        private RecordLayout(org.w3c.dom.Element el, String msgType, String cfgFile) throws Exception {
             // get format attribute, save format string
+            this.cfgFile = cfgFile;
             formatStringFromXml = el.getAttribute("format");
 
 //            if (formatAttr != null) {
@@ -1014,15 +1023,78 @@ public abstract class OutputSpecFormatter extends DefaultFormatter {
         }
 
         private void addInitScript(Element paramElement) throws Exception {
-            String s = paramElement.getTextContent();
-            if (StringUtils.isNotBlank(s)) {
-                s = StringUtils.trimToNull(s);
-            }
-            if (s != null) {
-                this.initScript = s;
+            String src = paramElement.getAttribute("src");
+            if (StringUtils.isNotBlank(src)) {
+
+                List<String> readAllLines;
+
+                File cf = new File(src);
+                if (cf.isAbsolute()) {
+                    readAllLines = Files.readAllLines(cf.toPath());
+                } else {
+                    Path cc = (new File(cfgFile)).toPath();
+                    readAllLines = readFile((cc.getParent() == null) ? "" : cc.getParent().toString(), src);
+                    if (readAllLines == null && Files.isSymbolicLink(cc)) {
+                        Path symParent = Files.readSymbolicLink(cc).getParent();
+                        readAllLines = readFile((symParent == null) ? "" : symParent.toString(), src);
+                    }
+                }
+                if (readAllLines == null) {
+                    throw new Exception("Not able to read JS source file " + src);
+                } else {
+                    this.initScript = (StringUtils.join(readAllLines, "\n"));
+                }
+
             } else {
-                throw new Exception("initScript specified but body is empty");
+                String s = paramElement.getTextContent();
+                if (StringUtils.isNotBlank(s)) {
+                    s = StringUtils.trimToNull(s);
+                }
+                if (s != null) {
+                    this.initScript = s;
+                } else {
+                    throw new Exception("initScript specified but body is empty");
+                }
             }
+        }
+
+        List<String> readFile(String dir, String name) {
+            Path get = Paths.get(dir, name);
+            logger.debug("Reading file " + get.toString());
+            if (Files.isReadable(get)) {
+                try {
+                    List<String> ret = Files.readAllLines(get);
+                    setJSFile(get);
+                    return ret;
+
+                } catch (IOException ex) {
+                    logger.error("Error reading file: ", ex);
+                }
+            }
+            return null;
+        }
+
+        private Utils.FileWatcher jsFileWatcher = null;
+
+        private void setJSFile(Path get) {
+            if (jsFileWatcher != null) {
+                jsFileWatcher.stopThread();
+            }
+            jsFileWatcher = new FileWatcher(get.toFile(),100) {
+                @Override
+                public void doOnChange(File f) {
+                    try {
+                        logger.info("File changed "+f);
+                        List<String> ret = Files.readAllLines(f.toPath());
+                        if (ret != null) {
+                            initScript = StringUtils.join(ret, "\n");
+                        }
+                    } catch (IOException ex) {
+                        logger.error("Error rereading file " + f);
+                    }
+                }
+            };
+            jsFileWatcher.watch();
         }
     }
 
