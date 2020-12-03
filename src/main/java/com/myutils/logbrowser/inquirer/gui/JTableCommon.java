@@ -402,7 +402,14 @@ abstract class JTableCommon extends JTablePopup {
 
             JTablePopup tab = getJTablePopup();
 
-            DefaultTableModel infoTableModel = new DefaultTableModel();
+            DefaultTableModel infoTableModel = new DefaultTableModel() {
+
+                @Override
+                public void setValueAt(Object aValue, int row, int column) {
+                    // ignoring edited value
+                }
+
+            };
             infoTableModel.addColumn("Values");
             infoTableModel.addColumn("Count");
             int grandTotal = 0;
