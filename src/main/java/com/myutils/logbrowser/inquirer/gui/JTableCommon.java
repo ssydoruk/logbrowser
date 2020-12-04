@@ -87,6 +87,8 @@ abstract class JTableCommon extends JTablePopup {
     private final TableColumnAdjuster tca;
     private JTablePopup uniquePopup = null;
 
+    private static final int MAX_CHARS_IN_TABLE = 25;
+
     public JTableCommon() {
         super();
         setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
@@ -127,13 +129,8 @@ abstract class JTableCommon extends JTablePopup {
         tca.setColumnDataIncluded(true);
         tca.setColumnHeaderIncluded(false);
         tca.setDynamicAdjustment(true);
-        tca.setMaxColumnWidth(300);
-//        if (getModel() != null) {
-//            tca.adjustColumns();
-//            inquirer.logger.debug("not-empty model");
-//        } else {
-//            inquirer.logger.debug("empty model");
-//        }
+
+        tca.setMaxColumnWidth(getFontMetrics(getFont()).stringWidth(getSampleString(MAX_CHARS_IN_TABLE)));
 
     }
 
@@ -348,6 +345,20 @@ abstract class JTableCommon extends JTablePopup {
             inquirer.ExceptionHandler.handleException("export to Excel", e);
         }
 
+    }
+
+    private String getSampleString(int MAX_CHARS_IN_TABLE) {
+        StringBuilder ret = new StringBuilder(MAX_CHARS_IN_TABLE);
+        char c = '0';
+        for (int i = 0; i < MAX_CHARS_IN_TABLE; i++) {
+            if (c >= '~') {
+                c = '0';
+            } else {
+                c++;
+            }
+            ret.append(c);
+        }
+        return ret.toString();
     }
 
     protected class DirectionalFilterMenu extends AbstractAction {

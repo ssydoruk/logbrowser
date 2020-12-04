@@ -65,43 +65,17 @@ public class MyJTable extends JTableCommon {
     public MyJTable() {
         super();
 
-//       sorter = new TableRowSorter<TabResultDataModel>((TabResultDataModel) getModel());
-//        setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-//        setTableHeader(null);
+
         setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-//        setCellSelectionEnabled(true);
+
         setRowSelectionAllowed(true);
 
-//        deleteItem = new JMenuItem("Delete");
-//
-//        deleteItem.addActionListener(new ActionListener() {
-//            @Override
-//            public void actionPerformed(ActionEvent e) {
-//                Component c = (Component) e.getSource();
-//                JPopupMenu popup = (JPopupMenu) c.getParent();
-//                JTable table = (JTable) popup.getInvoker();
-//                inquirer.logger.debug(table.getSelectedRow() + " : " + table.getSelectedColumn());
-//            }
-//        });
-//        popupMenu.add(deleteItem);
-////        JCheckBoxMenuItem followSource = new JCheckBoxMenuItem("Follow source");
-////        followSource.setSelected(followLog);
-////        followSource.addActionListener(new ActionListener() {
-////            @Override
-////            public void actionPerformed(ActionEvent e) {
-////                followLog = ((JCheckBoxMenuItem) e.getSource()).getModel().isSelected();
-////
-////            }
-////        });
-//        popupMenu.add(followSource);
-//        setComponentPopupMenu(popupMenu);
+
         Font font = this.getFont();
 
         setDefaultRenderer(Object.class, new CustomTableCellRenderer(new Font(font.getName(), Font.BOLD, font.getSize())));
-//        showMessage = new ShowMessage();
-//        popupMenu.insert(showMessage, copyItemsIdx);
 
-//        popupMenu.insert(new SearchCell(this), copyItemsIdx);
+        
         popupMenu.insert(new RegexField(this), copyItemsIdx);
 
         jmAddFields = new JMenu();

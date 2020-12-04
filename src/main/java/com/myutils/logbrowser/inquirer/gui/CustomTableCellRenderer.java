@@ -10,9 +10,12 @@ import com.myutils.logbrowser.inquirer.inquirer;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Font;
+import java.awt.FontMetrics;
 import java.awt.Rectangle;
+import javax.swing.JLabel;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableCellRenderer;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  *
@@ -27,41 +30,63 @@ class CustomTableCellRenderer extends DefaultTableCellRenderer {
     private static final DefaultTableCellRenderer DEFAULT_RENDERER = new DefaultTableCellRenderer();
     private final Font selectFont;
 
-    public CustomTableCellRenderer(Font f) {
+    CustomTableCellRenderer(Font f) {
         selectFont = f;
     }
 
+    private static final int NUM_DOTS = 2;
+    private static final String DOTS_STRING = StringUtils.repeat('.', NUM_DOTS);
+
     @Override
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-//                inquirer.logger.debug("getTableCellRendererComponent");
 
         Component c = DEFAULT_RENDERER.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-//        inquirer.logger.debug("getTableCellRendererComponent " + isSelected + " row: " + row + " col: " + column);
         Pair<Color, Color> fontBg = ((TabResultDataModel) table.getModel()).rowColors(table.convertRowIndexToModel(row));
+
         if (fontBg == null) {
             inquirer.logger.error("Empty font, row " + row);
-        }
-//        if (isSelected) {
-//            c.setBackground(Color.red);
-//        } else {
-//            c.setForeground(fontBg.getKey());
-//            c.setBackground(fontBg.getValue());
-//        }
-        if (isSelected) {
-//            c.setFont(selectFont);
-            Rectangle r = table.getCellRect(row, column, true);
-//            inquirer.logger.debug("r: " + r);
-            r.x = 0;
-            r.width = table.getWidth() - 2;
-            ((MyJTable) table).setRect(r, fontBg.getKey());
         } else {
-//            ((MyJTable) table).setRect(null);
-        }
-        c.setForeground(fontBg.getKey());
-        c.setBackground(fontBg.getValue());
-//        c.repaint();
+            Rectangle r = table.getCellRect(row, column, true);
+            if (isSelected) {
+                r.x = 0;
+                r.width = table.getWidth() - 2;
+                ((MyJTable) table).setRect(r, fontBg.getKey());
+            } else {
+            }
+            c.setForeground(fontBg.getKey());
+            c.setBackground(fontBg.getValue());
 
+            FontMetrics fontMetrics = table.getGraphics().getFontMetrics();
+
+            String s = (String) value;
+            if (fontMetrics.stringWidth(s) + table.getIntercellSpacing().width * NUM_DOTS >= r.getWidth()) {
+                int chars = maxChars(s, fontMetrics, Math.round(r.getWidth()), fontMetrics.charWidth('.') * NUM_DOTS + table.getIntercellSpacing().width * 2);
+
+//                inquirer.logger.info("chars:" + chars + " for [" + s + "] w:" + r.getWidth() + " spacing:" + table.getIntercellSpacing());
+                if (chars > 0) {
+                    ((JLabel) c).setText(StringUtils.left(s, chars) + DOTS_STRING + StringUtils.right(s, chars));
+                    return c;
+                } else {
+                }
+            }
+        }
         return c;
+    }
+
+    private int maxChars(String s, FontMetrics fontMetrics, long cellWidth, int dotsWidth) {
+        if (StringUtils.isNotBlank(s)) {
+            int currentWidth = 0;
+            for (int i = 0; i < s.length() / 2; i++) {
+                currentWidth += fontMetrics.charWidth(s.charAt(i)) + fontMetrics.charWidth(s.charAt(s.length() - 1 - i));
+//                inquirer.logger.info("maxchars for [" + s + "] currentWidth:" + currentWidth + " dotWidth:" + dotWidth + " cellWidth:" + cellWidth
+//                        + " (currentWidth + dotWidth):" + (currentWidth + dotWidth));
+
+                if (currentWidth + dotsWidth >= cellWidth) {
+                    return i;
+                }
+            }
+        }
+        return 0;
     }
 
 }

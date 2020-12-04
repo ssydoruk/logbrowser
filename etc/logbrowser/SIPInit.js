@@ -4,7 +4,7 @@ var hasBody = false;
 var m;
 var contentType = undefined;
 var lastLine = undefined;
-var dialogStart = false;
+var dialogStart = undefined;
 var conferenceID = undefined;
 
 for (var s of RECORD.getBytes().split("\n")) {
@@ -41,17 +41,19 @@ for (var s of RECORD.getBytes().split("\n")) {
           FIELDS.put("treatment", m[1]);
         }
       } else if (contentType.includes('msml')) {
-        if (!dialogStart) {
-          if ((m = s.match(/^&lt;dialogstart/i)) != undefined) {
-            dialogStart = true;
+        if (dialogStart == undefined) {
+          if ((m = s.match(/^<(dialogstart)/i)) != undefined ||
+            (m = s.match(/^<(play)/i)) != undefined
+          ) {
+            dialogStart = m[1];
           }
         }
-        if (dialogStart) {
+        if (dialogStart != undefined) {
           if (
             (m = s.match(/(src="[^"]+")/i)) != undefined ||
             (m = s.match(/(uri="[^"]+")/i)) != undefined
           ) {
-            FIELDS.put("treatment", 'start treatment ' + '|' + m[1]);
+            FIELDS.put("treatment", dialogStart + ' ' + m[1]);
             break;
           }
         } else {

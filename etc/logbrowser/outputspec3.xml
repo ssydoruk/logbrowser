@@ -22,20 +22,12 @@
 	  	<pattern match="^(\w{1,7})" ignorecase="true" groups="1" />
 	  </param>
 	  <param7 type="embedded" id="callidalias" format="|%s" name="connid"/>
-	  <param8 type="database" id="callid" format="%s" name="callid">
-		<!--pattern match="(.{4})(?:@|$)" group="1" ignorecase="true" /-->
-	  </param8>
-	  <param4 type="database" id="fromuri" format="|from: %4s" hidden="true" name="fromuri" >
-	   <!--pattern match="(\w{1,4}?)@" group="1"/-->
-	  </param4>
-	  <param5 type="database" id="touri" format="|to: %4s" hidden="true" >
-	   <!--pattern match="(\w{1,4}?)@" group="1"/-->
-	  </param5>
-	  <param6 type="database" id="cseq" format="|%-8s"  name="seqn">
-	  </param6>
-    	  <param7 type="database" id="uuid" format=" uuid=%s" hidden="true" name="uuid">
-		<!--pattern match="(\w+)" group="1" ignorecase="true" /-->
-	  </param7>
+
+	  <param8 type="database" id="callid" format="%s" name="callid" />
+	  <param4 type="database" id="fromuri" format="|from: %4s" hidden="true" name="fromuri" />
+	  <param5 type="database" id="touri" format="|to: %4s" hidden="true" />
+	  <param6 type="database" id="cseq" format="|%-8s"  name="seqn"/>
+    	  <param7 type="database" id="uuid" format=" uuid=%s" hidden="true" name="uuid"/>
 	  <param3 type="database" id="requestURIDN" format="|reqDN:%s" name="thisdn" hidden="true"/>
 	  <param3 type="database" id="FromUserpart" format="|from:%s" name="otherdn" hidden="true" />
 	  <param8 type="database" id="via" format="|via:%18s" hidden="true">
@@ -360,7 +352,7 @@
 	  <param type="database" id="app" name="app"/>
 
 	  <param type="database" id="newConnID" format="newConnID: %s" name="connid"/>
-	  <param type="database" id="connectionID" format="connID: %s" />
+	  <param type="database" id="connectionID" format="connID: %s" name="connid"/>
 	  <param type="file" format="|%s" name="name">
 	  	<pattern match="tscp.call\s+\{([^\}]+)\}" ignorecase="true" groups="1" />
 	  </param>
@@ -1148,119 +1140,7 @@
 	<!-- ORSINTERACTION -->
 	<!-- Orchestration METRIC -->
 	 <spec MsgType="orsm" format="filelink timestamp sid %s">
-		<initScript>
-			switch (RECORD.getField("metric")) {
-				case "eval_expr": {
-				  var s = RECORD.getBytes();
-				  var m;
-				  var expr;
-				  if ((m = s.match(/expression='([^\']+)' /)) != undefined) {
-					expr = m[1];
-				  }
-				  if (expr != undefined) {
-					if (
-					  expr.startsWith("storeEvent") ||
-					  expr.startsWith("storeUnhandledEvent") 
-					) {
-						IGNORE_RECORD = true;
-					} else {
-						var type;
-						var result;
-			  
-						if ((m = s.match(/type=[']([^\']+)' /)) != undefined) {
-							type= m[1];
-						}
-						if ((m = s.match(/result='([^\']+)' /)) != undefined) {
-							result=m[1];
-						}
-						if(result != undefined &amp;&amp; result.endsWith('.script.done') ){
-							IGNORE_RECORD = true;
-						}
-						else {
-							FIELDS.put("param2", "result:" + result);
-							FIELDS.put("param1", "type:" + type);
-							FIELDS.put("param", expr);
-						}
-					}
-				  }
-				  break;
-				}
-			  
-				case "eval_condition": {
-				  var s = RECORD.getBytes();
-				  var m;
-				  if ((m = s.match(/condition='(.+)' result='([^\']+)' /)) != undefined) {
-					FIELDS.put("param", m[1]);
-					FIELDS.put("param1", "result:" + m[2]);
-				  }
-				  break;
-				}
-			  
-				case "transition": {
-				  var s = RECORD.getBytes();
-				  var m;
-				  if ((m = s.match(/name='([^\']+)' event='([^\']+)'/)) != undefined) {
-					FIELDS.put("param", m[1]);
-					var p1 = m[2];
-					FIELDS.put("param1", m[2]);
-					if (p1 != "*") {
-					  if ((m = s.match(/target='([^\']+)' /)) != undefined) {
-						FIELDS.put("param2", m[1]);
-					  }
-					}
-				  }
-				  break;
-				}
-			  
-				case "log": {
-				  var s = RECORD.getBytes();
-				  var m;
-				  if ((m = s.match(/expr='(.+)' lab/)) != undefined) {
-					var p = m[1];
-					if (
-					  p.startsWith("done.state.") ||
-					  p.startsWith("Running ") ||
-					  p.startsWith("RelativePathURL =") ||
-					  p.startsWith("Entry1.done event") ||
-					  p.endsWith("End of this session") ||
-					  p.startsWith("return values = (") ||
-					  p.includes("script.done event")
-					) {
-					  IGNORE_RECORD = true;
-					} else {
-					  FIELDS.put("param", p);
-					}
-				  }
-				  break;
-				}
-			  
-				case "onentry":
-				case "state_enter":
-				case "state_exit":
-				case "event_queued":
-				case "event_processed":
-				case "onexit": {
-				  var m;
-				  if ((m = RECORD.getBytes().match(/name='([^\']+)' /)) != undefined) {
-					FIELDS.put("param", m[1]);
-				  }
-				  break;
-				}
-			  
-				case "fm_exec_error":
-				case "exec_error": {
-				  var m;
-				  if ((m = RECORD.getBytes().match(/error='([^\']+)' /)) != undefined) {
-					FIELDS.put("param", m[1]);
-				  }
-				  break;
-				}
-			  
-				default:
-				  break;
-			  }
-			
-		</initScript>
+		<initScript src="./ORSM.js" />
 
 	  <param1 type="embedded" id="filelink" name="filename" >
 		<pattern match="(log)" group="1"/>
