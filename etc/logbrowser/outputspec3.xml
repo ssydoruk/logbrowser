@@ -170,30 +170,7 @@
 
 	<!-- TLibrary events -->
 	 <spec MsgType="tlib" format="filelink timestamp" >
-		<initScript>
-			for(var s of RECORD.getBytes().split('\n')){
-				if( (m=s.match(/AttributePrivateMsgID\s*(\d*)$/i))!=undefined){
-					FIELDS.put('PrivateMsgID', 'msgid='+m[1]);
-				}
-				else if( (m=s.match(/AttributeLocation\s(\S*)$/i))!=undefined){
-					FIELDS.put('location', 'loc='+m[1]);
-				}
-				else if( (m=s.match(/(from ISCC):/))!=undefined){
-					FIELDS.put('source', m[1]);
-				}
-				else if( (m=s.match(/AttributeCallState\s(\d*)$/))!=undefined){
-					try {
-						var i=parseInt(m[1]);
-						if(i>0 || !RECORD.getField('name').toLowerCase().startsWith('request') ) {
-							FIELDS.put('callParams', 'state: '+RECORD.constToStr('CallState', i) );
-						}
-					}
-					catch(e) {
-					}
-				}
-
-			}
-		</initScript>
+		<initScript src="./TLib.js" />
 	  <param1 type="embedded" id="filelink" name="filename" >
 		<pattern match="(log)" group="1"/>
 	  </param1>
@@ -272,32 +249,7 @@
 
 	<!-- tlib_ISCC events -->
 	 <spec MsgType="tlib_ISCC" format="filelink timestamp" >
-		<initScript>
-			for(var s of RECORD.getBytes().split('\n')){
-				if( (m=s.match(/AttributePrivateMsgID\s*(\d*)$/i))!=undefined){
-					FIELDS.put('PrivateMsgID', 'msgid='+m[1]);
-				}
-				else if( (m=s.match(/AttributeLocation\s(\S*)$/i))!=undefined){
-					FIELDS.put('location', 'loc='+m[1]);
-				}
-				else if( (m=s.match(/(from ISCC):/i))!=undefined){
-					FIELDS.put('source', m[1]);
-				}
-				else if( (m=s.match(/ISCCAttributeNetworkDestDN\s(\S*)$/i))!=undefined){
-					FIELDS.put('destDN', 'loc='+m[1]);
-				}
-				else if( (m=s.match(/ISCCAttributeCallDataXferType\s(\S*)$/i))!=undefined){
-					FIELDS.put('xferType', 'xfertype:'+m[1]);
-				}				
-				else if( (m=s.match(/ISCCAttributeCallType\s(\S*)$/i))!=undefined){
-					FIELDS.put('calltype', 'calltype:'+m[1]);
-				}				
-				else if( (m=s.match(/.+AttributeError(?:Message|Code)\t(.*)$/i))!=undefined){
-					FIELDS.put('calltype', 'calltype:'+m[1]);
-				}				
-
-			}
-		</initScript>
+		<initScript src="./tlib_ISCC.js" />
 
 		<param1 type="embedded" id="filelink" name="filename" >
 		<pattern match="(log)" group="1"/>
@@ -310,33 +262,21 @@
 		RECORD.getField('inbound')==1?'&lt;-':'-&gt;'
 	  </param8>
     
-	  <param3 type="database" id="name" format=" %s" name="name" >
-	   <!--pattern match="(Event.+|Request.+)" group="1" ignorecase="true" /-->
-	   	<!--filter match="(EventCallCreated)" ignorecase="true" /-->
-	  </param3>
+	  <param3 type="database" id="name" format=" %s" name="name" />
 
 
-	  <param4 type="database" id="thisdn" format=" dn=%s" name="thisdn" >
-    </param4>
+	  <param4 type="database" id="thisdn" format=" dn=%s" name="thisdn" />
     
-	  <param5 type="database" id="otherdn" format=" odn=%s" hidden="true">
-    </param5>
-	  <param7 type="database" id="ConnectionID" format=" connid=%s" name="connid">
-		<!--pattern match="(.{3})$" group="1" ignorecase="true" /-->
-	  </param7>
+	  <param5 type="database" id="otherdn" format=" odn=%s" hidden="true"/>
+	  <param7 type="database" id="ConnectionID" format=" connid=%s" name="connid"/>
     
- 	  <param7 type="database" id="OtherConnectionID" format=" oconnid=%s" name="otherconnid">
-		<!--pattern match="(.{3})$" group="1" ignorecase="true" /-->
-	  </param7>
+ 	  <param7 type="database" id="OtherConnectionID" format=" oconnid=%s" name="otherconnid"/>
 
-	  <param4 type="database" id="source" format=" |ts:%s" name="source" >
-    </param4>    
+	  <param4 type="database" id="source" format=" |ts:%s" name="source" />    
     
-	  <param8 type="database" id="sourceSwitch" format=" |sw: %s" name="source">
-	  </param8>
+	  <param8 type="database" id="sourceSwitch" format=" |sw: %s" name="source"/>
 
-	  <param8 type="database" id="referenceid" format="|refID:%s" name="refid" hidden="true">
-	  </param8>
+	  <param8 type="database" id="referenceid" format="|refID:%s" name="refid" hidden="true"/>
   
 
 	 </spec>
