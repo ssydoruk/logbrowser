@@ -57,19 +57,15 @@
 	  	<pattern match="^(\w{1,7})" ignorecase="true" groups="1" />
 	  </param>
 	  <param7 type="embedded" id="callidalias" format="|%s" name="connid"/>
-	  <param8 type="database" id="callid" format="%s">
-		<!--pattern match="(.{4})(?:@|$)" group="1" ignorecase="true" /-->
-	  </param8>
+	  <param8 type="database" id="callid" format="%s"/>
 	  <param4 type="database" id="fromuri" format="|F:%4s" >
 	   <pattern match="(\w{1,4}?)@" group="1"/>
 	  </param4>
 	  <param5 type="database" id="touri" format="|T:%4s">
 	   <pattern match="(\w{1,4}?)@" group="1"/>
 	  </param5>
-	  <param5 type="database" id="sipuri" format="|%s">
-	  </param5>
-	  <param6 type="database" id="cseq" format="|%-8s"  name="seqn">
-	  </param6>
+	  <param5 type="database" id="sipuri" format="|%s"/>
+	  <param6 type="database" id="cseq" format="|%-8s"  name="seqn"/>
 	  <param3 type="database" id="requestURIDN" format="|to:%s" name="thisdn"/>
 	  <param3 type="database" id="FromUserpart" format="|from:%s" name="otherdn"/>
 	  <param8 type="database" id="via" format="|via:%18s">
@@ -182,32 +178,22 @@
 		RECORD.getField('inbound')==1?'&lt;-':'-&gt;'
 	  </param8>
 
-	  <param3 type="database" id="name" name="name">
-	  </param3>
+	  <param3 type="database" id="name" name="name"/>
 
-	  <param4 type="database" id="source" format=" server{%s}" name="source">
-    </param4>    
+	  <param4 type="database" id="source" format=" server{%s}" name="source"/>    
 
-	  <param6 type="database" id="seqnoHex" format="|seqn=%s" name="seqn" hidden='true'>
-	  </param6>
+	  <param6 type="database" id="seqnoHex" format="|seqn=%s" name="seqn" hidden='true'/>
 
-	  <param4 type="database" id="place" format=" place=%s" name="place" hidden='true'>
-    </param4>
+	  <param4 type="database" id="place" format=" place=%s" name="place" hidden='true'/>
 
-	  <param4 type="database" id="ani" format=" ani=%s" name="ani">
-    </param4>
+	  <param4 type="database" id="ani" format=" ani=%s" name="ani"/>
 
-	  <param4 type="database" id="dnis" format=" dnis=%s" name="dnis">
-    </param4>
+	  <param4 type="database" id="dnis" format=" dnis=%s" name="dnis"/>
 
-	  <param4 type="database" id="thisdn" format=" dn=%s" name="thisdn">
-    </param4>
+	  <param4 type="database" id="thisdn" format=" dn=%s" name="thisdn"/>
     
-	  <param5 type="database" id="otherdn" format=" odn=%s" name="otherdn">
-	  	<!-- -->
-          </param5>
- 	  <param8 type="database" id="agentid" format="|ag:%s" name="agent" >
-	  </param8>
+	  <param5 type="database" id="otherdn" format=" odn=%s" name="otherdn"/>
+ 	  <param8 type="database" id="agentid" format="|ag:%s" name="agent" />
 	  <param7 type="database" id="connid" format=" connid=%s" name="connid">
 		<pattern match="^(\d\w+)$" group="1" ignorecase="true" />
 	  </param7>
@@ -216,8 +202,7 @@
 		<pattern match="(\w+)" group="1" ignorecase="true" />
 	  </param7>
 
-	  <param8 type="database" id="TransferID" format=" prConnID=%s" >
-	  </param8>
+	  <param8 type="database" id="TransferID" format=" prConnID=%s" />
 
 	  <param8 type="script" name="callParams" >
 		var i=parseInt(RECORD.getField('calltype'));
@@ -240,8 +225,7 @@
 
  	  <param8 type="database" id="attr1" format="%s" name="attr1" hidden='true' />
     
-   	  <param7 type="database" id="uuid" format=" uuid=%s" name="uuid">
-	  </param7>
+   	  <param7 type="database" id="uuid" format=" uuid=%s" name="uuid"/>
 
 	 </spec>
 	<!-- TLibrary events -->

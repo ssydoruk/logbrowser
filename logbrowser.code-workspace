@@ -6,6 +6,13 @@
 	],
 	"settings": {
 		"java.format.settings.url": "eclipse-formatter.xml",
-		"java.configuration.updateBuildConfiguration": "automatic"
+		"java.configuration.updateBuildConfiguration": "automatic",
+		"files.autoSave": "onFocusChange",
+		"debug.javascript.autoAttachFilter": "always",
+		"debug.javascript.breakOnConditionalError": true,
+		"debug.javascript.usePreview": false,
+		"debug.javascript.pickAndAttachOptions": {
+		
+		}
 	}
 }

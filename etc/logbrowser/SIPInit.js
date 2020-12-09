@@ -1,5 +1,9 @@
 // evaluate SDP parameters
 //console.info('log '+RECORD.getField('id'));
+// uncomment when debuging standalone
+// const dbg=require('./DEBUG.js'); var RECORD=dbg.RECORD;  var FIELDS = dbg.FIELDS;
+
+// console.error('err');
 var hasBody = false;
 var m;
 var contentType = undefined;
@@ -53,23 +57,23 @@ for (var s of RECORD.getBytes().split("\n")) {
             (m = s.match(/(src="[^"]+")/i)) != undefined ||
             (m = s.match(/(uri="[^"]+")/i)) != undefined
           ) {
-            FIELDS.put("treatment", dialogStart + ' ' + m[1]);
+            setFields("treatment", dialogStart + ' ' + m[1]);
             break;
           }
         } else {
           if ((m = s.match(/(result response="\d+")/i)) != undefined) {
-            FIELDS.put("treatment", m[1]);
+            setFields("treatment", m[1]);
           } else if ((m = s.match(/(event)\s+name="([^"]+)"/i)) != undefined) {
-            FIELDS.put("treatment", m[1] + ' ' + m[2]);
+            setFields("treatment", m[1] + ' ' + m[2]);
+          } else if ((m = s.match(/gvp:param name="id">([^<]+)/i)) != undefined) {
+            setFields("externalID", 'externalID:'+ m[1] );
           } else if ((m = s.match(/(createconference)\s+name="([^"]+)"/i)) != undefined) {
-            FIELDS.put("treatment", m[1] + ' ' + m[2]);
-            break;
+            setFields("treatment", m[1] + ' ' + m[2]);
           } else if ((m = s.match(/(modifyconference)\s+id="([^"]+)"/i)) != undefined) {
             conferenceID = m[2];
           } else if (conferenceID != undefined) {
             if ((m = s.match(/(gvp:recorder state="[^"]+")/i)) != undefined) {
-              FIELDS.put("treatment", conferenceID + ' ' + m[1]);
-              break;
+              setFields("treatment", conferenceID + ' ' + m[1]);
             }
           }
         }
@@ -84,3 +88,16 @@ for (var s of RECORD.getBytes().split("\n")) {
 if (lastLine != undefined) {
   FIELDS.put("treatment", decodeURIComponent(lastLine).replace(/&/g, ' ').replace(/\\"/g, '"'));
 }
+
+function setFields(key, value){
+  var tmpVal=FIELDS.get(key);
+  if(tmpVal == null){
+    FIELDS.put(key, value);
+  }
+  else {
+    FIELDS.replace(key, tmpVal+' '+value);
+  }
+}
+
+// var v=FIELDS.entrySet();
+// console.error(JSON.stringify(v));

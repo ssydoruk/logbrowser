@@ -1,5 +1,10 @@
+
+// uncomment when debuging standalone
+// const dbg=require('./DEBUG.js'); var RECORD=dbg.RECORD;  var FIELDS = dbg.FIELDS;
+
 var m;
-for (var s of RECORD.getBytes().split("\n")) {
+
+for (var s of RECORD.getBytes().split('\n')) {
   if ((m = s.match(/AttributePrivateMsgID\s*(\d*)$/i)) != undefined) {
     FIELDS.put("PrivateMsgID", "msgid=" + m[1]);
   } else if ((m = s.match(/AttributeLocation\s(\S*)$/i)) != undefined) {
@@ -18,3 +23,4 @@ for (var s of RECORD.getBytes().split("\n")) {
     } catch (e) {}
   }
 }
+// console.log(FIELDS.entrySet());

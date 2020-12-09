@@ -11,7 +11,7 @@ for(var s of RECORD.getBytes().split('\n')){
         FIELDS.put('source', m[1]);
     }
     else if( (m=s.match(/ISCCAttributeNetworkDestDN\s(\S*)$/i))!=undefined){
-        FIELDS.put('destDN', 'loc='+m[1]);
+        FIELDS.put('destDN', 'dst='+m[1]);
     }
     else if( (m=s.match(/ISCCAttributeCallDataXferType\s(\S*)$/i))!=undefined){
         FIELDS.put('xferType', 'xfertype:'+m[1]);
