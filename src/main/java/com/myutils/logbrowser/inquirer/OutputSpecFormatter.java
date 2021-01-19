@@ -1,30 +1,20 @@
 package com.myutils.logbrowser.inquirer;
 
-import Utils.FileWatcher;
-import com.myutils.logbrowser.common.JSRunner;
-import com.myutils.logbrowser.inquirer.gui.TabResultDataModel;
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.sql.CallableStatement;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.MissingFormatArgumentException;
+import Utils.*;
+import com.myutils.logbrowser.common.*;
+import com.myutils.logbrowser.inquirer.gui.*;
+import java.io.*;
+import java.nio.file.*;
+import java.sql.*;
+import java.util.*;
+import java.util.logging.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.*;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
-import org.graalvm.polyglot.HostAccess;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
+import org.graalvm.polyglot.*;
+import org.w3c.dom.*;
 
 public abstract class OutputSpecFormatter extends DefaultFormatter {
 
@@ -1077,24 +1067,28 @@ public abstract class OutputSpecFormatter extends DefaultFormatter {
         private Utils.FileWatcher jsFileWatcher = null;
 
         private void setJSFile(Path get) {
-            if (jsFileWatcher != null) {
-                jsFileWatcher.stopThread();
-            }
-            jsFileWatcher = new FileWatcher(get.toFile(),100) {
-                @Override
-                public void doOnChange(File f) {
-                    try {
-                        logger.info("File changed "+f);
-                        List<String> ret = Files.readAllLines(f.toPath());
-                        if (ret != null) {
-                            initScript = StringUtils.join(ret, "\n");
-                        }
-                    } catch (IOException ex) {
-                        logger.error("Error rereading file " + f);
-                    }
+            try {
+                if (jsFileWatcher != null) {
+                    jsFileWatcher.stopThread();
                 }
-            };
-            jsFileWatcher.watch();
+                jsFileWatcher = new FileWatcher(get.toFile(),100) {
+                    @Override
+                    public void doOnChange(File f) {
+                        try {
+                            logger.info("File changed "+f);
+                            List<String> ret = Files.readAllLines(f.toPath());
+                            if (ret != null) {
+                                initScript = StringUtils.join(ret, "\n");
+                            }
+                        } catch (IOException ex) {
+                            logger.error("Error rereading file " + f);
+                        }
+                    }
+                };
+                jsFileWatcher.watch();
+            } catch (IOException ex) {
+                Logger.getLogger(OutputSpecFormatter.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
     }
 

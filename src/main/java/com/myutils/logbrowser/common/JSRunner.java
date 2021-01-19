@@ -7,6 +7,7 @@ package com.myutils.logbrowser.common;
 
 import com.myutils.logbrowser.inquirer.ILogRecord;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PipedInputStream;
@@ -18,6 +19,7 @@ import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.graalvm.polyglot.Context;
 import org.graalvm.polyglot.HostAccess;
+import org.graalvm.polyglot.Source;
 import org.graalvm.polyglot.Value;
 
 /**
@@ -59,7 +61,7 @@ public class JSRunner {
                 System.out.println("--close");
             }
         };
-        
+
         logHandler.setLevel(java.util.logging.Level.INFO);
         condContext = Context.newBuilder("js")
                 .allowAllAccess(true)
@@ -149,6 +151,27 @@ public class JSRunner {
         logger.trace("eval [" + eval + "] - result of [" + script + "]");
         return eval.asBoolean();
 
+    }
+
+    private static final HashMap<String, Source> sourceFiles = new HashMap();
+
+    static final boolean isDebug = System.getProperties().containsKey("debug");
+
+    static public boolean isDebug() {
+        return isDebug;
+    }
+
+    private static Source getSource(String fileName) throws IOException {
+        if (isDebug()) {
+            return Source.newBuilder("js", new File(fileName)).cached(false).build();
+        } else {
+            Source source = sourceFiles.get(fileName);
+            if (source == null) {
+                source = Source.newBuilder("js", new File(fileName)).build();
+                sourceFiles.put(fileName, source);
+            }
+            return source;
+        }
     }
 
     class OutReaderThread extends Thread {
