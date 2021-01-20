@@ -1,8 +1,7 @@
 package com.myutils.logbrowser.inquirer;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.HashMap;
+import java.io.*;
+import java.util.*;
 
 public class InquirerFileIo {
 
@@ -11,7 +10,9 @@ public class InquirerFileIo {
     public static void doneIO() throws IOException {
         if (logReaderHash != null) {
             for (InqFile obj : logReaderHash.values()) {
-                obj.close();
+                if (obj != null) {
+                    obj.close();
+                }
             }
             logReaderHash.clear();
         }
@@ -20,33 +21,37 @@ public class InquirerFileIo {
     public static byte[] GetLogBytes(LogFile fileName,
             long offset,
             int bytes) throws Exception {
-        InqFile retInqFile;
+        InqFile retInqFile = null;
 
         if (logReaderHash == null) {
             logReaderHash = new HashMap();
         }
         if (logReaderHash.containsKey(fileName)) {
             retInqFile = (InqFile) logReaderHash.get(fileName);
-
         } else {
-            retInqFile = new InqFile(fileName);
-            if (retInqFile.isInited()) {
-                logReaderHash.put(fileName, retInqFile);
-            } else {
-                return new byte[0];
+            try {
+                retInqFile = new InqFile(fileName);
+                if (retInqFile.isInited()) {
+                    logReaderHash.put(fileName, retInqFile);
+                } else {
+                    retInqFile = null;
+                    logReaderHash.put(fileName, null);
+                }
+            } catch (IOException iOException) {
+                logReaderHash.put(fileName, null);
             }
         }
 
-        return retInqFile.GetLogBytes(offset, bytes);
+        return (retInqFile == null) ? null : retInqFile.GetLogBytes(offset, bytes);
     }
 
     public static String GetFileBytes(ILogRecord record) throws Exception {
         String logBytes = "";
         int bytes = record.GetFileBytes();
         try {
-            byte[] GetLogBytes = null;
+            byte[] recordBytes = null;
             try {
-                GetLogBytes = GetLogBytes(
+                recordBytes = GetLogBytes(
                         record.GetFileName(),
                         record.GetFileOffset(),
                         bytes);
@@ -55,12 +60,14 @@ public class InquirerFileIo {
                 if (!inquirer.getEe().isIgnoreFileAccessErrors()) {
                     throw iOException;
                 } else {
-                    GetLogBytes = new byte[0];
+                    recordBytes = null;
                 }
             }
-            logBytes = new String(GetLogBytes,
-                    0,
-                    bytes);
+            if (recordBytes != null) {
+                logBytes = new String(recordBytes,
+                        0,
+                        bytes);
+            }
         } catch (Exception e) {
             inquirer.ExceptionHandler.handleException("Cannot read from file", e);
             throw e;
