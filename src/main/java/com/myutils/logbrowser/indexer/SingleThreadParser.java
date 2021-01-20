@@ -6,20 +6,12 @@ package com.myutils.logbrowser.indexer;
 
 import static Utils.Util.intOrDef;
 import static com.myutils.logbrowser.indexer.SingleThreadParser.ParserState.*;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import javax.swing.JOptionPane;
-import org.apache.commons.lang3.StringUtils;
-import org.json.JSONException;
-import org.json.JSONObject;
+import java.sql.*;
+import java.util.*;
+import java.util.regex.*;
+import javax.swing.*;
+import org.apache.commons.lang3.*;
+import org.json.*;
 
 /**
  *
@@ -1050,7 +1042,6 @@ public class SingleThreadParser extends Parser {
         }
 
         if (dpHeader == null) {
-            Main.logger.error("DPHeader null. Date not parsed?");
             hdr = header;
         } else {
             hdr = dpHeader.rest;

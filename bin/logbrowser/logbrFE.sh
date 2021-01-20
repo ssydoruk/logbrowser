@@ -38,7 +38,7 @@ fi
 
 cd ${RUN_DIR}
 
-if [ ${machine} = "Win" ]; then
+if [ ${machine=x} = "Win" ]; then
 	DB=$(cygpath -pw ${RUN_DIR}/${LOGBRDB})
 	RUN_DIR=$(cygpath -pw ${RUN_DIR})
 	CFG=$(cygpath -pw ${SS3}/inquirer.cfg)

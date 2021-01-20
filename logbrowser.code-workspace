@@ -13,6 +13,8 @@
 		"debug.javascript.usePreview": false,
 		"debug.javascript.pickAndAttachOptions": {
 		
-		}
+		},
+		"java.completion.enabled": false,
+		"java.debug.settings.enableRunDebugCodeLens": false
 	}
 }

@@ -41,7 +41,7 @@ fi
 
 cd ${RUN_DIR}
 
-if [ ${machine} = "Win" ]; then
+if [ ${machine=x} = "Win" ]; then
 	DB=$(cygpath -pw ${RUN_DIR}/${LOGBRDB})
 	CFG=$(cygpath -pw ${SS3}/backend.xml)
 else
