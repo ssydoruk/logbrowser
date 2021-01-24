@@ -5,33 +5,20 @@
  */
 package com.myutils.logbrowser.inquirer.gui;
 
-import com.jacob.com.ComFailException;
-import com.myutils.logbrowser.indexer.Main;
-import com.myutils.logbrowser.inquirer.CustomField;
-import com.myutils.logbrowser.inquirer.EditRegexFields;
-import com.myutils.logbrowser.inquirer.InquirerFileIo;
-import com.myutils.logbrowser.inquirer.MsgType;
+import com.jacob.com.*;
+import com.myutils.logbrowser.indexer.*;
+import com.myutils.logbrowser.inquirer.gui.SystemClipboard;
 import com.myutils.logbrowser.inquirer.gui.TabResultDataModel.FieldParams;
-import com.myutils.logbrowser.inquirer.inquirer;
-import java.awt.Component;
-import java.awt.Font;
-import java.awt.event.ActionEvent;
-import java.awt.event.MouseEvent;
-import java.io.IOException;
-import java.util.ArrayList;
-import javax.swing.AbstractAction;
-import javax.swing.DefaultListSelectionModel;
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
+import com.myutils.logbrowser.inquirer.*;
+import java.awt.*;
+import java.awt.event.*;
+import java.io.*;
+import java.util.*;
 import static javax.swing.JOptionPane.ERROR_MESSAGE;
-import javax.swing.JPopupMenu;
-import javax.swing.JTable;
-import javax.swing.ListSelectionModel;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
-import javax.swing.table.TableModel;
-import org.apache.logging.log4j.LogManager;
+import javax.swing.*;
+import javax.swing.event.*;
+import javax.swing.table.*;
+import org.apache.logging.log4j.*;
 
 /**
  *
@@ -65,17 +52,14 @@ public class MyJTable extends JTableCommon {
     public MyJTable() {
         super();
 
-
         setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
         setRowSelectionAllowed(true);
-
 
         Font font = this.getFont();
 
         setDefaultRenderer(Object.class, new CustomTableCellRenderer(new Font(font.getName(), Font.BOLD, font.getSize())));
 
-        
         popupMenu.insert(new RegexField(this), copyItemsIdx);
 
         jmAddFields = new JMenu();
@@ -207,7 +191,7 @@ public class MyJTable extends JTableCommon {
     @Override
     void theMousePressed(MouseEvent e) {
 //            inquirer.logger.trace("pressed");
-        if (e.getClickCount() == 2) { // on doubleclick open in editor
+        if (e.isAltDown()) { // on doubleclick open in editor
             MyJTable table = (MyJTable) e.getSource();
             int row = table.rowAtPoint(e.getPoint());
             int column = table.columnAtPoint(e.getPoint());
