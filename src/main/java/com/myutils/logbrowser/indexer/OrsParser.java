@@ -5,15 +5,11 @@
 package com.myutils.logbrowser.indexer;
 
 import static Utils.Util.intOrDef;
-import java.io.IOException;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import org.apache.commons.lang3.StringUtils;
+import java.io.*;
+import java.sql.*;
+import java.util.*;
+import java.util.regex.*;
+import org.apache.commons.lang3.*;
 
 /**
  *
@@ -399,7 +395,7 @@ public class OrsParser extends Parser {
                     m_ParserState = ParserState.STATE_TMESSAGE;
                     MessageType = MsgType.MSG_TLIB;
                 } else {
-                    logger.error("l:" + m_CurrentLine + " unexpected line in state " + m_ParserState);
+                    logger.debug("l:" + m_CurrentLine + " unexpected line in state " + m_ParserState);
                     m_ParserState = ParserState.STATE_COMMENT;
                     return str;
                 }
