@@ -80,7 +80,7 @@ public class PseudoLogFormatter implements ILogRecordFormatter {
             int fileBytes = loggedEvent.GetFileBytes();
             int fileID = loggedEvent.GetFileId();
 
-            byte buffer[] = InquirerFileIo.GetLogBytes(logFileName, fileOffset, fileBytes);
+            byte[] buffer = InquirerFileIo.GetLogBytes(logFileName, fileOffset, fileBytes);
             int eventLineCount = 0;
             int upperLimit = fileBytes < buffer.length ? fileBytes : buffer.length;
             for (int j = 0; j < upperLimit; j++) {
@@ -118,7 +118,7 @@ public class PseudoLogFormatter implements ILogRecordFormatter {
         } else {
             inquirer.logger.debug(m_outputFileName
                     + "("
-                    + Integer.toString(m_markedLine)
+                    + m_markedLine
                     + "): current message in the created pseudo-log");
         }
         m_fileWriter.close();
@@ -180,21 +180,21 @@ public class PseudoLogFormatter implements ILogRecordFormatter {
         m_lineCount++;
 
         if (!record.GetField("connid").isEmpty()) {
-            m_fileWriter.write("\tAttributeConnID\t" + (String) record.GetField("connid") + "\n");
+            m_fileWriter.write("\tAttributeConnID\t" + record.GetField("connid") + "\n");
             m_lineCount++;
         }
 
         if (!record.GetField("refid").isEmpty()) {
-            m_fileWriter.write("\tAttributeReferenceID\t" + (String) record.GetField("refid") + "\n");
+            m_fileWriter.write("\tAttributeReferenceID\t" + record.GetField("refid") + "\n");
             m_lineCount++;
         }
 
         if (!record.GetField("thisdn").isEmpty()) {
-            m_fileWriter.write("\tAttributeThisDN\t" + (String) record.GetField("thisdn") + "\n");
+            m_fileWriter.write("\tAttributeThisDN\t" + record.GetField("thisdn") + "\n");
             m_lineCount++;
         }
         if (!record.GetField("otherdn").isEmpty()) {
-            m_fileWriter.write("\tAttributeOtherDN\t" + (String) record.GetField("otherdn") + "\n");
+            m_fileWriter.write("\tAttributeOtherDN\t" + record.GetField("otherdn") + "\n");
             m_lineCount++;
         }
 

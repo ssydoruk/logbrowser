@@ -30,7 +30,7 @@ import javax.swing.table.TableModel;
 @SuppressWarnings("serial")
 public final class TableSorter extends TableMap {
 
-    int indexes[];
+    int[] indexes;
     List<Integer> sortingColumns = new ArrayList<>();
     boolean ascending = true;
     int compares;
@@ -207,7 +207,7 @@ public final class TableSorter extends TableMap {
     // arrays. The number of compares appears to vary between N-1 and
     // NlogN depending on the initial order but the main reason for
     // using it here is that, unlike qsort, it is stable.
-    public void shuttlesort(int from[], int to[], int low, int high) {
+    public void shuttlesort(int[] from, int[] to, int low, int high) {
         if (high - low < 2) {
             return;
         }

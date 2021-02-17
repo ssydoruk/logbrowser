@@ -1014,7 +1014,7 @@ abstract public class QueryTools {
     protected static DynamicTreeNode<OptionNode> getChildByName(DynamicTreeNode<OptionNode> parent, String reportName) {
         for (DynamicTreeNode<OptionNode> ch : parent.getChildren()) {
             if (((OptionNode) ch.getData()).getName().equals(reportName)) {
-                return (DynamicTreeNode<OptionNode>) ch;
+                return ch;
             }
         }
         return null;
@@ -1024,7 +1024,7 @@ abstract public class QueryTools {
         if (parent != null && reportName != null) {
             for (DynamicTreeNode<OptionNode> ch : parent.getChildren()) {
                 if (((OptionNode) ch.getData()).getDialogItem() == reportName) {
-                    return (DynamicTreeNode<OptionNode>) ch;
+                    return ch;
                 }
             }
         }

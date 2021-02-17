@@ -65,22 +65,22 @@ public final class IxnGMS extends Message {
     final private static Pattern regService = Pattern.compile("^\\s*'Service'.+= \"([^\"]+)\"$");
     final private static Pattern regMethod = Pattern.compile("^\\s*'Method'.+= \"([^\"]+)\"$");
     final private static Pattern regRouteType = Pattern.compile("^\\s*AttributeRouteType.+ = (\\d+)");
-    private String clientName = null;
+    private final String clientName = null;
     private String messageName = null;
 
 //    private static final Regexs reContact = new Regexs(new Pair[]{
 //        new Pair("^\\s*\'GSW_PHONE\'.+= \"([^\"]+)\"", 1),
 //        new Pair("^\\s*\'contact_info\'.+= \"([^\"]+)\"", 1),});
-    private RegExAttribute reIxnID = new RegExAttribute(IxnIDs);
-    private RegExAttribute reAgentID = new RegExAttribute(AgentIDs);
-    private RegExAttribute placeID = new RegExAttribute(PlaceIDs);
-    private RegExAttribute parentIxnIDAttr = new RegExAttribute(parentIxnID);
-    private RegExAttribute refID = new RegExAttribute(refIDs);
+    private final RegExAttribute reIxnID = new RegExAttribute(IxnIDs);
+    private final RegExAttribute reAgentID = new RegExAttribute(AgentIDs);
+    private final RegExAttribute placeID = new RegExAttribute(PlaceIDs);
+    private final RegExAttribute parentIxnIDAttr = new RegExAttribute(parentIxnID);
+    private final RegExAttribute refID = new RegExAttribute(refIDs);
 //    private RegExAttribute ChainID = new RegExAttribute(reChainIDs);
-    private RegExAttribute QueueID = new RegExAttribute(reQueue);
+    private final RegExAttribute QueueID = new RegExAttribute(reQueue);
 //    private RegExAttribute ContactID = new RegExAttribute(reContact);
-    private RegExAttribute mediaType = new RegExAttribute(reMediaType);
-    private RegExAttribute connID = new RegExAttribute(reConnID);
+    private final RegExAttribute mediaType = new RegExAttribute(reMediaType);
+    private final RegExAttribute connID = new RegExAttribute(reConnID);
 
     MessageAttributes attrs = new MessageAttributes();
     Attribute ixnID = new Attribute() {

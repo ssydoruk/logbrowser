@@ -243,10 +243,7 @@ public class RMParser extends Parser {
                     m_HeaderOffset = m_CurrentFilePos;
                     m_headerLine = m_CurrentLine;
                     m_MessageContents.clear();
-                    m_isInbound = true;
-                    if (trimmed.contains("sent")) {
-                        m_isInbound = false;
-                    }
+                    m_isInbound = !trimmed.contains("sent");
                     m_ParserState = STATE_SIP_HEADER_GSIPLIB;
                     setSavedFilePos(getFilePos());
                     m_isContentLengthUnknown = false;

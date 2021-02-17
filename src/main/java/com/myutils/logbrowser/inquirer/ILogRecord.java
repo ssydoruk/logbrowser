@@ -11,7 +11,7 @@ import org.graalvm.polyglot.HostAccess;
 
 public abstract class ILogRecord {
 
-    private static String[] sInboundFieldNames = {"inbound"
+    private static final String[] sInboundFieldNames = {"inbound"
     };
 
     private int m_appid;
@@ -355,8 +355,8 @@ public abstract class ILogRecord {
             if (!ignoreException) {
                 String s = "Error: \"" + fieldName + "\": no such field in " + GetType() + " message";
                 inquirer.logger.error(s);
-                inquirer.showError(null, s, "Field not found");
-                PrintFieldNames();
+//                inquirer.showError(null, s, "Field not found");
+//                PrintFieldNames();
             }
             return "";
 //            throw new Exception("Cannot continue");
@@ -373,8 +373,8 @@ public abstract class ILogRecord {
         if (ret == null) {
             String s = "Error: \"" + fieldName + "\": no such field in " + GetType() + " message";
             inquirer.logger.error(s);
-            inquirer.showError(null, s, "Field not found");
-            PrintFieldNames();
+//            inquirer.showError(null, s, "Field not found");
+//            PrintFieldNames();
             return 0;
 //            throw new Exception("Cannot continue");
         }
@@ -414,10 +414,7 @@ public abstract class ILogRecord {
     boolean hasField(String fldName) {
         if (stdFields.containsKey(fldName)) {
             return true;
-        } else if (m_fieldsAll.containsKey(fldName)) {
-            return true;
-        }
-        return false;
+        } else return m_fieldsAll.containsKey(fldName);
     }
 
     void debug() {

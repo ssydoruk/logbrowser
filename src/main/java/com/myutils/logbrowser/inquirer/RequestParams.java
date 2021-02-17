@@ -47,7 +47,7 @@ public class RequestParams extends javax.swing.JPanel {
     static private final int LEVEL = 1;
     static private final int CHILD_LISTBOX = 2;
 
-    private HashMap<CheckBoxList, String> lastRegExp = new HashMap<>(4);
+    private final HashMap<CheckBoxList, String> lastRegExp = new HashMap<>(4);
     private final QueryDialog qd;
 
     ArrayList<Integer> getSearchApps() {
@@ -272,22 +272,22 @@ public class RequestParams extends javax.swing.JPanel {
         cb.doneFullUpdate(allChecked);
     }
 
-    private MyCheckBoxList cblReportType;
-    private DefaultListModel lmReportType;
-    private MyCheckBoxList cblReportComp;
-    private DefaultListModel lmReportComp;
-    private IQueryResults qry;
+    private final MyCheckBoxList cblReportType;
+    private final DefaultListModel lmReportType;
+    private final MyCheckBoxList cblReportComp;
+    private final DefaultListModel lmReportComp;
+    private final IQueryResults qry;
 
-    private MyCheckBoxList cblApps;
-    private DefaultListModel lmApps;
+    private final MyCheckBoxList cblApps;
+    private final DefaultListModel lmApps;
 
     public IQueryResults getQry() {
         return qry;
     }
-    private DefaultListModel lmAttr;
-    private MyCheckBoxList cblAttr;
-    private DefaultListModel lmAttrValues;
-    private MyCheckBoxList cblAttrValues;
+    private final DefaultListModel lmAttr;
+    private final MyCheckBoxList cblAttr;
+    private final DefaultListModel lmAttrValues;
+    private final MyCheckBoxList cblAttrValues;
 
     /**
      * Creates new form RequestParams
@@ -324,7 +324,7 @@ public class RequestParams extends javax.swing.JPanel {
         InitCB(cblAttrValues, null, rptAttrValues, 4);
 
         cblReportType.setValueIsAdjusting(true);
-        FillElements(cblReportType, (DynamicTreeNode<OptionNode>) qry.getReportItems().getRoot(), true);
+        FillElements(cblReportType, qry.getReportItems().getRoot(), true);
 
 //        cblReportType.setCheckBoxListSelectedIndex(0);
 //        for (int i = 0; i < lmReportType.size(); i++) {
@@ -391,7 +391,7 @@ public class RequestParams extends javax.swing.JPanel {
         pShowFiles.setMaximumSize(new Dimension(pShowFiles.getMaximumSize().width, pShowFiles.getMinimumSize().height));
 
     }
-    private TDateRange timeRange;
+    private final TDateRange timeRange;
 
     public IDsFinder.RequestLevel getSearchLevel() {
         return (IDsFinder.RequestLevel) cbSearchLevel.getSelectedItem();
@@ -404,11 +404,11 @@ public class RequestParams extends javax.swing.JPanel {
 
     ArrayList<ChangeListItem> CRIs;
 
-    private CheckBoxList _listComps = null;
-    private DefaultListModel _modelComps = null;
+    private final CheckBoxList _listComps = null;
+    private final DefaultListModel _modelComps = null;
 
-    private HashMap<Integer, int[]> compChecked = new HashMap<>();
-    private int rptSelected = -1;
+    private final HashMap<Integer, int[]> compChecked = new HashMap<>();
+    private final int rptSelected = -1;
 
     class ChangeListItem {
 
@@ -476,7 +476,7 @@ public class RequestParams extends javax.swing.JPanel {
 
     }
 
-    private HashMap<CheckBoxList, ChangeListItem> changeList = new HashMap<>();
+    private final HashMap<CheckBoxList, ChangeListItem> changeList = new HashMap<>();
 
     private void setChildChecked(CheckBoxList lChild, boolean boxEnabled, boolean isCurrent) {
 //        inquirer.logger.debug("in setChildChecked " + boxEnabled);

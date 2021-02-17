@@ -237,9 +237,7 @@ public class MyJTable extends JTableCommon {
         if (totalBytes >= inquirer.getConfig().getFileSizeWarn() * 1024 * 1024) {
             int showConfirmDialog = inquirer.showConfirmDialog(null, "File size for full report is big (" + Main.formatSize(totalBytes) + ")\n"
                     + "Should files be printed?", "Please confirm", JOptionPane.YES_NO_OPTION);
-            if (showConfirmDialog == JOptionPane.NO_OPTION) {
-                return false;
-            }
+            return showConfirmDialog != JOptionPane.NO_OPTION;
         }
         return true;
     }

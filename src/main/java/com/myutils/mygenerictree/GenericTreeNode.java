@@ -121,13 +121,8 @@ public class GenericTreeNode<T> implements Serializable {
         }
         GenericTreeNode<?> other = (GenericTreeNode<?>) obj;
         if (data == null) {
-            if (other.data != null) {
-                return false;
-            }
-        } else if (!data.equals(other.data)) {
-            return false;
-        }
-        return true;
+            return other.data == null;
+        } else return data.equals(other.data);
     }
 
     /* (non-Javadoc)

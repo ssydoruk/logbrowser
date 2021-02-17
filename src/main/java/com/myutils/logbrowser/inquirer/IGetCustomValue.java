@@ -10,5 +10,5 @@ package com.myutils.logbrowser.inquirer;
  * @author stepan_sydoruk
  */
 public interface IGetCustomValue {
-    public String getCustomValue(String rec);
+    String getCustomValue(String rec);
 }

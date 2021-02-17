@@ -26,7 +26,7 @@ public abstract class DBTable {
         }
     }
 
-    private SqliteAccessor m_dbAccessor;
+    private final SqliteAccessor m_dbAccessor;
     protected int m_InsertStatementId;
 //    protected Parser m_pParser=null;
     protected TableType m_type = TableType.UNKNOWN;
@@ -155,8 +155,6 @@ public abstract class DBTable {
 
     public abstract void AddToDB(Record rec) throws Exception;
 
-    ;
-    
     public String StrOrEmpty(String param) {
         if (param == null) {
             return "";

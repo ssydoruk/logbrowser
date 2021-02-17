@@ -17,10 +17,10 @@ import org.w3c.dom.Document;
 /*It extends TServer message, however there is now TServer message attributes*/
 public class ORSMetricExtension extends Message {
 
-    private static Pattern regTMessageStart = Pattern.compile("^<([\\w~]+) sid='([\\w~]+)");
+    private static final Pattern regTMessageStart = Pattern.compile("^<([\\w~]+) sid='([\\w~]+)");
 //    private static Pattern regReqID = Pattern.compile("^\\s*<eval_expr .+expression='system.LastSubmitRequestId;.+result='(\\d+)' />");
-    private static Pattern regFunc = Pattern.compile("(?:function|name)='([^']+)'");
-    private static Pattern regNS = Pattern.compile("namespace='.+\\/([^']+)'");
+    private static final Pattern regFunc = Pattern.compile("(?:function|name)='([^']+)'");
+    private static final Pattern regNS = Pattern.compile("namespace='.+\\/([^']+)'");
     private static final Pattern regNamespace = Pattern.compile("namespace='[^']/([^\\/]+)'");
 
     public String sid = "";
@@ -47,7 +47,7 @@ public class ORSMetricExtension extends Message {
 
     private void FindSID() {
         Matcher m;
-        String s = (String) m_MessageLines.get(0);
+        String s = m_MessageLines.get(0);
 
         if (s != null && (m = regTMessageStart.matcher(s)).find()) {
             Method = m.group(1);

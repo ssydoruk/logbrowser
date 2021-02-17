@@ -19,7 +19,7 @@ import org.apache.commons.lang3.StringUtils;
  */
 final class DateParsers {
 
-    private ArrayList<Parser.DateFmt> dateFormats = new ArrayList<>();
+    private final ArrayList<Parser.DateFmt> dateFormats = new ArrayList<>();
     private ArrayList<Parser.DateFmt> prefferedFormats = null;
     private boolean checkRegex = true;
 

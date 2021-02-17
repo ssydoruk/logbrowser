@@ -193,7 +193,7 @@ public class ReportFrameQuery extends ReportFrame {
         setVisible(true);
     }
 
-    public void showReport(IQueryResults qry, QueryDialog qd, SelectionType selType, String searchID) throws FileNotFoundException, Exception {
+    public void showReport(IQueryResults qry, QueryDialog qd, SelectionType selType, String searchID) throws Exception {
         inquirer inq = inquirer.getInq();
         InquirerCfg cfg = inquirer.getConfig();
         ps = new PrintStreams(cfg);

@@ -43,12 +43,12 @@ public final class QuerySetting extends javax.swing.JDialog {
     /**
      * Creates new form QuerySetting
      */
-    private InquirerCfg cr;
+    private final InquirerCfg cr;
     private CheckBoxListSettings clbRefValues;
     private DefaultListModel lmRefValues;
     private int closeCause;
     private final JList lPrintFilters;
-    private HashMap<String, String> printFilters;
+    private final HashMap<String, String> printFilters;
     private CheckBoxListSettings clbLogMessages;
     private HashMap<ReferenceType, ArrayList<OptionNode>> savedRefs;
     private ReferenceType lastRefType;
@@ -88,7 +88,7 @@ public final class QuerySetting extends javax.swing.JDialog {
         pRefTypes.add(jScrollPane);
         ArrayList<ReferenceType> ar = new ArrayList<>(savedRefs.keySet());
          Collections.sort(ar, (o1, o2) -> {
-             return ((ReferenceType)o1).toString().compareToIgnoreCase(((ReferenceType)o2).toString());
+             return o1.toString().compareToIgnoreCase(o2.toString());
          });
 
         for (ReferenceType rt : ar) {

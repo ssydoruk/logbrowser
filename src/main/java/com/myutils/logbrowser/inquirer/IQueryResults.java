@@ -185,7 +185,7 @@ public abstract class IQueryResults extends QueryTools
                     if (ret.length() > 0) {
                         ret.append("\nUNION");
                     }
-                    ret.append("\nselect distinct ").append(tabAndField[i + 1]).append(" from ").append(tabAndField[i]).append("");
+                    ret.append("\nselect distinct ").append(tabAndField[i + 1]).append(" from ").append(tabAndField[i]);
                 }
                 i += 2;
             }
@@ -273,7 +273,7 @@ public abstract class IQueryResults extends QueryTools
             record.debug();
             for (int j = 0; j < m_formatters.size(); j++) {
                 ILogRecordFormatter formatter
-                        = (ILogRecordFormatter) m_formatters.get(j);
+                        = m_formatters.get(j);
 
                 formatter.Print(record, ps, this);
 //                Thread.sleep(200);
@@ -693,7 +693,7 @@ public abstract class IQueryResults extends QueryTools
         Print(ps);
 
         for (int i = 0; i < m_formatters.size(); i++) {
-            ((ILogRecordFormatter) m_formatters.get(i)).Close();
+            m_formatters.get(i).Close();
         }
         long timePrintEnd = new Date().getTime();
         inquirer.logger.info("Printing took " + Utils.Util.pDuration(timePrintEnd - timePrintStart));
@@ -956,7 +956,7 @@ public abstract class IQueryResults extends QueryTools
 
     public static class SearchFields {
 
-        private HashMap<com.myutils.logbrowser.indexer.FileInfoType, Pair<SelectionType, String>> recMap;
+        private final HashMap<com.myutils.logbrowser.indexer.FileInfoType, Pair<SelectionType, String>> recMap;
         private String typeField = null;
 
         public SearchFields() {
@@ -1079,12 +1079,12 @@ public abstract class IQueryResults extends QueryTools
 
         class CustomComponent {
 
-            private Integer id;
+            private final Integer id;
             //            private String value;
             private String name;
             private String fieldName = null;
             // keyfield1->val1,val2,val3,...
-            private HashMap<String, KeyValues> keyValues;
+            private final HashMap<String, KeyValues> keyValues;
 
             private CustomComponent(Integer valueID) {
                 this.keyValues = new HashMap<>();

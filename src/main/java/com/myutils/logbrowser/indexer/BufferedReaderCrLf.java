@@ -53,10 +53,10 @@ public class BufferedReaderCrLf {
     private static final Object lock = new Object();
     private static final int INVALIDATED = -2;
     private static final int UNMARKED = -1;
-    private static int defaultCharBufferSize = 8_192;
+    private static final int defaultCharBufferSize = 8_192;
     private InputStream in;
 
-    private byte cb[];
+    private byte[] cb;
     private int nChars, nextChar;
 
     public int charsSkippedOnReadLine;
@@ -140,7 +140,7 @@ public class BufferedReaderCrLf {
                     dst = delta;
                 } else {
                     /* Reallocate buffer to accommodate read-ahead limit */
-                    byte ncb[] = new byte[readAheadLimit];
+                    byte[] ncb = new byte[readAheadLimit];
                     System.arraycopy(cb, markedChar, ncb, 0, delta);
                     cb = ncb;
                     markedChar = 0;
@@ -282,7 +282,7 @@ public class BufferedReaderCrLf {
      *
      * @exception IOException If an I/O error occurs
      */
-    public int read(byte cbuf[], int off, int len) throws IOException {
+    public int read(byte[] cbuf, int off, int len) throws IOException {
         synchronized (lock) {
             ensureOpen();
             if ((off < 0) || (off > cbuf.length) || (len < 0)

@@ -27,7 +27,7 @@ public class SIPEPQuery extends IQuery {
     private int recCnt;
     private DynamicTreeNode<OptionNode> node = null;
     private IDsFinder cidFinder;
-    private HashMap sipRecords = new HashMap();
+    private final HashMap sipRecords = new HashMap();
 
     public SIPEPQuery() throws SQLException {
         addRef("ToUriID", "ToUri", ReferenceType.SIPURI.toString(), FieldType.Optional);

@@ -558,7 +558,7 @@ public final class SqliteAccessor extends Thread implements DBAccessor {
             }
         }
 
-        return (Integer[]) ret.toArray(new Integer[ret.size()]);
+        return ret.toArray(new Integer[ret.size()]);
     }
 
     public ArrayList<ArrayList<Long>> getIDsMultiple(String query) throws SQLException {

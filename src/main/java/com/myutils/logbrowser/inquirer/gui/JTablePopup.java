@@ -176,7 +176,7 @@ public abstract class JTablePopup extends JTable {
                         if (model instanceof TabResultDataModel) {
 
                             inquirer.logger.debug("changed selection to " + popupPoint.toString() + " r:" + row + " c:" + col
-                                    + " rowSelected?" + tab.isRowSelected(row) + " selC: " + ((TabResultDataModel) model).getValueAt(tab.convertRowIndexToModel(row), tab.convertColumnIndexToModel(col))
+                                    + " rowSelected?" + tab.isRowSelected(row) + " selC: " + model.getValueAt(tab.convertRowIndexToModel(row), tab.convertColumnIndexToModel(col))
                                     + "\n\tdata1:" + ((TabResultDataModel) model).getRow(tab.convertRowIndexToModel(row))
                             );
                         }

@@ -26,7 +26,7 @@ public class WindowsSystemUtility {
 
     static boolean libraryLoaded = false;
 
-    static void InitDLLActiveX() throws FileNotFoundException, IOException {
+    static void InitDLLActiveX() throws IOException {
         if (libraryLoaded == false) {
             /**
              * `System.getProperty("os.arch")` It'll tell us on which platform
@@ -90,9 +90,9 @@ public class WindowsSystemUtility {
         }
     }
 
-    public static interface User32 extends StdCallLibrary {
+    public interface User32 extends StdCallLibrary {
 
-        User32 INSTANCE = (User32) Native.loadLibrary("user32", User32.class);
+        User32 INSTANCE = Native.loadLibrary("user32", User32.class);
 
         int GetWindowTextA(WinDef.HWND hWnd, byte[] lpString, int nMaxCount);
 
@@ -114,9 +114,9 @@ public class WindowsSystemUtility {
 
     }
 
-    public static interface Kernel32 extends StdCallLibrary {
+    public interface Kernel32 extends StdCallLibrary {
 
-        Kernel32 INSTANCE = (Kernel32) Native.loadLibrary("kernel32", Kernel32.class);
+        Kernel32 INSTANCE = Native.loadLibrary("kernel32", Kernel32.class);
 
         int GetLastError();
     }

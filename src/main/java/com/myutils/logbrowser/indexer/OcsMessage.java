@@ -30,7 +30,7 @@ public class OcsMessage extends Message {
 
     private String m_refID;
     private String m_ThisDN;
-    private boolean isTServerReq = false;
+    private final boolean isTServerReq = false;
     private Long recordHandle = null;
 
     public OcsMessage(ArrayList newMessageLines) {

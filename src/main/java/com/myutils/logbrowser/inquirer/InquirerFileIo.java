@@ -27,7 +27,7 @@ public class InquirerFileIo {
             logReaderHash = new HashMap();
         }
         if (logReaderHash.containsKey(fileName)) {
-            retInqFile = (InqFile) logReaderHash.get(fileName);
+            retInqFile = logReaderHash.get(fileName);
         } else {
             try {
                 retInqFile = new InqFile(fileName);
@@ -99,10 +99,10 @@ public class InquirerFileIo {
         private long lastOffset = 0;
         private int lastBytes = 0;
         private final RandomFileReader rfr;
-        byte pseudoLogBuffer[];
+        byte[] pseudoLogBuffer;
         int pseudoLogBufferSize = 0;
 
-        public InqFile(LogFile lf) throws FileNotFoundException, IOException {
+        public InqFile(LogFile lf) throws IOException {
             if (lf.isText()) {
                 rfr = new TextFileReader(lf.getFileName());
             } else {

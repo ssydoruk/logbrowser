@@ -974,12 +974,12 @@ public class MCPParser extends Parser {
         private interface IParamParseProc {
 
             void proc(VXMLIntSteps msg, String[] msgParams, String strOrig);
-        };
+        }
 
         private interface IPatternProc {
 
             void proc(VXMLIntSteps msg, Matcher m);
-        };
+        }
 
         private final Map<String, IParamParseProc> procSplitSteps;
         private final Map<Pattern, IPatternProc> procPatternSteps;
@@ -1015,7 +1015,7 @@ public class MCPParser extends Parser {
             }
 
         }
-    };
+    }
 
     private static final VXMLStepsParams vXMLStepsParams = new VXMLStepsParams();
 

@@ -80,12 +80,12 @@ public enum MsgType {
 
     private final String name;
 
-    private MsgType(String s) {
+    MsgType(String s) {
         name = s.toLowerCase();
     }
 
     public boolean equalsName(String otherName) {
-        return (otherName == null) ? false : name.toLowerCase().equals(otherName.toLowerCase());
+        return otherName != null && name.equalsIgnoreCase(otherName);
     }
 
     @Override

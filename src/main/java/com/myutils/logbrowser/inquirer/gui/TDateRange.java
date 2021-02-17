@@ -41,10 +41,10 @@ public class TDateRange extends javax.swing.JPanel {
         jlTo.setEnabled(enabled);
     }
 
-    public static interface IRefresh {
+    public interface IRefresh {
 
         UTCTimeRange Refresh();
-    };
+    }
 
     private IRefresh refreshCB = null;
 

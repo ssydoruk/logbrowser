@@ -164,7 +164,7 @@ public class EnvInquirer extends ExecutionEnvironment {
 
     private boolean getBoolOptionOrDef(Option opt, boolean def) {
         boolean ret = cmd.hasOption(opt.getLongOpt());
-        return (ret ? true : def);
+        return (ret || def);
     }
 
     public boolean isIgnoreFileAccessErrors() {

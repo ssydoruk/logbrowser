@@ -358,10 +358,7 @@ public class SIPProxyParser extends Parser {
                     m_HeaderOffset = m_CurrentFilePos;
                     m_headerLine = m_CurrentLine;
                     m_MessageContents.clear();
-                    m_isInbound = true;
-                    if (s.endsWith(">")) {
-                        m_isInbound = false;
-                    }
+                    m_isInbound = !s.endsWith(">");
                     m_ParserState = STATE_SIP_HEADER;
                     m_isContentLengthUnknown = false;
                     setSavedFilePos(getFilePos());

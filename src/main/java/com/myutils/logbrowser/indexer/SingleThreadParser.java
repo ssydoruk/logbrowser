@@ -72,9 +72,8 @@ public class SingleThreadParser extends Parser {
     private static final Pattern regNotParseMessage = Pattern.compile("^(0454[1-5]"
             + ")");
     private final static HashSet<String> eventsWithCallInfo = new HashSet<String>(
-            Arrays.asList(new String[]{
-        "EventRegistered",
-        "EventAddressInfo"}));
+            Arrays.asList("EventRegistered",
+                    "EventAddressInfo"));
     static private final Pattern regISCCHead = Pattern.compile("^[\\d\\s]+\\[ISCC\\] (Received|Send).+: message (\\w+)$");
     static private final Pattern regJSONFinished = Pattern.compile("^GenHttpRequest.+destroyed$");
     static private final Pattern patternHandleBlock = Pattern.compile("^((([0-9a-zA-Z_-]*:)+)\\d+):?\\d*$");
@@ -452,10 +451,7 @@ public class SingleThreadParser extends Parser {
                     m_HeaderOffset = m_CurrentFilePos;
                     m_headerLine = m_CurrentLine;
                     m_MessageContents.clear();
-                    m_isInbound = true;
-                    if (s.endsWith(">")) {
-                        m_isInbound = false;
-                    }
+                    m_isInbound = !s.endsWith(">");
                     if (s.indexOf("T-Lib") > 0) {
                         m_ParserState = STATE_TLIB_MESSAGE;
 
@@ -514,7 +510,7 @@ public class SingleThreadParser extends Parser {
                         ((TLibTimerRedirectMessage) msgInProgress).setCause(cause);
                     }
                 }
-                ((TLibTimerRedirectMessage) msgInProgress).SetStdFieldsAndAdd(this);
+                msgInProgress.SetStdFieldsAndAdd(this);
                 m_ParserState = STATE_COMMENTS;
                 break;
             }
@@ -1085,12 +1081,12 @@ public class SingleThreadParser extends Parser {
 
     protected void AddJsonMessage(ArrayList<String> contents, String header) {
         int i = 0;
-        while (!((String) contents.get(i)).isEmpty()) {
+        while (!contents.get(i).isEmpty()) {
             i++;
         }
         String body = "";
         for (int j = i; j < contents.size(); j++) {
-            body += (String) contents.get(j);
+            body += contents.get(j);
         }
 
         try {
@@ -1478,7 +1474,7 @@ public class SingleThreadParser extends Parser {
 
     private class SIP1536OtherMessage extends Message {
 
-        private String key;
+        private final String key;
 
         private SIP1536OtherMessage(String string) throws Exception {
             super(TableType.SIP1536Other);
@@ -1495,10 +1491,8 @@ public class SingleThreadParser extends Parser {
         private boolean isChangedKey(String string) {
             if (string != null && !string.isEmpty()) {
                 String s = string.toLowerCase();
-                if (key.equals(s) || ((key.equals("gtscore") || key.equals("sipserver"))
-                        && (s.equals("gtscore") || s.equals("sipserver")))) {
-                    return false;
-                }
+                return !key.equals(s) && ((!key.equals("gtscore") && !key.equals("sipserver"))
+                        || (!s.equals("gtscore") && !s.equals("sipserver")));
             }
             return true;
         }
@@ -1735,7 +1729,7 @@ public class SingleThreadParser extends Parser {
 
     private class SIP1536RequestResponse extends Message {
 
-        private boolean request;
+        private final boolean request;
         private String msg;
         private String amount;
         HashMap<String, String> attrs = new HashMap<>();

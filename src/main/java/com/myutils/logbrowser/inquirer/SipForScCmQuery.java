@@ -19,7 +19,7 @@ import org.apache.commons.lang3.StringUtils;
 public class SipForScCmQuery extends IQuery {
 
     private String[] orderBy;
-    private HashSet handlerIDs = new HashSet();
+    private final HashSet handlerIDs = new HashSet();
     private boolean collectHandlers = false;
 
     private Integer[] m_CallIds;

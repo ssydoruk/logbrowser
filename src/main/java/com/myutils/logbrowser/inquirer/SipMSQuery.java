@@ -20,13 +20,13 @@ public class SipMSQuery extends IQuery {
     private String[] orderBy;
 
     private Integer[] m_CallIds;
-    private boolean m_useProxy = true;
+    private final boolean m_useProxy = true;
 
     private DynamicTreeNode<OptionNode> node = null;
     private IDsFinder cidFinder;
 
     private boolean shouldRun = false;
-    private HashMap sipRecords = new HashMap();
+    private final HashMap sipRecords = new HashMap();
 
     public SipMSQuery() throws SQLException {
         addRef("ToUriID", "ToUri", ReferenceType.SIPURI.toString(), FieldType.Optional);

@@ -55,13 +55,13 @@ public class SipMessage extends Message {
         if (contents.size() == 1) {
             Main.logger.info("One line SIP message???" + contents.get(0));
         }
-        Main.logger.trace("len: " + ((String) contents.get(0)).length() + " last: " + ((String) contents.get(0)).indexOf('\r'));
+        Main.logger.trace("len: " + contents.get(0).length() + " last: " + contents.get(0).indexOf('\r'));
         if (m_MessageLines.size() > 0) {
-            String s = (String) m_MessageLines.get(0);
+            String s = m_MessageLines.get(0);
             if (s.startsWith(_prefix)) {
                 m_MessageLines.set(0, s.substring(_prefix.length()));
             }
-            s = (String) m_MessageLines.get(m_MessageLines.size() - 1);
+            s = m_MessageLines.get(m_MessageLines.size() - 1);
             if (s.equals(_suffix)) {
                 m_MessageLines.set(m_MessageLines.size() - 1, "");
             } else if (s.endsWith(_suffix)) {
@@ -222,7 +222,7 @@ public class SipMessage extends Message {
     public String getM_Name() {
         if (m_Name == null) {
             Matcher m;
-            if ((m = regSIPMessage.matcher((String) m_MessageLines.get(0))).find()) {
+            if ((m = regSIPMessage.matcher(m_MessageLines.get(0))).find()) {
                 m_Name = m.group(1);
                 if (m_Name == null) {
                     m_Name = m.group(2);
@@ -429,9 +429,7 @@ const char* GSIP_HDRNAME_REPLACES				="Replaces";
         if (cSeq != null) {
             String[] split = StringUtils.split(cSeq);
             if (split != null && split.length > 1) {
-                if (nonCalls.contains(split[1].toUpperCase())) {
-                    return false;
-                }
+                return !nonCalls.contains(split[1].toUpperCase());
             }
         }
         return true;

@@ -28,7 +28,7 @@ enum OutbRequestType {
 
     CAMPAIGN_GROUP,
     AGENT,
-    CALL;
+    CALL
 }
 
 final class OutboundResults extends IQueryResults {
@@ -739,7 +739,7 @@ final class OutboundResults extends IQueryResults {
                         if (rec instanceof TLibEvent) {
                             addUnique(refIDs, ((TLibEvent) rec).GetReferenceId());
 
-                            long id = ((TLibEvent) rec).getID();
+                            long id = rec.getID();
                             if (id > 0) {
                                 ids.add(id);
                             }

@@ -54,7 +54,7 @@ public class EditRegexFields extends javax.swing.JDialog {
     public static final int RET_OK = 1;
     private List<RegexFieldSettings> selectedValuesList = null;
     private String savedReplace;
-    private DocumentListener listener;
+    private final DocumentListener listener;
     private MsgType msgType;
     private TabResultDataModel.TableRow curRow;
     private String curRec;
@@ -152,7 +152,7 @@ public class EditRegexFields extends javax.swing.JDialog {
         jPanel10.setSize(jPanel10.getWidth(), btEval.getHeight());
         // Close the dialog when Esc is pressed
         if (parent != null) {
-            Window windowAncestor = (Window) SwingUtilities.getWindowAncestor(parent);
+            Window windowAncestor = SwingUtilities.getWindowAncestor(parent);
             Point location = parent.getMousePosition();
             setLocation(location);
             setLocationRelativeTo(windowAncestor);
@@ -719,7 +719,7 @@ public class EditRegexFields extends javax.swing.JDialog {
 
     private void formComponentShown(java.awt.event.ComponentEvent evt) {// GEN-FIRST:event_formComponentShown
         // TODO add your handling code here:
-        setCurrentField((CustomField) null);
+        setCurrentField(null);
         jtfRegex.setText(savedSearch);
         jtfRetValue.setText(savedReplace);
 
@@ -896,8 +896,8 @@ public class EditRegexFields extends javax.swing.JDialog {
 
     }
 
-    private inquirer.InfoPanel savedSelect = null;
-    private JList lSavedList = null;
+    private final inquirer.InfoPanel savedSelect = null;
+    private final JList lSavedList = null;
     private DefaultListModel lmSavedList = null;
 
     private CustomField currentCustomField;
@@ -974,7 +974,7 @@ public class EditRegexFields extends javax.swing.JDialog {
             if (JOptionPane.showConfirmDialog(this, "Do you want to delete \"" + currentCustomField.getName() + "\"?",
                     "Please confirm", JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
                 lmSavedList.removeElement(currentCustomField);
-                setCurrentField((CustomField) null);
+                setCurrentField(null);
             }
         }
     }
@@ -995,6 +995,6 @@ public class EditRegexFields extends javax.swing.JDialog {
 
     private enum SaveAction {
         SAVE, SAVEAS, RENAME
-    };
+    }
 
 }

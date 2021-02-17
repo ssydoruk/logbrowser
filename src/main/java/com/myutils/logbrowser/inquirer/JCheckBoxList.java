@@ -17,7 +17,7 @@ public final class JCheckBoxList extends JList<JCheckBox> {
             public void mousePressed(MouseEvent e) {
                 int index = locationToIndex(e.getPoint());
                 if (index != -1) {
-                    JCheckBox checkbox = (JCheckBox) getModel().getElementAt(index);
+                    JCheckBox checkbox = getModel().getElementAt(index);
                     checkbox.setSelected(!checkbox.isSelected());
                     repaint();
                 }
@@ -29,10 +29,10 @@ public final class JCheckBoxList extends JList<JCheckBox> {
             public void keyPressed(KeyEvent e) {
                 int index = getSelectedIndex();
                 if (index != -1 && e.getKeyCode() == KeyEvent.VK_SPACE) {
-                    boolean newVal = !((JCheckBox) (getModel()
-                            .getElementAt(index))).isSelected();
+                    boolean newVal = !getModel()
+                            .getElementAt(index).isSelected();
                     for (int i : getSelectedIndices()) {
-                        JCheckBox checkbox = (JCheckBox) getModel()
+                        JCheckBox checkbox = getModel()
                                 .getElementAt(i);
                         checkbox.setSelected(newVal);
                         repaint();

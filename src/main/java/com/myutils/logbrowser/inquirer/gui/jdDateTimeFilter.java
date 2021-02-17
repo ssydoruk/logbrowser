@@ -177,8 +177,8 @@ public class jdDateTimeFilter extends javax.swing.JDialog {
         this.closeCause = closeCause;
     }
 
-    private DateTimePicker dtFrom;
-    private DateTimePicker dtTo;
+    private final DateTimePicker dtFrom;
+    private final DateTimePicker dtTo;
 
     private static DateTimePicker newPicker() {
         DateTimePicker dateTimePicker1 = new DateTimePicker();

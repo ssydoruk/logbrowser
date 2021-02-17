@@ -113,9 +113,7 @@ public abstract class Parser {
     }
 
     static public boolean isSessionID(String resp) {
-        return (resp != null && !resp.isEmpty())
-                ? regORSSessionID.matcher(resp).find()
-                : false;
+        return resp != null && !resp.isEmpty() && regORSSessionID.matcher(resp).find();
     }
     //    protected static final Pattern regGenesysMessage = Pattern.compile(" (None|Debug|Trace|Interaction|Standard|Alarm|Unknown|Non|Dbg|Trc|Int|Std|Alr|Unk) (\\d{5}) ");
     int m_CurrentLine;
@@ -138,23 +136,23 @@ public abstract class Parser {
     private long savedFilePos; // to save the begining of block
     private long endFilePos; //end of block
     private long posDiff = 0;
-    private FileInfoType m_type;
-    private DateParsers dateParsers = new DateParsers();
+    private final FileInfoType m_type;
+    private final DateParsers dateParsers = new DateParsers();
     protected FileInfo fileInfo;
     private LocalDateTime lastKnownDate = null;
 
-    private FilesParseSettings.FileParseSettings fileParseSettings;
+    private final FilesParseSettings.FileParseSettings fileParseSettings;
     private int lastChangeValue = 0;
     private String lastMatch;
 
     private FilesParseSettings.FileParseCustomSearch lastCustomSearch;
     private GenesysMsg lastLogMsg;
     private ArrayList<DateFmt> currentAppDates; //unlikely to have more than 3 date formats in single app
-    private HashMap<String, ArrayList<DateFmt>> appPreferedFormats = new HashMap<>();
+    private final HashMap<String, ArrayList<DateFmt>> appPreferedFormats = new HashMap<>();
     private DateDiff dateDiff = null;
-    private ArrayList<CustomRegexLine> printedCustomLines = new ArrayList<>();
+    private final ArrayList<CustomRegexLine> printedCustomLines = new ArrayList<>();
     //</editor-fold>
-    private CustomAttributeTable custAttrTab = null;
+    private final CustomAttributeTable custAttrTab = null;
     private CustomLineTable custLineTab = null;
 
     public Parser(FileInfoType type, HashMap<TableType, DBTable> tables) {
@@ -401,7 +399,7 @@ public abstract class Parser {
             Main.logger.error("Empty contents");
         } else {
             for (Object content : contents) {
-                Main.logger.error("[" + (String) content + "]");
+                Main.logger.error("[" + content + "]");
             }
         }
     }
@@ -653,12 +651,8 @@ public abstract class Parser {
     }
 
     private boolean ignoreFileDates(FileInfo fileInfo) {
-        if (fileInfo.getSize() < 1048576
-                || (fileInfo.getAppType().equals("TServer") && fileInfo.getLogFileName().contains("-1536."))) {
-            return true;
-        } else {
-            return false;
-        }
+        return fileInfo.getSize() < 1048576
+                || (fileInfo.getAppType().equals("TServer") && fileInfo.getLogFileName().contains("-1536."));
     }
 
     void doFinalize() throws Exception {
@@ -944,7 +938,7 @@ public abstract class Parser {
                     Pattern key1 = entry.getKey();
                     if ((m = key1.matcher(workString)).find()) {
                         buf = new StringBuilder();
-                        buf.append(workString.substring(0, m.start(0))).append(entry.getValue());
+                        buf.append(workString, 0, m.start(0)).append(entry.getValue());
                         if (m.end(0) < workString.length()) {
                             buf.append(workString.substring(m.end(0)));
                         }
@@ -1161,7 +1155,7 @@ public abstract class Parser {
 //            System.out.println("d: " + parse.toString() + " dt:" + dt.toString());
     }
 
-    public static enum DateIncluded {
+    public enum DateIncluded {
         DATE_INCUDED,
         DATE_NOT_INCLUDED,
         DATE_UNKNOWN

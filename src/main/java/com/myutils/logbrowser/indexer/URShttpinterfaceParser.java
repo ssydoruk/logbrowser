@@ -479,7 +479,7 @@ public class URShttpinterfaceParser extends WebParser {
         }
 
         void setHTTPServerID(String ip) {
-            this.reqID = Util.intOrDef(ip, (Long) null, 16);
+            this.reqID = Util.intOrDef(ip, null, 16);
         }
 
         void setSocket(int socket) {
@@ -508,9 +508,7 @@ public class URShttpinterfaceParser extends WebParser {
                     if (s != null && s.length() > 0) {
                         int cl = Integer.parseInt(s);
 
-                        if (cl == 0 || getContentLengh() >= cl) {
-                            return true;
-                        }
+                        return cl == 0 || getContentLengh() >= cl;
                     }
                     return false;
                 }
@@ -634,7 +632,7 @@ public class URShttpinterfaceParser extends WebParser {
         }
 
         void setHTTPResponseID(String group) {
-            if (group != null && group.substring(0, 2).toLowerCase().equals("0x")) {
+            if (group != null && group.substring(0, 2).equalsIgnoreCase("0x")) {
                 httpResponseID = group.substring(2);
             } else {
                 httpResponseID = group;
@@ -646,7 +644,7 @@ public class URShttpinterfaceParser extends WebParser {
         }
 
         private void setHTTPHandlerID(String hexHandlerID) {
-            this.httpHandlerID = Util.intOrDef(hexHandlerID, (Long) null, 16);
+            this.httpHandlerID = Util.intOrDef(hexHandlerID, null, 16);
         }
 
         public Long getHttpHandlerID() {
@@ -762,8 +760,8 @@ public class URShttpinterfaceParser extends WebParser {
 //<editor-fold defaultstate="collapsed" desc="comment">
     private class HTTPtoURS extends Message {
 
-        private Long ursRefID;
-        private Long httpReqID;
+        private final Long ursRefID;
+        private final Long httpReqID;
 
         private HTTPtoURS(Long ursRefID, Long httpReqID, boolean b) {
             super(TableType.HTTP_TO_URS);

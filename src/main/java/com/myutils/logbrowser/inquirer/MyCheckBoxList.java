@@ -153,7 +153,7 @@ public class MyCheckBoxList extends CheckBoxList {
     }
 
     private void doSearch(boolean initialRun, boolean searchForward) {
-        Window windowAncestor = (Window) SwingUtilities.getWindowAncestor(this);
+        Window windowAncestor = SwingUtilities.getWindowAncestor(this);
         if (dlg == null) {
             dlg = new EnterRegexDialog(null, true);
         }
@@ -240,7 +240,7 @@ public class MyCheckBoxList extends CheckBoxList {
 
     class MyChBoxListPopup extends JPopupMenu {
 
-        private CheckBoxList list;
+        private final CheckBoxList list;
         private JMenuItem jmCheckAll;
         private JMenuItem jmCheckByRegex;
         private JMenuItem jmFindSelect;
@@ -252,10 +252,10 @@ public class MyCheckBoxList extends CheckBoxList {
         private JMenuItem jmHideChecked;
         private JMenuItem jmHideUnchecked;
         private JMenuItem jmShowStat;
-        private JPanel w;
+        private final JPanel w;
         private JMenuItem jmFind;
         private JMenuItem jmFindNext;
-        private int lastIdx = -1;
+        private final int lastIdx = -1;
         private JMenuItem jmFindPrev;
         private JMenuItem jmCopyValue;
 
@@ -348,7 +348,7 @@ public class MyCheckBoxList extends CheckBoxList {
                             buf.add(i);
                         }
                     }
-                    int bufInt[] = new int[buf.size()];
+                    int[] bufInt = new int[buf.size()];
                     for (int i = 0; i < buf.size(); i++) {
                         bufInt[i] = buf.get(i);
 
@@ -416,7 +416,7 @@ public class MyCheckBoxList extends CheckBoxList {
             }
             dlg.setRegex(inquirer.geLocaltQuerySettings().getSavedFilters());
             dlg.setShowUps(false);
-            ScreenInfo.setVisible((Window) SwingUtilities.getWindowAncestor(this), dlg, true);
+            ScreenInfo.setVisible(SwingUtilities.getWindowAncestor(this), dlg, true);
 
             inquirer.logger.debug(dlg.getReturnStatus());
             if (dlg.getReturnStatus() == RET_OK) {

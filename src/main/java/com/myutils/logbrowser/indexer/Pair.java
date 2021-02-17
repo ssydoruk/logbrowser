@@ -96,11 +96,7 @@ public class Pair<K, V> implements Serializable {
 
         Pair pair = (Pair) o;
 
-        if (key != null ? !key.equals(pair.key) : pair.key != null) {
-            return false;
-        }
-
-        return true;
+        return key != null ? key.equals(pair.key) : pair.key == null;
     }
 
     @Override

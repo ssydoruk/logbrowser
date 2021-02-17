@@ -69,7 +69,7 @@ public class QueryDialog extends javax.swing.JFrame {
     private static final org.apache.logging.log4j.Logger logger = LogManager.getLogger();
 
     private int closeCause = 0;
-    private boolean aggregateInitiated = false;
+    private final boolean aggregateInitiated = false;
     private FileOutSettings fileOutSetting;
 
     public int getCloseCause() {
@@ -317,7 +317,7 @@ public class QueryDialog extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private ArrayList<ReportFrame> reps = new ArrayList<>();
+    private final ArrayList<ReportFrame> reps = new ArrayList<>();
 
     RequestProgress rp = null;
 //<editor-fold defaultstate="collapsed" desc="Query thread definition">
@@ -328,7 +328,7 @@ public class QueryDialog extends javax.swing.JFrame {
 
         private boolean displayForm;
 
-        private QueryDialog queryDialog;
+        private final QueryDialog queryDialog;
         private RequestProgress rp = null;
         IQueryResults qry = null;
 
@@ -512,7 +512,7 @@ public class QueryDialog extends javax.swing.JFrame {
             this.outFile = outFile;
         }
 
-    };
+    }
 //</editor-fold>
 
     DoneFileDialog dfg = null;
@@ -689,8 +689,7 @@ public class QueryDialog extends javax.swing.JFrame {
                     }
 
                 }
-                ;
-//</editor-fold>
+                //</editor-fold>
                 QueryTools.queryMessagesClear();
                 QueryAllTask tsk = new QueryAllTask(this, qry);
                 RequestProgress rp = new RequestProgress(this, true, tsk);

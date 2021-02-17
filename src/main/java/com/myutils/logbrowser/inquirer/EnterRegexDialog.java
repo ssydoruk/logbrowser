@@ -48,7 +48,7 @@ public final class EnterRegexDialog extends javax.swing.JDialog {
 
         // Close the dialog when Esc is pressed
         if (parent != null) {
-            Window windowAncestor = (Window) SwingUtilities.getWindowAncestor(parent);
+            Window windowAncestor = SwingUtilities.getWindowAncestor(parent);
             Point location = parent.getMousePosition();
             setLocation(location);
             setLocationRelativeTo(windowAncestor);
@@ -248,7 +248,7 @@ public final class EnterRegexDialog extends javax.swing.JDialog {
                 .addContainerGap())
         );
 
-        jPanel1Layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {cancelButton, okButton});
+        jPanel1Layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, cancelButton, okButton);
 
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)

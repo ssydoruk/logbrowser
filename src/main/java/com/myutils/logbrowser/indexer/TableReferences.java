@@ -209,7 +209,7 @@ class TableReference {
 
     public final class CIString {
 
-        private String s;
+        private final String s;
         private int hashCode = 0;
 
         public CIString(String s) {
@@ -267,11 +267,7 @@ public class TableReferences {
     public void Finalize() throws SQLException {
         for (TableReference tabRef : tabRefs.values()) {
             try {
-                if (!doNotSave.contains(tabRef.getType())) {
-                    tabRef.Finalize(m_accessor, false);
-                } else {
-                    tabRef.Finalize(m_accessor, true);
-                }
+                tabRef.Finalize(m_accessor, doNotSave.contains(tabRef.getType()));
                 m_accessor.Commit();
             } catch (SQLException sQLException) {
                 Main.logger.error("Not able to finalize " + tabRef.getType().toString(), sQLException);

@@ -48,10 +48,10 @@ public class TabResultDataModel extends AbstractTableModel {
     /*order of columns by default*/
     private static final String[] fixedColumns = new String[]{"Type", "timestamp", "app", "direction", "name", "connid", "sid", "thisdn", "otherdn"};
     private static final HashMap<MsgType, Pair<Color, Color>> msgRowColors = initMsgColors();
-    private static HashMap<MsgType, Pair<Color, Color>> msgAssignedColors = new HashMap<>();
+    private static final HashMap<MsgType, Pair<Color, Color>> msgAssignedColors = new HashMap<>();
     private static final ArrayList<Pair<Color, Color>> stdColors = initStdColors();
     private static int stdColorsIdx = 0;
-    private static HashMap<Integer, Pair<Color, Color>> assignedColorsAggregate = new HashMap<>();
+    private static final HashMap<Integer, Pair<Color, Color>> assignedColorsAggregate = new HashMap<>();
     private static final Pattern normalPattern = Pattern.compile("^[\\s|]*(.+)[\\s|]*$");
 
     /*
@@ -101,18 +101,18 @@ public class TabResultDataModel extends AbstractTableModel {
     private ArrayList<String> shortAbsoluteFileNames;
     private int emptyColumns;
 
-    private HashMap<String, Integer> columnTitle;
-    private ArrayList<TableRow> tableData;
+    private final HashMap<String, Integer> columnTitle;
+    private final ArrayList<TableRow> tableData;
 
     private int maxColumnIdx;
     private ArrayList<String> fullFileNames;
     private ArrayList<String> shortFileNames;
 //    private HashSet<Integer> columnsWithData;
-    private HashMap<MsgType, HashSet> columnsWithDataType;
+    private final HashMap<MsgType, HashSet> columnsWithDataType;
 //    private HashMap<Integer, Integer> columnIdxAdjuster;
-    private HashMap<MsgType, HashMap> columnIdxAdjusterType;
+    private final HashMap<MsgType, HashMap> columnIdxAdjusterType;
     private ColumnParams columnParams;
-    private ColumnParams columnParamsOrig;
+    private final ColumnParams columnParamsOrig;
     private TableRow currentRow = null;
     //    private int rowTypes = 0;
     MsgType lastRowType = MsgType.UNKNOWN;
@@ -785,7 +785,7 @@ public class TabResultDataModel extends AbstractTableModel {
         }
     }
 
-    private HashMap<MsgType, HashMap<Integer, CustomField>> customFields = new HashMap<>();
+    private final HashMap<MsgType, HashMap<Integer, CustomField>> customFields = new HashMap<>();
 
     void addCustomColumn(CustomField regexFieldsSetting, int popupRow) {
         TableRow row = getRow(popupRow);
@@ -1092,7 +1092,7 @@ public class TabResultDataModel extends AbstractTableModel {
 
         public final static String colPrefix = "$col$";
         private int fileID = 0;
-        private HashMap<Integer, Object> rowData;
+        private final HashMap<Integer, Object> rowData;
         private MsgType rowType;
         private int maxColumn;
         private ILogRecord record;
@@ -1197,9 +1197,7 @@ public class TabResultDataModel extends AbstractTableModel {
                         hm = new HashSet();
                         columnsWithDataType.put(getRowType(), hm);
                     }
-                    if (!hm.contains(columnIdx)) {
-                        hm.add(columnIdx);
-                    }
+                    hm.add(columnIdx);
                     maxColumn++;
                 }
             }

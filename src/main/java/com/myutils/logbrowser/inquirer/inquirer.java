@@ -32,6 +32,7 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -79,8 +80,8 @@ public class inquirer {
     static XmlCfg cfg;
     private static String curDirectory;
 
-    private static ZoneId zoneId = ZoneId.systemDefault();
-    private static HashMap<String, DateTimeFormatter> dateFormatters = new HashMap<String, DateTimeFormatter>();
+    private static final ZoneId zoneId = ZoneId.systemDefault();
+    private static final HashMap<String, DateTimeFormatter> dateFormatters = new HashMap<String, DateTimeFormatter>();
     public static Logger logger;
     static HashMap<Integer, String> fileidType = null;
     static HashMap<String, ArrayList<Pattern>> printFiltersPatterns = null;
@@ -91,7 +92,7 @@ public class inquirer {
     static QueryDialog dlg;
     private static InquirerCfg cr = null;
     private final static String serFileDef = ".logbr_checkedref.ser";
-    private static boolean useXMLSerializer = false;
+    private static final boolean useXMLSerializer = false;
 
     public static XmlCfg getXMLCfg() {
         return cfg;
@@ -261,7 +262,7 @@ public class inquirer {
 
         if (ee.getConfig().toLowerCase().endsWith(".json")) {
             try (BufferedWriter bufferedWriter = new BufferedWriter(
-                    new OutputStreamWriter(new FileOutputStream(ee.getConfig()), "UTF-8"))) {
+                    new OutputStreamWriter(new FileOutputStream(ee.getConfig()), StandardCharsets.UTF_8))) {
                 Gson gson = new GsonBuilder().enableComplexMapKeySerialization().setPrettyPrinting().create();
                 gson.toJson(cr, bufferedWriter);
                 jsonWritten = true;
@@ -296,7 +297,7 @@ public class inquirer {
 
     }
 
-    public static ArrayList<Pattern> getFullFilters(int GetFileId) throws SQLException, Exception {
+    public static ArrayList<Pattern> getFullFilters(int GetFileId) throws Exception {
         if (fileidType == null) {
             fileidType = new HashMap<>();
             ArrayList<Integer> ret = new ArrayList();
@@ -342,7 +343,7 @@ public class inquirer {
         return null;
     }
 
-    public static void main(String[] args) throws IOException, Exception {
+    public static void main(String[] args) throws Exception {
         try {
 
             // parse command line parameters, then
@@ -411,7 +412,7 @@ public class inquirer {
 
     public static QueryDialogSettings geLocaltQuerySettings() {
         if (queryDialogSettings == null) {
-            queryDialogSettings = (QueryDialogSettings) readObj(getSerFile());
+            queryDialogSettings = readObj(getSerFile());
             if (queryDialogSettings == null) {
                 queryDialogSettings = new QueryDialogSettings();
             }
@@ -595,7 +596,7 @@ public class inquirer {
                 boolean crRead = false;
                 if (f.getAbsolutePath().toLowerCase().endsWith(".json")) {
 
-                    try (InputStreamReader streamReader = new InputStreamReader(new FileInputStream(file), "UTF-8")) {
+                    try (InputStreamReader streamReader = new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8)) {
                         Gson gson = new GsonBuilder()
                                 .enableComplexMapKeySerialization()
                                 .setPrettyPrinting()
@@ -654,18 +655,12 @@ public class inquirer {
             // inquirer.logger.debug("search cell:" + search + " " + matchWholeWordSelected
             // + " " + " " +pt + ": [" + val);
             if (pt != null) {
-                if (pt.matcher(val).find()) {
-                    return true;
-                }
+                return pt.matcher(val).find();
             } else {
                 if (matchWholeWordSelected) {
-                    if (val.equalsIgnoreCase(search)) {
-                        return true;
-                    }
+                    return val.equalsIgnoreCase(search);
                 } else {
-                    if (val.toLowerCase().contains(search)) {
-                        return true;
-                    }
+                    return val.toLowerCase().contains(search);
 
                 }
 
@@ -680,7 +675,7 @@ public class inquirer {
         }
     }
 
-    private ArrayList<ILogRecordFormatter> formatters = new ArrayList();
+    private final ArrayList<ILogRecordFormatter> formatters = new ArrayList();
     IQueryResults queryResults = null;
     String startTime = "";
     String endTime = "";
@@ -736,7 +731,7 @@ public class inquirer {
 
     public void doRetrieve(IQueryResults queryResults, QueryDialog dlg) throws Exception {
         for (int i = 0; i < formatters.size(); i++) {
-            queryResults.AddFormatter((ILogRecordFormatter) formatters.get(i));
+            queryResults.AddFormatter(formatters.get(i));
         }
 
         Instant time3 = Instant.now();
@@ -784,7 +779,7 @@ public class inquirer {
         }
 
         for (int i = 0; i < formatters.size(); i++) {
-            ((ILogRecordFormatter) formatters.get(i)).Close();
+            formatters.get(i).Close();
         }
         if (doPrint) {
             inquirer.logger.info("Printing took "
@@ -845,7 +840,6 @@ public class inquirer {
 
             }
         }
-        ;
         // </editor-fold>
         QueryTools.queryMessagesClear();
         CountDownLatch latch = new CountDownLatch(1);

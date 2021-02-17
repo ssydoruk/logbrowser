@@ -767,7 +767,7 @@ public class OrsParser extends Parser {
         OrsUrsMessage themsg;
         if (m_MessageContents.size() > 0) {
             Matcher m;
-            if ((m = regORSURS.matcher((String) m_MessageContents.get(0))).find()) {
+            if ((m = regORSURS.matcher(m_MessageContents.get(0))).find()) {
                 themsg = new OrsUrsMessage(m.group(1), m_MessageContents);
             } else {
                 themsg = new OrsUrsMessage("", m_MessageContents);
@@ -1361,7 +1361,7 @@ public class OrsParser extends Parser {
         STATE_ORSUS,
         STATE_TMESSAGE_REQUEST,
         STATE_EXTENSION_FETCH1,
-        STATE_EXTENSION_FETCH2, STATE_ALARM;
+        STATE_EXTENSION_FETCH2, STATE_ALARM
     }
 
     enum MsgType {

@@ -23,7 +23,7 @@ abstract class AColumnFilter {
         if (val instanceof Integer) {
             l = ((Integer) val).doubleValue();
         } else {
-            l = Double.parseDouble((String) val.toString());
+            l = Double.parseDouble(val.toString());
         }
         return l;
     }
@@ -47,14 +47,11 @@ abstract class AColumnFilter {
         @Override
         boolean showValue(Object val) {
             if (val == null || val.toString().isEmpty()) {
-                if (values.contains(RECORD_EMPTY)) {
-                    return true;
-                }
+                return values.contains(RECORD_EMPTY);
             } else {
                 return values.contains(val.toString());
 
             }
-            return false;
         }
     }
 

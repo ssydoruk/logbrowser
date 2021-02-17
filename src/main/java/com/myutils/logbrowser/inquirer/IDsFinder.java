@@ -30,7 +30,7 @@ public final class IDsFinder extends QueryTools {
     private int queryLevel;
     private boolean maxLevelSet = false;
 
-    private HashSet<Integer> m_callIdHash = new HashSet<>();
+    private final HashSet<Integer> m_callIdHash = new HashSet<>();
 
     private String selection;
     private boolean regex;
@@ -39,7 +39,7 @@ public final class IDsFinder extends QueryTools {
 
     private Integer[] dnIDs = null;
     private Integer[] SIPdnIDs = null;
-    private Integer[] peerIDs = null;
+    private final Integer[] peerIDs = null;
     private Integer[] peerIPs = null;
 
     private Integer[] agentIDs = null;
@@ -50,9 +50,9 @@ public final class IDsFinder extends QueryTools {
     //    boolean initOutbound() {
 //        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
 //    }
-    private HashMap<IDType, Integer[]> CallIDs = new HashMap<>();
+    private final HashMap<IDType, Integer[]> CallIDs = new HashMap<>();
     private SearchType searchType = SearchType.UNKNOWN;
-    private HashSet<Integer> m_connIdHash = new HashSet<>();
+    private final HashSet<Integer> m_connIdHash = new HashSet<>();
     private final int MAX_DEPTH = 10;
 
     IDsFinder(QueryDialog dlg, SelectionType key, String searchID) throws SQLException {
@@ -86,7 +86,7 @@ public final class IDsFinder extends QueryTools {
     }
 
     public Integer[] getSearchApps() {
-        return (Integer[]) searchApps.toArray(new Integer[searchApps.size()]);
+        return searchApps.toArray(new Integer[searchApps.size()]);
     }
 
     public int getObjectsFound() {
@@ -543,9 +543,7 @@ public final class IDsFinder extends QueryTools {
     boolean anythingSIPRelated() throws SQLException {
         if (inquirer.getCr().isNewTLibSearch()) {
             Integer[] ids = getIDs(IDType.SIPCallID);
-            if (ids != null && ids.length > 0) {
-                return true;
-            }
+            return ids != null && ids.length > 0;
 
         } else {
             Integer[] callIDs = getCallIDs();
@@ -554,12 +552,8 @@ public final class IDsFinder extends QueryTools {
             }
 
             Integer[] sipdNs = getSIPDNs();
-            if (sipdNs != null && sipdNs.length > 0) {
-                return true;
-            }
+            return sipdNs != null && sipdNs.length > 0;
         }
-
-        return false;
 
     }
 
@@ -578,10 +572,7 @@ public final class IDsFinder extends QueryTools {
             return true;
         }
         ids = getIDs(IDType.UUID);
-        if (ids != null && ids.length > 0) {
-            return true;
-        }
-        return false;
+        return ids != null && ids.length > 0;
     }
 
     boolean anythingApacheWebRelated() throws SQLException {
@@ -613,15 +604,11 @@ public final class IDsFinder extends QueryTools {
                     return true;
                 }
 
-                if (refIDs != null && refIDs.length > 0) {
-                    return true;
-                }
+                return refIDs != null && refIDs.length > 0;
             }
         } else {
             return isNewCallRelated();
         }
-
-        return false;
     }
 
     public Integer[] getRefIDs() {
@@ -2279,22 +2266,14 @@ public final class IDsFinder extends QueryTools {
     boolean initRouting() throws SQLException {
         searchType = SearchType.ROUTING;
 
-        if (!getRoutingIDType()) {
-            return false;
-        }
-
-        return true;
+        return getRoutingIDType();
 
     }
 
     boolean initApacheWeb() throws SQLException {
         searchType = SearchType.ApacheWeb;
 
-        if (!getApacheWebIDType()) {
-            return false;
-        }
-
-        return true;
+        return getApacheWebIDType();
     }
 
     boolean initWWE() throws SQLException {
@@ -2503,9 +2482,7 @@ public final class IDsFinder extends QueryTools {
             ConnIDs = getRefIDs(ReferenceType.ConnID, new String[]{selection}, regex);
             if (ConnIDs != null && ConnIDs.length > 0) {
                 for (Integer ConnID : ConnIDs) {
-                    if (!m_connIdHash.contains(ConnID)) {
-                        m_connIdHash.add(ConnID);
-                    }
+                    m_connIdHash.add(ConnID);
                 }
                 AddIDs(IDType.ConnID, ConnIDs);
                 return true;
@@ -2522,9 +2499,7 @@ public final class IDsFinder extends QueryTools {
                 ConnIDs = DatabaseConnector.getDatabaseConnector(this).getIDs(this, "tlib_logbr", "ConnectionIDID", IQuery.getWhere("uuidID", UUIDs, true));
                 if (ConnIDs != null && ConnIDs.length > 0) { // parameter is a ConnID
                     for (Integer ConnID : ConnIDs) {
-                        if (!m_connIdHash.contains(ConnID)) {
-                            m_connIdHash.add(ConnID);
-                        }
+                        m_connIdHash.add(ConnID);
                     }
                     return true;
                 }
@@ -2541,9 +2516,7 @@ public final class IDsFinder extends QueryTools {
             if (ConnIDs != null && _CallIDs.length > 0) {
                 AddIDs(IDType.SIPCallID, _CallIDs);
                 for (Integer CallID : _CallIDs) {
-                    if (!m_callIdHash.contains(CallID)) {
-                        m_callIdHash.add(CallID);
-                    }
+                    m_callIdHash.add(CallID);
                 }
                 return true;
             } else if (selectionType == SelectionType.CALLID) {
@@ -2758,7 +2731,7 @@ public final class IDsFinder extends QueryTools {
                                                     "uuidid",
                                                     "sip_logbr",
                                                     getWhere("callidid",
-                                                            (Integer[]) newCallIds.toArray(new Integer[newCallIds.size()]),
+                                                            newCallIds.toArray(new Integer[newCallIds.size()]),
                                                             " AND uuidid>0 ",
                                                             true)
                                             ),
@@ -2789,7 +2762,7 @@ public final class IDsFinder extends QueryTools {
                                                     "handlerid",
                                                     "sip_logbr",
                                                     getWhere("callidid",
-                                                            (Integer[]) newCallIds.toArray(new Integer[newCallIds.size()]),
+                                                            newCallIds.toArray(new Integer[newCallIds.size()]),
                                                             " AND handlerid>0 ",
                                                             true)
                                             ),
@@ -2962,7 +2935,7 @@ public final class IDsFinder extends QueryTools {
         return ret;
     }
 
-    private static enum SearchType {
+    private enum SearchType {
         UNKNOWN,
         ROUTING,
         OUTBOUND,
@@ -3032,7 +3005,7 @@ public final class IDsFinder extends QueryTools {
         }
     }
 
-    public static enum RequestLevel {
+    public enum RequestLevel {
         LevelMax("Maximum"),
         Level0("No related search"),
         Level1("Level 1"),
@@ -3046,12 +3019,12 @@ public final class IDsFinder extends QueryTools {
 
         private final String name;
 
-        private RequestLevel(String s) {
+        RequestLevel(String s) {
             name = s;
         }
 
         public boolean equalsName(String otherName) {
-            return (otherName == null) ? false : name.equals(otherName);
+            return otherName != null && name.equals(otherName);
         }
 
         @Override

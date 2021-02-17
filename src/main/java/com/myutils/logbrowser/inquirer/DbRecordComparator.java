@@ -508,14 +508,14 @@ class DbRecordComparator implements Comparator {
 
             if (itemType1 == MsgType.PROXY) {
                 int id = Integer.parseInt(record1.GetField("tlib_id"));
-                if (id != 0 && m_tlibRecords.containsKey((Integer) id)) {
-                    record1 = (ILogRecord) m_tlibRecords.get((Integer) id);
+                if (id != 0 && m_tlibRecords.containsKey(id)) {
+                    record1 = (ILogRecord) m_tlibRecords.get(id);
                 }
             }
             if (itemType2 == MsgType.PROXY) {
                 int id = Integer.parseInt(record2.GetField("tlib_id"));
-                if (id != 0 && m_tlibRecords.containsKey((Integer) id)) {
-                    record2 = (ILogRecord) m_tlibRecords.get((Integer) id);
+                if (id != 0 && m_tlibRecords.containsKey(id)) {
+                    record2 = (ILogRecord) m_tlibRecords.get(id);
                 }
             }
 

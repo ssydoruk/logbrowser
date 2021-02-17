@@ -4,17 +4,17 @@ import java.sql.SQLException;
 
 public interface ILogRecordFormatter {
 
-    public boolean IsLayoutRequired();
+    boolean IsLayoutRequired();
 
-    public void Layout(ILogRecord loggedEvent) throws SQLException;
+    void Layout(ILogRecord loggedEvent) throws SQLException;
 
-    public void ProcessLayout();
+    void ProcessLayout();
 
-    public void Close() throws Exception;
+    void Close() throws Exception;
 
-    public void reset();
+    void reset();
 
-    public void Print(ILogRecord record, PrintStreams ps, IQueryResults qr);
+    void Print(ILogRecord record, PrintStreams ps, IQueryResults qr);
 
-    public void refreshFormatter() throws Exception;
+    void refreshFormatter() throws Exception;
 }

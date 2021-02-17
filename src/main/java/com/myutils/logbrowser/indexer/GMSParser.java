@@ -161,7 +161,7 @@ public class GMSParser extends Parser {
     private Record recInProgress;
     private String URL = null;
     private String app = null;
-    private boolean isInbound = true;
+    private final boolean isInbound = true;
     private String m_msg1;
     private String oldThread;
     private String savedThreadID;
@@ -444,7 +444,7 @@ public class GMSParser extends Parser {
                 } else {
                     if (msg instanceof IxnGMS) {
                         ((IxnGMS) msg).setAttributes(m_MessageContents);
-                        ((IxnGMS) msg).SetStdFieldsAndAdd(this);
+                        msg.SetStdFieldsAndAdd(this);
                     } else {
                         Main.logger.error("l:" + m_CurrentLine + " incorrect message type");
                     }

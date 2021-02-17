@@ -19,7 +19,7 @@ public class RequestProgress extends javax.swing.JDialog {
 
     private static final org.apache.logging.log4j.Logger logger = LogManager.getLogger();
 
-    private MySwingWorker wrk;
+    private final MySwingWorker wrk;
 
     /**
      * Creates new form RequestProgress

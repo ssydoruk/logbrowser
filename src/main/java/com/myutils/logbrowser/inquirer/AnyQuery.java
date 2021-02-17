@@ -15,7 +15,7 @@ public class AnyQuery extends IQuery {
 
     private ResultSetMetaData rsmd;
     private String queryTable;
-    private ArrayList<Pair> selectFields;
+    private final ArrayList<Pair> selectFields;
 
     public AnyQuery() {
         query = null;

@@ -48,34 +48,31 @@ public class WorkspaceParser extends Parser {
     private static final Pattern regStrategy = Pattern.compile("strategy:.+\\*+(\\S+)");
     //[14:33] strategy: **ORS (1085200831) is attached to the call
     private final static HashSet<String> eventsStatServer = new HashSet<String>(
-            Arrays.asList(new String[]{
-        "EventInfo",
-        "EventStatisticOpened",
-        "EventCurrentTargetStateSnapshot",
-        "RequestCloseStatistic",
-        "EventStatisticClosed",
-        "RequestGetStatisticEx",
-        "EventCurrentTargetStateTargetUpdated",
-        "RequestOpenStatistic",
-        "RequestGetStatistic",
-        "RequestSuspendNotification",
-        "RequestOpenStatisticEx"}));
+            Arrays.asList("EventInfo",
+                    "EventStatisticOpened",
+                    "EventCurrentTargetStateSnapshot",
+                    "RequestCloseStatistic",
+                    "EventStatisticClosed",
+                    "RequestGetStatisticEx",
+                    "EventCurrentTargetStateTargetUpdated",
+                    "RequestOpenStatistic",
+                    "RequestGetStatistic",
+                    "RequestSuspendNotification",
+                    "RequestOpenStatisticEx"));
     private final static HashSet<String> eventsEServices = new HashSet<String>(
-            Arrays.asList(new String[]{
-        "EventCurrentAgentStatus",
-        "Event3rdServerResponse",
-        "EventCurrentAgentStatus",
-        "RequestRemoveMedia",
-        "RequestNotReadyForMedia",
-        "RequestCancelNotReadyForMedia",
-        "Request3rdServer"}));
+            Arrays.asList("EventCurrentAgentStatus",
+                    "Event3rdServerResponse",
+                    "EventCurrentAgentStatus",
+                    "RequestRemoveMedia",
+                    "RequestNotReadyForMedia",
+                    "RequestCancelNotReadyForMedia",
+                    "Request3rdServer"));
     private final static HashSet<String> eventsConfig = new HashSet<String>(
-            Arrays.asList(new String[]{
-        "EventObjectsRead",
-        "EventObjectsSent",
-        "RequestUnregisterNotification",
-        "EventNotificationUnregistered",
-        "RequestReadObjects"}));
+            Arrays.asList("EventObjectsRead",
+                    "EventObjectsSent",
+                    "RequestUnregisterNotification",
+                    "EventNotificationUnregistered",
+                    "RequestReadObjects"));
     private static final Pattern regCfgObjectName = Pattern.compile("(?:name|userName|number|loginCode)='([^']+)'");
     private static final Pattern regCfgObjectType = Pattern.compile("^Cfg([^=]+)=.*\\{DBID=(\\d+)");
     //    private static final Pattern regCfgAGType = Pattern.compile("^Cfg([^=]+)=\\{DBID=(\\d+)");
@@ -372,18 +369,18 @@ public class WorkspaceParser extends Parser {
                 refID = m.group(4);
             } else if ((m = regSendingMessageTo.matcher(header)).find()) {
                 server = m.group(1);
-                if ((m = regToRequest.matcher((CharSequence) contents.get(0))).find()) {
+                if ((m = regToRequest.matcher(contents.get(0))).find()) {
                     event = m.group(1);
                 }
                 isInbound = false;
             } else if ((m = regCompletedHandling.matcher(header)).find()) {
                 server = m.group(1);
                 if (contents.isEmpty()) {
-                    if ((m = regLastOneOrTwoWords.matcher((CharSequence) header)).find()) {
+                    if ((m = regLastOneOrTwoWords.matcher(header)).find()) {
                         event = m.group(0);
                     }
 
-                } else if ((m = regToRequest.matcher((CharSequence) contents.get(0))).find()) {
+                } else if ((m = regToRequest.matcher(contents.get(0))).find()) {
                     event = m.group(1);
                 }
             } else {
@@ -397,7 +394,7 @@ public class WorkspaceParser extends Parser {
                         }
                         isInbound = false;
                     } else if ((regSendingTo.matcher(theDP.rest)).find()) {
-                        if ((m = regReqTo.matcher((CharSequence) contents.get(0))).find()) {
+                        if ((m = regReqTo.matcher(contents.get(0))).find()) {
                             fileHandle = m.group(1);
                             event = m.group(2);
                         }
@@ -407,7 +404,7 @@ public class WorkspaceParser extends Parser {
                     //request to 65467(--) message RequestUpdateUserData
                     //or
                     //request to 65467(--) message RequestRouteCall
-                    if (!contents.isEmpty() && (m = regReqTo.matcher((CharSequence) contents.get(0))).find()) {
+                    if (!contents.isEmpty() && (m = regReqTo.matcher(contents.get(0))).find()) {
                         fileHandle = m.group(1);
                         event = m.group(2);
                         isInbound = false;

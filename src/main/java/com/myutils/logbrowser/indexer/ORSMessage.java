@@ -59,7 +59,7 @@ public class ORSMessage extends Message {
     }
 
     public String GetConnID() {
-        return longOrShort(getAttributeTrim("AttributeConnID"), FindByRx(regShortConnID, 1, (String) null));
+        return longOrShort(getAttributeTrim("AttributeConnID"), FindByRx(regShortConnID, 1, null));
     }
 
     private String longOrShort(String l, String s) {

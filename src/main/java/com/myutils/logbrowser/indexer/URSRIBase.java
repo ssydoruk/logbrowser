@@ -80,7 +80,7 @@ public abstract class URSRIBase extends Message {
             return null;
         }
     }
-    private List<Pair<String, String>> allParams;
+    private final List<Pair<String, String>> allParams;
 
     private String ConnID;
     private String clientApp;
@@ -232,7 +232,7 @@ public abstract class URSRIBase extends Message {
         return null;
     }
 
-    void setURIParts(String url, String uriParams) throws UnsupportedEncodingException, Exception {
+    void setURIParts(String url, String uriParams) throws Exception {
         String[] split = StringUtils.split(url, '/');
         setURIParams(uriParams);
         switch (split.length) {

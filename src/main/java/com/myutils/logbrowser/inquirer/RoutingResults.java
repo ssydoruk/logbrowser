@@ -791,7 +791,7 @@ final public class RoutingResults extends IQueryResults {
                         if (rec instanceof TLibEvent) {
                             addUnique(refIDs, ((TLibEvent) rec).GetReferenceId());
 
-                            long id = ((TLibEvent) rec).getID();
+                            long id = rec.getID();
                             if (id > 0) {
                                 ids.add(id);
                             }
@@ -1295,7 +1295,7 @@ final public class RoutingResults extends IQueryResults {
                     public void recordLoaded(ILogRecord rec) {
                         if (rec instanceof TLibEvent) {
                             addUnique(refIDs, ((TLibEvent) rec).GetReferenceId());
-                            long id = ((TLibEvent) rec).getID();
+                            long id = rec.getID();
                             if (id > 0) {
                                 ids.add(id);
                             }

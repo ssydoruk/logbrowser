@@ -158,7 +158,7 @@ public class ParserThreadsProcessor {
     /**
      * ThreadConsumeResult
      */
-    public static enum ThreadConsumeResult {
+    public enum ThreadConsumeResult {
 
     }
 
@@ -166,7 +166,7 @@ public class ParserThreadsProcessor {
      * Returned by the state transition callback
      * <li> {@link #ERROR_STATE}</li>
      */
-    public static enum StateTransitionResult {
+    public enum StateTransitionResult {
         /**
          * Indicates that state transition did not consume line. Main parser
          * should continue parsing string
@@ -200,9 +200,9 @@ public class ParserThreadsProcessor {
          * not-consumed
          */
         ERROR_STATE
-    };
+    }
 
-    public static enum ParserState {
+    public enum ParserState {
         STATE_HEADER,
         STATE_TMESSAGE,
         STATE_ORSMESSAGE,
@@ -220,12 +220,12 @@ public class ParserThreadsProcessor {
         STATE_START_SESSION1,
         STATE_SESSION_START,
         STATE_WAITING_PARENT_SID,
-        STATE_HTTPOUT;
-    };
+        STATE_HTTPOUT
+    }
 
     public interface StateTransition {
 
-        abstract StateTransitionResult stateTransition(ParserThreadState threadState,
-                String sOrig, String sParsedAndTruncated, String threadID, Parser parser);
+        StateTransitionResult stateTransition(ParserThreadState threadState,
+                                              String sOrig, String sParsedAndTruncated, String threadID, Parser parser);
     }
 }

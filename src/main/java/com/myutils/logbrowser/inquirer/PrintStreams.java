@@ -29,7 +29,7 @@ public class PrintStreams {
     private boolean blockFilePrint;
     private String queryName = null;
     private String searchString = null;
-    private TabResultDataModel tabDataModel;
+    private final TabResultDataModel tabDataModel;
     ArrayList<String> memStorage = null;
     ArrayList<PrintStreamStorage> shortStreams = new ArrayList<>(2);
     ArrayList<PrintStreamStorage> fullStreams = new ArrayList<>(1);

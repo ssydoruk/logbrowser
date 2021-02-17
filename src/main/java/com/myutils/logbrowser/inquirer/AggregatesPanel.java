@@ -72,7 +72,7 @@ public class AggregatesPanel extends javax.swing.JPanel {
         }
         jpAggregateParams.setVisible(cfgPane != null);
         jpAggregateParams.invalidate();
-        Window f2 = (Window) SwingUtilities.getWindowAncestor(this);
+        Window f2 = SwingUtilities.getWindowAncestor(this);
         if (f2 != null) {
             f2.pack();
         }

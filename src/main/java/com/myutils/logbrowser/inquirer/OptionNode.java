@@ -267,7 +267,7 @@ public class OptionNode implements Serializable, TClonable, Comparable {
         return getName().compareToIgnoreCase(((OptionNode) o).getName());
     }
 
-    public static enum ChildrenChecked {
+    public enum ChildrenChecked {
         ALL_CHECKED,
         NONE_CHECKED,
         PARTIALLY_CHECKED

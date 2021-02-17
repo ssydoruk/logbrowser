@@ -498,7 +498,7 @@ public class DatabaseConnector {
             inquirer.logger.debug("\tRetrieved " + cnt + " records");
         }
 
-        return (Integer[]) ret.toArray(new Integer[ret.size()]);
+        return ret.toArray(new Integer[ret.size()]);
     }
 
     public static String[] getNames(String query) throws SQLException {
@@ -524,7 +524,7 @@ public class DatabaseConnector {
             resultSet.getStatement().close();
         }
 
-        return (String[]) ret.toArray(new String[ret.size()]);
+        return ret.toArray(new String[ret.size()]);
 
     }
 
@@ -588,7 +588,7 @@ public class DatabaseConnector {
             //        resultSet.getStatement().close();
         }
 
-        return (String[]) ret.toArray(new String[ret.size()]);
+        return ret.toArray(new String[ret.size()]);
     }
 
     public static UTCTimeRange getTimeRange(String[] tabs) throws SQLException {
@@ -602,7 +602,7 @@ public class DatabaseConnector {
         q.append("select min(filestarttime), max(endtime) from file_logbr ");
 
         if (searchApps != null && searchApps.size() > 0) {
-            arrSearchApps = (Integer[]) searchApps.toArray(new Integer[searchApps.size()]);
+            arrSearchApps = searchApps.toArray(new Integer[searchApps.size()]);
             q.append(getWhere("id", arrSearchApps, true));
         } else {
             String[] n = new String[tabs.length];
@@ -640,7 +640,7 @@ public class DatabaseConnector {
         StringBuilder q = new StringBuilder(256);
         Integer[] arrSearchApps = null;
         if (searchApps != null && searchApps.size() > 0) {
-            arrSearchApps = (Integer[]) searchApps.toArray(new Integer[searchApps.size()]);
+            arrSearchApps = searchApps.toArray(new Integer[searchApps.size()]);
         }
 
         for (String tab : tabs) {
@@ -814,7 +814,7 @@ public class DatabaseConnector {
                 }
             }
             inquirer.logger.debug("\tRetrieved " + cnt + " records");
-            ids = (Integer[]) ret.toArray(new Integer[ret.size()]);
+            ids = ret.toArray(new Integer[ret.size()]);
             QueryTools.DebugIDs(ids);
             rs.getStatement().close();
         }
@@ -861,7 +861,7 @@ public class DatabaseConnector {
         DatabaseConnector connector = DatabaseConnector.getDatabaseConnector(obj);
 
         StringBuilder q = new StringBuilder(256);
-        q.append("select name from ").append(tab).append("");//remove 'distinct' from here. Uniquness of names is ensured by parser,
+        q.append("select name from ").append(tab);//remove 'distinct' from here. Uniquness of names is ensured by parser,
         //so no need to sort again
         if (CheckTab != null && CheckIDField != null) {
             q.append(" where id in (select distinct ").append(CheckIDField).append(" from ").append(CheckTab);
@@ -890,7 +890,7 @@ public class DatabaseConnector {
             inquirer.logger.debug("\tRetrieved " + cnt + " records");
         }
 
-        return (String[]) ret.toArray(new String[ret.size()]);
+        return ret.toArray(new String[ret.size()]);
     }
 
     static ArrayList<NameID> getRefNamesNameID(Object obj, String tab, String CheckTab, String CheckIDField, String CheckIDField1) throws SQLException {
@@ -902,7 +902,7 @@ public class DatabaseConnector {
         DatabaseConnector connector = DatabaseConnector.getDatabaseConnector(obj);
 
         StringBuilder q = new StringBuilder(256);
-        q.append("select id, name from ").append(tab).append("");//remove 'distinct' from here. Uniquness of names is ensured by parser,
+        q.append("select id, name from ").append(tab);//remove 'distinct' from here. Uniquness of names is ensured by parser,
         //so no need to sort again
         if (CheckTab != null && CheckIDField != null) {
             q.append(" where id in (select distinct ").append(CheckIDField).append(" from ").append(CheckTab);
@@ -979,14 +979,14 @@ public class DatabaseConnector {
 
         return ret;
     }
-    private String m_dbName;
-    private String m_dbAlias;
-    private Connection m_conn;
+    private final String m_dbName;
+    private final String m_dbAlias;
+    private final Connection m_conn;
     HashMap m_activeStatements;
     ArrayList m_freeStatements;
     ArrayList<PreparedStatement> m_statements;
-    private HashMap<ReferenceType, HashMap<Integer, String>> thePersistentRef = new HashMap<>();
-    private IDsToName idsToName;
+    private final HashMap<ReferenceType, HashMap<Integer, String>> thePersistentRef = new HashMap<>();
+    private final IDsToName idsToName;
 
     protected DatabaseConnector(String dbName, String dbAlias) throws SQLException {
         m_dbName = dbName;
@@ -1123,7 +1123,7 @@ public class DatabaseConnector {
                         result((String) null);
                     }
                     if (ret != null && !ret.isEmpty()) {
-                        result((String) ret);
+                        result(ret);
                     } else {
                         result(theConst);
                     }

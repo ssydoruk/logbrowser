@@ -123,12 +123,12 @@ public enum ReferenceType {
 
     private final String name;
 
-    private ReferenceType(String s) {
+    ReferenceType(String s) {
         name = s;
     }
 
     public boolean equalsName(String otherName) {
-        return (otherName == null) ? false : name.equals(otherName);
+        return otherName != null && name.equals(otherName);
     }
 
     @Override

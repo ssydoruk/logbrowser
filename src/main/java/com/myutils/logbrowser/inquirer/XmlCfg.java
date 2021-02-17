@@ -29,7 +29,7 @@ public final class XmlCfg {
     private long lastModified = 0;
     private final String xmlFile;
 
-    public XmlCfg(String filePath) throws ParserConfigurationException, SAXException, IOException, Exception {
+    public XmlCfg(String filePath) throws Exception {
         this.xmlFile = filePath;
         loadFile();
     }

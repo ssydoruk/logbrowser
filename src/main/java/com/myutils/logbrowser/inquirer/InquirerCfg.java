@@ -32,16 +32,15 @@ public class InquirerCfg implements Serializable {
 
     private static final long serialVersionUID = 1L;
     private static final HashSet<Character> filenameProhibited = new HashSet<Character>(
-            Arrays.asList(new Character[]{
-        ':',
-        '\"',
-        '/',
-        '\\',
-        '|',
-        '?',
-        '*',
-        '<',
-        '>'}));
+            Arrays.asList(':',
+                    '\"',
+                    '/',
+                    '\\',
+                    '|',
+                    '?',
+                    '*',
+                    '<',
+                    '>'));
 
     public static String getFileUnique(String name) {
         Integer currFileIdx = 0;
@@ -626,7 +625,7 @@ public class InquirerCfg implements Serializable {
 
         private static final long serialVersionUID = 1L;
         private String name;
-        private ArrayList<Pair<String, Integer>> values;
+        private final ArrayList<Pair<String, Integer>> values;
 
         public GenesysConstant() {
             this.values = new ArrayList<>();
@@ -712,7 +711,7 @@ public class InquirerCfg implements Serializable {
     public static class GenesysConstants implements Serializable {
 
         private static final long serialVersionUID = 1L;
-        private ArrayList<GenesysConstant> constants;
+        private final ArrayList<GenesysConstant> constants;
 
         public GenesysConstants() {
             this.constants = new ArrayList<>();
@@ -821,7 +820,7 @@ public class InquirerCfg implements Serializable {
 
         private static final long serialVersionUID = 1L;
         private String name;
-        private ArrayList<Pair<String, Integer>> values;
+        private final ArrayList<Pair<String, Integer>> values;
 
         public GenesysConstant1() {
             this.values = new ArrayList<>();

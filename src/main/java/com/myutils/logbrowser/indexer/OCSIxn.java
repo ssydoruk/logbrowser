@@ -18,15 +18,15 @@ public class OCSIxn extends Message {
 
     final private static Pattern regQueue = Pattern.compile("^\\s+attr_queue.+= \"([^\"]+)\"");
 
-    final private static Pattern regPhone = Pattern.compile("^\\s+\'GSW_PHONE\'.+= \"([^\"]+)\"");
-    final private static Pattern regcontact_info = Pattern.compile("^\\s+\'contact_info\'.+= \"([^\"]+)\"");
+    final private static Pattern regPhone = Pattern.compile("^\\s+'GSW_PHONE'.+= \"([^\"]+)\"");
+    final private static Pattern regcontact_info = Pattern.compile("^\\s+'contact_info'.+= \"([^\"]+)\"");
 
-    final private static Pattern regGSW_RECORD_HANDLE = Pattern.compile("^\\s+\'GSW_RECORD_HANDLE\'.+= (\\d+)");
+    final private static Pattern regGSW_RECORD_HANDLE = Pattern.compile("^\\s+'GSW_RECORD_HANDLE'.+= (\\d+)");
 
     final private static Pattern regRefID = Pattern.compile("^\\s+attr_ref_id.+ = (\\d+)");
 
-    final private static Pattern regGSW_CHAIN_ID = Pattern.compile("^\\s+\'GSW_CHAIN_ID\'.+= (\\d+)");
-    final private static Pattern regchain_id = Pattern.compile("^\\s+\'chain_id\'.+= (\\d+)");
+    final private static Pattern regGSW_CHAIN_ID = Pattern.compile("^\\s+'GSW_CHAIN_ID'.+= (\\d+)");
+    final private static Pattern regchain_id = Pattern.compile("^\\s+'chain_id'.+= (\\d+)");
 
     public OCSIxn(ArrayList messageLines) {
         super(TableType.OCSIxn, messageLines);

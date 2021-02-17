@@ -435,7 +435,7 @@ public class DynamicTreeNode<T> extends GenericTreeNode implements Serializable 
 
     @Override
     public void addChildAt(int index, GenericTreeNode child) throws IndexOutOfBoundsException {
-        super.addChildAt(index, (DynamicTreeNode) child); //To change body of generated methods, choose Tools | Templates.
+        super.addChildAt(index, child); //To change body of generated methods, choose Tools | Templates.
 //        dynamicChildren = false;
 //            if (inquirer.logger.isDebugEnabled()) {
 //                if ((OptionNode) getData() == null) {
@@ -510,7 +510,7 @@ public class DynamicTreeNode<T> extends GenericTreeNode implements Serializable 
     private void writeObject(ObjectOutputStream s)
             throws IOException {
         s.defaultWriteObject();
-        s.writeObject((OptionNode) getData());
+        s.writeObject(getData());
         if (!dynamicChildren || ChildrenLoaded) {
             s.writeInt(getNumberOfChildren());
             List<DynamicTreeNode<T>> l = this.getChildren();

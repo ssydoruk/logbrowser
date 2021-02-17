@@ -233,7 +233,7 @@ public class StSParser extends Parser {
                     } else if (trimmed.contains("TimeProfile")) {
                         m_ParserState = ParserState.STATE_COMMENTS;
                         break;
-                    } else if (trimmed.contains("\'OpenStat\'") && m_isNewAPIRequest) {
+                    } else if (trimmed.contains("'OpenStat'") && m_isNewAPIRequest) {
                         m_isNewAPIRequest = false;
                     }
 
@@ -467,7 +467,7 @@ public class StSParser extends Parser {
     }
 
     protected void AddServerMessage() throws Exception {
-        if (customEvent || (m_MessageContents.size() > 0 && ((String) m_MessageContents.get(0)).startsWith("Server: IxnEvent"))) {
+        if (customEvent || (m_MessageContents.size() > 0 && m_MessageContents.get(0).startsWith("Server: IxnEvent"))) {
             Main.logger.trace("is IxnEvent");
             IxnSS msg = new IxnSS(m_MessageContents, customEvent);
             SetStdFieldsAndAdd(msg);

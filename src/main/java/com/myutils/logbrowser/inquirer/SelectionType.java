@@ -36,17 +36,16 @@ public enum SelectionType {
     GWS_DEVICEID("GWS Device ID"),
     GWS_USERID("GWS User ID"),
     ANYPARAM("Web request parameter");
-    ;
 
-    
-   private final String name;
 
-    private SelectionType(String s) {
+    private final String name;
+
+    SelectionType(String s) {
         name = s;
     }
 
     public boolean equalsName(String otherName) {
-        return (otherName == null) ? false : name.toLowerCase().equals(otherName.toLowerCase());
+        return otherName != null && name.equalsIgnoreCase(otherName);
     }
 
     @Override

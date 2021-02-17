@@ -251,7 +251,7 @@ public class UrsParser extends Parser {
 
     private boolean processHTTPBridgeRequest(String s) {
         URSRI msg = new URSRI();
-        msg.setRefid(Message.getRx((String) m_MessageContents.get(0), regRequestRef, 1, null));
+        msg.setRefid(Message.getRx(m_MessageContents.get(0), regRequestRef, 1, null));
         String theUrl = Message.GetHeaderValue("URL", ':', m_MessageContents);
         if (theUrl != null) {
             Matcher m;
@@ -272,7 +272,7 @@ public class UrsParser extends Parser {
     private boolean processWebResponse() {
         URSRI msg = new URSRI();
         Matcher m;
-        if ((m = regWebResponse.matcher((String) m_MessageContents.get(0))).find()) {
+        if ((m = regWebResponse.matcher(m_MessageContents.get(0))).find()) {
             msg.setSubFunc(m.group(1));
             msg.setRefid(m.group(2));
         }
@@ -290,7 +290,7 @@ public class UrsParser extends Parser {
 
     private boolean processWebNotification(String URSRest, String lastConnID) {
         URSRI msg = new URSRI();
-        String theUrl = Message.getRx((String) URSRest, regWebNotifURL, 1, null);
+        String theUrl = Message.getRx(URSRest, regWebNotifURL, 1, null);
         if (theUrl != null) {
             Matcher m;
             if ((m = regRequestURL.matcher(theUrl)).find()) {
@@ -304,7 +304,7 @@ public class UrsParser extends Parser {
         return true;
     }
 
-    private void ProcessRI(String s) throws UnsupportedEncodingException, Exception {
+    private void ProcessRI(String s) throws Exception {
         Main.logger.trace("ProcessRI [" + s + "]");
 
         Matcher m;
@@ -324,7 +324,7 @@ public class UrsParser extends Parser {
             ((URSRI) msgTmp).setClientID(m.group(2));
             ((URSRI) msgTmp).setClientApp(m.group(3));
             ((URSRI) msgTmp).setRefid(m.group(4));
-            ((URSRI) msgTmp).SetInbound(false);
+            msgTmp.SetInbound(false);
 
             m_ParserState = ParserState.STATE_RI_RESPONSE;
 
@@ -633,7 +633,7 @@ public class UrsParser extends Parser {
 
             case smUpdateObject: {
                 if ((m = regGroupContent.matcher(str)).find()) {
-                    groupUpdated(str.substring(m.end()), (String) m_MessageContents.get(0));
+                    groupUpdated(str.substring(m.end()), m_MessageContents.get(0));
                     str = null;
                 } else {
                     Main.logger.trace("l " + m_CurrentLine + ": Unexpected line in state " + m_ParserState + ": " + str + "; retry");
@@ -658,7 +658,7 @@ public class UrsParser extends Parser {
 
             case STATE_WAITINGCALLS: {
                 if ((m = regWaitingCalls.matcher(str)).find()) {
-                    processWaitingCalls((String) m_MessageContents.get(1), StringUtils.split(s.substring(m.end())));
+                    processWaitingCalls(m_MessageContents.get(1), StringUtils.split(s.substring(m.end())));
                     str = null;
                 } else {
                     Main.logger.debug("l " + m_CurrentLine + ": Unexpected line in state " + m_ParserState + ": " + str + "; retry");
@@ -711,10 +711,10 @@ public class UrsParser extends Parser {
                     msg.setRefid(m.group(4));
                     msg.setConnID(m.group(1));
                     msg.SetInbound(true);
-                    if ((m = regRIRequestStart.matcher((String) m_MessageContents.get(0))).find()) {
+                    if ((m = regRIRequestStart.matcher(m_MessageContents.get(0))).find()) {
                         String reqURI = m.group(2);
                         msg.setORSSID(getQueryKey(splitQuery(reqURI), "ORS_SESSION_ID"));
-                    } else if ((m = regRIRequestShort1.matcher((String) m_MessageContents.get(0))).find()) {
+                    } else if ((m = regRIRequestShort1.matcher(m_MessageContents.get(0))).find()) {
                         String reqURI = m.group(1);
                         msg.setSubFunc(reqURI);
 
@@ -840,21 +840,21 @@ public class UrsParser extends Parser {
         } else {
             if (!contents.isEmpty()) {
 
-                if (((m = regReceived.matcher((CharSequence) contents.get(0))).find())) {
+                if (((m = regReceived.matcher(contents.get(0))).find())) {
                     fileHandle = m.group(1);
                     server = m.group(2);
                     event = m.group(3);
                     refID = m.group(4);
-                    if (contents.size() > 1 && (m = regEventAttachedData.matcher((CharSequence) contents.get(1))).find()) {
+                    if (contents.size() > 1 && (m = regEventAttachedData.matcher(contents.get(1))).find()) {
                         thisDN = m.group(1);
                     }
                     isInbound = true;
 
-                } else if ((m = regReqTo.matcher((CharSequence) contents.get(0))).find()) {
+                } else if ((m = regReqTo.matcher(contents.get(0))).find()) {
                     fileHandle = m.group(1);
                     event = m.group(2);
                     Main.logger.trace("1event [" + event + "] fileHandle:" + fileHandle);
-                } else if ((m = regSentTo.matcher((CharSequence) contents.get(0))).find()) {
+                } else if ((m = regSentTo.matcher(contents.get(0))).find()) {
                     server = m.group(1);
                     event = m.group(2);
                     Main.logger.trace("2event [" + event + "] fileHandle:" + fileHandle);
@@ -970,7 +970,7 @@ public class UrsParser extends Parser {
         if (!contents.isEmpty()) {
             Matcher m;
 
-            if (((m = regCheckRoutingStates.matcher((CharSequence) contents.get(0))).find())) {
+            if (((m = regCheckRoutingStates.matcher(contents.get(0))).find())) {
                 if (m.group(1).startsWith("t")) {//can route; get target
                     if (msg != null) {
                         msg.parseTarget();

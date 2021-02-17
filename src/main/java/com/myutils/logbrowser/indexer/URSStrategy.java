@@ -26,7 +26,7 @@ public final class URSStrategy extends Message {
     private static final Pattern ptnNotif = Pattern.compile("^ASSIGN: v:\\d+:_event\\(LOCAL\\) <- OBJECT:[^=]+=(.+)");
 
     private final String FileLine;
-    private String ConnID;
+    private final String ConnID;
     private String rest;
     private String ref2;
     private String ref1;
@@ -247,7 +247,7 @@ public final class URSStrategy extends Message {
 
         private static class SS {
 
-            private HashMap<Pattern, String> pattString = new HashMap<>();
+            private final HashMap<Pattern, String> pattString = new HashMap<>();
 
             private SS(String Patt, String _ret) throws Exception {
                 if (Patt != null && Patt.length() > 0) {

@@ -427,12 +427,12 @@ public class IxnServerParser extends Parser {
 
         private final String name;
 
-        private StatEventType(String s) {
+        StatEventType(String s) {
             name = s;
         }
 
         public boolean equalsName(String otherName) {
-            return (otherName == null) ? false : name.equals(otherName);
+            return otherName != null && name.equals(otherName);
         }
 
         @Override

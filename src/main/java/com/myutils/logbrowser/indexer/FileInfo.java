@@ -66,7 +66,7 @@ public final class FileInfo extends Record {
     private static final Pattern regFileNameTypeSIP = Pattern.compile("-(\\d+)\\.\\d{8}_\\d{6}_\\d{3}\\.log$");
     public static final int WORKSPACE_BYTES = 1024;
     private static final Pattern regFileNameDate = Pattern.compile("\\.(\\d{8}_\\d{6}_\\d{3})\\.log");
-    static private DateTimeFormatter workSpaceDateTime = DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss_SSS");
+    static private final DateTimeFormatter workSpaceDateTime = DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss_SSS");
     private LogFileWrapper logFile;
     private String archiveName;
     private String filePath;
@@ -86,7 +86,7 @@ public final class FileInfo extends Record {
     boolean m_ServerStartTimeSet;
     private String appType = "";
 
-    private DateParsers dateParsers;
+    private final DateParsers dateParsers;
     private DateParsed fileLocalTime;
     private String logFileNo;
     private String logFileName;
@@ -94,8 +94,8 @@ public final class FileInfo extends Record {
     private DateParsed fileEndTime = null;
     private DateParsed fileStartTime;
     private boolean ignoring = false;
-    private byte buf[] = null;
-    private int bufRead = 0;
+    private final byte[] buf = null;
+    private final int bufRead = 0;
     private FileInfoType m_componentTypeSuspect = FileInfoType.type_Unknown;
 
     FileInfo(File file, LogFileWrapper wrapper) throws IOException {
@@ -120,7 +120,7 @@ public final class FileInfo extends Record {
         this.archiveName = logFile.getName();
     }
 
-    FileInfo(File _file) throws FileNotFoundException, IOException {
+    FileInfo(File _file) throws IOException {
         this();
         m_path = _file.getPath();
         m_name = _file.getName();
@@ -156,10 +156,8 @@ public final class FileInfo extends Record {
             int myReadBytes = readBytes(myBuf, BUF_SIZE);
             int otherReadBytes = otherFile.readBytes(otherBuf, BUF_SIZE);
 
-            if (myReadBytes == otherReadBytes
-                    && Arrays.equals(myBuf, otherBuf)) {
-                return true;
-            }
+            return myReadBytes == otherReadBytes
+                    && Arrays.equals(myBuf, otherBuf);
         } else if (getM_componentType() == FileInfoType.type_WWE) {
             if (getStartTime() != 0) {
                 boolean ret = getStartTime() == otherFile.getStartTime();
@@ -191,7 +189,7 @@ public final class FileInfo extends Record {
         return false;
     }
 
-    int readBytes(byte[] cbuf, int len) throws FileNotFoundException, IOException {
+    int readBytes(byte[] cbuf, int len) throws IOException {
         BufferedReaderCrLf input = new BufferedReaderCrLf(logFile.getInputStream(this));
         int read = input.read(cbuf, 0, len);
         input.close();
@@ -716,7 +714,7 @@ public final class FileInfo extends Record {
         return 0;
     }
 
-    FileInfoType CheckLog(InputStream is) throws FileNotFoundException, IOException {
+    FileInfoType CheckLog(InputStream is) throws IOException {
         BufferedReaderCrLf input = new BufferedReaderCrLf(is);
         m_componentType = CheckLog(input);
         input.close();
@@ -825,7 +823,7 @@ public final class FileInfo extends Record {
         return m_componentType;
     }
 
-    static protected enum FileType {
+    protected enum FileType {
         SIP_1536,
         UNKNOWN
     }

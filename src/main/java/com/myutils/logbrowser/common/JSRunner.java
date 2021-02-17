@@ -120,7 +120,7 @@ public class JSRunner {
      * @param script
      * @param rec
      * @param scriptFields
-     * @return true if record should be ignored (based on balue of boolean
+     * @return true if record should be ignored (based on value of boolean
      * IGNORE_RECORD calculated by the script
      */
     public static boolean evalFields(String script, ILogRecord rec, HashMap<String, Object> scriptFields) {

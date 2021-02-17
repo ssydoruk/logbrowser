@@ -64,7 +64,7 @@ public abstract class OutputSpecFormatter extends DefaultFormatter {
 
     private final XmlCfg cfg;
 
-    private HashMap<String, RecordLayout> outSpec = new HashMap<>();
+    private final HashMap<String, RecordLayout> outSpec = new HashMap<>();
 
     public OutputSpecFormatter(XmlCfg cfg,
             boolean isLongFileNameEnabled,
@@ -145,10 +145,10 @@ public abstract class OutputSpecFormatter extends DefaultFormatter {
     public static abstract class Parameter {
 
         private String m_ShortFormat;
-        private String m_Title;
+        private final String m_Title;
         private boolean hidden;
-        private HashSet<RegexParam> m_match = new HashSet<>();
-        private HashSet<RegexParam> m_filter = new HashSet<>();
+        private final HashSet<RegexParam> m_match = new HashSet<>();
+        private final HashSet<RegexParam> m_filter = new HashSet<>();
         private String m_format;
         private boolean isStatus;
         private String prevValue = "";
@@ -210,7 +210,7 @@ public abstract class OutputSpecFormatter extends DefaultFormatter {
             return ret;
         }
 
-        private String getFormatGroup(String str, ILogRecord record) throws MissingFormatArgumentException, Exception {
+        private String getFormatGroup(String str, ILogRecord record) throws Exception {
             String ret = "";
             if (m_match != null && m_match.size() > 0) {
                 ArrayList<String> arr = new ArrayList<>();
@@ -388,14 +388,14 @@ public abstract class OutputSpecFormatter extends DefaultFormatter {
 
         class RegexParam {
 
-            private int m_group;
-            private Pattern m_matchPattern;
+            private final int m_group;
+            private final Pattern m_matchPattern;
             private ArrayList<Integer> m_groups = null;
             private String retAttribute = null;
             String expr = null;
             CallableStatement st;
-            private int iRetGroup;
-            private Pattern mFileMatch;
+            private final int iRetGroup;
+            private final Pattern mFileMatch;
 
             public RegexParam(Element patternElement) {
                 //            Element patternElement = getElementChildByName(e, "pattern");
@@ -804,12 +804,12 @@ public abstract class OutputSpecFormatter extends DefaultFormatter {
 
         private final String name;
 
-        private ParamType(String s) {
+        ParamType(String s) {
             name = s;
         }
 
         public boolean equalsName(String otherName) {
-            return (otherName == null) ? false : name.equals(otherName);
+            return otherName != null && name.equals(otherName);
         }
 
         @Override
@@ -824,7 +824,7 @@ public abstract class OutputSpecFormatter extends DefaultFormatter {
         String formatString;
         String formatStringFromXml;
         private String initScript = null;
-        private HashMap<String, Object> scriptFields = new HashMap<>();
+        private final HashMap<String, Object> scriptFields = new HashMap<>();
         private final String cfgFile;
 
         private RecordLayout(org.w3c.dom.Element el, String msgType, String cfgFile) throws Exception {

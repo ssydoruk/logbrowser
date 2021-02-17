@@ -99,7 +99,7 @@ public class Main {
         return "";
     }
 
-    public static void main(String[] args) throws IOException, ParserConfigurationException, SAXException, Exception {
+    public static void main(String[] args) throws Exception {
 
         ee = new EnvIndexer();
         ee.parserCommandLine(args);
@@ -165,10 +165,7 @@ public class Main {
     }
 
     private static boolean fileOK(File fileInfo) {
-        if (regFilesNotGood.matcher(fileInfo.getName()).find()) {
-            return false;
-        }
-        return true;
+        return !regFilesNotGood.matcher(fileInfo.getName()).find();
     }
 
     private static void extendFilesList(ArrayList<FileInfo> filesToProcess, LogFileWrapper newLog) throws IOException {
@@ -220,10 +217,7 @@ public class Main {
 
     public static boolean ifSIPLines() {
         String isAll = (String) System.getProperties().get("SIPLINES");
-        if (isAll == null || isAll.length() == 0 || !isAll.equals("1")) {
-            return false;
-        }
-        return true;
+        return isAll != null && isAll.length() != 0 && isAll.equals("1");
     }
 
     private static void ParseZip(File file) {
@@ -260,7 +254,7 @@ public class Main {
     TableReferences tabRefs;
     ArrayList<FileInfo> filesToAccess = new ArrayList();
 
-    public Main(String dbname, String xmlCFG) throws IOException, Exception {
+    public Main(String dbname, String xmlCFG) throws Exception {
         setXMLCfg(xmlCFG);
     }
 
@@ -482,7 +476,7 @@ public class Main {
     }
 
     @SuppressWarnings("UseOfSystemOutOrSystemErr")
-    private void parseAll(String scanDir, String dbname, String alias) throws SQLException, Exception {
+    private void parseAll(String scanDir, String dbname, String alias) throws Exception {
         if (!setCurrentDirectory(scanDir)) {
             logger.error("Cannot cd to directory [" + scanDir + "]. Exiting");
             System.exit(1);
@@ -520,8 +514,8 @@ public class Main {
                     String logFileName = filesToAccess.get(i).getLogFileName();
                     if (logFileName != null && !logFileName.isEmpty()) { // fix for error resulting in empty DB. workspace file names are empty
                         ArrayList<ArrayList<Long>> iDs = m_accessor.getIDsMultiple(
-                                "select id, size from file_logbr where intfilename = \'"
-                                + filesToAccess.get(i).getLogFileName() + "\'"
+                                "select id, size from file_logbr where intfilename = '"
+                                + filesToAccess.get(i).getLogFileName() + "'"
                                 //                            + "and size=" + filesToAccess.get(i).getSize()
                                 + " ;");
                         if (iDs == null || iDs.size() == 0) {
@@ -763,7 +757,7 @@ public class Main {
 
     }
 
-    private void setXMLCfg(String xmlCFG) throws SAXException, IOException, Exception {
+    private void setXMLCfg(String xmlCFG) throws Exception {
         xmlCfg = new XmlCfg((xmlCFG));
     }
 
@@ -1025,10 +1019,10 @@ public class Main {
         private static Element root;
         private final Document doc; // XML doc for the CFG
 
-        private HashMap<String, ArrayList> tablesCfg;
+        private final HashMap<String, ArrayList> tablesCfg;
         FilesParseSettings filesSettings = new FilesParseSettings();
 
-        XmlCfg(String filePath) throws ParserConfigurationException, SAXException, IOException, Exception {
+        XmlCfg(String filePath) throws Exception {
             File fXmlFile = new File(filePath);
             DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();

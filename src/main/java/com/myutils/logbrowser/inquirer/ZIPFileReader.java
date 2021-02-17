@@ -27,7 +27,7 @@ public class ZIPFileReader extends RandomFileReader {
 
     long currentPos;
 
-    public ZIPFileReader(LogFile fileName) throws FileNotFoundException, IOException {
+    public ZIPFileReader(LogFile fileName) throws IOException {
         this.logFile = fileName;
         inquirer.logger.debug("ZIPFileReader: " + logFile);
         try {

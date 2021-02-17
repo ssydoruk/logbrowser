@@ -27,15 +27,15 @@ public class StSRequestHistoryMessage extends Message {
     }
 
     public String GetRequestID() {
-        return GetHeaderValue("\'REQ_ID\'");
+        return GetHeaderValue("'REQ_ID'");
     }
 
     public String GetRequestUserID() {
-        return GetHeaderValue("\'REQ_USER_ID\'");
+        return GetHeaderValue("'REQ_USER_ID'");
     }
 
     public String GetAssocRequestID() {
-        return GetHeaderValue("\'ASSOC_REQ_ID\'");
+        return GetHeaderValue("'ASSOC_REQ_ID'");
     }
 
 //    public static String InitDB(DBAccessor accessor, int statementId) {

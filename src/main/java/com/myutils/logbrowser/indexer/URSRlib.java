@@ -84,7 +84,7 @@ public final class URSRlib extends Message {
                             try {
                                 JSONObject _jsonBody = new JSONObject(result);
 
-                                String name = jsonStringOrDef(_jsonBody, "name", (String) null);
+                                String name = jsonStringOrDef(_jsonBody, "name", null);
                                 if (name != null) {
                                     method = name;
                                 }

@@ -13,5 +13,5 @@ import java.util.Properties;
  */
 public interface ICalculatedFields {
 
-    public Properties calc(Properties m_fieldsAll);
+    Properties calc(Properties m_fieldsAll);
 }

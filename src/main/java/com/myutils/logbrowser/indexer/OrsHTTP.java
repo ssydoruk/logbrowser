@@ -41,9 +41,7 @@ public class OrsHTTP extends Message {
 
     public boolean SessionStart() {
         if (m_MessageLines.size() > 0) {
-            if (m_MessageLines.get(0).startsWith("POST /scxml/session/start HTTP")) {
-                return true;
-            }
+            return m_MessageLines.get(0).startsWith("POST /scxml/session/start HTTP");
         }
         return false;
     }
@@ -121,9 +119,7 @@ public class OrsHTTP extends Message {
                 if (s != null && s.length() > 0) {
                     int cl = Integer.parseInt(s);
 
-                    if (cl == 0 || getContentLengh() >= cl) {
-                        return true;
-                    }
+                    return cl == 0 || getContentLengh() >= cl;
                 }
                 return false;
             }
@@ -287,7 +283,7 @@ public class OrsHTTP extends Message {
     }
 
     void setHTTPResponseID(String group) {
-        if (group != null && group.substring(0, 2).toLowerCase().equals("0x")) {
+        if (group != null && group.substring(0, 2).equalsIgnoreCase("0x")) {
             httpResponseID = group.substring(2);
         } else {
             httpResponseID = group;

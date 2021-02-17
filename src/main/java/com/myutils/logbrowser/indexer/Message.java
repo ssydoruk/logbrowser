@@ -90,7 +90,7 @@ public abstract class Message extends Record {
 
     static String replaceElement(String s, Matcher m, int i, String replace) {
         StringBuilder ret = new StringBuilder();
-        ret.append(s.substring(0, m.start(i)));
+        ret.append(s, 0, m.start(i));
         ret.append(replace);
         ret.append(s.substring(m.end(i)));
         return ret.toString();
@@ -1111,7 +1111,7 @@ public abstract class Message extends Record {
         } else {
             Main.logger.debug("::");
             for (Object content : m_MessageLines) {
-                Main.logger.debug("\t[" + (String) content + "]");
+                Main.logger.debug("\t[" + content + "]");
             }
         }
     }

@@ -380,7 +380,7 @@ public class ConfServParser extends Parser {
             if (op != null && !op.isEmpty()) {
                 return op;
             } else {
-                return FindByRx(ptOp, 1, (String) null);
+                return FindByRx(ptOp, 1, null);
 
             }
         }

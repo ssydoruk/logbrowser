@@ -86,10 +86,10 @@ public enum FileInfoType {
         return TypeFile.get(t);
     }
 
-    private int value;
+    private final int value;
     private static final Map map = new HashMap<>();
 
-    private FileInfoType(int value) {
+    FileInfoType(int value) {
         this.value = value;
     }
 

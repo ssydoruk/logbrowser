@@ -21,8 +21,8 @@ public class StCapacity extends Message {
     private String plGroup = null;
     private String agent = null;
     private String place = null;
-    private String OldStatus = null;
-    private String NewStatus = null;
+    private final String OldStatus = null;
+    private final String NewStatus = null;
     private String capacityRule = null;
 
     private String dn = null;

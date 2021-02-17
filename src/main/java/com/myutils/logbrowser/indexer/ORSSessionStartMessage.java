@@ -18,11 +18,11 @@ public class ORSSessionStartMessage extends Message {
 
     private String m_refID;
     private String m_ThisDN;
-    private boolean isTServerReq = false;
+    private final boolean isTServerReq = false;
     private String clientIP;
-    private boolean POSTParsed = false;
+    private final boolean POSTParsed = false;
     private String newSessionID;
-    private Pair<String, String> parseORSURI = null;
+    private final Pair<String, String> parseORSURI = null;
     ArrayList<String> params = new ArrayList<>();
 
     ORSSessionStartMessage(ArrayList<String> m_MessageContents) {

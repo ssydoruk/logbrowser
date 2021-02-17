@@ -79,5 +79,4 @@ public class CustomField implements Serializable {
         }
         return this.getClass().getCanonicalName();
     }
-;
 }

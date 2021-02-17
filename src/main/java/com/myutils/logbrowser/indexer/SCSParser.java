@@ -40,7 +40,7 @@ public class SCSParser extends Parser {
 
     int m_dbRecords = 0;
     private String m_LastLine;
-    private boolean customEvent = false;
+    private final boolean customEvent = false;
     private Message msg = null;
     private String lastMSGID;
     private String lastMSGText;
@@ -750,12 +750,12 @@ public class SCSParser extends Parser {
 
         private final String name;
 
-        private AlarmState(String s) {
+        AlarmState(String s) {
             name = s.toLowerCase();
         }
 
         public boolean equalsName(String otherName) {
-            return (otherName == null) ? false : name.toLowerCase().equals(otherName.toLowerCase());
+            return otherName != null && name.equalsIgnoreCase(otherName);
         }
 
         @Override

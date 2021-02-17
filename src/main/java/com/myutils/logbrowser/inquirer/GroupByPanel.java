@@ -237,7 +237,7 @@ public class GroupByPanel extends javax.swing.JPanel {
         int size = modelAvailable.getSize();
         for (int i = 0; i < size; i++) {
             if (selectAvailableModel.isSelectedIndex(i)) {
-                inModel.addElement((MenuItem) modelAvailable.getElementAt(i));
+                inModel.addElement(modelAvailable.getElementAt(i));
             }
         }
         for (int i = 0; i < size; i++) {
@@ -273,7 +273,7 @@ public class GroupByPanel extends javax.swing.JPanel {
         int selectedIndex = jlInList.getSelectedIndex();
         if (selectedIndex < jlInList.getModel().getSize() - 1) {
             DefaultListModel<MenuItem> model = (DefaultListModel) jlInList.getModel();
-            MenuItem remove = (MenuItem) model.remove(selectedIndex);
+            MenuItem remove = model.remove(selectedIndex);
             model.add(selectedIndex + 1, remove);
             jlInList.setSelectedIndex(selectedIndex + 1);
         }    }//GEN-LAST:event_jbDownActionPerformed
@@ -295,7 +295,7 @@ public class GroupByPanel extends javax.swing.JPanel {
         int size = modelIn.getSize();
         for (int i = 0; i < size; i++) {
             if (modelSelect.isSelectedIndex(i)) {
-                modelAvail.addElement((MenuItem) modelIn.getElementAt(i));
+                modelAvail.addElement(modelIn.getElementAt(i));
             }
         }
         for (int i = 0; i < size; i++) {
@@ -332,12 +332,8 @@ public class GroupByPanel extends javax.swing.JPanel {
         ListSelectionModel selectionModel = jlInList.getSelectionModel();
         ListModel listModel = jlInList.getModel();
 
-        jbDown.setEnabled(selectionModel.getMaxSelectionIndex() >= 0 && listModel.getSize() > 1
-                ? selectionModel.getMaxSelectionIndex() < listModel.getSize() - 1
-                : false);
-        jbUp.setEnabled(selectionModel.getMinSelectionIndex() >= 0 && listModel.getSize() > 1
-                ? selectionModel.getMinSelectionIndex() > 0
-                : false);
+        jbDown.setEnabled(selectionModel.getMaxSelectionIndex() >= 0 && listModel.getSize() > 1 && selectionModel.getMaxSelectionIndex() < listModel.getSize() - 1);
+        jbUp.setEnabled(selectionModel.getMinSelectionIndex() >= 0 && listModel.getSize() > 1 && selectionModel.getMinSelectionIndex() > 0);
     }
 
     DBField[] getSelected() {

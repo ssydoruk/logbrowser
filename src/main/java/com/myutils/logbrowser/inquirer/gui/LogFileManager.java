@@ -42,7 +42,7 @@ public class LogFileManager {
     private final HashMap<String, LogFile> logFileStore = new HashMap();
 
 //    HashMap<LogFile, ZipEntry> openedZIPFiles;
-    void unpackFile(LogFile logFile) throws FileNotFoundException, IOException {
+    void unpackFile(LogFile logFile) throws IOException {
 
         if (logFile.isText()) {
             return;

@@ -13,11 +13,11 @@ import java.sql.SQLException;
  */
 public interface DBAccessor {
 
-    public void runQuery(String query);
+    void runQuery(String query);
 
-    public PreparedStatement GetStatement(int statementId);
+    PreparedStatement GetStatement(int statementId);
 
-    public void SubmitStatement(int statementId) throws SQLException;
+    void SubmitStatement(int statementId) throws SQLException;
 
-    public void Close(boolean shouldAnalyze);
+    void Close(boolean shouldAnalyze);
 }

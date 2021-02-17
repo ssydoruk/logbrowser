@@ -1216,9 +1216,9 @@
  	  <param type="database" id="connectionid" format="|connid: %s" name="connid">
 	  </param>
 
- 	  <param type="database" id="refid" format="|ref: %s" name="refid">
+ 	  <!--param type="database" id="refid" format="|ref: %s" name="refid">
 	  	<pattern match="(^[1-9].+)" ignorecase="true" groups="1" />    
-	  </param>
+	  </param-->
 
  	  <param type="database" id="MediaType"  name="media" />
 
@@ -1282,9 +1282,9 @@
  	  <param type="database" id="connectionid" format="|connid: %s" name="connid">
 	  </param>
 
- 	  <param type="database" id="refid" format="|ref: %s" name="refid">
+ 	  <!--param type="database" id="refid" format="|ref: %s" name="refid">
 	  	<pattern match="(^[1-9].+)" ignorecase="true" groups="1" />    
-	  </param>
+	  </param-->
 
  	  <param type="database" id="MediaType"  name="media" />
 
@@ -1850,13 +1850,8 @@
 	  <param type="database" id="app" name="app"/>
     <param6 type="database" id="appname" format="%s" name="client"  />
 	  <param6 type="database" id="clienttype" format="%s" name="client" />
-	  <param type="database" id="isconnect" name="direction">
-	  	<pattern match="1" ignorecase="true" return="connected" />
-	  	<pattern match="0" ignorecase="true" return="disconnected" />
-	  </param>
 
 	  <param6 type="database" id="username" format="user:%s"  />
-	  <param6 type="database" id="socketno" format="socket:%s"  />
 	  <param6 type="database" id="hostport" format="from:%s"  />
 	  
     </spec>
@@ -1975,9 +1970,9 @@
 	  <param6 type="database" id="param1"  name="param" />
 	  <param6 type="database" id="param2"  name="param" />
 	  <param6 type="database" id="IxnID"  name="ixnid"   />
-	  <param6 type="database" id="bayeuxID" format="bayeuxID:%s"  />
-	  <param6 type="database" id="lastConected" format="last %s ms"  />
-	  <param6 type="database" id="action" format="action %s"  />
+	  <!-- <param6 type="database" id="bayeuxID" format="bayeuxID:%s"  /> -->
+	  <!-- <param6 type="database" id="lastConected" format="last %s ms"  /> -->
+	  <!-- <param6 type="database" id="action" format="action %s"  /> -->
 	  <param6 type="database" id="DeviceID"   />
 	  <param6 type="database" id="channel" format="ch:%s"   />
 	  <param6 type="database" id="msgType" format="type:%s"  />
@@ -2082,32 +2077,7 @@
     </spec>
   	<!-- <<<< Genesys messages for GMSWEB --> 
   
-   	<!-- Genesys messages for WWEBAYEUX >>>> -->
-	 <spec MsgType="WWEBAYEUX" format="filelink timestamp">
-	  <param1 type="embedded" id="filelink" name="filename" >
-		<pattern match="(log)" group="1"/>
-	  </param1>
-	  <param2 type="embedded" id="timestamp" name="timestamp" />
-	  <param type="database" id="app" name="app"/>
-	  <param6 type="database" id="Level" format="%s" name="level"  />
-	  <param6 type="database" id="class" format="%s" name="JAVA_CLASS" hidden="true"  />
-	  <!--param6 type="database" id="msgText" format="%s" name="Message text"  /-->
-	  <param6 type="database" id="IP" format="%s" name="IP_ADDRESS" hidden="true" />
-	  <param6 type="database" id="JSessionID" name="JSessionID" />
-	  <param6 type="database" id="url"   name="url"  />
-	  <param6 type="database" id="username" name="username"   />
-	  <param6 type="database" id="param1"  name="param" />
-	  <param6 type="database" id="param2"  name="param" />
-	  <param6 type="database" id="IxnID"  name="ixnid"   />
-	  <param6 type="database" id="bayeuxID" format="bayeuxID:%s"  />
-	  <param6 type="database" id="lastConected" format="last %s ms"  />
-	  <param6 type="database" id="action" format="action %s"  />
-	  <param6 type="database" id="DeviceID"   />
-	  <param6 type="database" id="channel" format="ch:%s"   />
-	  <param6 type="database" id="msgType" format="type:%s"  />
-	  <param6 type="database" id="UUID" format="%s" name="uuid"  />
-    </spec>
-  	<!-- <<<< Genesys messages for WWEBAYEUX -->
+
 
    	<!-- Genesys messages for WWEUCS >>>> -->
 	 <spec MsgType="WWEUCS" format="filelink timestamp">

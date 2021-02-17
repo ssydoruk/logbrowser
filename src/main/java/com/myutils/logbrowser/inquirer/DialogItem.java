@@ -222,7 +222,7 @@ public enum DialogItem {
 
     private final String name;
 
-    private DialogItem(String s) {
+    DialogItem(String s) {
         name = s;
     }
 
@@ -230,7 +230,7 @@ public enum DialogItem {
 //        
 //    }
     public boolean equalsName(String otherName) {
-        return (otherName == null) ? false : name.toLowerCase().equals(otherName.toLowerCase());
+        return otherName != null && name.equalsIgnoreCase(otherName);
     }
 
     @Override

@@ -21,7 +21,7 @@ public abstract class IQuery extends QueryTools {
     static private int queryTypes;
 
     private static final int SPLIT_ON = 1000;
-    private static String[] RequestsToShow = {"RequestMakePredictiveCall", "RequestMakeCall", "RequestMonitorNextCall", "EventError"};
+    private static final String[] RequestsToShow = {"RequestMakePredictiveCall", "RequestMakeCall", "RequestMonitorNextCall", "EventError"};
 
     static String theLimitClause() {
         return getLimitClause(inquirer.getCr().isLimitQueryResults(), inquirer.getCr().getMaxQueryLines());
@@ -75,7 +75,7 @@ public abstract class IQuery extends QueryTools {
             }
 
             q.append(fileIDField).append(" in (select id from file_logbr ").append(getWhere("appnameid",
-                    (Integer[]) apps.toArray(new Integer[apps.size()]), true)).append(" )");
+                    apps.toArray(new Integer[apps.size()]), true)).append(" )");
             q.append(")");
             return q.toString();
         }
@@ -538,7 +538,7 @@ public abstract class IQuery extends QueryTools {
         return "";
     }
     protected IRecordLoadedProc recLoadedProc = null;
-    private ArrayList<String> outFields;
+    private final ArrayList<String> outFields;
     private ICalculatedFields calcFields = null;
     protected String query;
     protected ArrayList<Integer> searchApps = null;
@@ -550,12 +550,12 @@ public abstract class IQuery extends QueryTools {
     protected int recCnt;
     Wheres addWheres = new Wheres();
 
-    private ArrayList<refTab> TabRefs;
-    private ArrayList<JoinTab> joinTabs;
-    private ArrayList<String> nullTab;
-    private ArrayList<String> nullFields = new ArrayList<>();
-    private ArrayList<String> idsToCollect = new ArrayList<>();
-    private HashMap<String, HashSet<Long>> collectIDsValues = new HashMap<>();
+    private final ArrayList<refTab> TabRefs;
+    private final ArrayList<JoinTab> joinTabs;
+    private final ArrayList<String> nullTab;
+    private final ArrayList<String> nullFields = new ArrayList<>();
+    private final ArrayList<String> idsToCollect = new ArrayList<>();
+    private final HashMap<String, HashSet<Long>> collectIDsValues = new HashMap<>();
 
     IQuery() {
         TabRefs = new ArrayList<>();
@@ -723,7 +723,7 @@ public abstract class IQuery extends QueryTools {
                                         attrIDs.add(data.getId());
                                     }
                                 }
-                                wh.addWhere(getWhere(fldName, (Integer[]) attrIDs.toArray(new Integer[attrIDs.size()])), "OR");
+                                wh.addWhere(getWhere(fldName, attrIDs.toArray(new Integer[attrIDs.size()])), "OR");
                             }
                         }
                     }
@@ -752,7 +752,7 @@ public abstract class IQuery extends QueryTools {
 //                    }
                 }
                 if (keyIDs.size() < node.getNumberOfChildren()) {
-                    wh.addWhere(getWhere(nameID, (Integer[]) keyIDs.toArray(new Integer[keyIDs.size()])), "AND");
+                    wh.addWhere(getWhere(nameID, keyIDs.toArray(new Integer[keyIDs.size()])), "AND");
                 }
                 addWhere(wh, AndOr);
             }
@@ -1046,7 +1046,7 @@ public abstract class IQuery extends QueryTools {
 
         private final String name;
 
-        private ANDOR(String s) {
+        ANDOR(String s) {
             name = s;
         }
 
@@ -1054,7 +1054,7 @@ public abstract class IQuery extends QueryTools {
 //
 //    }
         public boolean equalsName(String otherName) {
-            return (otherName == null) ? false : name.toLowerCase().equals(otherName.toLowerCase());
+            return otherName != null && name.equalsIgnoreCase(otherName);
         }
 
         @Override
@@ -1066,16 +1066,16 @@ public abstract class IQuery extends QueryTools {
 
     enum FieldType {
         Mandatory,
-        Optional;
+        Optional
     }
 
     class refTab {
 
-        private String refField;
-        private String outField;
-        private String refTable;
-        private String refTabAlias;
-        private FieldType ft;
+        private final String refField;
+        private final String outField;
+        private final String refTable;
+        private final String refTabAlias;
+        private final FieldType ft;
 
         refTab(String refField, String outField, String refTable, FieldType ft) {
             this.outField = outField;
@@ -1129,10 +1129,10 @@ public abstract class IQuery extends QueryTools {
     class JoinTab {
 
         private String joinTable = null;
-        private String tabAlias;
+        private final String tabAlias;
         private String JoinExpr = null;
         private String JoinWhere = null;
-        private FieldType ft;
+        private final FieldType ft;
 
         public JoinTab(String joinTable, String JoinExpr, String JoinWhere, FieldType ft, String tabAlias) {
             this.joinTable = joinTable;

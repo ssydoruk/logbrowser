@@ -11,9 +11,9 @@ public class TableQuery extends IQuery {
 
     private static final org.apache.logging.log4j.Logger logger = LogManager.getLogger();
 
-    private String tabName;
+    private final String tabName;
     private String idName;
-    private MsgType msgType;
+    private final MsgType msgType;
 
     private String idsSubQuery;
     private String existsTable;
@@ -22,7 +22,7 @@ public class TableQuery extends IQuery {
 //    private Class<ILogRecord> resultClass;
     private Class<TLibEvent> myClass;
     private WhereType whereType = WhereType.WhereNone;
-    private ArrayList<String> whereFields = new ArrayList<>();
+    private final ArrayList<String> whereFields = new ArrayList<>();
 
     public TableQuery(MsgType msgType, String _tabName, String _idName, String _addWhere) {
         this(msgType, _tabName, _addWhere);
@@ -294,7 +294,7 @@ public class TableQuery extends IQuery {
     enum WhereType {
 
         WhereNone,
-        WhereExists;
+        WhereExists
     }
 
 }

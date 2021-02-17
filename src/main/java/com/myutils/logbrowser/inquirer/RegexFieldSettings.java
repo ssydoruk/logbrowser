@@ -123,7 +123,7 @@ public class RegexFieldSettings  implements Serializable {
             int idx = 0;
             for (int i = 0; i < repl.size(); i++) {
                 Repl r = repl.get(i);
-                ret.append(text.substring(idx, r.start));
+                ret.append(text, idx, r.start);
                 ret.append(m.group(r.id));
                 idx = r.end;
             }
@@ -174,7 +174,7 @@ public class RegexFieldSettings  implements Serializable {
             ArrayList<Repl> repl = new ArrayList<>();
             while (m1.find()) {
                 repl.add(new Repl(m1.start(0), m1.end(0), Integer.parseInt(m1.group(1))));
-            };
+            }
             StringBuilder s = new StringBuilder();
             for (String string : split) {
                 Matcher m = selectedRegEx.matcher(string);
@@ -184,7 +184,7 @@ public class RegexFieldSettings  implements Serializable {
                     inquirer.logger.debug("found! [");
                     extendString(s, doRepl(text, repl, m));
                     found = true;
-                };
+                }
                 if (found) {
                     ret.appendSearched(string);
                     inquirer.logger.debug("matched! ret=[" + ret + "]");
@@ -215,13 +215,13 @@ public class RegexFieldSettings  implements Serializable {
             ArrayList<Repl> repl = new ArrayList<>();
             while (m1.find()) {
                 repl.add(new Repl(m1.start(0), m1.end(0), Integer.parseInt(m1.group(1))));
-            };
+            }
             StringBuilder s = new StringBuilder();
             for (String string : split) {
                 Matcher m = rx.matcher(string);
                 while (m.find()) {
                     extendString(s, doRepl(text, repl, m));
-                };
+                }
             }
             return s.toString();
         }

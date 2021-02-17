@@ -62,11 +62,9 @@ public class EditorUnix extends ExternalEditor {
 
     private static List<String> makeExecCmd(List cmd) {
         ArrayList<String> params = new ArrayList<>(3 + ((cmd == null) ? 0 : cmd.size()));
-        params.addAll(Arrays.asList(new String[]{
-            gvim,
-            "--servername",
-            gvimServer
-        }));
+        params.addAll(Arrays.asList(gvim,
+                "--servername",
+                gvimServer));
         if (cmd != null) {
             params.addAll(cmd);
         }
@@ -111,9 +109,8 @@ public class EditorUnix extends ExternalEditor {
      * @throws IOException
      */
     private static Integer remoteExprInt(String expr) throws IOException {
-        List<String> execOuts = execWaitSTDOut(new ArrayList<>(Arrays.asList(new String[]{
-            "--remote-expr",
-            expr})));
+        List<String> execOuts = execWaitSTDOut(new ArrayList<>(Arrays.asList("--remote-expr",
+                expr)));
         if (execOuts != null && !execOuts.isEmpty()) {
             return Util.intOrDef(execOuts.get(0), (Integer) null);
         }
@@ -122,9 +119,8 @@ public class EditorUnix extends ExternalEditor {
 
     private static List<String> remoteSend(String expr) throws IOException {
 
-        return execWaitSTDOut(Arrays.asList(new String[]{
-            "--remote-send",
-            expr}));
+        return execWaitSTDOut(Arrays.asList("--remote-send",
+                expr));
     }
     HashMap<String, Character> lastBookmark = new HashMap<>();
 
@@ -144,12 +140,11 @@ public class EditorUnix extends ExternalEditor {
             setActive(bufNumber);
         } else {
 
-            execReturn(Arrays.asList(new String[]{
-                //                "+",
-                //                "+':set nomodifiable'" //                                        + " | set hlsearch | set wrap | set noconfirm"
-                //                ,
-                "--remote-tab-wait-silent",
-                fileModified,}), false);
+            execReturn(Arrays.asList(//                "+",
+//                "+':set nomodifiable'" //                                        + " | set hlsearch | set wrap | set noconfirm"
+//                ,
+                    "--remote-tab-wait-silent",
+                    fileModified), false);
             confirmServer();
 
             long startTime = System.currentTimeMillis();
@@ -219,9 +214,8 @@ public class EditorUnix extends ExternalEditor {
 
     private List<String> sendCommand(String cmd) throws IOException {
 
-        return execWaitSTDOut(Arrays.asList(new String[]{
-            "--remote-send",
-            cmd}));
+        return execWaitSTDOut(Arrays.asList("--remote-send",
+                cmd));
 
     }
 
@@ -240,9 +234,8 @@ public class EditorUnix extends ExternalEditor {
 
     private void confirmServer() throws IOException {
         while (true) {
-            List<String> execWaitSTDOut = execGetStdOut(Arrays.asList(new String[]{
-                gvim,
-                "--serverlist",}));
+            List<String> execWaitSTDOut = execGetStdOut(Arrays.asList(gvim,
+                    "--serverlist"));
             if (execWaitSTDOut != null && !execWaitSTDOut.isEmpty()
                     && execWaitSTDOut.contains(gvimServer)) {
                 break;

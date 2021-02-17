@@ -1002,9 +1002,9 @@ public class WWEParser extends WebParser {
             return ret;
         }
 
-        static interface IRXFoundProc {
+        interface IRXFoundProc {
 
-            abstract void foundFun(String newLine, String replacedString);
+            void foundFun(String newLine, String replacedString);
         }
 
         private class ReplaceLiteral extends ICleanString {
@@ -1889,7 +1889,7 @@ public class WWEParser extends WebParser {
 
     private class WWEBayeuxSMsg extends WWEDebugMsg {
 
-        private boolean msgParsed = false;
+        private final boolean msgParsed = false;
         private Integer bayeuxId;
         private Long lastConnected;
         private String action;

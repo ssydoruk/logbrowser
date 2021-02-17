@@ -29,7 +29,7 @@ public class EnvIndexer extends ExecutionEnvironment {
     private boolean ignoreZIP = false;
 
     Option optHelp;
-    private Option optLogBrowserDir;
+    private final Option optLogBrowserDir;
     private final Option optSQLPragma;
 
     public String getBaseDir() {
@@ -156,8 +156,6 @@ public class EnvIndexer extends ExecutionEnvironment {
     public boolean isIgnoreZIP() {
         return ignoreZIP;
     }
-
-    ;
 
     public void parserCommandLine(String[] args) {
         try {

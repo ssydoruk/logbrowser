@@ -24,7 +24,7 @@ public class MediaServerResults extends IQueryResults {
 
     private Object cidFinder;
     ArrayList<NameID> appsType = null;
-    private UTCTimeRange timeRange = null;
+    private final UTCTimeRange timeRange = null;
 
     /**
      *
@@ -323,7 +323,7 @@ public class MediaServerResults extends IQueryResults {
 
         if (isChecked(strategyStepsSettings) && TableExist(TableType.VXMLIntStepsTable.toString())) {
             Integer[] mcpCallID = null;
-            if (((dlg.getSelectionType() != SelectionType.NO_SELECTION) ? (mcpCallID = cidFinder.getIDs(IDType.MCPCallID)) != null : true)) {
+            if ((dlg.getSelectionType() == SelectionType.NO_SELECTION || (mcpCallID = cidFinder.getIDs(IDType.MCPCallID)) != null)) {
                 TableQuery strategySteps = new TableQuery(MsgType.VXMLStrategySteps, TableType.VXMLIntStepsTable.toString());
                 tellProgress("Retrieving VXMLStrategy steps");
                 strategySteps.addRef("commandId", "command", ReferenceType.VXMLCommand.toString(), IQuery.FieldType.Mandatory);

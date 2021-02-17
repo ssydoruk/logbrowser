@@ -54,7 +54,7 @@ public class ReportFrame extends javax.swing.JFrame implements Cloneable {
 
     // Tool Bar
     private ToggleButtonToolBar toolbar = null;
-    private ButtonGroup toolbarGroup = new ButtonGroup();
+    private final ButtonGroup toolbarGroup = new ButtonGroup();
 
     JPanel reportArea;
     JScrollPane pane;

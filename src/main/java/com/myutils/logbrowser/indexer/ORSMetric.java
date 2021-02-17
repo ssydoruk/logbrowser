@@ -17,8 +17,8 @@ import org.w3c.dom.Document;
 /*It extends TServer message, however there is now TServer message attributes*/
 public class ORSMetric extends Message {
 
-    private static Pattern regTMessageStart = Pattern.compile("^<(\\w+) sid='([\\w~]+)");
-    private static Pattern regReqID = Pattern.compile("^\\s*<eval_expr .+expression='system.LastSubmitRequestId;.+result='(\\d+)' />");
+    private static final Pattern regTMessageStart = Pattern.compile("^<(\\w+) sid='([\\w~]+)");
+    private static final Pattern regReqID = Pattern.compile("^\\s*<eval_expr .+expression='system.LastSubmitRequestId;.+result='(\\d+)' />");
 
     public String sid = "";
     public String Method = "";
@@ -42,7 +42,7 @@ public class ORSMetric extends Message {
 
     private void FindSID() {
         Matcher m;
-        String s = (String) m_MessageLines.get(0);
+        String s = m_MessageLines.get(0);
 
         if (s != null && (m = regTMessageStart.matcher(s)).find()) {
             Method = m.group(1);
@@ -67,7 +67,7 @@ public class ORSMetric extends Message {
 //   expression='system.LastSubmitRequestId;system.LastSubmitRequestId=_event.data.requestid;' result='216731' />
     int getReqID() {
         Matcher m;
-        String s = (String) m_MessageLines.get(0);
+        String s = m_MessageLines.get(0);
 
         if (s != null && (m = regReqID.matcher(s)).find()) {
             try {

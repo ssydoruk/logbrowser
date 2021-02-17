@@ -8,7 +8,7 @@ public class ParentTransferQuery {
     private ResultSet m_resultSet;
     Integer m_connId;
     private DatabaseConnector m_connector;
-    private String m_tab;
+    private final String m_tab;
     private int recCnt;
 
     public ParentTransferQuery(String tab, Integer connId) {
