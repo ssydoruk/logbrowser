@@ -1162,11 +1162,12 @@ final public class RoutingResults extends IQueryResults {
                     && !isEmpty(CONNID)) {
                 URS_GENMSG.addWhere(getWhere("connidid", CONNID, false), "AND");
             }
-            URS_GENMSG.AddCheckedWhere(URS_GENMSG.getTabAlias() + ".levelID",
-                    ReferenceType.MSGLEVEL,
-                    FindNode(ursReportSettings, DialogItem.URS_GENMESSAGE, null, null),
-                    "AND",
-                    DialogItem.URS_GENMESSAGE_TYPE);
+            //todo: add filter on log level
+//            URS_GENMSG.AddCheckedWhere(URS_GENMSG.getTabAlias() + ".levelID",
+//                    ReferenceType.MSGLEVEL,
+//                    FindNode(ursReportSettings, DialogItem.URS_GENMESSAGE, null, null),
+//                    "AND",
+//                    DialogItem.URS_GENMESSAGE_TYPE);
             URS_GENMSG.AddCheckedWhere(URS_GENMSG.getTabAlias() + ".msgID",
                     ReferenceType.LOGMESSAGE,
                     FindNode(ursReportSettings, DialogItem.URS_GENMESSAGE, null, null),
