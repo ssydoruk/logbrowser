@@ -56,8 +56,8 @@ public class Handler extends Record {
         try {
             setFieldString(stmt,1,m_text);
             stmt.setInt(2, m_fileId);
-            stmt.setLong(3,(long)m_fileOffset);
-            stmt.setInt(4, m_line);
+            stmt.setLong(3,(long)getM_fileOffset());
+            stmt.setInt(4, getM_line());
             m_handlerId++;
             accessor.SubmitStatement(m_batchId);
         } catch (Exception e) {

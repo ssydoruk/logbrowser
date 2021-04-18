@@ -57,9 +57,9 @@ public class StSActionTable extends DBTable {
             setFieldInt(stmt, 4, Main.getRef(ReferenceType.StatEvent, theRec.GetValue()));
             setFieldInt(stmt, 5, Main.getRef(ReferenceType.ConnID, theRec.GetConnID()));
             setFieldInt(stmt, 6, StSActionMessage.getFileId());
-            stmt.setLong(7, theRec.m_fileOffset);
-            stmt.setLong(8, theRec.GetFileBytes());
-            setFieldInt(stmt, 9, theRec.m_line);
+            stmt.setLong(7, theRec.getM_fileOffset());
+            stmt.setLong(8, theRec.getFileBytes());
+            setFieldInt(stmt, 9, theRec.getM_line());
 
             getM_dbAccessor().SubmitStatement(m_InsertStatementId);
         } catch (SQLException e) {

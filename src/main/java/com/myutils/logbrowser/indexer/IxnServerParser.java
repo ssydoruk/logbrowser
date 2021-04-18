@@ -146,7 +146,7 @@ public class IxnServerParser extends Parser {
             break;
 
             case STATE_COMMENT:
-                m_LineStarted = m_CurrentLine;
+                m_lineStarted = m_CurrentLine;
 
                 s = ParseGenesys(str, TableType.MsgIxnServer, regNotParseMessage);
 
@@ -265,7 +265,7 @@ public class IxnServerParser extends Parser {
 //                        if (m_MessageContents.size() > 0) { //not first message
 //                            AddAssignmentMessage();
 //                            m_MessageContents.clear();
-//                            m_LineStarted = m_CurrentLine;
+//                            m_lineStarted = m_CurrentLine;
 //                        }
 //                        m_MessageContents.add(str);
 //                    } else {
@@ -301,7 +301,7 @@ public class IxnServerParser extends Parser {
 //                            && str.length() == 0) {
 //                        AddStatEventMessage();
 //                        m_MessageContents.clear();
-//                        m_LineStarted = m_CurrentLine;
+//                        m_lineStarted = m_CurrentLine;
 //                        setSavedFilePos(getFilePos());
 //                    } else {
 //                        m_MessageContents.add(str);

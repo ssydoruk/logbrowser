@@ -93,8 +93,8 @@ public class CIFaceRequest extends Record {
      setFieldString(stmt,4, "'"+m_otherDN+"'");
      stmt.setInt(5, m_handlerId);
      stmt.setInt(6, m_fileId);
-     stmt.setLong(7,m_fileOffset);
-     stmt.setInt(8, m_line);
+     stmt.setLong(7,getM_fileOffset());
+     stmt.setInt(8, getM_line());
             
      accessor.SubmitStatement(m_batchId);
      } catch (Exception e) {

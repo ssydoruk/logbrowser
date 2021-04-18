@@ -51,8 +51,8 @@ public class CustomLine extends Record {
             DBTable.setFieldString(stmt, 1, m_text);
             stmt.setInt(2, m_handlerId);
             stmt.setInt(3, getFileId());
-            stmt.setLong(4, m_fileOffset);
-            stmt.setLong(5, m_line);
+            stmt.setLong(4, getM_fileOffset());
+            stmt.setLong(5, getM_line());
 
             accessor.SubmitStatement(m_batchId);
         } catch (SQLException e) {

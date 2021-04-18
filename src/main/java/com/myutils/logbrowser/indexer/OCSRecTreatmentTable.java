@@ -74,9 +74,9 @@ public class OCSRecTreatmentTable extends DBTable {
         try {
             stmt.setTimestamp(1, new Timestamp(rec.GetAdjustedUsecTime()));
             stmt.setInt(2, OCSRecTreatment.getFileId());
-            stmt.setLong(3, rec.m_fileOffset);
+            stmt.setLong(3, rec.getM_fileOffset());
             stmt.setLong(4, rec.getM_FileBytes());
-            stmt.setLong(5, rec.m_line);
+            stmt.setLong(5, rec.getM_line());
 
             stmt.setInt(6, rec.getrecHandle());
             stmt.setInt(7, rec.getchID());
@@ -86,7 +86,7 @@ public class OCSRecTreatmentTable extends DBTable {
 
             getM_dbAccessor().SubmitStatement(m_InsertStatementId);
         } catch (SQLException e) {
-            Main.logger.error("Line: " + rec.m_line);
+            Main.logger.error("Line: " + rec.getM_line());
             Main.logger.error("Could not add record type " + m_type.toString() + ": " + e, e);
         }
     }

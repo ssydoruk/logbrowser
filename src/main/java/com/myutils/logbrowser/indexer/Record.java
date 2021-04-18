@@ -4,10 +4,9 @@
  */
 package com.myutils.logbrowser.indexer;
 
-import java.util.HashMap;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import org.apache.commons.lang3.StringUtils;
+import java.util.*;
+import java.util.regex.*;
+import org.apache.commons.lang3.*;
 
 /**
  *
@@ -114,8 +113,8 @@ public abstract class Record implements Cloneable {
     public static void SetProxiedId(int proxiedId) {
         m_proxiedId = proxiedId;
     }
-    long m_fileOffset;
-    int m_line;
+    private long m_fileOffset;
+    private int m_line;
     private TableType m_type;
 //    protected Date m_Timestamp = null;
     private DateParsed m_TimestampDP = null;
@@ -169,6 +168,18 @@ public abstract class Record implements Cloneable {
 
     public void SetOffset(long offset) {
         m_fileOffset = offset;
+    }
+
+    public long getM_fileOffset() {
+        return m_fileOffset;
+    }
+
+    public int getM_line() {
+        return m_line;
+    }
+
+    public long getM_FileBytes() {
+        return m_FileBytes;
     }
 
     public void SetLine(int line) {

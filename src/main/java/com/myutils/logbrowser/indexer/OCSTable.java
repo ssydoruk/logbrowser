@@ -102,9 +102,9 @@ public class OCSTable extends DBTable {
         try {
             stmt.setTimestamp(1, new Timestamp(rec.GetAdjustedUsecTime()));
             stmt.setInt(2, OcsMessage.getFileId());
-            setFieldLong(stmt, 3, rec.m_fileOffset);
+            setFieldLong(stmt, 3, rec.getM_fileOffset());
             setFieldLong(stmt, 4, rec.getM_FileBytes());
-            setFieldInt(stmt, 5, rec.m_line);
+            setFieldInt(stmt, 5, rec.getM_line());
 
             setFieldInt(stmt, 6, Main.getRef(ReferenceType.TEvent, rec.GetMessageName()));
             setFieldInt(stmt, 7, Main.getRef(ReferenceType.DN, Record.cleanDN(rec.getM_ThisDN())));

@@ -133,7 +133,7 @@ public class ConfServParser extends Parser {
 //<editor-fold defaultstate="collapsed" desc="STATE_COMMENTS">
             case STATE_COMMENTS:
 
-                m_LineStarted = m_CurrentLine;
+                m_lineStarted = m_CurrentLine;
 
                 s = ParseGenesysLocal(str);
 
@@ -523,9 +523,9 @@ public class ConfServParser extends Parser {
             try {
                 stmt.setTimestamp(1, new Timestamp(rec.GetAdjustedUsecTime()));
                 stmt.setInt(2, CSClientRequest1.getFileId());
-                stmt.setLong(3, rec.m_fileOffset);
+                stmt.setLong(3, rec.getM_fileOffset());
                 stmt.setLong(4, rec.getM_FileBytes());
-                stmt.setLong(5, rec.m_line);
+                stmt.setLong(5, rec.getM_line());
 
                 setFieldInt(stmt, 6, Main.getRef(ReferenceType.App, rec.getAppName()));
                 setFieldInt(stmt, 7, Main.getRef(ReferenceType.ObjectType, rec.getObjType()));
@@ -663,9 +663,9 @@ public class ConfServParser extends Parser {
             try {
                 stmt.setTimestamp(1, new Timestamp(rec.GetAdjustedUsecTime()));
                 stmt.setInt(2, CSConfToClient.getFileId());
-                stmt.setLong(3, rec.m_fileOffset);
+                stmt.setLong(3, rec.getM_fileOffset());
                 stmt.setLong(4, rec.getM_FileBytes());
-                stmt.setLong(5, rec.m_line);
+                stmt.setLong(5, rec.getM_line());
 
                 setFieldInt(stmt, 6, Main.getRef(ReferenceType.App, rec.getAppName()));
                 setFieldInt(stmt, 7, Main.getRef(ReferenceType.ObjectType, rec.getObjType()));
@@ -806,9 +806,9 @@ public class ConfServParser extends Parser {
             try {
                 stmt.setTimestamp(1, new Timestamp(rec.GetAdjustedUsecTime()));
                 stmt.setInt(2, CSClientConnect.getFileId());
-                stmt.setLong(3, rec.m_fileOffset);
+                stmt.setLong(3, rec.getM_fileOffset());
                 stmt.setLong(4, rec.getM_FileBytes());
-                stmt.setLong(5, rec.m_line);
+                stmt.setLong(5, rec.getM_line());
 
                 setFieldInt(stmt, 6, Main.getRef(ReferenceType.App, rec.getAppName()));
                 setFieldInt(stmt, 7, Main.getRef(ReferenceType.AppType, rec.getClientType()));

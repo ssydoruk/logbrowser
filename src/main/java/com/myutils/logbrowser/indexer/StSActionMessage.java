@@ -80,10 +80,10 @@ public class StSActionMessage extends Message {
 //            setFieldString(stmt,4,GetValue());
 //            setFieldString(stmt,5,GetConnID());
 //            stmt.setInt(6,m_fileId);
-//            stmt.setLong(7,m_fileOffset);
+//            stmt.setLong(7,getM_fileOffset());
 //            stmt.setInt(8,GetFileBytes());
 //            stmt.setInt(9,0);
-//            stmt.setInt(10,m_line);                
+//            stmt.setInt(10,getM_line());                
 //            
 //            accessor.SubmitStatement(m_statementId);
 //        } catch (Exception e) {

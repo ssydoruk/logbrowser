@@ -89,7 +89,7 @@ public class DBServerParser extends Parser {
             break;
 
             case STATE_COMMENTS:
-                m_LineStarted = m_CurrentLine;
+                m_lineStarted = m_CurrentLine;
 
                 try {
                     s = ParseGenesys(str, TableType.MsgDBServer);

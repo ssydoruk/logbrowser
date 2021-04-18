@@ -89,7 +89,7 @@ public class ApacheWebLogsParser extends WebParser {
         switch (m_ParserState) {
             case STATE_COMMENT:
 
-                m_LineStarted = m_CurrentLine;
+                m_lineStarted = m_CurrentLine;
 
                 if ((m = ENTRY_BEGIN_PATTERN.matcher(str)).find()) {
                     ApacheWebMsg entry = new ApacheWebMsg();
@@ -371,9 +371,9 @@ public class ApacheWebLogsParser extends WebParser {
             try {
                 stmt.setTimestamp(1, new Timestamp(rec.GetAdjustedUsecTime()));
                 stmt.setInt(2, ApacheWebMsg.getFileId());
-                stmt.setLong(3, rec.m_fileOffset);
+                stmt.setLong(3, rec.getM_fileOffset());
                 stmt.setLong(4, rec.getM_FileBytes());
-                stmt.setLong(5, rec.m_line);
+                stmt.setLong(5, rec.getM_line());
 
                 setFieldInt(stmt, 6, Main.getRef(ReferenceType.IP, rec.getIp()));
                 setFieldInt(stmt, 7, Main.getRef(ReferenceType.JSessionID, rec.getjSessionID()));

@@ -102,7 +102,7 @@ public class WorkspaceParser extends Parser {
             msg.setM_TimestampDP(getCurrentTimestamp());
             msg.SetOffset(getSavedFilePos());
             msg.SetFileBytes(getFilePos() - getSavedFilePos());
-            msg.SetLine(m_LineStarted);
+            msg.SetLine(m_lineStarted);
             msg.AddToDB(m_tables);
         } catch (Exception e) {
             Main.logger.error("Not added \"" + msg.getM_type() + "\" record:" + e.getMessage(), e);
@@ -126,7 +126,7 @@ public class WorkspaceParser extends Parser {
             msg.setM_TimestampDP(getCurrentTimestamp());
             msg.SetOffset(getFilePos());
             msg.SetFileBytes(getEndFilePos() - getFilePos());
-            msg.SetLine(m_LineStarted);
+            msg.SetLine(m_lineStarted);
             msg.AddToDB(m_tables);
         } catch (Exception e) {
             Main.logger.error("Not added \"" + msg.getM_type() + "\" record:" + e.getMessage(), e);
@@ -226,7 +226,7 @@ public class WorkspaceParser extends Parser {
             }
 
             case STATE_COMMENTS: {
-                m_LineStarted = m_CurrentLine;
+                m_lineStarted = m_CurrentLine;
                 setSavedFilePos(getFilePos());
 
                 try {

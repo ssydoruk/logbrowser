@@ -64,9 +64,9 @@ public class ExceptionTable extends DBTable {
 
             stmt.setTimestamp(1, new Timestamp(exceptionRec.GetAdjustedUsecTime()));
             stmt.setInt(2, ExceptionMessage.getFileId());
-            stmt.setLong(3, exceptionRec.m_fileOffset);
+            stmt.setLong(3, exceptionRec.getM_fileOffset());
             stmt.setLong(4, exceptionRec.getM_FileBytes());
-            stmt.setLong(5, exceptionRec.m_line);
+            stmt.setLong(5, exceptionRec.getM_line());
 
             setFieldInt(stmt, 6, Main.getRef(ReferenceType.Exception, exceptionRec.getException()));
             setFieldInt(stmt, 7, Main.getRef(ReferenceType.ExceptionMessage, exceptionRec.getExceptionMessage()));

@@ -66,8 +66,8 @@ public class TriggerTable extends DBTable {
             stmt.setInt(4, (theRec.m_msgId == 0 ? Trigger.m_tlibId : 0));
             stmt.setInt(5, (theRec.m_msgId == 2 ? Trigger.m_jsonId : 0));
             stmt.setInt(6, Trigger.getFileId());
-            stmt.setLong(7, theRec.m_fileOffset);
-            stmt.setInt(8, theRec.m_line);
+            stmt.setLong(7, theRec.getM_fileOffset());
+            stmt.setInt(8, theRec.getM_line());
 
             getM_dbAccessor().SubmitStatement(m_InsertStatementId);
         } catch (SQLException e) {

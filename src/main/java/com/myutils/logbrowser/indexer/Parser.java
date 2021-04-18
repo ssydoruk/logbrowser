@@ -1,28 +1,16 @@
 package com.myutils.logbrowser.indexer;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.text.ParseException;
-import java.time.Duration;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
-import java.time.temporal.TemporalAccessor;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import org.apache.commons.lang3.StringUtils;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
+import java.io.*;
+import java.net.*;
+import java.sql.*;
+import java.text.*;
+import java.time.*;
+import java.time.format.*;
+import java.time.temporal.*;
+import java.util.*;
+import java.util.regex.*;
+import org.apache.commons.lang3.*;
+import org.w3c.dom.*;
 
 /**
  *
@@ -128,7 +116,7 @@ public abstract class Parser {
     private final String m_StringType;
     private boolean foundBodyDates;
 
-    protected int m_LineStarted; // line where expression (TMessage) started
+    protected int m_lineStarted; // line where expression (TMessage) started
     private long bytesConsumed;
 
     protected DateParsed dp;
@@ -308,7 +296,7 @@ public abstract class Parser {
         if (dp != null) {
             return dp.rest;
         } else {
-            return null;
+            return str;
         }
     }
 
@@ -405,7 +393,7 @@ public abstract class Parser {
     }
 
     public int getLineStarted() {
-        return m_LineStarted;
+        return m_lineStarted;
     }
 
     public FileInfoType getM_type() {
@@ -497,7 +485,7 @@ public abstract class Parser {
         if (m_MessageContents.isEmpty()) { // line item
             msg.SetOffset(getFilePos());
             msg.SetFileBytes(getEndFilePos() - getFilePos());
-            msg.SetLine(m_LineStarted);
+            msg.SetLine(m_lineStarted);
         } else {
             SavePos(msg);
         }
@@ -505,7 +493,7 @@ public abstract class Parser {
 
     public long getLine() {
         if (m_MessageContents.isEmpty()) { // line item
-            return m_LineStarted;
+            return m_lineStarted;
         } else {
             return getLineStarted();
         }
@@ -533,7 +521,7 @@ public abstract class Parser {
             Main.logger.traceExit(msg);
             msg.AddToDB(m_tables);
         } catch (Exception e) {
-            Main.logger.error("line " + msg.m_line + " Not added \"" + msg.getM_type() + "\" record:" + e.getMessage(), e);
+            Main.logger.error("line " + msg.getM_line() + " Not added \"" + msg.getM_type() + "\" record:" + e.getMessage(), e);
             msg.PrintMsg();
 
         }
@@ -550,7 +538,7 @@ public abstract class Parser {
         if (ret != null) {
             lastKnownDate = ret.fmtDate;
             if (isParseTimeDiff()) {
-                dateDiff.newDate(ret, FileInfo.getFileId(), fileInfo.getAppNameID(), getFilePos(), getEndFilePos() - getFilePos(), m_LineStarted);
+                dateDiff.newDate(ret, FileInfo.getFileId(), fileInfo.getAppNameID(), getFilePos(), getEndFilePos() - getFilePos(), m_lineStarted);
             }
 
             commitDateParsers();
@@ -645,7 +633,7 @@ public abstract class Parser {
         }
 
         if (isParseTimeDiff()) {
-            dateDiff.newDate(parseDate, FileInfo.getFileId(), fileInfo.getAppNameID(), getFilePos(), getEndFilePos() - getFilePos(), m_LineStarted);
+            dateDiff.newDate(parseDate, FileInfo.getFileId(), fileInfo.getAppNameID(), getFilePos(), getEndFilePos() - getFilePos(), m_lineStarted);
         }
         return parseDate;
     }
@@ -693,7 +681,7 @@ public abstract class Parser {
         SaveTime(cl);
         cl.SetOffset(getFilePos());
         cl.SetFileBytes(getEndFilePos() - getFilePos());
-        cl.SetLine(m_LineStarted);
+        cl.SetLine(m_lineStarted);
         cl.handlerID(changeValue);
         custLineTab.AddToDB(cl);
 //        }
@@ -1023,9 +1011,9 @@ public abstract class Parser {
             try {
                 stmt.setTimestamp(1, new Timestamp(rec.GetAdjustedUsecTime()));
                 stmt.setInt(2, CustomRegexLine.getFileId());
-                stmt.setLong(3, rec.m_fileOffset);
+                stmt.setLong(3, rec.getM_fileOffset());
                 stmt.setLong(4, rec.getM_FileBytes());
-                stmt.setLong(5, rec.m_line);
+                stmt.setLong(5, rec.getM_line());
 
                 setFieldInt(stmt, 6, Main.getRef(ReferenceType.CUSTCOMP, rec.getComp()));
                 setFieldInt(stmt, 7, rec.getHandlerID());
@@ -1125,9 +1113,9 @@ public abstract class Parser {
             try {
 //                stmt.setTimestamp(1, new Timestamp(rec.GetAdjustedUsecTime()));
                 stmt.setInt(2, SCSAppStatus.getFileId());
-                stmt.setLong(3, rec.m_fileOffset);
+                stmt.setLong(3, rec.getM_fileOffset());
 //                stmt.setLong(4, rec.getM_FileBytes());
-                stmt.setLong(5, rec.m_line);
+                stmt.setLong(5, rec.getM_line());
 
                 getM_dbAccessor().SubmitStatement(m_InsertStatementId);
             } catch (SQLException e) {

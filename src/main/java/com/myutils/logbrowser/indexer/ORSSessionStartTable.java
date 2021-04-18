@@ -77,9 +77,9 @@ public class ORSSessionStartTable extends DBTable {
 
             stmt.setTimestamp(1, new Timestamp(gmsRec.GetAdjustedUsecTime()));
             stmt.setInt(2, ORSSessionStartMessage.getFileId());
-            stmt.setLong(3, gmsRec.m_fileOffset);
+            stmt.setLong(3, gmsRec.getM_fileOffset());
             stmt.setLong(4, gmsRec.getM_FileBytes());
-            stmt.setLong(5, gmsRec.m_line);
+            stmt.setLong(5, gmsRec.getM_line());
 
             setFieldInt(stmt, 6, Main.getRef(ReferenceType.GMSEvent, gmsRec.getEventName()));
             setFieldInt(stmt, 7, Main.getRef(ReferenceType.GMSCallbackType, gmsRec.CallBackType()));

@@ -78,9 +78,9 @@ public class ConfigUpdateTable extends DBTable {
             generateID(stmt, 1, rec);
             stmt.setTimestamp(2, new Timestamp(rec.GetAdjustedUsecTime()));
             stmt.setInt(3, ConfigUpdateRecord.getFileId());
-            stmt.setLong(4, rec.m_fileOffset);
+            stmt.setLong(4, rec.getM_fileOffset());
             stmt.setLong(5, rec.getM_FileBytes());
-            stmt.setLong(6, rec.m_line);
+            stmt.setLong(6, rec.getM_line());
 
             setFieldInt(stmt, 7, Main.getRef(ReferenceType.CfgOp, rec.GetOp()));
             setFieldInt(stmt, 8, Main.getRef(ReferenceType.CfgObjectType, rec.GetObjType()));

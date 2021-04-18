@@ -95,9 +95,9 @@ public class OrsHTTPTable extends DBTable {
         try {
             stmt.setTimestamp(1, new Timestamp(rec.GetAdjustedUsecTime()));
             stmt.setInt(2, OrsHTTP.getFileId());
-            stmt.setLong(3, rec.m_fileOffset);
+            stmt.setLong(3, rec.getM_fileOffset());
             stmt.setLong(4, rec.getM_FileBytes());
-            stmt.setLong(5, rec.m_line);
+            stmt.setLong(5, rec.getM_line());
 
             stmt.setInt(6, rec.getSocket());
             stmt.setInt(7, rec.getHTTPBytes());

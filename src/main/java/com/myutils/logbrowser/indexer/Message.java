@@ -657,7 +657,7 @@ public abstract class Message extends Record {
         setM_isInbound(isInbound);
     }
 
-    public long GetFileBytes() {
+    public long getFileBytes() {
         return getM_FileBytes();
     }
 
@@ -1145,7 +1145,7 @@ public abstract class Message extends Record {
         try {
             super.AddToDB(m_tables);
         } catch (Exception exception) {
-            Main.logger.error("l:" + m_line + " error adding message type [" + getM_type() + "]: " + exception.getMessage() + " msg: [" + this.toString() + "]");
+            Main.logger.error("l:" + getM_line() + " error adding message type [" + getM_type() + "]: " + exception.getMessage() + " msg: [" + this.toString() + "]");
         }
     }
 

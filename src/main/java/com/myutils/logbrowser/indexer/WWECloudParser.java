@@ -130,7 +130,7 @@ public class WWECloudParser extends Parser {
         switch (m_ParserState) {
             case STATE_COMMENT:
 
-                m_LineStarted = m_CurrentLine;
+                m_lineStarted = m_CurrentLine;
 
                 String s = ParseGenesys(str, TableType.MsgWWECloud, regNotParseMessage, regLineSkip);
 
@@ -446,9 +446,9 @@ public class WWECloudParser extends Parser {
 
                 stmt.setTimestamp(1, new Timestamp(wweRec.GetAdjustedUsecTime()));
                 stmt.setInt(2, WWECloudMessage.getFileId());
-                stmt.setLong(3, wweRec.m_fileOffset);
+                stmt.setLong(3, wweRec.getM_fileOffset());
                 stmt.setLong(4, wweRec.getM_FileBytes());
-                stmt.setLong(5, wweRec.m_line);
+                stmt.setLong(5, wweRec.getM_line());
 
                 setFieldInt(stmt, 6, Main.getRef(ReferenceType.ConnID, wweRec.getConnID()));
                 setFieldInt(stmt, 7, Main.getRef(ReferenceType.ConnID, wweRec.getTransferConnID()));
@@ -559,9 +559,9 @@ public class WWECloudParser extends Parser {
             try {
                 stmt.setTimestamp(1, new Timestamp(rec.GetAdjustedUsecTime()));
                 stmt.setInt(2, WWECloudAuthMsg.getFileId());
-                stmt.setLong(3, rec.m_fileOffset);
+                stmt.setLong(3, rec.getM_fileOffset());
                 stmt.setLong(4, rec.getM_FileBytes());
-                stmt.setLong(5, rec.m_line);
+                stmt.setLong(5, rec.getM_line());
 
                 setFieldInt(stmt, 6, Main.getRef(ReferenceType.Misc, rec.getSuccess()));
                 setFieldInt(stmt, 7, Main.getRef(ReferenceType.Agent, rec.getAgent()));
@@ -681,9 +681,9 @@ public class WWECloudParser extends Parser {
             try {
                 stmt.setTimestamp(1, new Timestamp(rec.GetAdjustedUsecTime()));
                 stmt.setInt(2, WWECloudExeptionMsg.getFileId());
-                stmt.setLong(3, rec.m_fileOffset);
+                stmt.setLong(3, rec.getM_fileOffset());
                 stmt.setLong(4, rec.getM_FileBytes());
-                stmt.setLong(5, rec.m_line);
+                stmt.setLong(5, rec.getM_line());
 
                 setFieldInt(stmt, 6, Main.getRef(ReferenceType.Exception, rec.getExceptionName()));
                 setFieldInt(stmt, 7, Main.getRef(ReferenceType.ExceptionMessage, rec.getMsg()));
@@ -749,9 +749,9 @@ public class WWECloudParser extends Parser {
             try {
                 stmt.setTimestamp(1, new Timestamp(rec.GetAdjustedUsecTime()));
                 stmt.setInt(2, WWECloudLogMsg.getFileId());
-                stmt.setLong(3, rec.m_fileOffset);
+                stmt.setLong(3, rec.getM_fileOffset());
                 stmt.setLong(4, rec.getM_FileBytes());
-                stmt.setLong(5, rec.m_line);
+                stmt.setLong(5, rec.getM_line());
 
                 setFieldInt(stmt, 6, Main.getRef(ReferenceType.CLOUD_LOG_MESSAGE_TYPE, rec.getMsg()));
                 setFieldInt(stmt, 7, Main.getRef(ReferenceType.CLOUD_LOG_MESSAGE, rec.getMsgText()));

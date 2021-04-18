@@ -56,10 +56,10 @@ public class StSRequestHistoryTable extends DBTable {
             stmt.setTimestamp(6, new Timestamp(theRec.GetAdjustedUsecTime()));
             setFieldInt(stmt, 7, Main.getRef(ReferenceType.StatEvent, theRec.GetMessageName()));
             setFieldInt(stmt, 8, StSRequestHistoryMessage.getFileId());
-            stmt.setLong(9, theRec.m_fileOffset);
-            stmt.setLong(10, theRec.GetFileBytes());
+            stmt.setLong(9, theRec.getM_fileOffset());
+            stmt.setLong(10, theRec.getFileBytes());
             setFieldInt(stmt, 11, 0);
-            setFieldInt(stmt, 12, theRec.m_line);
+            setFieldInt(stmt, 12, theRec.getM_line());
 
             getM_dbAccessor().SubmitStatement(m_InsertStatementId);
         } catch (SQLException e) {

@@ -6,22 +6,19 @@ package com.myutils.logbrowser.inquirer;
 
 import Utils.Pair;
 import Utils.UTCTimeRange;
-import Utils.Util;
-import com.myutils.logbrowser.indexer.FileInfoType;
-import com.myutils.logbrowser.indexer.ReferenceType;
-import com.myutils.logbrowser.indexer.TableType;
+import Utils.*;
+import com.myutils.logbrowser.indexer.*;
 import static com.myutils.logbrowser.inquirer.DatabaseConnector.TableExist;
 import com.myutils.logbrowser.inquirer.IQuery.IRecordLoadedProc;
 import static com.myutils.logbrowser.inquirer.IQuery.getCheckedWhere;
 import static com.myutils.logbrowser.inquirer.IQueryResults.addUnique;
 import static com.myutils.logbrowser.inquirer.QueryTools.FindNode;
-import java.awt.event.ActionEvent;
-import java.beans.PropertyChangeEvent;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashSet;
+import java.awt.event.*;
+import java.beans.*;
+import java.sql.*;
+import java.util.*;
 import static org.apache.commons.lang3.ArrayUtils.isEmpty;
-import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.*;
 
 /**
  *
@@ -46,13 +43,13 @@ final public class RoutingResults extends IQueryResults {
         try {
             isORS = (DatabaseConnector.fileExits(new FileInfoType[]{FileInfoType.type_ORS}));
         } catch (SQLException e) {
-            logger.error("fatal: ",  e);
+            logger.error("fatal: ", e);
 
         }
         try {
             isURS = (DatabaseConnector.fileExits(new FileInfoType[]{FileInfoType.type_URS, FileInfoType.type_URSHTTP}));
         } catch (SQLException e) {
-            logger.error("fatal: ",  e);
+            logger.error("fatal: ", e);
         }
 
         addSelectionType(SelectionType.NO_SELECTION);
@@ -88,7 +85,7 @@ final public class RoutingResults extends IQueryResults {
                 addCustom(rootA, FileInfoType.type_URS);
             }
         } catch (SQLException ex) {
-            logger.error("fatal: ",  ex);
+            logger.error("fatal: ", ex);
         }
         if (isURS) {
             msgUrsConfig = rootA.getLogMessagesReportType(TableType.MsgURServer, URS_LOG_MSG);
@@ -156,7 +153,14 @@ final public class RoutingResults extends IQueryResults {
 
             }
         } catch (SQLException ex) {
-            logger.error("fatal: ",  ex);
+            logger.error("fatal: ", ex);
+        }
+        if (!DatabaseConnector.TableEmptySilent(TableType.URSGenesysMessage.toString())) {
+            tEventsNode = new DynamicTreeNode<>(new OptionNode(true, DialogItem.URS_GENMESSAGE));
+            reportTypeURSStrategy.addChild(tEventsNode);
+            tEventsNode.addDynamicRef(DialogItem.URS_GENMESSAGE_TYPE, ReferenceType.MSGLEVEL);
+            tEventsNode.addDynamicRef(DialogItem.URS_GENMESSAGE_MSG, ReferenceType.LOGMESSAGE,
+                    TableType.URSGenesysMessage.toString(), "msgid");
         }
         try {
             if (DatabaseConnector.TableExist("ursstat")) {
@@ -167,7 +171,7 @@ final public class RoutingResults extends IQueryResults {
                 tEventsNode.addDynamicRef(DialogItem.URS_AGENTDN_AGENT, ReferenceType.Agent, "ursstat", "AgentNameID");
             }
         } catch (SQLException ex) {
-            logger.error("fatal: ",  ex);
+            logger.error("fatal: ", ex);
         }
         tEventsNode = new DynamicTreeNode<>(new OptionNode(true, DialogItem.URS_STRATEGY));
         reportTypeURSStrategy.addChild(tEventsNode);
@@ -181,7 +185,7 @@ final public class RoutingResults extends IQueryResults {
                 tEventsNode.addDynamicRef(DialogItem.URS_RLIB_METHOD, ReferenceType.ORSMETHOD);
             }
         } catch (SQLException ex) {
-            logger.error("fatal: ",  ex);
+            logger.error("fatal: ", ex);
         }
         try {
             if (DatabaseConnector.TableExist("ursri")) {
@@ -197,7 +201,7 @@ final public class RoutingResults extends IQueryResults {
 //                tEventsNode.addDynamicRef(DialogItem.URS_RI_SUBFUNCTION, ReferenceType.URSMETHOD, "ursri", "subfuncID");
             }
         } catch (SQLException ex) {
-            logger.error("fatal: ",  ex);
+            logger.error("fatal: ", ex);
         }
         try {
             if (DatabaseConnector.TableExist(TableType.URSHTTP)) {
@@ -214,7 +218,7 @@ final public class RoutingResults extends IQueryResults {
 //                tEventsNode.addDynamicRef(DialogItem.URS_RI_SUBFUNCTION, ReferenceType.URSMETHOD, "ursri", "subfuncID");
             }
         } catch (SQLException ex) {
-            logger.error("fatal: ",  ex);
+            logger.error("fatal: ", ex);
         }
 
         tEventsNode = new DynamicTreeNode<>(new OptionNode(true, DialogItem.URS_VQ));
@@ -1141,6 +1145,42 @@ final public class RoutingResults extends IQueryResults {
 
         }
 //</editor-fold>
+//<editor-fold defaultstate="collapsed" desc="urs_genesys_message">
+//        if (!DatabaseConnector.TableEmptySilent(TableType.URSGenesysMessage.toString())) {
+//            tEventsNode = new DynamicTreeNode<>(new OptionNode(true, DialogItem.URS_GENMESSAGE));
+//            reportTypeURSStrategy.addChild(tEventsNode);
+//            tEventsNode.addDynamicRef(DialogItem.URS_GENMESSAGE_TYPE, ReferenceType.MSGLEVEL);
+//            tEventsNode.addDynamicRef(DialogItem.URS_GENMESSAGE_MSG, ReferenceType.LOGMESSAGE,
+//                    TableType.URSGenesysMessage.toString(), "msgid");
+//        }
+
+        if (isChecked(FindNode(ursReportSettings, DialogItem.URS_GENMESSAGE, null, null))
+                && TableExist(TableType.URSGenesysMessage.toString())) {
+            tellProgress("Retrieving URS genesys messages");
+            TableQuery URS_GENMSG = new TableQuery(MsgType.GENESYS_URS_MSG, TableType.URSGenesysMessage.toString());
+            if (cidFinder != null && cidFinder.getSearchType() != SelectionType.NO_SELECTION
+                    && !isEmpty(CONNID)) {
+                URS_GENMSG.addWhere(getWhere("connidid", CONNID, false), "AND");
+            }
+            URS_GENMSG.AddCheckedWhere(URS_GENMSG.getTabAlias() + ".levelID",
+                    ReferenceType.MSGLEVEL,
+                    FindNode(ursReportSettings, DialogItem.URS_GENMESSAGE, null, null),
+                    "AND",
+                    DialogItem.URS_GENMESSAGE_TYPE);
+            URS_GENMSG.AddCheckedWhere(URS_GENMSG.getTabAlias() + ".msgID",
+                    ReferenceType.LOGMESSAGE,
+                    FindNode(ursReportSettings, DialogItem.URS_GENMESSAGE, null, null),
+                    "AND",
+                    DialogItem.URS_GENMESSAGE_MSG);
+
+            URS_GENMSG.addRef("connidid", "connid", ReferenceType.ConnID.toString(), IQuery.FieldType.Optional);
+            URS_GENMSG.addRef("levelid", "level", ReferenceType.MSGLEVEL.toString(), IQuery.FieldType.Optional);
+            URS_GENMSG.addRef("msgid", "msg", ReferenceType.LOGMESSAGE.toString(), IQuery.FieldType.Optional);
+            URS_GENMSG.setCommonParams(this, dlg);
+            getRecords(URS_GENMSG);
+        }
+
+//</editor-fold>
 //<editor-fold defaultstate="collapsed" desc="urshttp">
         if (isChecked(FindNode(ursReportSettings, DialogItem.URS_HTTP, null, null)) && TableExist(TableType.URSHTTP)) {
             if (cidFinder == null || cidFinder.getSearchType() == SelectionType.NO_SELECTION
@@ -1564,7 +1604,7 @@ final public class RoutingResults extends IQueryResults {
 
             return ret;
         } catch (Exception ex) {
-            logger.error("fatal: ",  ex);
+            logger.error("fatal: ", ex);
         }
         return null;
     }

@@ -304,7 +304,7 @@ public class OCSParser extends Parser {
             break;
 
             case STATE_COMMENT:
-                m_LineStarted = m_CurrentLine;
+                m_lineStarted = m_CurrentLine;
 
                 s = ParseGenesys(str, TableType.MsgOCServer, regNotParseMessage);
 
@@ -317,7 +317,7 @@ public class OCSParser extends Parser {
                         msg.setM_TimestampDP(getCurrentTimestamp());
                         msg.SetOffset(getFilePos());
                         msg.SetFileBytes(getEndFilePos() - getFilePos());
-                        msg.SetLine(m_LineStarted);
+                        msg.SetLine(m_lineStarted);
                         int e = m.end();
                         if ((m = regChainID.matcher(s.substring(e))).find()) {
                             msg.setChainID(m.group(1));
@@ -492,7 +492,7 @@ public class OCSParser extends Parser {
                         if (m_MessageContents.size() > 0) { //not first message
                             AddAssignmentMessage();
                             m_MessageContents.clear();
-                            m_LineStarted = m_CurrentLine;
+                            m_lineStarted = m_CurrentLine;
                         }
                         m_MessageContents.add(str);
                     } else {
@@ -528,7 +528,7 @@ public class OCSParser extends Parser {
                             && str.length() == 0) {
                         AddStatEventMessage();
                         m_MessageContents.clear();
-                        m_LineStarted = m_CurrentLine;
+                        m_lineStarted = m_CurrentLine;
                         setSavedFilePos(getFilePos());
                     } else {
                         m_MessageContents.add(str);
@@ -853,9 +853,9 @@ public class OCSParser extends Parser {
             try {
                 stmt.setTimestamp(1, new Timestamp(rec.GetAdjustedUsecTime()));
                 stmt.setInt(2, OCSPredInfo.getFileId());
-                stmt.setLong(3, rec.m_fileOffset);
+                stmt.setLong(3, rec.getM_fileOffset());
                 stmt.setLong(4, rec.getM_FileBytes());
-                stmt.setLong(5, rec.m_line);
+                stmt.setLong(5, rec.getM_line());
 
                 stmt.setInt(6, rec.getSessionID());
                 stmt.setDouble(7, rec.getDensity());

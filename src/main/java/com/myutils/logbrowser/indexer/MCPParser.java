@@ -212,7 +212,7 @@ public class MCPParser extends Parser {
                     throw exception; // do nothing so far. Can insert code to ignore certain exceptions
                 }
 
-                m_LineStarted = m_CurrentLine;
+                m_lineStarted = m_CurrentLine;
                 if (s != null) {
                     if ((m = reqSIPRequest.matcher(s)).find()
                             || (m = reqSIPResponse.matcher(s)).find()) {
@@ -383,7 +383,7 @@ public class MCPParser extends Parser {
         try {
             SetStdFieldsAndAdd(msg);
         } catch (Exception e) {
-            Main.logger.error("Error adding message line:" + m_LineStarted, e);
+            Main.logger.error("Error adding message line:" + m_lineStarted, e);
             PrintMsg(contents);
         }
     }
@@ -1257,9 +1257,9 @@ public class MCPParser extends Parser {
                 if (StringUtils.isNotEmpty(command)) {
                     stmt.setTimestamp(1, new Timestamp(rec.GetAdjustedUsecTime()));
                     stmt.setInt(2, SCSAppStatus.getFileId());
-                    stmt.setLong(3, rec.m_fileOffset);
+                    stmt.setLong(3, rec.getM_fileOffset());
                     stmt.setLong(4, rec.getM_FileBytes());
-                    stmt.setLong(5, rec.m_line);
+                    stmt.setLong(5, rec.getM_line());
 
                     setFieldInt(stmt, 6, Main.getRef(ReferenceType.VXMLCommand, command));
                     setFieldInt(stmt, 7, Main.getRef(ReferenceType.VXMLCommandParams, rec.getParam1()));

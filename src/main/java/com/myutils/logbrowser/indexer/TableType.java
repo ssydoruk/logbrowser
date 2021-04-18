@@ -98,6 +98,7 @@ public enum TableType {
     GMSPOST("GMSPOST"),
     GMSORSMessage("GMSORSMessage"),
     URSAgentGroupTable("URSAgentGroupTable"),
+    URSGenesysMessage("URSGenesysMessage"),
     OCSPredInfo("OCSPredInfo"),
     ObjectDBID("ObjectDBID"),
     MsgLCAServer("MsgLCAServer"),

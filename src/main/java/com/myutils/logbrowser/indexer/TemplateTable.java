@@ -68,9 +68,9 @@ public class TemplateTable extends DBTable {
             generateID(stmt, 1, rec);
             stmt.setTimestamp(2, new Timestamp(rec.GetAdjustedUsecTime()));
             stmt.setInt(3, ORSMetric.getFileId());
-            stmt.setLong(4, rec.m_fileOffset);
+            stmt.setLong(4, rec.getM_fileOffset());
             stmt.setLong(5, rec.getM_FileBytes());
-            stmt.setLong(6, rec.m_line);
+            stmt.setLong(6, rec.getM_line());
 
             stmt.setInt(7, ORSMetric.m_handlerId);
             setFieldString(stmt, 8, rec.sid);

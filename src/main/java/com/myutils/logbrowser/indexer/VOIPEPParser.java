@@ -230,7 +230,7 @@ public class VOIPEPParser extends Parser {
                     throw exception; // do nothing so far. Can insert code to ignore certain exceptions
                 }
 
-                m_LineStarted = m_CurrentLine;
+                m_lineStarted = m_CurrentLine;
 
                 if ((m = regConfigOneLineDN.matcher(str)).find()) {
                     ConfigUpdateRecord msg = new ConfigUpdateRecord(str);
@@ -443,7 +443,7 @@ public class VOIPEPParser extends Parser {
         try {
             SetStdFieldsAndAdd(msg);
         } catch (Exception e) {
-            Main.logger.error("Error adding message line:" + m_LineStarted, e);
+            Main.logger.error("Error adding message line:" + m_lineStarted, e);
             PrintMsg(contents);
         }
     }

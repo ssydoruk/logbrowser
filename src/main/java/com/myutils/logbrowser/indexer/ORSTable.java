@@ -179,10 +179,10 @@ public class ORSTable extends DBTable {
             setFieldInt(stmt, 8, orsRec.getM_refID());
             stmt.setBoolean(9, orsRec.isInbound());
             setFieldInt(stmt, 10, ORSMessage.getFileId());
-            stmt.setLong(11, orsRec.m_fileOffset);
-            stmt.setLong(12, orsRec.GetFileBytes());
+            stmt.setLong(11, orsRec.getM_fileOffset());
+            stmt.setLong(12, orsRec.getFileBytes());
             stmt.setInt(13, 0);
-            stmt.setInt(14, orsRec.m_line);
+            stmt.setInt(14, orsRec.getM_line());
             setFieldInt(stmt, 15, Main.getRef(ReferenceType.UUID, StripQuotes(orsRec.getAttributeTrim("AttributeCallUUID", 32))));
             setFieldLong(stmt, 16, orsRec.getAttributeHex("AttributeEventSequenceNumber"));
             setFieldInt(stmt, 17, Main.getRef(ReferenceType.App, orsRec.getM_TserverSRC()));

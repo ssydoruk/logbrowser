@@ -63,8 +63,8 @@ public class Trigger extends Record {
             stmt.setInt(4, (m_msgId == 0 ? m_tlibId : 0));
             stmt.setInt(5, (m_msgId == 2 ? m_jsonId : 0));
             stmt.setInt(6, m_fileId);
-            stmt.setLong(7,m_fileOffset);
-            stmt.setInt(8, m_line);
+            stmt.setLong(7,getM_fileOffset());
+            stmt.setInt(8, getM_line());
             
             accessor.SubmitStatement(m_batchId);
         } catch (Exception e) {

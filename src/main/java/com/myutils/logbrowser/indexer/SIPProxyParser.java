@@ -236,7 +236,7 @@ public class SIPProxyParser extends Parser {
                     throw exception; // do nothing so far. Can insert code to ignore certain exceptions
                 }
 
-                m_LineStarted = m_CurrentLine;
+                m_lineStarted = m_CurrentLine;
 
                 if ((m = regConfigOneLineDN.matcher(str)).find()) {
 //                    Main.logger.trace("-1-");
@@ -569,7 +569,7 @@ public class SIPProxyParser extends Parser {
 //            return;
 //        }
 //        if (s.indexOf(' ') == -1) {
-//            Main.logger.error("Broken message - firstLine doesn't contain empty space; line " + m_LineStarted);
+//            Main.logger.error("Broken message - firstLine doesn't contain empty space; line " + m_lineStarted);
 //            PrintMsg(contents);
 //            return;
 //        }
@@ -761,7 +761,7 @@ public class SIPProxyParser extends Parser {
         try {
             SetStdFieldsAndAdd(msg);
         } catch (Exception e) {
-            Main.logger.error("Error adding message line:" + m_LineStarted);
+            Main.logger.error("Error adding message line:" + m_lineStarted);
             PrintMsg(contents);
         }
     }

@@ -82,11 +82,11 @@ public class WSTlibTable extends DBTable {
             stmt.setInt(8, (int) theRec.getHeaderLong("AttributeReferenceID"));
             stmt.setBoolean(9, theRec.isInbound());
             stmt.setInt(10, UrsMessage.getFileId());
-            stmt.setLong(11, theRec.m_fileOffset);
-            stmt.setLong(12, theRec.GetFileBytes());
+            stmt.setLong(11, theRec.getM_fileOffset());
+            stmt.setLong(12, theRec.getFileBytes());
             stmt.setInt(13, 0);
             stmt.setLong(14, theRec.getSeqNo());
-            stmt.setInt(15, theRec.m_line);
+            stmt.setInt(15, theRec.getM_line());
             setFieldInt(stmt, 16, Main.getRef(ReferenceType.UUID, theRec.GetUUID()));
             setFieldInt(stmt, 17, Main.getRef(ReferenceType.IxnID, theRec.getIxnID()));
             setFieldInt(stmt, 18, Main.getRef(ReferenceType.App, theRec.getServer()));

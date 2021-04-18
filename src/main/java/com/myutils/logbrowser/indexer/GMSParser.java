@@ -196,7 +196,7 @@ public class GMSParser extends Parser {
         OrsHTTP tmpOrsHTTP = partHTTP.get(orsHTTP.getSocket());
         if (tmpOrsHTTP != null) { // pending HTTP request
             tmpOrsHTTP.AddBytes(orsHTTP);
-            tmpOrsHTTP.SetFileBytes(orsHTTP.m_fileOffset + orsHTTP.GetFileBytes() - tmpOrsHTTP.m_fileOffset);
+            tmpOrsHTTP.SetFileBytes(orsHTTP.getM_fileOffset() + orsHTTP.getFileBytes() - tmpOrsHTTP.getM_fileOffset());
             if (tmpOrsHTTP.isComplete()) {
                 partHTTP.remove(orsHTTP.getSocket());
                 return tmpOrsHTTP;
@@ -336,7 +336,7 @@ public class GMSParser extends Parser {
                 if (str.isEmpty()) {
                     return null;
                 }
-                m_LineStarted = m_CurrentLine;
+                m_lineStarted = m_CurrentLine;
                 if (!parsedGenesys) {
                     s = ParseGenesysGMS(str, TableType.MsgGMS, regNotParseMessage);
                     s = getThread(s);
@@ -822,9 +822,9 @@ public class GMSParser extends Parser {
                 try {
                     stmt.setTimestamp(1, new Timestamp(rec.GetAdjustedUsecTime()));
                     stmt.setInt(2, GMSStatServerMsg.getFileId());
-                    stmt.setLong(3, rec.m_fileOffset);
+                    stmt.setLong(3, rec.getM_fileOffset());
                     stmt.setLong(4, rec.getM_FileBytes());
-                    stmt.setLong(5, rec.m_line);
+                    stmt.setLong(5, rec.getM_line());
 
                     setFieldInt(stmt, 6, Main.getRef(ReferenceType.App, rec.getSsApp()));
                     setFieldInt(stmt, 7, Main.getRef(ReferenceType.Host, rec.getSsHost()));
@@ -989,9 +989,9 @@ public class GMSParser extends Parser {
             try {
                 stmt.setTimestamp(1, new Timestamp(rec.GetAdjustedUsecTime()));
                 stmt.setInt(2, GMSWebClientMsg.getFileId());
-                stmt.setLong(3, rec.m_fileOffset);
+                stmt.setLong(3, rec.getM_fileOffset());
                 stmt.setLong(4, rec.getM_FileBytes());
-                stmt.setLong(5, rec.m_line);
+                stmt.setLong(5, rec.getM_line());
 
                 setFieldInt(stmt, 6, Main.getRef(ReferenceType.HTTPURL, rec.getURL()));
                 stmt.setBoolean(7, rec.isResponse());

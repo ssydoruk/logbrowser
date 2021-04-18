@@ -66,9 +66,9 @@ public class ConnIDTable extends DBTable {
         try {
             stmt.setTimestamp(1, new Timestamp(theRec.GetAdjustedUsecTime()));
             stmt.setInt(2, ConnIdRecord.getFileId());
-            stmt.setLong(3, theRec.m_fileOffset);
+            stmt.setLong(3, theRec.getM_fileOffset());
             stmt.setLong(4, theRec.getM_FileBytes());
-            stmt.setInt(5, rec.m_line);
+            stmt.setInt(5, rec.getM_line());
 
             setFieldInt(stmt, 6, Main.getRef(ReferenceType.ConnID, theRec.getM_connId()));
             stmt.setInt(7, (ConnIdRecord.m_handlerInProgress ? ConnIdRecord.m_handlerId : 0));

@@ -76,9 +76,9 @@ public class ORSMetricTable extends DBTable {
             try {
                 stmt.setTimestamp(1, new Timestamp(orsRec.GetAdjustedUsecTime()));
                 stmt.setInt(2, ORSMetric.getFileId());
-                stmt.setLong(3, orsRec.m_fileOffset);
+                stmt.setLong(3, orsRec.getM_fileOffset());
                 stmt.setLong(4, orsRec.getM_FileBytes());
-                stmt.setLong(5, orsRec.m_line);
+                stmt.setLong(5, orsRec.getM_line());
 
                 setFieldInt(stmt, 6, Main.getRef(ReferenceType.ORSSID, orsRec.sid));
                 setFieldInt(stmt, 7, Main.getRef(ReferenceType.METRIC, orsRec.Method));

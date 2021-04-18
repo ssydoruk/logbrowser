@@ -131,7 +131,7 @@ public class LCAParser extends Parser {
 //<editor-fold defaultstate="collapsed" desc="STATE_COMMENTS">
             case STATE_COMMENTS:
 
-                m_LineStarted = m_CurrentLine;
+                m_lineStarted = m_CurrentLine;
 
                 s = ParseGenesys(str, TableType.MsgLCAServer, regNotParseMessage, regLineSkip);
 

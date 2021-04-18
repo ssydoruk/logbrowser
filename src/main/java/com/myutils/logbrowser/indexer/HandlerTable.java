@@ -60,8 +60,8 @@ public class HandlerTable extends DBTable {
         try {
             stmt.setInt(1, Main.getRef(ReferenceType.HANDLER, m_text));
             stmt.setInt(2, Handler.getFileId());
-//            stmt.setLong(3, (long) theRec.m_fileOffset);
-//            stmt.setInt(4, theRec.m_line);
+//            stmt.setLong(3, (long) theRec.getM_fileOffset());
+//            stmt.setInt(4, theRec.getM_line());
             theRec.IncHandler();
             getM_dbAccessor().SubmitStatement(m_InsertStatementId);
         } catch (SQLException e) {

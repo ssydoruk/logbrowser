@@ -68,10 +68,10 @@ public class JsonTable extends DBTable {
             setFieldInt(stmt, 6, Main.getRef(ReferenceType.SIPURI, theRec.GetDestUri()));
             stmt.setInt(7, theRec.GetSipsId());
             stmt.setInt(8, JsonMessage.getFileId());
-            stmt.setLong(9, theRec.m_fileOffset);
-            stmt.setLong(10, theRec.GetFileBytes());
+            stmt.setLong(9, theRec.getM_fileOffset());
+            stmt.setLong(10, theRec.getFileBytes());
             stmt.setInt(11, JsonMessage.m_sipId);
-            stmt.setInt(12, theRec.m_line);
+            stmt.setInt(12, theRec.getM_line());
             stmt.setInt(13, theRec.getHanglerID());
             JsonMessage.SetJsonId(getCurrentID());
 

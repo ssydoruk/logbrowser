@@ -71,10 +71,10 @@ public class StSRequestHistoryMessage extends Message {
 //            stmt.setTimestamp(6, new Timestamp(GetAdjustedUsecTime()));
 //            setFieldString(stmt,7,GetMessageName());
 //            stmt.setInt(8,m_fileId);
-//            stmt.setLong(9,m_fileOffset);
+//            stmt.setLong(9,getM_fileOffset());
 //            stmt.setInt(10,GetFileBytes());
 //            stmt.setInt(11,0);
-//            stmt.setInt(12,m_line);                
+//            stmt.setInt(12,getM_line());                
 //            
 //            accessor.SubmitStatement(m_statementId);
 //        } catch (Exception e) {

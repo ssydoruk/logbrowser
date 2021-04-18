@@ -65,8 +65,8 @@ public class CIFaceRequestTable extends DBTable {
             setFieldInt(stmt, 4, Main.getRef(ReferenceType.DN, CIFaceRequest.SingleQuotes(theRec.getM_otherDN())));
             stmt.setInt(5, CIFaceRequest.m_handlerId);
             stmt.setInt(6, CIFaceRequest.getFileId());
-            stmt.setLong(7, theRec.m_fileOffset);
-            stmt.setInt(8, theRec.m_line);
+            stmt.setLong(7, theRec.getM_fileOffset());
+            stmt.setInt(8, theRec.getM_line());
             Main.logger.trace("theRec.m_handlerId:" + CIFaceRequest.m_handlerId);
 
             getM_dbAccessor().SubmitStatement(m_InsertStatementId);

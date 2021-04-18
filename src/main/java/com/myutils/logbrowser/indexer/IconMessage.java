@@ -91,10 +91,10 @@ public class IconMessage extends Message {
             DBTable.setFieldString(stmt, 7, GetConnID());
             DBTable.setFieldString(stmt, 8, GetTransferConnID());
             stmt.setInt(9, getFileId());
-            stmt.setLong(10, m_fileOffset);
-            stmt.setLong(11, GetFileBytes());
+            stmt.setLong(10, getM_fileOffset());
+            stmt.setLong(11, getFileBytes());
             stmt.setInt(12, 0);
-            stmt.setInt(13, m_line);
+            stmt.setInt(13, getM_line());
 
             accessor.SubmitStatement(m_statementId);
         } catch (SQLException e) {

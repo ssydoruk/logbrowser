@@ -111,12 +111,12 @@ public class TLibTable extends DBTable {
             setFieldString(stmt, 13, theRec.getAttributeTrim("AttributePrivateMsgID"));
             setFieldInt(stmt, 14, Main.getRef(ReferenceType.Switch, Record.NoQuotes(theRec.getAttributeTrim("AttributeLocation"))));
             setFieldInt(stmt, 15, TLibMessage.getFileId());
-            setFieldLong(stmt, 16, theRec.m_fileOffset);
-            setFieldLong(stmt, 17, theRec.GetFileBytes());
+            setFieldLong(stmt, 16, theRec.getM_fileOffset());
+            setFieldLong(stmt, 17, theRec.getFileBytes());
             setFieldInt(stmt, 18, (TLibMessage.m_handlerInProgress ? TLibMessage.m_handlerId : 0));
             Main.logger.trace("theRec.m_handlerId:" + TLibMessage.m_handlerId + " theRec.m_handlerInProgress :" + TLibMessage.m_handlerInProgress);
 
-            setFieldInt(stmt, 19, theRec.m_line);
+            setFieldInt(stmt, 19, theRec.getM_line());
             setFieldLong(stmt, 20, theRec.getSeqNo());
             setFieldInt(stmt, 21, Main.getRef(ReferenceType.UUID, theRec.getUUID()));
             setFieldLong(stmt, 22, theRec.getErrorCode());

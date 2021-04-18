@@ -96,9 +96,9 @@ public class URSRITable extends DBTable {
         try {
             stmt.setTimestamp(1, new Timestamp(rec.GetAdjustedUsecTime()));
             stmt.setInt(2, URSRI.getFileId());
-            stmt.setLong(3, rec.m_fileOffset);
+            stmt.setLong(3, rec.getM_fileOffset());
             stmt.setLong(4, rec.getM_FileBytes());
-            stmt.setLong(5, rec.m_line);
+            stmt.setLong(5, rec.getM_line());
 
             setFieldInt(stmt, 6, Main.getRef(ReferenceType.ConnID, rec.getConnID()));
             setFieldInt(stmt, 7, Main.getRef(ReferenceType.App, rec.getClientApp()));

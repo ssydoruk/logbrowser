@@ -71,9 +71,9 @@ public class OrsUrsTable extends DBTable {
         try {
             stmt.setTimestamp(1, new Timestamp(theRec.GetAdjustedUsecTime()));
             stmt.setInt(2, OrsUrsMessage.getFileId());
-            stmt.setLong(3, theRec.m_fileOffset);
+            stmt.setLong(3, theRec.getM_fileOffset());
             stmt.setLong(4, theRec.getM_FileBytes());
-            stmt.setLong(5, theRec.m_line);
+            stmt.setLong(5, theRec.getM_line());
 
             stmt.setBoolean(6, theRec.isInbound());
             setFieldInt(stmt, 7, Main.getRef(ReferenceType.ORSSID, theRec.GetSid()));

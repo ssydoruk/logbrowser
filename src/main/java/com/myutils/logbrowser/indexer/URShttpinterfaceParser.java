@@ -175,7 +175,7 @@ public class URShttpinterfaceParser extends WebParser {
             break;
 
             case STATE_COMMENT:
-                m_LineStarted = m_CurrentLine;
+                m_lineStarted = m_CurrentLine;
                 if (!dateParsed) {
                     s = ParseTimestampStr1(str);
                 }
@@ -341,7 +341,7 @@ public class URShttpinterfaceParser extends WebParser {
         ursHTTPMsg tmpUrsHTTP = partHTTP.get(ursHTTP.getSocket());
         if (tmpUrsHTTP != null) { // pending HTTP request
             tmpUrsHTTP.AddBytes(ursHTTP);
-            tmpUrsHTTP.SetFileBytes(ursHTTP.m_fileOffset + ursHTTP.GetFileBytes() - tmpUrsHTTP.m_fileOffset);
+            tmpUrsHTTP.SetFileBytes(ursHTTP.getM_fileOffset() + ursHTTP.getFileBytes() - tmpUrsHTTP.getM_fileOffset());
             if (tmpUrsHTTP.isComplete()) {
                 partHTTP.remove(ursHTTP.getSocket());
                 return tmpUrsHTTP;
@@ -734,9 +734,9 @@ public class URShttpinterfaceParser extends WebParser {
             try {
                 stmt.setTimestamp(1, new Timestamp(rec.GetAdjustedUsecTime()));
                 stmt.setInt(2, OrsHTTP.getFileId());
-                stmt.setLong(3, rec.m_fileOffset);
+                stmt.setLong(3, rec.getM_fileOffset());
                 stmt.setLong(4, rec.getM_FileBytes());
-                stmt.setLong(5, rec.m_line);
+                stmt.setLong(5, rec.getM_line());
 
                 stmt.setInt(6, rec.getSocket());
                 stmt.setInt(7, rec.getHTTPBytes());
@@ -839,9 +839,9 @@ public class URShttpinterfaceParser extends WebParser {
             try {
                 stmt.setTimestamp(1, new Timestamp(theRec.GetAdjustedUsecTime()));
                 stmt.setInt(2, HTTPtoURS.getFileId());
-                stmt.setLong(3, theRec.m_fileOffset);
+                stmt.setLong(3, theRec.getM_fileOffset());
                 stmt.setLong(4, theRec.getM_FileBytes());
-                stmt.setLong(5, theRec.m_line);
+                stmt.setLong(5, theRec.getM_line());
 
                 setFieldLong(stmt, 6, theRec.getHTTPRefID());
                 setFieldLong(stmt, 7, theRec.getURSRefID());

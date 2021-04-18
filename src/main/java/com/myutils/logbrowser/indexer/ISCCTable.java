@@ -81,10 +81,10 @@ public class ISCCTable extends DBTable {
             stmt.setLong(6, theRec.getRefID());
             stmt.setBoolean(7, theRec.isInbound());
             stmt.setInt(8, IsccMessage.getFileId());
-            stmt.setLong(9, theRec.m_fileOffset);
-            stmt.setLong(10, theRec.GetFileBytes());
+            stmt.setLong(9, theRec.getM_fileOffset());
+            stmt.setLong(10, theRec.getFileBytes());
             stmt.setInt(11, IsccMessage.m_handlerId);
-            stmt.setInt(12, theRec.m_line);
+            stmt.setInt(12, theRec.getM_line());
             setFieldInt(stmt, 13, Main.getRef(ReferenceType.App, theRec.GetSrcApp()));
             setFieldInt(stmt, 14, Main.getRef(ReferenceType.Switch, theRec.GetSrcSwitch()));
             setFieldInt(stmt, 15, Main.getRef(ReferenceType.ConnID, theRec.GetOtherConnID()));

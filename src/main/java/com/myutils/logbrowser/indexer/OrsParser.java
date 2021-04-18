@@ -151,7 +151,7 @@ public class OrsParser extends Parser {
         OrsHTTP tmpOrsHTTP = partHTTP.get(orsHTTP.getSocket());
         if (tmpOrsHTTP != null) { // pending HTTP request
             tmpOrsHTTP.AddBytes(orsHTTP);
-            tmpOrsHTTP.SetFileBytes(orsHTTP.m_fileOffset + orsHTTP.GetFileBytes() - tmpOrsHTTP.m_fileOffset);
+            tmpOrsHTTP.SetFileBytes(orsHTTP.getM_fileOffset() + orsHTTP.getFileBytes() - tmpOrsHTTP.getM_fileOffset());
             if (tmpOrsHTTP.isComplete()) {
                 partHTTP.remove(orsHTTP.getSocket());
                 return tmpOrsHTTP;
@@ -304,7 +304,7 @@ public class OrsParser extends Parser {
             break;
 
             case STATE_COMMENT:
-                m_LineStarted = m_CurrentLine;
+                m_lineStarted = m_CurrentLine;
                 if (!parsedGenesys) {
                     s = parseGenesys(str);
                     s = getThread(s);
@@ -488,7 +488,7 @@ public class OrsParser extends Parser {
         theMsg.setM_Timestamp(getLastTimeStamp());
         theMsg.SetOffset(getSavedFilePos());
         theMsg.SetFileBytes(getFilePos() - getSavedFilePos());
-        theMsg.SetLine(m_LineStarted);
+        theMsg.SetLine(m_lineStarted);
         theMsg.setM_isInbound(isInbound);
         theMsg.AddToDB(m_tables);
 
@@ -502,7 +502,7 @@ public class OrsParser extends Parser {
         themsg.setM_Timestamp(getLastTimeStamp());
         themsg.SetOffset(getSavedFilePos());
         themsg.SetFileBytes(getFilePos() - getSavedFilePos());
-        themsg.SetLine(m_LineStarted);
+        themsg.SetLine(m_lineStarted);
         themsg.setM_isInbound(isInbound);
         themsg.AddToDB(m_tables);
 
@@ -535,7 +535,7 @@ public class OrsParser extends Parser {
             themsg.SetOffset(getFilePos());
             themsg.SetFileBytes(getEndFilePos() - getFilePos());
 
-            themsg.SetLine(m_LineStarted);
+            themsg.SetLine(m_lineStarted);
             themsg.setDirection("from".equals(m.group(4)));
             themsg.setSrcNodeID(Integer.parseInt(m.group(2)));
             themsg.setSrcNodeType(m.group(1));
@@ -625,7 +625,7 @@ public class OrsParser extends Parser {
         msg.setM_Timestamp(getLastTimeStamp());
         msg.SetOffset(getFilePos());
         msg.SetFileBytes(getEndFilePos() - getFilePos());
-        msg.SetLine(m_LineStarted);
+        msg.SetLine(m_lineStarted);
         msg.AddToDB(m_tables);
         m_MessageContents.clear(); // clear messages
     }
@@ -667,7 +667,7 @@ public class OrsParser extends Parser {
             themsg.setM_Timestamp(getLastTimeStamp());
             themsg.SetOffset(getFilePos());
             themsg.SetFileBytes(getEndFilePos() - getFilePos());
-            themsg.SetLine(m_LineStarted);
+            themsg.SetLine(m_lineStarted);
             themsg.AddToDB(m_tables);
 
             //m_ParserState=STATE_CLUSTER;
@@ -757,7 +757,7 @@ public class OrsParser extends Parser {
         themsg.setM_Timestamp(getLastTimeStamp());
         themsg.SetOffset(getFilePos());
         themsg.SetFileBytes(getEndFilePos() - getFilePos());
-        themsg.SetLine(m_LineStarted);
+        themsg.SetLine(m_lineStarted);
 
         themsg.AddToDB(m_tables);
         m_MessageContents.clear(); // clear messages
@@ -1318,15 +1318,15 @@ public class OrsParser extends Parser {
             try {
                 stmt.setTimestamp(1, new Timestamp(rec.GetAdjustedUsecTime()));
                 stmt.setInt(2, SCSAppStatus.getFileId());
-                stmt.setLong(3, rec.m_fileOffset);
+                stmt.setLong(3, rec.getM_fileOffset());
                 stmt.setLong(4, rec.getM_FileBytes());
-                stmt.setLong(5, rec.m_line);
+                stmt.setLong(5, rec.getM_line());
 
                 int baseRecNo = 6;
                 ArrayList<ORSAlarm.AlarmInstance> allAlarms = rec.getAllAlarms();
 //                for (int i = 0; i < allAlarms.size(); i++) {
 //                    if (i >= MAX_ALARMS) {
-//                        Main.logger.error(rec.m_line + ": more alarms then max (" + MAX_ALARMS + "):" + allAlarms.toString());
+//                        Main.logger.error(rec.getM_line() + ": more alarms then max (" + MAX_ALARMS + "):" + allAlarms.toString());
 //                        break;
 //                    }
 //                    setFieldInt(stmt, baseRecNo + i * 2, Main.getRef(ReferenceType.Misc, allAlarms.get(i).getName()));

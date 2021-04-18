@@ -276,7 +276,7 @@ public class SingleThreadParser extends Parser {
                     throw exception; // do nothing so far. Can insert code to ignore certain exceptions
                 }
 
-                m_LineStarted = m_CurrentLine;
+                m_lineStarted = m_CurrentLine;
 
                 if ((m = regConfigOneLineDN.matcher(str)).find()) {
                     ConfigUpdateRecord msg = new ConfigUpdateRecord(str);
@@ -832,7 +832,7 @@ public class SingleThreadParser extends Parser {
 //            return;
 //        }
 //        if (s.indexOf(' ') == -1) {
-//            Main.logger.error("Broken message - firstLine doesn't contain empty space; line " + m_LineStarted);
+//            Main.logger.error("Broken message - firstLine doesn't contain empty space; line " + m_lineStarted);
 //            PrintMsg(contents);
 //            return;
 //        }
@@ -1024,7 +1024,7 @@ public class SingleThreadParser extends Parser {
         try {
             SetStdFieldsAndAdd(msg);
         } catch (Exception e) {
-            Main.logger.error("Error adding message line:" + m_LineStarted);
+            Main.logger.error("Error adding message line:" + m_lineStarted);
             PrintMsg(contents);
         }
     }
@@ -1367,7 +1367,7 @@ public class SingleThreadParser extends Parser {
         }
 
         Main.logger.trace("ParseLine1536 str[" + str + "] s[" + s + "]");
-        m_LineStarted = m_CurrentLine;
+        m_lineStarted = m_CurrentLine;
 
         switch (m_ParserState) {
             case STATE_HEADER: {
@@ -1579,9 +1579,9 @@ public class SingleThreadParser extends Parser {
             try {
                 stmt.setTimestamp(1, new Timestamp(rec.GetAdjustedUsecTime()));
                 stmt.setInt(2, SCSAppStatus.getFileId());
-                stmt.setLong(3, rec.m_fileOffset);
+                stmt.setLong(3, rec.getM_fileOffset());
                 stmt.setLong(4, rec.getM_FileBytes());
-                stmt.setLong(5, rec.m_line);
+                stmt.setLong(5, rec.getM_line());
                 setFieldInt(stmt, 6, Main.getRef(ReferenceType.Misc, rec.getKey()));
 
                 int baseRecNo = 7;
@@ -1591,7 +1591,7 @@ public class SingleThreadParser extends Parser {
                     setFieldInt(stmt, baseRecNo + i * 2, Main.getRef(ReferenceType.Misc, entry.getKey()));
                     setFieldString(stmt, baseRecNo + i * 2 + 1, entry.getValue());
                     if (++i >= MAX_1536_ATTRIBUTES) {
-                        Main.logger.debug(rec.m_line + ": more attributes then max (" + MAX_1536_ATTRIBUTES + ") - "
+                        Main.logger.debug(rec.getM_line() + ": more attributes then max (" + MAX_1536_ATTRIBUTES + ") - "
                                 + attrs.size() + ":" + attrs.toString());
                         break;
                     }
@@ -1701,9 +1701,9 @@ public class SingleThreadParser extends Parser {
             try {
                 stmt.setTimestamp(1, new Timestamp(rec.GetAdjustedUsecTime()));
                 stmt.setInt(2, SCSAppStatus.getFileId());
-                stmt.setLong(3, rec.m_fileOffset);
+                stmt.setLong(3, rec.getM_fileOffset());
                 stmt.setLong(4, rec.getM_FileBytes());
-                stmt.setLong(5, rec.m_line);
+                stmt.setLong(5, rec.getM_line());
                 setFieldInt(stmt, 6, Main.getRef(ReferenceType.DN, Record.cleanDN(rec.getTrunk())));
 
                 int baseRecNo = 7;
@@ -1713,7 +1713,7 @@ public class SingleThreadParser extends Parser {
                     setFieldInt(stmt, baseRecNo + i * 2, Main.getRef(ReferenceType.Misc, entry.getKey()));
                     setFieldString(stmt, baseRecNo + i * 2 + 1, entry.getValue());
                     if (++i >= MAX_1536_ATTRIBUTES) {
-                        Main.logger.error(rec.m_line + ": more attributes then max (" + MAX_1536_ATTRIBUTES + ") - "
+                        Main.logger.error(rec.getM_line() + ": more attributes then max (" + MAX_1536_ATTRIBUTES + ") - "
                                 + attrs.size() + ":" + attrs.toString());
                         break;
                     }
@@ -1841,9 +1841,9 @@ public class SingleThreadParser extends Parser {
             try {
                 stmt.setTimestamp(1, new Timestamp(rec.GetAdjustedUsecTime()));
                 stmt.setInt(2, SCSAppStatus.getFileId());
-                stmt.setLong(3, rec.m_fileOffset);
+                stmt.setLong(3, rec.getM_fileOffset());
                 stmt.setLong(4, rec.getM_FileBytes());
-                stmt.setLong(5, rec.m_line);
+                stmt.setLong(5, rec.getM_line());
                 setFieldInt(stmt, 6, Main.getRef(ReferenceType.SIPMETHOD, rec.getMsg()));
                 setFieldInt(stmt, 7, rec.getAmount());
                 stmt.setBoolean(8, rec.isRequest());
@@ -1855,7 +1855,7 @@ public class SingleThreadParser extends Parser {
                     setFieldInt(stmt, baseRecNo + i * 2, Main.getRef(ReferenceType.Misc, entry.getKey()));
                     setFieldString(stmt, baseRecNo + i * 2 + 1, entry.getValue());
                     if (++i >= MAX_1536_ATTRIBUTES) {
-                        Main.logger.error(rec.m_line + ": more attributes then max (" + MAX_1536_ATTRIBUTES + ") - "
+                        Main.logger.error(rec.getM_line() + ": more attributes then max (" + MAX_1536_ATTRIBUTES + ") - "
                                 + attrs.size() + ":" + attrs.toString());
                         break;
                     }
@@ -1958,9 +1958,9 @@ public class SingleThreadParser extends Parser {
             try {
                 stmt.setTimestamp(1, new Timestamp(rec.GetAdjustedUsecTime()));
                 stmt.setInt(2, SCSAppStatus.getFileId());
-                stmt.setLong(3, rec.m_fileOffset);
+                stmt.setLong(3, rec.getM_fileOffset());
                 stmt.setLong(4, rec.getM_FileBytes());
-                stmt.setLong(5, rec.m_line);
+                stmt.setLong(5, rec.getM_line());
                 setFieldInt(stmt, 6, Main.getRef(ReferenceType.TEvent, rec.getMsg()));
                 setFieldInt(stmt, 7, Main.getRef(ReferenceType.ConnID, rec.getConnID()));
                 setFieldInt(stmt, 8, Main.getRef(ReferenceType.TEventRedirectCause, rec.getCause()));

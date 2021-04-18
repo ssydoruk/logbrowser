@@ -1,15 +1,9 @@
 package com.myutils.logbrowser.indexer;
 
-import java.io.UnsupportedEncodingException;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import org.apache.commons.lang3.StringUtils;
+import java.sql.*;
+import java.util.*;
+import java.util.regex.*;
+import org.apache.commons.lang3.*;
 
 /**
  *
@@ -24,6 +18,7 @@ public class UrsParser extends Parser {
     private static final Pattern regRIResp = Pattern.compile("^\\[19:11\\].+'([\\w~]+)'.+ client (\\d+)\\(([\\w~]+)\\).+ref=(\\d+)$");
     private static final Pattern regRICallStart = Pattern.compile("received: urs/call/start");
     private static final Pattern regRIConnIDGenerated = Pattern.compile("\\[19:10\\] connid ([\\w~]+).+client=(\\d+)\\(([^\\)]+)\\).+ref id=(\\d+), .+name=([\\w~]+)");
+    private static final Pattern reIID = Pattern.compile("^\\s+IID:(\\w+)$");
 
 //17:33:04.587_I_I_01d9027e17ef8b38 [09:05] >>>>>>>>>>>>resume interpretator(0), func:SuspendForDN
 //    _I_I_01d9027e17ef8b38 [09:04] ASSIGN: agent_target(LOCAL) <- STRING: "return:timeout"
@@ -131,7 +126,7 @@ public class UrsParser extends Parser {
 
     private void AddStrategyMessage(String FileLine, String URSRest1) {
         if (lastConnID == null) {
-            Main.logger.error("Not added StrategyMessage -  connID is null; m_LineStarted:" + m_LineStarted);
+            Main.logger.error("Not added StrategyMessage -  connID is null; m_lineStarted:" + m_lineStarted);
         } else {
             URSStrategy msg = new URSStrategy(m_MessageContents, lastConnID, FileLine, URSRest1);
             SetStdFieldsAndAdd(msg);
@@ -139,7 +134,7 @@ public class UrsParser extends Parser {
 //                msg.setM_TimestampDP(getCurrentTimestamp());
 //                msg.SetOffset(getSavedFilePos());
 //                msg.SetFileBytes(getFilePos() - getSavedFilePos());
-//                msg.SetLine(m_LineStarted);
+//                msg.SetLine(m_lineStarted);
 //                msg.AddToDB(m_tables);
 //            } catch (Exception e) {
 //                Main.logger.error("Not added \"" + msg.getM_type() + "\" record:" + e.getMessage(), e);
@@ -164,7 +159,7 @@ public class UrsParser extends Parser {
             msg.setM_TimestampDP(getCurrentTimestamp());
             msg.SetOffset(getFilePos());
             msg.SetFileBytes(getEndFilePos() - getFilePos());
-            msg.SetLine(m_LineStarted);
+            msg.SetLine(m_lineStarted);
             msg.AddToDB(m_tables);
         } catch (Exception e) {
             Main.logger.error("Not added \"" + msg.getM_type() + "\" record:" + e.getMessage(), e);
@@ -432,6 +427,8 @@ public class UrsParser extends Parser {
         return m_CurrentLine - line;
     }
 
+    private GenesysMsg genesysMsg;
+
     private String ParseLine(String str) throws Exception {
 //        String trimmed = str.trim();
         Matcher m;
@@ -449,24 +446,52 @@ public class UrsParser extends Parser {
             break;
 
             case STATE_COMMENTS:
-                m_LineStarted = m_CurrentLine;
+                m_lineStarted = m_CurrentLine;
+
+                if (genesysMsg != null) {
+                    if ((m = reIID.matcher(str)).find()) {
+                        URSGenesysMsg msg = new URSGenesysMsg(genesysMsg, m.group(1));
+                        msg.AddToDB(m_tables);
+                        genesysMsg = null;
+                        return null;
+                    } else {
+                        if (!genesysMsg.isToIgnore()) {
+                            genesysMsg.AddToDB(m_tables);
+                        }
+                        genesysMsg = null;
+                    }
+
+                }
 
                 try {
-                    s = ParseGenesys(str, TableType.MsgURServer);
+                    s = ParseTimestampStr(str);
+                } catch (Exception exception) {
+                    Exception e = exception;
+
+                    throw exception; // do nothing so far. Can insert code to ignore certain exceptions
+                }
+
+                try {
+                    genesysMsg = GenesysMsg.CheckGenesysMsg(dp, this, TableType.MsgURServer, null, false);
+                    if (genesysMsg != null) {
+                        genesysMsg.SetOffset(getOffset());
+                        genesysMsg.SetLine(m_lineStarted);
+                        return null;
+                    }
+
                 } catch (Exception exception) {
                     if (!(regVitalik.matcher(str)).find()) {
                         throw exception;
                     }
+                }
+                if (StringUtils.isBlank(s)) {
+                    return null;
                 }
 
                 if ((regCfgUpdate.matcher(s)).find()) {
                     setSavedFilePos(getFilePos());
                     m_MessageContents.add(s);
                     m_ParserState = ParserState.STATE_CONFIG;
-//                } else if ((m = regAgentStatusChanged.matcher(s)).find()) {
-//                    setSavedFilePos(getFilePos());
-//                    m_MessageContents.add(s.substring(m.end()));
-//                    m_ParserState = ParserState.STATEAGENTSTATUSNEW;
                 } else if ((m = regRI.matcher(s)).find()) {
                     ProcessRI(s.substring(m.end(0)));
                 } else if ((m = regCONNID_UUID.matcher(s)).find()) {
@@ -920,7 +945,7 @@ public class UrsParser extends Parser {
 
     private void processGUID(String GUIDMsg, String theConnID) {
         if (lastConnID == null) {
-            Main.logger.error("m_LineStarted:" + m_LineStarted + " - processGUID (empty ConnID; message ignored)");
+            Main.logger.error("m_lineStarted:" + m_lineStarted + " - processGUID (empty ConnID; message ignored)");
         } else {
             URSVQ msg = new URSVQ();
             msg.setConnID(theConnID);
@@ -962,7 +987,7 @@ public class UrsParser extends Parser {
     private void addStrategyTarget(ArrayList<String> contents) {
         URSStrategy msg = null;
         if (lastConnID == null) {
-            Main.logger.error("Not added StrategyMessage -  connID is null; m_LineStarted:" + m_LineStarted);
+            Main.logger.error("Not added StrategyMessage -  connID is null; m_lineStarted:" + m_lineStarted);
         } else {
             msg = new URSStrategy(lastConnID, URSFileID, m_MessageContents);
         }
@@ -977,7 +1002,7 @@ public class UrsParser extends Parser {
                     }
                 }
             } else {
-                Main.logger.error("l:" + m_LineStarted + " not regCheckRoutingStates; " + contents.toString());
+                Main.logger.error("l:" + m_lineStarted + " not regCheckRoutingStates; " + contents.toString());
                 msg = null;
             }
 
@@ -985,13 +1010,14 @@ public class UrsParser extends Parser {
         if (msg != null) {
             SetStdFieldsAndAdd(msg);
         } else {
-            Main.logger.error("l:" + m_LineStarted + " addStrategyTarget not created " + contents.toString());
+            Main.logger.error("l:" + m_lineStarted + " addStrategyTarget not created " + contents.toString());
         }
     }
 
     @Override
     void init(HashMap<TableType, DBTable> m_tables) {
         m_tables.put(TableType.URSAgentGroupTable, new URSAgentGroupTable(Main.getM_accessor(), TableType.URSAgentGroupTable));
+        m_tables.put(TableType.URSGenesysMessage, new GenesysUrsMsgTable(Main.getM_accessor(), TableType.URSGenesysMessage));
     }
 
 // parse state contants
@@ -1180,6 +1206,106 @@ public class UrsParser extends Parser {
 //
 //                stmt.setInt(2, rec.getUpdateID());
 //                stmt.setInt(3, rec.getAgentDBID());
+
+                getM_dbAccessor().SubmitStatement(m_InsertStatementId);
+            } catch (SQLException e) {
+                Main.logger.error("Could not add record type " + m_type.toString() + ": " + e, e);
+            }
+        }
+
+    }
+
+    private class URSGenesysMsg extends Message {
+
+        private final String connID;
+        private final GenesysMsg msg;
+
+        private URSGenesysMsg(GenesysMsg msg, String connID) {
+            super(TableType.URSGenesysMessage);
+            this.msg = msg;
+            this.connID = connID;
+        }
+
+        public String getConnID() {
+            return connID;
+        }
+
+        public GenesysMsg getMsg() {
+            return msg;
+        }
+
+    }
+
+    public class GenesysUrsMsgTable extends DBTable {
+
+        public GenesysUrsMsgTable(DBAccessor dbaccessor, TableType type) {
+            super(dbaccessor, type);
+        }
+
+        private String tabName() {
+            return getM_type().toString();
+        }
+
+        @Override
+        public void InitDB() {
+
+            setTabName(tabName());
+            addIndex("time");
+            addIndex("FileId");
+            addIndex("levelID");
+            addIndex("MSGID");
+            addIndex("connIDID");
+
+            dropIndexes();
+
+            String query = "create table if not exists " + tabName() + " (id INTEGER PRIMARY KEY ASC"
+                    + ",time timestamp"
+                    + ",FileId INTEGER"
+                    + ",FileOffset bigint"
+                    + ",FileBytes int"
+                    + ",line int"
+                    /* standard first */
+                    + ",levelID int2"
+                    + ",MSGID INTEGER"
+                    + ",connIDID INTEGER"
+                    + ");";
+            getM_dbAccessor().runQuery(query);
+            m_InsertStatementId = getM_dbAccessor().PrepareStatement("INSERT INTO  " + tabName() + " VALUES(NULL,?,?,?,?,?"
+                    /*standard first*/
+                    + ",?"
+                    + ",?"
+                    + ",?"
+                    + ");");
+
+        }
+
+        /**
+         *
+         * @throws Exception
+         */
+        @Override
+        public void FinalizeDB() throws Exception {
+            getM_dbAccessor().runQuery("drop index if exists " + tabName() + "_fileid;");
+            getM_dbAccessor().runQuery("drop index if exists " + tabName() + "_unixtime;");
+            getM_dbAccessor().runQuery("drop index if exists " + tabName() + "_levelID;");
+            getM_dbAccessor().runQuery("drop index if exists " + tabName() + "_MSGID;");
+        }
+
+        @Override
+        public void AddToDB(Record _rec) {
+            URSGenesysMsg rec = (URSGenesysMsg) _rec;
+            PreparedStatement stmt = getM_dbAccessor().GetStatement(m_InsertStatementId);
+
+            try {
+                stmt.setTimestamp(1, new Timestamp(rec.getMsg().GetAdjustedUsecTime()));
+                stmt.setInt(2, GenesysMsg.getFileId());
+                stmt.setLong(3, rec.getMsg().getM_fileOffset());
+                stmt.setLong(4, rec.getMsg().getFileBytes());
+                stmt.setLong(5, rec.getMsg().getM_line());
+
+                stmt.setInt(6, rec.getMsg().getLevel());
+                stmt.setInt(7, rec.getMsg().getMsgID());
+                setFieldInt(stmt, 8, Main.getRef(ReferenceType.ConnID, rec.getConnID()));
 
                 getM_dbAccessor().SubmitStatement(m_InsertStatementId);
             } catch (SQLException e) {

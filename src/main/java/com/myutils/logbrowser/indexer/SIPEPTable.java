@@ -84,12 +84,12 @@ public class SIPEPTable extends DBTable {
             setFieldInt(stmt, 11, Main.getRef(ReferenceType.IP, theRec.GetPeerIp()));
             stmt.setInt(12, theRec.GetPeerPort());
             stmt.setInt(13, SipMessage.getFileId());
-            stmt.setLong(14, theRec.m_fileOffset);
-            stmt.setLong(15, theRec.GetFileBytes());
+            stmt.setLong(14, theRec.getM_fileOffset());
+            stmt.setLong(15, theRec.getFileBytes());
             Main.logger.trace("theRec.m_handlerId :" + SipMessage.m_handlerId + " theRec.m_handlerInProgress" + SipMessage.m_handlerInProgress);
 
             stmt.setBoolean(16, theRec.isCallRelated());
-            stmt.setInt(17, theRec.m_line);
+            stmt.setInt(17, theRec.getM_line());
             setFieldInt(stmt, 18, Main.getRef(ReferenceType.UUID, theRec.getUUID()));
             setFieldInt(stmt, 19, Main.getRef(ReferenceType.DN, transformDN(SipMessage.SingleQuotes(theRec.getRequestURIDN()))));
             setFieldInt(stmt, 20, Main.getRef(ReferenceType.SIPURI, theRec.getSipURI()));
