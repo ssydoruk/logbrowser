@@ -653,7 +653,7 @@ public abstract class OutputSpecFormatter extends DefaultFormatter {
 
             } else if (m_id.equals(CALLIDALIAS)) {
                 if (record instanceof SipMessage) {
-                    return String.format("Cid%03d", getCallID(((SipMessage) record).getCallId()));
+                    return String.format("sip%d", getCallID(((SipMessage) record).getCallId()));
                 } else {
                     return "";
                 }
