@@ -822,51 +822,51 @@ final public class RoutingResults extends IQueryResults {
             if (cidFinder != null) {
                 agentIDs = cidFinder.getIDs(IDType.AGENT);
             }
+            TableQuery ursAgentPlace;
+            ursAgentPlace = new TableQuery(MsgType.URSSTAT, "ursstat");
+            if (IQuery.isAllChecked(FindNode(findNode, DialogItem.URS_AGENTDN_AGENT, null, null))
+                    && (agentIDs != null && agentIDs.length > 0)) {
+                ursAgentPlace.addWhere(getWhere("AgentNameID", agentIDs, false), "AND");
+
+            } else {
+                ursAgentPlace.AddCheckedWhere(ursAgentPlace.getTabAlias() + ".AgentNameID",
+                        ReferenceType.Agent,
+                        findNode,
+                        "AND",
+                        DialogItem.URS_AGENTDN_AGENT);
+            }
+
             if (cidFinder == null
                     || cidFinder.getSearchType() == SelectionType.NO_SELECTION
-                    || !isEmpty(agentIDs)) {
-                TableQuery URSAgentPlace;
-                URSAgentPlace = new TableQuery(MsgType.URSSTAT, "ursstat");
+                    || !ursAgentPlace.isWheresEmpty()) {
 
                 tellProgress("Retrieving URS agent/place messages");
 
-                URSAgentPlace.AddCheckedWhere(URSAgentPlace.getTabAlias() + ".statNewID",
+                ursAgentPlace.AddCheckedWhere(ursAgentPlace.getTabAlias() + ".statNewID",
                         ReferenceType.StatType,
                         findNode,
                         "AND",
                         DialogItem.URS_AGENTDN_NEWSTAT);
 
-                URSAgentPlace.AddCheckedWhere(URSAgentPlace.getTabAlias() + ".VoiceSwitchID",
+                ursAgentPlace.AddCheckedWhere(ursAgentPlace.getTabAlias() + ".VoiceSwitchID",
                         ReferenceType.Switch,
                         findNode,
                         "AND",
                         DialogItem.URS_AGENTDN_STATSWITCH);
 
-                if (IQuery.isAllChecked(FindNode(findNode, DialogItem.URS_AGENTDN_AGENT, null, null))
-                        && (agentIDs != null && agentIDs.length > 0)) {
-                    URSAgentPlace.addWhere(getWhere("AgentNameID", agentIDs, false), "AND");
+                ursAgentPlace.addRef("agentNameID", "agentName", ReferenceType.Agent.toString(), IQuery.FieldType.Optional);
+                ursAgentPlace.addRef("placeNameID", "placeName", ReferenceType.Place.toString(), IQuery.FieldType.Optional);
+                ursAgentPlace.addRef("ssNameID", "StatServer", ReferenceType.App.toString(), IQuery.FieldType.Optional);
+                ursAgentPlace.addRef("statPrevID", "statPrev", ReferenceType.StatType.toString(), IQuery.FieldType.Optional);
+                ursAgentPlace.addRef("statNewID", "statNew", ReferenceType.StatType.toString(), IQuery.FieldType.Optional);
+                ursAgentPlace.addRef("VoiceSwitchID", "VoiceSwitch", ReferenceType.Switch.toString(), IQuery.FieldType.Optional);
+                ursAgentPlace.addRef("VoiceDNID", "VoiceDN", ReferenceType.DN.toString(), IQuery.FieldType.Optional);
+                ursAgentPlace.addRef("VoiceStatID", "VoiceStat", ReferenceType.StatType.toString(), IQuery.FieldType.Optional);
+                ursAgentPlace.addRef("ChatStatID", "ChatStat", ReferenceType.StatType.toString(), IQuery.FieldType.Optional);
+                ursAgentPlace.addRef("EmailStatID", "EmailStat", ReferenceType.StatType.toString(), IQuery.FieldType.Optional);
 
-                } else {
-                    URSAgentPlace.AddCheckedWhere(URSAgentPlace.getTabAlias() + ".AgentNameID",
-                            ReferenceType.Agent,
-                            findNode,
-                            "AND",
-                            DialogItem.URS_AGENTDN_AGENT);
-                }
-
-                URSAgentPlace.addRef("agentNameID", "agentName", ReferenceType.Agent.toString(), IQuery.FieldType.Optional);
-                URSAgentPlace.addRef("placeNameID", "placeName", ReferenceType.Place.toString(), IQuery.FieldType.Optional);
-                URSAgentPlace.addRef("ssNameID", "StatServer", ReferenceType.App.toString(), IQuery.FieldType.Optional);
-                URSAgentPlace.addRef("statPrevID", "statPrev", ReferenceType.StatType.toString(), IQuery.FieldType.Optional);
-                URSAgentPlace.addRef("statNewID", "statNew", ReferenceType.StatType.toString(), IQuery.FieldType.Optional);
-                URSAgentPlace.addRef("VoiceSwitchID", "VoiceSwitch", ReferenceType.Switch.toString(), IQuery.FieldType.Optional);
-                URSAgentPlace.addRef("VoiceDNID", "VoiceDN", ReferenceType.DN.toString(), IQuery.FieldType.Optional);
-                URSAgentPlace.addRef("VoiceStatID", "VoiceStat", ReferenceType.StatType.toString(), IQuery.FieldType.Optional);
-                URSAgentPlace.addRef("ChatStatID", "ChatStat", ReferenceType.StatType.toString(), IQuery.FieldType.Optional);
-                URSAgentPlace.addRef("EmailStatID", "EmailStat", ReferenceType.StatType.toString(), IQuery.FieldType.Optional);
-
-                URSAgentPlace.setCommonParams(this, dlg);
-                getRecords(URSAgentPlace);
+                ursAgentPlace.setCommonParams(this, dlg);
+                getRecords(ursAgentPlace);
             }
 
         }
