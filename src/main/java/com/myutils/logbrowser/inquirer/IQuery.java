@@ -1,19 +1,13 @@
 package com.myutils.logbrowser.inquirer;
 
 import Utils.UTCTimeRange;
-import com.myutils.logbrowser.indexer.ReferenceType;
+import com.myutils.logbrowser.indexer.*;
 import static com.myutils.logbrowser.inquirer.QueryTools.getRefSubQuery;
 import static com.myutils.logbrowser.inquirer.QueryTools.isChecked;
 import com.myutils.logbrowser.inquirer.Wheres.Where;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.sql.*;
+import java.util.*;
+import java.util.logging.*;
 import org.apache.commons.lang3.StringUtils;
 
 public abstract class IQuery extends QueryTools {
@@ -549,6 +543,10 @@ public abstract class IQuery extends QueryTools {
     protected ResultSet m_resultSet;
     protected int recCnt;
     Wheres addWheres = new Wheres();
+
+    public boolean isWheresEmpty() {
+        return addWheres.isEmpty();
+    }
 
     private final ArrayList<refTab> TabRefs;
     private final ArrayList<JoinTab> joinTabs;
