@@ -5,13 +5,11 @@
  */
 package com.myutils.logbrowser.indexer;
 
-import java.text.ParseException;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.regex.Matcher;
-import java.util.regex.PatternSyntaxException;
-import org.apache.commons.lang3.StringUtils;
+import java.text.*;
+import java.time.*;
+import java.util.*;
+import java.util.regex.*;
+import org.apache.commons.lang3.*;
 
 /**
  *
@@ -101,7 +99,7 @@ final class DateParsers {
             for (Parser.DateFmt dateFormat : formats) {
 //                Main.logger.trace("Parsing date for [" + s + "]" + " against format " + dateFormat);
 //                if (checkRegex) {
-                if ((m = dateFormat.pattern.matcher(s)).find()) {
+                if ((m = dateFormat.pattern.reset(s)).find()) {
                     lastFmtMatched = dateFormat;
                     moveTop(formats, dateFormat);
                     String d = s.substring(0, m.end(0));

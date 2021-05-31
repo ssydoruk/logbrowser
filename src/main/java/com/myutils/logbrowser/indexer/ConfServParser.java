@@ -245,7 +245,7 @@ public class ConfServParser extends Parser {
 
                 }
 
-                GenesysMsg.CheckGenesysMsg(dp, this, TableType.MsgConfServer, null);
+                GenesysMsg.CheckGenesysMsg(dp, this, TableType.MsgConfServer, (Matcher) null);
 
                 break;
 //</editor-fold>

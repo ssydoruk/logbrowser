@@ -158,11 +158,14 @@ public abstract class Message extends Record {
     }
 
     public static String FindByRx(ArrayList<String> msgLines, Pattern rx, int groupId, String def) {
+        return FindByRx(msgLines,rx.matcher(""),groupId,def);
+    }
+    public static String FindByRx(ArrayList<String> msgLines, Matcher rx, int groupId, String def) {
         Matcher m;
 
         if (msgLines != null) {
             for (String s : msgLines) {
-                if (s != null && (m = rx.matcher(s)).find()) {
+                if (s != null && (m = rx.reset(s)).find()) {
                     return m.group(groupId);
                 }
             }

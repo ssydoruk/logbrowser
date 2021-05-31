@@ -1,19 +1,26 @@
 package com.myutils.logbrowser.indexer;
 
-import java.io.*;
-import java.net.*;
-import java.sql.*;
-import java.text.*;
-import java.time.*;
-import java.time.format.*;
-import java.time.temporal.*;
+import org.apache.commons.lang3.StringUtils;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.text.ParseException;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalAccessor;
 import java.util.*;
-import java.util.regex.*;
-import org.apache.commons.lang3.*;
-import org.w3c.dom.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
- *
  * @author ssydoruk
  */
 public abstract class Parser {
@@ -103,6 +110,7 @@ public abstract class Parser {
     static public boolean isSessionID(String resp) {
         return resp != null && !resp.isEmpty() && regORSSessionID.matcher(resp).find();
     }
+
     //    protected static final Pattern regGenesysMessage = Pattern.compile(" (None|Debug|Trace|Interaction|Standard|Alarm|Unknown|Non|Dbg|Trc|Int|Std|Alr|Unk) (\\d{5}) ");
     int m_CurrentLine;
 
@@ -196,7 +204,7 @@ public abstract class Parser {
      *
      * @param str
      * @param changeValue used for SIP Server parser. If greater than zero, than
-     * return if found str not changed and this number not changed
+     *                    return if found str not changed and this number not changed
      * @return true if match is found and flag parserRest is false on the
      * CustomSearch in backend.xml
      * @throws Exception
@@ -253,14 +261,22 @@ public abstract class Parser {
         return ret;
     }
 
+    protected String ParseGenesysTServer(String str, TableType tabType, Matcher ptIgnore, Matcher ptSkip) throws Exception {
+        return ParseGenesys(getTServerStart(str), tabType, ptIgnore, ptSkip);
+    }
+
     protected String ParseGenesysTServer(String str, TableType tabType, Pattern ptIgnore, Pattern ptSkip) throws Exception {
         return ParseGenesys(getTServerStart(str), tabType, ptIgnore, ptSkip);
     }
 
     private String parserRet(String ret, Pattern ptSkip) {
+        return parserRet(ret, ptSkip.matcher(""));
+    }
+
+    private String parserRet(String ret, Matcher ptSkip) {
         if (dp != null && ptSkip != null && ret != null) {
             Matcher m;
-            if ((m = ptSkip.matcher(ret)).find()) {
+            if ((m = ptSkip.reset(ret)).find()) {
                 dp.rest = ret.substring(m.end());
                 Main.logger.trace("Skipped per regex [" + ptSkip.toString() + "]; new rest [" + dp.rest + "]");
             }
@@ -274,6 +290,11 @@ public abstract class Parser {
     }
 
     protected String ParseGenesys(String str, TableType tabType, Pattern ptIgnore, Pattern ptSkip) throws Exception {
+        return parserRet(ParseGenesys(str, tabType, ptIgnore), ptSkip);
+
+    }
+
+    protected String ParseGenesys(String str, TableType tabType, Matcher ptIgnore, Matcher ptSkip) throws Exception {
         return parserRet(ParseGenesys(str, tabType, ptIgnore), ptSkip);
 
     }
@@ -333,7 +354,7 @@ public abstract class Parser {
     }
 
     protected void fakeGenesysMsg(DateParsed dp, Parser p, TableType t, Pattern ignoreMSGIDs,
-            String _lastGenesysMsgLevel, String _lastGenesysMsgID, String generatedMsgID, String generatedMsg) {
+                                  String _lastGenesysMsgLevel, String _lastGenesysMsgID, String generatedMsgID, String generatedMsg) {
         lastLogMsg = GenesysMsg.postGenesysMsg(dp, p, t, ignoreMSGIDs,
                 _lastGenesysMsgLevel, _lastGenesysMsgID, generatedMsgID, generatedMsg);
     }
@@ -344,6 +365,17 @@ public abstract class Parser {
             lastLogMsg = null;
 
             lastLogMsg = GenesysMsg.CheckGenesysMsgGMS(dp, this, tabType, ptMSGsIgnore); // not using return value. Check through the rest
+            return dp.rest;
+        } else {
+            return str;
+        }
+    }
+
+    protected String ParseGenesys(String str, TableType tabType, Matcher ptMSGsIgnore) throws Exception {
+        dp = ParseTimestamp(str);
+        if (dp != null) {
+            lastLogMsg = null;
+            lastLogMsg = GenesysMsg.CheckGenesysMsg(dp, this, tabType, ptMSGsIgnore); // not using return value. Check through the rest
             return dp.rest;
         } else {
             return str;
@@ -362,7 +394,7 @@ public abstract class Parser {
     }
 
     protected String ParseGenesys(String str, TableType tabType) throws Exception {
-        return ParseGenesys(str, tabType, null);
+        return ParseGenesys(str, tabType, (Matcher) null);
     }
 
     /**
@@ -527,7 +559,7 @@ public abstract class Parser {
         }
     }
 
-//    public DateParsed ParseDate(String s) throws Exception {
+    //    public DateParsed ParseDate(String s) throws Exception {
 //        DateParsed ret = adjustDay(dateParsers.parseDate(s), null);
 //        commitDateParsers();
 //        return ret;
@@ -668,7 +700,7 @@ public abstract class Parser {
     }
 
     private void insertIntoCustom(Matcher m, String key, ArrayList<FilesParseSettings.FileParseCustomSearch.SearchComponent> value, int changeValue,
-            FilesParseSettings.FileParseCustomSearch fileParseCustomSearch) throws Exception {
+                                  FilesParseSettings.FileParseCustomSearch fileParseCustomSearch) throws Exception {
         if (custLineTab == null) {
             custLineTab = new CustomLineTable(m_type);
             custLineTab.InitDB();
@@ -697,7 +729,7 @@ public abstract class Parser {
 
     public static class DateFmt {
 
-        Pattern pattern;
+        Matcher pattern;
 
         String fmt;
         private DateTimeFormatter formatter = null;
@@ -705,7 +737,7 @@ public abstract class Parser {
         DateIncluded isDateIncluded;
 
         public DateFmt(String p, String fmt, DateIncluded dateIncluded) {
-            this.pattern = Pattern.compile(p);
+            this.pattern = Pattern.compile(p).matcher("");
             this.fmt = fmt;
             isDateIncluded = dateIncluded;
             if (fmt != null) {
@@ -740,7 +772,7 @@ public abstract class Parser {
         public String toString() {
             return "pattern: [" + pattern.pattern() + "] fmt: [" + fmt + "] fmt: ["
                     + ((formatter == null) ? "(null)" : formatter.toString()
-                            + "] ");
+                    + "] ");
         }
 
         private void addReplace(String from, String to) {
@@ -1033,7 +1065,7 @@ public abstract class Parser {
 
     }
 
-//<editor-fold defaultstate="collapsed" desc="comment">
+    //<editor-fold defaultstate="collapsed" desc="comment">
     class CustomAttribute extends Record {
 
         private CustomAttribute(String key, String key0, Integer value) {

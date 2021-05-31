@@ -5,29 +5,38 @@
  */
 package com.myutils.logbrowser.indexer;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
+import org.apache.commons.lang3.StringUtils;
+
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.apache.commons.lang3.StringUtils;
 
 public final class GenesysMsg extends Message {
 
-    private static final Pattern regMsg = Pattern.compile("^\\s*(None|Debug|Trace|Interaction|Standard|Alarm|Unknown|Non|Dbg|Trc|Int|Std|Alr|Unk) (\\d{5})\\s*");
-    private static final Pattern regMsgSCS = Pattern.compile("^\\s*(None|Debug|Trace|Interaction|Standard|Alarm|Unknown|Non|Dbg|Trc|Int|Std|Alr|Unk)(?:\\s+(?:\\S+)){3}.+-(?:\\d{2})-(\\d{5})");
-    static private final Pattern ptThreadID = Pattern.compile("^(\\[\\S+\\])$");
+    private static final Matcher regMsg = Pattern.compile("^\\s*(None|Debug|Trace|Interaction|Standard|Alarm|Unknown|Non|Dbg|Trc|Int|Std|Alr|Unk) (\\d{5})\\s*").matcher("");
+    private static final Matcher regMsgSCS = Pattern.compile("^\\s*(None|Debug|Trace|Interaction|Standard|Alarm|Unknown|Non|Dbg|Trc|Int|Std|Alr|Unk)(?:\\s+(?:\\S+)){3}.+-(?:\\d{2})-(\\d{5})").matcher("");
+    static private final Matcher ptThreadID = Pattern.compile("^(\\[\\S+\\])$").matcher("");
     static GenesysMsgMap msgMap = new GenesysMsgMap();
 
     public static GenesysMsg CheckGenesysMsg(DateParsed dp, Parser p, TableType t, Pattern reg, Pattern ignoreMSGIDs) {
         return CheckGenesysMsg(dp, p, t, reg, ignoreMSGIDs, false);
     }
 
+    public static GenesysMsg CheckGenesysMsg(DateParsed dp, Parser p, TableType t, Matcher reg, Matcher ignoreMSGIDs) {
+        return CheckGenesysMsg(dp, p, t, reg, ignoreMSGIDs, false);
+    }
+
     public static GenesysMsg postGenesysMsg(DateParsed dp, Parser p, TableType t, Pattern ignoreMSGIDs,
-            String _lastGenesysMsgLevel, String _lastGenesysMsgID, String generatedMsgID, String generatedMsg,
-            boolean saveToDB) {
+                                            String _lastGenesysMsgLevel, String _lastGenesysMsgID, String generatedMsgID, String generatedMsg,
+                                            boolean saveToDB) {
+        return postGenesysMsg(dp, p, t, ignoreMSGIDs.matcher(""),
+                _lastGenesysMsgLevel, _lastGenesysMsgID, generatedMsgID, generatedMsg,
+                saveToDB);
+    }
+
+    public static GenesysMsg postGenesysMsg(DateParsed dp, Parser p, TableType t, Matcher ignoreMSGIDs,
+                                            String _lastGenesysMsgLevel, String _lastGenesysMsgID, String generatedMsgID, String generatedMsg,
+                                            boolean saveToDB) {
         GenesysMsg msg;
 
         msg = new GenesysMsg(t, _lastGenesysMsgLevel, generatedMsgID, generatedMsg);
@@ -37,7 +46,7 @@ public final class GenesysMsg extends Message {
         msg.SetFileBytes(p.getEndFilePos() - p.getFilePos());
         msg.SetLine(p.getLineStarted());
         msg.setLastGenesysMsgID(_lastGenesysMsgID);
-        if (ignoreMSGIDs != null && ignoreMSGIDs.matcher(_lastGenesysMsgID).find()) {
+        if (ignoreMSGIDs != null && ignoreMSGIDs.reset(_lastGenesysMsgID).find()) {
             msg.setToIgnore(true);
         }
         if (!msg.isToIgnore() && saveToDB) {
@@ -49,13 +58,20 @@ public final class GenesysMsg extends Message {
     }
 
     public static GenesysMsg postGenesysMsg(DateParsed dp, Parser p, TableType t, Pattern ignoreMSGIDs,
-            String _lastGenesysMsgLevel, String _lastGenesysMsgID, String generatedMsgID, String generatedMsg) {
+                                            String _lastGenesysMsgLevel, String _lastGenesysMsgID, String generatedMsgID, String generatedMsg) {
         return postGenesysMsg(dp, p, t, ignoreMSGIDs,
                 _lastGenesysMsgLevel, _lastGenesysMsgID, generatedMsgID, generatedMsg, true);
     }
 
     public static GenesysMsg CheckGenesysMsg(DateParsed dp, Parser p, TableType t, Pattern reg, Pattern ignoreMSGIDs,
-            boolean useFirstWord, boolean saveToDB) {
+                                             boolean useFirstWord, boolean saveToDB) {
+        return CheckGenesysMsg(dp, p, t, reg.matcher(""), ignoreMSGIDs.matcher(""),
+                useFirstWord, true);
+
+    }
+
+    public static GenesysMsg CheckGenesysMsg(DateParsed dp, Parser p, TableType t, Matcher reg, Matcher ignoreMSGIDs,
+                                             boolean useFirstWord, boolean saveToDB) {
         Matcher m;
         GenesysMsg msg = null;
         String _lastGenesysMsgLevel;
@@ -63,7 +79,7 @@ public final class GenesysMsg extends Message {
         String generatedMsgID = null;
         String generatedMsg = null;
 
-        if (dp != null && (m = reg.matcher(dp.rest)).find()) {
+        if (dp != null && (m = reg.reset(dp.rest)).find()) {
             try {
                 dp.rest = dp.rest.substring(m.end());
                 _lastGenesysMsgLevel = m.group(1);
@@ -71,7 +87,7 @@ public final class GenesysMsg extends Message {
                 if (useFirstWord) {
                     String[] split = StringUtils.split(dp.rest, " :,", 3);
                     if (split != null && split.length > 0) {
-                        if (ptThreadID.matcher(split[0]).find()) {
+                        if (ptThreadID.reset(split[0]).find()) {
                             if (split.length > 1) {
                                 generatedMsgID = split[1];
                                 generatedMsg = (split.length > 2) ? split[2] : "";
@@ -97,31 +113,43 @@ public final class GenesysMsg extends Message {
     }
 
     public static GenesysMsg CheckGenesysMsg(DateParsed dp, Parser p, TableType t, Pattern reg, Pattern ignoreMSGIDs,
-            boolean useFirstWord) {
+                                             boolean useFirstWord) {
         return CheckGenesysMsg(dp, p, t, reg, ignoreMSGIDs,
                 useFirstWord, true);
 
     }
 
+    public static GenesysMsg CheckGenesysMsg(DateParsed dp, Parser p, TableType t, Matcher reg, Matcher ignoreMSGIDs,
+                                             boolean useFirstWord) {
+        return CheckGenesysMsg(dp, p, t, reg, ignoreMSGIDs,
+                useFirstWord, true);
+
+    }
+
+
     public static GenesysMsg CheckGenesysMsgSCS(DateParsed dp, Parser p, TableType t, Pattern ignoreMSGIDs) {
-        GenesysMsg ret = CheckGenesysMsg(dp, p, t, regMsgSCS, ignoreMSGIDs);
+        GenesysMsg ret = CheckGenesysMsg(dp, p, t, regMsgSCS, ignoreMSGIDs.matcher(""));
         if (ret != null) {
             return ret;
         } else {
-            return CheckGenesysMsg(dp, p, t, regMsg, ignoreMSGIDs);
+            return CheckGenesysMsg(dp, p, t, regMsg, ignoreMSGIDs.matcher(""));
         }
     }
 
     public static GenesysMsg CheckGenesysMsgGMS(DateParsed dp, Parser p, TableType t, Pattern ignoreMSGIDs) {
-        return CheckGenesysMsg(dp, p, t, regMsg, ignoreMSGIDs, true);
+        return CheckGenesysMsg(dp, p, t, regMsg, ignoreMSGIDs.matcher(""), true);
     }
 
     public static GenesysMsg CheckGenesysMsg(DateParsed dp, Parser p, TableType t, Pattern ignoreMSGIDs) {
+        return CheckGenesysMsg(dp, p, t, regMsg, ignoreMSGIDs.matcher(""));
+    }
+
+    public static GenesysMsg CheckGenesysMsg(DateParsed dp, Parser p, TableType t, Matcher ignoreMSGIDs) {
         return CheckGenesysMsg(dp, p, t, regMsg, ignoreMSGIDs);
     }
 
     public static GenesysMsg CheckGenesysMsg(DateParsed dp, Parser p, TableType t, Pattern ignoreMSGIDs, boolean saveToDB) {
-        return CheckGenesysMsg(dp, p, t, regMsg, ignoreMSGIDs, false, saveToDB);
+        return CheckGenesysMsg(dp, p, t, regMsg, ignoreMSGIDs.matcher(""), false, saveToDB);
     }
 
     static void updateMsg() {
@@ -134,6 +162,7 @@ public final class GenesysMsg extends Message {
             Main.getMain().tabRefs.updateRef(ReferenceType.LOGMESSAGE, entry.getKey(), s.toString());
         }
     }
+
     //    private static final Pattern regMsgWords = Pattern.compile("([a-zA-Z]+)");
 //    private static final int MAX_LOG_WORDS = 3;
     private String lastGenesysMsgLevel;
@@ -227,7 +256,7 @@ public final class GenesysMsg extends Message {
         return Main.getRef(ReferenceType.LOGMESSAGE, msgID, 1);
     }
 
-//    int getMsgID() {
+    //    int getMsgID() {
 //        Matcher m;
 //        StringBuilder buf = new StringBuilder(line.length() + msgID.length());
 //
