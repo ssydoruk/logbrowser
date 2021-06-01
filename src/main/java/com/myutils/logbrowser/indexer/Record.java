@@ -15,9 +15,9 @@ import java.util.regex.Pattern;
  */
 public abstract class Record implements Cloneable {
 
-    private static final Pattern regAllQuotes = Pattern.compile("^(['\"]).+\\1$");
-    private static final Pattern regNoQuotes = Pattern.compile("^(['\"])(.+)\\1$");
-    private static final Pattern regDNWithHost = Pattern.compile("^(\\w+)\\.");
+    private static final Matcher regAllQuotes = Pattern.compile("^(['\"]).+\\1$").matcher("");
+    private static final Matcher regNoQuotes = Pattern.compile("^(['\"])(.+)\\1$").matcher("");
+    private static final Matcher regDNWithHost = Pattern.compile("^(\\w+)\\.").matcher("");
     static boolean m_handlerInProgress;
     static String m_alias;
     static int fileId = 0;
@@ -71,7 +71,7 @@ public abstract class Record implements Cloneable {
             if (ret.startsWith("+")) {
                 ret = ret.substring(1);
             }
-            if ((m = regDNWithHost.matcher(ret)).find()) {
+            if ((m = regDNWithHost.reset(ret)).find()) {
                 ret = m.group(1);
             }
         }
@@ -83,7 +83,7 @@ public abstract class Record implements Cloneable {
 
         Matcher m;
 
-        if (key != null && (m = regNoQuotes.matcher(key)).find()) {
+        if (key != null && (m = regNoQuotes.reset(key)).find()) {
             return m.group(2);
         }
         return key;
@@ -154,7 +154,7 @@ public abstract class Record implements Cloneable {
 
         Matcher m;
 
-        if ((m = regAllQuotes.matcher(key)).find()) {
+        if ((m = regAllQuotes.reset(key)).find()) {
             return key;
         }
         String sQ = key.substring(0, 1);

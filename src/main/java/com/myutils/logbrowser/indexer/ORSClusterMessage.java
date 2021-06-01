@@ -7,6 +7,7 @@ package com.myutils.logbrowser.indexer;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
@@ -14,7 +15,7 @@ import java.util.regex.Pattern;
  */
 public class ORSClusterMessage extends Message {
 
-    private static final Pattern patNewLine = Pattern.compile("\r\n");
+    private static final Matcher patNewLine = Pattern.compile("\r\n").matcher("");
     private static int m_statementId;
     private final String[] m_msgBody;
     private String SrcNodeType;

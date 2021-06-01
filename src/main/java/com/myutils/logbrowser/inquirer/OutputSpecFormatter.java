@@ -416,9 +416,9 @@ public abstract class OutputSpecFormatter extends DefaultFormatter {
         class RegexParam {
 
             private final int m_group;
-            private final Pattern m_matchPattern;
+            private final Matcher m_matchPattern;
             private final int iRetGroup;
-            private final Pattern mFileMatch;
+            private final Matcher mFileMatch;
             String expr = null;
             CallableStatement st;
             private ArrayList<Integer> m_groups = null;
@@ -474,10 +474,10 @@ public abstract class OutputSpecFormatter extends DefaultFormatter {
                 }
                 flags |= Pattern.MULTILINE;
 
-                m_matchPattern = Pattern.compile(m_match1, flags);
+                m_matchPattern = Pattern.compile(m_match1, flags).matcher("");
 
                 if (fileMatch != null && !fileMatch.isEmpty()) {
-                    mFileMatch = Pattern.compile(fileMatch, flags);
+                    mFileMatch = Pattern.compile(fileMatch, flags).matcher("");
                 } else {
                     mFileMatch = null;
                 }
@@ -539,7 +539,7 @@ public abstract class OutputSpecFormatter extends DefaultFormatter {
 //            }
             String[] getFormatGroups(String value, ILogRecord record) throws SQLException {
                 if (m_matchPattern != null) {
-                    Matcher matcher = m_matchPattern.matcher(value);
+                    Matcher matcher = m_matchPattern.reset(value);
                     if (matcher.find()) {
                         if (retAttribute != null && retAttribute.length() > 0) {
                             inquirer.logger.trace("returning [" + retAttribute + "]");
@@ -571,7 +571,7 @@ public abstract class OutputSpecFormatter extends DefaultFormatter {
             }
 
             boolean find(String value) {
-                return m_matchPattern.matcher(value).find();
+                return m_matchPattern.reset(value).find();
             }
 
             private String evalFileMatch(ILogRecord record) {
@@ -582,7 +582,7 @@ public abstract class OutputSpecFormatter extends DefaultFormatter {
                         StringBuilder ret = new StringBuilder();
                         for (String s : split) {
                             Matcher m;
-                            if ((m = mFileMatch.matcher(s)).find()) {
+                            if ((m = mFileMatch.reset(s)).find()) {
                                 if (ret.length() > 0) {
                                     ret.append(" | ");
                                 }

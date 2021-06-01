@@ -5,6 +5,7 @@
 package com.myutils.logbrowser.indexer;
 
 import java.util.ArrayList;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static Utils.Util.StripQuotes;
@@ -14,13 +15,13 @@ import static Utils.Util.StripQuotes;
  */
 public class WSMessage extends Message {
 
-    final private static Pattern regConnID = Pattern.compile("^AttributeConnID .+= (\\w+)$");
-    final private static Pattern regThisDN = Pattern.compile("^AttributeThisDN .+= \\\"([^\\\"]*)\\\"$");
-    final private static Pattern regOtherDN = Pattern.compile("^AttributeOtherDN .+= \\\"([^\\\"]*)\\\"$");
-    final private static Pattern regTransferConnID = Pattern.compile("^AttributeTransferConnID .+= (\\S+)$");
-    final private static Pattern regUUID = Pattern.compile("^AttributeCallUuid .+= \\\"([^\\\"]*)\\\"$");
-    final private static Pattern regAgentID = Pattern.compile("^AttributeAgentID .+= \\\"([^\\\"]*)\\\"$");
-    final private static Pattern regSeqNo = Pattern.compile("^AttributeEventSequenceNumber .+= (\\w+)$");
+    final private static Matcher regConnID = Pattern.compile("^AttributeConnID .+= (\\w+)$").matcher("");
+    final private static Matcher regThisDN = Pattern.compile("^AttributeThisDN .+= \\\"([^\\\"]*)\\\"$").matcher("");
+    final private static Matcher regOtherDN = Pattern.compile("^AttributeOtherDN .+= \\\"([^\\\"]*)\\\"$").matcher("");
+    final private static Matcher regTransferConnID = Pattern.compile("^AttributeTransferConnID .+= (\\S+)$").matcher("");
+    final private static Matcher regUUID = Pattern.compile("^AttributeCallUuid .+= \\\"([^\\\"]*)\\\"$").matcher("");
+    final private static Matcher regAgentID = Pattern.compile("^AttributeAgentID .+= \\\"([^\\\"]*)\\\"$").matcher("");
+    final private static Matcher regSeqNo = Pattern.compile("^AttributeEventSequenceNumber .+= (\\w+)$").matcher("");
     private final String m_MessageName;
     private final String server;
     private final String fileHandle;

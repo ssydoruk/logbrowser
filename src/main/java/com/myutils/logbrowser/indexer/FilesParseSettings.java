@@ -81,7 +81,7 @@ public class FilesParseSettings {
 
         private final HashMap<String, ArrayList<SearchComponent>> components = new HashMap<>();
         private boolean trimmed = false;
-        private Pattern pt;
+        private Matcher pt;
         private boolean handlerOnly = false;
         private boolean parseRest;
         private String name;
@@ -98,7 +98,7 @@ public class FilesParseSettings {
 
         }
 
-        public Pattern getPt() {
+        public Matcher getPt() {
             return pt;
         }
 
@@ -112,7 +112,7 @@ public class FilesParseSettings {
 
         public Matcher parseCustom(String str, int handlerID) {
             if (!handlerOnly || handlerID > 0) {
-                Matcher m = pt.matcher(str);
+                Matcher m = pt.reset(str);
 //            Main.logger.info("Checking ["+str+"] against ["+ptString+"]");
 
                 if (m != null && m.find()) {
@@ -216,7 +216,7 @@ public class FilesParseSettings {
          * method uses other parameters too
          */
         void compilePattern() {
-            pt = Pattern.compile(ptString);
+            pt = Pattern.compile(ptString).matcher("");
         }
 
         private void publishComponents(Matcher m) {

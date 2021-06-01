@@ -26,47 +26,47 @@ public class GMSParser extends Parser {
     private static final org.apache.logging.log4j.Logger logger = Main.logger;
     //2 types of thread messages in ORS logs
 //21:37:08.194 [T:2560] {ScxmlMetric:3} METRIC <eval_expr sid='VIKO7I50UD32135O60O7ACO4NS0083UP' expression='varConsiderConcierge = _genesys.session.getListItemValue('LIST_CHT_SCT', v_ServiceCallType, 'Concierge Considered').toUpperCase();' result='' />
-    private static final Matcher regWThread = Pattern.compile("^\\s*\\[([^\\]]+)[\\]\\s]*");
+    private static final Matcher regWThread = Pattern.compile("^\\s*\\[([^\\]]+)[\\]\\s]*").matcher("");
     //21:37:07.710 {FMWeb:2} HandleRequest: Path '/scxml', file '/session/start', query ''
-    private static final Matcher regFMThread = Pattern.compile("\\s*\\{([^:\\}]+)");
+    private static final Matcher regFMThread = Pattern.compile("\\s*\\{([^:\\}]+)").matcher("");
     // general buffer
     private static final byte[] m_CharBuf = new byte[8048];
     //16:41:55.299 ors:+OrsEvent[0x01aa91f0]:name=interaction.partystatechanged
 //2016-04-20T09:22:09.969 Trc 04541 Message EventAgentNotReady received from 'sipserver_01_p@+43891166406129992'
 //09:22:09.970 [LS] '00AGCH16J4BHF6E1GNHNK2LAES00000R' ProcessEvent=AgentEventNotReady dev='+43891166406129992' queue='' mediaType=100  StateStorageCnt=1 Key[102-148-0-100]
-    private static final Matcher regDate = Pattern.compile("^((?:\\d{4}-\\d{2}-\\d{2}T)*\\d{2}:\\d{2}:\\d{2}\\.\\d{3} )");
+    private static final Matcher regDate = Pattern.compile("^((?:\\d{4}-\\d{2}-\\d{2}T)*\\d{2}:\\d{2}:\\d{2}\\.\\d{3} )").matcher("");
     //16:41:55.299 Int 04543 Interaction message "EventRouteRequest" received from 65200 ("SIPTS750@3020")
 //16:39:27.319 Trc 04541 Message EventRegistered received from 'SIPTS750@7593'
     //hopefully URS always print : message EventCallDataChanged after
-    private static final Matcher regMsgStart = Pattern.compile("Handling update message:$");
-    private static final Matcher regMsgRequest = Pattern.compile("Sent '(\\w+)' \\(\\d+\\) attributes:$");
+    private static final Matcher regMsgStart = Pattern.compile("Handling update message:$").matcher("");
+    private static final Matcher regMsgRequest = Pattern.compile("Sent '(\\w+)' \\(\\d+\\) attributes:$").matcher("");
     //    java.net.ConnectException: Connection refused
-    private static final Matcher regExceptionStart = Pattern.compile("^([\\w\\.]+Exception[\\w\\.]*):(.*)");
-    private static final Matcher regNullExceptionStart = Pattern.compile("^([\\w\\.]+Exception[\\w\\.]*)");
+    private static final Matcher regExceptionStart = Pattern.compile("^([\\w\\.]+Exception[\\w\\.]*):(.*)").matcher("");
+    private static final Matcher regNullExceptionStart = Pattern.compile("^([\\w\\.]+Exception[\\w\\.]*)").matcher("");
     //07:23:14.681 Dbg 09900  [qtp747464370-266] Attempting to start session  with url {callback}
-    private static final Matcher regAttemptStartSession = Pattern.compile("Attempting to start session");
-    //    static Matcher regMsgStart = Pattern.compile("^\\s*(?:Int 04543|Trc 04541).+essage \\\"*(\\w+).+from \\d+ \\(\\\"([^@\\\"]+)");
+    private static final Matcher regAttemptStartSession = Pattern.compile("Attempting to start session").matcher("");
+    //    static Matcher regMsgStart = Pattern.compile("^\\s*(?:Int 04543|Trc 04541).+essage \\\"*(\\w+).+from \\d+ \\(\\\"([^@\\\"]+)").matcher("");
     // : message EventServerInfo
 //AgentMessage(super=BasicTelephonyMessage(message='EventAgentLogin' (73) attributes:
-    private static final Matcher regTMessageStart = Pattern.compile("^(?:\\w+)Message.+message='(\\w+)'");
-    //static Matcher regMsgStart=Pattern.compile("^(Int 04543 |Trc 04541 )");
-    private static final Matcher regMMsgStart = Pattern.compile("^\\s*attr_");
+    private static final Matcher regTMessageStart = Pattern.compile("^(?:\\w+)Message.+message='(\\w+)'").matcher("");
+    //static Matcher regMsgStart=Pattern.compile("^(Int 04543 |Trc 04541 )").matcher("");
+    private static final Matcher regMMsgStart = Pattern.compile("^\\s*attr_").matcher("");
     // : message EventServerInfo
-    private static final Matcher regOutMMsgStart = Pattern.compile("Message '(\\w+)' sent to '(\\w+)'");
+    private static final Matcher regOutMMsgStart = Pattern.compile("Message '(\\w+)' sent to '(\\w+)'").matcher("");
     // : message EventServerInfo
     //16:41:55.283 W-NODE[272](RUNNING): >>>> 78 bytes to S-NODE[272] >>>>
 //16:41:55.283 S-NODE[272](MASTER): <<<< 78 bytes from NODE[272] <<<<
     //" (W|S)-NODE\\[(\\d+)\\]\\D+(\\d+) bytes (to|from).+NODE\\[(\\d+)\\]"
-    private static final Matcher regClusterMsg = Pattern.compile("^(W|S)-NODE\\[(\\d+)\\]\\D+(\\d+) bytes (to|from).+NODE\\[(\\d+)\\]");
+    private static final Matcher regClusterMsg = Pattern.compile("^(W|S)-NODE\\[(\\d+)\\]\\D+(\\d+) bytes (to|from).+NODE\\[(\\d+)\\]").matcher("");
     //16:17:19.815 CTITM: R:323 UpdateUData(1,3020)
-    //static Matcher regCTITM = Pattern.compile("");
-    private static final Matcher m_strCTITM = Pattern.compile("^\\s*CTITM:\\s+(.+)$");
-    private static final Matcher regCTITMReq = Pattern.compile("^R:(\\d+) (\\w+)\\(([^,]+),([^\\)]+)");
+    //static Matcher regCTITM = Pattern.compile("").matcher("");
+    private static final Matcher m_strCTITM = Pattern.compile("^\\s*CTITM:\\s+(.+)$").matcher("");
+    private static final Matcher regCTITMReq = Pattern.compile("^R:(\\d+) (\\w+)\\(([^,]+),([^\\)]+)").matcher("");
     //11:19:06.379 [SessionManager]: adding key[IDEN4PA4QH5PJ2F786QKA47CPC0066RU]/value[5PQD29NRV96QVB8GF448P0ICEK0016KC]
-    private static final Matcher regGidUuid = Pattern.compile("adding key\\[(\\w+)]/value\\[(\\w+)\\]");
+    private static final Matcher regGidUuid = Pattern.compile("adding key\\[(\\w+)]/value\\[(\\w+)\\]").matcher("");
 
     //13:40:18.552 {SessionManager:2} URL [http://orswas.internal.gslb.service.nsw.gov.au/mod-routing/src-gen/IPD_default_mainWorkflow.scxml] associated with script [mod-routing]
-    private static final Matcher regAppURL = Pattern.compile("\\}\\sURL \\[([^\\]]+)\\] associated with script \\[([^\\]]+)\\]$");
+    private static final Matcher regAppURL = Pattern.compile("\\}\\sURL \\[([^\\]]+)\\] associated with script \\[([^\\]]+)\\]$").matcher("");
     //09:25:15.864 {ORSURS:3} InvokeFunctionalModule: <<
 //	refID	28
 //	call	'028AS5H6BGBHF6E1GNHNK2LAES00000F'
@@ -76,36 +76,36 @@ public class GMSParser extends Parser {
 //	args	'[1,"VQ_Residential_RP",0,"","any",1,0,0,"VQUser@.A"]'
 // <<
 //09:25:15.864 [T:140084682483456] {ScxmlMetric:3} METRIC <eval_condition sid='004BUJ1C0KBHF8NIG7HNK2LAES000008' condition='system.ANI == ''' result='false' />
-    private static final Matcher regPOST = Pattern.compile("^\\(POST\\) Client IP Address");
-    private static final Matcher regKVList = Pattern.compile("^\\s+'");
-    private static final Matcher regPostJSON = Pattern.compile("JSon: KVList:\\s*$");
+    private static final Matcher regPOST = Pattern.compile("^\\(POST\\) Client IP Address").matcher("");
+    private static final Matcher regKVList = Pattern.compile("^\\s+'").matcher("");
+    private static final Matcher regPostJSON = Pattern.compile("JSon: KVList:\\s*$").matcher("");
 
-    private static final Matcher regORSResponse = Pattern.compile("^OrsService: response from ORS (.+)$");
+    private static final Matcher regORSResponse = Pattern.compile("^OrsService: response from ORS (.+)$").matcher("");
 
-    private static final Matcher regExceptionContinue = Pattern.compile("^(\\s|Caused by:)");
-    private static final Matcher regIxnMsgContinue = Pattern.compile("^(\\s|attr_)");
-    //    private static final Matcher regSTATE_HTTPIN = Pattern.compile(" HandleRequest: |ORS_HTTPResponse");
-//    private static final Matcher regHTTPINSessionCreate = Pattern.compile("\\s*OnRequestStart: Creating session. SessionID=(\\w+)$");
+    private static final Matcher regExceptionContinue = Pattern.compile("^(\\s|Caused by:)").matcher("");
+    private static final Matcher regIxnMsgContinue = Pattern.compile("^(\\s|attr_)").matcher("");
+    //    private static final Matcher regSTATE_HTTPIN = Pattern.compile(" HandleRequest: |ORS_HTTPResponse").matcher("");
+//    private static final Matcher regHTTPINSessionCreate = Pattern.compile("\\s*OnRequestStart: Creating session. SessionID=(\\w+)$").matcher("");
     //19:36:55.156 HTTP[56,TCP] <<<< 413 bytes from 171.164.220.27 <<<<
-//    private static final Matcher regHTTPin = Pattern.compile("^\\s*HTTP\\[(\\d+)\\,TCP\\] <<<< (\\d+) bytes from ([\\d\\.]+) <<<<$");
+//    private static final Matcher regHTTPin = Pattern.compile("^\\s*HTTP\\[(\\d+)\\,TCP\\] <<<< (\\d+) bytes from ([\\d\\.]+) <<<<$").matcher("");
     //21:06:45.840 HTTP[42,TCP] >>>> 131 bytes >>>>
-//    private static final Matcher regHTTPout = Pattern.compile("^\\s*HTTP\\[(\\d+)\\,TCP\\] >>>> (\\d+) bytes >>>>$");
-//    private static final Matcher regHTTPignore = Pattern.compile(": OnConnect|client .+ exception|discard pending resonse| client [\\d\\.]+ disconnected");
+//    private static final Matcher regHTTPout = Pattern.compile("^\\s*HTTP\\[(\\d+)\\,TCP\\] >>>> (\\d+) bytes >>>>$").matcher("");
+//    private static final Matcher regHTTPignore = Pattern.compile(": OnConnect|client .+ exception|discard pending resonse| client [\\d\\.]+ disconnected").matcher("");
     private static final StartSessionTransition startSessionTransition = new StartSessionTransition();
     private static final Matcher regNotParseMessage = Pattern.compile(
             //07:47:39.182 Trc 09900  [qtp747464370-17] >>> /1/service/callback/RCC_CORK_CallBack - CCID [null]
             "^(09900"
-                    + ")");
+                    + ")").matcher("");
     private static final Matcher regStatisticMessage = Pattern.compile(
-            "^StatisticService: ");
+            "^StatisticService: ").matcher("");
     private static final Matcher regOpenMediaInteraction = Pattern.compile(
-            "^CreateOpenMediaInteractionController webRequestId \\[(\\d+)\\], submitInteraction (request received|response) for (\\S+)\\s+");
+            "^CreateOpenMediaInteractionController webRequestId \\[(\\d+)\\], submitInteraction (request received|response) for (\\S+)\\s+").matcher("");
     private static final Matcher regSendIxnServerMsg = Pattern.compile(
-            "^CreateOpenMediaInteractionTask.+(to|from) Interaction Server: '([^']+)'");
+            "^CreateOpenMediaInteractionTask.+(to|from) Interaction Server: '([^']+)'").matcher("");
     //<editor-fold defaultstate="collapsed" desc="GMSStatServerMsg">
-    private static final Matcher ptStatStringValue = Pattern.compile("^\\s*'STRING_VALUE'.+= \"(.+)\"$");
-    private static final Matcher ptStatMessageStart = Pattern.compile("message from (\\S+) - tcp:\\/\\/([^:]+):(\\d+): '([^']+)'.+attributes:\\s+");
-    private static final Matcher ptStatMessageAttr = Pattern.compile("(?:(\\S+)\\s+\\[\\S+\\]\\s+=\\s+([\\-\\d]+|\"[^\\\"]+\"|ObjectValue:[^\\}]+)\\s+)");
+    private static final Matcher ptStatStringValue = Pattern.compile("^\\s*'STRING_VALUE'.+= \"(.+)\"$").matcher("");
+    private static final Matcher ptStatMessageStart = Pattern.compile("message from (\\S+) - tcp:\\/\\/([^:]+):(\\d+): '([^']+)'.+attributes:\\s+").matcher("");
+    private static final Matcher ptStatMessageAttr = Pattern.compile("(?:(\\S+)\\s+\\[\\S+\\]\\s+=\\s+([\\-\\d]+|\"[^\\\"]+\"|ObjectValue:[^\\}]+)\\s+)").matcher("");
     private static final HashMap<String, Integer> keysPos = new HashMap<>(MAX_WEB_PARAMS);
     /*
     16:41:55.768 METRIC <state_enter sid='KL8938QSD91ER2RN2NR1397738000001' name='Telstra.globalstate' type='state' />
@@ -329,7 +329,7 @@ public class GMSParser extends Parser {
                 }
                 Main.logger.trace("latest thread ID: [" + (newThread == null ? "(null)" : newThread) + "] s[" + s + "]");
 
-                if ((m = regExceptionStart.matcher(str)).find() || (m = regNullExceptionStart.matcher(s)).find()) {
+                if ((m = regExceptionStart.reset(str)).find() || (m = regNullExceptionStart.reset(s)).find()) {
                     m_msgName = m.group(1);
                     if (m.groupCount() > 1) {
                         m_msg1 = m.group(2);
@@ -341,14 +341,14 @@ public class GMSParser extends Parser {
                     m_ParserState = ParserState.STATE_EXCEPTION;
                     setSavedFilePos(getFilePos());
                     break;
-                } else if ((regPOST.matcher(s)).find()) {
+                } else if ((regPOST.reset(s)).find()) {
                     m_HeaderOffset = m_CurrentFilePos;
                     m_MessageContents.add(s);
                     m_TotalLen = str.length() + in.charsSkippedOnReadLine;
                     m_ParserState = ParserState.STATE_POST;
                     setSavedFilePos(getFilePos());
                     //m_ParserState=STATE_CLUSTER;
-                } else if (regAttemptStartSession.matcher(s).find()) {
+                } else if (regAttemptStartSession.reset(s).find()) {
                     ParserThreadState tps = new ParserThreadState(
                             startSessionTransition,
                             ParserThreadsProcessor.ParserState.STATE_START_SESSION);
@@ -360,7 +360,7 @@ public class GMSParser extends Parser {
 
                 } else if (s.startsWith("OrsService: submit to ORS")) {
                     addORSRequest(newThread, dp);
-                } else if ((m = regORSResponse.matcher(s)).find()) {
+                } else if ((m = regORSResponse.reset(s)).find()) {
                     String resp = m.group(1);
                     Main.logger.trace("ORS response " + resp);
                     this.savedThreadID = newThread;
@@ -381,9 +381,9 @@ public class GMSParser extends Parser {
                     m_ParserState = ParserState.STATE_ORS_RESPONSE_EXCEPTION;
                     this.savedThreadID = newThread;
                     setSavedFilePos(getFilePos());
-                } else if ((m = regStatisticMessage.matcher(s)).find()) {
+                } else if ((m = regStatisticMessage.reset(s)).find()) {
                     processStatisticNotification(s.substring(m.end()));
-                } else if ((m = regOpenMediaInteraction.matcher(s)).find()) {
+                } else if ((m = regOpenMediaInteraction.reset(s)).find()) {
                     processOpenMediaInteraction(m.group(1), m.group(2).startsWith("resp"), m.group(3), s.substring(m.end()));
                 } else if (s.contains("[SESSION]") || s.startsWith("WebBasicAuthenticationFilter:")
                         || s.contains("Client IP Address: ") || s.startsWith("WebAPIApplicationSettings")
@@ -392,7 +392,7 @@ public class GMSParser extends Parser {
                         || s.startsWith("Context Services: ") || s.startsWith("WebAPILoadBalancerImpl") || s.startsWith("MediaServerProtocolFactory ")
                         || s.startsWith("Config Task Remove Agent")) {
 
-                } else if ((m = regSendIxnServerMsg.matcher(s)).find()) {
+                } else if ((m = regSendIxnServerMsg.reset(s)).find()) {
                     m_HeaderOffset = m_CurrentFilePos;
                     m_MessageContents.clear();
                     m_TotalLen = str.length() + in.charsSkippedOnReadLine;
@@ -413,7 +413,7 @@ public class GMSParser extends Parser {
                 break;
 
             case STATE_EXCEPTION: {
-                if (regExceptionContinue.matcher(str).find()) {
+                if (regExceptionContinue.reset(str).find()) {
                     m_MessageContents.add(str.substring(1));
                 } else {
                     addException();
@@ -425,7 +425,7 @@ public class GMSParser extends Parser {
             break;
 
             case STATE_IXNMESSAGE: {
-                if (regIxnMsgContinue.matcher(str).find()) {
+                if (regIxnMsgContinue.reset(str).find()) {
                     m_MessageContents.add(str);
                 } else {
                     if (msg instanceof IxnGMS) {
@@ -444,7 +444,7 @@ public class GMSParser extends Parser {
             break;
 
             case STATE_TMESSAGE_ATTRIBUTES: {
-                if (regKVList.matcher(str).find()) {
+                if (regKVList.reset(str).find()) {
                     m_MessageContents.add(str);
 
                 } else {
@@ -459,9 +459,9 @@ public class GMSParser extends Parser {
             break;
 
             case STATE_POST:
-                if (regPostJSON.matcher(str).find()) {
+                if (regPostJSON.reset(str).find()) {
                     m_MessageContents.add(str.substring(1));
-                } else if (regKVList.matcher(str).find()) {
+                } else if (regKVList.reset(str).find()) {
                     m_TotalLen += str.length() + in.charsSkippedOnReadLine; // str as we cut date
                     m_MessageContents.add(str);
                 } else {
@@ -474,7 +474,7 @@ public class GMSParser extends Parser {
                 break;
 
             case STATE_ORS_RESPONSE:
-                if (regKVList.matcher(str).find()) {
+                if (regKVList.reset(str).find()) {
                     m_TotalLen += str.length() + in.charsSkippedOnReadLine; // str as we cut date
                     m_MessageContents.add(str);
                 } else {
@@ -633,7 +633,7 @@ public class GMSParser extends Parser {
 
     private static class StartSessionTransition implements ParserThreadsProcessor.StateTransition {
 
-        private final static Matcher regParams = Pattern.compile("^\\s*Params:");
+        private final static Matcher regParams = Pattern.compile("^\\s*Params:").matcher("");
 
         @Override
         public ParserThreadsProcessor.StateTransitionResult stateTransition(ParserThreadState threadState,
@@ -642,7 +642,7 @@ public class GMSParser extends Parser {
 
             switch (threadState.getParserState()) {
                 case STATE_START_SESSION: {
-                    if (regParams.matcher(sParsedAndTruncated).find()) {
+                    if (regParams.reset(sParsedAndTruncated).find()) {
                         threadState.setParserState(ParserThreadsProcessor.ParserState.STATE_START_SESSION1);
                         threadState.addString(sParsedAndTruncated);
                         return ParserThreadsProcessor.StateTransitionResult.NON_STATE_LINE_WAITED;
@@ -653,7 +653,7 @@ public class GMSParser extends Parser {
                 }
 
                 case STATE_START_SESSION1:
-                    if ((m = regKVList.matcher(sParsedAndTruncated)).find()) {
+                    if ((m = regKVList.reset(sParsedAndTruncated)).find()) {
                         threadState.addString(sOrig);
                         return ParserThreadsProcessor.StateTransitionResult.NON_STATE_LINE_WAITED;
                     } else {
@@ -683,13 +683,13 @@ public class GMSParser extends Parser {
             this();
             Matcher m;
 
-            if ((m = ptStatMessageStart.matcher(substring)).find()) {
+            if ((m = ptStatMessageStart.reset(substring)).find()) {
                 this.ssApp = m.group(1);
                 this.ssHost = m.group(2);
                 this.ssPort = m.group(3);
                 this.ssEvent = m.group(4);
                 String attrs = substring.substring(m.end());
-                m = ptStatMessageAttr.matcher(attrs);
+                m = ptStatMessageAttr.reset(attrs);
                 while (m.find()) {
                     if (m.group(1).equals("REQ_ID")) {
                         this.reqID = m.group(2);

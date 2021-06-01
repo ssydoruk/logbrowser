@@ -5,12 +5,13 @@
  */
 package com.myutils.logbrowser.indexer;
 
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class OCSSCXMLTreatment extends Message {
 
     //Created scxml session '0000017F-040206B5-0001'
-    private static final Pattern regSessionID = Pattern.compile("Created scxml session '([\\w-]+)'");
+    private static final Matcher regSessionID = Pattern.compile("Created scxml session '([\\w-]+)'").matcher("");
     private final String campDBID;
     private final String recHandle;
     private final String chainID;

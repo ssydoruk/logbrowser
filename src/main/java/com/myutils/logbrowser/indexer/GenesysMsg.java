@@ -19,7 +19,7 @@ public final class GenesysMsg extends Message {
     static GenesysMsgMap msgMap = new GenesysMsgMap();
     private final String level;
     private final String msgID;
-    //    private static final Pattern regMsgWords = Pattern.compile("([a-zA-Z]+)");
+    //    private static final Matcher regMsgWords = Pattern.compile("([a-zA-Z]+)");
 //    private static final int MAX_LOG_WORDS = 3;
     private String lastGenesysMsgLevel;
     private String lastGenesysMsgID;
@@ -35,21 +35,12 @@ public final class GenesysMsg extends Message {
         this.line = line;
     }
 
-    public static GenesysMsg CheckGenesysMsg(DateParsed dp, Parser p, TableType t, Pattern reg, Pattern ignoreMSGIDs) {
-        return CheckGenesysMsg(dp, p, t, reg, ignoreMSGIDs, false);
-    }
 
     public static GenesysMsg CheckGenesysMsg(DateParsed dp, Parser p, TableType t, Matcher reg, Matcher ignoreMSGIDs) {
         return CheckGenesysMsg(dp, p, t, reg, ignoreMSGIDs, false);
     }
 
-    public static GenesysMsg postGenesysMsg(DateParsed dp, Parser p, TableType t, Pattern ignoreMSGIDs,
-                                            String _lastGenesysMsgLevel, String _lastGenesysMsgID, String generatedMsgID, String generatedMsg,
-                                            boolean saveToDB) {
-        return postGenesysMsg(dp, p, t, ignoreMSGIDs.matcher(""),
-                _lastGenesysMsgLevel, _lastGenesysMsgID, generatedMsgID, generatedMsg,
-                saveToDB);
-    }
+
 
     public static GenesysMsg postGenesysMsg(DateParsed dp, Parser p, TableType t, Matcher ignoreMSGIDs,
                                             String _lastGenesysMsgLevel, String _lastGenesysMsgID, String generatedMsgID, String generatedMsg,
@@ -74,18 +65,13 @@ public final class GenesysMsg extends Message {
         return msg;
     }
 
-    public static GenesysMsg postGenesysMsg(DateParsed dp, Parser p, TableType t, Pattern ignoreMSGIDs,
+    public static GenesysMsg postGenesysMsg(DateParsed dp, Parser p, TableType t, Matcher ignoreMSGIDs,
                                             String _lastGenesysMsgLevel, String _lastGenesysMsgID, String generatedMsgID, String generatedMsg) {
         return postGenesysMsg(dp, p, t, ignoreMSGIDs,
                 _lastGenesysMsgLevel, _lastGenesysMsgID, generatedMsgID, generatedMsg, true);
     }
 
-    public static GenesysMsg CheckGenesysMsg(DateParsed dp, Parser p, TableType t, Pattern reg, Pattern ignoreMSGIDs,
-                                             boolean useFirstWord, boolean saveToDB) {
-        return CheckGenesysMsg(dp, p, t, reg.matcher(""), ignoreMSGIDs.matcher(""),
-                useFirstWord, true);
 
-    }
 
     public static GenesysMsg CheckGenesysMsg(DateParsed dp, Parser p, TableType t, Matcher reg, Matcher ignoreMSGIDs,
                                              boolean useFirstWord, boolean saveToDB) {
@@ -129,13 +115,6 @@ public final class GenesysMsg extends Message {
 
     }
 
-    public static GenesysMsg CheckGenesysMsg(DateParsed dp, Parser p, TableType t, Pattern reg, Pattern ignoreMSGIDs,
-                                             boolean useFirstWord) {
-        return CheckGenesysMsg(dp, p, t, reg, ignoreMSGIDs,
-                useFirstWord, true);
-
-    }
-
     public static GenesysMsg CheckGenesysMsg(DateParsed dp, Parser p, TableType t, Matcher reg, Matcher ignoreMSGIDs,
                                              boolean useFirstWord) {
         return CheckGenesysMsg(dp, p, t, reg, ignoreMSGIDs,
@@ -143,29 +122,26 @@ public final class GenesysMsg extends Message {
 
     }
 
-    public static GenesysMsg CheckGenesysMsgSCS(DateParsed dp, Parser p, TableType t, Pattern ignoreMSGIDs) {
-        GenesysMsg ret = CheckGenesysMsg(dp, p, t, regMsgSCS, ignoreMSGIDs.matcher(""));
+    public static GenesysMsg CheckGenesysMsgSCS(DateParsed dp, Parser p, TableType t, Matcher ignoreMSGIDs) {
+        GenesysMsg ret = CheckGenesysMsg(dp, p, t, regMsgSCS, ignoreMSGIDs);
         if (ret != null) {
             return ret;
         } else {
-            return CheckGenesysMsg(dp, p, t, regMsg, ignoreMSGIDs.matcher(""));
+            return CheckGenesysMsg(dp, p, t, regMsg, ignoreMSGIDs);
         }
     }
 
-    public static GenesysMsg CheckGenesysMsgGMS(DateParsed dp, Parser p, TableType t, Pattern ignoreMSGIDs) {
-        return CheckGenesysMsg(dp, p, t, regMsg, ignoreMSGIDs.matcher(""), true);
+    public static GenesysMsg CheckGenesysMsgGMS(DateParsed dp, Parser p, TableType t, Matcher ignoreMSGIDs) {
+        return CheckGenesysMsg(dp, p, t, regMsg, ignoreMSGIDs, true);
     }
 
-    public static GenesysMsg CheckGenesysMsg(DateParsed dp, Parser p, TableType t, Pattern ignoreMSGIDs) {
-        return CheckGenesysMsg(dp, p, t, regMsg, ignoreMSGIDs.matcher(""));
-    }
 
     public static GenesysMsg CheckGenesysMsg(DateParsed dp, Parser p, TableType t, Matcher ignoreMSGIDs) {
         return CheckGenesysMsg(dp, p, t, regMsg, ignoreMSGIDs);
     }
 
-    public static GenesysMsg CheckGenesysMsg(DateParsed dp, Parser p, TableType t, Pattern ignoreMSGIDs, boolean saveToDB) {
-        return CheckGenesysMsg(dp, p, t, regMsg, ignoreMSGIDs.matcher(""), false, saveToDB);
+    public static GenesysMsg CheckGenesysMsg(DateParsed dp, Parser p, TableType t, Matcher ignoreMSGIDs, boolean saveToDB) {
+        return CheckGenesysMsg(dp, p, t, regMsg, ignoreMSGIDs, false, saveToDB);
     }
 
     static void updateMsg() {

@@ -9,9 +9,9 @@ import java.util.regex.Pattern;
  */
 public class DBServerParser extends Parser {
 
-    private static final Matcher regRI = Pattern.compile("^_R_I_\\s*");
+    private static final Matcher regRI = Pattern.compile("^_R_I_\\s*").matcher("");
 
-    private static final Matcher regCfgUpdate = Pattern.compile("^\\s+PopCfg");
+    private static final Matcher regCfgUpdate = Pattern.compile("^\\s+PopCfg").matcher("");
     final int MSG_STRING_LIMIT = 200;
     long m_CurrentFilePos;
     long m_HeaderOffset;

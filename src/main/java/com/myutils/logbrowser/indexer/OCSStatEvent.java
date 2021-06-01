@@ -6,21 +6,22 @@
 package com.myutils.logbrowser.indexer;
 
 import java.util.ArrayList;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class OCSStatEvent extends Message {
 
-    private static final Pattern nAgentDBID = Pattern.compile("^\\s+nAgentDBID: (\\d+)");
-    private static final Pattern pszAgentID = Pattern.compile("AgentID:\\s*([^,]+),");
-    private static final Pattern nPlaceDBID = Pattern.compile("^\\s+nAgentDBID:\\s*(\\d+)");
-    private static final Pattern pszPlaceID = Pattern.compile("PlaceID:\\s*([^,]+),");
+    private static final Matcher nAgentDBID = Pattern.compile("^\\s+nAgentDBID: (\\d+)").matcher("");
+    private static final Matcher pszAgentID = Pattern.compile("AgentID:\\s*([^,]+),").matcher("");
+    private static final Matcher nPlaceDBID = Pattern.compile("^\\s+nAgentDBID:\\s*(\\d+)").matcher("");
+    private static final Matcher pszPlaceID = Pattern.compile("PlaceID:\\s*([^,]+),").matcher("");
 
-    private static final Pattern AgentID = Pattern.compile("^AgentID: (.+)");
-    private static final Pattern PlaceID = Pattern.compile("^PlaceID: (.+)");
-    private static final Pattern DNID = Pattern.compile("^\\s+DN: ([^,]+),");
+    private static final Matcher AgentID = Pattern.compile("^AgentID: (.+)").matcher("");
+    private static final Matcher PlaceID = Pattern.compile("^PlaceID: (.+)").matcher("");
+    private static final Matcher DNID = Pattern.compile("^\\s+DN: ([^,]+),").matcher("");
 
-    private static final Pattern statTypeTargetUpdated = Pattern.compile("AGENT_VOICE_MEDIA_STATUS.+\\s(\\w+)$");
-    private static final Pattern statTypeEventInfo = Pattern.compile("^\\s*Status:\\s*(\\w+)");
+    private static final Matcher statTypeTargetUpdated = Pattern.compile("AGENT_VOICE_MEDIA_STATUS.+\\s(\\w+)$").matcher("");
+    private static final Matcher statTypeEventInfo = Pattern.compile("^\\s*Status:\\s*(\\w+)").matcher("");
 
     private final OCSParser.StatEventType statEventType;
 

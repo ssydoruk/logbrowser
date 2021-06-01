@@ -6,30 +6,31 @@
 package com.myutils.logbrowser.indexer;
 
 import java.util.ArrayList;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public final class OCSHTTP extends Message {
 
-    final private static Pattern regIsInbound = Pattern.compile("(::mesage received)$");
+    final private static Matcher regIsInbound = Pattern.compile("(::mesage received)$").matcher("");
 
-    final private static Pattern regMsgName = Pattern.compile("^\\s+'(?:GSW_AGENT_REQ_TYPE|GSW_USER_EVENT)'\\s+'([^']+)'");
+    final private static Matcher regMsgName = Pattern.compile("^\\s+'(?:GSW_AGENT_REQ_TYPE|GSW_USER_EVENT)'\\s+'([^']+)'").matcher("");
 
-    final private static Pattern regIxnID = Pattern.compile("^\\s+'InteractionId'.+= \"([^\"]+)\"");
+    final private static Matcher regIxnID = Pattern.compile("^\\s+'InteractionId'.+= \"([^\"]+)\"").matcher("");
 
-    final private static Pattern regMediaType = Pattern.compile("^\\s+attr_media_type.+= \"([^\"]+)\"");
+    final private static Matcher regMediaType = Pattern.compile("^\\s+attr_media_type.+= \"([^\"]+)\"").matcher("");
 
-    final private static Pattern regQueue = Pattern.compile("^\\s+attr_queue.+= \"([^\"]+)\"");
+    final private static Matcher regQueue = Pattern.compile("^\\s+attr_queue.+= \"([^\"]+)\"").matcher("");
 
-    final private static Pattern regPhone = Pattern.compile("^\\s+'GSW_PHONE'.+= \"([^\"]+)\"");
-    final private static Pattern regcontact_info = Pattern.compile("^\\s+'contact_info'.+= \"([^\"]+)\"");
+    final private static Matcher regPhone = Pattern.compile("^\\s+'GSW_PHONE'.+= \"([^\"]+)\"").matcher("");
+    final private static Matcher regcontact_info = Pattern.compile("^\\s+'contact_info'.+= \"([^\"]+)\"").matcher("");
 
-    final private static Pattern regGSW_RECORD_HANDLE = Pattern.compile("^\\s+'GSW_RECORD_HANDLE'\\s+\\'*(\\d+)");
+    final private static Matcher regGSW_RECORD_HANDLE = Pattern.compile("^\\s+'GSW_RECORD_HANDLE'\\s+\\'*(\\d+)").matcher("");
 
-    final private static Pattern regRefID = Pattern.compile("^\\s+attr_ref_id.+ = (\\d+)");
+    final private static Matcher regRefID = Pattern.compile("^\\s+attr_ref_id.+ = (\\d+)").matcher("");
 
-    final private static Pattern regGSW_CHAIN_ID = Pattern.compile("^\\s+'GSW_CHAIN_ID'.+= (\\d+)");
-    final private static Pattern regchain_id = Pattern.compile("^\\s+'chain_id'.+= (\\d+)");
-    final private static Pattern regGSW_CAMPAIGN = Pattern.compile("^\\s+'GSW_CAMPAIGN_NAME'.+= '([^']+)'");
+    final private static Matcher regGSW_CHAIN_ID = Pattern.compile("^\\s+'GSW_CHAIN_ID'.+= (\\d+)").matcher("");
+    final private static Matcher regchain_id = Pattern.compile("^\\s+'chain_id'.+= (\\d+)").matcher("");
+    final private static Matcher regGSW_CAMPAIGN = Pattern.compile("^\\s+'GSW_CAMPAIGN_NAME'.+= '([^']+)'").matcher("");
 
     public OCSHTTP(ArrayList messageLines) {
         super(TableType.OCSHTTP, messageLines);

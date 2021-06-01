@@ -6,15 +6,16 @@
 package com.myutils.logbrowser.indexer;
 
 import java.util.ArrayList;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class OCSClient extends Message {
 
-    final private static Pattern regMsgName = Pattern.compile("^\\s*GSW_CM_MessageType.+\\[([^\\]]+)\\]$");
+    final private static Matcher regMsgName = Pattern.compile("^\\s*GSW_CM_MessageType.+\\[([^\\]]+)\\]$").matcher("");
 
-    final private static Pattern regCampID = Pattern.compile("^\\s*GSW_CM_AttrCampaignID\\s*(\\d+)");
+    final private static Matcher regCampID = Pattern.compile("^\\s*GSW_CM_AttrCampaignID\\s*(\\d+)").matcher("");
 
-    final private static Pattern regGetGroupID = Pattern.compile("^\\s*GSW_CM_AttrGroupID\\s*(\\d+)");
+    final private static Matcher regGetGroupID = Pattern.compile("^\\s*GSW_CM_AttrGroupID\\s*(\\d+)").matcher("");
 
     public OCSClient(ArrayList messageLines) {
         super(TableType.OCSClient, messageLines);

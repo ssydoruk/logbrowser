@@ -14,10 +14,10 @@ import static Utils.Util.intOrDef;
 public class StCapacity extends Message {
 
     public static final int MAX_MEDIA = 5;
-    private static final Pattern regStatusLineAgent = Pattern.compile("^Status: (Capacity snapshot) for agent '([^']+)'(?:.+, place '([^']+)'.+\\(CR='([^\\']+))?");
-    private static final Pattern regStatusLinePlace = Pattern.compile("^Status: (Capacity snapshot) for place '([^']+)'(?:.+, agent '([^']+)'.+\\(CR='([^\\']+))?");
-    private static final Pattern regStatusLineDN = Pattern.compile("^Status: (Capacity snapshot) for \\w+ '([^@']+)");
-    private static final Pattern regStatusMedia = Pattern.compile("^\\s*\\[\\s*(\\w+)\\s+(\\d+)\\s+(\\d+).+--\\s(\\w+)");
+    private static final Matcher regStatusLineAgent = Pattern.compile("^Status: (Capacity snapshot) for agent '([^']+)'(?:.+, place '([^']+)'.+\\(CR='([^\\']+))?").matcher("");
+    private static final Matcher regStatusLinePlace = Pattern.compile("^Status: (Capacity snapshot) for place '([^']+)'(?:.+, agent '([^']+)'.+\\(CR='([^\\']+))?").matcher("");
+    private static final Matcher regStatusLineDN = Pattern.compile("^Status: (Capacity snapshot) for \\w+ '([^@']+)").matcher("");
+    private static final Matcher regStatusMedia = Pattern.compile("^\\s*\\[\\s*(\\w+)\\s+(\\d+)\\s+(\\d+).+--\\s(\\w+)").matcher("");
     private final String OldStatus = null;
     private final String NewStatus = null;
     private String plGroup = null;
@@ -30,17 +30,17 @@ public class StCapacity extends Message {
     public StCapacity(String name, ArrayList messageLines) {
         super(TableType.StCapacity, messageLines);
         Matcher m;
-        if ((m = regStatusLineAgent.matcher(name)).find()) {
+        if ((m = regStatusLineAgent.reset(name)).find()) {
             plGroup = m.group(1);
             agent = m.group(2);
             place = m.group(3);
             capacityRule = m.group(4);
-        } else if ((m = regStatusLinePlace.matcher(name)).find()) {
+        } else if ((m = regStatusLinePlace.reset(name)).find()) {
             plGroup = m.group(1);
             place = m.group(2);
             agent = m.group(3);
             capacityRule = m.group(4);
-        } else if ((m = regStatusLineDN.matcher(name)).find()) {
+        } else if ((m = regStatusLineDN.reset(name)).find()) {
             plGroup = m.group(1);
             dn = m.group(2);
         } else {
@@ -83,7 +83,7 @@ public class StCapacity extends Message {
 
         for (String m_MessageLine : m_MessageLines) {
             Main.logger.trace("status regexp against [" + m_MessageLine + "]");
-            if ((m = regStatusMedia.matcher(m_MessageLine)).find()) {
+            if ((m = regStatusMedia.reset(m_MessageLine)).find()) {
                 if (curMediaNo++ < StCapacity.MAX_MEDIA) {
                     ret.add(new MediaStatuses(m.group(1), m.group(2), m.group(3), m.group(4)));
                 } else {

@@ -25,6 +25,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 import java.util.zip.ZipEntry;
@@ -39,7 +40,7 @@ import static Utils.Util.pDuration;
 public class Main {
 
     private static final Constants constants = new Constants();
-    private static final Pattern regFilesNotGood = Pattern.compile("(^\\.logbr|logbr.db)");
+    private static final Matcher regFilesNotGood = Pattern.compile("(^\\.logbr|logbr.db)").matcher("");
     public static SqliteAccessor m_accessor;
     public static Logger logger;
     public static EnvIndexer ee;
@@ -171,7 +172,7 @@ public class Main {
     }
 
     private static boolean fileOK(File fileInfo) {
-        return !regFilesNotGood.matcher(fileInfo.getName()).find();
+        return !regFilesNotGood.reset(fileInfo.getName()).find();
     }
 
     private static void extendFilesList(ArrayList<FileInfo> filesToProcess, LogFileWrapper newLog) throws IOException {

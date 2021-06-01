@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static com.myutils.logbrowser.indexer.Parser.genList;
@@ -21,7 +22,7 @@ import static com.myutils.logbrowser.indexer.Parser.splitQuery;
  */
 public class URLProcessor {
 
-    private final ArrayList<Pair<String, Pattern>> pathProcessing = new ArrayList<>();
+    private final ArrayList<Pair<String, Matcher>> pathProcessing = new ArrayList<>();
 
     // in URL query, keyword:replaceWord
     private final HashMap<String, String> queryProcessing = new HashMap<>();
@@ -60,7 +61,7 @@ public class URLProcessor {
                     }
                 }
                 String uriPath = uri.getPath();
-                for (Pair<String, Pattern> entry : pathProcessing) {
+                for (Pair<String, Matcher> entry : pathProcessing) {
                     Utils.Pair<String, String> rxReplace;
                     if ((rxReplace = Message.getRxReplace(uriPath, entry.getValue(), 1, entry.getKey())) != null) {
                         uriPath = rxReplace.getValue();
@@ -132,7 +133,7 @@ public class URLProcessor {
         }
     }
 
-    void addPathProcessor(String PATH_UUID, Pattern compile) {
+    void addPathProcessor(String PATH_UUID, Matcher compile) {
         pathProcessing.add(new Pair(PATH_UUID, compile));
     }
 

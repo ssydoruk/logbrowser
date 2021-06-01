@@ -16,7 +16,7 @@ import java.util.regex.Pattern;
 
 public final class IDsFinder extends QueryTools {
 
-    private static final Pattern regCampName = Pattern.compile("^([^@]+)@");
+    private static final Matcher regCampName = Pattern.compile("^([^@]+)@").matcher("");
     private final HashSet<Integer> m_callIdHash = new HashSet<>();
     private final Integer[] peerIDs = null;
     //    boolean initOutbound() {
@@ -1392,7 +1392,7 @@ public final class IDsFinder extends QueryTools {
                             ArrayList<String> camp = new ArrayList<>(names.length);
                             for (String name : names) {
                                 Matcher m;
-                                if ((m = regCampName.matcher(name)).find()) {
+                                if ((m = regCampName.reset(name)).find()) {
                                     camp.add(m.group(1));
                                 } else {
                                     inquirer.logger.error("Incorrect campaign group name: [" + name + "]");

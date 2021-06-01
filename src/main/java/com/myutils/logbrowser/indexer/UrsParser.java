@@ -18,14 +18,14 @@ import java.util.regex.Pattern;
 public class UrsParser extends Parser {
 
     public static final HashMap<String, String> targetCode = getTargetCodes();
-    private static final Matcher regRIGenerated = Pattern.compile("^\\[19:0f\\]connid (\\w+) generated for client=(\\d+)\\(([^\\]]+)\\).+\\*(\\w+)$");
-    private static final Matcher regRIRequestStart = Pattern.compile("^\\[19:10\\][^:]+: ([^\\?]+)\\?(.+), client=(\\d+)\\(([^\\)]+)\\).+ref=(\\d+)$");
-    private static final Matcher regRIRequestShort = Pattern.compile("^\\[19:10\\][^:]+: (.+), client=(\\d+)\\(([^\\)]+)\\).+ref=(\\d+)$");
-    private static final Matcher regRIRequestShort1 = Pattern.compile("\\[19:10\\][^:]+: (.+), client=");
-    private static final Matcher regRIResp = Pattern.compile("^\\[19:11\\].+'([\\w~]+)'.+ client (\\d+)\\(([\\w~]+)\\).+ref=(\\d+)$");
-    private static final Matcher regRICallStart = Pattern.compile("received: urs/call/start");
-    private static final Matcher regRIConnIDGenerated = Pattern.compile("\\[19:10\\] connid ([\\w~]+).+client=(\\d+)\\(([^\\)]+)\\).+ref id=(\\d+), .+name=([\\w~]+)");
-    private static final Matcher reIID = Pattern.compile("^\\s+IID:(\\w+)$");
+    private static final Matcher regRIGenerated = Pattern.compile("^\\[19:0f\\]connid (\\w+) generated for client=(\\d+)\\(([^\\]]+)\\).+\\*(\\w+)$").matcher("");
+    private static final Matcher regRIRequestStart = Pattern.compile("^\\[19:10\\][^:]+: ([^\\?]+)\\?(.+), client=(\\d+)\\(([^\\)]+)\\).+ref=(\\d+)$").matcher("");
+    private static final Matcher regRIRequestShort = Pattern.compile("^\\[19:10\\][^:]+: (.+), client=(\\d+)\\(([^\\)]+)\\).+ref=(\\d+)$").matcher("");
+    private static final Matcher regRIRequestShort1 = Pattern.compile("\\[19:10\\][^:]+: (.+), client=").matcher("");
+    private static final Matcher regRIResp = Pattern.compile("^\\[19:11\\].+'([\\w~]+)'.+ client (\\d+)\\(([\\w~]+)\\).+ref=(\\d+)$").matcher("");
+    private static final Matcher regRICallStart = Pattern.compile("received: urs/call/start").matcher("");
+    private static final Matcher regRIConnIDGenerated = Pattern.compile("\\[19:10\\] connid ([\\w~]+).+client=(\\d+)\\(([^\\)]+)\\).+ref id=(\\d+), .+name=([\\w~]+)").matcher("");
+    private static final Matcher reIID = Pattern.compile("^\\s+IID:(\\w+)$").matcher("");
     //17:33:04.587_I_I_01d9027e17ef8b38 [09:05] >>>>>>>>>>>>resume interpretator(0), func:SuspendForDN
 //    _I_I_01d9027e17ef8b38 [09:04] ASSIGN: agent_target(LOCAL) <- STRING: "return:timeout"
 //    _I_I_01d9027e17ef8b38 [09:04] ASSIGN: N_attempt(LOCAL) <- INTEGER: 1
@@ -37,56 +37,56 @@ public class UrsParser extends Parser {
 //    _M_I_ [10:17] -ready DN 1077 @ TMK_SIP_Switch (type 1 CallInbound time=1463063585) for agent AZvyagina_tsk, place Place_1077_TMK, WaitForNextCall time=1463063585
 //    _M_I_ [10:17] STATOBJECT(06409ed0 208 2) tenant=Resources name=AZvyagina_tsk@OBN_StatServerRouting.A: 0(1) ready DNs reported, dT=0
 //17:33:04.697_T_I_03350282382b5512 [14:02] sending event 85 for virtual queue OBN_IP_Skill1_VQ_OBN_SIP_Outbound_Virtual
-    private static final Matcher regStrategyMessage = Pattern.compile("^\\s*_\\S_\\S_(\\S{16})\\s*\\[(\\S{2}:\\S{2})\\]\\s*");
-    private static final Matcher regNonStrategyMessage = Pattern.compile("^\\s*_\\S_\\S_\\s*\\[(\\S{2}:\\S{2})\\]\\s*");
-    private static final Matcher regRLibMessage = Pattern.compile("^\\s*RLIB: ");
-    private static final Matcher regStartsFromSpace = Pattern.compile("^\\s+");
-    private static final Matcher regTMessageOutFinal = Pattern.compile("^\\.\\.sent to");
-    private static final Matcher regTMessageAttribute = Pattern.compile("^\t");
-    private static final Matcher regTMessageInFinal = Pattern.compile("^(\\w.+is received for ts|\\.\\.sent to)");
-    //    private static final Matcher regAgentStatusChanged = Pattern.compile("^_M_I_ \\[10:17\\]");
-    private static final Matcher regWaitingCalls = Pattern.compile("^WAITING CALLS:\\s*");
-    private static final Matcher regWaitingInit = Pattern.compile("_M_I_ \\[10:15\\]");
-    private static final Matcher regGroupContent = Pattern.compile("CURRENT CONTENT\\(\\d+\\):");
-    private static final Matcher regSCXMLContinue = Pattern.compile("^\\s*_\\S_\\S_(\\S{16})\\s*\\[09:04\\]\\s*");
-    private static final Matcher regHTTPBridgeContinue = Pattern.compile("^\\s+");
-    private static final Matcher regHTTPResponse = Pattern.compile("^HTTP");
-    private static final Matcher regTargetInformation = Pattern.compile("^(============== Target|\\s)");
-    private static final Matcher regRIResponse = Pattern.compile("Message: (.+)$");
-    private static final Matcher regMediaStatus = Pattern.compile("^\\s+_M_I_ \\[(10:37|10:17)\\]");
+    private static final Matcher regStrategyMessage = Pattern.compile("^\\s*_\\S_\\S_(\\S{16})\\s*\\[(\\S{2}:\\S{2})\\]\\s*").matcher("");
+    private static final Matcher regNonStrategyMessage = Pattern.compile("^\\s*_\\S_\\S_\\s*\\[(\\S{2}:\\S{2})\\]\\s*").matcher("");
+    private static final Matcher regRLibMessage = Pattern.compile("^\\s*RLIB: ").matcher("");
+    private static final Matcher regStartsFromSpace = Pattern.compile("^\\s+").matcher("");
+    private static final Matcher regTMessageOutFinal = Pattern.compile("^\\.\\.sent to").matcher("");
+    private static final Matcher regTMessageAttribute = Pattern.compile("^\t").matcher("");
+    private static final Matcher regTMessageInFinal = Pattern.compile("^(\\w.+is received for ts|\\.\\.sent to)").matcher("");
+    //    private static final Matcher regAgentStatusChanged = Pattern.compile("^_M_I_ \\[10:17\\]").matcher("");
+    private static final Matcher regWaitingCalls = Pattern.compile("^WAITING CALLS:\\s*").matcher("");
+    private static final Matcher regWaitingInit = Pattern.compile("_M_I_ \\[10:15\\]").matcher("");
+    private static final Matcher regGroupContent = Pattern.compile("CURRENT CONTENT\\(\\d+\\):").matcher("");
+    private static final Matcher regSCXMLContinue = Pattern.compile("^\\s*_\\S_\\S_(\\S{16})\\s*\\[09:04\\]\\s*").matcher("");
+    private static final Matcher regHTTPBridgeContinue = Pattern.compile("^\\s+").matcher("");
+    private static final Matcher regHTTPResponse = Pattern.compile("^HTTP").matcher("");
+    private static final Matcher regTargetInformation = Pattern.compile("^(============== Target|\\s)").matcher("");
+    private static final Matcher regRIResponse = Pattern.compile("Message: (.+)$").matcher("");
+    private static final Matcher regMediaStatus = Pattern.compile("^\\s+_M_I_ \\[(10:37|10:17)\\]").matcher("");
     // WAITING CALLS: 0c5202aadb166aa9 0c5202aadb166aa9 0d4b02a63cbddec0
 //15:49:45.068_R_I_ [19:10] routing interface request received: urs/call/00e2029a670222cb/func?name=FindConfigObject&params=%5B1%2C+%22name%3ASwitch_VyS%22%5D&sync=1, client=732(OR_Server), ref=674437
-    private static final Matcher regRI = Pattern.compile("^_R_I_\\s*");
-    private static final Matcher regCfgUpdate = Pattern.compile("^\\s+PopCfg.+ing$");
-    private static final Matcher regCfgNotification = Pattern.compile("^Cfg\\w+=\\{");
-    private static final Matcher regCfgUnknownOption = Pattern.compile("^\\s+_C_W_");
+    private static final Matcher regRI = Pattern.compile("^_R_I_\\s*").matcher("");
+    private static final Matcher regCfgUpdate = Pattern.compile("^\\s+PopCfg.+ing$").matcher("");
+    private static final Matcher regCfgNotification = Pattern.compile("^Cfg\\w+=\\{").matcher("");
+    private static final Matcher regCfgUnknownOption = Pattern.compile("^\\s+_C_W_").matcher("");
     //11:50:52.636_R_I_ [19:0f] connid 0150028acff24002 generated for client=23(OR_Server_811), ref id=5, method name=ORS: 0000GaBNKN2Q0021
-    private static final Matcher regCONNID_UUID = Pattern.compile("connid ([\\w~]+) generated for client.+[\\* ]([\\w~]+)$");
+    private static final Matcher regCONNID_UUID = Pattern.compile("connid ([\\w~]+) generated for client.+[\\* ]([\\w~]+)$").matcher("");
     //    0083027d73c677aa, 05/23/16@17:54:52.974, RP(##TSERVER) -> @ [ 0 0 1 1], tms: 8418= (N)0 + (T)0 + (X)0 + (S)0 + (W)0 + (F)8418 + (R)0, trg:
-    private static final Matcher regVitalik = Pattern.compile("^\\w{16},");
+    private static final Matcher regVitalik = Pattern.compile("^\\w{16},").matcher("");
     //    DateParsed dp;
-    private static final Matcher regTMessageToStart = Pattern.compile("^.*(send to ts|sending event|received from|request to)");
-    private static final Matcher regTMessageOutFirstLine = Pattern.compile("^(request to|\\tAttribute|\\t\\()");
-    private static final Matcher regReceived = Pattern.compile("^received from (\\d+)\\(([^\\)]+)\\).+message (Event\\w+)(?:\\(refid=(\\d+)\\))*");
-    private static final Matcher regEventAttachedData = Pattern.compile("dn=([^,]+), refid=\\d+\\)$");
-    private static final Matcher regSentTo = Pattern.compile("^send to ts (.+) (Request\\w+)");
-    private static final Matcher regReqTo = Pattern.compile("^request to (\\d+).+message (Request\\w+)");
-    private static final Matcher regStrategy = Pattern.compile("strategy:.+\\*+(\\S+)");
+    private static final Matcher regTMessageToStart = Pattern.compile("^.*(send to ts|sending event|received from|request to)").matcher("");
+    private static final Matcher regTMessageOutFirstLine = Pattern.compile("^(request to|\\tAttribute|\\t\\()").matcher("");
+    private static final Matcher regReceived = Pattern.compile("^received from (\\d+)\\(([^\\)]+)\\).+message (Event\\w+)(?:\\(refid=(\\d+)\\))*").matcher("");
+    private static final Matcher regEventAttachedData = Pattern.compile("dn=([^,]+), refid=\\d+\\)$").matcher("");
+    private static final Matcher regSentTo = Pattern.compile("^send to ts (.+) (Request\\w+)").matcher("");
+    private static final Matcher regReqTo = Pattern.compile("^request to (\\d+).+message (Request\\w+)").matcher("");
+    private static final Matcher regStrategy = Pattern.compile("strategy:.+\\*+(\\S+)").matcher("");
     //[14:33] strategy: **ORS (1085200831) is attached to the call
-    private static final Matcher regRequestRef = Pattern.compile("request (\\d+) sent to");
-    private static final Matcher regRequestURL = Pattern.compile("session/([^/]+)/(.+)$");
-    private static final Matcher regWebResponse = Pattern.compile("^(^.+) is received from server.+ refid=(\\d+)");
-    private static final Matcher regWebResponseBody = Pattern.compile("^HTTPBody \\{(.+)\\}$");
-    private static final Matcher regWebNotifURL = Pattern.compile("^web notification <(.+)> ");
-    private static final Matcher regCfgObjectName = Pattern.compile("(?:name|userName|number|loginCode)='([^']+)'");
-    private static final Matcher regCfgObjectType = Pattern.compile("^Cfg([^=]+)=.*\\{DBID=(\\d+)");
-    //    private static final Matcher regCfgAGType = Pattern.compile("^Cfg([^=]+)=\\{DBID=(\\d+)");
-    private static final Matcher regCfgOp = Pattern.compile("PopCfg.+\\s(\\w+)$");
-    private static final Matcher regCfgAgentGroup = Pattern.compile("^CfgAgentGroup=.+agentDBIDs=\\[([^\\]]+)");
+    private static final Matcher regRequestRef = Pattern.compile("request (\\d+) sent to").matcher("");
+    private static final Matcher regRequestURL = Pattern.compile("session/([^/]+)/(.+)$").matcher("");
+    private static final Matcher regWebResponse = Pattern.compile("^(^.+) is received from server.+ refid=(\\d+)").matcher("");
+    private static final Matcher regWebResponseBody = Pattern.compile("^HTTPBody \\{(.+)\\}$").matcher("");
+    private static final Matcher regWebNotifURL = Pattern.compile("^web notification <(.+)> ").matcher("");
+    private static final Matcher regCfgObjectName = Pattern.compile("(?:name|userName|number|loginCode)='([^']+)'").matcher("");
+    private static final Matcher regCfgObjectType = Pattern.compile("^Cfg([^=]+)=.*\\{DBID=(\\d+)").matcher("");
+    //    private static final Matcher regCfgAGType = Pattern.compile("^Cfg([^=]+)=\\{DBID=(\\d+)").matcher("");
+    private static final Matcher regCfgOp = Pattern.compile("PopCfg.+\\s(\\w+)$").matcher("");
+    private static final Matcher regCfgAgentGroup = Pattern.compile("^CfgAgentGroup=.+agentDBIDs=\\[([^\\]]+)").matcher("");
     //09:24:35.821_M_I_ [10:15] SO(7f0021ca4cb8 -1 2) ten=Resources name=?BLD_Billing_AG:Chat_SK>0@hc1_statsrvr_urs_p.GA: content updated #503 <>
 //CURRENT CONTENT(32): shilpa.c@hc1_statsrvr_urs_p.A,shruthi.p@hc1_statsrvr_urs_p.A...
-    private static final Matcher regline1015 = Pattern.compile("name=(.+): content");
-    private static final Matcher regCheckRoutingStates = Pattern.compile("^check call routing.+(true|false)$");
+    private static final Matcher regline1015 = Pattern.compile("name=(.+): content").matcher("");
+    private static final Matcher regCheckRoutingStates = Pattern.compile("^check call routing.+(true|false)$").matcher("");
     final int MSG_STRING_LIMIT = 200;
     long m_CurrentFilePos;
     long m_HeaderOffset;
@@ -146,7 +146,7 @@ public class UrsParser extends Parser {
     private void AddStrategyMessageLine(String line, String FileLine) {
         Matcher m;
         Message msg;
-        if ((FileLine.equals("14:33") || FileLine.equals("1B:01")) && (m = regStrategy.matcher(line)).find()) {
+        if ((FileLine.equals("14:33") || FileLine.equals("1B:01")) && (m = regStrategy.reset(line)).find()) {
             msg = new URSStrategyInit(line, lastConnID, m.group(1), "strategy is attached to the call");
         } else if (FileLine.equals("01:08")) {
             msg = new URSStrategyInit(line, lastConnID, null, "call deleting truly");
@@ -249,7 +249,7 @@ public class UrsParser extends Parser {
         String theUrl = Message.GetHeaderValue("URL", ':', m_MessageContents);
         if (theUrl != null) {
             Matcher m;
-            if ((m = regRequestURL.matcher(theUrl)).find()) {
+            if ((m = regRequestURL.reset(theUrl)).find()) {
                 msg.setORSSID(m.group(1));
                 msg.setFunc(m.group(2));
             }
@@ -266,11 +266,11 @@ public class UrsParser extends Parser {
     private boolean processWebResponse() {
         URSRI msg = new URSRI();
         Matcher m;
-        if ((m = regWebResponse.matcher(m_MessageContents.get(0))).find()) {
+        if ((m = regWebResponse.reset(m_MessageContents.get(0))).find()) {
             msg.setSubFunc(m.group(1));
             msg.setRefid(m.group(2));
         }
-        String body = Message.FindByRx(m_MessageContents, regWebResponseBody, 1, null);
+        String body = Message.FindByRx(m_MessageContents, regWebResponseBody, 1, (String) null);
         if (body == null || body.isEmpty()) {
             msg.setFunc(msg.getFunc());
         } else {
@@ -287,7 +287,7 @@ public class UrsParser extends Parser {
         String theUrl = Message.getRx(URSRest, regWebNotifURL, 1, null);
         if (theUrl != null) {
             Matcher m;
-            if ((m = regRequestURL.matcher(theUrl)).find()) {
+            if ((m = regRequestURL.reset(theUrl)).find()) {
                 msg.setORSSID(m.group(1));
                 msg.setFunc(m.group(2));
             }
@@ -302,7 +302,7 @@ public class UrsParser extends Parser {
         Main.logger.trace("ProcessRI [" + s + "]");
 
         Matcher m;
-        if ((m = regRIGenerated.matcher(s)).find()) {
+        if ((m = regRIGenerated.reset(s)).find()) {
             Main.logger.trace("regRIGenerated");
             URSRI msg = new URSRI();
             msg.setConnID(m.group(1));
@@ -311,7 +311,7 @@ public class UrsParser extends Parser {
             msg.setORSSID(m.group(4));
             msg.SetInbound(true);
             SetStdFieldsAndAdd(msg);
-        } else if ((m = regRIResp.matcher(s)).find()) {
+        } else if ((m = regRIResp.reset(s)).find()) {
             Main.logger.trace("regRIResp");
             msgTmp = new URSRI();
             ((URSRI) msgTmp).setFunc(m.group(1));
@@ -322,12 +322,12 @@ public class UrsParser extends Parser {
 
             m_ParserState = ParserState.STATE_RI_RESPONSE;
 
-        } else if (regRICallStart.matcher(s).find()) {
+        } else if (regRICallStart.reset(s).find()) {
             m_MessageContents.clear();
             m_MessageContents.add(s);
             m_ParserState = ParserState.STATE_RI_CALLSTART;
 
-        } else if ((m = regRIRequestStart.matcher(s)).find()) {
+        } else if ((m = regRIRequestStart.reset(s)).find()) {
             Main.logger.trace("regRIRequestStart");
             URSRI msg = new URSRI();
             msg.setClientID(m.group(3));
@@ -340,7 +340,7 @@ public class UrsParser extends Parser {
 
             SetStdFieldsAndAdd(msg);
 
-        } else if ((m = regRIRequestShort.matcher(s)).find()) {
+        } else if ((m = regRIRequestShort.reset(s)).find()) {
             Main.logger.trace("regRIRequestShort");
             URSRI msg = new URSRI();
             msg.setClientID(m.group(2));
@@ -446,7 +446,7 @@ public class UrsParser extends Parser {
                 m_lineStarted = m_CurrentLine;
 
                 if (genesysMsg != null) {
-                    if ((m = reIID.matcher(str)).find()) {
+                    if ((m = reIID.reset(str)).find()) {
                         URSGenesysMsg msg = new URSGenesysMsg(genesysMsg, m.group(1));
                         msg.AddToDB(m_tables);
                         genesysMsg = null;
@@ -477,7 +477,7 @@ public class UrsParser extends Parser {
                     }
 
                 } catch (Exception exception) {
-                    if (!(regVitalik.matcher(str)).find()) {
+                    if (!(regVitalik.reset(str)).find()) {
                         throw exception;
                     }
                 }
@@ -485,15 +485,15 @@ public class UrsParser extends Parser {
                     return null;
                 }
 
-                if ((regCfgUpdate.matcher(s)).find()) {
+                if ((regCfgUpdate.reset(s)).find()) {
                     setSavedFilePos(getFilePos());
                     m_MessageContents.add(s);
                     m_ParserState = ParserState.STATE_CONFIG;
-                } else if ((m = regRI.matcher(s)).find()) {
+                } else if ((m = regRI.reset(s)).find()) {
                     ProcessRI(s.substring(m.end(0)));
-                } else if ((m = regCONNID_UUID.matcher(s)).find()) {
+                } else if ((m = regCONNID_UUID.reset(s)).find()) {
                     AddConnIDUUID(m.group(1), m.group(2));
-                } else if ((regRLibMessage.matcher(s)).find()) {
+                } else if ((regRLibMessage.reset(s)).find()) {
                     m_HeaderOffset = m_CurrentFilePos;
                     setSavedFilePos(getFilePos());
                     m_ParserState = ParserState.STATE_RLIB;
@@ -504,7 +504,7 @@ public class UrsParser extends Parser {
                     m_ParserState = ParserState.STATE_TLIB_MESSAGE_IN;
                     m_MessageContents.add(str);
                     setSavedFilePos(getFilePos());
-                } else if ((m = regNonStrategyMessage.matcher(s)).find()) {
+                } else if ((m = regNonStrategyMessage.reset(s)).find()) {
                     URSFileID = m.group(1);
                     URSRest = s.substring(m.end(0));
 
@@ -533,7 +533,7 @@ public class UrsParser extends Parser {
                     } else {
                         ProcessNonStrategyLine(URSFileID, URSRest);
                     }
-                } else if ((m = regStrategyMessage.matcher(s)).find()) {
+                } else if ((m = regStrategyMessage.reset(s)).find()) {
                     lastConnID = m.group(1);
                     URSFileID = m.group(2);
                     URSRest = s.substring(m.end());
@@ -572,7 +572,7 @@ public class UrsParser extends Parser {
                     } else {
                         AddStrategyMessageLine(s, URSFileID);
                     }
-                } else if ((regTMessageToStart.matcher(s)).find()) {
+                } else if ((regTMessageToStart.reset(s)).find()) {
                     m_HeaderOffset = m_CurrentFilePos;
                     m_ParserState = ParserState.STATE_TLIB_MESSAGE_OUT;
                     m_MessageContents.add(str);
@@ -581,7 +581,7 @@ public class UrsParser extends Parser {
                 break;
 
             case STATE_RI_RESPONSE: {
-                if ((m = regRIResponse.matcher(str)).find()) {
+                if ((m = regRIResponse.reset(str)).find()) {
                     ((URSRI) msgTmp).setSubFunc(m.group(1));
                 }
                 SetStdFieldsAndAdd(msgTmp);
@@ -591,7 +591,7 @@ public class UrsParser extends Parser {
             }
 
             case STATE_ROUTING_TARGET: {
-                if ((regTargetInformation.matcher(str)).find()) {
+                if ((regTargetInformation.reset(str)).find()) {
                     addStrategyTarget(m_MessageContents);
                     m_MessageContents.clear();
                     m_ParserState = ParserState.STATE_COMMENTS;
@@ -604,7 +604,7 @@ public class UrsParser extends Parser {
             }
 
             case STATE_HTTP_RESPONSE: {
-                if ((regHTTPResponse.matcher(str)).find()) {
+                if ((regHTTPResponse.reset(str)).find()) {
                     m_MessageContents.add(str);
                 } else {
                     processWebResponse();
@@ -617,7 +617,7 @@ public class UrsParser extends Parser {
             }
 
             case HTTP_BRIDGE: {
-                if ((m = regHTTPBridgeContinue.matcher(str)).find()) {
+                if ((m = regHTTPBridgeContinue.reset(str)).find()) {
                     m_MessageContents.add(str.substring(m.end()));
                 } else {
                     processHTTPBridgeRequest(str);
@@ -629,7 +629,7 @@ public class UrsParser extends Parser {
             }
 
             case STATE_STRATEGY_SCXML: {
-                if ((m = regSCXMLContinue.matcher(str)).find()) {
+                if ((m = regSCXMLContinue.reset(str)).find()) {
                     m_MessageContents.add(str.substring(m.end()));
                 } else {
                     AddStrategySCXMLMessage(URSFileID);
@@ -654,7 +654,7 @@ public class UrsParser extends Parser {
             }
 
             case smUpdateObject: {
-                if ((m = regGroupContent.matcher(str)).find()) {
+                if ((m = regGroupContent.reset(str)).find()) {
                     groupUpdated(str.substring(m.end()), m_MessageContents.get(0));
                     str = null;
                 } else {
@@ -666,7 +666,7 @@ public class UrsParser extends Parser {
             }
 
             case STATE_WAITINGCALLSSTART: {
-                if ((m = regWaitingInit.matcher(str)).find()) {
+                if ((m = regWaitingInit.reset(str)).find()) {
                     m_MessageContents.add(str.substring(m.end()));
                     m_ParserState = ParserState.STATE_WAITINGCALLS;
                     str = null;
@@ -679,7 +679,7 @@ public class UrsParser extends Parser {
             }
 
             case STATE_WAITINGCALLS: {
-                if ((m = regWaitingCalls.matcher(str)).find()) {
+                if ((m = regWaitingCalls.reset(str)).find()) {
                     processWaitingCalls(m_MessageContents.get(1), StringUtils.split(s.substring(m.end())));
                     str = null;
                 } else {
@@ -692,7 +692,7 @@ public class UrsParser extends Parser {
 
             }
             case STATEAGENTSTATUSNEW: {
-                if ((m = regMediaStatus.matcher(str)).find()) {
+                if ((m = regMediaStatus.reset(str)).find()) {
                     m_MessageContents.add(str.substring(m.end(0)));
                 }
                 if (str != null && str.contains("[0E:25]")) {
@@ -709,10 +709,10 @@ public class UrsParser extends Parser {
             break;
 
 //            case STATEAGENTSTATUSNEW: {
-//                if ((m = regMediaStatus.matcher(str)).find()) {
+//                if ((m = regMediaStatus.reset(str)).find()) {
 //                    m_MessageContents.add(str.substring(m.end()));
 //                    str = null;
-//                } else if ((m = regWaitingCalls.matcher(str)).find()) {
+//                } else if ((m = regWaitingCalls.reset(str)).find()) {
 //                    processWaitingCalls((String) m_MessageContents.get(0), StringUtils.split(s.substring(m.end())));
 //                    str = null;
 //                    m_ParserState = ParserState.STATE_COMMENTS;
@@ -725,7 +725,7 @@ public class UrsParser extends Parser {
 //                return str;
 //            }
             case STATE_RI_CALLSTART: {
-                if ((m = regRIConnIDGenerated.matcher(str)).find()) {
+                if ((m = regRIConnIDGenerated.reset(str)).find()) {
                     URSRI msg = new URSRI();
                     msg.setFunc(m.group(5));
                     msg.setClientID(m.group(2));
@@ -733,10 +733,10 @@ public class UrsParser extends Parser {
                     msg.setRefid(m.group(4));
                     msg.setConnID(m.group(1));
                     msg.SetInbound(true);
-                    if ((m = regRIRequestStart.matcher(m_MessageContents.get(0))).find()) {
+                    if ((m = regRIRequestStart.reset(m_MessageContents.get(0))).find()) {
                         String reqURI = m.group(2);
                         msg.setORSSID(getQueryKey(splitQuery(reqURI), "ORS_SESSION_ID"));
-                    } else if ((m = regRIRequestShort1.matcher(m_MessageContents.get(0))).find()) {
+                    } else if ((m = regRIRequestShort1.reset(m_MessageContents.get(0))).find()) {
                         String reqURI = m.group(1);
                         msg.setSubFunc(reqURI);
 
@@ -753,11 +753,11 @@ public class UrsParser extends Parser {
             break;
 
             case STATE_CONFIG:
-                if ((regCfgUnknownOption.matcher(str)).find()) {
+                if ((regCfgUnknownOption.reset(str)).find()) {
 //    _C_W_ [0D:07] unknown option 'Loaded' for server 'urs_ursvr_81_ad_dev'
                     break; // ignoring 
 
-                } else if ((regCfgNotification.matcher(str)).find()) {
+                } else if ((regCfgNotification.reset(str)).find()) {
                     m_MessageContents.add(str);
                     AddConfigMessage(m_MessageContents);
                     m_MessageContents.clear();
@@ -770,7 +770,7 @@ public class UrsParser extends Parser {
                 break;
 
             case STATE_STRATEGY_MULTILINE:
-                if ((MLPattern.matcher(str)).find()) {
+                if ((MLPattern.reset(str)).find()) {
                     m_MessageContents.add(str);
                 } else {
                     AddStrategyMessage(URSFileID, URSRest);
@@ -781,7 +781,7 @@ public class UrsParser extends Parser {
                 break;
 
             case STATE_RLIB:
-                if ((regStartsFromSpace.matcher(str)).find()) {
+                if ((regStartsFromSpace.reset(str)).find()) {
                     m_MessageContents.add(str);
                 } else {
                     AddRLibMessage();
@@ -793,10 +793,10 @@ public class UrsParser extends Parser {
 
             case STATE_TLIB_MESSAGE_IN:
                 boolean endFound = false;
-                if ((regTMessageInFinal.matcher(str)).find() || str.contains("[14:32]")) {
+                if ((regTMessageInFinal.reset(str)).find() || str.contains("[14:32]")) {
                     m_MessageContents.add(str);
                     endFound = true;
-                } else if (regTMessageAttribute.matcher(str).find()) {
+                } else if (regTMessageAttribute.reset(str).find()) {
                     m_MessageContents.add(str);
                     return null;
                 }
@@ -811,7 +811,7 @@ public class UrsParser extends Parser {
                 break;
 
             case STATE_TLIB_MESSAGE_OUT:
-                if ((regTMessageOutFinal.matcher(str)).find()) {
+                if ((regTMessageOutFinal.reset(str)).find()) {
                     AddUrsMessage(m_MessageContents, null, str);
                     m_ParserState = ParserState.STATE_COMMENTS;
                     m_MessageContents.clear();
@@ -824,7 +824,7 @@ public class UrsParser extends Parser {
                     boolean endMsg = false;
                     if (m_MessageContents.isEmpty()) {//filter out TEvent without attributes
                         if (str != null && str.length() > 0
-                                && !regTMessageOutFirstLine.matcher(str).find()) {
+                                && !regTMessageOutFirstLine.reset(str).find()) {
                             endMsg = true;
                         }
                     }
@@ -852,7 +852,7 @@ public class UrsParser extends Parser {
         String thisDN = null;
 
         Main.logger.trace("addURS: " + ((contents == null) ? "null" : contents.toString()) + " h:" + ((header == null) ? "null" : header));
-        if (header != null && (m = regReceived.matcher(header)).find()) {
+        if (header != null && (m = regReceived.reset(header)).find()) {
             fileHandle = m.group(1);
             server = m.group(2);
             event = m.group(3);
@@ -862,21 +862,21 @@ public class UrsParser extends Parser {
         } else {
             if (!contents.isEmpty()) {
 
-                if (((m = regReceived.matcher(contents.get(0))).find())) {
+                if (((m = regReceived.reset(contents.get(0))).find())) {
                     fileHandle = m.group(1);
                     server = m.group(2);
                     event = m.group(3);
                     refID = m.group(4);
-                    if (contents.size() > 1 && (m = regEventAttachedData.matcher(contents.get(1))).find()) {
+                    if (contents.size() > 1 && (m = regEventAttachedData.reset(contents.get(1))).find()) {
                         thisDN = m.group(1);
                     }
                     isInbound = true;
 
-                } else if ((m = regReqTo.matcher(contents.get(0))).find()) {
+                } else if ((m = regReqTo.reset(contents.get(0))).find()) {
                     fileHandle = m.group(1);
                     event = m.group(2);
                     Main.logger.trace("1event [" + event + "] fileHandle:" + fileHandle);
-                } else if ((m = regSentTo.matcher(contents.get(0))).find()) {
+                } else if ((m = regSentTo.reset(contents.get(0))).find()) {
                     server = m.group(1);
                     event = m.group(2);
                     Main.logger.trace("2event [" + event + "] fileHandle:" + fileHandle);
@@ -954,7 +954,7 @@ public class UrsParser extends Parser {
 
     private void groupUpdated(String agentList, String line1015) {
         Matcher m;
-        if ((m = regline1015.matcher(line1015)).find()) {
+        if ((m = regline1015.reset(line1015)).find()) {
             String[] agents = StringUtils.split(agentList, ',');
             String target = m.group(1);
             if (agents != null && agents.length > 0) {
@@ -992,7 +992,7 @@ public class UrsParser extends Parser {
         if (!contents.isEmpty()) {
             Matcher m;
 
-            if (((m = regCheckRoutingStates.matcher(contents.get(0))).find())) {
+            if (((m = regCheckRoutingStates.reset(contents.get(0))).find())) {
                 if (m.group(1).startsWith("t")) {//can route; get target
                     if (msg != null) {
                         msg.parseTarget();

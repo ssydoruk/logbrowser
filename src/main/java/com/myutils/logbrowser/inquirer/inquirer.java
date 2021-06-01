@@ -635,14 +635,14 @@ public class inquirer {
 
     }
 
-    static public boolean matchFound(String val, Pattern pt, String search, boolean matchWholeWordSelected) {
+    static public boolean matchFound(String val, Matcher pt, String search, boolean matchWholeWordSelected) {
         // logger.debug("search cell:[" + val + "] [" + search + "] " +
         // matchWholeWordSelected + " " + " " + pt + ": [" + val);
         if (val != null && !val.isEmpty()) {
             // inquirer.logger.debug("search cell:" + search + " " + matchWholeWordSelected
             // + " " + " " +pt + ": [" + val);
             if (pt != null) {
-                return pt.matcher(val).find();
+                return pt.reset(val).find();
             } else {
                 if (matchWholeWordSelected) {
                     return val.equalsIgnoreCase(search);

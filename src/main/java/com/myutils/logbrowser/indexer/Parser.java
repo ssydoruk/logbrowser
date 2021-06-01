@@ -27,7 +27,7 @@ public abstract class Parser {
 
     public static final int MAX_CUSTOM_FIELDS = 3;
     private static final int BASE_CUSTOM_FIELDS = 8;
-    private static final Pattern regORSSessionID = Pattern.compile("^[~\\w]{32}$");
+    private static final Matcher regORSSessionID = Pattern.compile("^[~\\w]{32}$").matcher("");
     private final String m_StringType;
     private final FileInfoType m_type;
     private final DateParsers dateParsers = new DateParsers();
@@ -42,7 +42,7 @@ public abstract class Parser {
     protected int m_lineStarted; // line where expression (TMessage) started
     protected DateParsed dp;
     protected FileInfo fileInfo;
-    //    protected static final Pattern regGenesysMessage = Pattern.compile(" (None|Debug|Trace|Interaction|Standard|Alarm|Unknown|Non|Dbg|Trc|Int|Std|Alr|Unk) (\\d{5}) ");
+    //    protected static final Matcher regGenesysMessage = Pattern.compile(" (None|Debug|Trace|Interaction|Standard|Alarm|Unknown|Non|Dbg|Trc|Int|Std|Alr|Unk) (\\d{5}) ");
     int m_CurrentLine;
     DBAccessor m_accessor;
     private String lastAppID = null;
@@ -170,7 +170,7 @@ public abstract class Parser {
     }
 
     static public boolean isSessionID(String resp) {
-        return resp != null && !resp.isEmpty() && regORSSessionID.matcher(resp).find();
+        return resp != null && !resp.isEmpty() && regORSSessionID.reset(resp).find();
     }
 
     public static void main(String[] args) {
@@ -276,13 +276,7 @@ public abstract class Parser {
         return ParseGenesys(getTServerStart(str), tabType, ptIgnore, ptSkip);
     }
 
-    protected String ParseGenesysTServer(String str, TableType tabType, Pattern ptIgnore, Pattern ptSkip) throws Exception {
-        return ParseGenesys(getTServerStart(str), tabType, ptIgnore, ptSkip);
-    }
 
-    private String parserRet(String ret, Pattern ptSkip) {
-        return parserRet(ret, ptSkip.matcher(""));
-    }
 
     private String parserRet(String ret, Matcher ptSkip) {
         if (dp != null && ptSkip != null && ret != null) {
@@ -296,14 +290,10 @@ public abstract class Parser {
         return ret;
     }
 
-    protected String ParseGenesysSCS(String str, TableType tabType, Pattern ptIgnore, Pattern ptSkip) throws Exception {
+    protected String ParseGenesysSCS(String str, TableType tabType, Matcher ptIgnore, Matcher ptSkip) throws Exception {
         return parserRet(ParseGenesysSCS(str, tabType, ptIgnore), ptSkip);
     }
 
-    protected String ParseGenesys(String str, TableType tabType, Pattern ptIgnore, Pattern ptSkip) throws Exception {
-        return parserRet(ParseGenesys(str, tabType, ptIgnore), ptSkip);
-
-    }
 
     protected String ParseGenesys(String str, TableType tabType, Matcher ptIgnore, Matcher ptSkip) throws Exception {
         return parserRet(ParseGenesys(str, tabType, ptIgnore), ptSkip);
@@ -341,7 +331,7 @@ public abstract class Parser {
         }
     }
 
-    protected String ParseGenesysSCS(String str, TableType tabType, Pattern ptMSGsIgnore) throws Exception {
+    protected String ParseGenesysSCS(String str, TableType tabType, Matcher ptMSGsIgnore) throws Exception {
         dp = ParseTimestamp(str);
         if (dp != null) {
 
@@ -364,13 +354,9 @@ public abstract class Parser {
         return (lastLogMsg != null) ? StringUtils.isNotBlank(lastLogMsg.getLastGenesysMsgLevel()) ? lastLogMsg.getLastGenesysMsgLevel() : null : null;
     }
 
-    protected void fakeGenesysMsg(DateParsed dp, Parser p, TableType t, Pattern ignoreMSGIDs,
-                                  String _lastGenesysMsgLevel, String _lastGenesysMsgID, String generatedMsgID, String generatedMsg) {
-        lastLogMsg = GenesysMsg.postGenesysMsg(dp, p, t, ignoreMSGIDs,
-                _lastGenesysMsgLevel, _lastGenesysMsgID, generatedMsgID, generatedMsg);
-    }
 
-    protected String ParseGenesysGMS(String str, TableType tabType, Pattern ptMSGsIgnore) throws Exception {
+
+    protected String ParseGenesysGMS(String str, TableType tabType, Matcher ptMSGsIgnore) throws Exception {
         dp = ParseTimestamp(str);
         if (dp != null) {
             lastLogMsg = null;
@@ -393,16 +379,6 @@ public abstract class Parser {
         }
     }
 
-    protected String ParseGenesys(String str, TableType tabType, Pattern ptMSGsIgnore) throws Exception {
-        dp = ParseTimestamp(str);
-        if (dp != null) {
-            lastLogMsg = null;
-            lastLogMsg = GenesysMsg.CheckGenesysMsg(dp, this, tabType, ptMSGsIgnore); // not using return value. Check through the rest
-            return dp.rest;
-        } else {
-            return str;
-        }
-    }
 
     protected String ParseGenesys(String str, TableType tabType) throws Exception {
         return ParseGenesys(str, tabType, (Matcher) null);

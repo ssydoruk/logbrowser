@@ -8,15 +8,16 @@ package com.myutils.logbrowser.indexer;
 import Utils.Pair;
 
 import java.util.ArrayList;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static Utils.Util.intOrDef;
 
 public final class IxnGMS extends Message {
 
-    //    final private static Pattern regGSW_RECORD_HANDLE = Pattern.compile("^\\s*\'GSW_RECORD_HANDLE\'.+= (\\d+)");
-    final private static Pattern regIxnActor = Pattern.compile("^\\s*attr_actor_router_id .+ \"([^\"]+)\"$");
-    final private static Pattern regIxnSubmitted = Pattern.compile("^\\s*attr_itx_submitted_by .+ \"([^\"]+)\"$");
+    //    final private static Matcher regGSW_RECORD_HANDLE = Pattern.compile("^\\s*\'GSW_RECORD_HANDLE\'.+= (\\d+)").matcher("");
+    final private static Matcher regIxnActor = Pattern.compile("^\\s*attr_actor_router_id .+ \"([^\"]+)\"$").matcher("");
+    final private static Matcher regIxnSubmitted = Pattern.compile("^\\s*attr_itx_submitted_by .+ \"([^\"]+)\"$").matcher("");
 
     private static final Regexs AgentIDs = new Regexs(new Pair[]{
             new Pair("^\\s*attr_agent_id.+ \"([^\"]+)\"$", 1),
@@ -64,9 +65,9 @@ public final class IxnGMS extends Message {
     private static final Regexs reConnID = new Regexs(new Pair[]{
             new Pair("^\\s*AttributeConnID .+ (\\w+)$", 1)}
     );
-    final private static Pattern regService = Pattern.compile("^\\s*'Service'.+= \"([^\"]+)\"$");
-    final private static Pattern regMethod = Pattern.compile("^\\s*'Method'.+= \"([^\"]+)\"$");
-    final private static Pattern regRouteType = Pattern.compile("^\\s*AttributeRouteType.+ = (\\d+)");
+    final private static Matcher regService = Pattern.compile("^\\s*'Service'.+= \"([^\"]+)\"$").matcher("");
+    final private static Matcher regMethod = Pattern.compile("^\\s*'Method'.+= \"([^\"]+)\"$").matcher("");
+    final private static Matcher regRouteType = Pattern.compile("^\\s*AttributeRouteType.+ = (\\d+)").matcher("");
     private final String clientName = null;
     //    private static final Regexs reContact = new Regexs(new Pair[]{
 //        new Pair("^\\s*\'GSW_PHONE\'.+= \"([^\"]+)\"", 1),

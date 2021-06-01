@@ -35,7 +35,7 @@ public class TabResultDataModel extends AbstractTableModel {
     private static final HashMap<MsgType, Pair<Color, Color>> msgAssignedColors = new HashMap<>();
     private static final ArrayList<Pair<Color, Color>> stdColors = initStdColors();
     private static final HashMap<Integer, Pair<Color, Color>> assignedColorsAggregate = new HashMap<>();
-    private static final Pattern normalPattern = Pattern.compile("^[\\s|]*(.+)[\\s|]*$");
+    private static final Matcher normalPattern = Pattern.compile("^[\\s|]*(.+)[\\s|]*$").matcher("");
     private static final String VALUE_KEY = "value";
     private static final String HIDDEN_KEY = "hidden";
     private static int stdColorsIdx = 0;
@@ -379,7 +379,7 @@ public class TabResultDataModel extends AbstractTableModel {
 
     private String normalizeCellData(String data) {
         Matcher m;
-        if (data != null && !data.isEmpty() && (m = normalPattern.matcher(data)).find()) {
+        if (data != null && !data.isEmpty() && (m = normalPattern.reset(data)).find()) {
             return m.group(1);
         }
         return data;

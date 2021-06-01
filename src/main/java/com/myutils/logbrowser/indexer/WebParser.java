@@ -44,19 +44,19 @@ abstract class WebParser extends Parser {
     }
 
     private void initURLProcessor() {
-        urlProcessor.addPathProcessor(PATH_UUID, Pattern.compile("^/api/v2/me/calls/([^/\\&]+)", Pattern.CASE_INSENSITIVE));
-        urlProcessor.addPathProcessor(PATH_DeviceID, Pattern.compile("^/api/v2/(?:me/)?devices/([^/\\&]+)", Pattern.CASE_INSENSITIVE));
-        urlProcessor.addPathProcessor(PATH_IxnID, Pattern.compile("^/api/v2/me/chats/([^/\\&]+)", Pattern.CASE_INSENSITIVE));
-        urlProcessor.addPathProcessor(PATH_IxnID, Pattern.compile("^/api/v2/me/openmedia/(?:messaging_inbound|messaging_outbound)/([^/\\&]+)", Pattern.CASE_INSENSITIVE));
-        urlProcessor.addPathProcessor(PATH_IxnID, Pattern.compile("^/internal-api/ucs/interactions/([^/\\&]+)", Pattern.CASE_INSENSITIVE));
-        urlProcessor.addPathProcessor(PATH_ContactID, Pattern.compile("^/api/v2/contacts/([^/\\&]+)", Pattern.CASE_INSENSITIVE));
-        urlProcessor.addPathProcessor(PATH_DBID, Pattern.compile("^/api/v2/platform/configuration/(?:[^/\\&]+)/([^/\\&]+)", Pattern.CASE_INSENSITIVE));
-        urlProcessor.addPathProcessor(PATH_STATS, Pattern.compile("^/api/v1/stats/([^/\\&]+)", Pattern.CASE_INSENSITIVE));
-        urlProcessor.addPathProcessor(PATH_GROUPS, Pattern.compile("^/api/v2/groups/([^/\\&]+)", Pattern.CASE_INSENSITIVE));
-        urlProcessor.addPathProcessor(PATH_USERID, Pattern.compile("^/api/v2/users/([^/\\&]+)", Pattern.CASE_INSENSITIVE));
-        urlProcessor.addPathProcessor(PATH_SKILLS, Pattern.compile("^/api/v2/platform/configuration/skills/([^/\\&]+)", Pattern.CASE_INSENSITIVE));
-        urlProcessor.addPathProcessor(PATH_AGENT_LOGINS, Pattern.compile("^/api/v2/platform/configuration/agent-logins/([^/\\&]+)", Pattern.CASE_INSENSITIVE));
-        urlProcessor.addPathProcessor(PATH_OFFSET, Pattern.compile("^/api/v2/users?offset=(\\d+)", Pattern.CASE_INSENSITIVE));
+        urlProcessor.addPathProcessor(PATH_UUID, Pattern.compile("^/api/v2/me/calls/([^/\\&]+)", Pattern.CASE_INSENSITIVE).matcher(""));
+        urlProcessor.addPathProcessor(PATH_DeviceID, Pattern.compile("^/api/v2/(?:me/)?devices/([^/\\&]+)", Pattern.CASE_INSENSITIVE).matcher(""));
+        urlProcessor.addPathProcessor(PATH_IxnID, Pattern.compile("^/api/v2/me/chats/([^/\\&]+)", Pattern.CASE_INSENSITIVE).matcher(""));
+        urlProcessor.addPathProcessor(PATH_IxnID, Pattern.compile("^/api/v2/me/openmedia/(?:messaging_inbound|messaging_outbound)/([^/\\&]+)", Pattern.CASE_INSENSITIVE).matcher(""));
+        urlProcessor.addPathProcessor(PATH_IxnID, Pattern.compile("^/internal-api/ucs/interactions/([^/\\&]+)", Pattern.CASE_INSENSITIVE).matcher(""));
+        urlProcessor.addPathProcessor(PATH_ContactID, Pattern.compile("^/api/v2/contacts/([^/\\&]+)", Pattern.CASE_INSENSITIVE).matcher(""));
+        urlProcessor.addPathProcessor(PATH_DBID, Pattern.compile("^/api/v2/platform/configuration/(?:[^/\\&]+)/([^/\\&]+)", Pattern.CASE_INSENSITIVE).matcher(""));
+        urlProcessor.addPathProcessor(PATH_STATS, Pattern.compile("^/api/v1/stats/([^/\\&]+)", Pattern.CASE_INSENSITIVE).matcher(""));
+        urlProcessor.addPathProcessor(PATH_GROUPS, Pattern.compile("^/api/v2/groups/([^/\\&]+)", Pattern.CASE_INSENSITIVE).matcher(""));
+        urlProcessor.addPathProcessor(PATH_USERID, Pattern.compile("^/api/v2/users/([^/\\&]+)", Pattern.CASE_INSENSITIVE).matcher(""));
+        urlProcessor.addPathProcessor(PATH_SKILLS, Pattern.compile("^/api/v2/platform/configuration/skills/([^/\\&]+)", Pattern.CASE_INSENSITIVE).matcher(""));
+        urlProcessor.addPathProcessor(PATH_AGENT_LOGINS, Pattern.compile("^/api/v2/platform/configuration/agent-logins/([^/\\&]+)", Pattern.CASE_INSENSITIVE).matcher(""));
+        urlProcessor.addPathProcessor(PATH_OFFSET, Pattern.compile("^/api/v2/users?offset=(\\d+)", Pattern.CASE_INSENSITIVE).matcher(""));
 
         urlProcessor.addQueryProcessor(QUERY_userName, "<user>");
         urlProcessor.addQueryProcessor(QUERY_filterParameters, "<param>");

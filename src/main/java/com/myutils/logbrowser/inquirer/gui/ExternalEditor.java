@@ -15,6 +15,7 @@ import org.apache.logging.log4j.LogManager;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
@@ -23,7 +24,7 @@ import java.util.regex.Pattern;
 public abstract class ExternalEditor {
 
     private static final org.apache.logging.log4j.Logger logger = LogManager.getLogger();
-    final private static Pattern regNum = Pattern.compile("(\\d+)");
+    final private static Matcher regNum = Pattern.compile("(\\d+)").matcher("");
     private static ExternalEditor editor = null;
     HashMap<String, Integer> loadedFiles = new HashMap<>();
 

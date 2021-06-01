@@ -17,8 +17,8 @@ import java.util.regex.Pattern;
 /*It extends TServer message, however there is now TServer message attributes*/
 public class ORSMetric extends Message {
 
-    private static final Pattern regTMessageStart = Pattern.compile("^<(\\w+) sid='([\\w~]+)");
-    private static final Pattern regReqID = Pattern.compile("^\\s*<eval_expr .+expression='system.LastSubmitRequestId;.+result='(\\d+)' />");
+    private static final Matcher regTMessageStart = Pattern.compile("^<(\\w+) sid='([\\w~]+)").matcher("");
+    private static final Matcher regReqID = Pattern.compile("^\\s*<eval_expr .+expression='system.LastSubmitRequestId;.+result='(\\d+)' />").matcher("");
 
     public String sid = "";
     public String Method = "";
@@ -44,7 +44,7 @@ public class ORSMetric extends Message {
         Matcher m;
         String s = m_MessageLines.get(0);
 
-        if (s != null && (m = regTMessageStart.matcher(s)).find()) {
+        if (s != null && (m = regTMessageStart.reset(s)).find()) {
             Method = m.group(1);
             sid = m.group(2);
         }
@@ -69,7 +69,7 @@ public class ORSMetric extends Message {
         Matcher m;
         String s = m_MessageLines.get(0);
 
-        if (s != null && (m = regReqID.matcher(s)).find()) {
+        if (s != null && (m = regReqID.reset(s)).find()) {
             try {
                 return Integer.parseInt(m.group(1));
             } catch (NumberFormatException e) {

@@ -19,98 +19,98 @@ import static Utils.Util.intOrDef;
 public class OCSParser extends Parser {
 
     private static final Matcher regNotParseMessage = Pattern.compile("^(50002|50071|04541|04542|61007|50080"
-            + ")");
-    private static final Matcher regStatEvtContinue = Pattern.compile("^(\\s+|pMediaCapacity)");
-    private static final Matcher regCampAssignment = Pattern.compile("^(\\d{2}:\\d{2}:\\d{2}\\.\\d{3}) ");
+            + ")").matcher("");
+    private static final Matcher regStatEvtContinue = Pattern.compile("^(\\s+|pMediaCapacity)").matcher("");
+    private static final Matcher regCampAssignment = Pattern.compile("^(\\d{2}:\\d{2}:\\d{2}\\.\\d{3}) ").matcher("");
 
     // general buffer 
     private static final char[] m_CharBuf = new char[1024];
 
     //14:20:55.847 Trc 52000 Campaign Group SIPProgressive@VAG_English has been loaded
-    private static final Matcher regDate = Pattern.compile("^(\\d{2}:\\d{2}:\\d{2}\\.\\d{3}) ");
+    private static final Matcher regDate = Pattern.compile("^(\\d{2}:\\d{2}:\\d{2}\\.\\d{3}) ").matcher("");
 
     //52000|TRACE|52000|Campaign Group %s has been loaded
 //52001|TRACE|52001|Campaign Group %s has been started
 //52002|TRACE|52002|Campaign Group %s has been stopped
 //52003|TRACE|52003|Campaign Group %s has been force unloaded
 //52004|TRACE|52004|Campaign Group %s has been unloaded
-    private static final Matcher regCGState = Pattern.compile("^Trc 5200[0-9] Campaign Group (.+) has been (.+)$");
+    private static final Matcher regCGState = Pattern.compile("^Trc 5200[0-9] Campaign Group (.+) has been (.+)$").matcher("");
 
     //16:18:52.794 CampaignGroup(180) (CAMP_DORIVETTES@VAG_CAMP_DORIVETTES): CampGrMsg: OCS version: 8.1.500.18;  WorkTime: 24386;
-//        static Matcher regCGStart= Pattern.compile("CampaignGroup\\(([0-9]+)\\) \\(([^\\)]+)\\): CampGrMsg: OCS version: ([^;]+); WorkTime: ([^;]+);");
-    private static final Matcher regCGStart = Pattern.compile("^\\s*CampaignGroup\\(");
+//        static Matcher regCGStart= Pattern.compile("CampaignGroup\\(([0-9]+)\\) \\(([^\\)]+)\\): CampGrMsg: OCS version: ([^;]+).matcher(""); WorkTime: ([^;]+).matcher("");").matcher("");
+    private static final Matcher regCGStart = Pattern.compile("^\\s*CampaignGroup\\(").matcher("");
 
     //        16:18:54.159 PA Session Info:
-    private static final Matcher regPAStart = Pattern.compile("^\\s*PA Session Info:");
-    private static final Matcher regPAInfo = Pattern.compile("Predictive Info for OwnerDBID: (\\d+)  - Density: ([^;]+); a: ([^;]+); PredTime: ([^;]+); Remainder: ([^;]+); SentCalls: (\\d+);");
+    private static final Matcher regPAStart = Pattern.compile("^\\s*PA Session Info:").matcher("");
+    private static final Matcher regPAInfo = Pattern.compile("Predictive Info for OwnerDBID: (\\d+)  - Density: ([^;]+); a: ([^;]+); PredTime: ([^;]+); Remainder: ([^;]+); SentCalls: (\\d+);").matcher("");
 
-    private static final Matcher regRecTreatment = Pattern.compile("^RecTreatment - Apply");
+    private static final Matcher regRecTreatment = Pattern.compile("^RecTreatment - Apply").matcher("");
 
     //        16:19:05.382 PA Agent Info:
-    private static final Matcher regPAAgentInfo = Pattern.compile("^\\s*PA Agent Info:");
+    private static final Matcher regPAAgentInfo = Pattern.compile("^\\s*PA Agent Info:").matcher("");
 
     //18:04:00.857 PAEventInfo (ContactInfo):
-    private static final Matcher regPAEventInfo = Pattern.compile("^\\s*PAEventInfo ");
+    private static final Matcher regPAEventInfo = Pattern.compile("^\\s*PAEventInfo ").matcher("");
 
     //16:59:20.250 TOTAL SCHEDULED AGENTS/PLACES ASSIGNMENT:
-    private static final Matcher regAgentAssignment = Pattern.compile("\\s*TOTAL SCHEDULED AGENTS");
+    private static final Matcher regAgentAssignment = Pattern.compile("\\s*TOTAL SCHEDULED AGENTS").matcher("");
 
     //There are 27 Agents/Places assigned to Session 'OBN_IP_EBlock_Campaign@OBN_IP_EBlock_Group'[268] OCS_Session_Loaded | OCS_Stat_Opened:
-    private static final Matcher regCampaignAssignment = Pattern.compile("\\s*There are \\d+ Agents/Places assigned to Session");
+    private static final Matcher regCampaignAssignment = Pattern.compile("\\s*There are \\d+ Agents/Places assigned to Session").matcher("");
 
     //16:19:05.382 STAT_EVENT SEventCurrentTargetState_TargetUpdated was received for Campaign Sessions: 137 174
-    private static final Matcher regStatEvent = Pattern.compile("\\s*STAT_EVENT (\\S+) ");
-    private static final Matcher regRecordCreate = Pattern.compile("^DBList.CreateRecord");
-    private static final Matcher regRecordDelete = Pattern.compile("^Call\\[(\\d+):[^\\]]+]::Deleting call");
+    private static final Matcher regStatEvent = Pattern.compile("\\s*STAT_EVENT (\\S+) ").matcher("");
+    private static final Matcher regRecordCreate = Pattern.compile("^DBList.CreateRecord").matcher("");
+    private static final Matcher regRecordDelete = Pattern.compile("^Call\\[(\\d+):[^\\]]+]::Deleting call").matcher("");
 
     //IxNServer 'ds12_ncclt_ixn_ocs_01' - SendRequest : 'request_submit' (101) message:
 //IxNServer 'ds12_ncclt_ixn_ocs_01' - EventReceived : 'event_ack' (125) message:
-    private static final Matcher regIxnMsg = Pattern.compile("^IxNServer ");
-    private static final Matcher regHTTPMessage = Pattern.compile("^HTTPProxyClient");
-    private static final Matcher regClient = Pattern.compile("^(\\s*OCMClient|Thirdparty, processing)");
-    private static final Matcher regRecCreateContinue = Pattern.compile("^(option::|::|SetRecordStatus|\\.assured-connect-field|\\.treatment-preferred-contact-field|\\.am-detection-map|CallingList\\[|Campaign\\[|\\[)");
-    private static final Matcher regRecCreateContinueParams = Pattern.compile("^\\s");
-    private static final Matcher regTreatmentContinue = Pattern.compile("^\\s+");
-    private static final Matcher regOCSIxnContinue = Pattern.compile("^\\t.+");
-    private static final Matcher regOCSHTTPContinue = Pattern.compile("^\\t+\\'");
-    private static final Matcher regClientContinue = Pattern.compile("^\\t.+");
-    private static final Matcher regOCSIconContinue = Pattern.compile("^\\s+");
+    private static final Matcher regIxnMsg = Pattern.compile("^IxNServer ").matcher("");
+    private static final Matcher regHTTPMessage = Pattern.compile("^HTTPProxyClient").matcher("");
+    private static final Matcher regClient = Pattern.compile("^(\\s*OCMClient|Thirdparty, processing)").matcher("");
+    private static final Matcher regRecCreateContinue = Pattern.compile("^(option::|::|SetRecordStatus|\\.assured-connect-field|\\.treatment-preferred-contact-field|\\.am-detection-map|CallingList\\[|Campaign\\[|\\[)").matcher("");
+    private static final Matcher regRecCreateContinueParams = Pattern.compile("^\\s").matcher("");
+    private static final Matcher regTreatmentContinue = Pattern.compile("^\\s+").matcher("");
+    private static final Matcher regOCSIxnContinue = Pattern.compile("^\\t.+").matcher("");
+    private static final Matcher regOCSHTTPContinue = Pattern.compile("^\\t+\\'").matcher("");
+    private static final Matcher regClientContinue = Pattern.compile("^\\t.+").matcher("");
+    private static final Matcher regOCSIconContinue = Pattern.compile("^\\s+").matcher("");
 
     //16:19:06.050 CM_DBCallList(236-136-336): DBServer 'DBServer_OCS for CL_CALLBACK (1440)' SQL: sp236136336114 @CampID = '136', @GroupID = '336', @ListID = '236', @RecType = 2, @NumRec = 6, @CTime = '69546', @TTime = '1461957646', @SPResult = @out [ReqID=877866]
 //16:19:06.052 CM_DBCallList(236-136-336): DBServer 'DBServer_OCS for CL_CALLBACK (1440)' MSG_RETRIEVED(DBM_SUCCESS) [ReqID=877866]
 //16:19:06.052 CM_DBCallList(236-136-336): SP return value (ReadyCount):0
-    private static final Matcher regDBServer = Pattern.compile("\\s*(?:CM_DBCallList|CM_DBCallRecord)\\(([0-9]+)-([0-9]+)-([0-9]+)\\): ");
-    private static final Matcher regChainID = Pattern.compile("chain_id=(\\d+)");
+    private static final Matcher regDBServer = Pattern.compile("\\s*(?:CM_DBCallList|CM_DBCallRecord)\\(([0-9]+)-([0-9]+)-([0-9]+)\\): ").matcher("");
+    private static final Matcher regChainID = Pattern.compile("chain_id=(\\d+)").matcher("");
 
     //10:02:02.602 RecSCXMLTreatment[113-12571-2748098]::Engine-> log {Created scxml session '00000143-04000B7B-0001' for treatment session id=2938}
-    private static final Matcher regSCXMLTreatment = Pattern.compile("RecSCXMLTreatment\\[([0-9]+)-([0-9]+)-([0-9]+)\\]::");
+    private static final Matcher regSCXMLTreatment = Pattern.compile("RecSCXMLTreatment\\[([0-9]+)-([0-9]+)-([0-9]+)\\]::").matcher("");
 
     //-> SCXML : 0000017F-040206B3-0001  METRIC <log expr="CPNDigits SCXML script: Record handle 16287 Option CPNDigits = 8008720829" label="" level="1" />
-    private static final Matcher regSCXMLScript = Pattern.compile("^-> SCXML : ([\\w-]+)");
+    private static final Matcher regSCXMLScript = Pattern.compile("^-> SCXML : ([\\w-]+)").matcher("");
 
     //16:41:55.299 Int 04543 Interaction message "EventRouteRequest" received from 65200 ("SIPTS750@3020")
 //16:39:27.319 Trc 04541 Message EventRegistered received from 'SIPTS750@7593'
-    //static Matcher regMsgStart=Pattern.compile("^(Int 04543 Interaction message \"(\\w+)\" |Trc 04541 Message (\\S+))");
+    //static Matcher regMsgStart=Pattern.compile("^(Int 04543 Interaction message \"(\\w+)\" |Trc 04541 Message (\\S+))").matcher("");
     //hopefully URS always print : message EventCallDataChanged after 
-    //static Matcher regMsgStart=Pattern.compile("^(Int 04543 |Trc 04541 )");
-    private static final Matcher regMsgStart = Pattern.compile("^(?:Int 04543|Trc 04541) .+from.*(?: '([^'@]+)| \\(\\\"([^@\"]+))");
+    //static Matcher regMsgStart=Pattern.compile("^(Int 04543 |Trc 04541 )").matcher("");
+    private static final Matcher regMsgStart = Pattern.compile("^(?:Int 04543|Trc 04541) .+from.*(?: '([^'@]+)| \\(\\\"([^@\"]+))").matcher("");
 
     // : message EventServerInfo
-    private static final Matcher regTMessageName = Pattern.compile(": message (.+)");
+    private static final Matcher regTMessageName = Pattern.compile(": message (.+)").matcher("");
 
     //received from 65200(SIPS)fliptop76.suzano.com.br:5001(fd=648) message EventAttachedDataChanged
-    private static final Matcher regTMessageStart = Pattern.compile("^(received from |\\s*Trc 50071 Send|request to)");
+    private static final Matcher regTMessageStart = Pattern.compile("^(received from |\\s*Trc 50071 Send|request to)").matcher("");
 
     //        2016-04-29T16:26:11.580 Trc 50002 TEvent: EventAttachedDataChanged
-    private static final Matcher regTMessageEnd = Pattern.compile("^[^\\s]");
-    private static final Matcher reg50002TEvent = Pattern.compile("Trc 50080 Predictive call \\(record id = (\\d+)\\)");
-    private static final Matcher regSentTo = Pattern.compile("^\\.{2}sent to");
-    private static final Matcher regLineSkip = Pattern.compile("^\\s*");
+    private static final Matcher regTMessageEnd = Pattern.compile("^[^\\s]").matcher("");
+    private static final Matcher reg50002TEvent = Pattern.compile("Trc 50080 Predictive call \\(record id = (\\d+)\\)").matcher("");
+    private static final Matcher regSentTo = Pattern.compile("^\\.{2}sent to").matcher("");
+    private static final Matcher regLineSkip = Pattern.compile("^\\s*").matcher("");
     //	private DBAccessor m_accessor;
-    private static final Matcher regCfgObjectName = Pattern.compile("(?:name|userName)='([^']+)'");
-    private static final Matcher regCfgObjectType = Pattern.compile("CfgDelta([^=]+)=");
-    private static final Matcher regCfgOp = Pattern.compile("PopCfg.+\\s(\\w+)$");
-    private static final Matcher regCfgObjectDBID = Pattern.compile("\\WDBID=(\\d+)\\W");
+    private static final Matcher regCfgObjectName = Pattern.compile("(?:name|userName)='([^']+)'").matcher("");
+    private static final Matcher regCfgObjectType = Pattern.compile("CfgDelta([^=]+)=").matcher("");
+    private static final Matcher regCfgOp = Pattern.compile("PopCfg.+\\s(\\w+)$").matcher("");
+    private static final Matcher regCfgObjectDBID = Pattern.compile("\\WDBID=(\\d+)\\W").matcher("");
     HashMap<String, String> prevSeqno = new HashMap();
     private int m_CurrentLine;
     private StatEventType statEventType;
@@ -386,11 +386,11 @@ public class OCSParser extends Parser {
                     setSavedFilePos(getFilePos());
                     m_MessageContents.add(s);
                     m_ParserState = ParserState.STATE_IXN_MSG;
-                } else if ((m = regHTTPMessage.matcher(s)).find()) {
+                } else if ((m = regHTTPMessage.reset(s)).find()) {
                     setSavedFilePos(getFilePos());
                     m_MessageContents.add(s);
                     m_ParserState = ParserState.STATE_HTTP;
-                } else if ((m = regClient.matcher(s)).find()) {
+                } else if ((m = regClient.reset(s)).find()) {
                     setSavedFilePos(getFilePos());
                     m_MessageContents.add(s);
                     m_ParserState = ParserState.STATE_CLIENT;
@@ -403,7 +403,7 @@ public class OCSParser extends Parser {
 
             case STATE_OCSICON: {
                 if (str.length() > 0
-                        && ((m = regOCSIconContinue.matcher(str)).find())) {
+                        && ((m = regOCSIconContinue.reset(str)).find())) {
                     m_MessageContents.add(str);
                 } else {
                     AddOCSIconMessage();
@@ -417,7 +417,7 @@ public class OCSParser extends Parser {
 
             case STATE_CLIENT:
                 if (str.length() > 0
-                        && ((m = regClientContinue.matcher(str)).find())) {
+                        && ((m = regClientContinue.reset(str)).find())) {
                     m_MessageContents.add(str);
                 } else {
                     AddClientMessage();
@@ -429,7 +429,7 @@ public class OCSParser extends Parser {
 
             case STATE_HTTP:
                 if (str.length() > 0
-                        && ((m = regOCSHTTPContinue.matcher(str)).find())) {
+                        && ((m = regOCSHTTPContinue.reset(str)).find())) {
                     m_MessageContents.add(str);
                 } else {
                     AddHTTPMessage();
@@ -441,7 +441,7 @@ public class OCSParser extends Parser {
 
             case STATE_IXN_MSG:
                 if (str.length() > 0
-                        && ((m = regOCSIxnContinue.matcher(str)).find())) {
+                        && ((m = regOCSIxnContinue.reset(str)).find())) {
                     m_MessageContents.add(str);
                 } else {
                     AddIxnMessage();
@@ -453,7 +453,7 @@ public class OCSParser extends Parser {
 
             case STATE_RECORD_CREATE:
                 if (str.length() > 0
-                        && ((m = regRecCreateContinue.matcher(str)).find())) {
+                        && ((m = regRecCreateContinue.reset(str)).find())) {
                     m_MessageContents.add(str);
                 } else {
                     m_ParserState = ParserState.STATE_RECORD_CREATE_PARAMS;
@@ -463,7 +463,7 @@ public class OCSParser extends Parser {
 
             case STATE_RECORD_CREATE_PARAMS:
                 if (str.length() > 0
-                        && ((m = regRecCreateContinueParams.matcher(str)).find())) {
+                        && ((m = regRecCreateContinueParams.reset(str)).find())) {
                     m_MessageContents.add(str);
                 } else {
                     AddRecCreateMessage();
@@ -475,7 +475,7 @@ public class OCSParser extends Parser {
 
             case STATE_RECTREATMENT:
                 if (str.length() > 0
-                        && ((m = regTreatmentContinue.matcher(str)).find())) {
+                        && ((m = regTreatmentContinue.reset(str)).find())) {
                     m_MessageContents.add(str);
                 } else {
                     AddRecTreatmentMessage();
@@ -487,7 +487,7 @@ public class OCSParser extends Parser {
 
             case STATE_AGENT_ASSIGNMENT:
                 if (str.length() > 0) {
-                    if ((m = regCampaignAssignment.matcher(str)).find()) {
+                    if ((m = regCampaignAssignment.reset(str)).find()) {
                         if (m_MessageContents.size() > 0) { //not first message
                             AddAssignmentMessage();
                             m_MessageContents.clear();
@@ -599,7 +599,7 @@ public class OCSParser extends Parser {
             case STATE_TMESSAGEEND: {
                 String recHandle = null;
                 m_MessageContents.add(str);
-                if ((m = reg50002TEvent.matcher(str)).find()) {
+                if ((m = reg50002TEvent.reset(str)).find()) {
                     recHandle = m.group(1);
                 }
                 AddOCSTMessage(recHandle);
@@ -611,7 +611,7 @@ public class OCSParser extends Parser {
             }
 
             case STATE_TMESSAGE: {
-                if (regTMessageEnd.matcher(str).find()) {
+                if (regTMessageEnd.reset(str).find()) {
 //                    if (isRequest && regSentTo.matcher(str).find()) {
 //                        m_MessageContents.add(str);
 //                        m_ParserState = ParserState.STATE_TMESSAGEEND;

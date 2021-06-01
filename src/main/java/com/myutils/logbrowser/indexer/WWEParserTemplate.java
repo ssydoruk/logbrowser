@@ -22,7 +22,7 @@ import java.util.regex.Pattern;
  */
 public class WWEParserTemplate extends WebParser {
 
-    private static final Matcher regMsgStart = Pattern.compile("Handling update message:$");
+    private static final Matcher regMsgStart = Pattern.compile("Handling update message:$").matcher("");
     private final HashMap<String, ParserState> threadParserState = new HashMap<>();
     /*	public OrsParser(DBAccessor accessor) {
      m_accessor = accessor;
@@ -162,7 +162,7 @@ public class WWEParserTemplate extends WebParser {
                 }
 //                getThread(getDP());
 
-                if ((m = regMsgStart.matcher(s)).find()) {
+                if ((m = regMsgStart.reset(s)).find()) {
                     m_ParserState = ParserState.STATE_TMESSAGE_EVENT;
                     setSavedFilePos(getFilePos());
                     break;

@@ -354,7 +354,7 @@ public class EditRegexFields extends javax.swing.JDialog {
 
     // private static class SearchParams {
     //
-    // private Pattern selectedRegEx = null;
+    // private Matcher selectedRegEx = null;
     // private final String retValue;
     //
     // private final boolean wholeWorld;

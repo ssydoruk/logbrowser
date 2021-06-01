@@ -37,7 +37,7 @@ public abstract class IQueryResults extends QueryTools
 
     public final static String KEY_ID_FIELD = "keyid";
     private static final org.apache.logging.log4j.Logger logger = inquirer.logger;
-    final private static Pattern regFileName = Pattern.compile("([^\\\\/]+)$");
+    final private static Matcher regFileName = Pattern.compile("([^\\\\/]+)$").matcher("");
     private static final String FILENO = "fileno";
     private static final String APPSTARTTIME = "app_starttime";
     protected String m_startTime;
@@ -528,7 +528,7 @@ public abstract class IQueryResults extends QueryTools
             ArrayList<String> trimNames = new ArrayList<>(names.length);
             for (String name : names) {
                 Matcher m;
-                if ((m = regFileName.matcher(name)).find()) {
+                if ((m = regFileName.reset(name)).find()) {
                     trimNames.add(m.group(1));
                 } else {
                     trimNames.add(name);

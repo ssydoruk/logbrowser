@@ -17,7 +17,7 @@ import static Utils.Util.intOrDef;
  */
 public class GMSStartMessage extends Message {
 
-    final private static Pattern regPOSTMessage = Pattern.compile("^\\(POST\\) Client IP Address: ([0-9\\.]+),\\s*");
+    final private static Matcher regPOSTMessage = Pattern.compile("^\\(POST\\) Client IP Address: ([0-9\\.]+),\\s*").matcher("");
     private final boolean isTServerReq = false;
     String m_MessageName;
     private String m_refID;

@@ -13,8 +13,8 @@ import java.util.regex.Pattern;
  */
 public class IsccMessage extends Message {
 
-    final private static Pattern regRefID = Pattern.compile("\\s*ISCCAttributeReferenceID\\s*(\\d+)");
-    final private static Pattern regSrcSwitch = Pattern.compile("(?:from|to)\\s+server\\s+([^\\@]+)\\@([^/:\\s]+)");
+    final private static Matcher regRefID = Pattern.compile("\\s*ISCCAttributeReferenceID\\s*(\\d+)").matcher("");
+    final private static Matcher regSrcSwitch = Pattern.compile("(?:from|to)\\s+server\\s+([^\\@]+)\\@([^/:\\s]+)").matcher("");
     String m_MessageName;
     private String sw = null;
     private String app = null;

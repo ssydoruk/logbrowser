@@ -9,7 +9,7 @@ import java.util.regex.Pattern;
  */
 public class StSActionMessage extends Message {
 
-    static final Pattern regAction = Pattern.compile("^Action:\\s*(:?\\(owned\\))?\\s*(\\w+)[\\s']+([^@]+)[^']+'\\s*(?:\\((\\w+)\\))?");
+    static final Matcher regAction = Pattern.compile("^Action:\\s*(:?\\(owned\\))?\\s*(\\w+)[\\s']+([^@]+)[^']+'\\s*(?:\\((\\w+)\\))?").matcher("");
 
     private String m_MessageName = null;
     private String m_type = null;

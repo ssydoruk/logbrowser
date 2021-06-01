@@ -11,6 +11,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
@@ -27,7 +28,7 @@ public final class EnterRegexDialog extends javax.swing.JDialog {
      * A return status code - returned if OK button has been pressed
      */
     public static final int RET_OK = 1;
-    private Pattern selectedRegEx = null;
+    private Matcher selectedRegEx = null;
     private String editLine;
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton cancelButton;
@@ -103,7 +104,7 @@ public final class EnterRegexDialog extends javax.swing.JDialog {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
-    public static Pattern getRegex(String lastRegEx, boolean wholeWord) {
+    public static Matcher getRegex(String lastRegEx, boolean wholeWord) {
         if (lastRegEx != null && !lastRegEx.isEmpty()) {
             if (wholeWord) {
                 StringBuilder rx = new StringBuilder(lastRegEx.length() + 2);
@@ -115,9 +116,9 @@ public final class EnterRegexDialog extends javax.swing.JDialog {
                     rx.append('$');
                 }
                 inquirer.logger.debug("Searching for [" + rx + "]");
-                return Pattern.compile(rx.toString(), Pattern.CASE_INSENSITIVE);
+                return Pattern.compile(rx.toString(), Pattern.CASE_INSENSITIVE).matcher("");
             } else {
-                return Pattern.compile(lastRegEx, Pattern.CASE_INSENSITIVE);
+                return Pattern.compile(lastRegEx, Pattern.CASE_INSENSITIVE).matcher("");
             }
         }
         return null;
@@ -362,9 +363,9 @@ public final class EnterRegexDialog extends javax.swing.JDialog {
     boolean checkMatch(String toString) {
         if (selectedRegEx != null) {
             if (toString == null) {
-                return selectedRegEx.matcher("").find();
+                return selectedRegEx.reset("").find();
             } else {
-                return selectedRegEx.matcher(toString).find();
+                return selectedRegEx.reset(toString).find();
             }
 
         } else {

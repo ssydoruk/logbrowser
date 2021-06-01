@@ -25,25 +25,25 @@ public class MCPParser extends Parser {
 
     static final String[] BlockNamesToIgnoreArray = {"SIP:CTI:callSync::0",
             "SIP:CTI:sipStackSync:0"};
-    private final static Matcher reqSIPRequest = Pattern.compile("Request (sent|received): (\\w+) (.+) SIP\\/2\\.0\\s*$");
-    private final static Matcher reqSIPResponse = Pattern.compile("Response (received|sent): SIP\\/2\\.0\\s+(.+)$");
-    private static final Matcher regHeaderEnd = Pattern.compile("^File:\\s+\\(");
-    private static final Matcher ptSkip = Pattern.compile("^[:\\s]*");
-    private final static Matcher SIPHeaderContinue = Pattern.compile("^\\S");
+    private final static Matcher reqSIPRequest = Pattern.compile("Request (sent|received): (\\w+) (.+) SIP\\/2\\.0\\s*$").matcher("");
+    private final static Matcher reqSIPResponse = Pattern.compile("Response (received|sent): SIP\\/2\\.0\\s+(.+)$").matcher("");
+    private static final Matcher regHeaderEnd = Pattern.compile("^File:\\s+\\(").matcher("");
+    private static final Matcher ptSkip = Pattern.compile("^[:\\s]*").matcher("");
+    private final static Matcher SIPHeaderContinue = Pattern.compile("^\\S").matcher("");
     //    15:22:50.980: Sending  [0,UDP] 3384 bytes to 10.82.10.146:5060 >>>>>
     private static final Matcher regNotParseMessage = Pattern.compile("^(33009|49005"
-            + ")");
-    private static final Matcher regCfgObjectName = Pattern.compile("(?:name|userName|number|loginCode)='([^']+)'");
-    private static final Matcher regCfgObjectDBID = Pattern.compile("DBID=(\\d+)");
-    private static final Matcher regCfgObjectType = Pattern.compile("object Cfg(\\w+)=");
-    private static final Matcher regCfgOp = Pattern.compile("\\(type Object(\\w+)\\)");
-    private static final Matcher regSIPServerStartDN = Pattern.compile("^\\s*DN added \\(dbid (\\d+)\\) \\(number ([^\\(]+)\\) ");
-    private static final Matcher ptGVPCallID = Pattern.compile("^\\w{8}-\\w{8}$");
-    private static final Matcher ptFile = Pattern.compile("^(\\S+:\\d+)\\s");
-    private static final Matcher ptFirstWord = Pattern.compile("^(\\S+)\\s");
+            + ")").matcher("");
+    private static final Matcher regCfgObjectName = Pattern.compile("(?:name|userName|number|loginCode)='([^']+)'").matcher("");
+    private static final Matcher regCfgObjectDBID = Pattern.compile("DBID=(\\d+)").matcher("");
+    private static final Matcher regCfgObjectType = Pattern.compile("object Cfg(\\w+)=").matcher("");
+    private static final Matcher regCfgOp = Pattern.compile("\\(type Object(\\w+)\\)").matcher("");
+    private static final Matcher regSIPServerStartDN = Pattern.compile("^\\s*DN added \\(dbid (\\d+)\\) \\(number ([^\\(]+)\\) ").matcher("");
+    private static final Matcher ptGVPCallID = Pattern.compile("^\\w{8}-\\w{8}$").matcher("");
+    private static final Matcher ptFile = Pattern.compile("^(\\S+:\\d+)\\s").matcher("");
+    private static final Matcher ptFirstWord = Pattern.compile("^(\\S+)\\s").matcher("");
     private static final HashMap<String, String> FunctionMap = getFunctionMap();
-    private static final Matcher ptInitURL = Pattern.compile("INIT_URL=([^\\|]+)");
-    private static final Matcher ptValidateURL = Pattern.compile("\\((\\w+)\\):(.+)$");
+    private static final Matcher ptInitURL = Pattern.compile("INIT_URL=([^\\|]+)").matcher("");
+    private static final Matcher ptValidateURL = Pattern.compile("\\((\\w+)\\):(.+)$").matcher("");
     private static final VXMLStepsParams vXMLStepsParams = new VXMLStepsParams();
     private static final org.apache.logging.log4j.Logger logger = Main.logger;
     private final ArrayList<String> extraBuff;
@@ -194,7 +194,7 @@ public class MCPParser extends Parser {
         ParseCustom(str, 0);
         switch (m_ParserState) {
             case STATE_HEADER: {
-                if ((regHeaderEnd.matcher(str)).find()) {
+                if ((regHeaderEnd.reset(str)).find()) {
                     m_ParserState = STATE_COMMENTS;
                 }
             }
@@ -215,8 +215,8 @@ public class MCPParser extends Parser {
 
                 m_lineStarted = m_CurrentLine;
                 if (s != null) {
-                    if ((m = reqSIPRequest.matcher(s)).find()
-                            || (m = reqSIPResponse.matcher(s)).find()) {
+                    if ((m = reqSIPRequest.reset(s)).find()
+                            || (m = reqSIPResponse.reset(s)).find()) {
                         isInbound = m.group(1).startsWith("r");
                         SIPMessage = m.group(2);
                         if (m.groupCount() > 2) {
@@ -283,7 +283,7 @@ public class MCPParser extends Parser {
 
 //<editor-fold defaultstate="collapsed" desc="state_SIP_HEADER">
             case STATE_SIP_HEADER: {
-                if ((SIPHeaderContinue.matcher(str)).find()) {
+                if ((SIPHeaderContinue.reset(str)).find()) {
                     m_MessageContents.add(str);
                     String contentL = Message.GetSIPHeader(str, "content-length", "l");
                     if (contentL != null) {
@@ -393,7 +393,7 @@ public class MCPParser extends Parser {
         ConfigUpdateRecord msg = new ConfigUpdateRecord(m_MessageContents);
         try {
             Matcher m;
-            if (m_MessageContents.size() > 0 && (m = regSIPServerStartDN.matcher(m_MessageContents.get(0))).find()) {
+            if (m_MessageContents.size() > 0 && (m = regSIPServerStartDN.reset(m_MessageContents.get(0))).find()) {
                 msg.setObjectType("DN");
                 msg.setObjectDBID(m.group(1));
                 msg.setObjName(m.group(2));
@@ -421,17 +421,17 @@ public class MCPParser extends Parser {
     }
 
     private void callMessage(String callID, String messageText) {
-        if (ptGVPCallID.matcher(callID).find()) {
+        if (ptGVPCallID.reset(callID).find()) {
 //            if (split.length > 4) {
             String s = messageText;
             Matcher m, m1;
-            if ((m = ptFile.matcher(s)).find()) {
+            if ((m = ptFile.reset(s)).find()) {
                 String theFile = m.group(1);
                 String noFile = s.substring(m.end());
                 if (theFile.startsWith("Runtime.c")) {
                     String firstWord = null;
                     String noFirstWord = null;
-                    if ((m1 = ptFirstWord.matcher(noFile)).find()) {
+                    if ((m1 = ptFirstWord.reset(noFile)).find()) {
                         firstWord = m1.group(1);
                         noFirstWord = noFile.substring(m1.end());
                     }
@@ -502,7 +502,7 @@ public class MCPParser extends Parser {
     private static class VXMLStepsParams {
 
         private final Map<String, IParamParseProc> procSplitSteps;
-        private final Map<Pattern, IPatternProc> procPatternSteps;
+        private final Map<Matcher, IPatternProc> procPatternSteps;
 
         public VXMLStepsParams() {
             this.procSplitSteps = initSplitSteps();
@@ -734,7 +734,7 @@ public class MCPParser extends Parser {
                 @Override
                 public void proc(VXMLIntSteps msg, String[] msgParams, String orig) {
                     msg.setCommand(msgParams[0]);
-                    Matcher m = ptValidateURL.matcher(orig);
+                    Matcher m = ptValidateURL.reset(orig);
                     if (m.find()) {
                         msg.setParam1(m.group(2));
                         msg.setParam2(m.group(1));
@@ -749,7 +749,7 @@ public class MCPParser extends Parser {
                 public void proc(VXMLIntSteps msg, String[] msgParams, String orig) {
                     msg.setCommand(msgParams[0]);
                     if (msgParams.length > 1) {
-                        Matcher m = ptInitURL.matcher(msgParams[1]);
+                        Matcher m = ptInitURL.reset(msgParams[1]);
 
                         if (m.find()) {
                             msg.setParam1(m.group(1));
@@ -958,16 +958,16 @@ public class MCPParser extends Parser {
             return StringUtils.stripStart(p, ":");
         }
 
-        private Map<Pattern, IPatternProc> initPatternSteps() {
-            HashMap<Pattern, IPatternProc> ret = new HashMap<>();
-            ret.put(Pattern.compile("^\\|\\d+ms$"), new IPatternProc() {
+        private Map<Matcher, IPatternProc> initPatternSteps() {
+            HashMap<Matcher, IPatternProc> ret = new HashMap<>();
+            ret.put(Pattern.compile("^\\|\\d+ms$").matcher(""), new IPatternProc() {
                 @Override
                 public void proc(VXMLIntSteps msg, Matcher m) {
                     msg.setCommand(null); // setting command to null ignores record
                 }
             });
 
-            ret.put(Pattern.compile("^((?:Fetching|Compile) Done).+\\|([^\\|]+)$"), new IPatternProc() {
+            ret.put(Pattern.compile("^((?:Fetching|Compile) Done).+\\|([^\\|]+)$").matcher(""), new IPatternProc() {
                 @Override
                 public void proc(VXMLIntSteps msg, Matcher m) {
                     msg.setCommand(m.group(1)); // setting command to null ignores record
@@ -987,11 +987,11 @@ public class MCPParser extends Parser {
                         return;
                     }
                 }
-                for (Map.Entry<Pattern, IPatternProc> entry : procPatternSteps.entrySet()) {
-                    Pattern rx = entry.getKey();
+                for (Map.Entry<Matcher, IPatternProc> entry : procPatternSteps.entrySet()) {
+                    Matcher rx = entry.getKey();
                     IPatternProc proc = entry.getValue();
                     Matcher m;
-                    if ((m = rx.matcher(msgParam)).find()) {
+                    if ((m = rx.reset(msgParam)).find()) {
                         proc.proc(msg, m);
                         return;
                     }

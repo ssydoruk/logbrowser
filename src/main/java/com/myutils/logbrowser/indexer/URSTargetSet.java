@@ -10,7 +10,7 @@ import java.util.regex.Pattern;
 
 public final class URSTargetSet extends Message {
 
-    private static final Pattern ptTargetItem = Pattern.compile("^[\\(\\s]*(.+)@[^@]+\\.(\\w{1,2})[\\)\\s]*$");
+    private static final Matcher ptTargetItem = Pattern.compile("^[\\(\\s]*(.+)@[^@]+\\.(\\w{1,2})[\\)\\s]*$").matcher("");
     private String obj;
     private String objType;
     private String target;
@@ -20,7 +20,7 @@ public final class URSTargetSet extends Message {
         Matcher m;
         boolean agentFound = false;
         if (targetItem != null) {
-            if ((m = ptTargetItem.matcher(targetItem)).find()) {
+            if ((m = ptTargetItem.reset(targetItem)).find()) {
                 String type = m.group(2);
                 if (type != null) {
                     objType = UrsParser.targetCode.get(type);

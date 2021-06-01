@@ -15,20 +15,20 @@ import java.util.regex.Pattern;
  */
 public class SCSParser extends Parser {
 
-    private static final Matcher regAppRunModeChanged = Pattern.compile("^AppRunModeChanged newMode='(\\w+)',\\s+App\\s+\\<DBID=(\\d+),\\s+([^,]+),\\s+PID=(\\d+)\\>,\\s+\\[prevMode=(\\w+)\\],\\s+(\\w+)");
-    private static final Matcher regClientMessage = Pattern.compile("^### MESSAGE#=(\\d+),\\s+'(.+)'$");
-    private static final Matcher regAlarmCleared = Pattern.compile("^Alarm   (\\S+)   (\\S+)   GCTI-00-04210   Active Alarm \"([^\"]+)\" Cleared");
-    private static final Matcher regAlarmCreated = Pattern.compile("^CREATE ActiveAlarm  <(\\d+), ([^>]+)> for  App=<(\\d+),\\s*([^>]+)>.+under control=1");
-    private static final Matcher regAlarmActive = Pattern.compile("^ActiveAlarm::SetDeleteTimer  <(\\d+), ([^>]+)> for App=<(\\d+), ([^>]+)>,");
+    private static final Matcher regAppRunModeChanged = Pattern.compile("^AppRunModeChanged newMode='(\\w+)',\\s+App\\s+\\<DBID=(\\d+),\\s+([^,]+),\\s+PID=(\\d+)\\>,\\s+\\[prevMode=(\\w+)\\],\\s+(\\w+)").matcher("");
+    private static final Matcher regClientMessage = Pattern.compile("^### MESSAGE#=(\\d+),\\s+'(.+)'$").matcher("");
+    private static final Matcher regAlarmCleared = Pattern.compile("^Alarm   (\\S+)   (\\S+)   GCTI-00-04210   Active Alarm \"([^\"]+)\" Cleared").matcher("");
+    private static final Matcher regAlarmCreated = Pattern.compile("^CREATE ActiveAlarm  <(\\d+), ([^>]+)> for  App=<(\\d+),\\s*([^>]+)>.+under control=1").matcher("");
+    private static final Matcher regAlarmActive = Pattern.compile("^ActiveAlarm::SetDeleteTimer  <(\\d+), ([^>]+)> for App=<(\\d+), ([^>]+)>,").matcher("");
 
-    private static final Matcher regNOtificationReceived = Pattern.compile("\\#{4} App\\{(\\d+),(\\w+)\\} status changed to (\\w+) mode=(\\w+), \\[prev=(\\w+)\\]");
-    private static final Matcher regNotifyApp = Pattern.compile("'([^']+)': NotifyApp: status= (\\w+) mode=(\\w+) pid=(\\d+) \\{(\\d+), (\\w+)\\}");
-    private static final Matcher regSelfServer = Pattern.compile("SelfServer: Internal Change RUNMODE from '(\\w+)' to '(\\w+)'");
-    private static final Matcher regSCSReq = Pattern.compile("\\#{5} Request change RUNMODE for Application \\<(\\d+),(\\w+)\\> from '(\\w+)' to '(\\w+)'");
+    private static final Matcher regNOtificationReceived = Pattern.compile("\\#{4} App\\{(\\d+),(\\w+)\\} status changed to (\\w+) mode=(\\w+), \\[prev=(\\w+)\\]").matcher("");
+    private static final Matcher regNotifyApp = Pattern.compile("'([^']+)': NotifyApp: status= (\\w+) mode=(\\w+) pid=(\\d+) \\{(\\d+), (\\w+)\\}").matcher("");
+    private static final Matcher regSelfServer = Pattern.compile("SelfServer: Internal Change RUNMODE from '(\\w+)' to '(\\w+)'").matcher("");
+    private static final Matcher regSCSReq = Pattern.compile("\\#{5} Request change RUNMODE for Application \\<(\\d+),(\\w+)\\> from '(\\w+)' to '(\\w+)'").matcher("");
 
-    private static final Matcher regLineSkip = Pattern.compile("^[>\\s]*");
-    private static final Matcher regNotParseMessage = Pattern.compile("(30201|04210)");
-    private static final Matcher ptServerName = Pattern.compile("^Application\\s+name:\\s+(\\S+)");
+    private static final Matcher regLineSkip = Pattern.compile("^[>\\s]*").matcher("");
+    private static final Matcher regNotParseMessage = Pattern.compile("(30201|04210)").matcher("");
+    private static final Matcher ptServerName = Pattern.compile("^Application\\s+name:\\s+(\\S+)").matcher("");
     final int MSG_STRING_LIMIT = 200;
     private final boolean customEvent = false;
     // parse state contants
@@ -188,7 +188,7 @@ public class SCSParser extends Parser {
                     _msg.setEvent("Request change RUNMODE");
                     SetStdFieldsAndAdd(_msg);
 
-                } else if ((m = regSelfServer.matcher(s)).find()) {
+                } else if ((m = regSelfServer.reset(s)).find()) {
                     SCSSelfStatus _msg = new SCSSelfStatus();
                     _msg.setNewMode(m.group(2));
                     _msg.setOldMode(m.group(1));
@@ -201,7 +201,7 @@ public class SCSParser extends Parser {
 
             case STATE_CLIENT_MESSAGE_RECEIVED: {
                 s = ParseGenesysSCS(str, TableType.MsgSCServer, regNotParseMessage, regLineSkip);
-                if ((m = regAlarmCreated.matcher(s)).find()) {
+                if ((m = regAlarmCreated.reset(s)).find()) {
                     msg = new SCSAlarm(AlarmState.Creating);
                     ((SCSAlarm) msg).setMsgID(lastMSGID);
                     ((SCSAlarm) msg).setMsgText(lastMSGText);
@@ -215,7 +215,7 @@ public class SCSParser extends Parser {
                     m_MessageContents.add(s);
                     m_ParserState = ParserState.STATE_ALARM_CREATED;
                     setSavedFilePos(getFilePos());
-                } else if ((m = regAlarmCleared.matcher(s)).find()) {
+                } else if ((m = regAlarmCleared.reset(s)).find()) {
                     msg = new SCSAlarm(AlarmState.Releasing);
                     ((SCSAlarm) msg).setMsgID(lastMSGID);
                     ((SCSAlarm) msg).setMsgText(lastMSGText);
@@ -228,7 +228,7 @@ public class SCSParser extends Parser {
                     m_MessageContents.add(s);
                     m_ParserState = ParserState.STATE_ALARM_PARAMS_CLEARED;
                     setSavedFilePos(getFilePos());
-                } else if ((m = regAlarmActive.matcher(s)).find()) {
+                } else if ((m = regAlarmActive.reset(s)).find()) {
                     msg = new SCSAlarm(AlarmState.ReActivate);
                     ((SCSAlarm) msg).setMsgID(lastMSGID);
                     ((SCSAlarm) msg).setMsgText(lastMSGText);
@@ -318,7 +318,7 @@ public class SCSParser extends Parser {
                 break;
             }
             case STATE_APP_STATUS_CHANGED1: {
-                if ((m = regNOtificationReceived.matcher(str)).find()) {
+                if ((m = regNOtificationReceived.reset(str)).find()) {
                     m_MessageContents.add(str);
                     SCSAppStatus _msg = new SCSAppStatus(m_MessageContents);
                     _msg.setAppDBID(m.group(1));
@@ -341,7 +341,7 @@ public class SCSParser extends Parser {
 
     protected void ParseServerName(String str) {
 
-        Matcher matcher = ptServerName.matcher(str);
+        Matcher matcher = ptServerName.reset(str);
         if (matcher.find()) {
             try {
                 m_ServerName = matcher.group(1);

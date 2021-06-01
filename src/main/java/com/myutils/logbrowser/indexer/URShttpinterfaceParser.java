@@ -26,24 +26,24 @@ public class URShttpinterfaceParser extends WebParser {
 
     private static final org.apache.logging.log4j.Logger logger = Main.logger;
 
-    private static final Matcher regReqReceived = Pattern.compile("^\\[HTTP Server (\\w+)\\] Received (\\d+) bytes from client on socket (\\d+):");
-    private static final Matcher regRespSent = Pattern.compile("^\\[HTTP Server (\\w+)\\] Response");
+    private static final Matcher regReqReceived = Pattern.compile("^\\[HTTP Server (\\w+)\\] Received (\\d+) bytes from client on socket (\\d+):").matcher("");
+    private static final Matcher regRespSent = Pattern.compile("^\\[HTTP Server (\\w+)\\] Response").matcher("");
 
-    private static final Matcher regRequestToHandler = Pattern.compile("^\\[HTTP Handler Factory (\\w+)\\] Handler (\\w+) created");
-    private static final Matcher regRequestToURS = Pattern.compile("^\\[URS Proxy (?:\\w+)] Router API called. Ref (\\w+)");
-    private static final Matcher regResponseFromURS = Pattern.compile("^\\[HTTP Handler (\\w+)\\] Received event 2 from Router. Ref (\\d+)");
-    private final static Matcher HTTPHeaderFound = Pattern.compile("^((\\w[\\w_\\-\\.\\s]+:)|\\s+;|HTTP)");
-    private final static Matcher HTTPHeaderContinue = Pattern.compile("^\\s*(\\w.+)");
-    private final static Matcher HTTPRequestContinue = Pattern.compile("^\\[(HTTP Request|HTTP Server)");
-    private final static Matcher HTTPRequestHandler = Pattern.compile("^\\[HTTP Handler (?:(\\w+)\\] Created)?");
-    private final static Matcher HTTPResponseContinue = Pattern.compile("^\\[(HTTP Response|HTTP Server)");
-    private final static Matcher HTTPResponseHandler = Pattern.compile("^\\[HTTP (?:Handler|Request) (\\w+)\\] Destroyed");
+    private static final Matcher regRequestToHandler = Pattern.compile("^\\[HTTP Handler Factory (\\w+)\\] Handler (\\w+) created").matcher("");
+    private static final Matcher regRequestToURS = Pattern.compile("^\\[URS Proxy (?:\\w+)] Router API called. Ref (\\w+)").matcher("");
+    private static final Matcher regResponseFromURS = Pattern.compile("^\\[HTTP Handler (\\w+)\\] Received event 2 from Router. Ref (\\d+)").matcher("");
+    private final static Matcher HTTPHeaderFound = Pattern.compile("^((\\w[\\w_\\-\\.\\s]+:)|\\s+;|HTTP)").matcher("");
+    private final static Matcher HTTPHeaderContinue = Pattern.compile("^\\s*(\\w.+)").matcher("");
+    private final static Matcher HTTPRequestContinue = Pattern.compile("^\\[(HTTP Request|HTTP Server)").matcher("");
+    private final static Matcher HTTPRequestHandler = Pattern.compile("^\\[HTTP Handler (?:(\\w+)\\] Created)?").matcher("");
+    private final static Matcher HTTPResponseContinue = Pattern.compile("^\\[(HTTP Response|HTTP Server)").matcher("");
+    private final static Matcher HTTPResponseHandler = Pattern.compile("^\\[HTTP (?:Handler|Request) (\\w+)\\] Destroyed").matcher("");
     //<editor-fold defaultstate="collapsed" desc="ursHTTPMsg">
-    private static final Matcher regHTTPURL = Pattern.compile("^(GET|HEAD|POST|PUT|DELETE|CONNECT|OPTIONS|TRACE|PATCH) (.+) HTTP/");
-    private static final Matcher regHTTPResp = Pattern.compile("^HTTP/.\\.. (.+)");
-    private static final Matcher regSIDCookie = Pattern.compile("ORSSESSIONID=([\\w~]+)");
-    private static final Matcher regHTTPMethod = Pattern.compile("^(\\w+)");
-    private static final Matcher regSessionID = Pattern.compile("session/([^\\/]+)");
+    private static final Matcher regHTTPURL = Pattern.compile("^(GET|HEAD|POST|PUT|DELETE|CONNECT|OPTIONS|TRACE|PATCH) (.+) HTTP/").matcher("");
+    private static final Matcher regHTTPResp = Pattern.compile("^HTTP/.\\.. (.+)").matcher("");
+    private static final Matcher regSIDCookie = Pattern.compile("ORSSESSIONID=([\\w~]+)").matcher("");
+    private static final Matcher regHTTPMethod = Pattern.compile("^(\\w+)").matcher("");
+    private static final Matcher regSessionID = Pattern.compile("session/([^\\/]+)").matcher("");
     /*	public OrsParser(DBAccessor accessor) {
      m_accessor = accessor;
      }
@@ -181,7 +181,7 @@ public class URShttpinterfaceParser extends WebParser {
 //                getThread(getDP());
 
                 if (s != null) {
-                    if ((m = regReqReceived.matcher(s)).find()) {
+                    if ((m = regReqReceived.reset(s)).find()) {
                         int socket = Integer.parseInt(m.group(3));
                         int bytes = Integer.parseInt(m.group(2));
                         String httpServerID = m.group(1);
@@ -215,7 +215,7 @@ public class URShttpinterfaceParser extends WebParser {
 
                             return null;
                         }
-                    } else if ((m = regRespSent.matcher(s)).find()) {
+                    } else if ((m = regRespSent.reset(s)).find()) {
                         ursHTTP = new ursHTTPMsg();
                         ursHTTP.setHTTPServerID(m.group(1));
                         m_PacketLength = 0;
@@ -226,11 +226,11 @@ public class URShttpinterfaceParser extends WebParser {
                         m_ContentLength = null;
                         m_ParserState = ParserState.STATE_HTTP_HEADER;
 
-                    } else if ((m = regRequestToHandler.matcher(s)).find()) {
+                    } else if ((m = regRequestToHandler.reset(s)).find()) {
                         requestHandler.store(intOrDef(m.group(1), null, 16), intOrDef(m.group(2), null, 16));
-                    } else if ((m = regRequestToURS.matcher(s)).find()) {
+                    } else if ((m = regRequestToURS.reset(s)).find()) {
                         saveRequestToURS(null, intOrDef(m.group(1), null, 10), false);
-                    } else if ((m = regResponseFromURS.matcher(s)).find()) {
+                    } else if ((m = regResponseFromURS.reset(s)).find()) {
                         saveRequestToURS(intOrDef(m.group(1), null, 16), intOrDef(m.group(2), null, 10), true);
                     }
                 }
@@ -240,9 +240,9 @@ public class URShttpinterfaceParser extends WebParser {
                 if (StringUtils.isNotBlank(s)) {
                     s = ParseTimestampStr1(str);
                     dateParsed = true;
-                    if (HTTPRequestContinue.matcher(s).find()) {
+                    if (HTTPRequestContinue.reset(s).find()) {
                         return null;
-                    } else if ((m = HTTPRequestHandler.matcher(s)).find()) {
+                    } else if ((m = HTTPRequestHandler.reset(s)).find()) {
                         ursHTTP.setHTTPHandlerID(m.group(1));
                         SetStdFieldsAndAdd(ursHTTP);
                         m_MessageContents.clear();
@@ -260,7 +260,7 @@ public class URShttpinterfaceParser extends WebParser {
 
             //<editor-fold defaultstate="collapsed" desc="state_SIP_HEADER">
             case STATE_HTTP_HEADER: {
-                if (HTTPHeaderFound.matcher(str).find()) {
+                if (HTTPHeaderFound.reset(str).find()) {
                     m_MessageContents.add(str);
                     String contentL = Message.GetSIPHeader(str, "content-length", "l");
                     if (contentL != null) {
@@ -293,9 +293,9 @@ public class URShttpinterfaceParser extends WebParser {
                 if (StringUtils.isBlank(s)) {
                     break;
                 }
-                if (HTTPResponseContinue.matcher(s).find()) {
+                if (HTTPResponseContinue.reset(s).find()) {
                     return null;
-                } else if ((m = HTTPResponseHandler.matcher(s)).find()) {
+                } else if ((m = HTTPResponseHandler.reset(s)).find()) {
                     ursHTTP.setHTTPHandlerID(m.group(1));
                     SetStdFieldsAndAdd(ursHTTP);
                     m_MessageContents.clear();
@@ -313,7 +313,7 @@ public class URShttpinterfaceParser extends WebParser {
             case STATE_HTTP_BODY: {
                 m_PacketLength -= s.length() + 2;
 
-                if ((m = HTTPHeaderContinue.matcher(str)).find()) {
+                if ((m = HTTPHeaderContinue.reset(str)).find()) {
                     m_MessageContents.add(s);
 
                 } else {
@@ -614,14 +614,14 @@ public class URShttpinterfaceParser extends WebParser {
             if (url == null) {
                 if (!m_MessageLines.isEmpty()) {
                     Matcher m;
-                    if ((m = regHTTPURL.matcher(m_MessageLines.get(0))).find()) {
+                    if ((m = regHTTPURL.reset(m_MessageLines.get(0))).find()) {
                         url = m.group(2);
                         processURL();
                         method = m.group(1);
                     }
 
                     if (method == null) {
-                        if ((m = regHTTPResp.matcher(m_MessageLines.get(0))).find()) {
+                        if ((m = regHTTPResp.reset(m_MessageLines.get(0))).find()) {
                             method = m.group(1);
                         }
                     }

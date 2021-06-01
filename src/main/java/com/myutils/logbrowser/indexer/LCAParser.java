@@ -10,24 +10,24 @@ import java.util.regex.Pattern;
  */
 public class LCAParser extends Parser {
 
-    private static final Matcher reqNotifyStatus = Pattern.compile("^\\s*Notify STATUS: App\\<(\\w+),\\s*([^,]+), pid=(\\w+), ([^,]+), (\\w+)");
-    private static final Matcher regNotifyRunmode = Pattern.compile("^\\s*Notify RUNMODE: App\\<(\\w+),\\s*([^,]+), pid=(\\w+), ([^,]+), (\\w+)");
+    private static final Matcher reqNotifyStatus = Pattern.compile("^\\s*Notify STATUS: App\\<(\\w+),\\s*([^,]+), pid=(\\w+), ([^,]+), (\\w+)").matcher("");
+    private static final Matcher regNotifyRunmode = Pattern.compile("^\\s*Notify RUNMODE: App\\<(\\w+),\\s*([^,]+), pid=(\\w+), ([^,]+), (\\w+)").matcher("");
 
-    private static final Matcher reqSCSRequest = Pattern.compile("\\[Request[^\\]]+\\]$");
-    private static final Matcher reqSCSRequestStartApplication = Pattern.compile("\\[RequestStartApplication[^\\]]*\\]$");
-    private static final Matcher reqSCSDisconnected = Pattern.compile("SCSRequester '(.+)' disconnected, fd=(\\w+)");
+    private static final Matcher reqSCSRequest = Pattern.compile("\\[Request[^\\]]+\\]$").matcher("");
+    private static final Matcher reqSCSRequestStartApplication = Pattern.compile("\\[RequestStartApplication[^\\]]*\\]$").matcher("");
+    private static final Matcher reqSCSDisconnected = Pattern.compile("SCSRequester '(.+)' disconnected, fd=(\\w+)").matcher("");
 
-    private static final Matcher regNOtificationReceived = Pattern.compile("\\#{4} App\\{(\\w+),(\\w+)\\} status changed to (\\w+) mode=(\\w+), \\[prev=(\\w+)\\]");
-//    private static final Matcher regNotifyApp = Pattern.compile("'([^']+)': NotifyApp: status= (\\w+) mode=(\\w+) pid=(\\w+) \\{(\\w+), (\\w+)\\}");
-//    private static final Matcher regSelfServer = Pattern.compile("SelfServer: Internal Change RUNMODE from '(\\w+)' to '(\\w+)'");
-//    private static final Matcher regSCSReq = Pattern.compile("\\#{5} Request change RUNMODE for Application \\<(\\w+),(\\w+)\\> from '(\\w+)' to '(\\w+)'");
+    private static final Matcher regNOtificationReceived = Pattern.compile("\\#{4} App\\{(\\w+),(\\w+)\\} status changed to (\\w+) mode=(\\w+), \\[prev=(\\w+)\\]").matcher("");
+//    private static final Matcher regNotifyApp = Pattern.compile("'([^']+)': NotifyApp: status= (\\w+) mode=(\\w+) pid=(\\w+) \\{(\\w+), (\\w+)\\}").matcher("");
+//    private static final Matcher regSelfServer = Pattern.compile("SelfServer: Internal Change RUNMODE from '(\\w+)' to '(\\w+)'").matcher("");
+//    private static final Matcher regSCSReq = Pattern.compile("\\#{5} Request change RUNMODE for Application \\<(\\w+),(\\w+)\\> from '(\\w+)' to '(\\w+)'").matcher("");
 
-    private static final Matcher regLineSkip = Pattern.compile("^[>\\s]*");
-    private static final Matcher regNotParseMessage = Pattern.compile("(30201)");
-    private static final Matcher ptServerName = Pattern.compile("^Application\\s+name:\\s+(\\S+)");
-    private static final Matcher regCfgObjectName = Pattern.compile("(?:name|userName)='([^']+)'");
-    private static final Matcher regCfgObjectType = Pattern.compile("^Cfg([^=]+)=\\{DBID=(\\w+)");
-    private static final Matcher regCfgOp = Pattern.compile("^(Creating|Adding\\s[\\w]+)");
+    private static final Matcher regLineSkip = Pattern.compile("^[>\\s]*").matcher("");
+    private static final Matcher regNotParseMessage = Pattern.compile("(30201)").matcher("");
+    private static final Matcher ptServerName = Pattern.compile("^Application\\s+name:\\s+(\\S+)").matcher("");
+    private static final Matcher regCfgObjectName = Pattern.compile("(?:name|userName)='([^']+)'").matcher("");
+    private static final Matcher regCfgObjectType = Pattern.compile("^Cfg([^=]+)=\\{DBID=(\\w+)").matcher("");
+    private static final Matcher regCfgOp = Pattern.compile("^(Creating|Adding\\s[\\w]+)").matcher("");
     final int MSG_STRING_LIMIT = 200;
     private final HashMap m_BlockNamesToIgnoreHash;
     // parse state contants

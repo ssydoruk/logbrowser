@@ -5,13 +5,14 @@
  */
 package com.myutils.logbrowser.indexer;
 
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class IxnNonIxn extends Message {
 
-    private static final Pattern rxUserEventIDs = Pattern.compile("^\\s+AttributeUserEvent.+ = (\\d+)");
+    private static final Matcher rxUserEventIDs = Pattern.compile("^\\s+AttributeUserEvent.+ = (\\d+)").matcher("");
 
-    private static final Pattern rxThisDN = Pattern.compile("^\\s+AttributeThisDN .+ \"([^\"]+)\"$");
+    private static final Matcher rxThisDN = Pattern.compile("^\\s+AttributeThisDN .+ \"([^\"]+)\"$").matcher("");
     private final Ixn parentMsg;
     MessageAttributes attrs = new MessageAttributes();
 
