@@ -2,6 +2,7 @@ package com.myutils.logbrowser.inquirer;
 
 import Utils.Pair;
 import com.myutils.mygenerictree.TClonable;
+
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -13,6 +14,57 @@ import java.util.List;
 public class OptionNode implements Serializable, TClonable, Comparable {
 
     private static final long serialVersionUID = 2L;
+    DialogItem dialogItem = null;
+    private Object data;
+    private boolean isEmpty = false;
+    private int id;
+    private Pair thePr = null;
+    private boolean checked = true; // is true by default
+    private String name = null;
+
+    OptionNode(boolean selected, NameID ch1) {
+        this(selected, ch1.getName());
+        this.id = ch1.getId();
+
+    }
+
+    OptionNode(NameID ch1) {
+        this(ch1.getName());
+        this.id = ch1.getId();
+    }
+    public OptionNode(boolean b, DialogItem dialogItem) {
+        this(b, dialogItem.toString());
+        this.dialogItem = dialogItem;
+    }
+    OptionNode(boolean b, Pair pr) {
+        this(b, pr.getKey().toString());
+        thePr = pr;
+    }
+    OptionNode(boolean b, DialogItem dialogItem, String itemName) {
+        this(b, dialogItem);
+        if (itemName != null) {
+            setName(itemName);
+        }
+    }
+    public OptionNode(boolean checked, String name) {
+        this.checked = checked;
+        this.name = name;
+//        inquirer.logger.debug("OptionNode constructor item [" + name + "] checked:" + checked );
+    }
+    public OptionNode(boolean checked, boolean isEmpty, String name) {
+        this.checked = checked;
+        this.name = name;
+        this.isEmpty = isEmpty;
+//        inquirer.logger.debug("OptionNode constructor item [" + name + "] checked:" + checked );
+    }
+
+    public OptionNode(String name) {
+        this(true, name);
+    }
+
+    public OptionNode(DialogItem item) {
+        this(true, item);
+    }
 
     static ArrayList<String> getChecked(DynamicTreeNode<OptionNode> nameSettings) {
         ArrayList<String> ret = new ArrayList<>();
@@ -102,63 +154,6 @@ public class OptionNode implements Serializable, TClonable, Comparable {
         return true;
 
     }
-    private Object data;
-
-    private boolean isEmpty = false;
-    private int id;
-    private Pair thePr = null;
-    private boolean checked = true; // is true by default
-    private String name = null;
-    DialogItem dialogItem = null;
-
-    OptionNode(boolean selected, NameID ch1) {
-        this(selected, ch1.getName());
-        this.id = ch1.getId();
-
-    }
-
-    OptionNode(NameID ch1) {
-        this(ch1.getName());
-        this.id = ch1.getId();
-    }
-
-    public OptionNode(boolean b, DialogItem dialogItem) {
-        this(b, dialogItem.toString());
-        this.dialogItem = dialogItem;
-    }
-
-    OptionNode(boolean b, Pair pr) {
-        this(b, pr.getKey().toString());
-        thePr = pr;
-    }
-
-    OptionNode(boolean b, DialogItem dialogItem, String itemName) {
-        this(b, dialogItem);
-        if (itemName != null) {
-            setName(itemName);
-        }
-    }
-
-    public OptionNode(boolean checked, String name) {
-        this.checked = checked;
-        this.name = name;
-//        inquirer.logger.debug("OptionNode constructor item [" + name + "] checked:" + checked );
-    }
-
-    public OptionNode(boolean checked, boolean isEmpty, String name) {
-        this.checked = checked;
-        this.name = name;
-        this.isEmpty = isEmpty;
-//        inquirer.logger.debug("OptionNode constructor item [" + name + "] checked:" + checked );
-    }
-
-    public OptionNode(String name) {
-        this(true, name);
-    }
-
-    public OptionNode(DialogItem item) {
-        this(true, item);
-    }
 
     public Object getData() {
         return data;
@@ -201,6 +196,10 @@ public class OptionNode implements Serializable, TClonable, Comparable {
         return dialogItem;
     }
 
+    public void setDialogItem(DialogItem dialogItem) {
+        this.dialogItem = dialogItem;
+    }
+
     public boolean isChecked() {
 //        inquirer.logger.debug("isChecked returns " + checked + " item [" + name + "]");
         return checked;
@@ -225,10 +224,6 @@ public class OptionNode implements Serializable, TClonable, Comparable {
     public String toString() {
         return name;
 //        return "OptionNode{" + "thePr=" + thePr + ", checked=" + checked + ", name=" + name + ", dialogItem=" + dialogItem + '}';
-    }
-
-    public void setDialogItem(DialogItem dialogItem) {
-        this.dialogItem = dialogItem;
     }
 
     @Override

@@ -8,6 +8,7 @@ package com.myutils.logbrowser.inquirer;
 import Utils.UTCTimeRange;
 import com.myutils.logbrowser.indexer.ReferenceType;
 import com.myutils.logbrowser.inquirer.IQuery.FieldType;
+
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
 import java.sql.SQLException;
@@ -15,7 +16,6 @@ import java.util.ArrayList;
 import java.util.Properties;
 
 /**
- *
  * @author ssydoruk
  */
 public class AggrORSDuration extends IAggregateQuery {
@@ -87,9 +87,9 @@ public class AggrORSDuration extends IAggregateQuery {
 
             DatabaseConnector.runQuery("create temp table " + TMP_TABLE + " as"
                     + "\nselect 0 as id, " + tab + ".time, " + tab + ".fileid, " + tab + ".line, " + tab + ".fileoffset, " + tab + ".filebytes, "
-                    + ReferenceType.TEvent.toString() + ".name, orssess_logbr.sidid"
+                    + ReferenceType.TEvent + ".name, orssess_logbr.sidid"
                     + "\nfrom " + tab
-                    + "\ninner join " + ReferenceType.TEvent.toString() + " on " + ReferenceType.TEvent.toString() + ".id=" + tab + ".nameid"
+                    + "\ninner join " + ReferenceType.TEvent + " on " + ReferenceType.TEvent + ".id=" + tab + ".nameid"
                     + "\ninner join orssess_logbr on orssess_logbr.uuidid=" + tab + ".uuidid"
                     + "\n" + whTEvent.makeWhere(true)
                     + "\n" + QueryTools.getLimitClause(isLimitQueryResults(), getMaxQueryLines())
@@ -107,9 +107,9 @@ public class AggrORSDuration extends IAggregateQuery {
             whMetric.addWhere("time", cfg.getTimeRange(), "AND");
 
             DatabaseConnector.runQuery(((isLibChecked) ? "insert into " + TMP_TABLE : "create temp table " + TMP_TABLE + " as")
-                    + "\nselect 0 as id, time, fileid, line, fileoffset,filebytes," + ReferenceType.METRIC.toString() + ".name, sidid"
+                    + "\nselect 0 as id, time, fileid, line, fileoffset,filebytes," + ReferenceType.METRIC + ".name, sidid"
                     + "\nfrom " + tab
-                    + "\ninner join " + ReferenceType.METRIC.toString() + " on " + ReferenceType.METRIC.toString() + ".id=" + tab + ".metricid"
+                    + "\ninner join " + ReferenceType.METRIC + " on " + ReferenceType.METRIC + ".id=" + tab + ".metricid"
                     + "\n" + whMetric.makeWhere(true)
                     + "\n" + QueryTools.getLimitClause(isLimitQueryResults(), getMaxQueryLines())
                     + "\n;"

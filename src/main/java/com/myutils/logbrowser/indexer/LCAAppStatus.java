@@ -5,10 +5,11 @@
  */
 package com.myutils.logbrowser.indexer;
 
-import static Utils.Util.intOrDef;
 import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static Utils.Util.intOrDef;
 
 public class LCAAppStatus extends Message {
 
@@ -41,30 +42,12 @@ public class LCAAppStatus extends Message {
         return host;
     }
 
+    void setHost(String group) {
+        this.host = group;
+    }
+
     void setMode(String group) {
         this.newMode = group;
-
-    }
-
-    void setAppDBID(String group) {
-        this.appDBID = intOrDef(group, -1);
-    }
-
-    void setAppName(String group) {
-        this.appName = group;
-    }
-
-    void setPID(String group) {
-        this.PID = intOrDef(group, -1);
-    }
-
-    void setOldMode(String group) {
-        this.OldMode = group;
-
-    }
-
-    void setStatus(String group) {
-        this.status = group;
 
     }
 
@@ -76,24 +59,42 @@ public class LCAAppStatus extends Message {
         return appDBID;
     }
 
+    void setAppDBID(String group) {
+        this.appDBID = intOrDef(group, -1);
+    }
+
     public String getAppName() {
         return appName;
+    }
+
+    void setAppName(String group) {
+        this.appName = group;
     }
 
     public int getPID() {
         return PID;
     }
 
+    void setPID(String group) {
+        this.PID = intOrDef(group, -1);
+    }
+
     public String getOldMode() {
         return OldMode;
+    }
+
+    void setOldMode(String group) {
+        this.OldMode = group;
+
     }
 
     public String getStatus() {
         return status;
     }
 
-    void setHost(String group) {
-        this.host = group;
+    void setStatus(String group) {
+        this.status = group;
+
     }
 
     String getEvent() {

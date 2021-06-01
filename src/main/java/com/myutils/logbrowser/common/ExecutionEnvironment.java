@@ -5,12 +5,7 @@
  */
 package com.myutils.logbrowser.common;
 
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.DefaultParser;
-import org.apache.commons.cli.Option;
-import org.apache.commons.cli.Options;
-import org.apache.commons.cli.ParseException;
+import org.apache.commons.cli.*;
 import org.apache.commons.lang3.StringUtils;
 
 /**
@@ -20,9 +15,9 @@ import org.apache.commons.lang3.StringUtils;
  */
 public class ExecutionEnvironment {
 
-    protected CommandLine cmd;
     protected final Options options;
     protected final CommandLineParser parser;
+    protected CommandLine cmd;
 
     public ExecutionEnvironment() {
         this.options = new Options();

@@ -8,6 +8,9 @@ package com.myutils.logbrowser.inquirer.gui;
 import Utils.UnixProcess.ExtProcess;
 import Utils.Util;
 import com.myutils.logbrowser.inquirer.LogFile;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -15,20 +18,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.logging.log4j.LogManager;
 
 /**
- *
  * @author Stepan
  */
 public class EditorUnix extends ExternalEditor {
 
     private static final org.apache.logging.log4j.Logger logger = LogManager.getLogger();
-
-    private static ArrayList<String> errBuf;
     private static final String gvim = "/usr/local/bin/mvim";
     private static final String gvimServer = "LOGBROWSER";
+    private static ArrayList<String> errBuf;
+    HashMap<String, Character> lastBookmark = new HashMap<>();
 
     /**
      * Executes external command and returns stdout
@@ -122,7 +122,6 @@ public class EditorUnix extends ExternalEditor {
         return execWaitSTDOut(Arrays.asList("--remote-send",
                 expr));
     }
-    HashMap<String, Character> lastBookmark = new HashMap<>();
 
     private void show() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
@@ -154,7 +153,7 @@ public class EditorUnix extends ExternalEditor {
 
                 bufNumber = getBufNumber(fileName, fileModified);
                 if (bufNumber != null && bufNumber > 0) {
-                    logger.debug("Loaded: " + bufNumber.toString());
+                    logger.debug("Loaded: " + bufNumber);
                     setActive(bufNumber);
                 } else {
                     bufNumber = null;
@@ -253,13 +252,13 @@ public class EditorUnix extends ExternalEditor {
 
     private void sendInitCommands() throws IOException {
         sendCommand("<C-\\><C-N>:set nomodifiable<CR>"
-                + "<C-\\><C-N>:set ic<CR>"
-                + "<C-\\><C-N>:set hlsearch<CR>"
-                + "<C-\\><C-N>:set wrap<CR>"
-                + "<C-\\><C-N>:set noconfirm<CR>"
-        //                + "<C-\\><C-N>:set nobackup<CR>"
-        //                + "<C-\\><C-N>:set nowritebackup<CR>"
-        //                + "<C-\\><C-N>:set noswapfile<CR>"       
+                        + "<C-\\><C-N>:set ic<CR>"
+                        + "<C-\\><C-N>:set hlsearch<CR>"
+                        + "<C-\\><C-N>:set wrap<CR>"
+                        + "<C-\\><C-N>:set noconfirm<CR>"
+                //                + "<C-\\><C-N>:set nobackup<CR>"
+                //                + "<C-\\><C-N>:set nowritebackup<CR>"
+                //                + "<C-\\><C-N>:set noswapfile<CR>"
         );
     }
 

@@ -5,11 +5,11 @@
 package com.myutils.logbrowser.inquirer;
 
 import com.myutils.logbrowser.indexer.ReferenceType;
-import java.sql.SQLException;
 import org.apache.commons.lang3.StringUtils;
 
+import java.sql.SQLException;
+
 /**
- *
  * @author ssydoruk
  */
 public final class IxnServerQuery extends IQuery {

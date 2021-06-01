@@ -5,12 +5,12 @@
 package com.myutils.logbrowser.inquirer;
 
 import com.myutils.logbrowser.indexer.ReferenceType;
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collection;
 
 /**
- *
  * @author ssydoruk
  */
 public class OCSByConnIdQuery extends IQuery {
@@ -139,7 +139,7 @@ public class OCSByConnIdQuery extends IQuery {
             AddCheckedWhere("OCS.sourceID", ReferenceType.App, node, "AND", DialogItem.OCS_CALL_TEVENT_SERVER);
         }
 
-        addWhere("OCS.nameID not in (select id from " + ReferenceType.TEvent.toString() + " where name = \"EventUserEvent\")", "AND");
+        addWhere("OCS.nameID not in (select id from " + ReferenceType.TEvent + " where name = \"EventUserEvent\")", "AND");
         addFileFilters("OCS", "fileid");
         addDateTimeFilters("OCS", "time");
 

@@ -6,17 +6,21 @@
 package com.myutils.logbrowser.inquirer.gui;
 
 import com.myutils.logbrowser.inquirer.DatabaseConnector;
-import static com.myutils.logbrowser.inquirer.gui.JTableCommon.RECORD_EMPTY;
+
+import javax.swing.*;
+import javax.swing.event.ListDataListener;
 import java.util.ArrayList;
 import java.util.HashSet;
-import javax.swing.ComboBoxModel;
-import javax.swing.event.ListDataListener;
+
+import static com.myutils.logbrowser.inquirer.gui.JTableCommon.RECORD_EMPTY;
 
 /**
- *
  * @author ssydoruk
  */
 abstract class AColumnFilter {
+
+    public AColumnFilter() {
+    }
 
     static public double convertDouble(Object val) throws NumberFormatException {
         double l;
@@ -26,9 +30,6 @@ abstract class AColumnFilter {
             l = Double.parseDouble(val.toString());
         }
         return l;
-    }
-
-    public AColumnFilter() {
     }
 
     abstract boolean showValue(Object val);
@@ -160,6 +161,10 @@ abstract class AColumnFilter {
             return showNonNumbers;
         }
 
+        public void setShowNonNumbers(boolean selected) {
+            this.showNonNumbers = selected;
+        }
+
         public String getName() {
             return name;
         }
@@ -204,10 +209,6 @@ abstract class AColumnFilter {
         public String toString() {
             return name;
         }
-
-        public void setShowNonNumbers(boolean selected) {
-            this.showNonNumbers = selected;
-        }
     }
 
     public static class FilterComboboxModel extends ArrayList<AColumnFilter> implements ComboBoxModel {
@@ -219,13 +220,13 @@ abstract class AColumnFilter {
         }
 
         @Override
-        public void setSelectedItem(Object anItem) {
-            this.selectedItem = anItem;
+        public Object getSelectedItem() {
+            return selectedItem;
         }
 
         @Override
-        public Object getSelectedItem() {
-            return selectedItem;
+        public void setSelectedItem(Object anItem) {
+            this.selectedItem = anItem;
         }
 
         @Override

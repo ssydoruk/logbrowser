@@ -8,7 +8,6 @@ package com.myutils.logbrowser.inquirer;
 import java.util.ArrayList;
 
 /**
- *
  * @author ssydoruk
  */
 public class ReportItem extends IReportConfigItem {
@@ -51,8 +50,8 @@ public class ReportItem extends IReportConfigItem {
 
     class ComponentAttribute extends IReportConfigItem {
 
-        private String name;
         ArrayList<String> attrValue = new ArrayList<>();
+        private String name;
 
         public ComponentAttribute(IReportConfigItem _parent, String name) {
             super(_parent, name);

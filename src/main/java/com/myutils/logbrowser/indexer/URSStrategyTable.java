@@ -9,7 +9,6 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 
 /**
- *
  * @author ssydoruk
  */
 public class URSStrategyTable extends DBTable {
@@ -55,7 +54,6 @@ public class URSStrategyTable extends DBTable {
     }
 
     /**
-     *
      * @throws Exception
      */
     @Override

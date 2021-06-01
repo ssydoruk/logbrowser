@@ -8,27 +8,55 @@ package com.myutils.logbrowser.inquirer;
 import com.jidesoft.swing.MultilineLabel;
 import com.myutils.logbrowser.indexer.FileInfoType;
 import com.myutils.logbrowser.indexer.ReferenceType;
-import static com.myutils.logbrowser.inquirer.QueryTools.getRefIDs;
-import static com.myutils.logbrowser.inquirer.QueryTools.getWhere;
-import static com.myutils.logbrowser.inquirer.QueryTools.uniqueInts;
-import java.awt.Window;
+import org.apache.commons.lang3.StringUtils;
+
+import javax.swing.*;
+import java.awt.*;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-import org.apache.commons.lang3.StringUtils;
+import java.util.*;
+
+import static com.myutils.logbrowser.inquirer.QueryTools.getWhere;
+import static com.myutils.logbrowser.inquirer.QueryTools.uniqueInts;
+
+enum IDType {
+    UNKNOWN,
+    UUID,
+    ConnID,
+    OCSSID,
+    OCSRecordHandle,
+    ORSSID,
+    IxnID,
+    OCSChainID,
+    CG,
+    DN,
+    AGENT,
+    CGDBID,
+    PLACE,
+    IxnQueue,
+    OCSCampaign,
+    OCSCampaignDBID,
+    GMSSESSION,
+    SIPCallID,
+    TLibRefID,
+    JSONID,
+    SIPHandlerID,
+    SIPTriggerID,
+    TLIBID,
+    SIPID,
+    PEERIP,
+    ORSCallID,
+    MCPCallID,
+    JSessionID,
+    GWS_DeviceID,
+    BrowserClientID,
+    WWEUserID,
+    ANYPARAM,
+}
 
 /**
- *
  * @author ssydoruk
  */
 class IxnIDs {
@@ -46,6 +74,7 @@ class SearchIDs {
     final static int m_maxDepth = 5;
 
     private static final HashMap<Integer, Integer> tmpConnIDs = new HashMap();
+    private final HashMap<IDType, Integer[]> CallIDs = new HashMap<>();
 
     private static Integer[] getCallIDs(Integer[] ids) throws SQLException {
         tmpConnIDs.clear();
@@ -160,7 +189,7 @@ class SearchIDs {
             }
 
             case UUID: {
-                ret.AddIDs(IDType.ConnID, getIDs(IDType.ConnID, IDType.UUID, ret.getIDs(IDType.UUID))); // for voice calls there will be 2 ConnIDs                
+                ret.AddIDs(IDType.ConnID, getIDs(IDType.ConnID, IDType.UUID, ret.getIDs(IDType.UUID))); // for voice calls there will be 2 ConnIDs
                 if (ret.getIDs(IDType.ConnID) != null) {
                     ret.AddIDs(IDType.ConnID, getCallIDs(ret.getIDs(IDType.ConnID)));
                     getIDsByConnID(ret, ret.getIDs(IDType.ConnID));
@@ -241,8 +270,8 @@ class SearchIDs {
                     case ORSSID:
                         return DatabaseConnector.getIDs(
                                 "select distinct ixnid "
-                                + "from orssessixn "
-                                + getWhere("sidid",
+                                        + "from orssessixn "
+                                        + getWhere("sidid",
                                         searchIDs, true));
 
                 }
@@ -348,7 +377,7 @@ class SearchIDs {
 
 //            case ORSSID:
 //                switch (searchIDType) {
-//                    case UUID:               
+//                    case UUID:
 //                        return DatabaseConnector.getIDs("orssess_logbr", "uuidid", getWhere("sidid", searchIDs, true));
 //                }
             default:
@@ -383,7 +412,7 @@ class SearchIDs {
         }
         /* <--- Is this recHandle --- */
 
- /* Is this ChainID ---> */
+        /* Is this ChainID ---> */
         tmpIDs = DatabaseConnector.getDatabaseConnector(owner).getIDs(owner, "ocs_logbr", "ConnectionIDID", getWhere("chID", sIDs, true));
         if (tmpIDs != null && tmpIDs.length > 0) {
             return new IDFound(IDType.OCSChainID, Integer.parseInt(sIDs[0]));
@@ -402,7 +431,6 @@ class SearchIDs {
 
         return null;
     }
-    private final HashMap<IDType, Integer[]> CallIDs = new HashMap<>();
 
     public Integer[] getIDs(IDType idType) {
         Integer[] ret = CallIDs.get(idType);
@@ -444,47 +472,17 @@ class SearchIDs {
 
 }
 
-enum IDType {
-    UNKNOWN,
-    UUID,
-    ConnID,
-    OCSSID,
-    OCSRecordHandle,
-    ORSSID,
-    IxnID,
-    OCSChainID,
-    CG,
-    DN,
-    AGENT,
-    CGDBID,
-    PLACE,
-    IxnQueue,
-    OCSCampaign,
-    OCSCampaignDBID,
-    GMSSESSION,
-    SIPCallID,
-    TLibRefID,
-    JSONID,
-    SIPHandlerID,
-    SIPTriggerID,
-    TLIBID,
-    SIPID,
-    PEERIP,
-    ORSCallID,
-    MCPCallID,
-    JSessionID,
-    GWS_DeviceID,
-    BrowserClientID,
-    WWEUserID,
-    ANYPARAM,
-}
-
 abstract public class QueryTools {
 
     private static final ArrayList<String> queryMessages = new ArrayList<String>();
     private static final int SPLIT_ON = 300;
     private static final HashMap<String, String> tableTypeByFileType = initTabTypes();
     private static final HashMap<String, FileInfoType> timeDiffByFileType = initTimeDiffTypes();
+    protected boolean printAlone = false; // should print records as they are extracted. Used for file output
+    protected PrintStreams ps = null;
+    private boolean limitQueryResults;
+    private int maxQueryLines;
+    private IQueryResults.ProgressNotifications progressCallback;
 
     public static ArrayList<Integer> sortedArray(Integer[] ids) {
         ArrayList<Integer> idsh = new ArrayList<>(Arrays.asList(ids));
@@ -675,7 +673,6 @@ abstract public class QueryTools {
     public static String getWhere(String Field, ReferenceType rt, String[] ids, boolean addWhere) {
         return getWhere(Field, rt, ids, addWhere, false);
     }
-
 
     /* last param - flag if comparison by start of literal */
     public static String getWhereLike(String Field, String[] ids, boolean addWhere) {
@@ -1030,11 +1027,6 @@ abstract public class QueryTools {
         }
         return null;
     }
-    protected boolean printAlone = false; // should print records as they are extracted. Used for file output
-    private boolean limitQueryResults;
-    private int maxQueryLines;
-    protected PrintStreams ps = null;
-    private IQueryResults.ProgressNotifications progressCallback;
 
     public boolean isLimitQueryResults() {
         return limitQueryResults;

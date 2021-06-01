@@ -11,18 +11,17 @@ import java.io.FileOutputStream;
 import java.io.PrintStream;
 
 /**
- *
  * @author Stepan
  */
 class PrintStreamStorage extends PrintStreams {
 
     private final PrintStream ps;
-    private int MaxRecords;
     private final String FileName;
+    private final PrintStreams outer;
+    private int MaxRecords;
     private int linesPrinted = 0;
     private int recsPrinted = 0;
     private boolean addShort = false;
-    private final PrintStreams outer;
     private File file;
 
     PrintStreamStorage(PrintStream out, int MaxRecords, final PrintStreams outer) {

@@ -6,10 +6,10 @@
 package com.myutils.logbrowser.inquirer;
 
 import Utils.UTCTimeRange;
+
 import java.util.ArrayList;
 
 /**
- *
  * @author ssydoruk
  */
 class Wheres {
@@ -127,8 +127,8 @@ class Wheres {
 
     class Where {
 
-        private String st = null;
         String andOr = null;
+        private String st = null;
         private Wheres theWh = null;
 
         Where(String st, String andOr) {

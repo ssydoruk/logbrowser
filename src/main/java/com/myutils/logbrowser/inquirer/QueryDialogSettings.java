@@ -13,16 +13,15 @@ import java.util.Collections;
 import java.util.HashMap;
 
 /**
- *
  * @author ssydoruk
  */
 public class QueryDialogSettings implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-//        private ArrayList<IQueryResults> queries;
+    //        private ArrayList<IQueryResults> queries;
     private final HashMap<String, DynamicTree> qParams;
-//        private HashMap<String , DynamicTreeNode> qParams1;
+    //        private HashMap<String , DynamicTreeNode> qParams1;
 //
 //        public ArrayList<IQueryResults> getQueries() {
 //            return queries;
@@ -56,7 +55,7 @@ public class QueryDialogSettings implements Serializable {
 //        private void setQueries(QueryDialogSettings queryDialigSettings) {
 //        }
 
-//    ArrayList<DynamicTreeNode<OptionNode>> lst;
+    //    ArrayList<DynamicTreeNode<OptionNode>> lst;
     public void setQueries(ArrayList<IQueryResults> queries) {
 //            qParams1.clear();
 //            for (IQueryResults query : queries) {

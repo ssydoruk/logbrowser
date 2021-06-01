@@ -5,19 +5,31 @@
  */
 package com.myutils.logbrowser.inquirer;
 
-import java.io.Serializable;
 import org.apache.logging.log4j.LogManager;
 
+import java.io.Serializable;
+
 /**
- *
  * @author stepan_sydoruk
  */
 public class CustomField implements Serializable {
 
-    private String name;
-
+    private static final org.apache.logging.log4j.Logger logger = LogManager.getLogger();
     private final JSFieldSettings jsFieldSettings;
     private final RegexFieldSettings rxFieldSettings;
+    private String name;
+
+    public CustomField(String name, JSFieldSettings jsfs) {
+        this.name = name;
+        this.jsFieldSettings = jsfs;
+        rxFieldSettings = null;
+    }
+
+    public CustomField(String name, RegexFieldSettings rxfs) {
+        this.name = name;
+        this.rxFieldSettings = rxfs;
+        jsFieldSettings = null;
+    }
 
     public boolean isJSField() {
         return jsFieldSettings != null;
@@ -35,18 +47,6 @@ public class CustomField implements Serializable {
         return rxFieldSettings;
     }
 
-    public CustomField(String name, JSFieldSettings jsfs) {
-        this.name = name;
-        this.jsFieldSettings = jsfs;
-        rxFieldSettings = null;
-    }
-
-    public CustomField(String name, RegexFieldSettings rxfs) {
-        this.name = name;
-        this.rxFieldSettings = rxfs;
-        jsFieldSettings = null;
-    }
-
     public String getName() {
         return name;
     }
@@ -54,7 +54,6 @@ public class CustomField implements Serializable {
     public void setName(String n) {
         name = n;
     }
-    private static final org.apache.logging.log4j.Logger logger = LogManager.getLogger();
 
     @Override
     public String toString() {

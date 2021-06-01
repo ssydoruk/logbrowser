@@ -5,7 +5,8 @@
 package com.myutils.logbrowser.indexer;
 
 import Utils.Util;
-import static Utils.Util.intOrDef;
+import org.apache.commons.lang3.StringUtils;
+
 import java.io.IOException;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -15,37 +16,34 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.apache.commons.lang3.StringUtils;
+
+import static Utils.Util.intOrDef;
 
 /**
- *
  * @author ssydoruk
  */
 public class URShttpinterfaceParser extends WebParser {
 
     private static final org.apache.logging.log4j.Logger logger = Main.logger;
 
-    private static final Pattern regReqReceived = Pattern.compile("^\\[HTTP Server (\\w+)\\] Received (\\d+) bytes from client on socket (\\d+):");
-    private static final Pattern regRespSent = Pattern.compile("^\\[HTTP Server (\\w+)\\] Response");
+    private static final Matcher regReqReceived = Pattern.compile("^\\[HTTP Server (\\w+)\\] Received (\\d+) bytes from client on socket (\\d+):");
+    private static final Matcher regRespSent = Pattern.compile("^\\[HTTP Server (\\w+)\\] Response");
 
-    private static final Pattern regRequestToHandler = Pattern.compile("^\\[HTTP Handler Factory (\\w+)\\] Handler (\\w+) created");
-    private static final Pattern regRequestToURS = Pattern.compile("^\\[URS Proxy (?:\\w+)] Router API called. Ref (\\w+)");
-    private static final Pattern regResponseFromURS = Pattern.compile("^\\[HTTP Handler (\\w+)\\] Received event 2 from Router. Ref (\\d+)");
-    private final static Pattern HTTPHeaderFound = Pattern.compile("^((\\w[\\w_\\-\\.\\s]+:)|\\s+;|HTTP)");
-    private final static Pattern HTTPHeaderContinue = Pattern.compile("^\\s*(\\w.+)");
-    private final static Pattern HTTPRequestContinue = Pattern.compile("^\\[(HTTP Request|HTTP Server)");
-    private final static Pattern HTTPRequestHandler = Pattern.compile("^\\[HTTP Handler (?:(\\w+)\\] Created)?");
-    private final static Pattern HTTPResponseContinue = Pattern.compile("^\\[(HTTP Response|HTTP Server)");
-    private final static Pattern HTTPResponseHandler = Pattern.compile("^\\[HTTP (?:Handler|Request) (\\w+)\\] Destroyed");
+    private static final Matcher regRequestToHandler = Pattern.compile("^\\[HTTP Handler Factory (\\w+)\\] Handler (\\w+) created");
+    private static final Matcher regRequestToURS = Pattern.compile("^\\[URS Proxy (?:\\w+)] Router API called. Ref (\\w+)");
+    private static final Matcher regResponseFromURS = Pattern.compile("^\\[HTTP Handler (\\w+)\\] Received event 2 from Router. Ref (\\d+)");
+    private final static Matcher HTTPHeaderFound = Pattern.compile("^((\\w[\\w_\\-\\.\\s]+:)|\\s+;|HTTP)");
+    private final static Matcher HTTPHeaderContinue = Pattern.compile("^\\s*(\\w.+)");
+    private final static Matcher HTTPRequestContinue = Pattern.compile("^\\[(HTTP Request|HTTP Server)");
+    private final static Matcher HTTPRequestHandler = Pattern.compile("^\\[HTTP Handler (?:(\\w+)\\] Created)?");
+    private final static Matcher HTTPResponseContinue = Pattern.compile("^\\[(HTTP Response|HTTP Server)");
+    private final static Matcher HTTPResponseHandler = Pattern.compile("^\\[HTTP (?:Handler|Request) (\\w+)\\] Destroyed");
     //<editor-fold defaultstate="collapsed" desc="ursHTTPMsg">
-    private static final Pattern regHTTPURL = Pattern.compile("^(GET|HEAD|POST|PUT|DELETE|CONNECT|OPTIONS|TRACE|PATCH) (.+) HTTP/");
-    private static final Pattern regHTTPResp = Pattern.compile("^HTTP/.\\.. (.+)");
-    private static final Pattern regSIDCookie = Pattern.compile("ORSSESSIONID=([\\w~]+)");
-    private static final Pattern regHTTPMethod = Pattern.compile("^(\\w+)");
-    private static final Pattern regSessionID = Pattern.compile("session/([^\\/]+)");
-
-    private ParserState m_ParserState;
-
+    private static final Matcher regHTTPURL = Pattern.compile("^(GET|HEAD|POST|PUT|DELETE|CONNECT|OPTIONS|TRACE|PATCH) (.+) HTTP/");
+    private static final Matcher regHTTPResp = Pattern.compile("^HTTP/.\\.. (.+)");
+    private static final Matcher regSIDCookie = Pattern.compile("ORSSESSIONID=([\\w~]+)");
+    private static final Matcher regHTTPMethod = Pattern.compile("^(\\w+)");
+    private static final Matcher regSessionID = Pattern.compile("session/([^\\/]+)");
     /*	public OrsParser(DBAccessor accessor) {
      m_accessor = accessor;
      }
@@ -59,6 +57,9 @@ public class URShttpinterfaceParser extends WebParser {
      }
      */
     private final HashMap<String, String> ThreadAlias = new HashMap<>();
+    private final RequestHandler requestHandler = new RequestHandler();
+    private final HashMap<Integer, ursHTTPMsg> partHTTP = new HashMap<>();
+    private ParserState m_ParserState;
     private String URL = null;
     private String app = null;
     private String m_msg1;
@@ -70,8 +71,6 @@ public class URShttpinterfaceParser extends WebParser {
     private Integer m_ContentLength;
     private ursHTTPMsg ursHTTP;
     private int m_PacketLength;
-    private final RequestHandler requestHandler = new RequestHandler();
-    private final HashMap<Integer, ursHTTPMsg> partHTTP = new HashMap<>();
     private String thread; // current thread name as parsed fom the line
 
     URShttpinterfaceParser(HashMap<TableType, DBTable> m_tables) {
@@ -411,6 +410,18 @@ public class URShttpinterfaceParser extends WebParser {
         m_CurrentLine += ParseHTTP(buf);
     }
 
+    enum ParserState {
+        STATE_HEADER,
+        STATE_TMESSAGE_REQUEST,
+        STATE_COMMENT,
+        STATE_REQUEST_RECEIVED,
+        STATE_READ_INFO,
+        STATE_HTTP_HEADER,
+        STATE_HTTP_HEADER1,
+        STATE_HTTP_BODY, STATE_WAITING_HANDLER, STATE_RESPONSE_WAITING_HANDLER
+
+    }
+
     class RequestHandler extends HashMap<Long, Long> {
 
         private void store(Long httpReqID, Long handlerID) throws Exception {
@@ -433,18 +444,6 @@ public class URShttpinterfaceParser extends WebParser {
             }
             return null;
         }
-
-    }
-
-    enum ParserState {
-        STATE_HEADER,
-        STATE_TMESSAGE_REQUEST,
-        STATE_COMMENT,
-        STATE_REQUEST_RECEIVED,
-        STATE_READ_INFO,
-        STATE_HTTP_HEADER,
-        STATE_HTTP_HEADER1,
-        STATE_HTTP_BODY, STATE_WAITING_HANDLER, STATE_RESPONSE_WAITING_HANDLER
 
     }
 
@@ -474,16 +473,16 @@ public class URShttpinterfaceParser extends WebParser {
             return socket;
         }
 
+        void setSocket(int socket) {
+            this.socket = socket;
+        }
+
         int getHTTPBytes() {
             return bytes;
         }
 
         void setHTTPServerID(String ip) {
             this.reqID = Util.intOrDef(ip, null, 16);
-        }
-
-        void setSocket(int socket) {
-            this.socket = socket;
         }
 
         void setBytes(int bytes) {
@@ -631,16 +630,16 @@ public class URShttpinterfaceParser extends WebParser {
 
         }
 
+        Long getHTTPResponseID() {
+            return intOrDef(httpResponseID, null, 16);
+        }
+
         void setHTTPResponseID(String group) {
             if (group != null && group.substring(0, 2).equalsIgnoreCase("0x")) {
                 httpResponseID = group.substring(2);
             } else {
                 httpResponseID = group;
             }
-        }
-
-        Long getHTTPResponseID() {
-            return intOrDef(httpResponseID, null, 16);
         }
 
         private void setHTTPHandlerID(String hexHandlerID) {
@@ -718,7 +717,6 @@ public class URShttpinterfaceParser extends WebParser {
         }
 
         /**
-         *
          * @throws Exception
          */
         @Override
@@ -757,7 +755,7 @@ public class URShttpinterfaceParser extends WebParser {
     }
 //</editor-fold>
 
-//<editor-fold defaultstate="collapsed" desc="comment">
+    //<editor-fold defaultstate="collapsed" desc="comment">
     private class HTTPtoURS extends Message {
 
         private final Long ursRefID;
@@ -823,7 +821,6 @@ public class URShttpinterfaceParser extends WebParser {
         }
 
         /**
-         *
          * @throws Exception
          */
         @Override

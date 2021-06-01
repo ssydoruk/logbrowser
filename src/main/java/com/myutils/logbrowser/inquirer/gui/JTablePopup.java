@@ -9,29 +9,24 @@ import Utils.Pair;
 import Utils.ScreenInfo;
 import com.myutils.logbrowser.inquirer.EditRegexFields;
 import com.myutils.logbrowser.inquirer.EnterRegexDialog;
-import static com.myutils.logbrowser.inquirer.EnterRegexDialog.RET_OK;
 import com.myutils.logbrowser.inquirer.gui.TabResultDataModel.TableRow;
 import com.myutils.logbrowser.inquirer.inquirer;
-import java.awt.Point;
-import java.awt.Rectangle;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import javax.swing.*;
+import javax.swing.table.TableModel;
+import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.regex.Pattern;
-import javax.swing.JOptionPane;
+
+import static com.myutils.logbrowser.inquirer.EnterRegexDialog.RET_OK;
 import static javax.swing.JOptionPane.INFORMATION_MESSAGE;
-import javax.swing.JPopupMenu;
-import javax.swing.JTable;
-import javax.swing.JViewport;
-import javax.swing.ListSelectionModel;
-import javax.swing.SwingUtilities;
-import javax.swing.table.TableModel;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 /**
- *
  * @author ssydoruk
  */
 public abstract class JTablePopup extends JTable {
@@ -70,12 +65,12 @@ public abstract class JTablePopup extends JTable {
         this.popupRow = popupRow;
     }
 
-    public void setPopupCol(int popupCol) {
-        this.popupCol = popupCol;
-    }
-
     public int getPopupCol() {
         return popupCol;
+    }
+
+    public void setPopupCol(int popupCol) {
+        this.popupCol = popupCol;
     }
 
     void copyAll() {
@@ -175,7 +170,7 @@ public abstract class JTablePopup extends JTable {
                         TableModel model = tab.getModel();
                         if (model instanceof TabResultDataModel) {
 
-                            inquirer.logger.debug("changed selection to " + popupPoint.toString() + " r:" + row + " c:" + col
+                            inquirer.logger.debug("changed selection to " + popupPoint + " r:" + row + " c:" + col
                                     + " rowSelected?" + tab.isRowSelected(row) + " selC: " + model.getValueAt(tab.convertRowIndexToModel(row), tab.convertColumnIndexToModel(col))
                                     + "\n\tdata1:" + ((TabResultDataModel) model).getRow(tab.convertRowIndexToModel(row))
                             );
@@ -250,7 +245,7 @@ public abstract class JTablePopup extends JTable {
         return null;
     }
 
-//    protected EditRegexFields editRegexFields(MsgType t) throws IOException {
+    //    protected EditRegexFields editRegexFields(MsgType t) throws IOException {
 //        return editRegexFields(t, null);
 //
 //    }

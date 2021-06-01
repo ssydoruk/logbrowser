@@ -9,7 +9,6 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 
 /**
- *
  * @author ssydoruk
  */
 public class ExceptionTable extends DBTable {
@@ -46,7 +45,6 @@ public class ExceptionTable extends DBTable {
     }
 
     /**
-     *
      * @throws Exception
      */
     @Override

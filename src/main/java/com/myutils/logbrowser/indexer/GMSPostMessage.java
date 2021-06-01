@@ -5,22 +5,20 @@
 package com.myutils.logbrowser.indexer;
 
 import Utils.Pair;
-import java.util.*;
+
+import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- *
  * @author terry The class Replicates TLibMessage
  */
 public class GMSPostMessage extends Message {
 
     final private static Pattern regService = Pattern.compile("/service/callback/([^,\\s]+)");
     final private static Pattern regPOSTMessage = Pattern.compile("^\\(POST\\) Client IP Address: ([0-9\\.]+),.+(http[^,]+)");
-
-    String m_MessageName;
-
     private final boolean isTServerReq = false;
+    String m_MessageName;
     private String clientIP;
     private boolean POSTParsed = false;
     private Pair<String, String> parseORSURI = null;

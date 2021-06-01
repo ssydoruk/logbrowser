@@ -5,27 +5,25 @@ import com.myutils.logbrowser.indexer.FileInfoType;
 import com.myutils.logbrowser.indexer.ReferenceType;
 import com.myutils.logbrowser.indexer.TableType;
 import com.myutils.logbrowser.inquirer.IQuery.FieldType;
-import static com.myutils.logbrowser.inquirer.QueryTools.FindNode;
+import org.apache.logging.log4j.LogManager;
+
+import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import javax.swing.JOptionPane;
-import org.apache.logging.log4j.LogManager;
 
 public class StatServerResults extends IQueryResults {
-
-    private static final org.apache.logging.log4j.Logger logger = LogManager.getLogger();
 
     public static final int TLIB = 0x01;
     public static final int ISCC = 0x02;
     public static final int TC = 0x04;
     public static final int SIP = 0x08;
     public static final int PROXY = 0x10;
-
+    private static final org.apache.logging.log4j.Logger logger = LogManager.getLogger();
+    IDsFinder cidFinder = null;
     private int m_componentFilter;
     private ArrayList<NameID> appType = null;
-    IDsFinder cidFinder = null;
 
     public StatServerResults(QueryDialogSettings qdSettings) throws SQLException {
         super(qdSettings);
@@ -156,7 +154,7 @@ public class StatServerResults extends IQueryResults {
         try {
             addCustom(rootA, FileInfoType.type_StatServer);
         } catch (SQLException ex) {
-            logger.error("fatal: ",  ex);
+            logger.error("fatal: ", ex);
         }
         addConfigUpdates(rootA);
         rootA.addLogMessagesReportType(TableType.MsgStatServer);

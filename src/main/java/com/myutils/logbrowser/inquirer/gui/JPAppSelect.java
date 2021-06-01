@@ -8,25 +8,25 @@ package com.myutils.logbrowser.inquirer.gui;
 import com.myutils.logbrowser.indexer.FileInfoType;
 import com.myutils.logbrowser.inquirer.IQueryResults;
 import com.myutils.logbrowser.inquirer.NameID;
+
+import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemListener;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import javax.swing.DefaultComboBoxModel;
 
 /**
- *
  * @author ssydoruk
  */
 public class JPAppSelect extends javax.swing.JPanel {
 
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JComboBox<String> jcbApps;
+
     public JPAppSelect(FileInfoType fileInfoType) throws Exception {
         this();
-    }
-
-    public void addActionListener(ActionListener l) {
-        jcbApps.addActionListener(l);
     }
 
     /**
@@ -35,6 +35,10 @@ public class JPAppSelect extends javax.swing.JPanel {
     public JPAppSelect() {
         initComponents();
 
+    }
+
+    public void addActionListener(ActionListener l) {
+        jcbApps.addActionListener(l);
     }
 
     public void loadApps() throws SQLException {
@@ -61,22 +65,22 @@ public class JPAppSelect extends javax.swing.JPanel {
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jLabel1)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jcbApps, javax.swing.GroupLayout.PREFERRED_SIZE, 216, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(21, Short.MAX_VALUE))
+                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(jLabel1)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jcbApps, javax.swing.GroupLayout.PREFERRED_SIZE, 216, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addContainerGap(21, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel1)
-                    .addComponent(jcbApps, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(jLabel1)
+                                        .addComponent(jcbApps, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -87,10 +91,6 @@ public class JPAppSelect extends javax.swing.JPanel {
     public void actionPerformed(ActionEvent e) {
         jcbApps.actionPerformed(e);
     }
-
-    // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JComboBox<String> jcbApps;
     // End of variables declaration//GEN-END:variables
 
     public int getAppID() {

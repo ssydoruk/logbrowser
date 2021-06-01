@@ -9,24 +9,19 @@ import com.jidesoft.swing.CheckBoxListSelectionModel;
 import com.jidesoft.swing.SearchableUtils;
 import com.myutils.logbrowser.indexer.FileInfoType;
 import com.myutils.logbrowser.indexer.ReferenceType;
-import java.awt.BorderLayout;
+
+import javax.swing.*;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.util.ArrayList;
 import java.util.List;
-import javax.swing.ButtonGroup;
-import javax.swing.DefaultListModel;
-import javax.swing.JPanel;
-import javax.swing.JRadioButton;
-import javax.swing.JScrollPane;
-import javax.swing.ListSelectionModel;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 
 /**
- *
  * @author ssydoruk
  */
 public class TLibSIPRetransmitsConfig extends javax.swing.JPanel {
@@ -35,17 +30,24 @@ public class TLibSIPRetransmitsConfig extends javax.swing.JPanel {
     private final MyCheckBoxList cblAttr;
     private final DefaultListModel lmAttrValues;
     private final MyCheckBoxList cblAttrValues;
-
+    private final ButtonGroup group = new ButtonGroup();
     /**
      * Creates new form TLibDelaysConfig
      */
     private DynamicTreeNode<OptionNode> root = null;
     private MyCheckBoxList clbOrderBy;
-
-    public DynamicTreeNode<OptionNode> getAttrRoot() {
-        return root;
-    }
-
+    private FileInfoType ft = FileInfoType.type_Unknown;
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel3;
+    private javax.swing.JButton jbDown;
+    private javax.swing.JButton jbUp;
+    private javax.swing.JPanel jpAttrValues;
+    private javax.swing.JPanel jpComponents;
+    private javax.swing.JPanel jpOrderBy;
     public TLibSIPRetransmitsConfig() {
         initComponents();
         jpComponents.setLayout(new BorderLayout());
@@ -74,37 +76,16 @@ public class TLibSIPRetransmitsConfig extends javax.swing.JPanel {
 
     }
 
+    public DynamicTreeNode<OptionNode> getAttrRoot() {
+        return root;
+    }
+
     private void FillElements(DefaultListModel lm, DynamicTreeNode<OptionNode> parent, boolean isChecked) {
         List<DynamicTreeNode<OptionNode>> l = parent.getChildren();
         for (DynamicTreeNode<OptionNode> node : parent.getChildren()) {
 //            node.getData().setChecked(isChecked);
             lm.addElement(node);
         }
-    }
-
-    class OrderField {
-
-        private final String fieldName;
-        private final String displayName;
-
-        public OrderField(String fieldName, String displayName) {
-            this.fieldName = fieldName;
-            this.displayName = displayName;
-        }
-
-        public String getFieldName() {
-            return fieldName;
-        }
-
-        public String getDisplayName() {
-            return displayName;
-        }
-
-        @Override
-        public String toString() {
-            return displayName;
-        }
-
     }
 
     public String[] getOrderBy() {
@@ -173,54 +154,6 @@ public class TLibSIPRetransmitsConfig extends javax.swing.JPanel {
         }
     }
 
-    class myListCheckListener implements ListSelectionListener {
-
-        private final MyCheckBoxList list;
-        private final MyCheckBoxList listChild;
-
-        public myListCheckListener(MyCheckBoxList list, MyCheckBoxList listChild) {
-            this.list = list;
-            this.listChild = listChild;
-        }
-
-        @Override
-        public void valueChanged(ListSelectionEvent e) {
-            ReportItemChecked(e, list, listChild);
-        }
-
-    }
-
-    class myListSelectionListener implements ListSelectionListener {
-
-        private final MyCheckBoxList list;
-        private final MyCheckBoxList listChild;
-
-        public myListSelectionListener(MyCheckBoxList list, MyCheckBoxList listChild) {
-            this.list = list;
-            this.listChild = listChild;
-        }
-
-        @Override
-        public void valueChanged(ListSelectionEvent e) {
-            ReportItemChanged(e, list, listChild);
-        }
-
-    }
-
-    class myFocusListener implements FocusListener {
-
-        @Override
-        public void focusGained(FocusEvent e) {
-            inquirer.logger.debug("focusGained", e);
-        }
-
-        @Override
-        public void focusLost(FocusEvent e) {
-            inquirer.logger.debug("focusLost", e);
-        }
-
-    }
-
     private void InitCB(MyCheckBoxList list, MyCheckBoxList clbChild, JPanel rptType, int i) {
 
         rptType.add(new JScrollPane(list));
@@ -233,9 +166,6 @@ public class TLibSIPRetransmitsConfig extends javax.swing.JPanel {
         list.addFocusListener(new myFocusListener());
 
     }
-
-    private final ButtonGroup group = new ButtonGroup();
-    private FileInfoType ft = FileInfoType.type_Unknown;
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -265,12 +195,12 @@ public class TLibSIPRetransmitsConfig extends javax.swing.JPanel {
         javax.swing.GroupLayout jpComponentsLayout = new javax.swing.GroupLayout(jpComponents);
         jpComponents.setLayout(jpComponentsLayout);
         jpComponentsLayout.setHorizontalGroup(
-            jpComponentsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 0, Short.MAX_VALUE)
+                jpComponentsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGap(0, 0, Short.MAX_VALUE)
         );
         jpComponentsLayout.setVerticalGroup(
-            jpComponentsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 112, Short.MAX_VALUE)
+                jpComponentsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGap(0, 112, Short.MAX_VALUE)
         );
 
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder("Order by"));
@@ -278,12 +208,12 @@ public class TLibSIPRetransmitsConfig extends javax.swing.JPanel {
         javax.swing.GroupLayout jpOrderByLayout = new javax.swing.GroupLayout(jpOrderBy);
         jpOrderBy.setLayout(jpOrderByLayout);
         jpOrderByLayout.setHorizontalGroup(
-            jpOrderByLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 284, Short.MAX_VALUE)
+                jpOrderByLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGap(0, 284, Short.MAX_VALUE)
         );
         jpOrderByLayout.setVerticalGroup(
-            jpOrderByLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 0, Short.MAX_VALUE)
+                jpOrderByLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGap(0, 0, Short.MAX_VALUE)
         );
 
         jbUp.setText("Up");
@@ -293,45 +223,45 @@ public class TLibSIPRetransmitsConfig extends javax.swing.JPanel {
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
-            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel3Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jbDown, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jbUp, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(jPanel3Layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                        .addComponent(jbDown, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addComponent(jbUp, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel3Layout.setVerticalGroup(
-            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel3Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jbUp)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jbDown)
-                .addContainerGap(144, Short.MAX_VALUE))
+                jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(jPanel3Layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(jbUp)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(jbDown)
+                                .addContainerGap(144, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jpOrderBy, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGap(18, 18, 18)
-                .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
+                jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(jpOrderBy, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addGap(18, 18, 18)
+                                .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 29, Short.MAX_VALUE))
-                    .addComponent(jpOrderBy, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap())
+                jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addGroup(jPanel1Layout.createSequentialGroup()
+                                                .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addGap(0, 29, Short.MAX_VALUE))
+                                        .addComponent(jpOrderBy, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                .addContainerGap())
         );
 
         jLabel2.setText("Attribute value");
@@ -343,61 +273,48 @@ public class TLibSIPRetransmitsConfig extends javax.swing.JPanel {
         javax.swing.GroupLayout jpAttrValuesLayout = new javax.swing.GroupLayout(jpAttrValues);
         jpAttrValues.setLayout(jpAttrValuesLayout);
         jpAttrValuesLayout.setHorizontalGroup(
-            jpAttrValuesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 389, Short.MAX_VALUE)
+                jpAttrValuesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGap(0, 389, Short.MAX_VALUE)
         );
         jpAttrValuesLayout.setVerticalGroup(
-            jpAttrValuesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 133, Short.MAX_VALUE)
+                jpAttrValuesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGap(0, 133, Short.MAX_VALUE)
         );
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel2Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jpComponents, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 211, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel2)
-                    .addComponent(jpAttrValues, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
+                jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(jPanel2Layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                        .addComponent(jpComponents, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 211, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(jLabel2)
+                                        .addComponent(jpAttrValues, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addGap(18, 18, 18)
+                                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addContainerGap())
         );
         jPanel2Layout.setVerticalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel2Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jLabel1)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addComponent(jpComponents, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jLabel2)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jpAttrValues, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap())
+                jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(jPanel2Layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(jLabel1)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                        .addGroup(jPanel2Layout.createSequentialGroup()
+                                                .addComponent(jpComponents, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                                .addComponent(jLabel2)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                                .addComponent(jpAttrValues, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                        .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addContainerGap())
         );
 
         add(jPanel2, java.awt.BorderLayout.CENTER);
     }// </editor-fold>//GEN-END:initComponents
-
-    // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel2;
-    private javax.swing.JPanel jPanel3;
-    private javax.swing.JButton jbDown;
-    private javax.swing.JButton jbUp;
-    private javax.swing.JPanel jpAttrValues;
-    private javax.swing.JPanel jpComponents;
-    private javax.swing.JPanel jpOrderBy;
-    // End of variables declaration//GEN-END:variables
 
     private void addRadioButton(String btTitle, final FileInfoType fileInfoType) {
         JRadioButton btn = new JRadioButton(btTitle);
@@ -489,6 +406,7 @@ public class TLibSIPRetransmitsConfig extends javax.swing.JPanel {
 //        lChild.revalidate();
 //        lChild.repaint();
     }
+    // End of variables declaration//GEN-END:variables
 
     private void setChildChecked(MyCheckBoxList lChild, boolean boxEnabled) {
         inquirer.logger.debug("in setChildChecked " + boxEnabled);
@@ -554,7 +472,7 @@ public class TLibSIPRetransmitsConfig extends javax.swing.JPanel {
 //
 ////                    if( i>=minIndex && i<=maxIndex )
 ////                        node.getData().setChecked(true);
-////                    else 
+////                    else
 ////                        node.getData().setChecked(false);
 //                }
 //
@@ -572,6 +490,79 @@ public class TLibSIPRetransmitsConfig extends javax.swing.JPanel {
 ////                    (DynamicTreeNode<OptionNode>) lm.get(i)
 //                }
             }
+        }
+
+    }
+
+    class OrderField {
+
+        private final String fieldName;
+        private final String displayName;
+
+        public OrderField(String fieldName, String displayName) {
+            this.fieldName = fieldName;
+            this.displayName = displayName;
+        }
+
+        public String getFieldName() {
+            return fieldName;
+        }
+
+        public String getDisplayName() {
+            return displayName;
+        }
+
+        @Override
+        public String toString() {
+            return displayName;
+        }
+
+    }
+
+    class myListCheckListener implements ListSelectionListener {
+
+        private final MyCheckBoxList list;
+        private final MyCheckBoxList listChild;
+
+        public myListCheckListener(MyCheckBoxList list, MyCheckBoxList listChild) {
+            this.list = list;
+            this.listChild = listChild;
+        }
+
+        @Override
+        public void valueChanged(ListSelectionEvent e) {
+            ReportItemChecked(e, list, listChild);
+        }
+
+    }
+
+    class myListSelectionListener implements ListSelectionListener {
+
+        private final MyCheckBoxList list;
+        private final MyCheckBoxList listChild;
+
+        public myListSelectionListener(MyCheckBoxList list, MyCheckBoxList listChild) {
+            this.list = list;
+            this.listChild = listChild;
+        }
+
+        @Override
+        public void valueChanged(ListSelectionEvent e) {
+            ReportItemChanged(e, list, listChild);
+        }
+
+    }
+
+    class myFocusListener implements FocusListener {
+
+        @Override
+        public void focusGained(FocusEvent e) {
+            inquirer.logger.debug("focusGained", e);
+        }
+
+        @Override
+        public void focusLost(FocusEvent e) {
+            inquirer.logger.debug("focusLost", e);
         }
 
     }

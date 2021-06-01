@@ -9,19 +9,19 @@ import Utils.UTCTimeRange;
 import com.myutils.logbrowser.indexer.FileInfoType;
 import com.myutils.logbrowser.indexer.ReferenceType;
 import com.myutils.logbrowser.indexer.TableType;
-import static com.myutils.logbrowser.inquirer.DatabaseConnector.CampaignDBIDtoName;
-import static com.myutils.logbrowser.inquirer.DatabaseConnector.GroupDBIDtoName;
 import com.myutils.logbrowser.inquirer.IQuery.FieldType;
-import static com.myutils.logbrowser.inquirer.IQueryResults.addUnique;
+
+import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashSet;
-import javax.swing.JOptionPane;
+
+import static com.myutils.logbrowser.inquirer.DatabaseConnector.CampaignDBIDtoName;
+import static com.myutils.logbrowser.inquirer.DatabaseConnector.GroupDBIDtoName;
 
 /**
- *
  * @author ssydoruk
  */
 enum OutbRequestType {
@@ -33,10 +33,9 @@ enum OutbRequestType {
 
 final class OutboundResults extends IQueryResults {
 
-    private ArrayList<NameID> appType = null;
-
-    private UTCTimeRange timeRange = null;
     IDsFinder cidFinder;
+    private ArrayList<NameID> appType = null;
+    private UTCTimeRange timeRange = null;
 
     //    private DynamicTreeNode<OptionNode> repComponents=new DynamicTreeNode<OptionNode>();
     OutboundResults() throws SQLException {
@@ -76,7 +75,7 @@ final class OutboundResults extends IQueryResults {
         }
     }
 
-//    private void GeneralRequest() throws SQLException {
+    //    private void GeneralRequest() throws SQLException {
 //        // report on all running campaigns
 //        TableQuery OCSCG = new TableQuery(MsgType.OCSCG, "ocscg_logbr");
 //        OCSCG.addRef("cgnameID", "cgname", ReferenceType.OCSCG.toString(), FieldType.Optional);
@@ -319,7 +318,7 @@ final class OutboundResults extends IQueryResults {
                     return 0;
 
                 default:
-                    throw new SQLException(this.toString() + ": more than one CGDBID returned: " + ids.length + "[" + cg + "]");
+                    throw new SQLException(this + ": more than one CGDBID returned: " + ids.length + "[" + cg + "]");
             }
         } else {
             return 0;
@@ -410,7 +409,7 @@ final class OutboundResults extends IQueryResults {
         getRecords(OCSUEvents);
     }
 
-//    private void UserEventsByConnIDs(Integer[] ids, SearchIDs oIDs) throws SQLException {
+    //    private void UserEventsByConnIDs(Integer[] ids, SearchIDs oIDs) throws SQLException {
 //        Integer[] DNID = DatabaseConnector.getDatabaseConnector(this).getIDs(this, "ocs_logbr", "thisDNID", getWhere("ConnectionIDID", ids, true));
 //        if (DNID.length > 0) {
 //            UserEventsByDN(DNID, oIDs);
@@ -1289,7 +1288,7 @@ final class OutboundResults extends IQueryResults {
     @Override
     public String getReportSummary() {
         return ("Outbound\n\t" + ((cidFinder != null)
-                ? "search: " + cidFinder.toString()
+                ? "search: " + cidFinder
                 : "[no filter]"));
     }
 

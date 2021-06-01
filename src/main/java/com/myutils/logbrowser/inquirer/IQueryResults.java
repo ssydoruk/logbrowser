@@ -4,32 +4,26 @@ import Utils.Pair;
 import Utils.UTCTimeRange;
 import com.myutils.logbrowser.indexer.FileInfoType;
 import com.myutils.logbrowser.indexer.Parser;
-import static com.myutils.logbrowser.indexer.Parser.MAX_CUSTOM_FIELDS;
 import com.myutils.logbrowser.indexer.ReferenceType;
 import com.myutils.logbrowser.indexer.TableType;
 import com.myutils.logbrowser.inquirer.DynamicTreeNode.ILoadChildrenProc;
 import com.myutils.logbrowser.inquirer.IQuery.FieldType;
 import com.myutils.logbrowser.inquirer.OutputSpecFormatter.Parameter;
-import static com.myutils.logbrowser.inquirer.QueryTools.FindNode;
 import com.myutils.mygenerictree.GenericTree;
-import java.awt.Toolkit;
+
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeListener;
 import java.io.PrintStream;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import javax.swing.JTextArea;
-import javax.swing.ProgressMonitor;
-import javax.swing.SwingWorker;
+
+import static com.myutils.logbrowser.indexer.Parser.MAX_CUSTOM_FIELDS;
 import static org.sqlite.SQLiteErrorCode.SQLITE_INTERRUPT;
 
 /**
@@ -41,11 +35,51 @@ public abstract class IQueryResults extends QueryTools
         implements ActionListener,
         PropertyChangeListener {
 
+    public final static String KEY_ID_FIELD = "keyid";
     private static final org.apache.logging.log4j.Logger logger = inquirer.logger;
     final private static Pattern regFileName = Pattern.compile("([^\\\\/]+)$");
     private static final String FILENO = "fileno";
     private static final String APPSTARTTIME = "app_starttime";
-    public final static String KEY_ID_FIELD = "keyid";
+    protected String m_startTime;
+    protected String m_endTime;
+    protected ArrayList m_results = new ArrayList();
+    protected ArrayList<ILogRecordFormatter> m_formatters = new ArrayList();
+    protected DynamicTree<OptionNode> repComponents;
+    protected ArrayList<SelectionType> selectionTypes = new ArrayList<>();
+    protected ArrayList<Pair<String, Integer>> getAllResults = new ArrayList<>();
+    PrintStream os = null;
+    AggregatesPanel aggregateParams = null;
+    //</editor-fold>
+    CustomStorage cs;
+    HashMap<MsgType, ArrayList<OutputSpecFormatter.Parameter>> addOutParams = new HashMap<>();
+    private int objectsFound;
+    private ArrayList<IAggregateQuery> reportAggregates = null;
+    private DynamicTreeNode<OptionNode> savedRoot;
+    private ProgressMonitor progressMonitor;
+    private JTextArea taskOutput;
+    private Task task;
+    private boolean suppressConfirms = true;
+    //    public void getGenesysMessages(TableType t, UTCTimeRange timeRange) throws SQLException {
+//        getGenesysMessages(t, null, timeRange, null);
+//    }
+//    public void getGenesysMessages(TableType t) throws SQLException {
+//        getGenesysMessages(t, null, null, null);
+//    }
+    public IQueryResults(QueryDialogSettings qdSettings) {
+        this();
+        if (qdSettings != null) {
+            DynamicTree tree = qdSettings.getQParams(this.getClass().getName());
+            if (tree != null) {
+                DynamicTreeNode<OptionNode> rootA = tree.getRoot();
+                if (rootA != null) {
+                    repComponents.setRoot(rootA);
+                }
+            }
+        }
+    }
+    public IQueryResults() {
+        repComponents = new DynamicTree<>();
+    }
 
     public static ArrayList<NameID> getAllApps(Object owner, FileInfoType fileInfoType) throws SQLException {
         if (fileInfoType == null) {
@@ -53,7 +87,7 @@ public abstract class IQueryResults extends QueryTools
         } else {
             return getRefNameIDs(owner, ReferenceType.App, "id in (select distinct appnameid from file_logbr"
                     + " where apptypeid = (select id from "
-                    + ReferenceType.AppType.toString() + " where name =\""
+                    + ReferenceType.AppType + " where name =\""
                     + FileInfoType.getFileType(fileInfoType) + "\"))", true);
         }
     }
@@ -88,51 +122,12 @@ public abstract class IQueryResults extends QueryTools
         }
     }
 
-    protected String m_startTime;
-    protected String m_endTime;
-    protected ArrayList m_results = new ArrayList();
-    protected ArrayList<ILogRecordFormatter> m_formatters = new ArrayList();
-    PrintStream os = null;
-    private int objectsFound;
-    private ArrayList<IAggregateQuery> reportAggregates = null;
-    AggregatesPanel aggregateParams = null;
-    protected DynamicTree<OptionNode> repComponents;
-    private DynamicTreeNode<OptionNode> savedRoot;
-    protected ArrayList<SelectionType> selectionTypes = new ArrayList<>();
-    private ProgressMonitor progressMonitor;
-    private JTextArea taskOutput;
-    private Task task;
-    private boolean suppressConfirms = true;
-    protected ArrayList<Pair<String, Integer>> getAllResults = new ArrayList<>();
-    //</editor-fold>
-    CustomStorage cs;
-    HashMap<MsgType, ArrayList<OutputSpecFormatter.Parameter>> addOutParams = new HashMap<>();
-
-    //    public void getGenesysMessages(TableType t, UTCTimeRange timeRange) throws SQLException {
-//        getGenesysMessages(t, null, timeRange, null);
-//    }
-//    public void getGenesysMessages(TableType t) throws SQLException {
-//        getGenesysMessages(t, null, null, null);
-//    }
-    public IQueryResults(QueryDialogSettings qdSettings) {
-        this();
-        if (qdSettings != null) {
-            DynamicTree tree = qdSettings.getQParams(this.getClass().getName());
-            if (tree != null) {
-                DynamicTreeNode<OptionNode> rootA = tree.getRoot();
-                if (rootA != null) {
-                    repComponents.setRoot(rootA);
-                }
-            }
-        }
-    }
-
-    public IQueryResults() {
-        repComponents = new DynamicTree<>();
-    }
-
     public int getObjectsFound() {
         return objectsFound;
+    }
+
+    public void setObjectsFound(int objectsFound) {
+        this.objectsFound = objectsFound;
     }
 
     protected DynamicTreeNode<Object> getNode(DialogItem dialogItem, String tabName) throws SQLException {
@@ -193,8 +188,8 @@ public abstract class IQueryResults extends QueryTools
 //                ret.append("))");
                 return getRefNameIDs(this, ReferenceType.App,
                         "id in (select distinct appnameid from file_logbr\nwhere id in ("
-                        + ret.toString()
-                        + "))"
+                                + ret
+                                + "))"
                 );
             }
         }
@@ -206,7 +201,7 @@ public abstract class IQueryResults extends QueryTools
     public ArrayList<NameID> getAppsType(FileInfoType fileInfoType) throws SQLException {
         return getRefNameIDs(this, ReferenceType.App, "id in (select distinct appnameid from file_logbr"
                 + " where apptypeid = (select id from "
-                + ReferenceType.AppType.toString() + " where name =\""
+                + ReferenceType.AppType + " where name =\""
                 + FileInfoType.getFileType(fileInfoType) + "\"))", true);
     }
 
@@ -309,8 +304,8 @@ public abstract class IQueryResults extends QueryTools
         int cnt = 0;
         try {
             for (ILogRecord record = query.GetNext();
-                    record != null;
-                    record = query.GetNext()) {
+                 record != null;
+                 record = query.GetNext()) {
                 if (Thread.currentThread().isInterrupted()) {
                     throw new RuntimeInterruptException();
                 }
@@ -347,8 +342,8 @@ public abstract class IQueryResults extends QueryTools
         query.Execute();
 
         for (ILogRecord record = query.GetNext();
-                record != null;
-                record = query.GetNext()) {
+             record != null;
+             record = query.GetNext()) {
             long id = record.getID();
             if (ids.containsKey(id)) {
                 continue;
@@ -392,7 +387,7 @@ public abstract class IQueryResults extends QueryTools
         selectionTypes.add(id);
     }
 
-//    public abstract 
+    //    public abstract
     private void ShowProgressDlg() {
         //Schedule a job for the event-dispatching thread:
         //creating and showing this application's GUI.
@@ -402,10 +397,6 @@ public abstract class IQueryResults extends QueryTools
                 createAndShowGUI();
             }
         });
-    }
-
-    public void setObjectsFound(int objectsFound) {
-        this.objectsFound = objectsFound;
     }
 
     public abstract void Retrieve(QueryDialog dlg) throws SQLException;
@@ -589,7 +580,7 @@ public abstract class IQueryResults extends QueryTools
 
     }
 
-//    public void getConfigMessages(ArrayList<Integer> searchApps, DynamicTreeNode<OptionNode> root) throws Exception {
+    //    public void getConfigMessages(ArrayList<Integer> searchApps, DynamicTreeNode<OptionNode> root) throws Exception {
 //        getConfigMessages(searchApps, root, null);
 //
 //    }
@@ -631,12 +622,12 @@ public abstract class IQueryResults extends QueryTools
         }
     }
 
-//    public void getGenesysMessages(TableType tableType, DynamicTreeNode<OptionNode> root) throws Exception {
+    //    public void getGenesysMessages(TableType tableType, DynamicTreeNode<OptionNode> root) throws Exception {
 //        getGenesysMessages(tableType, root, null, null);
 //    }
     public void getGenesysMessagesApp(TableType tableType,
-            DynamicTreeNode<OptionNode> root,
-            QueryDialog dlg, IQueryResults qry) throws SQLException {
+                                      DynamicTreeNode<OptionNode> root,
+                                      QueryDialog dlg, IQueryResults qry) throws SQLException {
         boolean shouldRunQuery;
         DynamicTreeNode<OptionNode> logMsgType;
         if (root != null) {
@@ -664,11 +655,11 @@ public abstract class IQueryResults extends QueryTools
         }
     }
 
-//    private void getGenesysMessages(TableType tableType, DynamicTreeNode<OptionNode> root, QueryDialog dlg, IQueryResults qry) {
+    //    private void getGenesysMessages(TableType tableType, DynamicTreeNode<OptionNode> root, QueryDialog dlg, IQueryResults qry) {
 //        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
 //    }
     public void getGenesysMessages(TableType tableType, DynamicTreeNode<OptionNode> root,
-            QueryDialog dlg, IQueryResults qry) throws SQLException {
+                                   QueryDialog dlg, IQueryResults qry) throws SQLException {
         if (root != null) {
             getGenesysMessagesApp(tableType, getChildByName(root, DialogItem.APP_LOG_MESSAGES), dlg, qry);
         }
@@ -747,7 +738,7 @@ public abstract class IQueryResults extends QueryTools
                     CustomStorage.CustomComponent customItem = item.getValue();
                     DynamicTreeNode<OptionNode> key = new DynamicTreeNode<>(
                             new CustomOptionNode(true, customItem, customItem.getName())
-                    //                            new CustomOptionNode(true, customItem.getFieldName(), customItem.getId(), item.getKey())
+                            //                            new CustomOptionNode(true, customItem.getFieldName(), customItem.getId(), item.getKey())
                     );
                     nd.addChild(key);
                     ILoadChildrenProc keyLoadProc = new ILoadChildrenProc() {
@@ -848,7 +839,7 @@ public abstract class IQueryResults extends QueryTools
     }
 
     protected void getCustom(FileInfoType ft, QueryDialog dlg, DynamicTreeNode<OptionNode> reportSettings, IDsFinder cidFinder,
-            HashSet handlerIDs) throws SQLException {
+                             HashSet handlerIDs) throws SQLException {
 
         if (!DatabaseConnector.TableExist(Parser.getCustomTab(ft))) {
             return;
@@ -1080,11 +1071,11 @@ public abstract class IQueryResults extends QueryTools
         class CustomComponent {
 
             private final Integer id;
+            // keyfield1->val1,val2,val3,...
+            private final HashMap<String, KeyValues> keyValues;
             //            private String value;
             private String name;
             private String fieldName = null;
-            // keyfield1->val1,val2,val3,...
-            private final HashMap<String, KeyValues> keyValues;
 
             private CustomComponent(Integer valueID) {
                 this.keyValues = new HashMap<>();

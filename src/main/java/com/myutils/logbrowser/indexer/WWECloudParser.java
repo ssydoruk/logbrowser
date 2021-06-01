@@ -1,11 +1,11 @@
 /*
  * To change this template, choose Tools | Templates
- * and open the template in the editor. 
+ * and open the template in the editor.
  */
 package com.myutils.logbrowser.indexer;
 
 import Utils.Pair;
-import static Utils.Util.intOrDef;
+
 import java.io.IOException;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -16,47 +16,49 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static Utils.Util.intOrDef;
+
 public class WWECloudParser extends Parser {
 
     private static final org.apache.logging.log4j.Logger logger = Main.logger;
 
-    private static final HashMap<Pattern, String> IGNORE_LOG_WORDS = new HashMap<Pattern, String>() {
+    private static final HashMap<Matcher, String> IGNORE_LOG_WORDS = new HashMap<Matcher, String>() {
         {
-            put(Pattern.compile("place \\[[^\\]]+\\]"), "place \\[...\\]");
-            put(Pattern.compile("User \\[[^\\]]+\\]"), "User \\[...\\]");
-            put(Pattern.compile("name \\[[^\\]]+\\]"), "name \\[...\\]");
-            put(Pattern.compile("user \\[[^\\]]+\\]"), "user \\[...\\]");
-            put(Pattern.compile("Object \\p{XDigit}+"), "Object ...");
-            put(Pattern.compile("CustomContact.+ in "), "CustomContact... in ");
-            put(Pattern.compile("Contact.+ in "), "Contact... in ");
-            put(Pattern.compile("index.html\\?\\S+"), "index.html?<...>");
-            put(Pattern.compile("\\[\\p{XDigit}{32}\\]"), "\\[...\\]");
-            put(Pattern.compile("\\[Number=[^\\]]+\\]"), "\\[Number=...\\]");
-            put(Pattern.compile("\\[[\\p{XDigit}-]+\\]"), "\\[...\\]");
+            put(Pattern.compile("place \\[[^\\]]+\\]").matcher(""), "place \\[...\\]");
+            put(Pattern.compile("User \\[[^\\]]+\\]").matcher(""), "User \\[...\\]");
+            put(Pattern.compile("name \\[[^\\]]+\\]").matcher(""), "name \\[...\\]");
+            put(Pattern.compile("user \\[[^\\]]+\\]").matcher(""), "user \\[...\\]");
+            put(Pattern.compile("Object \\p{XDigit}+").matcher(""), "Object ...");
+            put(Pattern.compile("CustomContact.+ in ").matcher(""), "CustomContact... in ");
+            put(Pattern.compile("Contact.+ in ").matcher(""), "Contact... in ");
+            put(Pattern.compile("index.html\\?\\S+").matcher(""), "index.html?<...>");
+            put(Pattern.compile("\\[\\p{XDigit}{32}\\]").matcher(""), "\\[...\\]");
+            put(Pattern.compile("\\[Number=[^\\]]+\\]").matcher(""), "\\[Number=...\\]");
+            put(Pattern.compile("\\[[\\p{XDigit}-]+\\]").matcher(""), "\\[...\\]");
         }
     };
-    private static final Pattern regLineSkip = Pattern.compile("^[>\\s]*");
-    private static final Pattern regNotParseMessage = Pattern.compile("(30201)");
-    private static final Pattern regMsgStart = Pattern.compile("Handling update message:$");
-    private static final Pattern regMsgRequest = Pattern.compile(" Sent '([^']+)' ");
+    private static final Matcher regLineSkip = Pattern.compile("^[>\\s]*").matcher("");
+    private static final Matcher regNotParseMessage = Pattern.compile("(30201)").matcher("");
+    private static final Matcher regMsgStart = Pattern.compile("Handling update message:$").matcher("");
+    private static final Matcher regMsgRequest = Pattern.compile(" Sent '([^']+)' ").matcher("");
 
-    private static final Pattern regAuthResult = Pattern.compile("CloudWebBasicAuthenticationFilter\\s+(.+)$");
-    private static final Pattern regTMessageStart = Pattern.compile("message='([^']+)'");
-    private static final Pattern regTMessageAttributesContinue = Pattern.compile("^(Attr|\\s|Time|Call)");
-    private static final Pattern regAuthAttributesContinue = Pattern.compile("^(SATR|IATR)");
-    private static final Pattern regExceptionStart = Pattern.compile("^([\\w_\\.]+Exception[\\w\\.]*):(.*)");
-    private static final Pattern regExceptionContinue = Pattern.compile("^(\\s|Caused by:)");
-    private static final Pattern regLogMessage = Pattern.compile("^(WARN|ERROR|INFO)");
-    private static final Pattern regLogMessageMsg = Pattern.compile("\\s(?:\\b[a-zA-Z][\\w\\.]*)+(.+)");
+    private static final Matcher regAuthResult = Pattern.compile("CloudWebBasicAuthenticationFilter\\s+(.+)$").matcher("");
+    private static final Matcher regTMessageStart = Pattern.compile("message='([^']+)'").matcher("");
+    private static final Matcher regTMessageAttributesContinue = Pattern.compile("^(Attr|\\s|Time|Call)").matcher("");
+    private static final Matcher regAuthAttributesContinue = Pattern.compile("^(SATR|IATR)").matcher("");
+    private static final Matcher regExceptionStart = Pattern.compile("^([\\w_\\.]+Exception[\\w\\.]*):(.*)").matcher("");
+    private static final Matcher regExceptionContinue = Pattern.compile("^(\\s|Caused by:)").matcher("");
+    private static final Matcher regLogMessage = Pattern.compile("^(WARN|ERROR|INFO)").matcher("");
+    private static final Matcher regLogMessageMsg = Pattern.compile("\\s(?:\\b[a-zA-Z][\\w\\.]*)+(.+)").matcher("");
     private static final Message.Regexs regAuthUsers = new Message.Regexs(new Pair[]{
-        new Pair("user \\[([^\\]]+)\\]", 1),
-        new Pair("Username: ([^;]+);", 1)
+            new Pair("user \\[([^\\]]+)\\]", 1),
+            new Pair("Username: ([^;]+);", 1)
     });
     long m_CurrentFilePos;
     long m_HeaderOffset;
-    private ParserState m_ParserState;
     String m_Header;
     int m_dbRecords = 0;
+    private ParserState m_ParserState;
     private String m_LastLine;
     private boolean isInbound;
     private String m_msgName;
@@ -134,12 +136,12 @@ public class WWECloudParser extends Parser {
 
                 String s = ParseGenesys(str, TableType.MsgWWECloud, regNotParseMessage, regLineSkip);
 
-                if ((regMsgStart.matcher(s)).find()) {
+                if ((regMsgStart.reset(s)).find()) {
                     m_HeaderOffset = m_CurrentFilePos;
                     m_ParserState = ParserState.STATE_TMESSAGE_EVENT;
                     setSavedFilePos(getFilePos());
                     isInbound = true;
-                } else if ((m = regMsgRequest.matcher(s)).find()) {
+                } else if ((m = regMsgRequest.reset(s)).find()) {
                     m_msgName = m.group(1);
                     m_HeaderOffset = m_CurrentFilePos;
                     m_ParserState = ParserState.STATE_TMESSAGE_ATTRIBUTES;
@@ -147,18 +149,18 @@ public class WWECloudParser extends Parser {
                     m_MessageContents.clear();
                     m_MessageContents.add(s);
                     isInbound = false;
-                } else if ((m = regExceptionStart.matcher(s)).find()) {
+                } else if ((m = regExceptionStart.reset(s)).find()) {
                     m_msgName = m.group(1);
                     m_msg1 = m.group(2);
                     m_MessageContents.add(s);
                     m_HeaderOffset = m_CurrentFilePos;
                     m_ParserState = ParserState.STATE_EXCEPTION;
                     setSavedFilePos(getFilePos());
-                } else if ((m = regLogMessage.matcher(s)).find()) {
+                } else if ((m = regLogMessage.reset(s)).find()) {
                     m_msgName = m.group(1);
                     String rest = s.substring(m.end());
                     String msgText;
-                    if ((m = regLogMessageMsg.matcher(rest)).find()) {
+                    if ((m = regLogMessageMsg.reset(rest)).find()) {
                         msgText = m.group(1);
                     } else {
                         msgText = rest;
@@ -166,7 +168,7 @@ public class WWECloudParser extends Parser {
                     WWECloudLogMsg theMsg = new WWECloudLogMsg(m_msgName, msgText);
                     SetStdFieldsAndAdd(theMsg);
 
-                } else if ((m = regAuthResult.matcher(s)).find()) {
+                } else if ((m = regAuthResult.reset(s)).find()) {
                     m_HeaderOffset = m_CurrentFilePos;
                     m_ParserState = ParserState.STATE_AUTHRESULT;
                     setSavedFilePos(getFilePos());
@@ -174,7 +176,7 @@ public class WWECloudParser extends Parser {
                     m_MessageContents.add(m.group(1));
                     isInbound = false;
 
-                } else if ((m = regExceptionStart.matcher(s)).find()) {
+                } else if ((m = regExceptionStart.reset(s)).find()) {
                     msg = new WWECloudExeptionMsg(m.group(1), m.group(2));
                     m_HeaderOffset = m_CurrentFilePos;
                     m_ParserState = ParserState.STATE_EXCEPTION;
@@ -187,7 +189,7 @@ public class WWECloudParser extends Parser {
                 break;
 
             case STATE_AUTHRESULT: {
-                if ((regAuthAttributesContinue.matcher(str)).find()) {
+                if ((regAuthAttributesContinue.reset(str)).find()) {
                     m_MessageContents.add(str);
                 } else {
                     addAuthResponse();
@@ -200,7 +202,7 @@ public class WWECloudParser extends Parser {
             }
 
             case STATE_EXCEPTION: {
-                if ((regExceptionContinue.matcher(str)).find()) {
+                if ((regExceptionContinue.reset(str)).find()) {
                     m_MessageContents.add(str);
                 } else {
                     if (msg instanceof WWECloudExeptionMsg) {
@@ -218,7 +220,7 @@ public class WWECloudParser extends Parser {
             }
 
             case STATE_TMESSAGE_EVENT: {
-                if ((m = regTMessageStart.matcher(str)).find()) {
+                if ((m = regTMessageStart.reset(str)).find()) {
                     m_msgName = m.group(1);
                     m_ParserState = ParserState.STATE_TMESSAGE_ATTRIBUTES;
                 } else {
@@ -230,7 +232,7 @@ public class WWECloudParser extends Parser {
             }
 
             case STATE_TMESSAGE_ATTRIBUTES: {
-                if (regTMessageAttributesContinue.matcher(str).find()
+                if (regTMessageAttributesContinue.reset(str).find()
                         || ParseTimestamp(str) == null) {
                     m_MessageContents.add(str);
 
@@ -269,7 +271,7 @@ public class WWECloudParser extends Parser {
             WWECloudAuthMsg theMsg = new WWECloudAuthMsg(m_MessageContents);
             SetStdFieldsAndAdd(theMsg);
         } catch (Exception ex) {
-            logger.error("fatal: ",  ex);
+            logger.error("fatal: ", ex);
         }
     }
 
@@ -284,7 +286,7 @@ public class WWECloudParser extends Parser {
         STATE_TMESSAGE_ATTRIBUTES, STATE_EXCEPTION, STATE_AUTHRESULT
     }
 
-//<editor-fold defaultstate="collapsed" desc="WWECloud">
+    //<editor-fold defaultstate="collapsed" desc="WWECloud">
     public class WWECloudMessage extends Message {
 
         String m_MessageName;
@@ -293,13 +295,7 @@ public class WWECloudParser extends Parser {
         private String m_ThisDN;
         private boolean isTServerReq = false;
 
-        /**
-         *
-         * @param event
-         * @param TserverSRC
-         * @param newMessageLines
-         * @param isTServerReq
-         */
+
         public WWECloudMessage(String event, ArrayList newMessageLines, boolean isTServerReq) {
             super(TableType.WWECloud);
             m_MessageLines = newMessageLines;
@@ -429,7 +425,6 @@ public class WWECloudParser extends Parser {
         }
 
         /**
-         *
          * @throws Exception
          */
         @Override
@@ -543,7 +538,6 @@ public class WWECloudParser extends Parser {
         }
 
         /**
-         *
          * @throws Exception
          */
         @Override
@@ -597,8 +591,8 @@ public class WWECloudParser extends Parser {
 
         private String optimizeText(String msgText) {
             String ret = msgText;
-            for (Map.Entry<Pattern, String> entry : IGNORE_LOG_WORDS.entrySet()) {
-                ret = entry.getKey().matcher(ret).replaceAll(entry.getValue());
+            for (Map.Entry<Matcher, String> entry : IGNORE_LOG_WORDS.entrySet()) {
+                ret = entry.getKey().reset(ret).replaceAll(entry.getValue());
             }
             return ret;
 
@@ -665,7 +659,6 @@ public class WWECloudParser extends Parser {
         }
 
         /**
-         *
          * @throws Exception
          */
         @Override
@@ -733,7 +726,6 @@ public class WWECloudParser extends Parser {
         }
 
         /**
-         *
          * @throws Exception
          */
         @Override

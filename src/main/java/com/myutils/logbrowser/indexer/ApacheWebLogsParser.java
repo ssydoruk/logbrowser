@@ -1,6 +1,6 @@
 /*
  * To change this template, choose Tools | Templates
- * and open the template in the editor. 
+ * and open the template in the editor.
  */
 package com.myutils.logbrowser.indexer;
 
@@ -17,25 +17,22 @@ import java.util.regex.Pattern;
 public class ApacheWebLogsParser extends WebParser {
 
     private static final org.apache.logging.log4j.Logger logger = Main.logger;
-    private final static Pattern ptJSessionID = Pattern.compile("JSESSIONID=([^;\\s\"\\.]+)");
-    private final static Pattern ptBrowserClientID = Pattern.compile("BAYEUX_BROWSER=([^;\\s\"\\.]+)");
-    private final static Pattern ENTRY_BEGIN_PATTERN = Pattern.compile(
-            "^(.*?) - (.*?) \\[(.*?)\\] \"((\\S+)(?:\\s+)(.+)?(?:\\s+)(HTTP/\\S+)?)?\" (\\d+) (.*)\\s+(\\d+)$");
-
-    public static Pattern getENTRY_BEGIN_PATTERN() {
-        return ENTRY_BEGIN_PATTERN;
-    }
-
+    private final static Matcher ptJSessionID = Pattern.compile("JSESSIONID=([^;\\s\"\\.]+)").matcher("");
+    private final static Matcher ptBrowserClientID = Pattern.compile("BAYEUX_BROWSER=([^;\\s\"\\.]+)").matcher("");
+    private final static Matcher ENTRY_BEGIN_PATTERN = Pattern.compile(
+            "^(.*?) - (.*?) \\[(.*?)\\] \"((\\S+)(?:\\s+)(.+)?(?:\\s+)(HTTP/\\S+)?)?\" (\\d+) (.*)\\s+(\\d+)$").matcher("");
     long m_CurrentFilePos;
-
     long m_HeaderOffset;
-    private ParserState m_ParserState;
     String m_Header;
-
     int m_dbRecords = 0;
+    private ParserState m_ParserState;
 
     public ApacheWebLogsParser(HashMap<TableType, DBTable> m_tables) {
         super(FileInfoType.type_WWECloud, m_tables);
+    }
+
+    public static Matcher getENTRY_BEGIN_PATTERN() {
+        return ENTRY_BEGIN_PATTERN;
     }
 
     @Override
@@ -91,7 +88,7 @@ public class ApacheWebLogsParser extends WebParser {
 
                 m_lineStarted = m_CurrentLine;
 
-                if ((m = ENTRY_BEGIN_PATTERN.matcher(str)).find()) {
+                if ((m = ENTRY_BEGIN_PATTERN.reset(str)).find()) {
                     ApacheWebMsg entry = new ApacheWebMsg();
 
                     entry.setIP(m.group(1)); // save IP
@@ -115,10 +112,10 @@ public class ApacheWebLogsParser extends WebParser {
                     entry.setHttpCode(m.group(8));
 
                     Matcher m1;
-                    if ((m1 = ptJSessionID.matcher(m.group(9))).find()) {
+                    if ((m1 = ptJSessionID.reset(m.group(9))).find()) {
                         entry.setJSessionID(m1.group(1));
                     }
-                    if ((m1 = ptBrowserClientID.matcher(m.group(9))).find()) {
+                    if ((m1 = ptBrowserClientID.reset(m.group(9))).find()) {
                         entry.setBrowserClientID(m1.group(1));
                     }
                     entry.setExecutionTime(m.group(10));
@@ -225,16 +222,16 @@ public class ApacheWebLogsParser extends WebParser {
             return httpCode;
         }
 
+        private void setHttpCode(String s) {
+            httpCode = s;
+        }
+
         public String getMethod() {
             return method;
         }
 
         private void setMethod(String s) {
             method = s;
-        }
-
-        private void setHttpCode(String s) {
-            httpCode = s;
         }
 
         private void setDate(String s) {
@@ -265,6 +262,12 @@ public class ApacheWebLogsParser extends WebParser {
             return userName;
         }
 
+        private void setUserName(String get) {
+            if (get != null) {
+                this.userName = get;
+            }
+        }
+
         private void setUserKey(String s) {
             key = s;
         }
@@ -282,18 +285,16 @@ public class ApacheWebLogsParser extends WebParser {
             }
         }
 
-        private void setUserName(String get) {
-            if (get != null) {
-                this.userName = get;
-            }
+        public String getBrowserClientID() {
+            return browserClientID;
         }
 
         private void setBrowserClientID(String group) {
             this.browserClientID = group;
         }
 
-        public String getBrowserClientID() {
-            return browserClientID;
+        public Integer getExecutionTime() {
+            return executionTime;
         }
 
         private void setExecutionTime(String group) {
@@ -304,10 +305,6 @@ public class ApacheWebLogsParser extends WebParser {
                     Main.logger.error("Error parsing int [" + group + "]");
                 }
             }
-        }
-
-        public Integer getExecutionTime() {
-            return executionTime;
         }
 
         private void setUserID(String u) {
@@ -355,7 +352,6 @@ public class ApacheWebLogsParser extends WebParser {
         }
 
         /**
-         *
          * @throws Exception
          */
         @Override

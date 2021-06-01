@@ -10,13 +10,23 @@ import java.sql.Timestamp;
 import java.util.regex.Pattern;
 
 /**
- *
  * @author terry The class Replicates TLibMessage
  */
 public class ORSClusterMessage extends Message {
 
-    private static int m_statementId;
     private static final Pattern patNewLine = Pattern.compile("\r\n");
+    private static int m_statementId;
+    private final String[] m_msgBody;
+    private String SrcNodeType;
+    private int SrcNodeID;
+    private String DstNodeType;
+    private int DstNodeID;
+    private boolean Direction;
+    private long m_Bytes;
+    ORSClusterMessage(String arr) {
+        super();
+        m_msgBody = arr.split("\r\n");
+    }
 
     public static String InitDB(DBAccessor accessor, int statementId) {
         m_statementId = statementId;
@@ -35,18 +45,6 @@ public class ORSClusterMessage extends Message {
                 + "UUID char(32));";
         accessor.runQuery(query);
         return "INSERT INTO ORSCluster_" + m_alias + " VALUES(NULL,?,?,?,?,?,?,?,?,?,?,?);";
-    }
-    private String SrcNodeType;
-    private int SrcNodeID;
-    private String DstNodeType;
-    private final String[] m_msgBody;
-    private int DstNodeID;
-    private boolean Direction;
-    private long m_Bytes;
-
-    ORSClusterMessage(String arr) {
-        super();
-        m_msgBody = arr.split("\r\n");
     }
 
     public void setM_Bytes(long m_Bytes) {

@@ -6,12 +6,12 @@ package com.myutils.logbrowser.inquirer;
 
 import com.myutils.logbrowser.indexer.FileInfoType;
 import com.myutils.logbrowser.indexer.ReferenceType;
+
 import java.sql.SQLException;
 import java.util.Collection;
 import java.util.HashSet;
 
 /**
- *
  * @author ssydoruk
  */
 public final class TlibForScCmQuery extends IQuery {
@@ -242,7 +242,7 @@ public final class TlibForScCmQuery extends IQuery {
                 ret = getWhere("tlib.ConnectionIdid", m_connectionIds, false);
 
                 String s = " tlib.nameid NOT IN (select id from "
-                        + ReferenceType.TEvent.toString() + " where name in (\""
+                        + ReferenceType.TEvent + " where name in (\""
                         + m_msgFilter.replace(",", "\",\"") + "\")" + ") ";
 
                 ret += " AND " + s;

@@ -1,16 +1,16 @@
 package com.myutils.logbrowser.inquirer.gui;
 
+import javax.swing.*;
+import javax.swing.event.TableModelEvent;
+import javax.swing.table.JTableHeader;
+import javax.swing.table.TableColumnModel;
+import javax.swing.table.TableModel;
 import java.awt.event.InputEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import javax.swing.JTable;
-import javax.swing.event.TableModelEvent;
-import javax.swing.table.JTableHeader;
-import javax.swing.table.TableColumnModel;
-import javax.swing.table.TableModel;
 
 /**
  * A sorter for TableModels. The sorter has a model (conforming to TableModel)

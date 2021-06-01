@@ -8,7 +8,6 @@ package com.myutils.logbrowser.indexer;
 import java.util.ArrayList;
 
 /**
- *
  * @author ssydoruk
  */
 public class ParserThreadState {
@@ -41,10 +40,6 @@ public class ParserThreadState {
     @Override
     public String toString() {
         return "ParserThreadState{" + "waitNonthread=" + waitNonthread + ", msg=" + msg + ", msgLines=" + msgLines + ", filePos=" + filePos + ", bytes=" + bytes + ", parserState=" + parserState + ", headerOffset=" + headerOffset + '}';
-    }
-
-    public void setWaitNonthread(boolean waitNonthread) {
-        this.waitNonthread = waitNonthread;
     }
 
     public Message getMsg() {
@@ -103,6 +98,10 @@ public class ParserThreadState {
 
     boolean isWaitNonthread() {
         return this.waitNonthread;
+    }
+
+    public void setWaitNonthread(boolean waitNonthread) {
+        this.waitNonthread = waitNonthread;
     }
 
 }

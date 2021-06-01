@@ -7,8 +7,10 @@ package com.myutils.logbrowser.inquirer.gui;
 
 import com.myutils.logbrowser.inquirer.LogFile;
 import com.myutils.logbrowser.inquirer.inquirer;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
+
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -16,14 +18,14 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.FilenameUtils;
 
 /**
- *
  * @author Stepan
  */
 public class LogFileManager {
+
+    private final HashMap<String, LogFile> logFileStore = new HashMap();
+    HashSet<String> usedArchives = new HashSet<>();
 
     public static File newFile(File destinationDir, ZipEntry zipEntry) throws IOException {
         File destFile = new File(destinationDir, zipEntry.getName());
@@ -38,10 +40,7 @@ public class LogFileManager {
         return destFile;
     }
 
-    HashSet<String> usedArchives = new HashSet<>();
-    private final HashMap<String, LogFile> logFileStore = new HashMap();
-
-//    HashMap<LogFile, ZipEntry> openedZIPFiles;
+    //    HashMap<LogFile, ZipEntry> openedZIPFiles;
     void unpackFile(LogFile logFile) throws IOException {
 
         if (logFile.isText()) {

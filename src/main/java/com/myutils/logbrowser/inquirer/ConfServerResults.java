@@ -8,6 +8,7 @@ import com.myutils.logbrowser.indexer.ReferenceType;
 import com.myutils.logbrowser.indexer.TableType;
 import com.myutils.logbrowser.inquirer.IQuery.FieldType;
 import com.myutils.logbrowser.inquirer.IQuery.IRecordLoadedProc;
+
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
 import java.sql.SQLException;
@@ -42,7 +43,7 @@ public class ConfServerResults extends IQueryResults {
 
     @Override
     public String getReportSummary() {
-        return "ConfServer \n\t" + (cidFinder != null ? "search: " + cidFinder.toString() : "");
+        return "ConfServer \n\t" + (cidFinder != null ? "search: " + cidFinder : "");
     }
 
     @Override
@@ -291,7 +292,7 @@ public class ConfServerResults extends IQueryResults {
 
     }
 
-//</editor-fold>
+    //</editor-fold>
     private void retrieveNotifs(QueryDialog dlg, DynamicTreeNode<OptionNode> reportSettings, IDsFinder cidFinder) throws SQLException {
 //<editor-fold defaultstate="collapsed" desc="retrieveUpdates">
         if (isChecked(reportSettings) && DatabaseConnector.TableExist(TableType.CSClientConf.toString())) {

@@ -6,13 +6,14 @@
 package com.myutils.logbrowser.indexer;
 
 import Utils.Util;
+import org.apache.commons.lang3.StringUtils;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.apache.commons.lang3.StringUtils;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 public final class URSRlib extends Message {
 
@@ -91,7 +92,7 @@ public final class URSRlib extends Message {
                                 JSONObject obj = jsonOrDef(_jsonBody, "data");
                                 if (obj != null) {
                                     StringBuilder dataRest = new StringBuilder();
-                                    for (Iterator<String> iterator = obj.keys(); iterator.hasNext();) {
+                                    for (Iterator<String> iterator = obj.keys(); iterator.hasNext(); ) {
                                         String key = iterator.next();
                                         if (key.equals("requestid")) {
                                             reqID = obj.getInt("requestid");

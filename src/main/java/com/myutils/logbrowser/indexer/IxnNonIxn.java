@@ -12,9 +12,8 @@ public class IxnNonIxn extends Message {
     private static final Pattern rxUserEventIDs = Pattern.compile("^\\s+AttributeUserEvent.+ = (\\d+)");
 
     private static final Pattern rxThisDN = Pattern.compile("^\\s+AttributeThisDN .+ \"([^\"]+)\"$");
-
-    MessageAttributes attrs = new MessageAttributes();
     private final Ixn parentMsg;
+    MessageAttributes attrs = new MessageAttributes();
 
     IxnNonIxn(TableType tableType, Ixn msg) {
         super(tableType);

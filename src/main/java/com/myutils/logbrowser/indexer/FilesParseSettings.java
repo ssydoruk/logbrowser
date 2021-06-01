@@ -12,7 +12,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- *
  * @author ssydoruk
  */
 public class FilesParseSettings {
@@ -20,7 +19,6 @@ public class FilesParseSettings {
     private final HashMap<String, FileParseSettings> fileSettings = new HashMap<>();
 
     /**
-     *
      * @param t
      * @return
      */
@@ -81,6 +79,7 @@ public class FilesParseSettings {
 
     static class FileParseCustomSearch {
 
+        private final HashMap<String, ArrayList<SearchComponent>> components = new HashMap<>();
         private boolean trimmed = false;
         private Pattern pt;
         private boolean handlerOnly = false;
@@ -89,10 +88,14 @@ public class FilesParseSettings {
         private boolean ignoreCase;
         private String ptString;
         private String[] groups;
-        private final HashMap<String, ArrayList<SearchComponent>> components = new HashMap<>();
 
         public boolean isParseRest() {
             return parseRest;
+        }
+
+        void setParseRest(String attribute) {
+            this.parseRest = boolAttr(attribute, true);
+
         }
 
         public Pattern getPt() {
@@ -101,6 +104,10 @@ public class FilesParseSettings {
 
         public String getPtString() {
             return ptString;
+        }
+
+        public void setPtString(String ptString) {
+            this.ptString = ptString;
         }
 
         public Matcher parseCustom(String str, int handlerID) {
@@ -114,10 +121,6 @@ public class FilesParseSettings {
                 }
             }
             return null;
-        }
-
-        public void setPtString(String ptString) {
-            this.ptString = ptString;
         }
 
         public boolean isTrimmed() {
@@ -241,11 +244,6 @@ public class FilesParseSettings {
 
         void setHandlerOnly(String attribute) {
             this.handlerOnly = boolAttr(attribute, false);
-        }
-
-        void setParseRest(String attribute) {
-            this.parseRest = boolAttr(attribute, true);
-
         }
 
         class SearchComponent {

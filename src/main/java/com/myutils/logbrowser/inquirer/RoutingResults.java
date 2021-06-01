@@ -6,22 +6,24 @@ package com.myutils.logbrowser.inquirer;
 
 import Utils.Pair;
 import Utils.UTCTimeRange;
-import Utils.*;
-import com.myutils.logbrowser.indexer.*;
-import static com.myutils.logbrowser.inquirer.DatabaseConnector.TableExist;
+import Utils.Util;
+import com.myutils.logbrowser.indexer.FileInfoType;
+import com.myutils.logbrowser.indexer.ReferenceType;
+import com.myutils.logbrowser.indexer.TableType;
 import com.myutils.logbrowser.inquirer.IQuery.IRecordLoadedProc;
+import org.apache.logging.log4j.LogManager;
+
+import java.awt.event.ActionEvent;
+import java.beans.PropertyChangeEvent;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashSet;
+
+import static com.myutils.logbrowser.inquirer.DatabaseConnector.TableExist;
 import static com.myutils.logbrowser.inquirer.IQuery.getCheckedWhere;
-import static com.myutils.logbrowser.inquirer.IQueryResults.addUnique;
-import static com.myutils.logbrowser.inquirer.QueryTools.FindNode;
-import java.awt.event.*;
-import java.beans.*;
-import java.sql.*;
-import java.util.*;
 import static org.apache.commons.lang3.ArrayUtils.isEmpty;
-import org.apache.logging.log4j.*;
 
 /**
- *
  * @author ssydoruk
  */
 final public class RoutingResults extends IQueryResults {
@@ -29,12 +31,11 @@ final public class RoutingResults extends IQueryResults {
     private static final org.apache.logging.log4j.Logger logger = LogManager.getLogger();
     static private final String URS_LOG_MSG = "URS log messages";
     static private final String ORS_LOG_MSG = "ORS log messages";
-
+    IDsFinder cidFinder = null;
+    ArrayList<NameID> appsType = null;
     private UTCTimeRange timeRange;
     private DynamicTreeNode<OptionNode> msgUrsConfig;
     private DynamicTreeNode<OptionNode> msgOrsConfig;
-    IDsFinder cidFinder = null;
-    ArrayList<NameID> appsType = null;
 
     public RoutingResults() throws SQLException {
         super();
@@ -118,7 +119,7 @@ final public class RoutingResults extends IQueryResults {
 
     @Override
     public String getReportSummary() {
-        return "ORS/URS \n\t" + (cidFinder != null ? "search: " + cidFinder.toString() : "");
+        return "ORS/URS \n\t" + (cidFinder != null ? "search: " + cidFinder : "");
     }
 
     @Override
@@ -226,7 +227,7 @@ final public class RoutingResults extends IQueryResults {
 
     }
 
-//    private static final String URS_RLIB = "RLIB";
+    //    private static final String URS_RLIB = "RLIB";
     final public void addORSReportType(DynamicTreeNode<OptionNode> root) throws SQLException {
         DynamicTreeNode<OptionNode> Attr;
         DynamicTreeNode<OptionNode> tEventsNode;
@@ -748,7 +749,7 @@ final public class RoutingResults extends IQueryResults {
 
     }
 
-//    }
+    //    }
     @Override
     public String getName() {
         return "Routing";

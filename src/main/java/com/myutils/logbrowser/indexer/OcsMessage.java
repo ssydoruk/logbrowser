@@ -4,18 +4,16 @@
  */
 package com.myutils.logbrowser.indexer;
 
-import java.util.*;
+import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- *
  * @author terry The class Replicates TLibMessage
  */
 public class OcsMessage extends Message {
 
     /**
-     *
      * @param event
      * @param TserverSRC
      * @param newMessageLines
@@ -24,13 +22,12 @@ public class OcsMessage extends Message {
     private static final Pattern regStartLine = Pattern.compile("^received from \\d+\\(([^\\)]+)\\).+message (\\S+)");
     private static final Pattern regSentMsg = Pattern.compile("^request to (\\d+)\\(([^\\)]+)\\) message (\\w+)");
     private static final Pattern regPrimBackup = Pattern.compile("^([^\\/]+)/(^\\/+)$");
+    private final boolean isTServerReq = false;
     String m_MessageName;
     private String m_TserverSRCp;
     private String m_TserverSRCb;
-
     private String m_refID;
     private String m_ThisDN;
-    private final boolean isTServerReq = false;
     private Long recordHandle = null;
 
     public OcsMessage(ArrayList newMessageLines) {
@@ -129,6 +126,15 @@ public class OcsMessage extends Message {
         return getAttributeDN("AttributeOtherDN");
     }
 
+    Long getRecordHandle() {
+        long uData = getUData("GSW_RECORD_HANDLE", -1, true);
+        if (uData == -1) {
+            return recordHandle;
+        } else {
+            return uData;
+        }
+    }
+
     void setRecordHandle(String recHandle) {
         if (recHandle != null && !recHandle.isEmpty()) {
             try {
@@ -136,15 +142,6 @@ public class OcsMessage extends Message {
             } catch (NumberFormatException e) {
                 recordHandle = null;
             }
-        }
-    }
-
-    Long getRecordHandle() {
-        long uData = getUData("GSW_RECORD_HANDLE", -1, true);
-        if (uData == -1) {
-            return recordHandle;
-        } else {
-            return uData;
         }
     }
 

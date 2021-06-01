@@ -17,6 +17,23 @@ public final class GenesysMsg extends Message {
     private static final Matcher regMsgSCS = Pattern.compile("^\\s*(None|Debug|Trace|Interaction|Standard|Alarm|Unknown|Non|Dbg|Trc|Int|Std|Alr|Unk)(?:\\s+(?:\\S+)){3}.+-(?:\\d{2})-(\\d{5})").matcher("");
     static private final Matcher ptThreadID = Pattern.compile("^(\\[\\S+\\])$").matcher("");
     static GenesysMsgMap msgMap = new GenesysMsgMap();
+    private final String level;
+    private final String msgID;
+    //    private static final Pattern regMsgWords = Pattern.compile("([a-zA-Z]+)");
+//    private static final int MAX_LOG_WORDS = 3;
+    private String lastGenesysMsgLevel;
+    private String lastGenesysMsgID;
+    private boolean savedToDB = false;
+    private boolean toIgnore = false;
+    private FileInfoType msgType;
+    private String line;
+
+    public GenesysMsg(TableType t, String level, String msgID, String line) {
+        super(t);
+        this.level = level;
+        this.msgID = msgID;
+        this.line = line;
+    }
 
     public static GenesysMsg CheckGenesysMsg(DateParsed dp, Parser p, TableType t, Pattern reg, Pattern ignoreMSGIDs) {
         return CheckGenesysMsg(dp, p, t, reg, ignoreMSGIDs, false);
@@ -51,7 +68,7 @@ public final class GenesysMsg extends Message {
         }
         if (!msg.isToIgnore() && saveToDB) {
             msg.AddToDB(p.m_tables);
-            Main.logger.traceExit("Added log message " + t + ": " + msg.toString());
+            Main.logger.traceExit("Added log message " + t + ": " + msg);
 
         }
         return msg;
@@ -126,7 +143,6 @@ public final class GenesysMsg extends Message {
 
     }
 
-
     public static GenesysMsg CheckGenesysMsgSCS(DateParsed dp, Parser p, TableType t, Pattern ignoreMSGIDs) {
         GenesysMsg ret = CheckGenesysMsg(dp, p, t, regMsgSCS, ignoreMSGIDs.matcher(""));
         if (ret != null) {
@@ -161,24 +177,6 @@ public final class GenesysMsg extends Message {
             }
             Main.getMain().tabRefs.updateRef(ReferenceType.LOGMESSAGE, entry.getKey(), s.toString());
         }
-    }
-
-    //    private static final Pattern regMsgWords = Pattern.compile("([a-zA-Z]+)");
-//    private static final int MAX_LOG_WORDS = 3;
-    private String lastGenesysMsgLevel;
-    private String lastGenesysMsgID;
-    private boolean savedToDB = false;
-    private boolean toIgnore = false;
-    private final String level;
-    private final String msgID;
-    private FileInfoType msgType;
-    private String line;
-
-    public GenesysMsg(TableType t, String level, String msgID, String line) {
-        super(t);
-        this.level = level;
-        this.msgID = msgID;
-        this.line = line;
     }
 
     /**

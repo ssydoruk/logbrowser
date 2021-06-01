@@ -7,8 +7,8 @@ import com.myutils.logbrowser.indexer.ReferenceType;
 import com.myutils.logbrowser.indexer.TableType;
 import com.myutils.logbrowser.inquirer.IQuery.FieldType;
 import com.myutils.logbrowser.inquirer.IQuery.IRecordLoadedProc;
-import static com.myutils.logbrowser.inquirer.IQueryResults.addUnique;
-import static com.myutils.logbrowser.inquirer.QueryTools.getWhere;
+
+import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
 import java.sql.SQLException;
@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
-import javax.swing.JOptionPane;
+
 import static org.apache.commons.lang3.ArrayUtils.isEmpty;
 
 public class CallFlowResults extends IQueryResults {
@@ -26,13 +26,13 @@ public class CallFlowResults extends IQueryResults {
     public static final int TC = 0x04;
     public static final int SIP = 0x08;
     public static final int PROXY = 0x10;
-//    private static final String[] RequestsToShow = {"RequestMakePredictiveCall", "RequestMakeCall", "RequestMonitorNextCall"};
-//    private static final String[] EventsToShow = {"EventDialing", "EventNetworkReached", "EventMonitoringNextCall"};
-    private IDsFinder cidFinder;
-//    private String m_tlibFilter;
+    private final Handlers handlerIDs = new Handlers();
+    //    private String m_tlibFilter;
 //    private int m_componentFilter;
     ArrayList<NameID> appsType;
-    private final Handlers handlerIDs = new Handlers();
+    //    private static final String[] RequestsToShow = {"RequestMakePredictiveCall", "RequestMakeCall", "RequestMonitorNextCall"};
+//    private static final String[] EventsToShow = {"EventDialing", "EventNetworkReached", "EventMonitoringNextCall"};
+    private IDsFinder cidFinder;
 
     public CallFlowResults(QueryDialogSettings qdSettings) throws SQLException {
         super(qdSettings);
@@ -171,7 +171,7 @@ public class CallFlowResults extends IQueryResults {
                     + "and thisdnid>0\n"
                     + dnWhere
                     + IQuery.getCheckedWhere("nameID", ReferenceType.TEvent,
-                            FindNode(repComponents.getRoot(), DialogItem.TLIB_CALLS, DialogItem.TLIB_CALLS_TEVENT, DialogItem.TLIB_CALLS_TEVENT_NAME), "AND")
+                    FindNode(repComponents.getRoot(), DialogItem.TLIB_CALLS, DialogItem.TLIB_CALLS_TEVENT, DialogItem.TLIB_CALLS_TEVENT_NAME), "AND")
                     + IQuery.getFileFilters(tab, "fileid", qd.getSearchApps(false), "AND")
                     + IQuery.getDateTimeFilters(tab, "time", qd.getTimeRange(), "AND")
                     + "\n"
@@ -378,7 +378,7 @@ public class CallFlowResults extends IQueryResults {
 //        Attr.addChild(AttrValue);
     }
 
-//    private void addSIPReportType(DynamicTreeNode<OptionNode> root) {
+    //    private void addSIPReportType(DynamicTreeNode<OptionNode> root) {
 //        DynamicTreeNode<OptionNode> nd = new DynamicTreeNode<OptionNode>(new OptionNode(true, "SIP"));
 //        root.addChild(nd);
 //        

@@ -6,6 +6,7 @@
 package com.myutils.logbrowser.inquirer;
 
 import Utils.Pair;
+
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -13,16 +14,14 @@ import java.util.HashMap;
 import java.util.HashSet;
 
 /**
- *
  * @author Stepan
  */
 public class FullTable {
 
     private final ArrayList<ArrayList<Object>> data;
-
-    private HashMap<String, Pair<Integer, Integer>> columnNames = null;
-//    private ArrayList<Integer> columnTypes = null;
+    //    private ArrayList<Integer> columnTypes = null;
     private final HashSet<String> hiddenFields = new HashSet<>();
+    private HashMap<String, Pair<Integer, Integer>> columnNames = null;
 
     //    public ArrayList<String> getColumnNames() {
 //        return columnNames;

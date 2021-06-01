@@ -6,17 +6,11 @@
 package com.myutils.logbrowser.inquirer;
 
 import com.myutils.logbrowser.inquirer.gui.ReportFrame;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.GraphicsConfiguration;
-import java.awt.GraphicsDevice;
-import java.awt.GraphicsEnvironment;
-import java.awt.Rectangle;
-import java.awt.Window;
-import javax.swing.JFrame;
+
+import javax.swing.*;
+import java.awt.*;
 
 /**
- *
  * @author ssydoruk
  */
 public class ScreenInfo {

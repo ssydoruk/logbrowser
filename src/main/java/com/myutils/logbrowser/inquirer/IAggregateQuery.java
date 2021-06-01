@@ -5,15 +5,14 @@
  */
 package com.myutils.logbrowser.inquirer;
 
+import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
-import javax.swing.JPanel;
 
 /**
- *
  * @author ssydoruk
  */
 public abstract class IAggregateQuery extends IQueryResults {
@@ -21,8 +20,8 @@ public abstract class IAggregateQuery extends IQueryResults {
     private static final String TMP_TABLE_PREFIX = "tmp";
     private static int tmpTableIdx = 0;
     protected QueryDialog qd = null;
-    private JPanel jpConfig = null;
     protected AnyQuery resultQuery = null;
+    private JPanel jpConfig = null;
 
     @Override
     boolean callRelatedSearch(IDsFinder cidFinder) throws SQLException {

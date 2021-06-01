@@ -5,24 +5,24 @@
  */
 package com.myutils.logbrowser.indexer;
 
-import static Utils.Util.intOrDef;
 import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static Utils.Util.intOrDef;
+
 public class StCapacity extends Message {
 
+    public static final int MAX_MEDIA = 5;
     private static final Pattern regStatusLineAgent = Pattern.compile("^Status: (Capacity snapshot) for agent '([^']+)'(?:.+, place '([^']+)'.+\\(CR='([^\\']+))?");
     private static final Pattern regStatusLinePlace = Pattern.compile("^Status: (Capacity snapshot) for place '([^']+)'(?:.+, agent '([^']+)'.+\\(CR='([^\\']+))?");
     private static final Pattern regStatusLineDN = Pattern.compile("^Status: (Capacity snapshot) for \\w+ '([^@']+)");
     private static final Pattern regStatusMedia = Pattern.compile("^\\s*\\[\\s*(\\w+)\\s+(\\d+)\\s+(\\d+).+--\\s(\\w+)");
-    public static final int MAX_MEDIA = 5;
-
+    private final String OldStatus = null;
+    private final String NewStatus = null;
     private String plGroup = null;
     private String agent = null;
     private String place = null;
-    private final String OldStatus = null;
-    private final String NewStatus = null;
     private String capacityRule = null;
 
     private String dn = null;
@@ -110,7 +110,7 @@ public class StCapacity extends Message {
             this.curNumber = intOrDef(curNumber, -1);
             this.maxNumber = intOrDef(maxNumber, -1);
             this.media = media;
-            Main.logger.trace("MediaStatuses: " + this.toString());
+            Main.logger.trace("MediaStatuses: " + this);
         }
 
         @Override

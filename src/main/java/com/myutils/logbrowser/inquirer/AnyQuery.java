@@ -6,16 +6,17 @@
 package com.myutils.logbrowser.inquirer;
 
 import Utils.Pair;
+import org.apache.commons.lang3.StringUtils;
+
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import org.apache.commons.lang3.StringUtils;
 
 public class AnyQuery extends IQuery {
 
+    private final ArrayList<Pair> selectFields;
     private ResultSetMetaData rsmd;
     private String queryTable;
-    private final ArrayList<Pair> selectFields;
 
     public AnyQuery() {
         query = null;
@@ -85,12 +86,12 @@ public class AnyQuery extends IQuery {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
-    public void setTable(String tmp1) {
-        queryTable = tmp1;
-    }
-
     public String getTable() {
         return queryTable;
+    }
+
+    public void setTable(String tmp1) {
+        queryTable = tmp1;
     }
 
     public void addOutField(String fld, String alias) {

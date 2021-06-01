@@ -1,27 +1,30 @@
 package com.myutils.logbrowser.inquirer;
 
+import org.apache.commons.lang3.StringUtils;
+import org.graalvm.polyglot.HostAccess;
+
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Properties;
-import org.apache.commons.lang3.StringUtils;
-import org.graalvm.polyglot.HostAccess;
 
 public abstract class ILogRecord {
 
     private static final String[] sInboundFieldNames = {"inbound"
     };
-
+    private static final String FILEOFFSET = "fileoffset";
+    private static final String FILEBYTES = "filebytes";
+    private static final String APPNAMEID = "appnameid";
+    private static final String COMPONENT = "component";
+    private static final String ID = "id";
+    public Properties m_fieldsAll;
+    protected StdFields stdFields = new StdFields();
     private int m_appid;
     private int appnameid;
     private int id;
-
-    public Properties m_fieldsAll;
-
     private boolean m_isMarked;
-
     private long m_unixtime;
     private long m_fileOffset;
     private int m_fileBytes;
@@ -33,8 +36,6 @@ public abstract class ILogRecord {
     private ICalculatedFields calcFields;
     private Date dateTime = null;
     private LogFile logFile = null;
-
-    protected StdFields stdFields = new StdFields();
 
     public ILogRecord() {
         m_fieldsAll = new Properties();
@@ -58,7 +59,6 @@ public abstract class ILogRecord {
     }
 
     /**
-     *
      * @param rs
      * @throws Exception
      */
@@ -74,12 +74,6 @@ public abstract class ILogRecord {
         this.calcFields = calcFields;
         m_fieldsAll.putAll(calcFields.calc(m_fieldsAll));
     }
-
-    private static final String FILEOFFSET = "fileoffset";
-    private static final String FILEBYTES = "filebytes";
-    private static final String APPNAMEID = "appnameid";
-    private static final String COMPONENT = "component";
-    private static final String ID = "id";
 
     abstract void initCustomFields();
 
@@ -450,39 +444,6 @@ public abstract class ILogRecord {
 
     }
 
-    protected interface IValueAssessor {
-
-        void setValue(Object val);
-
-        Object getValue();
-    }
-
-    public static class StdFields extends HashMap<String, IValueAssessor> {
-
-        /**
-         *
-         * @param fieldName
-         * @param valueAccessor - if null, this means field from record set is
-         * ignored
-         */
-        public void fieldInit(String fieldName, IValueAssessor valueAccessor) {
-            put(fieldName, valueAccessor);
-        }
-
-        public boolean setValue(String fieldName, Object val) {
-            if (containsKey(fieldName)) {
-                IValueAssessor get = get(fieldName);
-
-                //null value means ignore field
-                if (get != null) {
-                    get.setValue(val);
-                    return true;
-                }
-            }
-            return false;
-        }
-    }
-
     protected long setLong(Object val) {
         if (val == null) {
             return 0;
@@ -510,6 +471,38 @@ public abstract class ILogRecord {
             return (Integer) val != 0;
         } else {
             return (boolean) val;
+        }
+    }
+
+    protected interface IValueAssessor {
+
+        Object getValue();
+
+        void setValue(Object val);
+    }
+
+    public static class StdFields extends HashMap<String, IValueAssessor> {
+
+        /**
+         * @param fieldName
+         * @param valueAccessor - if null, this means field from record set is
+         *                      ignored
+         */
+        public void fieldInit(String fieldName, IValueAssessor valueAccessor) {
+            put(fieldName, valueAccessor);
+        }
+
+        public boolean setValue(String fieldName, Object val) {
+            if (containsKey(fieldName)) {
+                IValueAssessor get = get(fieldName);
+
+                //null value means ignore field
+                if (get != null) {
+                    get.setValue(val);
+                    return true;
+                }
+            }
+            return false;
         }
     }
 

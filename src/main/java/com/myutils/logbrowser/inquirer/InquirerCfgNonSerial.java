@@ -6,14 +6,15 @@
 package com.myutils.logbrowser.inquirer;
 
 import com.myutils.logbrowser.indexer.ReferenceType;
-import static com.myutils.logbrowser.inquirer.QueryTools.getRefNames;
+
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Set;
 
+import static com.myutils.logbrowser.inquirer.QueryTools.getRefNames;
+
 /**
- *
  * @author ssydoruk
  */
 public class InquirerCfgNonSerial {

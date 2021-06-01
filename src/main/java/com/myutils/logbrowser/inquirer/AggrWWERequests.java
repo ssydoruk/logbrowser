@@ -9,7 +9,8 @@ import Utils.UTCTimeRange;
 import com.myutils.logbrowser.indexer.ReferenceType;
 import com.myutils.logbrowser.indexer.TableType;
 import com.myutils.logbrowser.inquirer.IQuery.FieldType;
-import static com.myutils.logbrowser.inquirer.inquirer.getCr;
+import org.apache.commons.lang3.StringUtils;
+
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
 import java.io.FileNotFoundException;
@@ -17,10 +18,10 @@ import java.io.FileOutputStream;
 import java.io.PrintStream;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import org.apache.commons.lang3.StringUtils;
+
+import static com.myutils.logbrowser.inquirer.inquirer.getCr;
 
 /**
- *
  * @author ssydoruk
  */
 public class AggrWWERequests extends IAggregateAggregate {

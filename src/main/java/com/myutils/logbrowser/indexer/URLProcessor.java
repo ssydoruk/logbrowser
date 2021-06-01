@@ -5,8 +5,6 @@
  */
 package com.myutils.logbrowser.indexer;
 
-import static com.myutils.logbrowser.indexer.Parser.genList;
-import static com.myutils.logbrowser.indexer.Parser.splitQuery;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -15,8 +13,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+import static com.myutils.logbrowser.indexer.Parser.genList;
+import static com.myutils.logbrowser.indexer.Parser.splitQuery;
+
 /**
- *
  * @author stepan_sydoruk
  */
 public class URLProcessor {

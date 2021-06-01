@@ -4,12 +4,11 @@
  */
 package com.myutils.logbrowser.indexer;
 
-import java.util.*;
+import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- *
  * @author terry The class Replicates TLibMessage
  */
 public final class OCSRecTreatment extends Message {

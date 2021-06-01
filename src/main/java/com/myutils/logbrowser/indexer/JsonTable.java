@@ -9,7 +9,6 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 
 /**
- *
  * @author ssydoruk
  */
 public class JsonTable extends DBTable {

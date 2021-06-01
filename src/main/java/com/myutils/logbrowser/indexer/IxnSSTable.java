@@ -7,13 +7,13 @@ package com.myutils.logbrowser.indexer;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+
 import static java.sql.Types.INTEGER;
 
 /**
- *
  * @author ssydoruk
- *
- *
+ * <p>
+ * <p>
  * Make Refactor/Copy of this class for new table type
  */
 public class IxnSSTable extends DBTable {
@@ -86,7 +86,6 @@ public class IxnSSTable extends DBTable {
     }
 
     /**
-     *
      * @throws Exception
      */
     @Override

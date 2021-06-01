@@ -10,7 +10,7 @@ import java.util.regex.Pattern;
 
 public class OCSPAAgentInfo extends Message {
 
-//	OwnerDBID: 165; OriginDBID: 0; RecHandle: 0; ConnID: ; PlaceDBID: 279; AgentDBID: 452; Agent/Place: CINTIASA
+    //	OwnerDBID: 165; OriginDBID: 0; RecHandle: 0; ConnID: ; PlaceDBID: 279; AgentDBID: 452; Agent/Place: CINTIASA
 //	CurrentStatType: AgentBusy; CallType: Inbound; NotAvailableFlag: 0;  
     final private static Pattern regCGDBID = Pattern.compile("\\sOwnerDBID: (\\d+);");
     final private static Pattern regPlaceDBID = Pattern.compile("\\sPlaceDBID: (\\d+);");

@@ -81,16 +81,16 @@ public class OCSDBActivity extends Message {
         return reqID;
     }
 
+    long getChainID() {
+        return chainID;
+    }
+
     void setChainID(String group) {
         try {
             chainID = Integer.parseInt(group);
         } catch (NumberFormatException numberFormatException) {
             Main.logger.error("Incorrect number: [" + group + "]", numberFormatException);
         }
-    }
-
-    long getChainID() {
-        return chainID;
     }
 
     private void parseDB() {
@@ -171,7 +171,7 @@ public class OCSDBActivity extends Message {
                 Main.logger.trace("Compare DBActivity: [" + logLine + "] vs [" + key.toString() + "]");
 
                 if ((m = key.matcher(logLine)).find()) {
-                    Main.logger.trace("Compare DBActivity: [" + logLine + "] vs [" + key.toString() + "] :" + (((m.groupCount() > 0)) ? m.group(1) : ""));
+                    Main.logger.trace("Compare DBActivity: [" + logLine + "] vs [" + key + "] :" + (((m.groupCount() > 0)) ? m.group(1) : ""));
                     if (m.groupCount() > 0) {
                         return m.group(1);
                     } else {

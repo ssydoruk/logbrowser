@@ -1,13 +1,7 @@
 package com.myutils.logbrowser.inquirer;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.Deque;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 class DbRecordComparator implements Comparator {
 
@@ -27,18 +21,18 @@ class DbRecordComparator implements Comparator {
         if (DatabaseConnector.TableExist("ors_logbr")) {
             orsQuery = new RuntimeQuery(
                     "SELECT max(seqno) FROM ors_logbr AS ors"
-                    + " INNER JOIN file_logbr AS file ON  file.id=ors.fileId WHERE"
-                    + " ors.fileid<=? and ors.line <= ? and "
-                    + " file.appnameid in (select id from app where name = ?) "
-                    + " and ors.sourceid=?");
+                            + " INNER JOIN file_logbr AS file ON  file.id=ors.fileId WHERE"
+                            + " ors.fileid<=? and ors.line <= ? and "
+                            + " file.appnameid in (select id from app where name = ?) "
+                            + " and ors.sourceid=?");
         }
 
         if (DatabaseConnector.TableExist("tlib_logbr")) {
             tlibQuery = new RuntimeQuery(
                     "SELECT max(seqno) FROM tlib_logbr AS tlib "
-                    + "INNER JOIN file_logbr AS file ON  file.id=tlib.fileId WHERE "
-                    + "fileid<=? and line <= ? "
-                    + "and file.appnameid in (select id from app where name = ?) "
+                            + "INNER JOIN file_logbr AS file ON  file.id=tlib.fileId WHERE "
+                            + "fileid<=? and line <= ? "
+                            + "and file.appnameid in (select id from app where name = ?) "
             );
         }
 
@@ -105,7 +99,7 @@ class DbRecordComparator implements Comparator {
     }
 
     protected int CompareCustomItems1(ILogRecord item1,
-            ILogRecord item2) throws Exception {
+                                      ILogRecord item2) throws Exception {
         MsgType itemType1 = item1.GetType();
         MsgType itemType2 = item2.GetType();
 
@@ -170,7 +164,7 @@ class DbRecordComparator implements Comparator {
     }
 
     protected int CompareXsRecords(ILogRecord item1,
-            ILogRecord item2) {
+                                   ILogRecord item2) {
         // we already know they have same timestamp and one of them is Json in SIP
 
         if (item2.GetType() == MsgType.JSON) {
@@ -264,7 +258,7 @@ class DbRecordComparator implements Comparator {
         TLibEvent ev2 = (TLibEvent) record2;
 
         /*
-             * todo: verify TServer.
+         * todo: verify TServer.
          */
         long seqNo1 = ev1.getSeqNo();
         long seqNo2 = ev2.getSeqNo();
@@ -822,9 +816,9 @@ class DbRecordComparator implements Comparator {
         } else {
             if (tlibQuery != null) {
                 Object[] queryParams = {
-                    FileID,
-                    Line,
-                    ev.getApp()
+                        FileID,
+                        Line,
+                        ev.getApp()
                 };
                 return tlibQuery.getSingleValue(queryParams);
             } else {
@@ -836,10 +830,10 @@ class DbRecordComparator implements Comparator {
     private int GetORSSeqNo(int GetFileId, int GetLine, String ORSName, String TServerName) throws SQLException {
         if (orsQuery != null) {
             Object[] queryParams = {
-                GetFileId,
-                GetLine,
-                ORSName,
-                TServerName
+                    GetFileId,
+                    GetLine,
+                    ORSName,
+                    TServerName
             };
             return orsQuery.getSingleValue(queryParams);
         } else {

@@ -6,16 +6,13 @@
 package com.myutils.logbrowser.inquirer;
 
 import com.jidesoft.swing.CheckBoxListSelectionModel;
+
+import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.HashSet;
-import javax.swing.AbstractAction;
-import javax.swing.DefaultListModel;
-import javax.swing.JMenuItem;
-import javax.swing.JPanel;
 
 /**
- *
  * @author ssydoruk
  */
 public class CheckBoxListSettings extends MyCheckBoxList {

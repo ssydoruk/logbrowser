@@ -5,7 +5,6 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 
 /**
- *
  * @author akolo
  */
 public class StSActionTable extends DBTable {

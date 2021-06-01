@@ -9,7 +9,6 @@ import java.util.HashMap;
 import java.util.regex.Pattern;
 
 /**
- *
  * @author stepan_sydoruk
  */
 abstract class WebParser extends Parser {

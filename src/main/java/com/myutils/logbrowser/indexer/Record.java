@@ -4,39 +4,56 @@
  */
 package com.myutils.logbrowser.indexer;
 
-import java.util.*;
-import java.util.regex.*;
-import org.apache.commons.lang3.*;
+import org.apache.commons.lang3.StringUtils;
+
+import java.util.HashMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
- *
  * @author ssydoruk
  */
 public abstract class Record implements Cloneable {
 
+    private static final Pattern regAllQuotes = Pattern.compile("^(['\"]).+\\1$");
+    private static final Pattern regNoQuotes = Pattern.compile("^(['\"])(.+)\\1$");
+    private static final Pattern regDNWithHost = Pattern.compile("^(\\w+)\\.");
     static boolean m_handlerInProgress;
-
     static String m_alias;
     static int fileId = 0;
-
     static int m_handlerId = 0;
     static int m_sipId = 0;
     static int m_tlibId = 0;
     static int m_jsonId = 0;
     static int m_proxiedId = 0;
     private static int objCreated;
+    protected long m_FileBytes;
+    private long m_fileOffset;
+    private int m_line;
+    private TableType m_type;
+    //    protected Date m_Timestamp = null;
+    private DateParsed m_TimestampDP = null;
+    private int lastID = 0;
 
-    private static final Pattern regAllQuotes = Pattern.compile("^(['\"]).+\\1$");
-    private static final Pattern regNoQuotes = Pattern.compile("^(['\"])(.+)\\1$");
+    public Record(TableType type) {
+        this();
+        m_type = type;
+        Main.logger.trace("Creating record type " + type);
+        objCreated++;
+    }
 
-    public static void setFileId(int m_fileId) {
-        Record.fileId = m_fileId;
+    public Record() {
+
     }
 
     /*initial value - 1 because when record is inserted into
     file_logbr, initial ID is also 1. Bad design, sure, correct it next time*/
     public static int getFileId() {
         return fileId;
+    }
+
+    public static void setFileId(int m_fileId) {
+        Record.fileId = m_fileId;
     }
 
     public static Integer getObjCreated() {
@@ -46,8 +63,6 @@ public abstract class Record implements Cloneable {
     public static void resetCounter() {
         objCreated = 0;
     }
-
-    private static final Pattern regDNWithHost = Pattern.compile("^(\\w+)\\.");
 
     public static String cleanDN(String key) {
         Matcher m;
@@ -113,25 +128,6 @@ public abstract class Record implements Cloneable {
     public static void SetProxiedId(int proxiedId) {
         m_proxiedId = proxiedId;
     }
-    private long m_fileOffset;
-    private int m_line;
-    private TableType m_type;
-//    protected Date m_Timestamp = null;
-    private DateParsed m_TimestampDP = null;
-
-    protected long m_FileBytes;
-    private int lastID = 0;
-
-    public Record(TableType type) {
-        this();
-        m_type = type;
-        Main.logger.trace("Creating record type " + type);
-        objCreated++;
-    }
-
-    public Record() {
-
-    }
 
     @Override
     protected Object clone() throws CloneNotSupportedException {
@@ -143,6 +139,10 @@ public abstract class Record implements Cloneable {
 
     public int getLastID() {
         return lastID;
+    }
+
+    void setLastID(int currentID) {
+        this.lastID = currentID;
     }
 
     @Override
@@ -182,6 +182,13 @@ public abstract class Record implements Cloneable {
         return m_FileBytes;
     }
 
+    /**
+     * @param m_FileBytes the m_FileBytes to set
+     */
+    public void setM_FileBytes(long m_FileBytes) {
+        this.m_FileBytes = m_FileBytes;
+    }
+
     public void SetLine(int line) {
         m_line = line;
     }
@@ -191,7 +198,7 @@ public abstract class Record implements Cloneable {
         if (tab != null) {
             tab.checkInit();
             try {
-                Main.logger.debug("Adding to db " + this.toString());
+                Main.logger.debug("Adding to db " + this);
                 tab.AddToDB(this);
                 tab.recordAdded();
             } catch (Exception exception) {
@@ -228,19 +235,8 @@ public abstract class Record implements Cloneable {
         this.m_TimestampDP = m_Timestamp;
     }
 
-    /**
-     * @param m_FileBytes the m_FileBytes to set
-     */
-    public void setM_FileBytes(long m_FileBytes) {
-        this.m_FileBytes = m_FileBytes;
-    }
-
     void PrintMsg() {
         Main.logger.info("line[" + m_line + "]");
-    }
-
-    void setLastID(int currentID) {
-        this.lastID = currentID;
     }
 
     private void SetStdFields(Parser parser) {

@@ -6,16 +6,14 @@
 package com.myutils.logbrowser.inquirer.gui;
 
 import com.myutils.logbrowser.inquirer.inquirer;
-import java.awt.Component;
-import java.awt.Point;
-import javax.swing.JPopupMenu;
-import javax.swing.SwingUtilities;
+
+import javax.swing.*;
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
 import javax.swing.table.TableModel;
+import java.awt.*;
 
 /**
- *
  * @author Stepan
  */
 class JTablePopupMenu extends JPopupMenu {

@@ -8,14 +8,14 @@ package com.myutils.logbrowser.inquirer;
 import Utils.UTCTimeRange;
 import com.myutils.logbrowser.indexer.FileInfoType;
 import com.myutils.logbrowser.indexer.ReferenceType;
+
+import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import javax.swing.JOptionPane;
 
 /**
- *
  * @author ssydoruk
  */
 public class AggrTimestampDelays extends IAggregateQuery {

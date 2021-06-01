@@ -4,13 +4,13 @@
  */
 package com.myutils.logbrowser.indexer;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import org.apache.commons.lang3.StringUtils;
 
 /**
- *
  * @author ssydoruk
  */
 public class TLibTable extends DBTable {

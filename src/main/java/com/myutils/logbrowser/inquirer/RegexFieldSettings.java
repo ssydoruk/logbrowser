@@ -6,30 +6,31 @@
 package com.myutils.logbrowser.inquirer;
 
 import Utils.Pair;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 /**
- *
  * @author stepan_sydoruk
  */
-public class RegexFieldSettings  implements Serializable {
+public class RegexFieldSettings implements Serializable {
 
     private static final long serialVersionUID = 1L;
+    private static final Pattern rxVar = Pattern.compile("\\\\(\\d+)");
+    private static final Logger logger = LogManager.getLogger(RegexFieldSettings.class);
     private String searchString;
     private String retValue;
     private boolean makeWholeWorld;
     private boolean caseSensitive;
+    private Pattern selectedRegEx = null;
 
-
-
-    public RegexFieldSettings( String searchString, String retValue, boolean makeWholeWorld, boolean caseSensitive) {
+    public RegexFieldSettings(String searchString, String retValue, boolean makeWholeWorld, boolean caseSensitive) {
 
         this.searchString = searchString;
         this.retValue = retValue;
@@ -83,7 +84,6 @@ public class RegexFieldSettings  implements Serializable {
         makeWholeWorld = isWord;
         selectedRegEx = getRegex(searchString, makeWholeWorld, caseSensitive);
     }
-    private Pattern selectedRegEx = null;
 
     private Pattern getRegex() {
         if (selectedRegEx == null) {
@@ -163,8 +163,6 @@ public class RegexFieldSettings  implements Serializable {
         return s;
     }
 
-    private static final Pattern rxVar = Pattern.compile("\\\\(\\d+)");
-
     public SearchSample findRxSample(String bytes) {
         if (bytes != null && bytes.length() > 0 && selectedRegEx != null) {
             SearchSample ret = new SearchSample();
@@ -200,7 +198,6 @@ public class RegexFieldSettings  implements Serializable {
         }
         return null;
     }
-    private static final Logger logger = LogManager.getLogger(RegexFieldSettings.class);
 
     public String evalValue(String bytes) {
         Pattern rx;

@@ -7,14 +7,13 @@ import com.myutils.logbrowser.indexer.ReferenceType;
 import com.myutils.logbrowser.indexer.TableType;
 import com.myutils.logbrowser.inquirer.IQuery.ANDOR;
 import com.myutils.logbrowser.inquirer.IQuery.FieldType;
-import static com.myutils.logbrowser.inquirer.QueryTools.getWhere;
-import static com.myutils.logbrowser.inquirer.QueryTools.isChecked;
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.logging.log4j.LogManager;
+
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import org.apache.commons.lang3.ArrayUtils;
-import org.apache.logging.log4j.LogManager;
 
 public class GMSResults extends IQueryResults {
 
@@ -22,9 +21,8 @@ public class GMSResults extends IQueryResults {
     private final static String GMSWEB_WEBREQID = "webReqID";
     private final static String FIELD_REFID = "Refid";
     private final static String FIELD_ID = "id";
-
-    private IDsFinder _cidFinder;
     ArrayList<NameID> appsType = null;
+    private IDsFinder _cidFinder;
 
     /**
      *
@@ -254,7 +252,7 @@ public class GMSResults extends IQueryResults {
         try {
             addCustom(rootA, FileInfoType.type_GMS);
         } catch (SQLException ex) {
-            logger.error("fatal: ",  ex);
+            logger.error("fatal: ", ex);
         }
         rootA.addLogMessagesReportType(TableType.MsgGMS);
         DoneSTDOptions();
@@ -290,7 +288,7 @@ public class GMSResults extends IQueryResults {
         doSort();
     }
 
-//    private void retrieveSIP
+    //    private void retrieveSIP
     private void doRetrieve(QueryDialog dlg, SelectionType selectionType, String selection, boolean isRegex) throws SQLException {
         ILogRecord record = null;
         IDsFinder cidFinder;

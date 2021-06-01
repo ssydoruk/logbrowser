@@ -7,7 +7,6 @@ package com.myutils.logbrowser.indexer;
 //import org.jdom.xpath.XPath;
 
 /**
- *
  * @author ssydoruk
  */
 
@@ -39,16 +38,16 @@ public class OrsSidIxnID extends Message {
         this.theURL = URL;
     }
 
-    void setApp(String app) {
-        this.app = app;
-    }
-
     String getURL() {
         return theURL;
     }
 
     String getApp() {
         return app;
+    }
+
+    void setApp(String app) {
+        this.app = app;
     }
 
 }

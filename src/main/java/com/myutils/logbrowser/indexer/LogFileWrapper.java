@@ -13,10 +13,16 @@ import java.util.HashMap;
 import java.util.Set;
 
 /**
- *
  * @author Stepan
  */
 public abstract class LogFileWrapper {
+
+    private final File file;
+    private final HashMap<FileInfo, Object> fileInfoFileMap = new HashMap<>();
+    private boolean ignoreLog = false;
+    LogFileWrapper(File file) throws IOException {
+        this.file = file;
+    }
 
     public static LogFileWrapper getContainer(File file) {
         LogFileWrapper ret = null;
@@ -36,15 +42,6 @@ public abstract class LogFileWrapper {
         }
 
         return null;
-    }
-
-    private final File file;
-
-    private boolean ignoreLog = false;
-    private final HashMap<FileInfo, Object> fileInfoFileMap = new HashMap<>();
-
-    LogFileWrapper(File file) throws IOException {
-        this.file = file;
     }
 
     public File getFile() {

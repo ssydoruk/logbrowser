@@ -9,10 +9,7 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 
 /**
- *
  * @author ssydoruk
- *
- *
  */
 public class URSCONNIDSIDTable extends DBTable {
 
@@ -49,7 +46,6 @@ public class URSCONNIDSIDTable extends DBTable {
     }
 
     /**
-     *
      * @throws Exception
      */
     @Override

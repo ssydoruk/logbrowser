@@ -8,12 +8,11 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- *
  * @author terry
  */
 public class WorkspaceParser extends Parser {
 
-//17:33:04.587_I_I_01d9027e17ef8b38 [09:05] >>>>>>>>>>>>resume interpretator(0), func:SuspendForDN
+    //17:33:04.587_I_I_01d9027e17ef8b38 [09:05] >>>>>>>>>>>>resume interpretator(0), func:SuspendForDN
 //    _I_I_01d9027e17ef8b38 [09:04] ASSIGN: agent_target(LOCAL) <- STRING: "return:timeout"
 //    _I_I_01d9027e17ef8b38 [09:04] ASSIGN: N_attempt(LOCAL) <- INTEGER: 1
 //17:33:04.587_M_I_01d9027e17ef8b38 [07:0c] default priority 6300
@@ -24,28 +23,25 @@ public class WorkspaceParser extends Parser {
 //    _M_I_ [10:17] -ready DN 1077 @ TMK_SIP_Switch (type 1 CallInbound time=1463063585) for agent AZvyagina_tsk, place Place_1077_TMK, WaitForNextCall time=1463063585
 //    _M_I_ [10:17] STATOBJECT(06409ed0 208 2) tenant=Resources name=AZvyagina_tsk@OBN_StatServerRouting.A: 0(1) ready DNs reported, dT=0
 //17:33:04.697_T_I_03350282382b5512 [14:02] sending event 85 for virtual queue OBN_IP_Skill1_VQ_OBN_SIP_Outbound_Virtual
-    private static final Pattern regTMessageOutFinal = Pattern.compile("^\\.\\.sent to");
-    private static final Pattern regTMessageInFinal = Pattern.compile("^\\. Processing with  state");
-    private static final Pattern regTMessageRequestFinal = Pattern.compile("^(ReferenceId|AttributeReferenceID|attr_ref_id|$)");
+    private static final Matcher regTMessageOutFinal = Pattern.compile("^\\.\\.sent to");
+    private static final Matcher regTMessageInFinal = Pattern.compile("^\\. Processing with  state");
+    private static final Matcher regTMessageRequestFinal = Pattern.compile("^(ReferenceId|AttributeReferenceID|attr_ref_id|$)");
 
-    private static final Pattern regCfgUpdate = Pattern.compile("^\\s+PopCfg");
-
-    // keys: multiline function spec, value: pattern that ML is still on
-    static HashMap<String, Pattern> regMultiLine = new HashMap<String, Pattern>();
-    private static final Pattern regTMessageInStart = Pattern.compile("Proxy got message");
-    private static final Pattern regTMessageCompleted = Pattern.compile("- Completed handling");
-    private static final Pattern regTMessageSending = Pattern.compile("Sending message to");
-    private static final Pattern regTMessageOutFirstLine = Pattern.compile("^(request to|\\tAttribute|\\t\\()");
-    private static final Pattern regReceived = Pattern.compile("received from (\\d+)\\(([^\\)]+)\\).+message (Event\\w+)(?:\\(refid=(\\d+)\\))*");
-    private static final Pattern regProxyReceived = Pattern.compile("Proxy got message '(\\w+)' \\('(\\d+)'\\)");
-    private static final Pattern regSentTo = Pattern.compile("send to ts ([^\\[\\s]+)");
-    private static final Pattern regSendingTo = Pattern.compile(" sending event ");
-    private static final Pattern regSendingMessageTo = Pattern.compile(" Sending message to (\\w+)");
-    private static final Pattern regCompletedHandling = Pattern.compile("- Completed handling (\\w+)");
-    private static final Pattern regLastOneOrTwoWords = Pattern.compile("(?:\\s*(?:\\w+)){1,2}$");
-    private static final Pattern regReqTo = Pattern.compile("^request to (\\d+).+message (Request\\w+)");
-    private static final Pattern regToRequest = Pattern.compile("^'(\\w+)'");
-    private static final Pattern regStrategy = Pattern.compile("strategy:.+\\*+(\\S+)");
+    private static final Matcher regCfgUpdate = Pattern.compile("^\\s+PopCfg");
+    private static final Matcher regTMessageInStart = Pattern.compile("Proxy got message");
+    private static final Matcher regTMessageCompleted = Pattern.compile("- Completed handling");
+    private static final Matcher regTMessageSending = Pattern.compile("Sending message to");
+    private static final Matcher regTMessageOutFirstLine = Pattern.compile("^(request to|\\tAttribute|\\t\\()");
+    private static final Matcher regReceived = Pattern.compile("received from (\\d+)\\(([^\\)]+)\\).+message (Event\\w+)(?:\\(refid=(\\d+)\\))*");
+    private static final Matcher regProxyReceived = Pattern.compile("Proxy got message '(\\w+)' \\('(\\d+)'\\)");
+    private static final Matcher regSentTo = Pattern.compile("send to ts ([^\\[\\s]+)");
+    private static final Matcher regSendingTo = Pattern.compile(" sending event ");
+    private static final Matcher regSendingMessageTo = Pattern.compile(" Sending message to (\\w+)");
+    private static final Matcher regCompletedHandling = Pattern.compile("- Completed handling (\\w+)");
+    private static final Matcher regLastOneOrTwoWords = Pattern.compile("(?:\\s*(?:\\w+)){1,2}$");
+    private static final Matcher regReqTo = Pattern.compile("^request to (\\d+).+message (Request\\w+)");
+    private static final Matcher regToRequest = Pattern.compile("^'(\\w+)'");
+    private static final Matcher regStrategy = Pattern.compile("strategy:.+\\*+(\\S+)");
     //[14:33] strategy: **ORS (1085200831) is attached to the call
     private final static HashSet<String> eventsStatServer = new HashSet<String>(
             Arrays.asList("EventInfo",
@@ -73,18 +69,20 @@ public class WorkspaceParser extends Parser {
                     "RequestUnregisterNotification",
                     "EventNotificationUnregistered",
                     "RequestReadObjects"));
-    private static final Pattern regCfgObjectName = Pattern.compile("(?:name|userName|number|loginCode)='([^']+)'");
-    private static final Pattern regCfgObjectType = Pattern.compile("^Cfg([^=]+)=.*\\{DBID=(\\d+)");
-    //    private static final Pattern regCfgAGType = Pattern.compile("^Cfg([^=]+)=\\{DBID=(\\d+)");
-    private static final Pattern regCfgOp = Pattern.compile("PopCfg.+\\s(\\w+)$");
-    long m_CurrentFilePos;
+    private static final Matcher regCfgObjectName = Pattern.compile("(?:name|userName|number|loginCode)='([^']+)'");
+    private static final Matcher regCfgObjectType = Pattern.compile("^Cfg([^=]+)=.*\\{DBID=(\\d+)");
+    //    private static final Matcher regCfgAGType = Pattern.compile("^Cfg([^=]+)=\\{DBID=(\\d+)");
+    private static final Matcher regCfgOp = Pattern.compile("PopCfg.+\\s(\\w+)$");
+    // keys: multiline function spec, value: pattern that ML is still on
+    static HashMap<String, Pattern> regMultiLine = new HashMap<String, Pattern>();
     final int MSG_STRING_LIMIT = 200;
-    private String ConnID;
-    private String URSRest;
+    long m_CurrentFilePos;
     long m_HeaderOffset;
     ParserState m_ParserState;
     String m_Header;
     int m_dbRecords = 0;
+    private String ConnID;
+    private String URSRest;
 
     public WorkspaceParser(HashMap<TableType, DBTable> m_tables) {
         super(FileInfoType.type_WorkSpace, m_tables);

@@ -4,12 +4,11 @@
  */
 package com.myutils.logbrowser.indexer;
 
-import java.util.*;
+import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- *
  * @author ssydoruk
  */
 public class IsccMessage extends Message {
@@ -83,7 +82,7 @@ public class IsccMessage extends Message {
 
     String GetOtherConnID() {
         return checkDifferent(GetConnID(), new String[]{getAttribute("ISCCAttributeLastTransferConnID"),
-            getAttribute("ISCCAttributeFirstTransferConnID")});
+                getAttribute("ISCCAttributeFirstTransferConnID")});
     }
 
     private String checkDifferent(String toCompare, String[] strings) {

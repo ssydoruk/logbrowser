@@ -9,10 +9,9 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 
 /**
- *
  * @author ssydoruk
- *
- *
+ * <p>
+ * <p>
  * Make Refactor/Copy of this class for new table type
  */
 public class OCSStatEventTable extends DBTable {
@@ -63,7 +62,6 @@ public class OCSStatEventTable extends DBTable {
     }
 
     /**
-     *
      * @throws Exception
      */
     @Override

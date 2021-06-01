@@ -9,7 +9,6 @@ import java.nio.file.Paths;
 import java.sql.ResultSet;
 
 /**
- *
  * @author ssydoruk
  */
 public class PathManager {

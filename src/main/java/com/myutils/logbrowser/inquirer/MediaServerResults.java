@@ -5,14 +5,14 @@ import Utils.UTCTimeRange;
 import com.myutils.logbrowser.indexer.FileInfoType;
 import com.myutils.logbrowser.indexer.ReferenceType;
 import com.myutils.logbrowser.indexer.TableType;
-import static com.myutils.logbrowser.inquirer.DatabaseConnector.TableExist;
 import com.myutils.logbrowser.inquirer.IQuery.FieldType;
-import static com.myutils.logbrowser.inquirer.QueryTools.FindNode;
-import static com.myutils.logbrowser.inquirer.QueryTools.getWhere;
+
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
 import java.sql.SQLException;
 import java.util.ArrayList;
+
+import static com.myutils.logbrowser.inquirer.DatabaseConnector.TableExist;
 
 public class MediaServerResults extends IQueryResults {
 
@@ -21,10 +21,9 @@ public class MediaServerResults extends IQueryResults {
     public static final int TC = 0x04;
     public static final int SIP = 0x08;
     public static final int PROXY = 0x10;
-
-    private Object cidFinder;
-    ArrayList<NameID> appsType = null;
     private final UTCTimeRange timeRange = null;
+    ArrayList<NameID> appsType = null;
+    private Object cidFinder;
 
     /**
      *
@@ -88,7 +87,7 @@ public class MediaServerResults extends IQueryResults {
 //            wh.addWhere(IQuery.getCheckedWhere("sipms.nameID", ReferenceType.SIPMETHOD,
 //                    FindNode(repComponents.getRoot(), DialogItem.TLIB_CALLS, DialogItem.TLIB_CALLS_SIP, DialogItem.TLIB_CALLS_SIP_NAME)), "AND");
             wh.addWhere(getWhere("sipms.nameID", ReferenceType.SIPMETHOD, new String[]{"OPTIONS", "200 OK OPTIONS",
-                "NOTIFY", "200 OK NOTIFY", "503 Service Unavailable OPTIONS"}, false, false, true), "AND");
+                    "NOTIFY", "200 OK NOTIFY", "503 Service Unavailable OPTIONS"}, false, false, true), "AND");
 
             DatabaseConnector.runQuery("insert into " + tmpTable + " (callidid, started, ended)"
                     + "\nselect distinct callidid, min(time), max(time) from " + tab

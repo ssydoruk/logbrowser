@@ -1,6 +1,5 @@
 package com.myutils.logbrowser.inquirer;
 
-import static Utils.FileUtils.setCurrentDirectory;
 import Utils.ScreenInfo;
 import Utils.Util;
 import com.google.gson.Gson;
@@ -14,23 +13,18 @@ import com.myutils.logbrowser.inquirer.gui.LogFileManager;
 import com.myutils.logbrowser.inquirer.gui.MySwingWorker;
 import com.myutils.logbrowser.inquirer.gui.RequestProgress;
 import com.myutils.logbrowser.inquirer.gui.WindowsSystemUtility;
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.beans.XMLDecoder;
 import java.beans.XMLEncoder;
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
-import java.io.StringWriter;
+import java.io.*;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -38,7 +32,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneId;
@@ -56,43 +49,37 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
-import javax.swing.AbstractAction;
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
-import javax.swing.JComponent;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+
+import static Utils.FileUtils.setCurrentDirectory;
 
 public class inquirer {
+
+    private static final ZoneId zoneId = ZoneId.systemDefault();
+    private static final HashMap<String, DateTimeFormatter> dateFormatters = new HashMap<String, DateTimeFormatter>();
+    private final static String serFile = ".logbr_dialog.ser";
+    private final static String serFileDef = ".logbr_checkedref.ser";
+    private static final boolean useXMLSerializer = false;
+    public static Logger logger;
+    static XmlCfg cfg;
+    static HashMap<Integer, String> fileidType = null;
+    static HashMap<String, ArrayList<Pattern>> printFiltersPatterns = null;
+    static inquirer inq;
+    static ArrayList<IQueryResults> queries = new ArrayList<IQueryResults>();
+    static QueryDialog dlg;
+    static EnvInquirer ee;
+    private static String curDirectory;
+    private static QueryDialogSettings queryDialogSettings = null;
+    private static InquirerCfg cr = null;
+    private final ArrayList<ILogRecordFormatter> formatters = new ArrayList();
+    private final LogFileManager lfm = new LogFileManager();
+    IQueryResults queryResults = null;
+    String startTime = "";
+    String endTime = "";
 
     public inquirer() {
         // Init different static. This is unsave but efficient
         JSRunner.getInstance().getCondContext().eval("js", "2");
     }
-
-    static XmlCfg cfg;
-    private static String curDirectory;
-
-    private static final ZoneId zoneId = ZoneId.systemDefault();
-    private static final HashMap<String, DateTimeFormatter> dateFormatters = new HashMap<String, DateTimeFormatter>();
-    public static Logger logger;
-    static HashMap<Integer, String> fileidType = null;
-    static HashMap<String, ArrayList<Pattern>> printFiltersPatterns = null;
-    static inquirer inq;
-    private final static String serFile = ".logbr_dialog.ser";
-    private static QueryDialogSettings queryDialogSettings = null;
-    static ArrayList<IQueryResults> queries = new ArrayList<IQueryResults>();
-    static QueryDialog dlg;
-    private static InquirerCfg cr = null;
-    private final static String serFileDef = ".logbr_checkedref.ser";
-    private static final boolean useXMLSerializer = false;
 
     public static XmlCfg getXMLCfg() {
         return cfg;
@@ -170,7 +157,7 @@ public class inquirer {
     }
 
     public static int showYesNoPanel(Window p, String t, JComponent bannerPannel, Container jScrollPane,
-            int buttonOptions) {
+                                     int buttonOptions) {
         // JDialog allFiles = new JDialog(parent, title);
         InfoPanel infoDialog = new InfoPanel(p, t, bannerPannel, jScrollPane, buttonOptions);
 
@@ -675,20 +662,12 @@ public class inquirer {
         }
     }
 
-    private final ArrayList<ILogRecordFormatter> formatters = new ArrayList();
-    IQueryResults queryResults = null;
-    String startTime = "";
-    String endTime = "";
-    private final LogFileManager lfm = new LogFileManager();
-
     public ArrayList getFormatters() throws Exception {
         for (ILogRecordFormatter formatter : formatters) {
             formatter.refreshFormatter();
         }
         return formatters;
     }
-
-    static EnvInquirer ee;
 
     private boolean initReport() throws Exception {
         // DatabaseConnector.initDatabaseConnector(dbname,alias);
@@ -750,7 +729,7 @@ public class inquirer {
             int dialogButton = JOptionPane.YES_NO_CANCEL_OPTION;
             dialogResult = inquirer.showConfirmDialog(null,
                     "Number of records seems large (" + getCr().getMaxRecords() + "/" + queryResults.m_results.size()
-                    + "). Do you want to print on screen(Yes), to files only (No), or Cancel?",
+                            + "). Do you want to print on screen(Yes), to files only (No), or Cancel?",
                     "Warning", dialogButton);
             if (dialogResult == JOptionPane.CANCEL_OPTION) {
                 doPrint = false;
@@ -796,8 +775,8 @@ public class inquirer {
         // <editor-fold defaultstate="collapsed" desc="Query thread definition">
         class QueryTask extends MySwingWorker<Void, String> {
 
-            private RequestProgress rp = null;
             private final CountDownLatch latch;
+            private RequestProgress rp = null;
 
             private QueryTask(CountDownLatch latch) {
                 this.latch = latch;
@@ -860,8 +839,8 @@ public class inquirer {
 
     public static class InfoPanel extends StandardDialog {
 
-        private Container mainPanel;
         private final int buttonOptions;
+        private Container mainPanel;
         private JComponent bannerPannel = null;
 
         private InfoPanel(Window p, String t, JComponent bannerPannel, Container jScrollPane, int YES_NO_OPTION) {

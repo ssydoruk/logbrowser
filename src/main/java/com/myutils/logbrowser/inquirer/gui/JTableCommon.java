@@ -14,16 +14,12 @@ import com.myutils.logbrowser.inquirer.DatabaseConnector;
 import com.myutils.logbrowser.inquirer.MsgType;
 import com.myutils.logbrowser.inquirer.gui.AColumnFilter.PositionalFilter;
 import com.myutils.logbrowser.inquirer.inquirer;
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Container;
-import java.awt.Frame;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Rectangle;
-import java.awt.RenderingHints;
-import java.awt.Window;
+
+import javax.swing.*;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import javax.swing.table.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
@@ -31,63 +27,30 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
-import javax.swing.AbstractAction;
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
-import javax.swing.JComponent;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.KeyStroke;
-import javax.swing.ListSelectionModel;
-import javax.swing.RowFilter;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
-import javax.swing.table.AbstractTableModel;
-import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableCellRenderer;
-import javax.swing.table.TableColumn;
-import javax.swing.table.TableModel;
-import javax.swing.table.TableRowSorter;
 
 /**
- *
  * @author ssydoruk
  */
 abstract class JTableCommon extends JTablePopup {
 
+    static final String RECORD_EMPTY = "<(Empty)>";
     /**
      *
      */
     private static final long serialVersionUID = 1L;
-
-    static final String RECORD_EMPTY = "<(Empty)>";
-
+    private static final int MAX_CHARS_IN_TABLE = 25;
     private final HashMap<Integer, AColumnFilter> columnFilters = new HashMap<>();
-
-    Rectangle r = null;
-    private Color c;
-    TableRowSorter<TableModel> sorter = null;
-
     private final TableCellRenderer savedHeaderRenderer;
     private final JMenuItem miCancelColumnFilter;
-
-    JMenuItem miCancelFilters;
-    protected int copyItemsIdx = 0;
     private final TableColumnAdjuster tca;
+    protected int copyItemsIdx = 0;
+    Rectangle r = null;
+    TableRowSorter<TableModel> sorter = null;
+    JMenuItem miCancelFilters;
+    private Color c;
     private JTablePopup uniquePopup = null;
-
-    private static final int MAX_CHARS_IN_TABLE = 25;
 
     public JTableCommon() {
         super();
@@ -870,9 +833,9 @@ abstract class JTableCommon extends JTablePopup {
 
     class InfoPanel extends StandardDialog {
 
-        private int closeCause = JOptionPane.CANCEL_OPTION;
         private final JTable tab;
         JButton jbFilter;
+        private int closeCause = JOptionPane.CANCEL_OPTION;
 
         InfoPanel(Window parent, String title, JTable tab) {
             super(parent, title);

@@ -218,7 +218,7 @@ public enum DialogItem {
     MCP_STRATEGY_STEPSPARAMS2("Strategy parameters 2"),
     URS_HTTP("HTTP requests to URS"),
     URS_HTTP_METHOD("HTTP method"),
-    URS_HTTP_URI("HTTP URI"), 
+    URS_HTTP_URI("HTTP URI"),
     URS_GENMESSAGE("Strategy log message"), URS_GENMESSAGE_TYPE("Type"),
     URS_GENMESSAGE_MSG("Message");
 
@@ -228,7 +228,7 @@ public enum DialogItem {
         name = s;
     }
 
-//    public boolean equals(DialogItem item) {
+    //    public boolean equals(DialogItem item) {
 //        
 //    }
     public boolean equalsName(String otherName) {

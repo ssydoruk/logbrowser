@@ -8,7 +8,6 @@ package com.myutils.logbrowser.inquirer;
 import java.util.HashSet;
 
 /**
- *
  * @author ssydoruk
  */
 public class OutputSpecFormatterFile extends OutputSpecFormatter {

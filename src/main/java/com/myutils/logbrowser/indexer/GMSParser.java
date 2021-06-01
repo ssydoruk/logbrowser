@@ -4,6 +4,8 @@
  */
 package com.myutils.logbrowser.indexer;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.io.IOException;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -14,67 +16,57 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.apache.commons.lang3.StringUtils;
 
 /**
- *
  * @author ssydoruk
  */
 public class GMSParser extends Parser {
 
+    public static final int MAX_WEB_PARAMS = 20;
     private static final org.apache.logging.log4j.Logger logger = Main.logger;
-
     //2 types of thread messages in ORS logs
 //21:37:08.194 [T:2560] {ScxmlMetric:3} METRIC <eval_expr sid='VIKO7I50UD32135O60O7ACO4NS0083UP' expression='varConsiderConcierge = _genesys.session.getListItemValue('LIST_CHT_SCT', v_ServiceCallType, 'Concierge Considered').toUpperCase();' result='' />
-    private static final Pattern regWThread = Pattern.compile("^\\s*\\[([^\\]]+)[\\]\\s]*");
+    private static final Matcher regWThread = Pattern.compile("^\\s*\\[([^\\]]+)[\\]\\s]*");
     //21:37:07.710 {FMWeb:2} HandleRequest: Path '/scxml', file '/session/start', query ''
-    private static final Pattern regFMThread = Pattern.compile("\\s*\\{([^:\\}]+)");
+    private static final Matcher regFMThread = Pattern.compile("\\s*\\{([^:\\}]+)");
     // general buffer
     private static final byte[] m_CharBuf = new byte[8048];
     //16:41:55.299 ors:+OrsEvent[0x01aa91f0]:name=interaction.partystatechanged
 //2016-04-20T09:22:09.969 Trc 04541 Message EventAgentNotReady received from 'sipserver_01_p@+43891166406129992'
 //09:22:09.970 [LS] '00AGCH16J4BHF6E1GNHNK2LAES00000R' ProcessEvent=AgentEventNotReady dev='+43891166406129992' queue='' mediaType=100  StateStorageCnt=1 Key[102-148-0-100]
-    private static final Pattern regDate = Pattern.compile("^((?:\\d{4}-\\d{2}-\\d{2}T)*\\d{2}:\\d{2}:\\d{2}\\.\\d{3} )");
+    private static final Matcher regDate = Pattern.compile("^((?:\\d{4}-\\d{2}-\\d{2}T)*\\d{2}:\\d{2}:\\d{2}\\.\\d{3} )");
     //16:41:55.299 Int 04543 Interaction message "EventRouteRequest" received from 65200 ("SIPTS750@3020")
 //16:39:27.319 Trc 04541 Message EventRegistered received from 'SIPTS750@7593'
     //hopefully URS always print : message EventCallDataChanged after
-    private static final Pattern regMsgStart = Pattern.compile("Handling update message:$");
-    private static final Pattern regMsgRequest = Pattern.compile("Sent '(\\w+)' \\(\\d+\\) attributes:$");
-
-//    java.net.ConnectException: Connection refused
-    private static final Pattern regExceptionStart = Pattern.compile("^([\\w\\.]+Exception[\\w\\.]*):(.*)");
-    private static final Pattern regNullExceptionStart = Pattern.compile("^([\\w\\.]+Exception[\\w\\.]*)");
-
-//07:23:14.681 Dbg 09900  [qtp747464370-266] Attempting to start session  with url {callback}
-    private static final Pattern regAttemptStartSession = Pattern.compile("Attempting to start session");
-    //    static Pattern regMsgStart = Pattern.compile("^\\s*(?:Int 04543|Trc 04541).+essage \\\"*(\\w+).+from \\d+ \\(\\\"([^@\\\"]+)");
+    private static final Matcher regMsgStart = Pattern.compile("Handling update message:$");
+    private static final Matcher regMsgRequest = Pattern.compile("Sent '(\\w+)' \\(\\d+\\) attributes:$");
+    //    java.net.ConnectException: Connection refused
+    private static final Matcher regExceptionStart = Pattern.compile("^([\\w\\.]+Exception[\\w\\.]*):(.*)");
+    private static final Matcher regNullExceptionStart = Pattern.compile("^([\\w\\.]+Exception[\\w\\.]*)");
+    //07:23:14.681 Dbg 09900  [qtp747464370-266] Attempting to start session  with url {callback}
+    private static final Matcher regAttemptStartSession = Pattern.compile("Attempting to start session");
+    //    static Matcher regMsgStart = Pattern.compile("^\\s*(?:Int 04543|Trc 04541).+essage \\\"*(\\w+).+from \\d+ \\(\\\"([^@\\\"]+)");
     // : message EventServerInfo
 //AgentMessage(super=BasicTelephonyMessage(message='EventAgentLogin' (73) attributes:
-    private static final Pattern regTMessageStart = Pattern.compile("^(?:\\w+)Message.+message='(\\w+)'");
-    //static Pattern regMsgStart=Pattern.compile("^(Int 04543 |Trc 04541 )");
-    private static final Pattern regMMsgStart = Pattern.compile("^\\s*attr_");
+    private static final Matcher regTMessageStart = Pattern.compile("^(?:\\w+)Message.+message='(\\w+)'");
+    //static Matcher regMsgStart=Pattern.compile("^(Int 04543 |Trc 04541 )");
+    private static final Matcher regMMsgStart = Pattern.compile("^\\s*attr_");
     // : message EventServerInfo
-    private static final Pattern regOutMMsgStart = Pattern.compile("Message '(\\w+)' sent to '(\\w+)'");
+    private static final Matcher regOutMMsgStart = Pattern.compile("Message '(\\w+)' sent to '(\\w+)'");
     // : message EventServerInfo
     //16:41:55.283 W-NODE[272](RUNNING): >>>> 78 bytes to S-NODE[272] >>>>
 //16:41:55.283 S-NODE[272](MASTER): <<<< 78 bytes from NODE[272] <<<<
     //" (W|S)-NODE\\[(\\d+)\\]\\D+(\\d+) bytes (to|from).+NODE\\[(\\d+)\\]"
-    private static final Pattern regClusterMsg = Pattern.compile("^(W|S)-NODE\\[(\\d+)\\]\\D+(\\d+) bytes (to|from).+NODE\\[(\\d+)\\]");
+    private static final Matcher regClusterMsg = Pattern.compile("^(W|S)-NODE\\[(\\d+)\\]\\D+(\\d+) bytes (to|from).+NODE\\[(\\d+)\\]");
     //16:17:19.815 CTITM: R:323 UpdateUData(1,3020)
-    //static Pattern regCTITM = Pattern.compile("");
-    private static final Pattern m_strCTITM = Pattern.compile("^\\s*CTITM:\\s+(.+)$");
-    private static final Pattern regCTITMReq = Pattern.compile("^R:(\\d+) (\\w+)\\(([^,]+),([^\\)]+)");
-    /*
-    16:41:55.768 METRIC <state_enter sid='KL8938QSD91ER2RN2NR1397738000001' name='Telstra.globalstate' type='state' />
-    16:41:55.768 METRIC <transition sid='KL8938QSD91ER2RN2NR1397738000001' target='Telstra.Entry1' line='2859' />
-    16:41:55.768 METRIC <log sid='KL8938QSD91ER2RN2NR1397738000001' expr='KL8938QSD91ER2RN2NR1397738000001: Inside Entry Block: Entry1' label='' level='1' />
-     */
-    static String m_strMetric = "METRIC ";
+    //static Matcher regCTITM = Pattern.compile("");
+    private static final Matcher m_strCTITM = Pattern.compile("^\\s*CTITM:\\s+(.+)$");
+    private static final Matcher regCTITMReq = Pattern.compile("^R:(\\d+) (\\w+)\\(([^,]+),([^\\)]+)");
     //11:19:06.379 [SessionManager]: adding key[IDEN4PA4QH5PJ2F786QKA47CPC0066RU]/value[5PQD29NRV96QVB8GF448P0ICEK0016KC]
-    private static final Pattern regGidUuid = Pattern.compile("adding key\\[(\\w+)]/value\\[(\\w+)\\]");
+    private static final Matcher regGidUuid = Pattern.compile("adding key\\[(\\w+)]/value\\[(\\w+)\\]");
 
-//13:40:18.552 {SessionManager:2} URL [http://orswas.internal.gslb.service.nsw.gov.au/mod-routing/src-gen/IPD_default_mainWorkflow.scxml] associated with script [mod-routing]
-    private static final Pattern regAppURL = Pattern.compile("\\}\\sURL \\[([^\\]]+)\\] associated with script \\[([^\\]]+)\\]$");
+    //13:40:18.552 {SessionManager:2} URL [http://orswas.internal.gslb.service.nsw.gov.au/mod-routing/src-gen/IPD_default_mainWorkflow.scxml] associated with script [mod-routing]
+    private static final Matcher regAppURL = Pattern.compile("\\}\\sURL \\[([^\\]]+)\\] associated with script \\[([^\\]]+)\\]$");
     //09:25:15.864 {ORSURS:3} InvokeFunctionalModule: <<
 //	refID	28
 //	call	'028AS5H6BGBHF6E1GNHNK2LAES00000F'
@@ -84,65 +76,64 @@ public class GMSParser extends Parser {
 //	args	'[1,"VQ_Residential_RP",0,"","any",1,0,0,"VQUser@.A"]'
 // <<
 //09:25:15.864 [T:140084682483456] {ScxmlMetric:3} METRIC <eval_condition sid='004BUJ1C0KBHF8NIG7HNK2LAES000008' condition='system.ANI == ''' result='false' />
-    private static final Pattern regPOST = Pattern.compile("^\\(POST\\) Client IP Address");
-    private static final Pattern regKVList = Pattern.compile("^\\s+'");
-    private static final Pattern regPostJSON = Pattern.compile("JSon: KVList:\\s*$");
+    private static final Matcher regPOST = Pattern.compile("^\\(POST\\) Client IP Address");
+    private static final Matcher regKVList = Pattern.compile("^\\s+'");
+    private static final Matcher regPostJSON = Pattern.compile("JSon: KVList:\\s*$");
 
-    private static final Pattern regORSResponse = Pattern.compile("^OrsService: response from ORS (.+)$");
+    private static final Matcher regORSResponse = Pattern.compile("^OrsService: response from ORS (.+)$");
 
-    private static final Pattern regExceptionContinue = Pattern.compile("^(\\s|Caused by:)");
-    private static final Pattern regIxnMsgContinue = Pattern.compile("^(\\s|attr_)");
-
-    static String httpStart = " HTTP[";
-//    private static final Pattern regSTATE_HTTPIN = Pattern.compile(" HandleRequest: |ORS_HTTPResponse");
-//    private static final Pattern regHTTPINSessionCreate = Pattern.compile("\\s*OnRequestStart: Creating session. SessionID=(\\w+)$");
+    private static final Matcher regExceptionContinue = Pattern.compile("^(\\s|Caused by:)");
+    private static final Matcher regIxnMsgContinue = Pattern.compile("^(\\s|attr_)");
+    //    private static final Matcher regSTATE_HTTPIN = Pattern.compile(" HandleRequest: |ORS_HTTPResponse");
+//    private static final Matcher regHTTPINSessionCreate = Pattern.compile("\\s*OnRequestStart: Creating session. SessionID=(\\w+)$");
     //19:36:55.156 HTTP[56,TCP] <<<< 413 bytes from 171.164.220.27 <<<<
-//    private static final Pattern regHTTPin = Pattern.compile("^\\s*HTTP\\[(\\d+)\\,TCP\\] <<<< (\\d+) bytes from ([\\d\\.]+) <<<<$");
+//    private static final Matcher regHTTPin = Pattern.compile("^\\s*HTTP\\[(\\d+)\\,TCP\\] <<<< (\\d+) bytes from ([\\d\\.]+) <<<<$");
     //21:06:45.840 HTTP[42,TCP] >>>> 131 bytes >>>>
-//    private static final Pattern regHTTPout = Pattern.compile("^\\s*HTTP\\[(\\d+)\\,TCP\\] >>>> (\\d+) bytes >>>>$");
-//    private static final Pattern regHTTPignore = Pattern.compile(": OnConnect|client .+ exception|discard pending resonse| client [\\d\\.]+ disconnected");
+//    private static final Matcher regHTTPout = Pattern.compile("^\\s*HTTP\\[(\\d+)\\,TCP\\] >>>> (\\d+) bytes >>>>$");
+//    private static final Matcher regHTTPignore = Pattern.compile(": OnConnect|client .+ exception|discard pending resonse| client [\\d\\.]+ disconnected");
     private static final StartSessionTransition startSessionTransition = new StartSessionTransition();
-    private static final Pattern regNotParseMessage = Pattern.compile(
+    private static final Matcher regNotParseMessage = Pattern.compile(
             //07:47:39.182 Trc 09900  [qtp747464370-17] >>> /1/service/callback/RCC_CORK_CallBack - CCID [null]
             "^(09900"
-            + ")");
-    private static final Pattern regStatisticMessage = Pattern.compile(
+                    + ")");
+    private static final Matcher regStatisticMessage = Pattern.compile(
             "^StatisticService: ");
-    private static final Pattern regOpenMediaInteraction = Pattern.compile(
+    private static final Matcher regOpenMediaInteraction = Pattern.compile(
             "^CreateOpenMediaInteractionController webRequestId \\[(\\d+)\\], submitInteraction (request received|response) for (\\S+)\\s+");
-    private static final Pattern regSendIxnServerMsg = Pattern.compile(
+    private static final Matcher regSendIxnServerMsg = Pattern.compile(
             "^CreateOpenMediaInteractionTask.+(to|from) Interaction Server: '([^']+)'");
     //<editor-fold defaultstate="collapsed" desc="GMSStatServerMsg">
-    private static final Pattern ptStatStringValue = Pattern.compile("^\\s*'STRING_VALUE'.+= \"(.+)\"$");
-    private static final Pattern ptStatMessageStart = Pattern.compile("message from (\\S+) - tcp:\\/\\/([^:]+):(\\d+): '([^']+)'.+attributes:\\s+");
-    private static final Pattern ptStatMessageAttr = Pattern.compile("(?:(\\S+)\\s+\\[\\S+\\]\\s+=\\s+([\\-\\d]+|\"[^\\\"]+\"|ObjectValue:[^\\}]+)\\s+)");
-    public static final int MAX_WEB_PARAMS = 20;
+    private static final Matcher ptStatStringValue = Pattern.compile("^\\s*'STRING_VALUE'.+= \"(.+)\"$");
+    private static final Matcher ptStatMessageStart = Pattern.compile("message from (\\S+) - tcp:\\/\\/([^:]+):(\\d+): '([^']+)'.+attributes:\\s+");
+    private static final Matcher ptStatMessageAttr = Pattern.compile("(?:(\\S+)\\s+\\[\\S+\\]\\s+=\\s+([\\-\\d]+|\"[^\\\"]+\"|ObjectValue:[^\\}]+)\\s+)");
     private static final HashMap<String, Integer> keysPos = new HashMap<>(MAX_WEB_PARAMS);
-
+    /*
+    16:41:55.768 METRIC <state_enter sid='KL8938QSD91ER2RN2NR1397738000001' name='Telstra.globalstate' type='state' />
+    16:41:55.768 METRIC <transition sid='KL8938QSD91ER2RN2NR1397738000001' target='Telstra.Entry1' line='2859' />
+    16:41:55.768 METRIC <log sid='KL8938QSD91ER2RN2NR1397738000001' expr='KL8938QSD91ER2RN2NR1397738000001: Inside Entry Block: Entry1' label='' level='1' />
+     */
+    static String m_strMetric = "METRIC ";
+    static String httpStart = " HTTP[";
+    private final HashMap<Integer, OrsHTTP> partHTTP = new HashMap<>();
+    private final HashMap<String, ParserState> threadParserState = new HashMap<>();
+    private final HashMap<String, String> ThreadAlias = new HashMap<>();
+    private final boolean isInbound = true;
+    private final ParserThreadsProcessor ptpsThreadProcessor;
+    HashMap<String, String> prevSeqno = new HashMap();
+    MsgType MessageType;
+    Message msg = null;
+    HashMap<String, GMSORSMessage> threadReqs = new HashMap<>();
     private long m_CurrentFilePos;
     private int m_TotalLen;
     private int m_dbRecords;
     private String m_msgName;
     private String m_TserverSRC;
     private String m_TMessageHeader;
-    HashMap<String, String> prevSeqno = new HashMap();
-
     private long m_HeaderOffset;
-
     private ParserState m_ParserState;
-
-    private final HashMap<Integer, OrsHTTP> partHTTP = new HashMap<>();
-
-    private final HashMap<String, ParserState> threadParserState = new HashMap<>();
-
-    MsgType MessageType;
-
     private String m_MetricType;
     private String m_SessionID;
-
     private String m_LastLine = "";
-
-
     /*	public OrsParser(DBAccessor accessor) {
      m_accessor = accessor;
      }
@@ -156,18 +147,13 @@ public class GMSParser extends Parser {
      }
      */
     private BufferedReaderCrLf m_input;
-    private final HashMap<String, String> ThreadAlias = new HashMap<>();
     private String newThread; // current thread name as parsed fom the line
     private Record recInProgress;
     private String URL = null;
     private String app = null;
-    private final boolean isInbound = true;
     private String m_msg1;
     private String oldThread;
     private String savedThreadID;
-    private final ParserThreadsProcessor ptpsThreadProcessor;
-    Message msg = null;
-    HashMap<String, GMSORSMessage> threadReqs = new HashMap<>();
 
     GMSParser(HashMap<TableType, DBTable> m_tables) {
         super(FileInfoType.type_GMS, m_tables);
@@ -220,12 +206,12 @@ public class GMSParser extends Parser {
     private String getThread(String s) {
         if (s != null) {
             Matcher m;
-            if ((m = regWThread.matcher(s)).find()) {
+            if ((m = regWThread.reset(s)).find()) {
                 oldThread = newThread;
                 newThread = getThreadAlias(m.group(1));
                 return s.substring(m.end());
             }
-//            if ((m = regFMThread.matcher(dp.rest)).find()) {
+//            if ((m = regFMThread .reset(dp.rest)).find()) {
 //                thread = getThreadAlias(m.group(1));
 //                return;
 //            }
@@ -549,7 +535,7 @@ public class GMSParser extends Parser {
 
                 }
             } catch (Exception ex) {
-                logger.error("fatal: ",  ex);
+                logger.error("fatal: ", ex);
             }
         }
         GMSORSMessage _msg = new GMSORSMessage(threadID, dp.rest);
@@ -608,14 +594,13 @@ public class GMSParser extends Parser {
             msgResp.AddToDB(m_tables);
 
         } catch (Exception ex) {
-            logger.error("fatal: ",  ex);
+            logger.error("fatal: ", ex);
         }
         threadReqs.remove(savedThreadID);
         savedThreadID = null;
     }
 
     @Override
-
     void init(HashMap<TableType, DBTable> m_tables) {
         m_tables.put(TableType.GMSStart, new GMSStartTable(Main.getM_accessor(), TableType.GMSStart));
         m_tables.put(TableType.GMSStatServerMessage, new GMSStatServerMsgTable(Main.getM_accessor(), TableType.GMSStatServerMessage));
@@ -624,13 +609,35 @@ public class GMSParser extends Parser {
 
     }
 
+    enum ParserState {
+        STATE_HEADER,
+        STATE_TMESSAGE_REQUEST,
+        STATE_ORSMESSAGE,
+        STATE_COMMENT,
+        STATE_TMESSAGE_EVENT,
+        STATE_CLUSTER,
+        STATE_HTTPIN,
+        STATE_HTTPHANDLEREQUEST,
+        STATE_POST,
+        STATE_TMESSAGE_ATTRIBUTES,
+        STATE_EXCEPTION,
+        STATE_ORS_RESPONSE, STATE_ORS_RESPONSE_EXCEPTION, STATE_IXNMESSAGE
+    }
+
+    enum MsgType {
+        MSG_UNKNOWN,
+        MSG_MM_OUT,
+        MSG_MM_IN,
+        MSG_TLIB
+    }
+
     private static class StartSessionTransition implements ParserThreadsProcessor.StateTransition {
 
-        private final static Pattern regParams = Pattern.compile("^\\s*Params:");
+        private final static Matcher regParams = Pattern.compile("^\\s*Params:");
 
         @Override
         public ParserThreadsProcessor.StateTransitionResult stateTransition(ParserThreadState threadState,
-                String sOrig, String sParsedAndTruncated, String threadID, Parser parser) {
+                                                                            String sOrig, String sParsedAndTruncated, String threadID, Parser parser) {
             Matcher m;
 
             switch (threadState.getParserState()) {
@@ -660,28 +667,6 @@ public class GMSParser extends Parser {
             return ParserThreadsProcessor.StateTransitionResult.ERROR_STATE;
         }
 
-    }
-
-    enum ParserState {
-        STATE_HEADER,
-        STATE_TMESSAGE_REQUEST,
-        STATE_ORSMESSAGE,
-        STATE_COMMENT,
-        STATE_TMESSAGE_EVENT,
-        STATE_CLUSTER,
-        STATE_HTTPIN,
-        STATE_HTTPHANDLEREQUEST,
-        STATE_POST,
-        STATE_TMESSAGE_ATTRIBUTES,
-        STATE_EXCEPTION,
-        STATE_ORS_RESPONSE, STATE_ORS_RESPONSE_EXCEPTION, STATE_IXNMESSAGE
-    }
-
-    enum MsgType {
-        MSG_UNKNOWN,
-        MSG_MM_OUT,
-        MSG_MM_IN,
-        MSG_TLIB
     }
 
     private class GMSStatServerMsg extends Message {
@@ -805,7 +790,6 @@ public class GMSParser extends Parser {
         }
 
         /**
-         *
          * @throws Exception
          */
         @Override
@@ -952,7 +936,7 @@ public class GMSParser extends Parser {
                     + ",URLID int"
                     + ",isResponse boolean"
                     + ",webReqID int"
-                    + buf.toString()
+                    + buf
                     + ");";
             getM_dbAccessor().runQuery(query);
 
@@ -966,14 +950,13 @@ public class GMSParser extends Parser {
                     + ",?"
                     + ",?"
                     + ",?"
-                    + buf.toString()
+                    + buf
                     + ");"
             );
 
         }
 
         /**
-         *
          * @throws Exception
          */
         @Override

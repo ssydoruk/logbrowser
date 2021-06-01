@@ -4,11 +4,11 @@
  */
 package com.myutils.logbrowser.indexer;
 
+import java.util.ArrayList;
+
 import static Utils.Util.StripQuotes;
-import java.util.*;
 
 /**
- *
  * @author terry The class Replicates TLibMessage
  */
 public class UrsMessage extends Message {
@@ -82,15 +82,15 @@ public class UrsMessage extends Message {
         this.refID = refID;
     }
 
-    void setThisDN(String thisDN) {
-        this.thisDN = thisDN;
-    }
-
     String getThisDN() {
         if (thisDN == null) {
             thisDN = getAttributeDN("AttributeThisDN");
         }
         return thisDN;
+    }
+
+    void setThisDN(String thisDN) {
+        this.thisDN = thisDN;
     }
 
     String getOtherDN() {

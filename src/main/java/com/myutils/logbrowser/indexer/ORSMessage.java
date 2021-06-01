@@ -4,13 +4,14 @@
  */
 package com.myutils.logbrowser.indexer;
 
-import static Utils.Util.intOrDef;
-import java.util.*;
-import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.ArrayList;
+import java.util.regex.Pattern;
+
+import static Utils.Util.intOrDef;
+
 /**
- *
  * @author terry The class Replicates TLibMessage
  */
 public class ORSMessage extends Message {
@@ -19,17 +20,14 @@ public class ORSMessage extends Message {
     private static final Pattern regShortThisDN = Pattern.compile("^\\sTDN:(.+)$");
     private static final Pattern regShortThisDNIS = Pattern.compile("^\\sDNIS:(.+)$");
     private static final Pattern regShortANI = Pattern.compile("^\\sANI:(.+)$");
-
-    String m_MessageName;
     private final String m_TserverSRC;
-
+    String m_MessageName;
     private String m_refID;
     private String m_ThisDN;
     private boolean isTServerReq = false;
     private Integer callID;
 
     /**
-     *
      * @param event
      * @param TserverSRC
      * @param newMessageLines

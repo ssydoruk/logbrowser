@@ -12,10 +12,12 @@ import com.myutils.logbrowser.inquirer.FullTableColors;
 import com.myutils.logbrowser.inquirer.IQueryResults;
 import com.myutils.logbrowser.inquirer.SelectionType;
 import com.myutils.logbrowser.inquirer.inquirer;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Font;
-import java.awt.Rectangle;
+
+import javax.swing.*;
+import javax.swing.event.TableModelListener;
+import javax.swing.table.AbstractTableModel;
+import javax.swing.table.DefaultTableCellRenderer;
+import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -23,19 +25,29 @@ import java.io.FileOutputStream;
 import java.io.PrintStream;
 import java.time.ZoneId;
 import java.util.ArrayList;
-import javax.swing.JTable;
-import javax.swing.event.TableModelListener;
-import javax.swing.table.AbstractTableModel;
-import javax.swing.table.DefaultTableCellRenderer;
 
 /**
- *
  * @author Stepan
  */
 public class QueryJTable extends JTableCommon {
 
-    static ZoneId zoneId = ZoneId.systemDefault();
     private static final DefaultTableCellRenderer DEFAULT_RENDERER = new DefaultTableCellRenderer();
+    static ZoneId zoneId = ZoneId.systemDefault();
+
+    public QueryJTable(FullTableColors tabs) throws Exception {
+        super();
+
+        this.setModel(new DataModel(tabs));
+//        setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
+
+        Font font = this.getFont();
+
+        setDefaultRenderer(Object.class, new QueryJTableCellRenderer(new Font(font.getName(), Font.BOLD, font.getSize())));
+        TableColumnAdjuster tca = getTca();
+        tca.setColumnHeaderIncluded(true);
+        tca.adjustColumns();
+
+    }
 
     public static void setResize(JTable table) {
 //        for (int column = 0; column < table.getColumnCount(); column++) {
@@ -58,21 +70,6 @@ public class QueryJTable extends JTableCommon {
 //
 //            tableColumn.setPreferredWidth(preferredWidth + 5);
 //        }
-    }
-
-    public QueryJTable(FullTableColors tabs) throws Exception {
-        super();
-
-        this.setModel(new DataModel(tabs));
-//        setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
-
-        Font font = this.getFont();
-
-        setDefaultRenderer(Object.class, new QueryJTableCellRenderer(new Font(font.getName(), Font.BOLD, font.getSize())));
-        TableColumnAdjuster tca = getTca();
-        tca.setColumnHeaderIncluded(true);
-        tca.adjustColumns();
-
     }
 
     @Override
@@ -198,7 +195,6 @@ public class QueryJTable extends JTableCommon {
         }
 
         /**
-         *
          * @param row
          * @param searchField
          * @return pair of Selection Type, value of ID for selectionType

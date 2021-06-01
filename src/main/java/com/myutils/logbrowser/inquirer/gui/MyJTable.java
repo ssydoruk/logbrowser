@@ -5,23 +5,25 @@
  */
 package com.myutils.logbrowser.inquirer.gui;
 
-import com.jacob.com.*;
-import com.myutils.logbrowser.indexer.*;
-import com.myutils.logbrowser.inquirer.gui.SystemClipboard;
-import com.myutils.logbrowser.inquirer.gui.TabResultDataModel.FieldParams;
+import com.jacob.com.ComFailException;
+import com.myutils.logbrowser.indexer.Main;
 import com.myutils.logbrowser.inquirer.*;
-import java.awt.*;
-import java.awt.event.*;
-import java.io.*;
-import java.util.*;
-import static javax.swing.JOptionPane.ERROR_MESSAGE;
+import com.myutils.logbrowser.inquirer.gui.TabResultDataModel.FieldParams;
+import org.apache.logging.log4j.LogManager;
+
 import javax.swing.*;
-import javax.swing.event.*;
-import javax.swing.table.*;
-import org.apache.logging.log4j.*;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import javax.swing.table.TableModel;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.MouseEvent;
+import java.io.IOException;
+import java.util.ArrayList;
+
+import static javax.swing.JOptionPane.ERROR_MESSAGE;
 
 /**
- *
  * @author Stepan
  */
 public class MyJTable extends JTableCommon {
@@ -32,14 +34,10 @@ public class MyJTable extends JTableCommon {
     private static final long serialVersionUID = 1L;
 
     private static final org.apache.logging.log4j.Logger logger = LogManager.getLogger();
-
-    private String queryName = null;
     private final ShowInfo infoAction;
     private final JMenuItem hideColumnRTMenu;
-    private String searchString = null;
-    JMenuItem deleteItem;
     protected ShowFullMessage fullMsg;
-    private boolean followLog = false;
+    JMenuItem deleteItem;
     HideColumn hideColumn;
     ShowAllColumns showAllColumns;
     ShowMessage showMessage;
@@ -48,6 +46,9 @@ public class MyJTable extends JTableCommon {
     JMenu jmAddFields;
     JMenu jmRegexFields;
     JMenu jmOpenIn;
+    private String queryName = null;
+    private String searchString = null;
+    private boolean followLog = false;
 
     public MyJTable() {
         super();
@@ -128,8 +129,8 @@ public class MyJTable extends JTableCommon {
             }
             MsgType rowType = model.getRowType(popupRow);
             if (rowType != null) {
-                hideColumnRTMenu.setText("Hide this column for \"" + rowType.toString() + "\"");
-                jmAddFields.setText("Hidden columns for \"" + rowType.toString() + "\"");
+                hideColumnRTMenu.setText("Hide this column for \"" + rowType + "\"");
+                jmAddFields.setText("Hidden columns for \"" + rowType + "\"");
 
                 ArrayList<TabResultDataModel.FieldParams> hidden = model.getHidden(rowType);
                 int menusAdded = 0;
@@ -137,12 +138,12 @@ public class MyJTable extends JTableCommon {
                     for (TabResultDataModel.FieldParams cp : hidden) {
                         menusAdded++;
                         jmAddFields.add(new AbstractAction(cp.menuName()) {
-                            @Override
-                            public void actionPerformed(ActionEvent e) {
-                                cp.setHidden(false);
-                                model.refreshTable();
-                            }
-                        }
+                                            @Override
+                                            public void actionPerformed(ActionEvent e) {
+                                                cp.setHidden(false);
+                                                model.refreshTable();
+                                            }
+                                        }
                         );
                     }
                 }
@@ -285,12 +286,12 @@ public class MyJTable extends JTableCommon {
         if (regexFieldsSettings != null && !regexFieldsSettings.isEmpty()) {
             for (CustomField regexFieldsSetting : regexFieldsSettings) {
                 jmRegexFields.add(new AbstractAction(regexFieldsSetting.getName()) {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        model.addCustomColumn(regexFieldsSetting, popupRow);
+                                      @Override
+                                      public void actionPerformed(ActionEvent e) {
+                                          model.addCustomColumn(regexFieldsSetting, popupRow);
 
-                    }
-                }
+                                      }
+                                  }
                 );
             }
 
@@ -318,6 +319,106 @@ public class MyJTable extends JTableCommon {
         jmRegexFields.add(action);
 
         jmRegexFields.setVisible(true);
+    }
+
+    private void addMultipleRows(JTable tab, TabResultDataModel model, EditRegexFields showFind) {
+        model.addCustomColumn(showFind, tab.convertRowIndexToModel(popupRow));
+    }
+
+    private void editRegexFields1(JTable tab) {
+        try {
+            TabResultDataModel model = (TabResultDataModel) tab.getModel();
+
+            EditRegexFields showFind = null;
+            boolean addRows = false;
+            int rowNo = tab.convertRowIndexToModel(popupRow);
+
+            if ((showFind = editRegexFields(model.getRow(rowNo))) != null) {
+                model.addCustomColumn(showFind, rowNo);
+            }
+        } catch (IOException ex) {
+            logger.fatal("", ex);
+        }
+    }
+
+    private void editRegexFields(JTable tab) {
+//        try {
+//            TabResultDataModel model = (TabResultDataModel) tab.getModel();
+//
+//            EditRegexFields showFind = null;
+//            boolean addRows = false;
+//            int sampleRowsCnt = 3;
+//            boolean cancelled = false;
+//            int rowNo = tab.convertRowIndexToModel(popupRow);
+//            TabResultDataModel.TableRow tableRow = ((TabResultDataModel) getModel()).getRow(rowNo);
+//
+//            while (!cancelled && (showFind = editRegexFields(tableRow.getRowType())) != null) {
+//                if (showFind.isMultipleRows()) {
+//                    addMultipleRows(tab, model, showFind);
+//                    cancelled = true;
+//                } else {
+//
+//                    ArrayList<EditRegexFields.SearchSample> sampleRows = model.getSampleRows(showFind, rowNo, sampleRowsCnt);
+//                    if (sampleRows == null) {
+//                        int showConfirmDialog = inquirer.showConfirmDialog(null, "Nothing found", "Do you want to change search parameters", JOptionPane.YES_NO_OPTION);
+//                        if (showConfirmDialog == JOptionPane.NO_OPTION) {
+//                            cancelled = true;
+//
+//                        } else {
+//
+//                        }
+//                    } else {
+//                        DefaultTableModel infoTableModel = new DefaultTableModel();
+//                        infoTableModel.addColumn("Matched string");
+//                        infoTableModel.addColumn("result string");
+//                        for (EditRegexFields.SearchSample entry : sampleRows) {
+//                            infoTableModel.addRow(new Object[]{entry.getKey(), entry.getValue()});
+//                        }
+//
+//                        JTable tab1 = new JTable(infoTableModel);
+//                        tab1.getTableHeader().setVisible(true);
+//
+//                        Dimension d = tab1.getPreferredSize();
+//                        JPanel jScrollPane = new JPanel(new BorderLayout());
+//                        jScrollPane.add(tab1);
+//                        jScrollPane.setPreferredSize(d);
+//
+//                        JPanel infoPanel = new JPanel(new BorderLayout());
+//                        JTextArea lb = new JTextArea();
+//                        lb.setText("Below are samples found by specified expression.\n\n"
+//                                + "Please make sure that it is what you want\n"
+//                                + "Press\n"
+//                                + "Yes - you want add these rows to the table\n"
+//                                + "No - you want to change search expression\n"
+//                                + "Cancel - you want to terminate the dialog");
+//                        lb.setFocusable(false);
+//
+//                        infoPanel.add(lb, BorderLayout.NORTH);
+////                     infoPanel.setPreferredSize(new Dimension(640, 480));
+//                        switch (inquirer.showYesNoPanel((Window) getRootPane().getParent(),
+//                                "Found following rows ( out of sample " + sampleRowsCnt + ")", infoPanel, jScrollPane, JOptionPane.YES_NO_CANCEL_OPTION)) {
+//                            case JOptionPane.CANCEL_OPTION:
+//                                cancelled = true;
+//                                break;
+//
+//                            case JOptionPane.NO_OPTION:
+//                                break;
+//
+//                            case JOptionPane.YES_OPTION:
+//                                cancelled = true;
+//                                addRows = true;
+//                                break;
+//                        };
+//
+//                    }
+//                }
+//                if (addRows && showFind != null) {
+//                    model.addCustomColumn(showFind, rowNo);
+//                }
+//            }
+//        } catch (IOException ex) {
+//            logger.fatal("", ex);
+//        }
     }
 
     class CopyRecord extends AbstractAction {
@@ -462,10 +563,6 @@ public class MyJTable extends JTableCommon {
 
     }
 
-    private void addMultipleRows(JTable tab, TabResultDataModel model, EditRegexFields showFind) {
-        model.addCustomColumn(showFind, tab.convertRowIndexToModel(popupRow));
-    }
-
     class AppendRecord extends AbstractAction {
 
         /**
@@ -591,102 +688,6 @@ public class MyJTable extends JTableCommon {
                 }
             }
         }
-    }
-
-    private void editRegexFields1(JTable tab) {
-        try {
-            TabResultDataModel model = (TabResultDataModel) tab.getModel();
-
-            EditRegexFields showFind = null;
-            boolean addRows = false;
-            int rowNo = tab.convertRowIndexToModel(popupRow);
-
-            if ((showFind = editRegexFields(model.getRow(rowNo))) != null) {
-                model.addCustomColumn(showFind, rowNo);
-            }
-        } catch (IOException ex) {
-            logger.fatal("", ex);
-        }
-    }
-
-    private void editRegexFields(JTable tab) {
-//        try {
-//            TabResultDataModel model = (TabResultDataModel) tab.getModel();
-//
-//            EditRegexFields showFind = null;
-//            boolean addRows = false;
-//            int sampleRowsCnt = 3;
-//            boolean cancelled = false;
-//            int rowNo = tab.convertRowIndexToModel(popupRow);
-//            TabResultDataModel.TableRow tableRow = ((TabResultDataModel) getModel()).getRow(rowNo);
-//
-//            while (!cancelled && (showFind = editRegexFields(tableRow.getRowType())) != null) {
-//                if (showFind.isMultipleRows()) {
-//                    addMultipleRows(tab, model, showFind);
-//                    cancelled = true;
-//                } else {
-//
-//                    ArrayList<EditRegexFields.SearchSample> sampleRows = model.getSampleRows(showFind, rowNo, sampleRowsCnt);
-//                    if (sampleRows == null) {
-//                        int showConfirmDialog = inquirer.showConfirmDialog(null, "Nothing found", "Do you want to change search parameters", JOptionPane.YES_NO_OPTION);
-//                        if (showConfirmDialog == JOptionPane.NO_OPTION) {
-//                            cancelled = true;
-//
-//                        } else {
-//
-//                        }
-//                    } else {
-//                        DefaultTableModel infoTableModel = new DefaultTableModel();
-//                        infoTableModel.addColumn("Matched string");
-//                        infoTableModel.addColumn("result string");
-//                        for (EditRegexFields.SearchSample entry : sampleRows) {
-//                            infoTableModel.addRow(new Object[]{entry.getKey(), entry.getValue()});
-//                        }
-//
-//                        JTable tab1 = new JTable(infoTableModel);
-//                        tab1.getTableHeader().setVisible(true);
-//
-//                        Dimension d = tab1.getPreferredSize();
-//                        JPanel jScrollPane = new JPanel(new BorderLayout());
-//                        jScrollPane.add(tab1);
-//                        jScrollPane.setPreferredSize(d);
-//
-//                        JPanel infoPanel = new JPanel(new BorderLayout());
-//                        JTextArea lb = new JTextArea();
-//                        lb.setText("Below are samples found by specified expression.\n\n"
-//                                + "Please make sure that it is what you want\n"
-//                                + "Press\n"
-//                                + "Yes - you want add these rows to the table\n"
-//                                + "No - you want to change search expression\n"
-//                                + "Cancel - you want to terminate the dialog");
-//                        lb.setFocusable(false);
-//
-//                        infoPanel.add(lb, BorderLayout.NORTH);
-////                     infoPanel.setPreferredSize(new Dimension(640, 480));
-//                        switch (inquirer.showYesNoPanel((Window) getRootPane().getParent(),
-//                                "Found following rows ( out of sample " + sampleRowsCnt + ")", infoPanel, jScrollPane, JOptionPane.YES_NO_CANCEL_OPTION)) {
-//                            case JOptionPane.CANCEL_OPTION:
-//                                cancelled = true;
-//                                break;
-//
-//                            case JOptionPane.NO_OPTION:
-//                                break;
-//
-//                            case JOptionPane.YES_OPTION:
-//                                cancelled = true;
-//                                addRows = true;
-//                                break;
-//                        };
-//
-//                    }
-//                }
-//                if (addRows && showFind != null) {
-//                    model.addCustomColumn(showFind, rowNo);
-//                }
-//            }
-//        } catch (IOException ex) {
-//            logger.fatal("", ex);
-//        }
     }
 
     class RegexField extends AbstractAction {

@@ -1,26 +1,32 @@
 package com.myutils.logbrowser.indexer;
 
-import java.sql.*;
-import java.util.*;
-import java.util.regex.*;
-import org.apache.commons.lang3.*;
+import org.apache.commons.lang3.StringUtils;
+
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
- *
  * @author terry
  */
 public class UrsParser extends Parser {
 
-    private static final Pattern regRIGenerated = Pattern.compile("^\\[19:0f\\]connid (\\w+) generated for client=(\\d+)\\(([^\\]]+)\\).+\\*(\\w+)$");
-    private static final Pattern regRIRequestStart = Pattern.compile("^\\[19:10\\][^:]+: ([^\\?]+)\\?(.+), client=(\\d+)\\(([^\\)]+)\\).+ref=(\\d+)$");
-    private static final Pattern regRIRequestShort = Pattern.compile("^\\[19:10\\][^:]+: (.+), client=(\\d+)\\(([^\\)]+)\\).+ref=(\\d+)$");
-    private static final Pattern regRIRequestShort1 = Pattern.compile("\\[19:10\\][^:]+: (.+), client=");
-    private static final Pattern regRIResp = Pattern.compile("^\\[19:11\\].+'([\\w~]+)'.+ client (\\d+)\\(([\\w~]+)\\).+ref=(\\d+)$");
-    private static final Pattern regRICallStart = Pattern.compile("received: urs/call/start");
-    private static final Pattern regRIConnIDGenerated = Pattern.compile("\\[19:10\\] connid ([\\w~]+).+client=(\\d+)\\(([^\\)]+)\\).+ref id=(\\d+), .+name=([\\w~]+)");
-    private static final Pattern reIID = Pattern.compile("^\\s+IID:(\\w+)$");
-
-//17:33:04.587_I_I_01d9027e17ef8b38 [09:05] >>>>>>>>>>>>resume interpretator(0), func:SuspendForDN
+    public static final HashMap<String, String> targetCode = getTargetCodes();
+    private static final Matcher regRIGenerated = Pattern.compile("^\\[19:0f\\]connid (\\w+) generated for client=(\\d+)\\(([^\\]]+)\\).+\\*(\\w+)$");
+    private static final Matcher regRIRequestStart = Pattern.compile("^\\[19:10\\][^:]+: ([^\\?]+)\\?(.+), client=(\\d+)\\(([^\\)]+)\\).+ref=(\\d+)$");
+    private static final Matcher regRIRequestShort = Pattern.compile("^\\[19:10\\][^:]+: (.+), client=(\\d+)\\(([^\\)]+)\\).+ref=(\\d+)$");
+    private static final Matcher regRIRequestShort1 = Pattern.compile("\\[19:10\\][^:]+: (.+), client=");
+    private static final Matcher regRIResp = Pattern.compile("^\\[19:11\\].+'([\\w~]+)'.+ client (\\d+)\\(([\\w~]+)\\).+ref=(\\d+)$");
+    private static final Matcher regRICallStart = Pattern.compile("received: urs/call/start");
+    private static final Matcher regRIConnIDGenerated = Pattern.compile("\\[19:10\\] connid ([\\w~]+).+client=(\\d+)\\(([^\\)]+)\\).+ref id=(\\d+), .+name=([\\w~]+)");
+    private static final Matcher reIID = Pattern.compile("^\\s+IID:(\\w+)$");
+    //17:33:04.587_I_I_01d9027e17ef8b38 [09:05] >>>>>>>>>>>>resume interpretator(0), func:SuspendForDN
 //    _I_I_01d9027e17ef8b38 [09:04] ASSIGN: agent_target(LOCAL) <- STRING: "return:timeout"
 //    _I_I_01d9027e17ef8b38 [09:04] ASSIGN: N_attempt(LOCAL) <- INTEGER: 1
 //17:33:04.587_M_I_01d9027e17ef8b38 [07:0c] default priority 6300
@@ -31,64 +37,75 @@ public class UrsParser extends Parser {
 //    _M_I_ [10:17] -ready DN 1077 @ TMK_SIP_Switch (type 1 CallInbound time=1463063585) for agent AZvyagina_tsk, place Place_1077_TMK, WaitForNextCall time=1463063585
 //    _M_I_ [10:17] STATOBJECT(06409ed0 208 2) tenant=Resources name=AZvyagina_tsk@OBN_StatServerRouting.A: 0(1) ready DNs reported, dT=0
 //17:33:04.697_T_I_03350282382b5512 [14:02] sending event 85 for virtual queue OBN_IP_Skill1_VQ_OBN_SIP_Outbound_Virtual
-    private static final Pattern regStrategyMessage = Pattern.compile("^\\s*_\\S_\\S_(\\S{16})\\s*\\[(\\S{2}:\\S{2})\\]\\s*");
-    private static final Pattern regNonStrategyMessage = Pattern.compile("^\\s*_\\S_\\S_\\s*\\[(\\S{2}:\\S{2})\\]\\s*");
-    private static final Pattern regRLibMessage = Pattern.compile("^\\s*RLIB: ");
-    private static final Pattern regStartsFromSpace = Pattern.compile("^\\s+");
-    private static final Pattern regTMessageOutFinal = Pattern.compile("^\\.\\.sent to");
-    private static final Pattern regTMessageAttribute = Pattern.compile("^\t");
-    private static final Pattern regTMessageInFinal = Pattern.compile("^(\\w.+is received for ts|\\.\\.sent to)");
-
-//    private static final Pattern regAgentStatusChanged = Pattern.compile("^_M_I_ \\[10:17\\]");
-    private static final Pattern regWaitingCalls = Pattern.compile("^WAITING CALLS:\\s*");
-    private static final Pattern regWaitingInit = Pattern.compile("_M_I_ \\[10:15\\]");
-
-    private static final Pattern regGroupContent = Pattern.compile("CURRENT CONTENT\\(\\d+\\):");
-    private static final Pattern regSCXMLContinue = Pattern.compile("^\\s*_\\S_\\S_(\\S{16})\\s*\\[09:04\\]\\s*");
-    private static final Pattern regHTTPBridgeContinue = Pattern.compile("^\\s+");
-    private static final Pattern regHTTPResponse = Pattern.compile("^HTTP");
-    private static final Pattern regTargetInformation = Pattern.compile("^(============== Target|\\s)");
-    private static final Pattern regRIResponse = Pattern.compile("Message: (.+)$");
-
-    private static final Pattern regMediaStatus = Pattern.compile("^\\s+_M_I_ \\[(10:37|10:17)\\]");
-
-// WAITING CALLS: 0c5202aadb166aa9 0c5202aadb166aa9 0d4b02a63cbddec0
+    private static final Matcher regStrategyMessage = Pattern.compile("^\\s*_\\S_\\S_(\\S{16})\\s*\\[(\\S{2}:\\S{2})\\]\\s*");
+    private static final Matcher regNonStrategyMessage = Pattern.compile("^\\s*_\\S_\\S_\\s*\\[(\\S{2}:\\S{2})\\]\\s*");
+    private static final Matcher regRLibMessage = Pattern.compile("^\\s*RLIB: ");
+    private static final Matcher regStartsFromSpace = Pattern.compile("^\\s+");
+    private static final Matcher regTMessageOutFinal = Pattern.compile("^\\.\\.sent to");
+    private static final Matcher regTMessageAttribute = Pattern.compile("^\t");
+    private static final Matcher regTMessageInFinal = Pattern.compile("^(\\w.+is received for ts|\\.\\.sent to)");
+    //    private static final Matcher regAgentStatusChanged = Pattern.compile("^_M_I_ \\[10:17\\]");
+    private static final Matcher regWaitingCalls = Pattern.compile("^WAITING CALLS:\\s*");
+    private static final Matcher regWaitingInit = Pattern.compile("_M_I_ \\[10:15\\]");
+    private static final Matcher regGroupContent = Pattern.compile("CURRENT CONTENT\\(\\d+\\):");
+    private static final Matcher regSCXMLContinue = Pattern.compile("^\\s*_\\S_\\S_(\\S{16})\\s*\\[09:04\\]\\s*");
+    private static final Matcher regHTTPBridgeContinue = Pattern.compile("^\\s+");
+    private static final Matcher regHTTPResponse = Pattern.compile("^HTTP");
+    private static final Matcher regTargetInformation = Pattern.compile("^(============== Target|\\s)");
+    private static final Matcher regRIResponse = Pattern.compile("Message: (.+)$");
+    private static final Matcher regMediaStatus = Pattern.compile("^\\s+_M_I_ \\[(10:37|10:17)\\]");
+    // WAITING CALLS: 0c5202aadb166aa9 0c5202aadb166aa9 0d4b02a63cbddec0
 //15:49:45.068_R_I_ [19:10] routing interface request received: urs/call/00e2029a670222cb/func?name=FindConfigObject&params=%5B1%2C+%22name%3ASwitch_VyS%22%5D&sync=1, client=732(OR_Server), ref=674437
-    private static final Pattern regRI = Pattern.compile("^_R_I_\\s*");
-
-    private static final Pattern regCfgUpdate = Pattern.compile("^\\s+PopCfg.+ing$");
-    private static final Pattern regCfgNotification = Pattern.compile("^Cfg\\w+=\\{");
-    private static final Pattern regCfgUnknownOption = Pattern.compile("^\\s+_C_W_");
-
-//11:50:52.636_R_I_ [19:0f] connid 0150028acff24002 generated for client=23(OR_Server_811), ref id=5, method name=ORS: 0000GaBNKN2Q0021
-    private static final Pattern regCONNID_UUID = Pattern.compile("connid ([\\w~]+) generated for client.+[\\* ]([\\w~]+)$");
-
-//    0083027d73c677aa, 05/23/16@17:54:52.974, RP(##TSERVER) -> @ [ 0 0 1 1], tms: 8418= (N)0 + (T)0 + (X)0 + (S)0 + (W)0 + (F)8418 + (R)0, trg:
-    private static final Pattern regVitalik = Pattern.compile("^\\w{16},");
-//    DateParsed dp;
-    private static final Pattern regTMessageToStart = Pattern.compile("^.*(send to ts|sending event|received from|request to)");
-    private static final Pattern regTMessageOutFirstLine = Pattern.compile("^(request to|\\tAttribute|\\t\\()");
-    private static final Pattern regReceived = Pattern.compile("^received from (\\d+)\\(([^\\)]+)\\).+message (Event\\w+)(?:\\(refid=(\\d+)\\))*");
-    private static final Pattern regEventAttachedData = Pattern.compile("dn=([^,]+), refid=\\d+\\)$");
-    private static final Pattern regSentTo = Pattern.compile("^send to ts (.+) (Request\\w+)");
-    private static final Pattern regReqTo = Pattern.compile("^request to (\\d+).+message (Request\\w+)");
-    private static final Pattern regStrategy = Pattern.compile("strategy:.+\\*+(\\S+)");
+    private static final Matcher regRI = Pattern.compile("^_R_I_\\s*");
+    private static final Matcher regCfgUpdate = Pattern.compile("^\\s+PopCfg.+ing$");
+    private static final Matcher regCfgNotification = Pattern.compile("^Cfg\\w+=\\{");
+    private static final Matcher regCfgUnknownOption = Pattern.compile("^\\s+_C_W_");
+    //11:50:52.636_R_I_ [19:0f] connid 0150028acff24002 generated for client=23(OR_Server_811), ref id=5, method name=ORS: 0000GaBNKN2Q0021
+    private static final Matcher regCONNID_UUID = Pattern.compile("connid ([\\w~]+) generated for client.+[\\* ]([\\w~]+)$");
+    //    0083027d73c677aa, 05/23/16@17:54:52.974, RP(##TSERVER) -> @ [ 0 0 1 1], tms: 8418= (N)0 + (T)0 + (X)0 + (S)0 + (W)0 + (F)8418 + (R)0, trg:
+    private static final Matcher regVitalik = Pattern.compile("^\\w{16},");
+    //    DateParsed dp;
+    private static final Matcher regTMessageToStart = Pattern.compile("^.*(send to ts|sending event|received from|request to)");
+    private static final Matcher regTMessageOutFirstLine = Pattern.compile("^(request to|\\tAttribute|\\t\\()");
+    private static final Matcher regReceived = Pattern.compile("^received from (\\d+)\\(([^\\)]+)\\).+message (Event\\w+)(?:\\(refid=(\\d+)\\))*");
+    private static final Matcher regEventAttachedData = Pattern.compile("dn=([^,]+), refid=\\d+\\)$");
+    private static final Matcher regSentTo = Pattern.compile("^send to ts (.+) (Request\\w+)");
+    private static final Matcher regReqTo = Pattern.compile("^request to (\\d+).+message (Request\\w+)");
+    private static final Matcher regStrategy = Pattern.compile("strategy:.+\\*+(\\S+)");
     //[14:33] strategy: **ORS (1085200831) is attached to the call
-    private static final Pattern regRequestRef = Pattern.compile("request (\\d+) sent to");
-    private static final Pattern regRequestURL = Pattern.compile("session/([^/]+)/(.+)$");
-    private static final Pattern regWebResponse = Pattern.compile("^(^.+) is received from server.+ refid=(\\d+)");
-    private static final Pattern regWebResponseBody = Pattern.compile("^HTTPBody \\{(.+)\\}$");
-    private static final Pattern regWebNotifURL = Pattern.compile("^web notification <(.+)> ");
-    private static final Pattern regCfgObjectName = Pattern.compile("(?:name|userName|number|loginCode)='([^']+)'");
-    private static final Pattern regCfgObjectType = Pattern.compile("^Cfg([^=]+)=.*\\{DBID=(\\d+)");
-    //    private static final Pattern regCfgAGType = Pattern.compile("^Cfg([^=]+)=\\{DBID=(\\d+)");
-    private static final Pattern regCfgOp = Pattern.compile("PopCfg.+\\s(\\w+)$");
-    private static final Pattern regCfgAgentGroup = Pattern.compile("^CfgAgentGroup=.+agentDBIDs=\\[([^\\]]+)");
+    private static final Matcher regRequestRef = Pattern.compile("request (\\d+) sent to");
+    private static final Matcher regRequestURL = Pattern.compile("session/([^/]+)/(.+)$");
+    private static final Matcher regWebResponse = Pattern.compile("^(^.+) is received from server.+ refid=(\\d+)");
+    private static final Matcher regWebResponseBody = Pattern.compile("^HTTPBody \\{(.+)\\}$");
+    private static final Matcher regWebNotifURL = Pattern.compile("^web notification <(.+)> ");
+    private static final Matcher regCfgObjectName = Pattern.compile("(?:name|userName|number|loginCode)='([^']+)'");
+    private static final Matcher regCfgObjectType = Pattern.compile("^Cfg([^=]+)=.*\\{DBID=(\\d+)");
+    //    private static final Matcher regCfgAGType = Pattern.compile("^Cfg([^=]+)=\\{DBID=(\\d+)");
+    private static final Matcher regCfgOp = Pattern.compile("PopCfg.+\\s(\\w+)$");
+    private static final Matcher regCfgAgentGroup = Pattern.compile("^CfgAgentGroup=.+agentDBIDs=\\[([^\\]]+)");
     //09:24:35.821_M_I_ [10:15] SO(7f0021ca4cb8 -1 2) ten=Resources name=?BLD_Billing_AG:Chat_SK>0@hc1_statsrvr_urs_p.GA: content updated #503 <>
 //CURRENT CONTENT(32): shilpa.c@hc1_statsrvr_urs_p.A,shruthi.p@hc1_statsrvr_urs_p.A...
-    private static final Pattern regline1015 = Pattern.compile("name=(.+): content");
-    private static final Pattern regCheckRoutingStates = Pattern.compile("^check call routing.+(true|false)$");
-    public static final HashMap<String, String> targetCode = getTargetCodes();
+    private static final Matcher regline1015 = Pattern.compile("name=(.+): content");
+    private static final Matcher regCheckRoutingStates = Pattern.compile("^check call routing.+(true|false)$");
+    final int MSG_STRING_LIMIT = 200;
+    long m_CurrentFilePos;
+    long m_HeaderOffset;
+    ParserState m_ParserState;
+    String m_Header;
+    int m_dbRecords = 0;
+    private String lastConnID;
+    private Matcher MLPattern;
+    private String URSFileID;
+    private String URSRest;
+    private Message msgTmp; // storage for message in progress
+    private GenesysMsg genesysMsg;
+
+    public UrsParser(HashMap<TableType, DBTable> m_tables) {
+        super(FileInfoType.type_URS, m_tables);
+
+//17:33:06.335_I_I_03350282382b556f [07:07] HERE IS TARGETS
+//TARGETS: OBN_IP_Skill1_Group@OBN_StatServerRouting.GA
+    }
 
     private static HashMap<String, String> getTargetCodes() {
         HashMap<String, String> ret = new HashMap<>();
@@ -104,24 +121,6 @@ public class UrsParser extends Parser {
         ret.put("GQ", "Queue Group");
         ret.put("RP", "Routing Point");
         return ret;
-    }
-    long m_CurrentFilePos;
-    final int MSG_STRING_LIMIT = 200;
-    private String lastConnID;
-    private Pattern MLPattern;
-    private String URSFileID;
-    private String URSRest;
-    long m_HeaderOffset;
-    ParserState m_ParserState;
-    String m_Header;
-    int m_dbRecords = 0;
-    private Message msgTmp; // storage for message in progress
-
-    public UrsParser(HashMap<TableType, DBTable> m_tables) {
-        super(FileInfoType.type_URS, m_tables);
-
-//17:33:06.335_I_I_03350282382b556f [07:07] HERE IS TARGETS
-//TARGETS: OBN_IP_Skill1_Group@OBN_StatServerRouting.GA
     }
 
     private void AddStrategyMessage(String FileLine, String URSRest1) {
@@ -181,7 +180,7 @@ public class UrsParser extends Parser {
         if (!msg.isInbound()) {
             String message = msg.getMessage();
             if (message != null && message.equals("RequestInvoke")) {
-                Main.logger.debug("Ignored " + msg.toString());
+                Main.logger.debug("Ignored " + msg);
                 return;
             }
         }
@@ -271,7 +270,7 @@ public class UrsParser extends Parser {
             msg.setSubFunc(m.group(1));
             msg.setRefid(m.group(2));
         }
-        String body = Message.FindByRx(m_MessageContents, regWebResponseBody, 1, (String) null);
+        String body = Message.FindByRx(m_MessageContents, regWebResponseBody, 1, null);
         if (body == null || body.isEmpty()) {
             msg.setFunc(msg.getFunc());
         } else {
@@ -426,8 +425,6 @@ public class UrsParser extends Parser {
 
         return m_CurrentLine - line;
     }
-
-    private GenesysMsg genesysMsg;
 
     private String ParseLine(String str) throws Exception {
 //        String trimmed = str.trim();
@@ -1002,7 +999,7 @@ public class UrsParser extends Parser {
                     }
                 }
             } else {
-                Main.logger.error("l:" + m_lineStarted + " not regCheckRoutingStates; " + contents.toString());
+                Main.logger.error("l:" + m_lineStarted + " not regCheckRoutingStates; " + contents);
                 msg = null;
             }
 
@@ -1010,7 +1007,7 @@ public class UrsParser extends Parser {
         if (msg != null) {
             SetStdFieldsAndAdd(msg);
         } else {
-            Main.logger.error("l:" + m_lineStarted + " addStrategyTarget not created " + contents.toString());
+            Main.logger.error("l:" + m_lineStarted + " addStrategyTarget not created " + contents);
         }
     }
 
@@ -1020,7 +1017,7 @@ public class UrsParser extends Parser {
         m_tables.put(TableType.URSGenesysMessage, new GenesysUrsMsgTable(Main.getM_accessor(), TableType.URSGenesysMessage));
     }
 
-// parse state contants
+    // parse state contants
     enum ParserState {
 
         STATE_HEADER,
@@ -1044,7 +1041,7 @@ public class UrsParser extends Parser {
         STATE_RI_RESPONSE
     }
 
-//    public static void main(String args[]) {
+    //    public static void main(String args[]) {
 //        String[] agents = StringUtils.split("Lori McLaren@stat_server_omaha.A,Bre'anna King@stat_server_omaha.A,Jamie Irvin@stat_server_omaha.A,Howie Brewer@stat_server_omaha.A,Sierra Godinez@stat_server_omaha.A,Beth Swank@stat_server_omaha.A,Paula Shearer@stat_server_omaha.A,Kendra McCallister@stat_server_omaha.A,Cass Hackett@stat_server_omaha.A,Laura Bautista-Marquez@stat_server_omaha.A,Katrina Johnsen@stat_server_omaha.A,Chasidy Kirksey@stat_server_omaha.A,Gabe Knudsen@stat_server_omaha.A,Meagan Anderson@stat_server_omaha.A,Renee Mickens@stat_server_omaha.A,Mindy McGuire@stat_server_omaha.A,Noelle Clarke@stat_server_omaha.A,Shari Roberts@stat_server_omaha.A,Logan Adams@stat_server_omaha.A,Monica Ridout@stat_server_omaha.A,Robert Rice@stat_server_omaha.A,Luke Van Hemert@stat_server_omaha.A,Valerie Butler@stat_server_omaha.A,Erica Smith-Phalen@stat_server_omaha.A,Bonnie Caulder@stat_server_omaha.A,Becka McClusky@stat_server_omaha.A,Daniel Dever Sr@stat_server_omaha.A,Donna Burch@stat_server_omaha.A,Tamie Grzebielski@stat_server_omaha.A,Terrohn Falkner@stat_server_omaha.A,Cynthia Johnson@stat_server_omaha.A,Daryl Mountain@stat_server_omaha.A,Keith Lyle@stat_server_omaha.A,Samantha Brown@stat_server_omaha.A,JaTaYa Johnson@stat_server_omaha.A,Meredith Williams@stat_server_omaha.A,Datrina Cain@stat_server_omaha.A,Julius Sanders@stat_server_omaha.A,Alex Maycher@stat_server_omaha.A,Tim Sobbing@stat_server_omaha.A,Jasmine Butler@stat_server_omaha.A,Dwaynda Mayfield@stat_server_omaha.A,Debra Graveman@stat_server_omaha.A,Joana Rodriguez@stat_server_omaha.A,Marquez Brewer@stat_server_omaha.A,Deborah Lewis@stat_server_omaha.A,Kyle Ging@stat_server_omaha.A,Vanessa Eiras@stat_server_omaha.A,Paulette Logan@stat_server_omaha.A,Isabella Lopez@stat_server_omaha.A,Sykeyah Bass@stat_server_omaha.A,Angelica Sandoval@stat_server_omaha.A,Shannon Crawford@stat_server_omaha.A,Brittney Rockwell@stat_server_omaha.A,Uniquea Davis@stat_server_omaha.A,Amanda Janecek@stat_server_omaha.A,Tia Booker@stat_server_omaha.A,Ziyadah Beacham@stat_server_omaha.A,Letisha Marion@stat_server_omaha.A,Heather Baker@stat_server_omaha.A,Amie Wickman@stat_server_omaha.A,Kylynn Wagner@stat_server_omaha.A,Jade Havlicek@stat_server_omaha.A,Sherry Kaiser@stat_server_omaha.A,Lauren Conway@stat_server_omaha.A,Stacy Schultz@stat_server_omaha.A,Rubi Soto@stat_server_omaha.A,Denys Workman@stat_server_omaha.A,Shanda Hahn Kinkade@stat_server_omaha.A,Tyuanna Thomas@stat_server_omaha.A,Salesia Domina@stat_server_omaha.A,Suzannah Simmons@stat_server_omaha.A,Tionna Andrews@stat_server_omaha.A,Robert Moore@stat_server_omaha.A,Alexandria Phillips@stat_server_omaha.A,Phyllis Gibson@stat_server_omaha.A,Matt Allen@stat_server_omaha.A,Colandra Cooper@stat_server_omaha.A,Yanelh Garcia-Madrid@stat_server_omaha.A,Kerry Foland@stat_server_omaha.A,Monterey Scott (bta91589)@stat_server_omaha.A,Keyane Woodruff@stat_server_omaha.A,Bonnie.Bell@stat_server_omaha.A,Naymond Coss@stat_server_omaha.A,Jason Glynn@stat_server_omaha.A,Emily Phillips@stat_server_omaha.A,Shannon Boatwright@stat_server_omaha.A,Sonda Garton@stat_server_omaha.A,Sharon_Fouquier-Simpson@stat_server_omaha.A,Marcus Parrish@stat_server_omaha.A,Marcus Brown@stat_server_omaha.A,Ashley Winchester@stat_server_omaha.A,Christopher Aragon@stat_server_omaha.A,Zach Sanko@stat_server_omaha.A,Tia Boatwright@stat_server_omaha.A,John Bashonski@stat_server_omaha.A,Debbie Lemr@stat_server_omaha.A,Raul Banderas@stat_server_omaha.A,Tay Kent@stat_server_omaha.A,Lucas Nielsen@stat_server_omaha.A,Maria Suarez Bejar@stat_server_omaha.A,Cindy Maitland@stat_server_omaha.A,Tanya Stewart-Ford@stat_server_omaha.A,Rebecca Pearson@stat_server_omaha.A,Jania White@stat_server_omaha.A,Matt Johnson@stat_server_omaha.A,Danielle Kempkes@stat_server_omaha.A,Miranda Yablonski@stat_server_omaha.A,Sam Wendland@stat_server_omaha.A,Lopez, Alan@stat_server_omaha.A,Gerardo Martinez@stat_server_omaha.A,Hannah Kreitzinger@stat_server_omaha.A,Khambrel Crawford@stat_server_omaha.A,Nakeeta Murray@stat_server_omaha.A,Cachet Irvin@stat_server_omaha.A,Cornell Booth Sr@stat_server_omaha.A,Anna Edmonds@stat_server_omaha.A,Darlene Murry@stat_server_omaha.A,Olivia Bradley@stat_server_omaha.A,Justina Cummings@stat_server_omaha.A,Webb, Paul@stat_server_omaha.A,Michelle Maske@stat_server_omaha.A,Chrissy Willingham@stat_server_omaha.A,Raven Welchel@stat_server_omaha.A,Hunter Morrell@stat_server_omaha.A,Dedra Smith@stat_server_omaha.A,Katris Hayes@stat_server_omaha.A,Nicole Murchison@stat_server_omaha.A,Michael Herod@stat_server_omaha.A,Mikayla Finley@stat_server_omaha.A,Sam Swanson@stat_server_omaha.A,Jerome Dismuke II@stat_server_omaha.A,Alex Stuart@stat_server_omaha.A,Andrew Ryder@stat_server_omaha.A,Kristy Helm@stat_server_omaha.A,Karen Roy@stat_server_omaha.A,Stewart, Joy@stat_server_omaha.A,Bj Bunten@stat_server_omaha.A", ',');
 //        for (String agent : agents) {
 //            System.out.println(agent);
@@ -1105,7 +1102,6 @@ public class UrsParser extends Parser {
         }
 
         /**
-         *
          * @throws Exception
          */
         @Override
@@ -1135,9 +1131,9 @@ public class UrsParser extends Parser {
 
     private class ObjectDBID extends Message {
 
-        private int objectDBID;
         String objectType;
         String objectName;
+        private int objectDBID;
 
         private ObjectDBID(int objectDBID, String objectType, String objectName) {
             super(TableType.ObjectDBID);
@@ -1186,7 +1182,6 @@ public class UrsParser extends Parser {
         }
 
         /**
-         *
          * @throws Exception
          */
         @Override
@@ -1280,7 +1275,6 @@ public class UrsParser extends Parser {
         }
 
         /**
-         *
          * @throws Exception
          */
         @Override

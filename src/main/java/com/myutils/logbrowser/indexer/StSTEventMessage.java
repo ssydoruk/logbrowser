@@ -1,13 +1,13 @@
 package com.myutils.logbrowser.indexer;
 
 import java.math.BigInteger;
-import java.util.*;
+import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 import static java.util.regex.Pattern.CASE_INSENSITIVE;
 
 /**
- *
  * @author akolo
  */
 public class StSTEventMessage extends Message {

@@ -5,10 +5,11 @@
  */
 package com.myutils.logbrowser.indexer;
 
-import static Utils.Util.intOrDef;
 import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static Utils.Util.intOrDef;
 
 public class IxnSS extends Ixn {
 

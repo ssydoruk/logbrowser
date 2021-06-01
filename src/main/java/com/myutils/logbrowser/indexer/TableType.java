@@ -5,7 +5,6 @@
 package com.myutils.logbrowser.indexer;
 
 /**
- *
  * @author ssydoruk
  */
 public enum TableType {

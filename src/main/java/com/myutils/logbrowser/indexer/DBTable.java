@@ -4,19 +4,40 @@
  */
 package com.myutils.logbrowser.indexer;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import org.apache.commons.lang3.StringUtils;
 
 /**
- *
  * @author ssydoruk
  */
 public abstract class DBTable {
 
     private static final org.apache.logging.log4j.Logger logger = Main.logger;
+    private final SqliteAccessor m_dbAccessor;
+    private final ArrayList<ArrayList<String>> idxFields;
+    protected int m_InsertStatementId;
+    //    protected Parser m_pParser=null;
+    protected TableType m_type = TableType.UNKNOWN;
+    private boolean tabCreated = false;
+    private String tabName;
+    private int recordsAdded = 0;
+    private String fileIDField;
+    private int currentID; // primary key on the table. Implies that each table has to have field named
+    public DBTable(DBAccessor dbaccessor, TableType type) {
+        m_dbAccessor = (SqliteAccessor) dbaccessor;
+        m_type = type;
+        setTabName(type.toString());
+        idxFields = new ArrayList();
+    }
+    //ID
+
+    public DBTable(DBAccessor dbaccessor) {
+        this(dbaccessor, TableType.UNKNOWN);
+    }
 
     static public void setFieldString(PreparedStatement stmt, int i, String ref) throws SQLException {
         if (ref != null) {
@@ -26,35 +47,8 @@ public abstract class DBTable {
         }
     }
 
-    private final SqliteAccessor m_dbAccessor;
-    protected int m_InsertStatementId;
-//    protected Parser m_pParser=null;
-    protected TableType m_type = TableType.UNKNOWN;
-    private boolean tabCreated = false;
-    private String tabName;
-    private final ArrayList<ArrayList<String>> idxFields;
-    private int recordsAdded = 0;
-    private String fileIDField;
-    private int currentID; // primary key on the table. Implies that each table has to have field named
-    //ID
-
-    public DBTable(DBAccessor dbaccessor, TableType type) {
-        m_dbAccessor = (SqliteAccessor) dbaccessor;
-        m_type = type;
-        setTabName(type.toString());
-        idxFields = new ArrayList();
-    }
-
-    public DBTable(DBAccessor dbaccessor) {
-        this(dbaccessor, TableType.UNKNOWN);
-    }
-
     public int getRecordsAdded() {
         return recordsAdded;
-    }
-
-    protected void setTabName(String tab) {
-        this.tabName = tab;
     }
 
     protected void addIndex(String name) {
@@ -137,6 +131,10 @@ public abstract class DBTable {
         return tabName;
     }
 
+    protected void setTabName(String tab) {
+        this.tabName = tab;
+    }
+
     public TableType getM_type() {
         return m_type;
     }
@@ -180,7 +178,7 @@ public abstract class DBTable {
 //                    Main.logger.info("Table " + tabName1 + ": currentID: " + currentID);
                 } catch (Exception ex) {
                     currentID = 0;
-                    logger.error("fatal: ",  ex);
+                    logger.error("fatal: ", ex);
                 }
             }
             tabCreated = true;
@@ -211,12 +209,12 @@ public abstract class DBTable {
         _rec.setLastID(currentID);
     }
 
-    public void setCurrentID(int currentID) {
-        this.currentID = currentID;
-    }
-
     public int getCurrentID() {
         return currentID;
+    }
+
+    public void setCurrentID(int currentID) {
+        this.currentID = currentID;
     }
 
     void recordAdded() {

@@ -9,7 +9,6 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 
 /**
- *
  * @author ssydoruk
  */
 public class GMSPostTable extends DBTable {
@@ -64,7 +63,6 @@ public class GMSPostTable extends DBTable {
     }
 
     /**
-     *
      * @throws Exception
      */
     @Override

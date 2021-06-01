@@ -5,32 +5,27 @@
 package com.myutils.logbrowser.indexer;
 
 import Utils.Pair;
-import static Utils.Util.StripQuotes;
-import static Utils.Util.intOrDef;
+import org.apache.commons.lang3.StringUtils;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.apache.commons.lang3.StringUtils;
-import org.json.JSONException;
-import org.json.JSONObject;
+
+import static Utils.Util.StripQuotes;
+import static Utils.Util.intOrDef;
 
 /**
- *
  * @author aglagole
  */
 public abstract class Message extends Record {
 
+    //    private static final Pattern regSIPURI = Pattern.compile("^(?:\\\")?(?:[^<\\\"]*)(?:\\\")?[ ]*(?:<)?(?:sip(?:s)?|tel):([^@>]+)(?:@([^;>]+)(?:>)?)?");
+    public static final String USER_PART = "userpart";
     private static final Pattern ptAttrInBrackets = Pattern.compile("\\[(.+)\\]$");
-
-//    private static final Pattern regQuotes = Pattern.compile("^['\"]*(.+)['\"\\s]*$");
-    // keeping track of current date
-    // looking for hour reset at midnight
-    static String m_CurrentDate;
-    static String m_CurrentDateStartTime;
-
-    static long m_timezone;
     private static final String udPref = "\t\t";
     private static final Pattern regLongAttribute = Pattern.compile("(\\d+)$");
     private static final Pattern regStringAttribute = Pattern.compile("\\\"(.+)\\\"$");
@@ -40,11 +35,40 @@ public abstract class Message extends Record {
     private static final Pattern regHexAttribute = Pattern.compile("(\\w+)$");
     private final static Pattern SIPHeaderVal = Pattern.compile("^\\s*:\\s*(.+)");
     private static final Pattern regSIPDN = Pattern.compile("^([^@]+)");
-    //    private static final Pattern regSIPURI = Pattern.compile("^(?:\\\")?(?:[^<\\\"]*)(?:\\\")?[ ]*(?:<)?(?:sip(?:s)?|tel):([^@>]+)(?:@([^;>]+)(?:>)?)?");
-    public static final String USER_PART = "userpart";
     private static final Pattern regSIPURI = Pattern.compile("^(?:\\\")?(?:[^<\\\"]*)(?:\\\")?[ ]*(?:<)?(?:sip(?:s)?|tel):(?<userpart>[^@>]+)(?:@(?<host>[^;>]+)(?:>)?)?");
     private static final Pattern regSIPURIMediaService = Pattern.compile("media-service=(\\w+)");
     final private static Pattern regErrorMessage = Pattern.compile("^\\s+\\((\\w.+)\\)$");
+    //    private static final Pattern regQuotes = Pattern.compile("^['\"]*(.+)['\"\\s]*$");
+    // keeping track of current date
+    // looking for hour reset at midnight
+    static String m_CurrentDate;
+    static String m_CurrentDateStartTime;
+    static long m_timezone;
+    private final HashMap<String, Pattern> cfgAttrNames = new HashMap<>();
+    protected ArrayList<String> m_MessageLines = null;
+    private boolean m_isInbound;
+    private ArrayList<String> m_MMUserData = null;
+    private ArrayList<String> m_MMEnvelope = null;
+
+    public Message() {
+        super();
+    }
+
+    public Message(TableType type) {
+        super(type);
+        m_MessageLines = new ArrayList<>(1); // by default store only one line
+    }
+
+    public Message(TableType type, String line) {
+        super(type);
+        m_MessageLines = new ArrayList<>(1); // by default store only one line
+        m_MessageLines.add(line);
+    }
+
+    public Message(TableType type, ArrayList<String> m_MessageLines) {
+        super(type);
+        setMessageLines(m_MessageLines);
+    }
 
     public static JSONObject jsonOrDef(JSONObject _jsonBody, String name) throws JSONException {
         if (_jsonBody.has(name)) {
@@ -158,8 +182,9 @@ public abstract class Message extends Record {
     }
 
     public static String FindByRx(ArrayList<String> msgLines, Pattern rx, int groupId, String def) {
-        return FindByRx(msgLines,rx.matcher(""),groupId,def);
+        return FindByRx(msgLines, rx.matcher(""), groupId, def);
     }
+
     public static String FindByRx(ArrayList<String> msgLines, Matcher rx, int groupId, String def) {
         Matcher m;
 
@@ -301,8 +326,8 @@ public abstract class Message extends Record {
                 if (header != null && header.toLowerCase().startsWith(s)
                         && header.length() > iSLen //removing = changes order in reports!!!
                         && ((Sep == null)
-                                ? Character.isWhitespace(header.charAt(iSLen))
-                                : Sep.equals(header.charAt(iSLen)))) {
+                        ? Character.isWhitespace(header.charAt(iSLen))
+                        : Sep.equals(header.charAt(iSLen)))) {
                     String ret = header.substring(iSLen + 1).trim();
                     if (ret.length() == 0) {
                         return null;
@@ -330,7 +355,6 @@ public abstract class Message extends Record {
     }
 
     /**
-     *
      * @param uri
      * @return Pair<SessionID, URIRequest>
      */
@@ -385,33 +409,6 @@ public abstract class Message extends Record {
             return i + 1;
         }
         return -1;
-    }
-    private final HashMap<String, Pattern> cfgAttrNames = new HashMap<>();
-
-    private boolean m_isInbound;
-
-    protected ArrayList<String> m_MessageLines = null;
-    private ArrayList<String> m_MMUserData = null;
-    private ArrayList<String> m_MMEnvelope = null;
-
-    public Message() {
-        super();
-    }
-
-    public Message(TableType type) {
-        super(type);
-        m_MessageLines = new ArrayList<>(1); // by default store only one line
-    }
-
-    public Message(TableType type, String line) {
-        super(type);
-        m_MessageLines = new ArrayList<>(1); // by default store only one line
-        m_MessageLines.add(line);
-    }
-
-    public Message(TableType type, ArrayList<String> m_MessageLines) {
-        super(type);
-        setMessageLines(m_MessageLines);
     }
 
     protected void checkDiffer(String oldS, String newS, String prop, int line) {
@@ -474,9 +471,9 @@ public abstract class Message extends Record {
      * strStartRX will check if the line starts with start and then apply rx to
      * the end of the line if it matches, then return groupIdx from match
      *
-     * @param line - String
-     * @param start - String
-     * @param rx - Pattern
+     * @param line     - String
+     * @param start    - String
+     * @param rx       - Pattern
      * @param groupIdx - index of the group expression in Pattern
      * @return null if the line does not begin with start; empty string if RX
      * does not match
@@ -633,6 +630,10 @@ public abstract class Message extends Record {
         return FindByRx(m_MessageLines, rx, groupId, def);
     }
 
+    public String FindByRx(Matcher rx, int groupId, String def) {
+        return FindByRx(m_MessageLines, rx, groupId, def);
+    }
+
     public int toInt(String s, int def) {
         try {
             return Integer.parseInt(s);
@@ -665,11 +666,8 @@ public abstract class Message extends Record {
     }
 
     /**
-     *
      * @param s - string with SIP URI
      * @return matcher if SIP URI matches.
-     *
-     *
      */
     Matcher parseSIPURI(String s) {
         Matcher m;
@@ -690,7 +688,7 @@ public abstract class Message extends Record {
         if ((headerLong != null && headerLong.length() > 0
                 || headerShort != null && headerShort.length() > 0)
                 && m_MessageLines != null) {
-            for (Iterator i = m_MessageLines.iterator(); i.hasNext();) {
+            for (Iterator i = m_MessageLines.iterator(); i.hasNext(); ) {
                 ret = GetSIPHeader((String) i.next(), headerLong, headerShort);
                 if (ret != null && !ret.isEmpty()) {
                     break;
@@ -700,7 +698,7 @@ public abstract class Message extends Record {
         return ret;
     }
 
-//   public String GetHeaderValue(String s, Character delim)
+    //   public String GetHeaderValue(String s, Character delim)
 //    {
 //        if( m_MessageLines != null && s!= null && s != "" ) {
 //            s = s.toLowerCase();
@@ -753,7 +751,7 @@ public abstract class Message extends Record {
         return StripQuotes(GetHeaderValue(s));
     }
 
-//    protected long GetUsecTime() {
+    //    protected long GetUsecTime() {
 //        String time = GetAdjustedTimestamp();
 //        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
 //        Date date = null;
@@ -770,7 +768,7 @@ public abstract class Message extends Record {
         return GetAdjustedUsecTime() + m_timezone * 1000;
     }
 
-//    protected long GetAdjustedUsecTime() {
+    //    protected long GetAdjustedUsecTime() {
 //        String time = GetAdjustedTimestamp();
 //        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
 //        Date date = null;
@@ -885,7 +883,6 @@ public abstract class Message extends Record {
     }
 
     /**
-     *
      * @param attr
      * @return
      */
@@ -1148,7 +1145,7 @@ public abstract class Message extends Record {
         try {
             super.AddToDB(m_tables);
         } catch (Exception exception) {
-            Main.logger.error("l:" + getM_line() + " error adding message type [" + getM_type() + "]: " + exception.getMessage() + " msg: [" + this.toString() + "]");
+            Main.logger.error("l:" + getM_line() + " error adding message type [" + getM_type() + "]: " + exception.getMessage() + " msg: [" + this + "]");
         }
     }
 
@@ -1233,8 +1230,8 @@ public abstract class Message extends Record {
     public class RegExAttribute {
 
         private final Regexs re;
-        private boolean matched;
         String attrValue = null;
+        private boolean matched;
 
         public RegExAttribute(Regexs re) {
             this.re = re;

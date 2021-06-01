@@ -1,13 +1,15 @@
 package com.myutils.logbrowser.inquirer;
 
 import com.myutils.logbrowser.indexer.FileInfoType;
+import org.apache.commons.lang3.StringUtils;
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
-import org.apache.commons.lang3.StringUtils;
 
 public class TLibEvent extends ILogRecord {
 
+    int handlerId;
     private boolean m_isInbound;
     private long m_referenceId;
     private int m_triggerFileId;
@@ -18,10 +20,7 @@ public class TLibEvent extends ILogRecord {
     private String otherDn;
     private int thisDNID;
     private int otherDNID;
-
     private long seqNo;
-
-    int handlerId;
 
     public TLibEvent(ResultSet rs) throws SQLException {
         this(rs, MsgType.TLIB);

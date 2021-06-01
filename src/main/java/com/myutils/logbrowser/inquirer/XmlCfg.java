@@ -5,29 +5,27 @@
  */
 package com.myutils.logbrowser.inquirer;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import java.io.File;
+import java.util.ArrayList;
+
 /**
- *
  * @author ssydoruk
  */
 public final class XmlCfg {
 
+    private final String xmlFile;
     private Document doc; // XML doc for the CFG
     private Element root;
     private long lastModified = 0;
-    private final String xmlFile;
 
     public XmlCfg(String filePath) throws Exception {
         this.xmlFile = filePath;
@@ -76,7 +74,6 @@ public final class XmlCfg {
     }
 
     /**
-     *
      * @return true if file was reloaded
      * @throws ParserConfigurationException
      * @throws Exception

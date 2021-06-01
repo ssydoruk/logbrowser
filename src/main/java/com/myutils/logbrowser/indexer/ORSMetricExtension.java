@@ -4,13 +4,13 @@
  */
 package com.myutils.logbrowser.indexer;
 
+import org.w3c.dom.Document;
+
 import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.w3c.dom.Document;
 
 /**
- *
  * @author ssydoruk
  */
 
@@ -18,7 +18,7 @@ import org.w3c.dom.Document;
 public class ORSMetricExtension extends Message {
 
     private static final Pattern regTMessageStart = Pattern.compile("^<([\\w~]+) sid='([\\w~]+)");
-//    private static Pattern regReqID = Pattern.compile("^\\s*<eval_expr .+expression='system.LastSubmitRequestId;.+result='(\\d+)' />");
+    //    private static Pattern regReqID = Pattern.compile("^\\s*<eval_expr .+expression='system.LastSubmitRequestId;.+result='(\\d+)' />");
     private static final Pattern regFunc = Pattern.compile("(?:function|name)='([^']+)'");
     private static final Pattern regNS = Pattern.compile("namespace='.+\\/([^']+)'");
     private static final Pattern regNamespace = Pattern.compile("namespace='[^']/([^\\/]+)'");

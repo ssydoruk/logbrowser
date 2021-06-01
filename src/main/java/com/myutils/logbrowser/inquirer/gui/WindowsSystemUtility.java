@@ -12,17 +12,15 @@ import com.sun.jna.Native;
 import com.sun.jna.NativeLong;
 import com.sun.jna.platform.win32.WinDef;
 import com.sun.jna.win32.StdCallLibrary;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.net.URISyntaxException;
 import org.apache.logging.log4j.LogManager;
+
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.net.URISyntaxException;
 
 /**
- *
  * @author ssydoruk
  */
 public class WindowsSystemUtility {
@@ -40,7 +38,7 @@ public class WindowsSystemUtility {
      * Derived from ample code found in Sun's java forums <p.
      *
      * @return true if the native library has loaded, false if there was a
-     *         problem.
+     * problem.
      */
     public static boolean loadLibrary() {
         try {
@@ -112,7 +110,7 @@ public class WindowsSystemUtility {
             //        System.setProperty(LibraryLoader.JACOB_DLL_PATH, temporaryDll.getAbsolutePath());
             String dll = (String) System.getProperties().get("jacob.dll");
             if (dll == null || dll.length() == 0) {
-                if(! loadLibrary()){
+                if (!loadLibrary()) {
                     try {
                         File f = new File(com.jacob.com.LibraryLoader.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath().substring(1));
                         String absolutePath = f.getAbsolutePath();

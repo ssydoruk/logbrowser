@@ -8,19 +8,17 @@ package com.myutils.logbrowser.inquirer;
 import Utils.Pair;
 import com.myutils.logbrowser.inquirer.gui.QueryJTable;
 import com.myutils.logbrowser.inquirer.gui.ReportFrameQuery;
+import org.apache.logging.log4j.LogManager;
+
+import javax.swing.*;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import javax.swing.DefaultListSelectionModel;
-import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JMenuItem;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
-import org.apache.logging.log4j.LogManager;
 
 /**
- *
  * @author ssydoruk
  */
 public final class QueryAllJTable extends QueryJTable {
@@ -30,10 +28,9 @@ public final class QueryAllJTable extends QueryJTable {
     private final IQueryResults qry;
     private final IQueryResults.SearchFields searchField;
     private final QueryDialog qd;
-    private boolean followLog = false;
-
     ListSelectionChanged listSelectionChanged = null;
     ReportFrameQuery frm = null;
+    private boolean followLog = false;
 
     public QueryAllJTable(IQueryResults qry, QueryDialog qd, FullTableColors all) throws Exception {
         super(all);
@@ -81,9 +78,8 @@ public final class QueryAllJTable extends QueryJTable {
     }
 
     /**
-     *
-     * @param row - row id. Row is from table, so needs adjustment for usage in
-     * model
+     * @param row        - row id. Row is from table, so needs adjustment for usage in
+     *                   model
      * @param isDblClick
      */
     public void showCall(int row, boolean isDblClick, boolean newForm) {
@@ -112,7 +108,7 @@ public final class QueryAllJTable extends QueryJTable {
                 theFrm.showReport(qry, qd, sc.getKey(), sc.getValue());
                 theFrm.doShow(isDblClick);
             } catch (Exception ex) {
-                logger.error("fatal: ",  ex);
+                logger.error("fatal: ", ex);
             }
         }
     }

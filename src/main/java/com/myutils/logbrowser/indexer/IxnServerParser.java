@@ -10,36 +10,33 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- *
  * @author ssydoruk
  */
 public class IxnServerParser extends Parser {
 
-    private static final Pattern regNotParseMessage = Pattern.compile("^(24102|24101|26015|26016|26019|26020|26021|26202|26201|"
+    private static final Matcher regNotParseMessage = Pattern.compile("^(24102|24101|26015|26016|26019|26020|26021|26202|26201|"
             //            + "25020|25021|25030|25032" // database activity
             + "30010|30004|30006|30013" // database activity
-            + ")");
+            + ")").matcher("");
 
-    private static final Pattern regTmessage = Pattern.compile("^(24102|24101|26015|26016|26019|26020|26202|26201|30010|30004|30006|30013)");
+    private static final Matcher regTmessage = Pattern.compile("^(24102|24101|26015|26016|26019|26020|26202|26201|30010|30004|30006|30013)").matcher("");
 
-    private static final Pattern regDBActivity = Pattern.compile("^([^:]+):.+request id: '(\\d+)'.+interaction id:'([^']+)'");
+    private static final Matcher regDBActivity = Pattern.compile("^([^:]+):.+request id: '(\\d+)'.+interaction id:'([^']+)'").matcher("");
 
-//        2016-04-29T16:26:11.580 Trc 50002 TEvent: EventAttachedDataChanged
-    private static final Pattern regTMessageEnd = Pattern.compile("^([^\\s\"]+|$)");
+    //        2016-04-29T16:26:11.580 Trc 50002 TEvent: EventAttachedDataChanged
+    private static final Matcher regTMessageEnd = Pattern.compile("^([^\\s\"]+|$)").matcher("");
     //	private DBAccessor m_accessor;
     private static final HashSet<String> nonIxnMsg = getNonIxnMsg();
+    HashMap<String, String> prevSeqno = new HashMap();
+    private ParserState m_ParserState;
+    IxnServerParser(HashMap<TableType, DBTable> m_tables) {
+        super(FileInfoType.type_IxnServer, m_tables);
+    }
 
     private static HashSet<String> getNonIxnMsg() {
         HashSet<String> ret = new HashSet<>();
         ret.add("RequestDistributeEvent");
         return ret;
-    }
-
-    HashMap<String, String> prevSeqno = new HashMap();
-    private ParserState m_ParserState;
-
-    IxnServerParser(HashMap<TableType, DBTable> m_tables) {
-        super(FileInfoType.type_IxnServer, m_tables);
     }
 
     private void AddIxnMessage() {
@@ -53,7 +50,7 @@ public class IxnServerParser extends Parser {
         }
     }
 
-//    private static Class<? extends Record>[] avail = new Class[]{Ixn.class};
+    //    private static Class<? extends Record>[] avail = new Class[]{Ixn.class};
     @Override
     public int ParseFrom(BufferedReaderCrLf input, long offset, int line, FileInfo fi) {
         m_CurrentLine = line;
@@ -152,48 +149,48 @@ public class IxnServerParser extends Parser {
 
 //                Main.logger.debug("using s:["+s+"]");
                 GenesysMsg lastLogMsg;
-                if ((lastLogMsg = getLastLogMsg()) != null && (regTmessage.matcher(lastLogMsg.getLastGenesysMsgID())).find()) {//starts on clear line
+                if ((lastLogMsg = getLastLogMsg()) != null && (regTmessage.reset(lastLogMsg.getLastGenesysMsgID())).find()) {//starts on clear line
                     setSavedFilePos(getFilePos());
                     m_MessageContents.add(s);
                     m_ParserState = ParserState.STATE_TMESSAGE;
                     break;
-                } else if ((m = regDBActivity.matcher(s)).find()) {
+                } else if ((m = regDBActivity.reset(s)).find()) {
                     IxnDBActivity msg = new IxnDBActivity(m.group(1), m.group(2), m.group(3));
                     SetStdFieldsAndAdd(msg);
                     break;
                 }
 
-//                else if ((m = regCGStart.matcher(s)).find()) {
+//                else if ((m = regCGStart .reset(s)).find()) {
 //                    setSavedFilePos(getFilePos());
 //                    m_MessageContents.add(s);
 //                    m_ParserState = ParserState.STATE_CG;
-//                } else if ((m = regPAStart.matcher(s)).find()) {
+//                } else if ((m = regPAStart .reset(s)).find()) {
 //                    setSavedFilePos(getFilePos());
 //                    m_MessageContents.add(s);
 //                    m_ParserState = ParserState.STATE_PA_SESSION_INFO;
-//                } else if ((m = regPAAgentInfo.matcher(s)).find()) {
+//                } else if ((m = regPAAgentInfo .reset(s)).find()) {
 //                    setSavedFilePos(getFilePos());
 //                    m_MessageContents.add(s);
 //                    m_ParserState = ParserState.STATE_AGENT_INFO;
-//                } else if ((m = regPAEventInfo.matcher(s)).find()) {
+//                } else if ((m = regPAEventInfo .reset(s)).find()) {
 //                    setSavedFilePos(getFilePos());
 //                    m_MessageContents.add(s);
 //                    m_ParserState = ParserState.STATE_EVENT_INFO;
-//                } else if ((m = regStatEvent.matcher(s)).find()) {
+//                } else if ((m = regStatEvent .reset(s)).find()) {
 //                    setSavedFilePos(getFilePos());
 //                    statEventType = StatEventType.valueOf(m.group(1));// name of StatEvent
 //                    m_MessageContents.add(s);
 //                    m_ParserState = ParserState.STATE_STAT_EVENT;
-//                } else if ((m = regSCXMLTreatment.matcher(s)).find()) {
+//                } else if ((m = regSCXMLTreatment .reset(s)).find()) {
 //                    AddSCXMLTreatmentMessage(m.group(1), m.group(2), m.group(3),
 //                            s.substring(m.end()));
-//                } else if ((m = regSCXMLScript.matcher(str)).find()) {
+//                } else if ((m = regSCXMLScript .reset(str)).find()) {
 //                    AddSCXMLScript(m.group(1), s.substring(m.end()));
-//                } else if ((m = regAgentAssignment.matcher(s)).find()) {
+//                } else if ((m = regAgentAssignment .reset(s)).find()) {
 //                    setSavedFilePos(getFilePos());
 ////                    m_MessageContents.add(s);
 //                    m_ParserState = ParserState.STATE_AGENT_ASSIGNMENT;
-//                } else if ((m = regRecordCreate.matcher(s)).find()) {
+//                } else if ((m = regRecordCreate .reset(s)).find()) {
 //                    setSavedFilePos(getFilePos());
 //                    m_MessageContents.add(s);
 //                    m_ParserState = ParserState.STATE_RECORD_CREATE;
@@ -354,7 +351,7 @@ public class IxnServerParser extends Parser {
 //                break;
 //            case STATE_TMESSAGE_START:
 //                //	 : message EventServerInfo
-//                //static Pattern regTMessageName=Pattern.compile(": message (.+)");
+//                //static Matcher regTMessageName=Pattern.compile(": message (.+)");
 ////                m_msgName = SubstrAfterPrefix(s, ": message ");
 //                m_MessageContents=new ArrayList();
 //                m_ParserState=ParserState.STATE_TMESSAGE;
@@ -369,7 +366,7 @@ public class IxnServerParser extends Parser {
                 break;
 
             case STATE_TMESSAGE: {
-                if (regTMessageEnd.matcher(str).find()) {
+                if (regTMessageEnd.reset(str).find()) {
                     AddIxnMessage();
                     m_MessageContents.clear();
                     m_ParserState = ParserState.STATE_COMMENT;

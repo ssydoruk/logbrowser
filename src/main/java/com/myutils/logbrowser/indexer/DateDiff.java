@@ -10,7 +10,6 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 
 /**
- *
  * @author ssydoruk
  */
 public class DateDiff {
@@ -55,7 +54,7 @@ public class DateDiff {
         try {
             dateDiffTable.FinalizeDB();
         } catch (Exception ex) {
-            logger.error("fatal: ",  ex);
+            logger.error("fatal: ", ex);
         }
     }
 
@@ -63,8 +62,8 @@ public class DateDiff {
 
         private final FileInfoType type;
         private final SqliteAccessor dbaccessor;
-        private int m_InsertStatementId;
         private final String tabName;
+        private int m_InsertStatementId;
         private boolean dbInited = false;
 
         public DateDiffTable(SqliteAccessor dbaccessor, FileInfoType type) {
@@ -94,7 +93,6 @@ public class DateDiff {
         }
 
         /**
-         *
          * @throws Exception
          */
         public void FinalizeDB() throws Exception {

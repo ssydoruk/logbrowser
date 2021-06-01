@@ -4,11 +4,11 @@
  */
 package com.myutils.logbrowser.indexer;
 
-import static Utils.Util.intOrDef;
 import java.util.regex.Pattern;
 
+import static Utils.Util.intOrDef;
+
 /**
- *
  * @author ssydoruk
  */
 public class ProxiedMessage extends Message {

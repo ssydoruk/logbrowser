@@ -4,13 +4,13 @@
  */
 package com.myutils.logbrowser.indexer;
 
+import org.w3c.dom.Document;
+
 import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.w3c.dom.Document;
 
 /**
- *
  * @author ssydoruk
  */
 
@@ -64,7 +64,7 @@ public class ORSMetric extends Message {
         }
     }
 
-//   expression='system.LastSubmitRequestId;system.LastSubmitRequestId=_event.data.requestid;' result='216731' />
+    //   expression='system.LastSubmitRequestId;system.LastSubmitRequestId=_event.data.requestid;' result='216731' />
     int getReqID() {
         Matcher m;
         String s = m_MessageLines.get(0);
@@ -96,12 +96,12 @@ public class ORSMetric extends Message {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
-    void setParam1(String group) {
-        this.param1 = group;
-    }
-
     public String getParam1() {
         return param1;
+    }
+
+    void setParam1(String group) {
+        this.param1 = group;
     }
 
 }

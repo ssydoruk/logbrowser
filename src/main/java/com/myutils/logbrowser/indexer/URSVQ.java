@@ -5,9 +5,10 @@
  */
 package com.myutils.logbrowser.indexer;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.apache.commons.lang3.StringUtils;
 
 public final class URSVQ extends Message {
 

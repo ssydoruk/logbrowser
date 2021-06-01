@@ -6,10 +6,12 @@
 package com.myutils.logbrowser.indexer;
 
 import Utils.Pair;
-import static Utils.Util.intOrDef;
+
 import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static Utils.Util.intOrDef;
 
 public class Ixn extends Message {
 
@@ -21,64 +23,61 @@ public class Ixn extends Message {
     final private static Pattern regMsgAndClient = Pattern.compile("message '([^']+)'.+(to|from) (?:client|server) '([^']+)'");
     final private static Pattern regMsgAndClientProxy = Pattern.compile("through proxy '([^']+)'");
 
-//    final private static Pattern regGSW_RECORD_HANDLE = Pattern.compile("^\\s+\'GSW_RECORD_HANDLE\'.+= (\\d+)");
+    //    final private static Pattern regGSW_RECORD_HANDLE = Pattern.compile("^\\s+\'GSW_RECORD_HANDLE\'.+= (\\d+)");
     final private static Pattern regIxnActor = Pattern.compile("^\\s+attr_actor_router_id .+ \"([^\"]+)\"$");
     final private static Pattern regIxnSubmitted = Pattern.compile("^\\s+attr_itx_submitted_by .+ \"([^\"]+)\"$");
 
     private static final Regexs AgentIDs = new Regexs(new Pair[]{
-        new Pair("^\\s+attr_agent_id.+ \"([^\"]+)\"$", 1),
-        new Pair("^\\s+attr_actor_agent_id.+ \"([^\"]+)\"$", 1),
-        new Pair("^\\s+AttributeAgentID.+ \"([^\"]+)\"$", 1),
-        new Pair("^\\s+'Agent'.+ \"([^\"]+)\"$", 1)
+            new Pair("^\\s+attr_agent_id.+ \"([^\"]+)\"$", 1),
+            new Pair("^\\s+attr_actor_agent_id.+ \"([^\"]+)\"$", 1),
+            new Pair("^\\s+AttributeAgentID.+ \"([^\"]+)\"$", 1),
+            new Pair("^\\s+'Agent'.+ \"([^\"]+)\"$", 1)
     });
 
     private final static Message.Regexs IxnIDs = new Regexs(new Pair[]{
-        new Pair("^\\s+attr_itx_id .+ \"([^\"]+)\"$", 1),
-        new Pair("^\\s+'InteractionId'.+= \"([^\"]+)\"$", 1),
-        new Pair("^\\s+'Id' .+\"([^\"]+)\"$", 1),
-        new Pair("^\\s*'ORSI:.+:([\\w~]+)' \\[list\\]", 1)
+            new Pair("^\\s+attr_itx_id .+ \"([^\"]+)\"$", 1),
+            new Pair("^\\s+'InteractionId'.+= \"([^\"]+)\"$", 1),
+            new Pair("^\\s+'Id' .+\"([^\"]+)\"$", 1),
+            new Pair("^\\s*'ORSI:.+:([\\w~]+)' \\[list\\]", 1)
     });
 
     private final static Message.Regexs parentIxnID = new Regexs(new Pair[]{
-        new Pair("^\\s+attr_prnt_itx_id.+ \"([^\"]+)\"$", 1),
-        new Pair("^\\s+'attr_itx_prnt_itx_id'.+= \"([^\"]+)\"$", 1),
-        new Pair("^\\s+'Parent' .+\"([^\"]+)\"$", 1)
+            new Pair("^\\s+attr_prnt_itx_id.+ \"([^\"]+)\"$", 1),
+            new Pair("^\\s+'attr_itx_prnt_itx_id'.+= \"([^\"]+)\"$", 1),
+            new Pair("^\\s+'Parent' .+\"([^\"]+)\"$", 1)
     });
 
     private static final Regexs PlaceIDs = new Regexs(new Pair[]{
-        new Pair("^\\s+attr_place_id.+ \"([^\"]+)\"$", 1),
-        new Pair("^\\s+attr_actor_place_id.+ \"([^\"]+)\"$", 1),
-        new Pair("^\\s+AttributePlace.+ \"([^\"]+)\"$", 1)
+            new Pair("^\\s+attr_place_id.+ \"([^\"]+)\"$", 1),
+            new Pair("^\\s+attr_actor_place_id.+ \"([^\"]+)\"$", 1),
+            new Pair("^\\s+AttributePlace.+ \"([^\"]+)\"$", 1)
     });
 
     private static final Regexs refIDs = new Regexs(new Pair[]{
-        new Pair("^\\s+attr_ref_id.+ = (\\d+)", 1),
-        new Pair("^\\s+attr_esp_server_refid.+ = (\\d+)", 1),
-        new Pair("^\\s+AttributeReferenceID.+ = (\\d+)", 1),
-        new Pair("^\\s+AttributeConnID .+ (\\w+)$", 1)
+            new Pair("^\\s+attr_ref_id.+ = (\\d+)", 1),
+            new Pair("^\\s+attr_esp_server_refid.+ = (\\d+)", 1),
+            new Pair("^\\s+AttributeReferenceID.+ = (\\d+)", 1),
+            new Pair("^\\s+AttributeConnID .+ (\\w+)$", 1)
     });
 
-//    private static final Regexs reChainIDs = new Regexs(new Pair[]{
+    //    private static final Regexs reChainIDs = new Regexs(new Pair[]{
 //        new Pair("^\\s+\'GSW_CHAIN_ID\'.+= (\\d+)", 1),
 //        new Pair("^\\s+\'chain_id\'.+= (\\d+)", 1),});
     private static final Regexs reQueue = new Regexs(new Pair[]{
-        new Pair("^\\s+(?:attr_queue|attr_itx_queue) .+ \"([^\"]+)\"$", 1),
-        new Pair("^\\s+AttributeThisDN .+ (\\w+)$", 1),});
+            new Pair("^\\s+(?:attr_queue|attr_itx_queue) .+ \"([^\"]+)\"$", 1),
+            new Pair("^\\s+AttributeThisDN .+ (\\w+)$", 1),});
 
     private static final Regexs reMediaType = new Regexs(new Pair[]{
-        new Pair("^\\s+(?:attr_media_type|attr_itx_media_type|attr_media_type_name) .+ \"([^\"]+)\"$", 1)}
+            new Pair("^\\s+(?:attr_media_type|attr_itx_media_type|attr_media_type_name) .+ \"([^\"]+)\"$", 1)}
     );
 
     private static final Regexs reConnID = new Regexs(new Pair[]{
-        new Pair("^\\s+AttributeConnID .+ (\\w+)$", 1)}
+            new Pair("^\\s+AttributeConnID .+ (\\w+)$", 1)}
     );
     final private static Pattern regService = Pattern.compile("^\\s+'Service'.+= \"([^\"]+)\"$");
     final private static Pattern regMethod = Pattern.compile("^\\s+'Method'.+= \"([^\"]+)\"$");
     final private static Pattern regRouteType = Pattern.compile("^\\s+AttributeRouteType.+ = (\\d+)");
-    private String clientName = null;
-    private String messageName = null;
-
-//    private static final Regexs reContact = new Regexs(new Pair[]{
+    //    private static final Regexs reContact = new Regexs(new Pair[]{
 //        new Pair("^\\s+\'GSW_PHONE\'.+= \"([^\"]+)\"", 1),
 //        new Pair("^\\s+\'contact_info\'.+= \"([^\"]+)\"", 1),});
     private final RegExAttribute reIxnID = new RegExAttribute(IxnIDs);
@@ -86,12 +85,11 @@ public class Ixn extends Message {
     private final RegExAttribute placeID = new RegExAttribute(PlaceIDs);
     private final RegExAttribute parentIxnIDAttr = new RegExAttribute(parentIxnID);
     private final RegExAttribute refID = new RegExAttribute(refIDs);
-//    private RegExAttribute ChainID = new RegExAttribute(reChainIDs);
+    //    private RegExAttribute ChainID = new RegExAttribute(reChainIDs);
     private final RegExAttribute QueueID = new RegExAttribute(reQueue);
-//    private RegExAttribute ContactID = new RegExAttribute(reContact);
+    //    private RegExAttribute ContactID = new RegExAttribute(reContact);
     private final RegExAttribute mediaType = new RegExAttribute(reMediaType);
     private final RegExAttribute connID = new RegExAttribute(reConnID);
-
     MessageAttributes attrs = new MessageAttributes();
     Attribute ixnID = new Attribute() {
         @Override
@@ -120,6 +118,8 @@ public class Ixn extends Message {
             return null;
         }
     };
+    private String clientName = null;
+    private String messageName = null;
 
     public Ixn(TableType t, ArrayList messageLines) {
         super(t, messageLines);

@@ -7,11 +7,11 @@ package com.myutils.logbrowser.inquirer;
 
 import Utils.Pair;
 import com.myutils.logbrowser.inquirer.gui.TabResultDataModel;
-import java.awt.Color;
 import org.apache.commons.lang3.StringUtils;
 
+import java.awt.*;
+
 /**
- *
  * @author Stepan
  */
 public abstract class IAggregateAggregate extends IAggregateQuery {

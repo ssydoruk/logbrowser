@@ -1,21 +1,27 @@
 /*
  * To change this template, choose Tools | Templates
- * and open the template in the editor. 
+ * and open the template in the editor.
  */
 package com.myutils.logbrowser.indexer;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.util.*;
+import java.util.ArrayList;
 
 /**
- *
  * @author terry The class Replicates TLibMessage
  */
 public class IconMessage extends Message {
 
     private static int m_statementId;
+    String m_MessageName;
+
+    public IconMessage(String event, ArrayList newMessageLines) {
+        m_MessageLines = newMessageLines;
+        m_MessageName = event;
+        m_MessageLines.add(0, event);
+    }
 
     public static String InitDB(DBAccessor accessor, int statementId) {
         m_statementId = statementId;
@@ -36,13 +42,6 @@ public class IconMessage extends Message {
                 + "line int);";
         accessor.runQuery(query);
         return "INSERT INTO icon_" + m_alias + " VALUES(NULL,?,?,?,?,?,?,?,?,?,?,?,?,?);";
-    }
-    String m_MessageName;
-
-    public IconMessage(String event, ArrayList newMessageLines) {
-        m_MessageLines = newMessageLines;
-        m_MessageName = event;
-        m_MessageLines.add(0, event);
     }
 
     public String GetMessageName() {

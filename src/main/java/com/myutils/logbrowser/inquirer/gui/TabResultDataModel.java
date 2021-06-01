@@ -1,45 +1,29 @@
 package com.myutils.logbrowser.inquirer.gui;
 
 import Utils.Pair;
-import com.myutils.logbrowser.inquirer.CustomField;
-import com.myutils.logbrowser.inquirer.EditRegexFields;
-import com.myutils.logbrowser.inquirer.ILogRecord;
-import com.myutils.logbrowser.inquirer.InquirerCfg;
-import com.myutils.logbrowser.inquirer.InquirerFileIo;
-import com.myutils.logbrowser.inquirer.LogFile;
-import com.myutils.logbrowser.inquirer.MsgType;
-import com.myutils.logbrowser.inquirer.OutputSpecFormatter;
-import static com.myutils.logbrowser.inquirer.gui.TabResultDataModel.TableRow.colPrefix;
-import com.myutils.logbrowser.inquirer.inquirer;
-import java.awt.Color;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.Writer;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Objects;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import javax.swing.JTable;
-import javax.swing.SwingUtilities;
-import javax.swing.table.AbstractTableModel;
+import com.myutils.logbrowser.inquirer.*;
 import org.apache.commons.io.output.StringBuilderWriter;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
+
+import javax.swing.*;
+import javax.swing.table.AbstractTableModel;
+import java.awt.*;
+import java.io.*;
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import static com.myutils.logbrowser.inquirer.gui.TabResultDataModel.TableRow.colPrefix;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
+
 /**
- *
  * @author Stepan
  */
 public class TabResultDataModel extends AbstractTableModel {
@@ -50,14 +34,64 @@ public class TabResultDataModel extends AbstractTableModel {
     private static final HashMap<MsgType, Pair<Color, Color>> msgRowColors = initMsgColors();
     private static final HashMap<MsgType, Pair<Color, Color>> msgAssignedColors = new HashMap<>();
     private static final ArrayList<Pair<Color, Color>> stdColors = initStdColors();
-    private static int stdColorsIdx = 0;
     private static final HashMap<Integer, Pair<Color, Color>> assignedColorsAggregate = new HashMap<>();
     private static final Pattern normalPattern = Pattern.compile("^[\\s|]*(.+)[\\s|]*$");
+    private static final String VALUE_KEY = "value";
+    private static final String HIDDEN_KEY = "hidden";
+    private static int stdColorsIdx = 0;
+    private final HashMap<String, Integer> columnTitle;
+    private final ArrayList<TableRow> tableData;
+    //    private HashSet<Integer> columnsWithData;
+    private final HashMap<MsgType, HashSet> columnsWithDataType;
+    //    private HashMap<Integer, Integer> columnIdxAdjuster;
+    private final HashMap<MsgType, HashMap> columnIdxAdjusterType;
+    private final ColumnParams columnParamsOrig;
+    private final HashMap<MsgType, HashMap<Integer, CustomField>> customFields = new HashMap<>();
+    //    private int rowTypes = 0;
+    MsgType lastRowType = MsgType.UNKNOWN;
+    ArrayList<CustomField> searchParams = new ArrayList<>();
+    private boolean isAggregate;
+    private ArrayList<String> shortAbsoluteFileNames;
+    private int emptyColumns;
+    private int maxColumnIdx;
+    private ArrayList<String> fullFileNames;
+    private ArrayList<String> shortFileNames;
+    private ColumnParams columnParams;
+    private TableRow currentRow = null;
+
+    TabResultDataModel(TabResultDataModel srcModel) {
+//        this.columnIdxAdjusterType = new HashMap<>(srcModel.columnIdxAdjusterType);
+        this.columnIdxAdjusterType = new HashMap<>();
+
+        this.columnsWithDataType = new HashMap(srcModel.columnsWithDataType);
+        this.tableData = new ArrayList<>();
+        copyData(tableData, srcModel.tableData);
+
+        this.columnTitle = new HashMap<>(srcModel.columnTitle);
+        columnParamsOrig = new ColumnParams(srcModel.columnParamsOrig);
+        columnParams = new ColumnParams(columnParamsOrig);
+
+    }
+
+    public TabResultDataModel() {
+        this.columnIdxAdjusterType = new HashMap<>();
+        this.columnsWithDataType = new HashMap();
+//        this.columnIdxAdjuster = new HashMap<>();
+        this.emptyColumns = -1;
+        this.tableData = new ArrayList<>();
+        this.columnTitle = new HashMap<>();
+//        columnsWithData = new HashSet<Integer>();
+        maxColumnIdx = 0;
+
+        columnParams = new ColumnParams();
+        columnParamsOrig = new ColumnParams();
+
+    }
 
     /*
     1st color - foreground
     2nd color - background
-    
+
     http://www.javascripter.net/faq/colornam.htm
     http://www.rapidtables.com/web/color/RGB_Color.htm
      */
@@ -97,55 +131,6 @@ public class TabResultDataModel extends AbstractTableModel {
         return ret;
     }
 
-    private boolean isAggregate;
-    private ArrayList<String> shortAbsoluteFileNames;
-    private int emptyColumns;
-
-    private final HashMap<String, Integer> columnTitle;
-    private final ArrayList<TableRow> tableData;
-
-    private int maxColumnIdx;
-    private ArrayList<String> fullFileNames;
-    private ArrayList<String> shortFileNames;
-//    private HashSet<Integer> columnsWithData;
-    private final HashMap<MsgType, HashSet> columnsWithDataType;
-//    private HashMap<Integer, Integer> columnIdxAdjuster;
-    private final HashMap<MsgType, HashMap> columnIdxAdjusterType;
-    private ColumnParams columnParams;
-    private final ColumnParams columnParamsOrig;
-    private TableRow currentRow = null;
-    //    private int rowTypes = 0;
-    MsgType lastRowType = MsgType.UNKNOWN;
-
-    TabResultDataModel(TabResultDataModel srcModel) {
-//        this.columnIdxAdjusterType = new HashMap<>(srcModel.columnIdxAdjusterType);
-        this.columnIdxAdjusterType = new HashMap<>();
-
-        this.columnsWithDataType = new HashMap(srcModel.columnsWithDataType);
-        this.tableData = new ArrayList<>();
-        copyData(tableData, srcModel.tableData);
-
-        this.columnTitle = new HashMap<>(srcModel.columnTitle);
-        columnParamsOrig = new ColumnParams(srcModel.columnParamsOrig);
-        columnParams = new ColumnParams(columnParamsOrig);
-
-    }
-
-    public TabResultDataModel() {
-        this.columnIdxAdjusterType = new HashMap<>();
-        this.columnsWithDataType = new HashMap();
-//        this.columnIdxAdjuster = new HashMap<>();
-        this.emptyColumns = -1;
-        this.tableData = new ArrayList<>();
-        this.columnTitle = new HashMap<>();
-//        columnsWithData = new HashSet<Integer>();
-        maxColumnIdx = 0;
-
-        columnParams = new ColumnParams();
-        columnParamsOrig = new ColumnParams();
-
-    }
-
     final public ColumnParams getColumnParams() {
         return columnParams;
     }
@@ -154,8 +139,26 @@ public class TabResultDataModel extends AbstractTableModel {
         return fullFileNames;
     }
 
+    final public void setFullFileNames(ArrayList<String> fullStreamsFileNames) {
+        if (fullStreamsFileNames != null && fullStreamsFileNames.size() > 0) {
+            fullFileNames = new ArrayList<>(fullStreamsFileNames.size());
+            for (String fullStreamsFileName : fullStreamsFileNames) {
+                fullFileNames.add(fullStreamsFileName);
+            }
+        }
+    }
+
     public ArrayList<String> getShortFileNames() {
         return shortFileNames;
+    }
+
+    public void setShortFileNames(ArrayList<String> shortStreamsFileNames) {
+        if (shortStreamsFileNames != null && shortStreamsFileNames.size() > 0) {
+            shortFileNames = new ArrayList<>(shortStreamsFileNames.size());
+            for (String shortFileName : shortStreamsFileNames) {
+                shortFileNames.add(shortFileName);
+            }
+        }
     }
 
     private <T, E> T getKeyByValue(Map<T, E> map, E value) {
@@ -374,24 +377,6 @@ public class TabResultDataModel extends AbstractTableModel {
         return tableData.get(row);
     }
 
-    final public void setFullFileNames(ArrayList<String> fullStreamsFileNames) {
-        if (fullStreamsFileNames != null && fullStreamsFileNames.size() > 0) {
-            fullFileNames = new ArrayList<>(fullStreamsFileNames.size());
-            for (String fullStreamsFileName : fullStreamsFileNames) {
-                fullFileNames.add(fullStreamsFileName);
-            }
-        }
-    }
-
-    public void setShortFileNames(ArrayList<String> shortStreamsFileNames) {
-        if (shortStreamsFileNames != null && shortStreamsFileNames.size() > 0) {
-            shortFileNames = new ArrayList<>(shortStreamsFileNames.size());
-            for (String shortFileName : shortStreamsFileNames) {
-                shortFileNames.add(shortFileName);
-            }
-        }
-    }
-
     private String normalizeCellData(String data) {
         Matcher m;
         if (data != null && !data.isEmpty() && (m = normalPattern.matcher(data)).find()) {
@@ -404,6 +389,10 @@ public class TabResultDataModel extends AbstractTableModel {
         isAggregate = b;
     }
 
+    public ArrayList<String> getShortAbsoluteFileNames() {
+        return shortAbsoluteFileNames;
+    }
+
     public void setShortAbsoluteFileNames(ArrayList<String> shortStreamsFileNames) {
         if (shortStreamsFileNames != null) {
             shortAbsoluteFileNames = new ArrayList<>(shortStreamsFileNames.size());
@@ -411,10 +400,6 @@ public class TabResultDataModel extends AbstractTableModel {
                 shortAbsoluteFileNames.add(shortFileName);
             }
         }
-    }
-
-    public ArrayList<String> getShortAbsoluteFileNames() {
-        return shortAbsoluteFileNames;
     }
 
     private Integer getNamed(Integer realIdx) {
@@ -773,8 +758,6 @@ public class TabResultDataModel extends AbstractTableModel {
         return ret;
     }
 
-    ArrayList<CustomField> searchParams = new ArrayList<>();
-
     public void addRxColumns(String GetFileBytes, TabResultDataModel.TableRow tableRow, String colPrefix, int startIdx) {
         int i = 0;
         for (CustomField searchParam : searchParams) {
@@ -784,8 +767,6 @@ public class TabResultDataModel extends AbstractTableModel {
             i++;
         }
     }
-
-    private final HashMap<MsgType, HashMap<Integer, CustomField>> customFields = new HashMap<>();
 
     void addCustomColumn(CustomField regexFieldsSetting, int popupRow) {
         TableRow row = getRow(popupRow);
@@ -851,7 +832,6 @@ public class TabResultDataModel extends AbstractTableModel {
     }
 
     /**
-     *
      * @param row - adjusted for table.convertRowIndexToModel(row)
      * @return
      */
@@ -867,7 +847,7 @@ public class TabResultDataModel extends AbstractTableModel {
 
     }
 
-//    ArrayList<EditRegexFields.SearchSample> getSampleRows(EditRegexFields showFind, int popupRow, int maxRows) {
+    //    ArrayList<EditRegexFields.SearchSample> getSampleRows(EditRegexFields showFind, int popupRow, int maxRows) {
 //        TableRow row = getRow(popupRow);
 //        if (row == null) {
 //            inquirer.logger.info("Empty row");
@@ -951,7 +931,7 @@ public class TabResultDataModel extends AbstractTableModel {
         columnParams = new ColumnParams(columnParamsOrig);
     }
 
-//    private void addIfNotFound(ArrayList<ColumnParam> hidden, ColumnParam colStd) {
+    //    private void addIfNotFound(ArrayList<ColumnParam> hidden, ColumnParam colStd) {
 //        for (ColumnParam col : hidden) {
 //            if (col.equalCol(colStd)) {
 //                return;
@@ -1005,9 +985,6 @@ public class TabResultDataModel extends AbstractTableModel {
             columnParamsOrig.setParams(currentRow.getRowType(), columnIdx, param);
         }
     }
-
-    private static final String VALUE_KEY = "value";
-    private static final String HIDDEN_KEY = "hidden";
 
     public void addCell(String title, Object s) {
         if (s instanceof String) {
@@ -1091,21 +1068,16 @@ public class TabResultDataModel extends AbstractTableModel {
     public final class TableRow {
 
         public final static String colPrefix = "$col$";
-        private int fileID = 0;
         private final HashMap<Integer, Object> rowData;
+        private int fileID = 0;
         private MsgType rowType;
         private int maxColumn;
         private ILogRecord record;
-
-        public int getMaxColumn() {
-            return maxColumn;
-        }
         private LogFile FileName;
         private int fileBytes;
         private int line;
         private long offset;
         private Pair<Color, Color> cellColor = null;
-
         private TableRow(TableRow tableRow) {
             this();
             for (Entry<Integer, Object> row : tableRow.rowData.entrySet()) {
@@ -1120,6 +1092,10 @@ public class TabResultDataModel extends AbstractTableModel {
             maxColumn = 0;
         }
 
+        public int getMaxColumn() {
+            return maxColumn;
+        }
+
         public String getBytes() {
             return InquirerFileIo.GetFileBytes(getFileName(), getOffset(), getFileBytes());
         }
@@ -1131,6 +1107,10 @@ public class TabResultDataModel extends AbstractTableModel {
 
         public ILogRecord getRecord() {
             return record;
+        }
+
+        public void setRecord(ILogRecord record) {
+            this.record = record;
         }
 
         public int getFileID() {
@@ -1243,22 +1223,13 @@ public class TabResultDataModel extends AbstractTableModel {
                 rowData.put(columnIdx, data);
             }
         }
-
-        public void setRecord(ILogRecord record) {
-            this.record = record;
-        }
     }
 
     class FieldParams {
 
-        public String menuName() {
-            return getTitle() + "(" + getType() + ")";
-        }
-
         private boolean hidden;
         private String title;
         private String type;
-
         public FieldParams() {
 
         }
@@ -1286,6 +1257,10 @@ public class TabResultDataModel extends AbstractTableModel {
                     prm.getType());
         }
 
+        public String menuName() {
+            return getTitle() + "(" + getType() + ")";
+        }
+
         public String getType() {
             return type;
         }
@@ -1294,16 +1269,16 @@ public class TabResultDataModel extends AbstractTableModel {
             return hidden;
         }
 
-        public String getTitle() {
-            return title;
-        }
-
         public void setHidden(boolean isHidden) {
             hidden = isHidden;
         }
+
+        public String getTitle() {
+            return title;
+        }
     }
 
-//    class ColumnParam extends Pair<Integer, FieldParams> {
+    //    class ColumnParam extends Pair<Integer, FieldParams> {
 //
 //        private ColumnParam(int columnIdx,
 //                boolean _hidden,
@@ -1355,7 +1330,7 @@ public class TabResultDataModel extends AbstractTableModel {
             }
         }
 
-//        private ArrayList<ColumnParam> dupl(ArrayList<ColumnParam> src) {
+        //        private ArrayList<ColumnParam> dupl(ArrayList<ColumnParam> src) {
 //            ArrayList<ColumnParam> ret = new ArrayList<>(src.size());
 //            for (ColumnParam columnParam : src) {
 //                ret.add(new ColumnParam(columnParam));
@@ -1381,8 +1356,8 @@ public class TabResultDataModel extends AbstractTableModel {
         }
 
         private void setParams(MsgType rowType, int columnIdx, boolean _hidden,
-                String _title,
-                String _type) {
+                               String _title,
+                               String _type) {
             HashMap<Integer, FieldParams> map = getFieldsMap(rowType);
 
             if (!map.containsKey(columnIdx)) {
@@ -1410,7 +1385,7 @@ public class TabResultDataModel extends AbstractTableModel {
             }
         }
 
-//        private boolean addToMap(ArrayList<ColumnParam> map, int columnIdx, OutputSpecFormatter.Parameter param) {
+        //        private boolean addToMap(ArrayList<ColumnParam> map, int columnIdx, OutputSpecFormatter.Parameter param) {
 //            for (ColumnParam pair : map) {
 //                if (pair.getKey() == columnIdx) {
 //                    return false;

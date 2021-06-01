@@ -6,15 +6,20 @@
 package com.myutils.logbrowser.inquirer.gui;
 
 import com.myutils.logbrowser.inquirer.inquirer;
-import java.text.NumberFormat;
+
 import javax.swing.text.DefaultFormatterFactory;
 import javax.swing.text.NumberFormatter;
+import java.text.NumberFormat;
 
 /**
- *
  * @author ssydoruk
  */
 public class JPSecSelect extends javax.swing.JPanel {
+
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JFormattedTextField jtfSeconds;
+    private javax.swing.JLabel lbEnd;
+    private javax.swing.JLabel lbStart;
 
     /**
      * Creates new form JPSecSelect
@@ -29,6 +34,11 @@ public class JPSecSelect extends javax.swing.JPanel {
 //    jFormattedTextField1.setFormatterFactory(c);
     }
 
+    public JPSecSelect(int min, int def) {
+        initComponents();
+        initFormats(min, def);
+    }
+
     private void initFormats(int min, int def) {
         NumberFormat format = NumberFormat.getInstance();
         NumberFormatter formatter = new NumberFormatter(format);
@@ -39,11 +49,6 @@ public class JPSecSelect extends javax.swing.JPanel {
         jtfSeconds.setFormatterFactory(new DefaultFormatterFactory(formatter));
         jtfSeconds.setValue(def);
         jtfSeconds.setColumns(6);
-    }
-
-    public JPSecSelect(int min, int def) {
-        initComponents();
-        initFormats(min, def);
     }
 
     public void setTextStart(String text) {
@@ -90,11 +95,6 @@ public class JPSecSelect extends javax.swing.JPanel {
         lbEnd.setText("second(s)");
         add(lbEnd);
     }// </editor-fold>//GEN-END:initComponents
-
-    // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JFormattedTextField jtfSeconds;
-    private javax.swing.JLabel lbEnd;
-    private javax.swing.JLabel lbStart;
     // End of variables declaration//GEN-END:variables
 
 }

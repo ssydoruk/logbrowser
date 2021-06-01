@@ -4,13 +4,13 @@
  */
 package com.myutils.logbrowser.indexer;
 
-import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.ArrayList;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 /**
- *
  * @author aglagole
  */
 public class TLibMessage extends Message {
@@ -20,11 +20,10 @@ public class TLibMessage extends Message {
     private final static Pattern regTRequesSource = Pattern.compile("\\s+\\(\\w+\\s+([^\\s]+)");
     private final static Pattern regTEvtPrivateI = Pattern.compile("^(\\w+)");
     final private static Pattern regISCCRefID = Pattern.compile("^\\s+ISCCAttributeReferenceID\\s+(\\d+)");
-
+    final private GenesysMsg lastLogMsg;
     String m_MessageName;
     private String m_source;
     private String ConnID = null;
-    final private GenesysMsg lastLogMsg;
     private String UUID = null;
     private Long _seqNo = null;
     private String thisDN = null;

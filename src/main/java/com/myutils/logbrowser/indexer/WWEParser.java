@@ -5,7 +5,7 @@
 package com.myutils.logbrowser.indexer;
 
 import Utils.Pair;
-import static com.myutils.logbrowser.indexer.Message.getRx;
+
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
@@ -17,117 +17,114 @@ import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static com.myutils.logbrowser.indexer.Message.getRx;
+
 /**
- *
  * @author ssydoruk
  */
 public class WWEParser extends WebParser {
 
     private static final org.apache.logging.log4j.Logger logger = Main.logger;
 
-    private static final Pattern regMsgStart = Pattern.compile("Handling update message:$");
-    private static final Pattern regMsgRequest = Pattern.compile("(?: |=|\\[)'(\\w+)' \\(\\d+\\) attributes:\\s*$");
-    private static final Pattern regMsgContactServerResponse = Pattern.compile("Received response \\[([^:\\[\\}]+):\\s*$");
+    private static final Matcher regMsgStart = Pattern.compile("Handling update message:$");
+    private static final Matcher regMsgRequest = Pattern.compile("(?: |=|\\[)'(\\w+)' \\(\\d+\\) attributes:\\s*$");
+    private static final Matcher regMsgContactServerResponse = Pattern.compile("Received response \\[([^:\\[\\}]+):\\s*$");
 
-    private static final Pattern regMsgEventRegistered = Pattern.compile("message \\[?'(\\w+)' \\(\\d+\\) attributes:$");
-//    private static final Pattern regMsgRequest1 = Pattern.compile("sent: \\['(\\w+)' \\(\\d+\\) attributes:$");
+    private static final Matcher regMsgEventRegistered = Pattern.compile("message \\[?'(\\w+)' \\(\\d+\\) attributes:$");
+//    private static final Matcher regMsgRequest1 = Pattern.compile("sent: \\['(\\w+)' \\(\\d+\\) attributes:$");
 
-//    java.net.ConnectException: Connection refused
-    private static final Pattern regExceptionStart = Pattern.compile("^([\\w\\.]+Exception[\\w\\.]*):(.*)");
-    //    static Pattern regMsgStart = Pattern.compile("^\\s*(?:Int 04543|Trc 04541).+essage \\\"*(\\w+).+from \\d+ \\(\\\"([^@\\\"]+)");
+    //    java.net.ConnectException: Connection refused
+    private static final Matcher regExceptionStart = Pattern.compile("^([\\w\\.]+Exception[\\w\\.]*):(.*)");
+    //    static Matcher regMsgStart = Pattern.compile("^\\s*(?:Int 04543|Trc 04541).+essage \\\"*(\\w+).+from \\d+ \\(\\\"([^@\\\"]+)");
     // : message EventServerInfo
 //AgentMessage(super=BasicTelephonyMessage(message='EventAgentLogin' (73) attributes:
-    private static final Pattern regTMessageStart = Pattern.compile("^(?:\\w+)Message.+message='(\\w+)'");
-    //static Pattern regMsgStart=Pattern.compile("^(Int 04543 |Trc 04541 )");
+    private static final Matcher regTMessageStart = Pattern.compile("^(?:\\w+)Message.+message='(\\w+)'");
+    //static Matcher regMsgStart=Pattern.compile("^(Int 04543 |Trc 04541 )");
 
-//13:40:18.552 {SessionManager:2} URL [http://orswas.internal.gslb.service.nsw.gov.au/mod-routing/src-gen/IPD_default_mainWorkflow.scxml] associated with script [mod-routing]
-    private static final Pattern regAppURL = Pattern.compile("\\}\\sURL \\[([^\\]]+)\\] associated with script \\[([^\\]]+)\\]$");
+    //13:40:18.552 {SessionManager:2} URL [http://orswas.internal.gslb.service.nsw.gov.au/mod-routing/src-gen/IPD_default_mainWorkflow.scxml] associated with script [mod-routing]
+    private static final Matcher regAppURL = Pattern.compile("\\}\\sURL \\[([^\\]]+)\\] associated with script \\[([^\\]]+)\\]$");
 
-    private static final Pattern regIndexList = Pattern.compile("^(\\s|\\})");
+    private static final Matcher regIndexList = Pattern.compile("^(\\s|\\})");
 
-    private static final Pattern regWWELogMessage = Pattern.compile("^(\\w+)\\s+\\[([^\\]]*)\\] \\[([^\\]]*)\\] \\[([^\\]]*)\\] \\[([^\\]]*)\\]( [\\d\\.]*)? (\\S+)?\\s(\\s|(?:\\S+)\\s+)?(?:(\\S+)\\s+(.+))?");
+    private static final Matcher regWWELogMessage = Pattern.compile("^(\\w+)\\s+\\[([^\\]]*)\\] \\[([^\\]]*)\\] \\[([^\\]]*)\\] \\[([^\\]]*)\\]( [\\d\\.]*)? (\\S+)?\\s(\\s|(?:\\S+)\\s+)?(?:(\\S+)\\s+(.+))?");
 
-//    private static final Pattern regElasticSearch = Pattern.compile("\\s+o[^\\.]+\\.e[^\\.]+\\.[\\.\\w]+\\s+(.+)");
-    private static final Pattern regKVList = Pattern.compile("reasons=KVList:\\s*$");
-    private static final Pattern regIndexListStart = Pattern.compile("\\.IndexList = \\{\\s*$");
-    private static final Pattern regWWEUCSStart = Pattern.compile("About to submit request .+\\.requests\\.([^:]+):\\s*$");
+    //    private static final Matcher regElasticSearch = Pattern.compile("\\s+o[^\\.]+\\.e[^\\.]+\\.[\\.\\w]+\\s+(.+)");
+    private static final Matcher regKVList = Pattern.compile("reasons=KVList:\\s*$");
+    private static final Matcher regIndexListStart = Pattern.compile("\\.IndexList = \\{\\s*$");
+    private static final Matcher regWWEUCSStart = Pattern.compile("About to submit request .+\\.requests\\.([^:]+):\\s*$");
 
-    private static final Pattern regWWEIxnServerRequestStart = Pattern.compile("bout to submit request '([^']+)'");
-    private static final Pattern regWWEIxnServerEventStart = Pattern.compile("eceived response '([^']+)'");
+    private static final Matcher regWWEIxnServerRequestStart = Pattern.compile("bout to submit request '([^']+)'");
+    private static final Matcher regWWEIxnServerEventStart = Pattern.compile("eceived response '([^']+)'");
 
-    private static final Pattern regWWEUCSEvent = Pattern.compile("eceived response .+\\.events\\.([^:]+):\\s*$");
-    private static final Pattern regWWEUCSEventOther = Pattern.compile("received message .+\\.events\\.([^:]+):\\s*$");
-    private static final Pattern regWWEUCSHandlingEvent = Pattern.compile("handling message .+\\.events\\.([^:]+):\\s*$");
+    private static final Matcher regWWEUCSEvent = Pattern.compile("eceived response .+\\.events\\.([^:]+):\\s*$");
+    private static final Matcher regWWEUCSEventOther = Pattern.compile("received message .+\\.events\\.([^:]+):\\s*$");
+    private static final Matcher regWWEUCSHandlingEvent = Pattern.compile("handling message .+\\.events\\.([^:]+):\\s*$");
 
-    private static final Pattern regCreateChatContext = Pattern.compile("createChatServerContextV2 ");
-    private static final Pattern regItems = Pattern.compile("item\\(s\\)\\] = \\{\\s*$");
-    private static final Pattern regGetRootCategories = Pattern.compile("RequestGetRootCategories:\\s*$");
-    private static final Pattern regInteractionAttributes = Pattern.compile("contactserver\\.InteractionAttributes \\{\\s*$");
-    private static final Pattern regInteractionProperties = Pattern.compile("interactionProperties=InteractionProperties:\\s*$");
+    private static final Matcher regCreateChatContext = Pattern.compile("createChatServerContextV2 ");
+    private static final Matcher regItems = Pattern.compile("item\\(s\\)\\] = \\{\\s*$");
+    private static final Matcher regGetRootCategories = Pattern.compile("RequestGetRootCategories:\\s*$");
+    private static final Matcher regInteractionAttributes = Pattern.compile("contactserver\\.InteractionAttributes \\{\\s*$");
+    private static final Matcher regInteractionProperties = Pattern.compile("interactionProperties=InteractionProperties:\\s*$");
 
-    private static final Pattern regWWEUCSConfigErrorUser = Pattern.compile("failed for user \\[([^\\]]+)\\]:");
-    private static final Pattern regWWEUCSConfigErrorContinue = Pattern.compile("^(SATRCFG_|IATRCFG)");
+    private static final Matcher regWWEUCSConfigErrorUser = Pattern.compile("failed for user \\[([^\\]]+)\\]:");
+    private static final Matcher regWWEUCSConfigErrorContinue = Pattern.compile("^(SATRCFG_|IATRCFG)");
 
-    private static final Pattern regBayeuxId = Pattern.compile("channel=[^,]+, id=(\\d+),");
-    private static final Pattern regBayeuxLastConnected = Pattern.compile("last connect (\\d+) ms ago$");
-    private static final Pattern regBayeuxAction = Pattern.compile("\\s([><]+)\\s+\\{");
-    private static final Pattern regBayeuxChannel = Pattern.compile("channel=([\\w/]+)");
-    private static final Pattern regBayeuxMessageType = Pattern.compile("messageType=([\\w/]+)");
-    private static final Pattern regURIChatIxnID = Pattern.compile("/chats/(\\w+)");
+    private static final Matcher regBayeuxId = Pattern.compile("channel=[^,]+, id=(\\d+),");
+    private static final Matcher regBayeuxLastConnected = Pattern.compile("last connect (\\d+) ms ago$");
+    private static final Matcher regBayeuxAction = Pattern.compile("\\s([><]+)\\s+\\{");
+    private static final Matcher regBayeuxChannel = Pattern.compile("channel=([\\w/]+)");
+    private static final Matcher regBayeuxMessageType = Pattern.compile("messageType=([\\w/]+)");
+    private static final Matcher regURIChatIxnID = Pattern.compile("/chats/(\\w+)");
 
-    private static final Pattern regWWEReceivedInteractions = Pattern.compile(" received interactions from Interaction Server (.+)\\s*$");
-    private static final Pattern regIxnContinue = Pattern.compile("^\\s");
+    private static final Matcher regWWEReceivedInteractions = Pattern.compile(" received interactions from Interaction Server (.+)\\s*$");
+    private static final Matcher regIxnContinue = Pattern.compile("^\\s");
 
-//<editor-fold defaultstate="collapsed" desc="WWEStatServerMsg">
-    private static final Pattern ptStatStringValue = Pattern.compile("^\\s*'STRING_VALUE'.+= \"(.+)\"$");
+    //<editor-fold defaultstate="collapsed" desc="WWEStatServerMsg">
+    private static final Matcher ptStatStringValue = Pattern.compile("^\\s*'STRING_VALUE'.+= \"(.+)\"$");
 
-//<editor-fold defaultstate="collapsed" desc="WWEBayeuxSMsg">
-//    private static final Pattern regBayeuxMessageType = Pattern.compile("messageType=([^,\\}]+)");
-    private static final Pattern regMessageUUID = Pattern.compile("Found call \\[(\\p{Alnum}+)\\]");
+    //<editor-fold defaultstate="collapsed" desc="WWEBayeuxSMsg">
+//    private static final Matcher regBayeuxMessageType = Pattern.compile("messageType=([^,\\}]+)");
+    private static final Matcher regMessageUUID = Pattern.compile("Found call \\[(\\p{Alnum}+)\\]");
 
-    private static final Pattern regMessageStartingHTTP = Pattern.compile("^https?://(\\S+)", Pattern.CASE_INSENSITIVE);
+    private static final Matcher regMessageStartingHTTP = Pattern.compile("^https?://(\\S+)", Pattern.CASE_INSENSITIVE);
 
-    private static final Pattern regMessageUserID = Pattern.compile("(?:user(?:Id)?|agent):? \\[?(\\p{Alnum}{32})\\]?", Pattern.CASE_INSENSITIVE);
-    private static final Pattern regMessageUserNameID = Pattern.compile("(?:(?<!No )[Ll]ogin *[Cc]ode|UserName:) \\[?((?!for)[^\\]\\s]+)\\]?");
-    private static final Pattern regMessageUserNameID1 = Pattern.compile(" agentId=([^\\s,]+), ");
-    private static final Pattern regMessageDeviceID = Pattern.compile("device .*(?:\\[(?:Id=)|DeviceV2\\(id=)([\\w\\-]+)", Pattern.CASE_INSENSITIVE);
-    private static final Pattern regMessageDevice1ID = Pattern.compile("[Dd]evice \\[*([\\w\\-]+)\\]*");
+    private static final Matcher regMessageUserID = Pattern.compile("(?:user(?:Id)?|agent):? \\[?(\\p{Alnum}{32})\\]?", Pattern.CASE_INSENSITIVE);
+    private static final Matcher regMessageUserNameID = Pattern.compile("(?:(?<!No )[Ll]ogin *[Cc]ode|UserName:) \\[?((?!for)[^\\]\\s]+)\\]?");
+    private static final Matcher regMessageUserNameID1 = Pattern.compile(" agentId=([^\\s,]+), ");
+    private static final Matcher regMessageDeviceID = Pattern.compile("device .*(?:\\[(?:Id=)|DeviceV2\\(id=)([\\w\\-]+)", Pattern.CASE_INSENSITIVE);
+    private static final Matcher regMessageDevice1ID = Pattern.compile("[Dd]evice \\[*([\\w\\-]+)\\]*");
 
-    private static final Pattern regMessageCalUUID1 = Pattern.compile("Call \\[(?:Id=)?([\\w\\-]{32})\\]", Pattern.CASE_INSENSITIVE);
-    private static final Pattern regMessageCalUUID2 = Pattern.compile("call recording details \\[([\\w\\-]{32})\\]", Pattern.CASE_INSENSITIVE);
-    private static final Pattern regMessageGSessionID = Pattern.compile(" session \\[*(\\p{Alnum}{20,}+)\\]*", Pattern.CASE_INSENSITIVE);
-//    private static final Pattern regMessageGSessionMonitorID = Pattern.compile("^Session \\[(\\p{Alnum}+)\\]", Pattern.CASE_INSENSITIVE);
-    private static final Pattern regUserWithID = Pattern.compile("user(?: with ID| settings)? \\[?([^\\s\\]]{12,}+)\\]?", Pattern.CASE_INSENSITIVE);
-    private static final Pattern regUserWithID1 = Pattern.compile("for (?:user|agent) \\[([^\\]]+)\\]");
-    private static final Pattern regUserWithID2 = Pattern.compile("user \\[([^\\s\\]]+)\\] not", Pattern.CASE_INSENSITIVE);
-    private static final Pattern regMessageWWESessionID = Pattern.compile("Session \\[(\\p{Alnum}+)\\] removed", Pattern.CASE_INSENSITIVE);
+    private static final Matcher regMessageCalUUID1 = Pattern.compile("Call \\[(?:Id=)?([\\w\\-]{32})\\]", Pattern.CASE_INSENSITIVE);
+    private static final Matcher regMessageCalUUID2 = Pattern.compile("call recording details \\[([\\w\\-]{32})\\]", Pattern.CASE_INSENSITIVE);
+    private static final Matcher regMessageGSessionID = Pattern.compile(" session \\[*(\\p{Alnum}{20,}+)\\]*", Pattern.CASE_INSENSITIVE);
+    //    private static final Matcher regMessageGSessionMonitorID = Pattern.compile("^Session \\[(\\p{Alnum}+)\\]", Pattern.CASE_INSENSITIVE);
+    private static final Matcher regUserWithID = Pattern.compile("user(?: with ID| settings)? \\[?([^\\s\\]]{12,}+)\\]?", Pattern.CASE_INSENSITIVE);
+    private static final Matcher regUserWithID1 = Pattern.compile("for (?:user|agent) \\[([^\\]]+)\\]");
+    private static final Matcher regUserWithID2 = Pattern.compile("user \\[([^\\s\\]]+)\\] not", Pattern.CASE_INSENSITIVE);
+    private static final Matcher regMessageWWESessionID = Pattern.compile("Session \\[(\\p{Alnum}+)\\] removed", Pattern.CASE_INSENSITIVE);
 
-    private static final Pattern regUserID1 = Pattern.compile("userId=([^\\s,\\>\\<]+)", Pattern.CASE_INSENSITIVE);
-    private static final Pattern regUserID2 = Pattern.compile("(?:for|with) userId ([^\\s,\\>\\<]+)", Pattern.CASE_INSENSITIVE);
+    private static final Matcher regUserID1 = Pattern.compile("userId=([^\\s,\\>\\<]+)", Pattern.CASE_INSENSITIVE);
+    private static final Matcher regUserID2 = Pattern.compile("(?:for|with) userId ([^\\s,\\>\\<]+)", Pattern.CASE_INSENSITIVE);
 
-    private static final Pattern regUserID3ID = Pattern.compile("sessions from (\\w+)");
-    private static final Pattern regUserRemovingSession = Pattern.compile("Removing session (\\w+)");
-//    private static final Pattern regUserSettings = Pattern.compile("user settings \\[(\\p{Alnum}+)\\]");
+    private static final Matcher regUserID3ID = Pattern.compile("sessions from (\\w+)");
+    private static final Matcher regUserRemovingSession = Pattern.compile("Removing session (\\w+)");
+//    private static final Matcher regUserSettings = Pattern.compile("user settings \\[(\\p{Alnum}+)\\]");
 
-    private static final Pattern regMessageBrowser1ID = Pattern.compile("browserId ([\\w\\-]+)");
-    private static final Pattern regMessageBrowser2ID = Pattern.compile("clientId=([\\w\\-]+),");
-    private static final Pattern regMessageIxnID = Pattern.compile("﻿interaction with identity \\[([\\w\\-]+)\\]");
-    private static final Pattern regMessageIxn1ID = Pattern.compile("interactionId=(\\w+)");
-    private static final Pattern regMessageIxn2ID = Pattern.compile("(?:interactionid|chat id) '*\\{*(\\w+)\\}*'*", Pattern.CASE_INSENSITIVE);
-    private static final Pattern regMessageIxn3ID = Pattern.compile("ixnId=(\\w+)");
-    private static final Pattern regMessageIxn4ID = Pattern.compile("(?:interactionId|interaction with identity) \\[(\\w+)\\]", Pattern.CASE_INSENSITIVE);
-//    private static final Pattern regMessageUserToken = Pattern.compile("userToken=(\\w+)");
-    private static final Pattern regMessageIxnChatID = Pattern.compile("/(?:chats|calls)/(\\w+)");
+    private static final Matcher regMessageBrowser1ID = Pattern.compile("browserId ([\\w\\-]+)");
+    private static final Matcher regMessageBrowser2ID = Pattern.compile("clientId=([\\w\\-]+),");
+    private static final Matcher regMessageIxnID = Pattern.compile("﻿interaction with identity \\[([\\w\\-]+)\\]");
+    private static final Matcher regMessageIxn1ID = Pattern.compile("interactionId=(\\w+)");
+    private static final Matcher regMessageIxn2ID = Pattern.compile("(?:interactionid|chat id) '*\\{*(\\w+)\\}*'*", Pattern.CASE_INSENSITIVE);
+    private static final Matcher regMessageIxn3ID = Pattern.compile("ixnId=(\\w+)");
+    private static final Matcher regMessageIxn4ID = Pattern.compile("(?:interactionId|interaction with identity) \\[(\\w+)\\]", Pattern.CASE_INSENSITIVE);
+    //    private static final Matcher regMessageUserToken = Pattern.compile("userToken=(\\w+)");
+    private static final Matcher regMessageIxnChatID = Pattern.compile("/(?:chats|calls)/(\\w+)");
 
     private static final WWEMessageCleanTool msgCleaner = new WWEMessageCleanTool();
 
-//05/30/2019 13:35:39.159 DEBUG [graham.saludares@outreach.airbnb.com] [Ca6138neMXSzsR6ccjA7eA1ekz4a2zuirypscugq9fj67a1] [7c3316db-ae59-43a8-aa67-4990fe4506cc] [hystrix-ApiOperationPool-483] 203.153.14.144 /api/v2/me  c.g.c.v.a.t.u.o.StartContactCenterSessionApiTaskV2 https://esv1-cvt-gws-p.airbnb.biz/ui/crm-workspace/index.html?sfdcIFrameOrigin=https%3A%2F%2Fairbnb.my.salesforce.com&nonce=b205c3a50141a2989a23ce1abfc1f8c7bb46bf0dfa5da4bf898c3257d12dc8ee&isAdapterUrl=true&isdtp=vw& Place: [Configuration object: type = CfgPlace, properties = {
-    private static final Pattern regConfigObjectRead = Pattern.compile("Configuration object: type = (\\S+), properties = \\{");
-    private String m_msgName;
-    private String m_TserverSRC;
-    private ParserState m_ParserState;
+    //05/30/2019 13:35:39.159 DEBUG [graham.saludares@outreach.airbnb.com] [Ca6138neMXSzsR6ccjA7eA1ekz4a2zuirypscugq9fj67a1] [7c3316db-ae59-43a8-aa67-4990fe4506cc] [hystrix-ApiOperationPool-483] 203.153.14.144 /api/v2/me  c.g.c.v.a.t.u.o.StartContactCenterSessionApiTaskV2 https://esv1-cvt-gws-p.airbnb.biz/ui/crm-workspace/index.html?sfdcIFrameOrigin=https%3A%2F%2Fairbnb.my.salesforce.com&nonce=b205c3a50141a2989a23ce1abfc1f8c7bb46bf0dfa5da4bf898c3257d12dc8ee&isAdapterUrl=true&isdtp=vw& Place: [Configuration object: type = CfgPlace, properties = {
+    private static final Matcher regConfigObjectRead = Pattern.compile("Configuration object: type = (\\S+), properties = \\{");
     private final HashMap<String, ParserState> threadParserState = new HashMap<>();
-    MsgType MessageType;
     /*	public OrsParser(DBAccessor accessor) {
     m_accessor = accessor;
     }
@@ -141,6 +138,10 @@ public class WWEParser extends WebParser {
     }
      */
     private final HashMap<String, String> ThreadAlias = new HashMap<>();
+    MsgType MessageType;
+    private String m_msgName;
+    private String m_TserverSRC;
+    private ParserState m_ParserState;
     private String URL = null;
     private String app = null;
     private String m_msg1;
@@ -420,7 +421,7 @@ public class WWEParser extends WebParser {
                                     || (rxReplace = Message.getRxReplace(theMessage, regUserID3ID, 1, "<userID>")) != null
                                     //                                    || (rxReplace = Message.getRxReplace(theMessage, regMessageUserToken, 1, "<UserID>")) != null
                                     || (rxReplace = Message.getRxReplace(theMessage, regUserRemovingSession, 1, "<UserID>")) != null //                                    || (rxReplace = Message.getRxReplace(theMessage, regUserSettings, 1, "<UserID>")) != null
-                                    ) {
+                            ) {
                                 theMessage = rxReplace.getValue();
                                 entry.setUserID(rxReplace.getKey());
                             }
@@ -906,6 +907,46 @@ public class WWEParser extends WebParser {
 
     }
 
+    enum ParserState {
+        STATE_INIT,
+        STATE_HEADER,
+        STATE_TMESSAGE_REQUEST,
+        STATE_ORSMESSAGE,
+        STATE_COMMENT,
+        STATE_TMESSAGE_EVENT,
+        STATE_CLUSTER,
+        STATE_HTTPIN,
+        STATE_HTTPHANDLEREQUEST,
+        STATE_ORSUS,
+        STATE_TMESSAGE_ATTRIBUTES,
+        STATE_EXCEPTION,
+        STATE_IndexList,
+        STATE_UCSREQUEST,
+        STATE_UCSPREPARETASK,
+        STATE_UCSRESPONSE,
+        STATE_CONFIG_ERROR,
+        STATE_UCSHANDLINGRESPONSE,
+        STATE_UCSRESPONSEOTHER,
+        STATE_IXNSERVER_REQUEST,
+        STATE_BAYEUX,
+        STATE_RECEIVED_INTERACTION,
+        STATE_CREATECHATCONTEXT,
+        STATE_READ_INFO,
+        STATE_GETROOTCATEGORIES,
+        STATE_INTERACTION_ATTRIBUTES,
+        STATE_INTERACTION_PROPERTIES,
+        STATE_KVLIST,
+        STATE_ITEMS,
+        STATE_CONFIG_OBJECT, STATE_STATSERVER
+    }
+
+    enum MsgType {
+        MSG_UNKNOWN,
+        MSG_MM_OUT,
+        MSG_MM_IN,
+        MSG_TLIB
+    }
+
     private static class WWEMessageCleanTool {
 
         private static ArrayList<ICleanString> rxs = new ArrayList<>();
@@ -1032,7 +1073,7 @@ public class WWEParser extends WebParser {
 
         private class ReplaceRx extends ICleanString {
 
-            private final Pattern p;
+            private final Matcher p;
             private final int idx;
             private final String replaceString;
 
@@ -1083,46 +1124,6 @@ public class WWEParser extends WebParser {
 
     }
 
-    enum ParserState {
-        STATE_INIT,
-        STATE_HEADER,
-        STATE_TMESSAGE_REQUEST,
-        STATE_ORSMESSAGE,
-        STATE_COMMENT,
-        STATE_TMESSAGE_EVENT,
-        STATE_CLUSTER,
-        STATE_HTTPIN,
-        STATE_HTTPHANDLEREQUEST,
-        STATE_ORSUS,
-        STATE_TMESSAGE_ATTRIBUTES,
-        STATE_EXCEPTION,
-        STATE_IndexList,
-        STATE_UCSREQUEST,
-        STATE_UCSPREPARETASK,
-        STATE_UCSRESPONSE,
-        STATE_CONFIG_ERROR,
-        STATE_UCSHANDLINGRESPONSE,
-        STATE_UCSRESPONSEOTHER,
-        STATE_IXNSERVER_REQUEST,
-        STATE_BAYEUX,
-        STATE_RECEIVED_INTERACTION,
-        STATE_CREATECHATCONTEXT,
-        STATE_READ_INFO,
-        STATE_GETROOTCATEGORIES,
-        STATE_INTERACTION_ATTRIBUTES,
-        STATE_INTERACTION_PROPERTIES,
-        STATE_KVLIST,
-        STATE_ITEMS,
-        STATE_CONFIG_OBJECT, STATE_STATSERVER
-    }
-
-    enum MsgType {
-        MSG_UNKNOWN,
-        MSG_MM_OUT,
-        MSG_MM_IN,
-        MSG_TLIB
-    }
-
     private final class WWEStatServerMsg extends Message {
 
         private String ip;
@@ -1169,6 +1170,10 @@ public class WWEParser extends WebParser {
 
         public String getParam2() {
             return param2;
+        }
+
+        public void setParam2(String param2) {
+            this.param2 = param2;
         }
 
         /**
@@ -1235,16 +1240,16 @@ public class WWEParser extends WebParser {
             return httpCode;
         }
 
+        private void setHttpCode(String s) {
+            httpCode = s;
+        }
+
         public String getMethod() {
             return method;
         }
 
         private void setMethod(String s) {
             method = s;
-        }
-
-        private void setHttpCode(String s) {
-            httpCode = s;
         }
 
         private void setDate(String s) {
@@ -1275,6 +1280,16 @@ public class WWEParser extends WebParser {
             return userName;
         }
 
+        private void setUserName(String get) {
+            if (userName != null && !userName.isEmpty()) {
+                setParam1(get);
+            } else {
+                checkDiffer(this.userName, get, "userName", m_CurrentLine);
+                this.userName = get;
+            }
+
+        }
+
         private void setUserKey(String s) {
 
             key = s;
@@ -1297,39 +1312,6 @@ public class WWEParser extends WebParser {
             }
         }
 
-        private void setUserName(String get) {
-            if (userName != null && !userName.isEmpty()) {
-                setParam1(get);
-            } else {
-                checkDiffer(this.userName, get, "userName", m_CurrentLine);
-                this.userName = get;
-            }
-
-        }
-
-        private void setLevel(String group) {
-            this.level = group;
-
-        }
-
-        private void setClassName(String group) {
-            this.className = group;
-
-        }
-
-        public void setMsgText(String msgText) {
-            this.msgText = msgText;
-        }
-
-        public void setParam1(String param1) {
-            checkDiffer(this.param1, param1, "param1", m_CurrentLine);
-
-        }
-
-        public void setParam2(String param2) {
-            this.param2 = param2;
-        }
-
         private void setMessageText(String group) {
             this.msgText = group;
         }
@@ -1338,12 +1320,26 @@ public class WWEParser extends WebParser {
             return level;
         }
 
+        private void setLevel(String group) {
+            this.level = group;
+
+        }
+
         public String getClassName() {
             return className;
         }
 
+        private void setClassName(String group) {
+            this.className = group;
+
+        }
+
         public String getMsgText() {
             return msgText;
+        }
+
+        public void setMsgText(String msgText) {
+            this.msgText = msgText;
         }
 
         private void setURIParam(String group) {
@@ -1354,13 +1350,18 @@ public class WWEParser extends WebParser {
             return FindByRx(ptStatStringValue, 1, null);
         }
 
-        private void setUserID(String key) {
-            checkDiffer(this.userID, key, "userID", m_CurrentLine);
-            this.userID = key;
+        public void setParam1(String param1) {
+            checkDiffer(this.param1, param1, "param1", m_CurrentLine);
+
         }
 
         public String getUserID() {
             return userID;
+        }
+
+        private void setUserID(String key) {
+            checkDiffer(this.userID, key, "userID", m_CurrentLine);
+            this.userID = key;
         }
 
         private void setClientID(String key) {
@@ -1371,14 +1372,14 @@ public class WWEParser extends WebParser {
             return browserClient;
         }
 
+        public String getSessionID() {
+            return sessionID;
+        }
+
         private void setSessionID(String key) {
             checkDiffer(this.sessionID, key, "sessionID", m_CurrentLine);
 
             this.sessionID = key;
-        }
-
-        public String getSessionID() {
-            return sessionID;
         }
     }
 
@@ -1459,7 +1460,6 @@ public class WWEParser extends WebParser {
         }
 
         /**
-         *
          * @throws Exception
          */
         @Override
@@ -1552,6 +1552,10 @@ public class WWEParser extends WebParser {
             return param2;
         }
 
+        public void setParam2(String param2) {
+            this.param2 = param2;
+        }
+
         /**
          * Get the value of deviceID
          *
@@ -1616,16 +1620,16 @@ public class WWEParser extends WebParser {
             return httpCode;
         }
 
+        private void setHttpCode(String s) {
+            httpCode = s;
+        }
+
         public String getMethod() {
             return method;
         }
 
         private void setMethod(String s) {
             method = s;
-        }
-
-        private void setHttpCode(String s) {
-            httpCode = s;
         }
 
         private void setDate(String s) {
@@ -1658,6 +1662,16 @@ public class WWEParser extends WebParser {
             return userName;
         }
 
+        private void setUserName(String get) {
+            if (userName != null && !userName.isEmpty()) {
+                setParam1(get);
+            } else {
+                checkDiffer(this.userName, get, "userName", m_CurrentLine);
+                this.userName = get;
+            }
+
+        }
+
         private void setUserKey(String s) {
 
             key = s;
@@ -1680,39 +1694,6 @@ public class WWEParser extends WebParser {
             }
         }
 
-        private void setUserName(String get) {
-            if (userName != null && !userName.isEmpty()) {
-                setParam1(get);
-            } else {
-                checkDiffer(this.userName, get, "userName", m_CurrentLine);
-                this.userName = get;
-            }
-
-        }
-
-        private void setLevel(String group) {
-            this.level = group;
-
-        }
-
-        private void setClassName(String group) {
-            this.className = group;
-
-        }
-
-        public void setMsgText(String msgText) {
-            this.msgText = msgText;
-        }
-
-        public void setParam1(String param1) {
-            checkDiffer(this.param1, param1, "param1", m_CurrentLine);
-
-        }
-
-        public void setParam2(String param2) {
-            this.param2 = param2;
-        }
-
         private void setMessageText(String group) {
             this.msgText = group;
         }
@@ -1721,12 +1702,26 @@ public class WWEParser extends WebParser {
             return level;
         }
 
+        private void setLevel(String group) {
+            this.level = group;
+
+        }
+
         public String getClassName() {
             return className;
         }
 
+        private void setClassName(String group) {
+            this.className = group;
+
+        }
+
         public String getMsgText() {
             return msgText;
+        }
+
+        public void setMsgText(String msgText) {
+            this.msgText = msgText;
         }
 
         private void setURIParam(String group) {
@@ -1737,13 +1732,18 @@ public class WWEParser extends WebParser {
             return param1;
         }
 
-        private void setUserID(String key) {
-            checkDiffer(this.userID, key, "userID", m_CurrentLine);
-            this.userID = key;
+        public void setParam1(String param1) {
+            checkDiffer(this.param1, param1, "param1", m_CurrentLine);
+
         }
 
         public String getUserID() {
             return userID;
+        }
+
+        private void setUserID(String key) {
+            checkDiffer(this.userID, key, "userID", m_CurrentLine);
+            this.userID = key;
         }
 
         private void setClientID(String key) {
@@ -1754,14 +1754,14 @@ public class WWEParser extends WebParser {
             return browserClient;
         }
 
+        public String getSessionID() {
+            return sessionID;
+        }
+
         private void setSessionID(String key) {
             checkDiffer(this.sessionID, key, "sessionID", m_CurrentLine);
 
             this.sessionID = key;
-        }
-
-        public String getSessionID() {
-            return sessionID;
         }
     }
 
@@ -1842,7 +1842,6 @@ public class WWEParser extends WebParser {
         }
 
         /**
-         *
          * @throws Exception
          */
         @Override
@@ -1908,32 +1907,12 @@ public class WWEParser extends WebParser {
             return channel;
         }
 
+        private void setChannel(String rx) {
+            this.channel = rx;
+        }
+
         public String getMsgType() {
             return msgType;
-        }
-
-        void setBayeuxId(String rx) {
-            try {
-                if (rx != null && !rx.isEmpty()) {
-                    bayeuxId = new Integer(rx);
-                }
-            } catch (NumberFormatException numberFormatException) {
-                Main.logger.error("1error parsing number [" + rx + "]");
-            }
-        }
-
-        void setLastConnected(String rx) {
-            try {
-                if (rx != null && !rx.isEmpty()) {
-                    lastConnected = new Long(rx);
-                }
-            } catch (NumberFormatException numberFormatException) {
-                Main.logger.error("2error parsing number [" + rx + "]");
-            }
-        }
-
-        void setAction(String rx) {
-            action = rx;
         }
 
         private void setAdditionalLines(ArrayList<String> m_MessageContents) {
@@ -1976,16 +1955,36 @@ public class WWEParser extends WebParser {
             return bayeuxId;
         }
 
+        void setBayeuxId(String rx) {
+            try {
+                if (rx != null && !rx.isEmpty()) {
+                    bayeuxId = new Integer(rx);
+                }
+            } catch (NumberFormatException numberFormatException) {
+                Main.logger.error("1error parsing number [" + rx + "]");
+            }
+        }
+
         public Long getLastConnected() {
             return lastConnected;
+        }
+
+        void setLastConnected(String rx) {
+            try {
+                if (rx != null && !rx.isEmpty()) {
+                    lastConnected = new Long(rx);
+                }
+            } catch (NumberFormatException numberFormatException) {
+                Main.logger.error("2error parsing number [" + rx + "]");
+            }
         }
 
         public String getAction() {
             return action;
         }
 
-        private void setChannel(String rx) {
-            this.channel = rx;
+        void setAction(String rx) {
+            action = rx;
         }
 
         private void setMessageType(String rx) {
@@ -2076,7 +2075,6 @@ public class WWEParser extends WebParser {
         }
 
         /**
-         *
          * @throws Exception
          */
         @Override
@@ -2124,7 +2122,7 @@ public class WWEParser extends WebParser {
     }
 //</editor-fold>
 
-//<editor-fold defaultstate="collapsed" desc="WWEUCSMsg">
+    //<editor-fold defaultstate="collapsed" desc="WWEUCSMsg">
     private class WWEUCSMsg extends WWEDebugMsg {
 
         private final String msgName;
@@ -2206,7 +2204,6 @@ public class WWEParser extends WebParser {
         }
 
         /**
-         *
          * @throws Exception
          */
         @Override
@@ -2250,6 +2247,7 @@ public class WWEParser extends WebParser {
 
     private class WWEIxnServerMsg extends Message {
 
+        private final String msgName;
         private String ip;
         private String jSessionID;
         private String httpCode;
@@ -2257,13 +2255,11 @@ public class WWEParser extends WebParser {
         private String method;
         private String key;
         private String url;
-
         private String deviceID;
         private String userName;
         private String level;
         private String className;
         private String msgText;
-        private final String msgName;
         private String UUID;
         private String ixnID;
 
@@ -2331,16 +2327,16 @@ public class WWEParser extends WebParser {
             return httpCode;
         }
 
+        private void setHttpCode(String s) {
+            httpCode = s;
+        }
+
         public String getMethod() {
             return method;
         }
 
         private void setMethod(String s) {
             method = s;
-        }
-
-        private void setHttpCode(String s) {
-            httpCode = s;
         }
 
         private void setDate(String s) {
@@ -2371,6 +2367,10 @@ public class WWEParser extends WebParser {
             return userName;
         }
 
+        private void setUserName(String get) {
+            this.userName = get;
+        }
+
         private void setUserKey(String s) {
             key = s;
         }
@@ -2390,20 +2390,6 @@ public class WWEParser extends WebParser {
             }
         }
 
-        private void setUserName(String get) {
-            this.userName = get;
-        }
-
-        private void setLevel(String group) {
-            this.level = group;
-
-        }
-
-        private void setClassName(String group) {
-            this.className = group;
-
-        }
-
         private void setMessageText(String group) {
             this.msgText = group;
         }
@@ -2412,12 +2398,22 @@ public class WWEParser extends WebParser {
             return level;
         }
 
+        private void setLevel(String group) {
+            this.level = group;
+
+        }
+
         public String getMsgName() {
             return msgName;
         }
 
         public String getClassName() {
             return className;
+        }
+
+        private void setClassName(String group) {
+            this.className = group;
+
         }
 
         public String getMsgText() {
@@ -2460,7 +2456,6 @@ public class WWEParser extends WebParser {
         }
 
         /**
-         *
          * @throws Exception
          */
         @Override
@@ -2568,7 +2563,6 @@ public class WWEParser extends WebParser {
         }
 
         /**
-         *
          * @throws Exception
          */
         @Override

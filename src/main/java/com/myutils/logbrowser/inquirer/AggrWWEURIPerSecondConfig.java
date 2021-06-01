@@ -10,37 +10,34 @@ import com.jidesoft.swing.SearchableUtils;
 import com.myutils.logbrowser.indexer.FileInfoType;
 import com.myutils.logbrowser.indexer.ReferenceType;
 import com.myutils.logbrowser.inquirer.gui.JPSecSelect;
-import java.awt.BorderLayout;
+
+import javax.swing.*;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.util.ArrayList;
 import java.util.List;
-import javax.swing.ButtonGroup;
-import javax.swing.DefaultListModel;
-import javax.swing.JPanel;
-import javax.swing.JRadioButton;
-import javax.swing.JScrollPane;
-import javax.swing.ListSelectionModel;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 
 /**
- *
  * @author ssydoruk
  */
 public class AggrWWEURIPerSecondConfig extends javax.swing.JPanel {
-
-    private DefaultListModel lmAttr;
-    private MyCheckBoxList cblAttr;
-    private DefaultListModel lmAttrValues;
-    private MyCheckBoxList cblAttrValues;
 
     /**
      * Creates new form TLibDelaysConfig
      */
     private final DynamicTreeNode<OptionNode> root = null;
+    private final JPSecSelect jpSecSelect;
+    private final JPSecSelect jpHavingSelect;
+    private final ButtonGroup group = new ButtonGroup();
+    private DefaultListModel lmAttr;
+    private MyCheckBoxList cblAttr;
+    private DefaultListModel lmAttrValues;
+    private MyCheckBoxList cblAttrValues;
     private MyCheckBoxList clbOrderBy;
     private DefaultListModel lmAttrTLib;
     private MyCheckBoxList cblAttrTLib;
@@ -49,8 +46,23 @@ public class AggrWWEURIPerSecondConfig extends javax.swing.JPanel {
     private DynamicTreeNode<OptionNode> rootTLib;
     private GroupByPanel gpOrderByTLib;
     private GroupByPanel gpGroupByTLib;
-    private final JPSecSelect jpSecSelect;
-    private final JPSecSelect jpHavingSelect;
+    private GroupByPanel gpGroupBy;
+    private GroupByPanel gpOrderBy;
+    private FileInfoType ft = FileInfoType.type_Unknown;
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
+    private javax.swing.JPanel jPanel3;
+    private javax.swing.JPanel jPanel4;
+    private javax.swing.JPanel jPanel6;
+    private javax.swing.JPanel jpAppSettings;
+    private javax.swing.JPanel jpAttrValuesTLib;
+    private javax.swing.JPanel jpComponentsTLib;
+    private javax.swing.JPanel jpGroupByTLib;
+    private javax.swing.JPanel jpOrderByTLib;
+    private javax.swing.JPanel jpOrderGroup;
+    private javax.swing.JPanel jpOtherSettings;
+    private javax.swing.JPanel jpTLIB;
 
     public AggrWWEURIPerSecondConfig() {
         initComponents();
@@ -81,7 +93,6 @@ public class AggrWWEURIPerSecondConfig extends javax.swing.JPanel {
             lm.addElement(node);
         }
     }
-    private GroupByPanel gpGroupBy;
 
     private void initFilterPanel() {
         jpComponentsTLib.setLayout(new BorderLayout());
@@ -152,81 +163,6 @@ public class AggrWWEURIPerSecondConfig extends javax.swing.JPanel {
         return jpSecSelect.getSeconds();
     }
 
-    class OrderField {
-
-        private final String fieldName;
-        private final String displayName;
-
-        public OrderField(String fieldName, String displayName) {
-            this.fieldName = fieldName;
-            this.displayName = displayName;
-        }
-
-        public String getFieldName() {
-            return fieldName;
-        }
-
-        public String getDisplayName() {
-            return displayName;
-        }
-
-        @Override
-        public String toString() {
-            return displayName;
-        }
-
-    }
-
-    private GroupByPanel gpOrderBy;
-
-    class myListCheckListener implements ListSelectionListener {
-
-        private final MyCheckBoxList list;
-        private final MyCheckBoxList listChild;
-
-        public myListCheckListener(MyCheckBoxList list, MyCheckBoxList listChild) {
-            this.list = list;
-            this.listChild = listChild;
-        }
-
-        @Override
-        public void valueChanged(ListSelectionEvent e) {
-            ReportItemChecked(e, list, listChild);
-        }
-
-    }
-
-    class myListSelectionListener implements ListSelectionListener {
-
-        private final MyCheckBoxList list;
-        private final MyCheckBoxList listChild;
-
-        public myListSelectionListener(MyCheckBoxList list, MyCheckBoxList listChild) {
-            this.list = list;
-            this.listChild = listChild;
-        }
-
-        @Override
-        public void valueChanged(ListSelectionEvent e) {
-            ReportItemChanged(e, list, listChild);
-        }
-
-    }
-
-    class myFocusListener implements FocusListener {
-
-        @Override
-        public void focusGained(FocusEvent e) {
-            inquirer.logger.debug("focusGained", e);
-        }
-
-        @Override
-        public void focusLost(FocusEvent e) {
-            inquirer.logger.debug("focusLost", e);
-        }
-
-    }
-
     private void InitCB(MyCheckBoxList list, MyCheckBoxList clbChild, JPanel rptType, int i) {
 
         rptType.add(new JScrollPane(list));
@@ -239,9 +175,6 @@ public class AggrWWEURIPerSecondConfig extends javax.swing.JPanel {
         list.addFocusListener(new myFocusListener());
 
     }
-
-    private final ButtonGroup group = new ButtonGroup();
-    private FileInfoType ft = FileInfoType.type_Unknown;
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -291,12 +224,12 @@ public class AggrWWEURIPerSecondConfig extends javax.swing.JPanel {
         javax.swing.GroupLayout jpComponentsTLibLayout = new javax.swing.GroupLayout(jpComponentsTLib);
         jpComponentsTLib.setLayout(jpComponentsTLibLayout);
         jpComponentsTLibLayout.setHorizontalGroup(
-            jpComponentsTLibLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 0, Short.MAX_VALUE)
+                jpComponentsTLibLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGap(0, 0, Short.MAX_VALUE)
         );
         jpComponentsTLibLayout.setVerticalGroup(
-            jpComponentsTLibLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 212, Short.MAX_VALUE)
+                jpComponentsTLibLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGap(0, 212, Short.MAX_VALUE)
         );
 
         jPanel3.add(jpComponentsTLib);
@@ -314,12 +247,12 @@ public class AggrWWEURIPerSecondConfig extends javax.swing.JPanel {
         javax.swing.GroupLayout jpAttrValuesTLibLayout = new javax.swing.GroupLayout(jpAttrValuesTLib);
         jpAttrValuesTLib.setLayout(jpAttrValuesTLibLayout);
         jpAttrValuesTLibLayout.setHorizontalGroup(
-            jpAttrValuesTLibLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 384, Short.MAX_VALUE)
+                jpAttrValuesTLibLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGap(0, 384, Short.MAX_VALUE)
         );
         jpAttrValuesTLibLayout.setVerticalGroup(
-            jpAttrValuesTLibLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 201, Short.MAX_VALUE)
+                jpAttrValuesTLibLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGap(0, 201, Short.MAX_VALUE)
         );
 
         jPanel6.add(jpAttrValuesTLib);
@@ -333,12 +266,12 @@ public class AggrWWEURIPerSecondConfig extends javax.swing.JPanel {
         javax.swing.GroupLayout jpOrderByTLibLayout = new javax.swing.GroupLayout(jpOrderByTLib);
         jpOrderByTLib.setLayout(jpOrderByTLibLayout);
         jpOrderByTLibLayout.setHorizontalGroup(
-            jpOrderByTLibLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 446, Short.MAX_VALUE)
+                jpOrderByTLibLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGap(0, 446, Short.MAX_VALUE)
         );
         jpOrderByTLibLayout.setVerticalGroup(
-            jpOrderByTLibLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 237, Short.MAX_VALUE)
+                jpOrderByTLibLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGap(0, 237, Short.MAX_VALUE)
         );
 
         jpOrderGroup.add(jpOrderByTLib);
@@ -346,12 +279,12 @@ public class AggrWWEURIPerSecondConfig extends javax.swing.JPanel {
         javax.swing.GroupLayout jpGroupByTLibLayout = new javax.swing.GroupLayout(jpGroupByTLib);
         jpGroupByTLib.setLayout(jpGroupByTLibLayout);
         jpGroupByTLibLayout.setHorizontalGroup(
-            jpGroupByTLibLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 0, Short.MAX_VALUE)
+                jpGroupByTLibLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGap(0, 0, Short.MAX_VALUE)
         );
         jpGroupByTLibLayout.setVerticalGroup(
-            jpGroupByTLibLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 237, Short.MAX_VALUE)
+                jpGroupByTLibLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGap(0, 237, Short.MAX_VALUE)
         );
 
         jpOrderGroup.add(jpGroupByTLib);
@@ -360,22 +293,6 @@ public class AggrWWEURIPerSecondConfig extends javax.swing.JPanel {
 
         add(jpTLIB);
     }// </editor-fold>//GEN-END:initComponents
-
-    // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel4;
-    private javax.swing.JPanel jPanel3;
-    private javax.swing.JPanel jPanel4;
-    private javax.swing.JPanel jPanel6;
-    private javax.swing.JPanel jpAppSettings;
-    private javax.swing.JPanel jpAttrValuesTLib;
-    private javax.swing.JPanel jpComponentsTLib;
-    private javax.swing.JPanel jpGroupByTLib;
-    private javax.swing.JPanel jpOrderByTLib;
-    private javax.swing.JPanel jpOrderGroup;
-    private javax.swing.JPanel jpOtherSettings;
-    private javax.swing.JPanel jpTLIB;
-    // End of variables declaration//GEN-END:variables
 
     private void addRadioButton(String btTitle, final FileInfoType fileInfoType) {
         JRadioButton btn = new JRadioButton(btTitle);
@@ -466,6 +383,7 @@ public class AggrWWEURIPerSecondConfig extends javax.swing.JPanel {
 //        lChild.revalidate();
 //        lChild.repaint();
     }
+    // End of variables declaration//GEN-END:variables
 
     private void setChildChecked(MyCheckBoxList lChild, boolean boxEnabled) {
         inquirer.logger.debug("in setChildChecked " + boxEnabled);
@@ -531,7 +449,7 @@ public class AggrWWEURIPerSecondConfig extends javax.swing.JPanel {
 //
 ////                    if( i>=minIndex && i<=maxIndex )
 ////                        node.getData().setChecked(true);
-////                    else 
+////                    else
 ////                        node.getData().setChecked(false);
 //                }
 //
@@ -549,6 +467,79 @@ public class AggrWWEURIPerSecondConfig extends javax.swing.JPanel {
 ////                    (DynamicTreeNode<OptionNode>) lm.get(i)
 //                }
             }
+        }
+
+    }
+
+    class OrderField {
+
+        private final String fieldName;
+        private final String displayName;
+
+        public OrderField(String fieldName, String displayName) {
+            this.fieldName = fieldName;
+            this.displayName = displayName;
+        }
+
+        public String getFieldName() {
+            return fieldName;
+        }
+
+        public String getDisplayName() {
+            return displayName;
+        }
+
+        @Override
+        public String toString() {
+            return displayName;
+        }
+
+    }
+
+    class myListCheckListener implements ListSelectionListener {
+
+        private final MyCheckBoxList list;
+        private final MyCheckBoxList listChild;
+
+        public myListCheckListener(MyCheckBoxList list, MyCheckBoxList listChild) {
+            this.list = list;
+            this.listChild = listChild;
+        }
+
+        @Override
+        public void valueChanged(ListSelectionEvent e) {
+            ReportItemChecked(e, list, listChild);
+        }
+
+    }
+
+    class myListSelectionListener implements ListSelectionListener {
+
+        private final MyCheckBoxList list;
+        private final MyCheckBoxList listChild;
+
+        public myListSelectionListener(MyCheckBoxList list, MyCheckBoxList listChild) {
+            this.list = list;
+            this.listChild = listChild;
+        }
+
+        @Override
+        public void valueChanged(ListSelectionEvent e) {
+            ReportItemChanged(e, list, listChild);
+        }
+
+    }
+
+    class myFocusListener implements FocusListener {
+
+        @Override
+        public void focusGained(FocusEvent e) {
+            inquirer.logger.debug("focusGained", e);
+        }
+
+        @Override
+        public void focusLost(FocusEvent e) {
+            inquirer.logger.debug("focusLost", e);
         }
 
     }

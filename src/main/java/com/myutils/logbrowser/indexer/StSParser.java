@@ -6,48 +6,44 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- *
  * @author akolo
  */
 public class StSParser extends Parser {
 
-    private static final Pattern regServerContinue = Pattern.compile("^\\s");
-    private static final Pattern regJavaStart = Pattern.compile("^Java:");
+    private static final Matcher regServerContinue = Pattern.compile("^\\s");
+    private static final Matcher regJavaStart = Pattern.compile("^Java:");
 
-    private static final Pattern regJavaOnData = Pattern.compile("_extension_core::onData");
-    private static final Pattern regJava1 = Pattern.compile("Java:.+>\\s*$");
-    private static final Pattern regJavaContinue = Pattern.compile("^(\\s|_extension_core|KVList:)");
-    private static final Pattern regStatusSingleLine = Pattern.compile("^Status: (Place|Agent) '([^']+)'.+: (\\w+)[ ->]+(\\w+)$");
-    private static final Pattern regStatusMultiLine = Pattern.compile("^Status: Capacity");
+    private static final Matcher regJavaOnData = Pattern.compile("_extension_core::onData");
+    private static final Matcher regJava1 = Pattern.compile("Java:.+>\\s*$");
+    private static final Matcher regJavaContinue = Pattern.compile("^(\\s|_extension_core|KVList:)");
+    private static final Matcher regStatusSingleLine = Pattern.compile("^Status: (Place|Agent) '([^']+)'.+: (\\w+)[ ->]+(\\w+)$");
+    private static final Matcher regStatusMultiLine = Pattern.compile("^Status: Capacity");
 
-    private static final Pattern regInit = Pattern.compile("^Init:\\s+");
+    private static final Matcher regInit = Pattern.compile("^Init:\\s+");
 
-    private static final Pattern regCapacityContinue = Pattern.compile("^\\s");
+    private static final Matcher regCapacityContinue = Pattern.compile("^\\s");
 
-    private static final Pattern regLineSkip = Pattern.compile("^[>\\s]*");
-    private static final Pattern regTMessageStart = Pattern.compile("^Int 04543");
-    private static final Pattern regNotParseMessage = Pattern.compile("^(04543"
+    private static final Matcher regLineSkip = Pattern.compile("^[>\\s]*");
+    private static final Matcher regTMessageStart = Pattern.compile("^Int 04543");
+    private static final Matcher regNotParseMessage = Pattern.compile("^(04543"
             + ")");
-    private static final Pattern ptServerName = Pattern.compile("^Application\\s+name:\\s+(\\S+)");
-    long m_CurrentFilePos;
+    private static final Matcher ptServerName = Pattern.compile("^Application\\s+name:\\s+(\\S+)");
     final int MSG_STRING_LIMIT = 200;
+    private final HashMap m_BlockNamesToIgnoreHash;
     // parse state contants
-
+    private final FileInfoType m_fileFilterId;
+    long m_CurrentFilePos;
     long m_HeaderOffset;
-    private ParserState m_ParserState;
     String m_Header;
-
     String m_lastClientName;
     String m_lastClientSocket;
     String m_lastClientUID;
     boolean m_isNewAPIRequest;
     String m_ServerName;
-
     int m_rHistId = 0;
     int m_actionId = 0;
     int m_dbRecords = 0;
-    private final HashMap m_BlockNamesToIgnoreHash;
-    private final FileInfoType m_fileFilterId;
+    private ParserState m_ParserState;
     private String m_LastLine;
     private boolean customEvent = false;
 

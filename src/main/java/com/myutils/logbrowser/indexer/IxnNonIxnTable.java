@@ -9,10 +9,9 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 
 /**
- *
  * @author ssydoruk
- *
- *
+ * <p>
+ * <p>
  * Make Refactor/Copy of this class for new table type
  */
 public class IxnNonIxnTable extends DBTable {
@@ -88,7 +87,6 @@ public class IxnNonIxnTable extends DBTable {
     }
 
     /**
-     *
      * @throws Exception
      */
     @Override

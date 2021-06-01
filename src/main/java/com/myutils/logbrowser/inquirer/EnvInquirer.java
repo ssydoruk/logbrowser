@@ -6,8 +6,6 @@
 package com.myutils.logbrowser.inquirer;
 
 import com.myutils.logbrowser.common.ExecutionEnvironment;
-import java.io.File;
-import java.nio.file.Paths;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
@@ -15,8 +13,10 @@ import org.apache.commons.cli.ParseException;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import java.io.File;
+import java.nio.file.Paths;
+
 /**
- *
  * @author stepan_sydoruk
  */
 public class EnvInquirer extends ExecutionEnvironment {
@@ -28,36 +28,12 @@ public class EnvInquirer extends ExecutionEnvironment {
     private final Option optLogsBaseDir;
     private final Option optAppConfigFile;
     private final Option optIgnoreFileAccessErrors;
-    Option optHelp;
     private final Option optLogBrowserDir;
+    private final Option optNoTLibRequests;
+    Option optHelp;
     private String alias;
     private String dbname;
-    private final Option optNoTLibRequests;
     private boolean noTLibRequest;
-
-    public String getAlias() {
-        return alias;
-    }
-
-    public String getDbname() {
-        return dbname;
-    }
-
-    public String getOutputSpecFile() {
-        return outputSpecFile;
-    }
-
-    public String getConfig() {
-        return config;
-    }
-
-    public boolean isRefSyncDisabled() {
-        return refSyncDisabled;
-    }
-
-    public String getLogBrDir() {
-        return logBrDir;
-    }
     private String outputSpecFile;
     private String config;
     private String baseDir;
@@ -115,6 +91,30 @@ public class EnvInquirer extends ExecutionEnvironment {
                 .build();
         options.addOption(optNoTLibRequests);
 
+    }
+
+    public String getAlias() {
+        return alias;
+    }
+
+    public String getDbname() {
+        return dbname;
+    }
+
+    public String getOutputSpecFile() {
+        return outputSpecFile;
+    }
+
+    public String getConfig() {
+        return config;
+    }
+
+    public boolean isRefSyncDisabled() {
+        return refSyncDisabled;
+    }
+
+    public String getLogBrDir() {
+        return logBrDir;
     }
 
     private boolean getOptNoTLibRequest() {
@@ -221,6 +221,6 @@ public class EnvInquirer extends ExecutionEnvironment {
         if (StringUtils.isEmpty(ret)) {
             ret = ".logbr";
         }
-        return  (new File(ret).isAbsolute())?ret:FilenameUtils.concat(getBaseDir(), ret);
+        return (new File(ret).isAbsolute()) ? ret : FilenameUtils.concat(getBaseDir(), ret);
     }
 }

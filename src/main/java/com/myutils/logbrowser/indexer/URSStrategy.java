@@ -8,12 +8,13 @@ package com.myutils.logbrowser.indexer;
 import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
+import org.apache.commons.lang3.StringUtils;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.apache.commons.lang3.StringUtils;
 
 public final class URSStrategy extends Message {
 
@@ -31,9 +32,9 @@ public final class URSStrategy extends Message {
     private String ref2;
     private String ref1;
 
-//    final private static Pattern regCampaignDBID= Pattern.compile("CampaignDBID: ([^;]+);");
+    //    final private static Pattern regCampaignDBID= Pattern.compile("CampaignDBID: ([^;]+);");
     URSStrategy(ArrayList m_MessageContents, String ConnID, String FileLine,
-            String lineRest) {
+                String lineRest) {
         super(TableType.URSStrategy);
         this.m_MessageLines = m_MessageContents;
         this.FileLine = FileLine;

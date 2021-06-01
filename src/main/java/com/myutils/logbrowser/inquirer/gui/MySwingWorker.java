@@ -8,11 +8,11 @@ package com.myutils.logbrowser.inquirer.gui;
 import com.myutils.logbrowser.inquirer.DatabaseConnector;
 import com.myutils.logbrowser.inquirer.RuntimeInterruptException;
 import com.myutils.logbrowser.inquirer.inquirer;
-import javax.swing.SwingWorker;
 import org.apache.logging.log4j.LogManager;
 
+import javax.swing.*;
+
 /**
- *
  * @author ssydoruk
  */
 public abstract class MySwingWorker<T, V> extends SwingWorker<T, V> {
@@ -74,7 +74,7 @@ public abstract class MySwingWorker<T, V> extends SwingWorker<T, V> {
             }
 
         } catch (InterruptedException ex) {
-            logger.error("fatal: ",  ex);
+            logger.error("fatal: ", ex);
         }
         return true;
     }

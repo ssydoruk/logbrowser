@@ -4,37 +4,38 @@
  */
 package com.myutils.logbrowser.indexer;
 
-import java.util.*;
-import java.util.regex.*;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 /**
- *
  * @author aglagole
  */
 public class SipMessage extends Message {
 
     private static final String _prefix = "\n";
     private static final String _suffix = "\r";
-    private static final Pattern regSIPMessage = Pattern.compile("^(?:SIP[^ ]+ (.+)|(\\w+)\\s(\\S+)\\s)", Pattern.CASE_INSENSITIVE);
-    private static final Pattern regSIPUserPart = Pattern.compile("([^@:]+)@");
-    private static final Pattern regSIPResponse = Pattern.compile("(\\w+)$");
-    private static final Pattern patternPeer
-            = Pattern.compile("(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}):(\\d{1,5})");
+    private static final Matcher regSIPMessage = Pattern.compile("^(?:SIP[^ ]+ (.+)|(\\w+)\\s(\\S+)\\s)", Pattern.CASE_INSENSITIVE).matcher("");
+    private static final Matcher regSIPUserPart = Pattern.compile("([^@:]+)@").matcher("");
+    private static final Matcher regSIPResponse = Pattern.compile("(\\w+)$").matcher("");
+    private static final Matcher patternPeer
+            = Pattern.compile("(\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}):(\\d{1,5})").matcher("");
     private final static HashSet<String> nonCalls = new HashSet<String>(Arrays.asList("OPTIONS", "NOTIFY", "SUBSCRIBE", "REGISTER"));
 
     String m_Sendername;
     String m_Receivername;
     String m_Name = null;
+    String peerIp = null;
     private String m_RequestURIDN = null;
-
     private String theFrom = null;
     private String cSeq = null;
     private String peerPort = null;
     private String via;
-
     private String sipURI = null;
-    String peerIp = null;
 
     public SipMessage(ArrayList<String> contents, TableType t) {
         super(t);
@@ -84,7 +85,7 @@ public class SipMessage extends Message {
     public void setSipURI(String sipURI) {
         this.sipURI = sipURI;
         Matcher m;
-        if ((m = regSIPUserPart.matcher(sipURI)).find()) {
+        if ((m = regSIPUserPart.reset(sipURI)).find()) {
             m_RequestURIDN = m.group(1);
         }
     }
@@ -111,7 +112,7 @@ public class SipMessage extends Message {
         if (from == null) {
             return null;
         }
-        if ((m = regSIPUserPart.matcher(from)).find()) {
+        if ((m = regSIPUserPart.reset(from)).find()) {
             return m.group(1);
         }
         return null;
@@ -210,7 +211,7 @@ public class SipMessage extends Message {
 
         if (Character.isDigit(n.charAt(0))) {
             String cSeq = GetCSeq();
-            if (cSeq != null && (m = regSIPResponse.matcher(cSeq)).find()) {
+            if (cSeq != null && (m = regSIPResponse.reset(cSeq)).find()) {
                 return n + " " + m.group(1);
             }
             return n;
@@ -222,7 +223,7 @@ public class SipMessage extends Message {
     public String getM_Name() {
         if (m_Name == null) {
             Matcher m;
-            if ((m = regSIPMessage.matcher(m_MessageLines.get(0))).find()) {
+            if ((m = regSIPMessage.reset(m_MessageLines.get(0))).find()) {
                 m_Name = m.group(1);
                 if (m_Name == null) {
                     m_Name = m.group(2);
@@ -385,7 +386,7 @@ const char* GSIP_HDRNAME_REPLACES				="Replaces";
                 peerIp = "";
                 peerPort = "";
             } else {
-                Matcher matcher = patternPeer.matcher(peer);
+                Matcher matcher = patternPeer.reset(peer);
                 if (matcher.find()) {
                     peerIp = matcher.group(1);
                     peerPort = matcher.group(2);
@@ -449,8 +450,16 @@ const char* GSIP_HDRNAME_REPLACES				="Replaces";
 
     public static class ExtentionCall {
 
-        private static final Pattern regConn = Pattern.compile("^\\s+'conn-(\\d)+'\\s+'(\\w+)'$");
-        private static final Pattern regUUID = Pattern.compile("^\\s+'call-uuid-(\\d)+'\\s+'(\\w+)'$");
+        private static final Matcher regConn = Pattern.compile("^\\s+'conn-(\\d)+'\\s+'(\\w+)'$").matcher("");
+        private static final Matcher regUUID = Pattern.compile("^\\s+'call-uuid-(\\d)+'\\s+'(\\w+)'$").matcher("");
+        private final String ConnID;
+        private final Integer callIdx;
+        private String UUID;
+        public ExtentionCall(Integer callIdx, String ConnID, String UUID) {
+            this.callIdx = callIdx;
+            this.ConnID = ConnID;
+            this.UUID = UUID;
+        }
 
         private static ExtentionCall findCall(ArrayList<ExtentionCall> ret, int parseInt) {
             for (ExtentionCall extentionCall : ret) {
@@ -470,7 +479,7 @@ const char* GSIP_HDRNAME_REPLACES				="Replaces";
                 for (int i = 0; i < ext.size(); i++) {
                     String get = ext.get(i);
                     Matcher m;
-                    if (get != null && !get.isEmpty() && (m = regConn.matcher(get)).find()) {
+                    if (get != null && !get.isEmpty() && (m = regConn.reset(get)).find()) {
                         try {
                             ret.add(new ExtentionCall(Integer.parseInt(m.group(1)), m.group(2), null));
                         } catch (NumberFormatException numberFormatException) {
@@ -482,7 +491,7 @@ const char* GSIP_HDRNAME_REPLACES				="Replaces";
                 for (int i = 0; i < ext.size(); i++) {
                     String get = ext.get(i);
                     Matcher m;
-                    if (get != null && !get.isEmpty() && (m = regUUID.matcher(get)).find()) {
+                    if (get != null && !get.isEmpty() && (m = regUUID.reset(get)).find()) {
                         try {
                             int parseInt = Integer.parseInt(m.group(1));
                             ExtentionCall ec = findCall(ret, parseInt);
@@ -499,15 +508,6 @@ const char* GSIP_HDRNAME_REPLACES				="Replaces";
             }
             return ret;
         }
-        private final String ConnID;
-        private final Integer callIdx;
-        private String UUID;
-
-        public ExtentionCall(Integer callIdx, String ConnID, String UUID) {
-            this.callIdx = callIdx;
-            this.ConnID = ConnID;
-            this.UUID = UUID;
-        }
 
         public String getConnID() {
             return ConnID;
@@ -517,12 +517,12 @@ const char* GSIP_HDRNAME_REPLACES				="Replaces";
             return UUID;
         }
 
-        public Integer getCallIdx() {
-            return callIdx;
-        }
-
         private void setUUID(String group) {
             this.UUID = group;
+        }
+
+        public Integer getCallIdx() {
+            return callIdx;
         }
     }
 

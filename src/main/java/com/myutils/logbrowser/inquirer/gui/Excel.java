@@ -9,23 +9,28 @@ import com.jacob.activeX.ActiveXComponent;
 import com.jacob.com.Dispatch;
 import com.jacob.com.Variant;
 import com.myutils.logbrowser.inquirer.inquirer;
-import java.io.IOException;
-import java.util.ArrayList;
 import org.apache.logging.log4j.LogManager;
 
+import java.io.IOException;
+import java.util.ArrayList;
+
 /**
- *
  * @author ssydoruk
  */
 public class Excel {
 
     private static final org.apache.logging.log4j.Logger logger = LogManager.getLogger();
 
-//        https://msdn.microsoft.com/en-us/library/office/aa221100(v=office.11).aspx
+    //        https://msdn.microsoft.com/en-us/library/office/aa221100(v=office.11).aspx
     private static final int xlWindows = 2;
     private static final int xlDelimited = 1;
     private static final int xlTextQualifierNone = -4142;
     private static Excel excelInstance = null;
+    private ActiveXComponent excel;
+
+    public Excel() throws IOException {
+        InitDLL();
+    }
 
     private static Dispatch openExcel(String fileName) throws IOException {
         ActiveXComponent xl = getExcel().excel;
@@ -90,11 +95,11 @@ public class Excel {
             inquirer.logger.info("result of close: " + invoke);
 
             /*
-            This is to terminate excel application completely 
+            This is to terminate excel application completely
             https://sourceforge.net/p/jacob-project/discussion/375946/thread/01491160/
-            
+
             o successfully run Excel:
-Upgrade to at least Jacob 1.13.  There have been a number of stability improvements since 1.9.  I can't say for sure that it will not work with 1.9, but all my current testing has been done with 1.13 and 1.14 Mx. 
+Upgrade to at least Jacob 1.13.  There have been a number of stability improvements since 1.9.  I can't say for sure that it will not work with 1.9, but all my current testing has been done with 1.13 and 1.14 Mx.
 Before you start to work with Excel, use initMTA(), NOT initSTA().  InitSTA() still causes JVM crashes.
 When you are done working with an instance of Excel, call COMThread.Release().  This is very important, since Jacob is really wrapping a C++ library, and this is the only way that it will clean up after itself propertly in all cases.  I recommend the following structure:
 ComThread.InitMTA();
@@ -109,7 +114,7 @@ finally
 }
 Do NOT use com.jacob.autogc.  It kind of works most of the time, but it causes JVM crashes occasionally.  It is tempting to try to get this to work, but you don't need it.  Calling ComThread.Release() cleans up memory perfectly.
 If you need help with a strategy to make Excel work reliably without user input, post back to the Help thread under a different heading.
- 
+
              */
         }
     }
@@ -151,12 +156,6 @@ If you need help with a strategy to make Excel work reliably without user input,
             excelInstance = new Excel();
         }
         return excelInstance;
-    }
-
-    private ActiveXComponent excel;
-
-    public Excel() throws IOException {
-        InitDLL();
     }
 
     private void InitDLL() throws IOException {

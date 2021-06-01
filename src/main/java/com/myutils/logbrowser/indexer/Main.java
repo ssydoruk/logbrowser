@@ -4,19 +4,22 @@
  */
 package com.myutils.logbrowser.indexer;
 
-import static Utils.FileUtils.setCurrentDirectory;
-import static Utils.Util.pDuration;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.io.StringWriter;
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import javax.swing.*;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import java.io.*;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.sql.SQLException;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -26,38 +29,40 @@ import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
-import javax.swing.JOptionPane;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
+
+import static Utils.FileUtils.setCurrentDirectory;
+import static Utils.Util.pDuration;
 
 /**
- *
  * @author ssydoruk
  */
 public class Main {
 
-    static Main theParser = null;
-
     private static final Constants constants = new Constants();
+    private static final Pattern regFilesNotGood = Pattern.compile("(^\\.logbr|logbr.db)");
     public static SqliteAccessor m_accessor;
-    static String m_component = "all";
-    static String m_executableName = "indexer.jar";
     public static Logger logger;
     public static EnvIndexer ee;
+    static Main theParser = null;
+    static String m_component = "all";
+    static String m_executableName = "indexer.jar";
     static long totalBytes = 0;
-    private static final Pattern regFilesNotGood = Pattern.compile("(^\\.logbr|logbr.db)");
+    private final ArrayList<File> m_files = new ArrayList();
+    public XmlCfg xmlCfg = null;
+    HashMap<FileInfoType, Parser> m_parsers = new HashMap<>();
+    int m_current;
+    boolean m_scanDir = true;
+    boolean m_parseZip = false;
+    TableReferences tabRefs;
+    ArrayList<FileInfo> filesToAccess = new ArrayList();
+    private int totalFiles = 0;
+    private boolean dbExisted = false;
+    private FileInfoTable m_FileInfoTable;
+    private HashMap<TableType, DBTable> m_tables;
+
+    public Main(String dbname, String xmlCFG) throws Exception {
+        setXMLCfg(xmlCFG);
+    }
 
     static String lookupConstant(GenesysConstants constName, Integer intOrDef) {
         if (intOrDef != null) {
@@ -112,7 +117,7 @@ public class Main {
 
 //            logBrDirAbs = Paths.get(logBrDir).toAbsolutePath().normalize().toString();
         System.setProperty("log4j2.saveDirectory", ee.getLogbrowserDir());
-        
+
         logger = LogManager.getLogger("indexer");
         logger.info("starting");
         StringBuilder s = new StringBuilder();
@@ -148,6 +153,7 @@ public class Main {
 
         return ret;
     }
+//    static SqliteAccessor m_accessor; 
 
     public static Integer getRef(ReferenceType type, String name, int wordsToCompare) {
         Integer ret = getMain().tabRefs.getRef(type, name, wordsToCompare);
@@ -233,29 +239,6 @@ public class Main {
             System.out.println("ERROR parsing zip archive: " + e);
             return;
         }
-    }
-    private int totalFiles = 0;
-    private boolean dbExisted = false;
-
-    HashMap<FileInfoType, Parser> m_parsers = new HashMap<>();
-//    static SqliteAccessor m_accessor; 
-
-    private FileInfoTable m_FileInfoTable;
-
-    private final ArrayList<File> m_files = new ArrayList();
-    int m_current;
-    private HashMap<TableType, DBTable> m_tables;
-
-    boolean m_scanDir = true;
-    boolean m_parseZip = false;
-
-    public XmlCfg xmlCfg = null;
-
-    TableReferences tabRefs;
-    ArrayList<FileInfo> filesToAccess = new ArrayList();
-
-    public Main(String dbname, String xmlCFG) throws Exception {
-        setXMLCfg(xmlCFG);
     }
 
     private void ScanDir(File file) throws IOException {
@@ -467,7 +450,7 @@ public class Main {
         } else {
             Parser parser = initParser(type);
             if (parser == null) {
-                logger.error("Parser not yet implemented for " + type.toString());
+                logger.error("Parser not yet implemented for " + type);
                 return null;
             }
             m_parsers.put(type, parser);
@@ -515,9 +498,9 @@ public class Main {
                     if (logFileName != null && !logFileName.isEmpty()) { // fix for error resulting in empty DB. workspace file names are empty
                         ArrayList<ArrayList<Long>> iDs = m_accessor.getIDsMultiple(
                                 "select id, size from file_logbr where intfilename = '"
-                                + filesToAccess.get(i).getLogFileName() + "'"
-                                //                            + "and size=" + filesToAccess.get(i).getSize()
-                                + " ;");
+                                        + filesToAccess.get(i).getLogFileName() + "'"
+                                        //                            + "and size=" + filesToAccess.get(i).getSize()
+                                        + " ;");
                         if (iDs == null || iDs.size() == 0) {
                             logger.debug("Will process file [" + filesToAccess.get(i).getM_path() + "]");
                             filesToProcess.add(filesToAccess.get(i));

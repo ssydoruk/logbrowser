@@ -6,16 +6,19 @@
 package com.myutils.logbrowser.inquirer.gui;
 
 import Utils.ScreenInfo;
+
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
 /**
- *
  * @author ssydoruk
  */
 public class ShowFullMessage extends javax.swing.JFrame {
 
     private ReportFrameQuery parentForm;
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JTextArea jtaMessageText;
 
     /**
      * Creates new form ShowFullMessage
@@ -73,6 +76,7 @@ public class ShowFullMessage extends javax.swing.JFrame {
             public void windowClosing(java.awt.event.WindowEvent evt) {
                 formWindowClosing(evt);
             }
+
             public void windowDeactivated(java.awt.event.WindowEvent evt) {
                 formWindowDeactivated(evt);
             }
@@ -101,10 +105,6 @@ public class ShowFullMessage extends javax.swing.JFrame {
     private void formWindowStateChanged(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowStateChanged
         // TODO add your handling code here:
     }//GEN-LAST:event_formWindowStateChanged
-
-    // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTextArea jtaMessageText;
     // End of variables declaration//GEN-END:variables
 
     void showMessage(String GetFileBytes) {

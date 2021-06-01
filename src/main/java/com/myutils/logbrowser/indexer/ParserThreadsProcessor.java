@@ -10,14 +10,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- *
  * @author ssydoruk
  */
 public class ParserThreadsProcessor {
 
-    private boolean threadWaitsForNonthreadMessage = false;
     private final ArrayList<StateTransition> stateTransitions;
     private final HashMap<String, ParserThreadState> threadStates;
+    private boolean threadWaitsForNonthreadMessage = false;
 
     public ParserThreadsProcessor() {
         stateTransitions = new ArrayList();
@@ -29,22 +28,22 @@ public class ParserThreadsProcessor {
         return !threadStates.isEmpty();
     }
 
-    public void setThreadWaitsForNonthreadMessage(boolean threadWaitsForNonthreadMessage) {
-        this.threadWaitsForNonthreadMessage = threadWaitsForNonthreadMessage;
-    }
-
     public boolean isThreadWaitsForNonthreadMessage() {
         return threadWaitsForNonthreadMessage;
+    }
+
+    public void setThreadWaitsForNonthreadMessage(boolean threadWaitsForNonthreadMessage) {
+        this.threadWaitsForNonthreadMessage = threadWaitsForNonthreadMessage;
     }
 
     /**
      * public method to be called from ParseLine.
      *
-     * @param sOrig - original string
+     * @param sOrig               - original string
      * @param sParsedAndTruncated - truncated string after date and thread cut
-     * out
-     * @param threadID - ID of the thread
-     * @param parser - {@link Parser}
+     *                            out
+     * @param threadID            - ID of the thread
+     * @param parser              - {@link Parser}
      * @return true - parsing done; caller should return null to the
      * {@link Parser.ParseFrom()} false - ParseLine should continue parsing the
      * line
@@ -88,7 +87,7 @@ public class ParserThreadsProcessor {
     }
 
     private boolean transitionForThread(ParserThreadState pts,
-            String sOrig, String sParsedAndTruncated, String threadID, Parser parser) {
+                                        String sOrig, String sParsedAndTruncated, String threadID, Parser parser) {
         Main.logger.trace("transitionForThread "
                 + "sOrig[" + sOrig + "] "
                 + "threadID[" + threadID + "]"
@@ -155,6 +154,7 @@ public class ParserThreadsProcessor {
 //        }
 //        return false;
 //    }
+
     /**
      * ThreadConsumeResult
      */

@@ -11,33 +11,30 @@ import com.jidesoft.swing.SearchableUtils;
 import com.myutils.logbrowser.indexer.FileInfoType;
 import com.myutils.logbrowser.indexer.ReferenceType;
 import com.myutils.logbrowser.inquirer.gui.JPSecSelect;
-import java.awt.BorderLayout;
+
+import javax.swing.*;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.util.ArrayList;
 import java.util.List;
-import javax.swing.ButtonGroup;
-import javax.swing.DefaultListModel;
-import javax.swing.JPanel;
-import javax.swing.JRadioButton;
-import javax.swing.JScrollPane;
-import javax.swing.ListSelectionModel;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 
 /**
- *
  * @author ssydoruk
  */
 public class AggrSIPServerCallsPerSecondConfig extends javax.swing.JPanel {
 
+    private final JPSecSelect jpSecSelect;
+    private final JPSecSelect jpHavingSelect;
+    private final ButtonGroup group = new ButtonGroup();
     private DefaultListModel lmAttr;
     private MyCheckBoxList cblAttr;
     private DefaultListModel lmAttrValues;
     private MyCheckBoxList cblAttrValues;
-
     /**
      * Creates new form TLibDelaysConfig
      */
@@ -50,12 +47,30 @@ public class AggrSIPServerCallsPerSecondConfig extends javax.swing.JPanel {
     private DynamicTreeNode<OptionNode> rootTLib;
     private GroupByPanel gpOrderByTLib;
     private GroupByPanel gpGroupByTLib;
-    private final JPSecSelect jpSecSelect;
-    private final JPSecSelect jpHavingSelect;
-
-    public DynamicTreeNode<OptionNode> getAttrRoot() {
-        return root;
-    }
+    private GroupByPanel gpGroupBy;
+    private GroupByPanel gpOrderBy;
+    private FileInfoType ft = FileInfoType.type_Unknown;
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel5;
+    private javax.swing.JPanel jPanel6;
+    private javax.swing.JPanel jpAppSettings;
+    private javax.swing.JPanel jpAttrValues;
+    private javax.swing.JPanel jpAttrValuesTLib;
+    private javax.swing.JPanel jpComponents;
+    private javax.swing.JPanel jpComponentsTLib;
+    private javax.swing.JPanel jpGroupBy;
+    private javax.swing.JPanel jpGroupByTLib;
+    private javax.swing.JPanel jpOrderBy;
+    private javax.swing.JPanel jpOrderByTLib;
+    private javax.swing.JPanel jpOtherSettings;
+    private javax.swing.JPanel jpSIP;
+    private javax.swing.JPanel jpTLIB;
+    private javax.swing.JTabbedPane jtpReportType;
 
     public AggrSIPServerCallsPerSecondConfig(boolean hasSIP) {
         initComponents();
@@ -84,6 +99,10 @@ public class AggrSIPServerCallsPerSecondConfig extends javax.swing.JPanel {
         revalidate();
     }
 
+    public DynamicTreeNode<OptionNode> getAttrRoot() {
+        return root;
+    }
+
     public int getSeconds() {
         return jpHavingSelect.getSeconds();
     }
@@ -95,7 +114,6 @@ public class AggrSIPServerCallsPerSecondConfig extends javax.swing.JPanel {
             lm.addElement(node);
         }
     }
-    private GroupByPanel gpGroupBy;
 
     private void InitGroupBy() {
         ArrayList<DBField> flds = new ArrayList<>();
@@ -214,36 +232,9 @@ public class AggrSIPServerCallsPerSecondConfig extends javax.swing.JPanel {
         return jpSecSelect.getSeconds();
     }
 
-    class OrderField {
-
-        private final String fieldName;
-        private final String displayName;
-
-        public OrderField(String fieldName, String displayName) {
-            this.fieldName = fieldName;
-            this.displayName = displayName;
-        }
-
-        public String getFieldName() {
-            return fieldName;
-        }
-
-        public String getDisplayName() {
-            return displayName;
-        }
-
-        @Override
-        public String toString() {
-            return displayName;
-        }
-
-    }
-
     public DBField[] getOrderBy() {
         return gpOrderBy.getSelected();
     }
-
-    private GroupByPanel gpOrderBy;
 
     private void InitOrderBy() {
         ArrayList<DBField> flds = new ArrayList<>();
@@ -254,7 +245,7 @@ public class AggrSIPServerCallsPerSecondConfig extends javax.swing.JPanel {
         jpOrderBy.setLayout(new BorderLayout());
         jpOrderBy.add(gpOrderBy);
 
-//        
+//
 //        clbOrderBy = new MyCheckBoxList(jpOrderBy);
 //        clbOrderBy.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 //
@@ -264,7 +255,7 @@ public class AggrSIPServerCallsPerSecondConfig extends javax.swing.JPanel {
 //        clbOrderBy.getLm().addElement(new OrderField("time", "Time"));
 //        clbOrderBy.getLm().addElement(new OrderField("callidid", "SIP CallID"));
 //        clbOrderBy.checkAll();
-//        
+//
 //        clbOrderBy.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
 //            @Override
 //            public void valueChanged(ListSelectionEvent e) {
@@ -288,54 +279,6 @@ public class AggrSIPServerCallsPerSecondConfig extends javax.swing.JPanel {
 //        });
     }
 
-    class myListCheckListener implements ListSelectionListener {
-
-        private final MyCheckBoxList list;
-        private final MyCheckBoxList listChild;
-
-        public myListCheckListener(MyCheckBoxList list, MyCheckBoxList listChild) {
-            this.list = list;
-            this.listChild = listChild;
-        }
-
-        @Override
-        public void valueChanged(ListSelectionEvent e) {
-            ReportItemChecked(e, list, listChild);
-        }
-
-    }
-
-    class myListSelectionListener implements ListSelectionListener {
-
-        private final MyCheckBoxList list;
-        private final MyCheckBoxList listChild;
-
-        public myListSelectionListener(MyCheckBoxList list, MyCheckBoxList listChild) {
-            this.list = list;
-            this.listChild = listChild;
-        }
-
-        @Override
-        public void valueChanged(ListSelectionEvent e) {
-            ReportItemChanged(e, list, listChild);
-        }
-
-    }
-
-    class myFocusListener implements FocusListener {
-
-        @Override
-        public void focusGained(FocusEvent e) {
-            inquirer.logger.debug("focusGained", e);
-        }
-
-        @Override
-        public void focusLost(FocusEvent e) {
-            inquirer.logger.debug("focusLost", e);
-        }
-
-    }
-
     private void InitCB(MyCheckBoxList list, MyCheckBoxList clbChild, JPanel rptType, int i) {
 
         rptType.add(new JScrollPane(list));
@@ -348,9 +291,6 @@ public class AggrSIPServerCallsPerSecondConfig extends javax.swing.JPanel {
         list.addFocusListener(new myFocusListener());
 
     }
-
-    private final ButtonGroup group = new ButtonGroup();
-    private FileInfoType ft = FileInfoType.type_Unknown;
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -405,12 +345,12 @@ public class AggrSIPServerCallsPerSecondConfig extends javax.swing.JPanel {
         javax.swing.GroupLayout jpComponentsTLibLayout = new javax.swing.GroupLayout(jpComponentsTLib);
         jpComponentsTLib.setLayout(jpComponentsTLibLayout);
         jpComponentsTLibLayout.setHorizontalGroup(
-            jpComponentsTLibLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 0, Short.MAX_VALUE)
+                jpComponentsTLibLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGap(0, 0, Short.MAX_VALUE)
         );
         jpComponentsTLibLayout.setVerticalGroup(
-            jpComponentsTLibLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 112, Short.MAX_VALUE)
+                jpComponentsTLibLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGap(0, 112, Short.MAX_VALUE)
         );
 
         jpAttrValuesTLib.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
@@ -418,12 +358,12 @@ public class AggrSIPServerCallsPerSecondConfig extends javax.swing.JPanel {
         javax.swing.GroupLayout jpAttrValuesTLibLayout = new javax.swing.GroupLayout(jpAttrValuesTLib);
         jpAttrValuesTLib.setLayout(jpAttrValuesTLibLayout);
         jpAttrValuesTLibLayout.setHorizontalGroup(
-            jpAttrValuesTLibLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 389, Short.MAX_VALUE)
+                jpAttrValuesTLibLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGap(0, 389, Short.MAX_VALUE)
         );
         jpAttrValuesTLibLayout.setVerticalGroup(
-            jpAttrValuesTLibLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 133, Short.MAX_VALUE)
+                jpAttrValuesTLibLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGap(0, 133, Short.MAX_VALUE)
         );
 
         jLabel4.setText("Attribute value");
@@ -431,78 +371,78 @@ public class AggrSIPServerCallsPerSecondConfig extends javax.swing.JPanel {
         javax.swing.GroupLayout jPanel6Layout = new javax.swing.GroupLayout(jPanel6);
         jPanel6.setLayout(jPanel6Layout);
         jPanel6Layout.setHorizontalGroup(
-            jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel6Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jpComponentsTLib, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 211, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel4)
-                    .addComponent(jpAttrValuesTLib, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap())
+                jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(jPanel6Layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addGroup(jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                        .addComponent(jpComponentsTLib, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 211, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(jLabel4)
+                                        .addComponent(jpAttrValuesTLib, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addContainerGap())
         );
         jPanel6Layout.setVerticalGroup(
-            jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel6Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jLabel3)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jpComponentsTLib, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jLabel4)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jpAttrValuesTLib, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
+                jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(jPanel6Layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(jLabel3)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jpComponentsTLib, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(jLabel4)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(jpAttrValuesTLib, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addContainerGap())
         );
 
         javax.swing.GroupLayout jpOrderByTLibLayout = new javax.swing.GroupLayout(jpOrderByTLib);
         jpOrderByTLib.setLayout(jpOrderByTLibLayout);
         jpOrderByTLibLayout.setHorizontalGroup(
-            jpOrderByTLibLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 353, Short.MAX_VALUE)
+                jpOrderByTLibLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGap(0, 353, Short.MAX_VALUE)
         );
         jpOrderByTLibLayout.setVerticalGroup(
-            jpOrderByTLibLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 122, Short.MAX_VALUE)
+                jpOrderByTLibLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGap(0, 122, Short.MAX_VALUE)
         );
 
         javax.swing.GroupLayout jpGroupByTLibLayout = new javax.swing.GroupLayout(jpGroupByTLib);
         jpGroupByTLib.setLayout(jpGroupByTLibLayout);
         jpGroupByTLibLayout.setHorizontalGroup(
-            jpGroupByTLibLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 0, Short.MAX_VALUE)
+                jpGroupByTLibLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGap(0, 0, Short.MAX_VALUE)
         );
         jpGroupByTLibLayout.setVerticalGroup(
-            jpGroupByTLibLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 126, Short.MAX_VALUE)
+                jpGroupByTLibLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGap(0, 126, Short.MAX_VALUE)
         );
 
         javax.swing.GroupLayout jpTLIBLayout = new javax.swing.GroupLayout(jpTLIB);
         jpTLIB.setLayout(jpTLIBLayout);
         jpTLIBLayout.setHorizontalGroup(
-            jpTLIBLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jpTLIBLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jPanel6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(jpTLIBLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jpOrderByTLib, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jpGroupByTLib, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap())
+                jpTLIBLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(jpTLIBLayout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(jPanel6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addGroup(jpTLIBLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                        .addComponent(jpOrderByTLib, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addComponent(jpGroupByTLib, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                .addContainerGap())
         );
         jpTLIBLayout.setVerticalGroup(
-            jpTLIBLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jpTLIBLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jpTLIBLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jpTLIBLayout.createSequentialGroup()
-                        .addComponent(jpOrderByTLib, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jpGroupByTLib, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addGroup(jpTLIBLayout.createSequentialGroup()
-                        .addComponent(jPanel6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 45, Short.MAX_VALUE))))
+                jpTLIBLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(jpTLIBLayout.createSequentialGroup()
+                                .addContainerGap()
+                                .addGroup(jpTLIBLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addGroup(jpTLIBLayout.createSequentialGroup()
+                                                .addComponent(jpOrderByTLib, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                .addComponent(jpGroupByTLib, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                        .addGroup(jpTLIBLayout.createSequentialGroup()
+                                                .addComponent(jPanel6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addGap(0, 45, Short.MAX_VALUE))))
         );
 
         jtpReportType.addTab("TLib", jpTLIB);
@@ -510,12 +450,12 @@ public class AggrSIPServerCallsPerSecondConfig extends javax.swing.JPanel {
         javax.swing.GroupLayout jpOrderByLayout = new javax.swing.GroupLayout(jpOrderBy);
         jpOrderBy.setLayout(jpOrderByLayout);
         jpOrderByLayout.setHorizontalGroup(
-            jpOrderByLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 353, Short.MAX_VALUE)
+                jpOrderByLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGap(0, 353, Short.MAX_VALUE)
         );
         jpOrderByLayout.setVerticalGroup(
-            jpOrderByLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 122, Short.MAX_VALUE)
+                jpOrderByLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGap(0, 122, Short.MAX_VALUE)
         );
 
         jPanel5.setBorder(javax.swing.BorderFactory.createTitledBorder("Messages filter"));
@@ -527,12 +467,12 @@ public class AggrSIPServerCallsPerSecondConfig extends javax.swing.JPanel {
         javax.swing.GroupLayout jpComponentsLayout = new javax.swing.GroupLayout(jpComponents);
         jpComponents.setLayout(jpComponentsLayout);
         jpComponentsLayout.setHorizontalGroup(
-            jpComponentsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 0, Short.MAX_VALUE)
+                jpComponentsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGap(0, 0, Short.MAX_VALUE)
         );
         jpComponentsLayout.setVerticalGroup(
-            jpComponentsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 112, Short.MAX_VALUE)
+                jpComponentsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGap(0, 112, Short.MAX_VALUE)
         );
 
         jpAttrValues.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
@@ -540,12 +480,12 @@ public class AggrSIPServerCallsPerSecondConfig extends javax.swing.JPanel {
         javax.swing.GroupLayout jpAttrValuesLayout = new javax.swing.GroupLayout(jpAttrValues);
         jpAttrValues.setLayout(jpAttrValuesLayout);
         jpAttrValuesLayout.setHorizontalGroup(
-            jpAttrValuesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 389, Short.MAX_VALUE)
+                jpAttrValuesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGap(0, 389, Short.MAX_VALUE)
         );
         jpAttrValuesLayout.setVerticalGroup(
-            jpAttrValuesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 133, Short.MAX_VALUE)
+                jpAttrValuesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGap(0, 133, Short.MAX_VALUE)
         );
 
         jLabel2.setText("Attribute value");
@@ -553,67 +493,67 @@ public class AggrSIPServerCallsPerSecondConfig extends javax.swing.JPanel {
         javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
         jPanel5.setLayout(jPanel5Layout);
         jPanel5Layout.setHorizontalGroup(
-            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel5Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jpComponents, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 211, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel2)
-                    .addComponent(jpAttrValues, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap())
+                jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(jPanel5Layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                        .addComponent(jpComponents, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 211, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(jLabel2)
+                                        .addComponent(jpAttrValues, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addContainerGap())
         );
         jPanel5Layout.setVerticalGroup(
-            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel5Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jLabel1)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jpComponents, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jLabel2)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jpAttrValues, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
+                jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(jPanel5Layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(jLabel1)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jpComponents, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(jLabel2)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(jpAttrValues, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addContainerGap())
         );
 
         javax.swing.GroupLayout jpGroupByLayout = new javax.swing.GroupLayout(jpGroupBy);
         jpGroupBy.setLayout(jpGroupByLayout);
         jpGroupByLayout.setHorizontalGroup(
-            jpGroupByLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 0, Short.MAX_VALUE)
+                jpGroupByLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGap(0, 0, Short.MAX_VALUE)
         );
         jpGroupByLayout.setVerticalGroup(
-            jpGroupByLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 126, Short.MAX_VALUE)
+                jpGroupByLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGap(0, 126, Short.MAX_VALUE)
         );
 
         javax.swing.GroupLayout jpSIPLayout = new javax.swing.GroupLayout(jpSIP);
         jpSIP.setLayout(jpSIPLayout);
         jpSIPLayout.setHorizontalGroup(
-            jpSIPLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jpSIPLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jPanel5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(jpSIPLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jpOrderBy, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jpGroupBy, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap())
+                jpSIPLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(jpSIPLayout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(jPanel5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addGroup(jpSIPLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                        .addComponent(jpOrderBy, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addComponent(jpGroupBy, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                .addContainerGap())
         );
         jpSIPLayout.setVerticalGroup(
-            jpSIPLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jpSIPLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jpSIPLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jpSIPLayout.createSequentialGroup()
-                        .addComponent(jpOrderBy, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jpGroupBy, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addGroup(jpSIPLayout.createSequentialGroup()
-                        .addComponent(jPanel5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 45, Short.MAX_VALUE))))
+                jpSIPLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(jpSIPLayout.createSequentialGroup()
+                                .addContainerGap()
+                                .addGroup(jpSIPLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addGroup(jpSIPLayout.createSequentialGroup()
+                                                .addComponent(jpOrderBy, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                .addComponent(jpGroupBy, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                        .addGroup(jpSIPLayout.createSequentialGroup()
+                                                .addComponent(jPanel5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addGap(0, 45, Short.MAX_VALUE))))
         );
 
         jtpReportType.addTab("SIP", jpSIP);
@@ -622,29 +562,6 @@ public class AggrSIPServerCallsPerSecondConfig extends javax.swing.JPanel {
 
         add(jPanel1, java.awt.BorderLayout.PAGE_START);
     }// </editor-fold>//GEN-END:initComponents
-
-    // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel4;
-    private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel5;
-    private javax.swing.JPanel jPanel6;
-    private javax.swing.JPanel jpAppSettings;
-    private javax.swing.JPanel jpAttrValues;
-    private javax.swing.JPanel jpAttrValuesTLib;
-    private javax.swing.JPanel jpComponents;
-    private javax.swing.JPanel jpComponentsTLib;
-    private javax.swing.JPanel jpGroupBy;
-    private javax.swing.JPanel jpGroupByTLib;
-    private javax.swing.JPanel jpOrderBy;
-    private javax.swing.JPanel jpOrderByTLib;
-    private javax.swing.JPanel jpOtherSettings;
-    private javax.swing.JPanel jpSIP;
-    private javax.swing.JPanel jpTLIB;
-    private javax.swing.JTabbedPane jtpReportType;
-    // End of variables declaration//GEN-END:variables
 
     private void addRadioButton(String btTitle, final FileInfoType fileInfoType) {
         JRadioButton btn = new JRadioButton(btTitle);
@@ -736,6 +653,7 @@ public class AggrSIPServerCallsPerSecondConfig extends javax.swing.JPanel {
 //        lChild.revalidate();
 //        lChild.repaint();
     }
+    // End of variables declaration//GEN-END:variables
 
     private void setChildChecked(MyCheckBoxList lChild, boolean boxEnabled) {
         inquirer.logger.debug("in setChildChecked " + boxEnabled);
@@ -801,7 +719,7 @@ public class AggrSIPServerCallsPerSecondConfig extends javax.swing.JPanel {
 //
 ////                    if( i>=minIndex && i<=maxIndex )
 ////                        node.getData().setChecked(true);
-////                    else 
+////                    else
 ////                        node.getData().setChecked(false);
 //                }
 //
@@ -819,6 +737,79 @@ public class AggrSIPServerCallsPerSecondConfig extends javax.swing.JPanel {
 ////                    (DynamicTreeNode<OptionNode>) lm.get(i)
 //                }
             }
+        }
+
+    }
+
+    class OrderField {
+
+        private final String fieldName;
+        private final String displayName;
+
+        public OrderField(String fieldName, String displayName) {
+            this.fieldName = fieldName;
+            this.displayName = displayName;
+        }
+
+        public String getFieldName() {
+            return fieldName;
+        }
+
+        public String getDisplayName() {
+            return displayName;
+        }
+
+        @Override
+        public String toString() {
+            return displayName;
+        }
+
+    }
+
+    class myListCheckListener implements ListSelectionListener {
+
+        private final MyCheckBoxList list;
+        private final MyCheckBoxList listChild;
+
+        public myListCheckListener(MyCheckBoxList list, MyCheckBoxList listChild) {
+            this.list = list;
+            this.listChild = listChild;
+        }
+
+        @Override
+        public void valueChanged(ListSelectionEvent e) {
+            ReportItemChecked(e, list, listChild);
+        }
+
+    }
+
+    class myListSelectionListener implements ListSelectionListener {
+
+        private final MyCheckBoxList list;
+        private final MyCheckBoxList listChild;
+
+        public myListSelectionListener(MyCheckBoxList list, MyCheckBoxList listChild) {
+            this.list = list;
+            this.listChild = listChild;
+        }
+
+        @Override
+        public void valueChanged(ListSelectionEvent e) {
+            ReportItemChanged(e, list, listChild);
+        }
+
+    }
+
+    class myFocusListener implements FocusListener {
+
+        @Override
+        public void focusGained(FocusEvent e) {
+            inquirer.logger.debug("focusGained", e);
+        }
+
+        @Override
+        public void focusLost(FocusEvent e) {
+            inquirer.logger.debug("focusLost", e);
         }
 
     }

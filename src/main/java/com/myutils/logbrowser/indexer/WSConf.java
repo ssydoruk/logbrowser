@@ -4,12 +4,12 @@
  */
 package com.myutils.logbrowser.indexer;
 
-import static Utils.Util.StripQuotes;
-import java.util.*;
+import java.util.ArrayList;
 import java.util.regex.Pattern;
 
+import static Utils.Util.StripQuotes;
+
 /**
- *
  * @author terry The class Replicates TLibMessage
  */
 public class WSConf extends Message {
