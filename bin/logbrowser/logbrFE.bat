@@ -1,16 +1,27 @@
-set BASEDIR=C: \Users\N748772\gcti
+@echo on
 
-set LIBDIR=%BASEDIR%\1ib
+set BASEDIR=C:\gcti
 
-set LOGDIR=$(pwd)\tmp
+set LIBDIR=%BASEDIR%\lib
+
+if [%1]==[] (
+set RUN_DIR=%CD%
+) else (
+set RUN_DIR=%1
+)
+
+cd %RUN_DIR%
+
+
+set LOGDIR=%RUN_DIR%\.tmp
 
 set VARDIR=%BASEDIR%\var
 
-set ETCDIR=4BASEDIRA\etc
+set ETCDIR=%BASEDIR%\etc\logbrowser
 
-set JAVA_HOME=C: \Users\N748772\Software\graalvm-ce-java8-21.0.0.2
+set JAVA_HOME=C:\Java\graalvm-ce-java8-21.0.0.2
 
-set PATH=%JAVA_HOME%\bin; PATH
+set PATH=%JAVA_HOME%\bin;%PATH%
 
 rem default name of the database
 
@@ -20,9 +31,9 @@ set LOGBR_TMP=.tmp
 
 set LOGBR_TMP_OPT=-Dlogbr.dir=%LOGBR_TMP%
 
-rem DBG="-Xdebug -Xrunjdwp:transport=dt_socket, address=8000, server=y, suspend=y"
-set LOG_OPTS=-Dlog4j.configurationFile=%ETCDIR%\logbr.log4j2.indexer.xml -Dlog4j.logPath=%LOGDIR%
-set MISC_OPTIONS=-Dsun. java2d.d3d=false -Dall=1 -Xms32000m -Xmx32000m
+rem DBG="-Xdebug -Xrunjdwp:transport=dt_socket,address=8000,server=y,suspend=y"
+set LOG_OPTS=-Dlog4j.configurationFile=%ETCDIR%\logbr.log4j2.inquirer.xml -DlogPath=%LOGDIR%
+set MISC_OPTIONS=-Dsun.java2d.d3d=false -Dall=1 -Xms4000m -Xmx4000m
 
 set SQLITE_PRAGMAS=-Dsqlite.pragma=true
 
@@ -32,15 +43,13 @@ set TIMEDIFF=-Dtimediff.parse=false
 
 rem ------------------ no config after this line -------------------------
 
-set JAVA_OPTS=%DBG% %LOGBR_TMP_OPT% %LOG_OPTS% *MISC_OPTIONS% *%SQLITE_PRAGMAS% %NO_TLIB_REQUESTS% %TIMEDIFF%
-if [%1]==[] set RUN _DIR=%CD%
+set JAVA_OPTS=%DBG% %LOGBR_TMP_OPT% %LOG_OPTS% %MISC_OPTIONS% %SQLITE_PRAGMAS% %NO_TLIB_REQUESTS% %TIMEDIFF%
 
-else set RUN _DIR=%1
+set DB=%RUN_DIR%\logbr
 
-cd %RUN DIR%
+set CFG=%ETCDIR%\backend.xml
 
-set DB=%RUN_DIR%\ALOGBRDBA
+# uncomment below if database is too large
+rem set REFERENCE=--no-ref-sync
 
-set CFG=%ETCDIR%\backend. xml
-
-%LIBDIR%\bin\indexer.bat --dbname=%DB% --basedir=%RUN _DIR% --cfgxml %CFG%
+%LIBDIR%\bin\inquirer.bat %REFERENCE% --dbname=%DB% --config=%ETCDIR%\inquirer.cfg.json --basedir=%RUN_DIR% --outputspec=%ETCDIR%\outputspec3.xml
