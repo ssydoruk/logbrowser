@@ -6,7 +6,7 @@
     <version>1.0</version>
     <packaging>jar</packaging>
     <properties>
-        <installdir>c:\Users\Stepan\gcti\lib</installdir>
+        <installdir>c:\gcti\lib</installdir>
         <!--installdir>/Users/stepan_sydoruk/GCTI/lib/getlogs</installdir-->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>1.8</maven.compiler.source>
@@ -88,9 +88,9 @@
             <type>jar</type>
         </dependency>
         <dependency>
-            <groupId>com.hynnet</groupId>
+            <groupId>xyz.cofe</groupId>
             <artifactId>jacob</artifactId>
-            <version>1.18</version>
+            <version>1.20</version>
         </dependency>
         <dependency>
             <groupId>net.java.dev.jna</groupId>
@@ -130,11 +130,7 @@
             <version>21.0.0.2</version>
             <type>jar</type>
         </dependency>
-        <dependency>
-            <groupId>org.netbeans.external</groupId>
-            <artifactId>AbsoluteLayout</artifactId>
-            <version>RELEASE121</version>
-        </dependency>
+
     </dependencies>
     <build>
         <plugins>

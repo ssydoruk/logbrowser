@@ -19,7 +19,7 @@ set VARDIR=%BASEDIR%\var
 
 set ETCDIR=%BASEDIR%\etc\logbrowser
 
-set JAVA_HOME=C:\Java\graalvm-ce-java8-21.0.0.2
+set JAVA_HOME=C:\Tools\graalvm-ce-java8-21.1.0
 
 set PATH=%JAVA_HOME%\bin;%PATH%
 
@@ -33,7 +33,7 @@ set LOGBR_TMP_OPT=-Dlogbr.dir=%LOGBR_TMP%
 
 rem DBG="-Xdebug -Xrunjdwp:transport=dt_socket,address=8000,server=y,suspend=y"
 set LOG_OPTS=-Dlog4j.configurationFile=%ETCDIR%\logbr.log4j2.inquirer.xml -DlogPath=%LOGDIR%
-set MISC_OPTIONS=-Dsun.java2d.d3d=false -Dall=1 -Xms4000m -Xmx4000m
+set MISC_OPTIONS=-Dsun.java2d.d3d=false -Dall=1 -Xms4000m -Xmx4000m -Djacob.dll=C:\GCTI\bin\logbrowser\jacob-1.20-x64.dll
 
 set SQLITE_PRAGMAS=-Dsqlite.pragma=true
 

@@ -9,7 +9,7 @@ set VARDIR=%BASEDIR%\var
 
 set ETCDIR=%BASEDIR%\etc\logbrowser
 
-set JAVA_HOME=C:\Java\graalvm-ce-java8-21.0.0.2
+set JAVA_HOME=C:\Tools\graalvm-ce-java8-21.1.0
 
 set PATH=%JAVA_HOME%\bin;%PATH%
 
