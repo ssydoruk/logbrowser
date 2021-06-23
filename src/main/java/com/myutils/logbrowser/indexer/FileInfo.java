@@ -5,6 +5,8 @@
 package com.myutils.logbrowser.indexer;
 
 import static com.myutils.logbrowser.indexer.Main.m_component;
+import static java.lang.System.arraycopy;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -18,10 +20,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
+
 import org.apache.commons.io.FilenameUtils;
 
 /**
- *
  * @author ssydoruk
  */
 public final class FileInfo extends Record {
@@ -144,6 +146,27 @@ public final class FileInfo extends Record {
         return archiveName;
     }
 
+    private byte[] startBuf = null;
+
+    public byte[] getStartBuf() throws IOException {
+        if (startBuf == null) {
+            byte[] _startBuf = new byte[BUF_SIZE];
+            int bytesRead = readBytes(_startBuf, BUF_SIZE);
+            if (bytesRead < BUF_SIZE) {
+                startBuf = new byte[bytesRead];
+                arraycopy(_startBuf,
+                        0,
+                        startBuf,
+                        0,
+                        bytesRead);
+            }
+            else {
+                startBuf=_startBuf;
+            }
+        }
+        return startBuf;
+    }
+
     public boolean fileEqual(FileInfo otherFile) throws IOException {
 
         if (getM_componentType() != otherFile.getM_componentType()) {
@@ -151,10 +174,10 @@ public final class FileInfo extends Record {
         }
 
         if (getM_componentType() == FileInfoType.type_WorkSpace) {// two workspace files
-            byte[] myBuf = new byte[BUF_SIZE];
-            byte[] otherBuf = new byte[BUF_SIZE];
-            int myReadBytes = readBytes(myBuf, BUF_SIZE);
-            int otherReadBytes = otherFile.readBytes(otherBuf, BUF_SIZE);
+            byte[] myBuf = getStartBuf();
+            byte[] otherBuf = otherFile.getStartBuf();
+            int myReadBytes =myBuf.length;
+            int otherReadBytes = otherBuf.length;
 
             return myReadBytes == otherReadBytes
                     && Arrays.equals(myBuf, otherBuf);
@@ -190,6 +213,7 @@ public final class FileInfo extends Record {
     }
 
     int readBytes(byte[] cbuf, int len) throws IOException {
+        InputStream inputStream = logFile.getInputStream(this);
         BufferedReaderCrLf input = new BufferedReaderCrLf(logFile.getInputStream(this));
         int read = input.read(cbuf, 0, len);
         input.close();
@@ -460,7 +484,7 @@ public final class FileInfo extends Record {
                                 Main.logger.debug("local time: " + fileLocalTime);
 
                             } catch (Exception ex) {
-                                logger.error("fatal: ",  ex);
+                                logger.error("fatal: ", ex);
                             }
                         } else if ((startTimePatternGMS.matcher(str)).find()) {
                             numParamsToRead++;
@@ -469,7 +493,7 @@ public final class FileInfo extends Record {
                                 Main.logger.debug("start time: " + fileStartTime);
 
                             } catch (Exception ex) {
-                                logger.error("fatal: ",  ex);
+                                logger.error("fatal: ", ex);
                             }
                         } else if ((m = startTimePattern.matcher(str)).find()) {
                             numParamsToRead++;
@@ -482,7 +506,7 @@ public final class FileInfo extends Record {
                                 Main.logger.debug("start time: " + fileStartTime);
 
                             } catch (Exception ex) {
-                                logger.error("fatal: ",  ex);
+                                logger.error("fatal: ", ex);
                             }
                         } else if ((m = startTimeSIPEP.matcher(str)).find()) {
                             numParamsToRead++;
@@ -492,7 +516,7 @@ public final class FileInfo extends Record {
                                 Main.logger.debug("start time: " + fileStartTime);
 
                             } catch (Exception ex) {
-                                logger.error("fatal: ",  ex);
+                                logger.error("fatal: ", ex);
                             }
                         } else if ((m = regTimezone.matcher(str)).find()) {
                             numParamsToRead++;
@@ -525,7 +549,7 @@ public final class FileInfo extends Record {
                             try {
                                 fileStartTime = dateParsers.parseFormatDate(m.group(1));
                             } catch (Exception ex) {
-                                logger.error("fatal: ",  ex);
+                                logger.error("fatal: ", ex);
                             }
                         } else if (m_componentType == FileInfoType.type_WWE) {
                             if (str.startsWith("+++++++++++++++++++++++++++++++++++++++++")) {
@@ -564,7 +588,7 @@ public final class FileInfo extends Record {
                                 doBreak = true;
                             }
                         } catch (Exception ex) {
-                            logger.error("fatal: ",  ex);
+                            logger.error("fatal: ", ex);
                             doBreak = true;
                         }
                         break;
@@ -811,7 +835,7 @@ public final class FileInfo extends Record {
                 fileStartTime = new DateParsed(logFileName, d, "", LocalDateTime.parse(d, workSpaceDateTime));
             } catch (DateTimeParseException ex) {
                 fileStartTime = null;
-                logger.error("fatal: ",  ex);
+                logger.error("fatal: ", ex);
             }
         }
 

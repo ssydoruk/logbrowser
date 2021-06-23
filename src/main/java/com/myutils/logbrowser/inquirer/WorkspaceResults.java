@@ -403,6 +403,7 @@ public class WorkspaceResults extends IQueryResults {
             inquirer.logger.debug("TLib report");
             WSTLibQuery tlibQuery = new WSTLibQuery(eventsSettings, cidFinder);
             tlibQuery.setCommonParams(this, dlg);
+            getRecords(tlibQuery);
 
             if (cidFinder != null && !inquirer.ee.isNoTLibRequest()) {
                 Integer[] connIDs = cidFinder.getConnIDs();
