@@ -1627,32 +1627,18 @@
 
 		<!-- Genesys messages for vxmlstrategy >>>> -->
 		<spec MsgType="vxmlstrategy" format="filelink timestamp">
+			<initScript src="./vxmlstrategy.js" />			
 			<param1 type="embedded" id="filelink" name="filename">
 				<pattern match="(log)" group="1" />
 			</param1>
 			<param2 type="embedded" id="timestamp" name="timestamp" />
 			<param type="database" id="app" name="app" />
-			<param6 type="database" id="command" format="%s" name="name" />
-			<param6 type="database" id="param1" format="%s" name="name" />
-			<param6 type="database" id="param2" format="%s" hidden="true" />
+			<!-- <param6 type="database" id="command" format="%s" name="name" /> -->
+			<!-- <param6 type="database" id="param1" format="%s" name="name" />
+			<param6 type="database" id="param2" format="%s" hidden="true" /> -->
 			<param10 type="file" cond="RECORD.getField('command')=='log'" format="%s" name="name">
 				<pattern match="log (.+)" group="1" ignorecase="true" />
 			</param10>
-
-			<param10 type="script" name="name">
-		var fld= RECORD.getField('command'); 
-		var ret='';
-		if( fld=='expression' || fld=='execution step') {
-			var m=RECORD.getBytes().match(/\(\):* (.+)/);
-			if(m!=undefined){
-				ret='orig: '+m[1];
-			}
-			else {
-				ret="";
-			}
-		}
-	  </param10>
-
 
 			<param8 type="database" id="ivrprofile" format="%s" />
 			<param8 type="database" id="sipcall" format="call-id:%s" name="callid" />
