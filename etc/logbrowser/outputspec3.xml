@@ -1632,7 +1632,7 @@
 				<pattern match="(log)" group="1" />
 			</param1>
 			<param2 type="embedded" id="timestamp" name="timestamp" />
-			<param type="database" id="app" name="app" />
+			<param type="database" id="app" name="app" hidden="true" />
 			<!-- <param6 type="database" id="command" format="%s" name="name" /> -->
 			<!-- <param6 type="database" id="param1" format="%s" name="name" />
 			<param6 type="database" id="param2" format="%s" hidden="true" /> -->
@@ -1644,7 +1644,7 @@
 			<param8 type="database" id="sipcall" format="call-id:%s" name="callid" />
 			<param8 type="database" id="gvpsession" format="gvpsess%s" />
 			<param8 type="database" id="tenant" format="%s" />
-			<param8 type="database" id="mcpCall" format="mcpsess:%s" />
+			<param8 type="database" id="mcpCall" format="mcpsess:%s" hidden="true"/>
 		</spec>
 
 		<!-- Genesys messages for EXCEPTIONS >>>> -->
