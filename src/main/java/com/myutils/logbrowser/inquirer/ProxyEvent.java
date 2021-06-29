@@ -9,7 +9,6 @@ import java.sql.SQLException;
 import java.util.HashMap;
 
 /**
- *
  * @author ssydoruk
  */
 public class ProxyEvent extends ILogRecord {
@@ -17,7 +16,6 @@ public class ProxyEvent extends ILogRecord {
     public ProxyEvent(ResultSet rs) throws SQLException {
         super(rs, MsgType.PROXY);
 
-        
 
     }
 

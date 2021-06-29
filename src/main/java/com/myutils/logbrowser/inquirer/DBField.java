@@ -6,7 +6,6 @@
 package com.myutils.logbrowser.inquirer;
 
 /**
- *
  * @author ssydoruk
  */
 public class DBField {

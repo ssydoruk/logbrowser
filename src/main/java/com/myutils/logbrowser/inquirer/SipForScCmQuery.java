@@ -6,20 +6,20 @@ package com.myutils.logbrowser.inquirer;
 
 import com.myutils.logbrowser.indexer.FileInfoType;
 import com.myutils.logbrowser.indexer.ReferenceType;
+import org.apache.commons.lang3.StringUtils;
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.HashSet;
-import org.apache.commons.lang3.StringUtils;
 
 /**
- *
  * @author ssydoruk
  */
 public class SipForScCmQuery extends IQuery {
 
-    private String[] orderBy;
     private final HashSet handlerIDs = new HashSet();
+    private String[] orderBy;
     private boolean collectHandlers = false;
 
     private Integer[] m_CallIds;
@@ -109,7 +109,7 @@ public class SipForScCmQuery extends IQuery {
         recCnt = 0;
     }
 
-//    private HashMap sipRecords = new HashMap();
+    //    private HashMap sipRecords = new HashMap();
 //    public HashMap getSipRecords() {
 //        return sipRecords;
 //    }
@@ -218,7 +218,18 @@ public class SipForScCmQuery extends IQuery {
         return r;
     }
 
-//    void setRegexSearch(boolean regex) {
+    private String getOrderBy() {
+        if (inquirer.getCr().isAddOrderBy() && orderBy.length > 0) {
+            String join = StringUtils.join(orderBy, ";");
+            return "ORDER BY " + StringUtils.join(orderBy, ";");
+//        ORDER BY sip.time;
+
+        } else {
+            return "";
+        }
+    }
+
+    //    void setRegexSearch(boolean regex) {
 //        this.regexSearch = regex;
 //    }
 //
@@ -237,17 +248,6 @@ public class SipForScCmQuery extends IQuery {
 
         }
         this.orderBy = arr;
-    }
-
-    private String getOrderBy() {
-        if (inquirer.getCr().isAddOrderBy() && orderBy.length > 0) {
-            String join = StringUtils.join(orderBy, ";");
-            return "ORDER BY " + StringUtils.join(orderBy, ";");
-//        ORDER BY sip.time;
-
-        } else {
-            return "";
-        }
     }
 
 }

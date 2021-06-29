@@ -5,12 +5,12 @@
  */
 package com.myutils.logbrowser.inquirer;
 
-import java.util.Enumeration;
-import java.util.HashSet;
 import org.apache.logging.log4j.LogManager;
 
+import java.util.Enumeration;
+import java.util.HashSet;
+
 /**
- *
  * @author ssydoruk
  */
 public class OutputSpecFormatterScreen extends OutputSpecFormatter {
@@ -30,7 +30,7 @@ public class OutputSpecFormatterScreen extends OutputSpecFormatter {
             try {
                 lo.PrintRecord(record, ps, qr);
             } catch (Exception ex) {
-                logger.error("fatal: ",  ex);
+                logger.error("fatal: ", ex);
             }
         } else {
             printAll(record, ps, qr);

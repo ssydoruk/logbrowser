@@ -7,32 +7,26 @@ package com.myutils.logbrowser.inquirer;
 
 import com.myutils.logbrowser.inquirer.OutputSpecFormatter.Parameter;
 import com.myutils.logbrowser.inquirer.gui.TabResultDataModel;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintStream;
-import java.util.ArrayList;
-import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 
+import java.io.*;
+import java.util.ArrayList;
+import java.util.regex.Pattern;
+
 /**
- *
  * @author ssydoruk
  */
 public class PrintStreams {
 
-    private int nrows;
-
-    private boolean isAggregate;
-    private boolean blockFilePrint;
-    private String queryName = null;
-    private String searchString = null;
     private final TabResultDataModel tabDataModel;
     ArrayList<String> memStorage = null;
     ArrayList<PrintStreamStorage> shortStreams = new ArrayList<>(2);
     ArrayList<PrintStreamStorage> fullStreams = new ArrayList<>(1);
+    private int nrows;
+    private boolean isAggregate;
+    private boolean blockFilePrint;
+    private String queryName = null;
+    private String searchString = null;
 
     public PrintStreams() {
         this.blockFilePrint = false;
@@ -61,8 +55,16 @@ public class PrintStreams {
         return queryName;
     }
 
+    void setQueryName(String name) {
+        this.queryName = name;
+    }
+
     public String getSearchString() {
         return searchString;
+    }
+
+    void setSearchString(String searchString) {
+        this.searchString = searchString;
     }
 
     private void printShort(String shorRec, ArrayList<PrintStreamStorage> streams, int i) {
@@ -195,14 +197,6 @@ public class PrintStreams {
 
     void setNoFiles() {
         blockFilePrint = true;
-    }
-
-    void setQueryName(String name) {
-        this.queryName = name;
-    }
-
-    void setSearchString(String searchString) {
-        this.searchString = searchString;
     }
 
     final void addFullStream(String fileName, int MaxRecords, boolean addShort) throws FileNotFoundException {

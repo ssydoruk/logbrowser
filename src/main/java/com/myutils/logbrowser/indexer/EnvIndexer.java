@@ -6,15 +6,15 @@
 package com.myutils.logbrowser.indexer;
 
 import com.myutils.logbrowser.common.ExecutionEnvironment;
-import java.nio.file.Paths;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.lang3.StringUtils;
 
+import java.nio.file.Paths;
+
 /**
- *
  * @author stepan_sydoruk
  */
 public class EnvIndexer extends ExecutionEnvironment {
@@ -25,26 +25,16 @@ public class EnvIndexer extends ExecutionEnvironment {
     private final Option optLogsBaseDir;
     private final Option optIgnoreZIP;
     private final Option optTDiffParse;
-    private boolean parseTDiff = false;
-    private boolean ignoreZIP = false;
-
-    Option optHelp;
     private final Option optLogBrowserDir;
     private final Option optSQLPragma;
-
-    public String getBaseDir() {
-        return baseDir;
-    }
+    Option optHelp;
+    private boolean parseTDiff = false;
+    private boolean ignoreZIP = false;
     private String baseDir;
     private String xmlCFG;
     private String alias;
     private String dbname;
     private String logbrowserDir;
-
-    public String getLogbrowserDir() {
-        return logbrowserDir;
-    }
-
     private boolean sqlPragma;
 
     EnvIndexer() {
@@ -119,6 +109,14 @@ public class EnvIndexer extends ExecutionEnvironment {
                 .longOpt("logbr.dir").valueSeparator('=').build();
         options.addOption(optLogBrowserDir);
 
+    }
+
+    public String getBaseDir() {
+        return baseDir;
+    }
+
+    public String getLogbrowserDir() {
+        return logbrowserDir;
     }
 
     public void printHelp() {

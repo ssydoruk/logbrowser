@@ -8,12 +8,11 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- *
  * @author terry
  */
 public class WorkspaceParser extends Parser {
 
-//17:33:04.587_I_I_01d9027e17ef8b38 [09:05] >>>>>>>>>>>>resume interpretator(0), func:SuspendForDN
+    //17:33:04.587_I_I_01d9027e17ef8b38 [09:05] >>>>>>>>>>>>resume interpretator(0), func:SuspendForDN
 //    _I_I_01d9027e17ef8b38 [09:04] ASSIGN: agent_target(LOCAL) <- STRING: "return:timeout"
 //    _I_I_01d9027e17ef8b38 [09:04] ASSIGN: N_attempt(LOCAL) <- INTEGER: 1
 //17:33:04.587_M_I_01d9027e17ef8b38 [07:0c] default priority 6300
@@ -24,28 +23,25 @@ public class WorkspaceParser extends Parser {
 //    _M_I_ [10:17] -ready DN 1077 @ TMK_SIP_Switch (type 1 CallInbound time=1463063585) for agent AZvyagina_tsk, place Place_1077_TMK, WaitForNextCall time=1463063585
 //    _M_I_ [10:17] STATOBJECT(06409ed0 208 2) tenant=Resources name=AZvyagina_tsk@OBN_StatServerRouting.A: 0(1) ready DNs reported, dT=0
 //17:33:04.697_T_I_03350282382b5512 [14:02] sending event 85 for virtual queue OBN_IP_Skill1_VQ_OBN_SIP_Outbound_Virtual
-    private static final Pattern regTMessageOutFinal = Pattern.compile("^\\.\\.sent to");
-    private static final Pattern regTMessageInFinal = Pattern.compile("^\\. Processing with  state");
-    private static final Pattern regTMessageRequestFinal = Pattern.compile("^(ReferenceId|AttributeReferenceID|attr_ref_id|$)");
+    private static final Matcher regTMessageOutFinal = Pattern.compile("^\\.\\.sent to").matcher("");
+    private static final Matcher regTMessageInFinal = Pattern.compile("^\\. Processing with  state").matcher("");
+    private static final Matcher regTMessageRequestFinal = Pattern.compile("^(ReferenceId|AttributeReferenceID|attr_ref_id|$)").matcher("");
 
-    private static final Pattern regCfgUpdate = Pattern.compile("^\\s+PopCfg");
-
-    // keys: multiline function spec, value: pattern that ML is still on
-    static HashMap<String, Pattern> regMultiLine = new HashMap<String, Pattern>();
-    private static final Pattern regTMessageInStart = Pattern.compile("Proxy got message");
-    private static final Pattern regTMessageCompleted = Pattern.compile("- Completed handling");
-    private static final Pattern regTMessageSending = Pattern.compile("Sending message to");
-    private static final Pattern regTMessageOutFirstLine = Pattern.compile("^(request to|\\tAttribute|\\t\\()");
-    private static final Pattern regReceived = Pattern.compile("received from (\\d+)\\(([^\\)]+)\\).+message (Event\\w+)(?:\\(refid=(\\d+)\\))*");
-    private static final Pattern regProxyReceived = Pattern.compile("Proxy got message '(\\w+)' \\('(\\d+)'\\)");
-    private static final Pattern regSentTo = Pattern.compile("send to ts ([^\\[\\s]+)");
-    private static final Pattern regSendingTo = Pattern.compile(" sending event ");
-    private static final Pattern regSendingMessageTo = Pattern.compile(" Sending message to (\\w+)");
-    private static final Pattern regCompletedHandling = Pattern.compile("- Completed handling (\\w+)");
-    private static final Pattern regLastOneOrTwoWords = Pattern.compile("(?:\\s*(?:\\w+)){1,2}$");
-    private static final Pattern regReqTo = Pattern.compile("^request to (\\d+).+message (Request\\w+)");
-    private static final Pattern regToRequest = Pattern.compile("^'(\\w+)'");
-    private static final Pattern regStrategy = Pattern.compile("strategy:.+\\*+(\\S+)");
+    private static final Matcher regCfgUpdate = Pattern.compile("^\\s+PopCfg").matcher("");
+    private static final Matcher regTMessageInStart = Pattern.compile("Proxy got message").matcher("");
+    private static final Matcher regTMessageCompleted = Pattern.compile("- Completed handling").matcher("");
+    private static final Matcher regTMessageSending = Pattern.compile("Sending message to").matcher("");
+    private static final Matcher regTMessageOutFirstLine = Pattern.compile("^(request to|\\tAttribute|\\t\\()").matcher("");
+    private static final Matcher regReceived = Pattern.compile("received from (\\d+)\\(([^\\)]+)\\).+message (Event\\w+)(?:\\(refid=(\\d+)\\))*").matcher("");
+    private static final Matcher regProxyReceived = Pattern.compile("Proxy got message '(\\w+)' \\('(\\d+)'\\)").matcher("");
+    private static final Matcher regSentTo = Pattern.compile("send to ts ([^\\[\\s]+)").matcher("");
+    private static final Matcher regSendingTo = Pattern.compile(" sending event ").matcher("");
+    private static final Matcher regSendingMessageTo = Pattern.compile(" Sending message to (\\w+)").matcher("");
+    private static final Matcher regCompletedHandling = Pattern.compile("- Completed handling (\\w+)").matcher("");
+    private static final Matcher regLastOneOrTwoWords = Pattern.compile("(?:\\s*(?:\\w+)){1,2}$").matcher("");
+    private static final Matcher regReqTo = Pattern.compile("^request to (\\d+).+message (Request\\w+)").matcher("");
+    private static final Matcher regToRequest = Pattern.compile("^'(\\w+)'").matcher("");
+    private static final Matcher regStrategy = Pattern.compile("strategy:.+\\*+(\\S+)").matcher("");
     //[14:33] strategy: **ORS (1085200831) is attached to the call
     private final static HashSet<String> eventsStatServer = new HashSet<String>(
             Arrays.asList("EventInfo",
@@ -73,26 +69,28 @@ public class WorkspaceParser extends Parser {
                     "RequestUnregisterNotification",
                     "EventNotificationUnregistered",
                     "RequestReadObjects"));
-    private static final Pattern regCfgObjectName = Pattern.compile("(?:name|userName|number|loginCode)='([^']+)'");
-    private static final Pattern regCfgObjectType = Pattern.compile("^Cfg([^=]+)=.*\\{DBID=(\\d+)");
-    //    private static final Pattern regCfgAGType = Pattern.compile("^Cfg([^=]+)=\\{DBID=(\\d+)");
-    private static final Pattern regCfgOp = Pattern.compile("PopCfg.+\\s(\\w+)$");
-    long m_CurrentFilePos;
+    private static final Matcher regCfgObjectName = Pattern.compile("(?:name|userName|number|loginCode)='([^']+)'").matcher("");
+    private static final Matcher regCfgObjectType = Pattern.compile("^Cfg([^=]+)=.*\\{DBID=(\\d+)").matcher("");
+    //    private static final Matcher regCfgAGType = Pattern.compile("^Cfg([^=]+)=\\{DBID=(\\d+)").matcher("");
+    private static final Matcher regCfgOp = Pattern.compile("PopCfg.+\\s(\\w+)$").matcher("");
+    // keys: multiline function spec, value: pattern that ML is still on
+    static HashMap<String, Pattern> regMultiLine = new HashMap<String, Pattern>();
     final int MSG_STRING_LIMIT = 200;
-    private String ConnID;
-    private String URSRest;
+    long m_CurrentFilePos;
     long m_HeaderOffset;
     ParserState m_ParserState;
     String m_Header;
     int m_dbRecords = 0;
+    private String ConnID;
+    private String URSRest;
 
     public WorkspaceParser(HashMap<TableType, DBTable> m_tables) {
         super(FileInfoType.type_WorkSpace, m_tables);
 
 //17:33:06.335_I_I_03350282382b556f [07:07] HERE IS TARGETS
 //TARGETS: OBN_IP_Skill1_Group@OBN_StatServerRouting.GA
-        regMultiLine.put("07:07", Pattern.compile("^TARGETS"));
-        regMultiLine.put("10:17", Pattern.compile("^\\s*_\\S_\\S_\\s*\\[(\\S{2}:\\S{2})\\] "));
+        regMultiLine.put("07:07", Pattern.compile("^TARGETS")).matcher("");
+        regMultiLine.put("10:17", Pattern.compile("^\\s*_\\S_\\S_\\s*\\[(\\S{2}:\\S{2})\\] ")).matcher("");
 
     }
 
@@ -114,7 +112,7 @@ public class WorkspaceParser extends Parser {
     private void AddStrategyMessageLine(String line, String FileLine) {
         Matcher m;
         Message msg;
-        if ((FileLine.equals("14:33") || FileLine.equals("1B:01")) && (m = regStrategy.matcher(line)).find()) {
+        if ((FileLine.equals("14:33") || FileLine.equals("1B:01")) && (m = regStrategy.reset(line)).find()) {
             msg = new URSStrategyInit(line, ConnID, m.group(1), "strategy is attached to the call");
         } else if (FileLine.equals("01:08")) {
             msg = new URSStrategyInit(line, ConnID, null, "call deleting truly");
@@ -236,21 +234,21 @@ public class WorkspaceParser extends Parser {
 
                 }
 
-                if ((m = regCfgUpdate.matcher(s)).find()) {
+                if ((m = regCfgUpdate.reset(s)).find()) {
                     setSavedFilePos(getFilePos());
                     m_MessageContents.add(s);
                     m_ParserState = ParserState.STATE_CONFIG;
-                } else if ((m = regTMessageInStart.matcher(s)).find()) {
+                } else if ((m = regTMessageInStart.reset(s)).find()) {
                     m_Header = s;
                     m_HeaderOffset = m_CurrentFilePos;
                     m_ParserState = ParserState.STATE_TLIB_MESSAGE_IN;
                     setSavedFilePos(getFilePos());
-                } else if ((m = regTMessageCompleted.matcher(s)).find()) {
+                } else if ((m = regTMessageCompleted.reset(s)).find()) {
                     m_Header = s;
                     m_HeaderOffset = m_CurrentFilePos;
                     m_ParserState = ParserState.STATE_TLIB_MESSAGE_IN_COMPLETED;
                     setSavedFilePos(getFilePos());
-                } else if ((m = regTMessageSending.matcher(s)).find()) {
+                } else if ((m = regTMessageSending.reset(s)).find()) {
                     m_Header = s;
                     m_HeaderOffset = m_CurrentFilePos;
                     m_ParserState = ParserState.STATE_TLIB_MESSAGE_REQUEST;
@@ -272,7 +270,7 @@ public class WorkspaceParser extends Parser {
                 break;
 
             case STATE_TLIB_MESSAGE_REQUEST:
-                if ((regTMessageRequestFinal.matcher(str)).find()) {
+                if ((regTMessageRequestFinal.reset(str)).find()) {
                     AddTServerMessage(m_MessageContents, m_Header, str);
                     m_ParserState = ParserState.STATE_COMMENTS;
                     m_MessageContents.clear();
@@ -285,7 +283,7 @@ public class WorkspaceParser extends Parser {
 
 //<editor-fold defaultstate="collapsed" desc="STATE_TLIB_MESSAGE_IN">
             case STATE_TLIB_MESSAGE_IN:
-                if ((regTMessageInFinal.matcher(str)).find()) {
+                if ((regTMessageInFinal.reset(str)).find()) {
                     AddTServerMessage(m_MessageContents, m_Header, str);
                     m_ParserState = ParserState.STATE_COMMENTS;
                     m_MessageContents.clear();
@@ -314,7 +312,7 @@ public class WorkspaceParser extends Parser {
 //</editor-fold>
 
             case STATE_TLIB_MESSAGE_OUT:
-                if ((m = regTMessageOutFinal.matcher(str)).find()) {
+                if ((m = regTMessageOutFinal.reset(str)).find()) {
                     AddTServerMessage(m_MessageContents, m_Header, str);
                     m_ParserState = ParserState.STATE_COMMENTS;
                     m_MessageContents.clear();
@@ -327,7 +325,7 @@ public class WorkspaceParser extends Parser {
                     boolean endMsg = false;
                     if (m_MessageContents.isEmpty()) {//filter out TEvent without attributes
                         if (str != null && str.length() > 0
-                                && !regTMessageOutFirstLine.matcher(str).find()) {
+                                && !regTMessageOutFirstLine.reset(str).find()) {
                             endMsg = true;
                         }
                     }
@@ -359,42 +357,42 @@ public class WorkspaceParser extends Parser {
             if (header.contains("ConfigServerProtocol")) {
                 isConfServ = true;
             }
-            if ((m = regProxyReceived.matcher(header)).find()) {
+            if ((m = regProxyReceived.reset(header)).find()) {
                 event = m.group(1);
                 fileHandle = m.group(2);
-            } else if ((m = regReceived.matcher(header)).find()) {
+            } else if ((m = regReceived.reset(header)).find()) {
                 fileHandle = m.group(1);
                 server = m.group(2);
                 event = m.group(3);
                 refID = m.group(4);
-            } else if ((m = regSendingMessageTo.matcher(header)).find()) {
+            } else if ((m = regSendingMessageTo.reset(header)).find()) {
                 server = m.group(1);
-                if ((m = regToRequest.matcher(contents.get(0))).find()) {
+                if ((m = regToRequest.reset(contents.get(0))).find()) {
                     event = m.group(1);
                 }
                 isInbound = false;
-            } else if ((m = regCompletedHandling.matcher(header)).find()) {
+            } else if ((m = regCompletedHandling.reset(header)).find()) {
                 server = m.group(1);
                 if (contents.isEmpty()) {
-                    if ((m = regLastOneOrTwoWords.matcher(header)).find()) {
+                    if ((m = regLastOneOrTwoWords.reset(header)).find()) {
                         event = m.group(0);
                     }
 
-                } else if ((m = regToRequest.matcher(contents.get(0))).find()) {
+                } else if ((m = regToRequest.reset(contents.get(0))).find()) {
                     event = m.group(1);
                 }
             } else {
                 theDP = ParseFormatDate(header);
                 if (theDP != null) {
-                    if ((m = regSentTo.matcher(theDP.rest)).find()) {
+                    if ((m = regSentTo.reset(theDP.rest)).find()) {
                         server = m.group(1);
-                        if ((m = regReqTo.matcher(contents.get(0))).find()) {
+                        if ((m = regReqTo.reset(contents.get(0))).find()) {
                             fileHandle = m.group(1);
                             event = m.group(2);
                         }
                         isInbound = false;
-                    } else if ((regSendingTo.matcher(theDP.rest)).find()) {
-                        if ((m = regReqTo.matcher(contents.get(0))).find()) {
+                    } else if ((regSendingTo.reset(theDP.rest)).find()) {
+                        if ((m = regReqTo.reset(contents.get(0))).find()) {
                             fileHandle = m.group(1);
                             event = m.group(2);
                         }
@@ -404,11 +402,11 @@ public class WorkspaceParser extends Parser {
                     //request to 65467(--) message RequestUpdateUserData
                     //or
                     //request to 65467(--) message RequestRouteCall
-                    if (!contents.isEmpty() && (m = regReqTo.matcher(contents.get(0))).find()) {
+                    if (!contents.isEmpty() && (m = regReqTo.reset(contents.get(0))).find()) {
                         fileHandle = m.group(1);
                         event = m.group(2);
                         isInbound = false;
-                    } else if ((m = regReqTo.matcher(header)).find()) {
+                    } else if ((m = regReqTo.reset(header)).find()) {
                         fileHandle = m.group(1);
                         event = m.group(2);
                         isInbound = false;

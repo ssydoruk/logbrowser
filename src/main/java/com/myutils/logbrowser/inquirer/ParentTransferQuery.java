@@ -5,10 +5,10 @@ import java.sql.SQLException;
 
 public class ParentTransferQuery {
 
-    private ResultSet m_resultSet;
-    Integer m_connId;
-    private DatabaseConnector m_connector;
     private final String m_tab;
+    Integer m_connId;
+    private ResultSet m_resultSet;
+    private DatabaseConnector m_connector;
     private int recCnt;
 
     public ParentTransferQuery(String tab, Integer connId) {

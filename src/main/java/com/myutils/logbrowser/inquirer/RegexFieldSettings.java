@@ -6,30 +6,31 @@
 package com.myutils.logbrowser.inquirer;
 
 import Utils.Pair;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 /**
- *
  * @author stepan_sydoruk
  */
-public class RegexFieldSettings  implements Serializable {
+public class RegexFieldSettings implements Serializable {
 
     private static final long serialVersionUID = 1L;
+    private static final Matcher rxVar = Pattern.compile("\\\\(\\d+)").matcher("");
+    private static final Logger logger = LogManager.getLogger(RegexFieldSettings.class);
     private String searchString;
     private String retValue;
     private boolean makeWholeWorld;
     private boolean caseSensitive;
+    private Matcher selectedRegEx = null;
 
-
-
-    public RegexFieldSettings( String searchString, String retValue, boolean makeWholeWorld, boolean caseSensitive) {
+    public RegexFieldSettings(String searchString, String retValue, boolean makeWholeWorld, boolean caseSensitive) {
 
         this.searchString = searchString;
         this.retValue = retValue;
@@ -83,16 +84,15 @@ public class RegexFieldSettings  implements Serializable {
         makeWholeWorld = isWord;
         selectedRegEx = getRegex(searchString, makeWholeWorld, caseSensitive);
     }
-    private Pattern selectedRegEx = null;
 
-    private Pattern getRegex() {
+    private Matcher getRegex() {
         if (selectedRegEx == null) {
             selectedRegEx = getRegex(searchString, makeWholeWorld, caseSensitive);
         }
         return selectedRegEx;
     }
 
-    private Pattern getRegex(String lastRegEx, boolean wholeWord, boolean matchCase) throws PatternSyntaxException {
+    private Matcher getRegex(String lastRegEx, boolean wholeWord, boolean matchCase) throws PatternSyntaxException {
         if (lastRegEx != null && !lastRegEx.isEmpty()) {
             int flags = 0;
             if (!matchCase) {
@@ -108,10 +108,10 @@ public class RegexFieldSettings  implements Serializable {
                     rx.append('$');
                 }
                 inquirer.logger.debug("Searching for [" + rx + "]");
-                return Pattern.compile(rx.toString(), flags);
+                return Pattern.compile(rx.toString(), flags).matcher("");
             } else {
                 inquirer.logger.debug("Searching for [" + lastRegEx + "]");
-                return Pattern.compile(lastRegEx, flags);
+                return Pattern.compile(lastRegEx, flags).matcher("");
             }
         }
         return null;
@@ -138,9 +138,9 @@ public class RegexFieldSettings  implements Serializable {
     public boolean checkMatch(String toString) {
         if (selectedRegEx != null) {
             if (toString == null) {
-                return selectedRegEx.matcher("").find();
+                return selectedRegEx.reset("").find();
             } else {
-                return selectedRegEx.matcher(toString).find();
+                return selectedRegEx.reset(toString).find();
             }
 
         } else {
@@ -163,21 +163,19 @@ public class RegexFieldSettings  implements Serializable {
         return s;
     }
 
-    private static final Pattern rxVar = Pattern.compile("\\\\(\\d+)");
-
     public SearchSample findRxSample(String bytes) {
         if (bytes != null && bytes.length() > 0 && selectedRegEx != null) {
             SearchSample ret = new SearchSample();
             String[] split = StringUtils.split(bytes, "\r\n");
             String text = retValue;
-            Matcher m1 = rxVar.matcher(text);
+            Matcher m1 = rxVar.reset(text);
             ArrayList<Repl> repl = new ArrayList<>();
             while (m1.find()) {
                 repl.add(new Repl(m1.start(0), m1.end(0), Integer.parseInt(m1.group(1))));
             }
             StringBuilder s = new StringBuilder();
             for (String string : split) {
-                Matcher m = selectedRegEx.matcher(string);
+                Matcher m = selectedRegEx.reset(string);
                 boolean found = false;
                 inquirer.logger.trace("matching [" + selectedRegEx + "] against [" + string + "]");
                 while (m.find()) {
@@ -200,10 +198,9 @@ public class RegexFieldSettings  implements Serializable {
         }
         return null;
     }
-    private static final Logger logger = LogManager.getLogger(RegexFieldSettings.class);
 
     public String evalValue(String bytes) {
-        Pattern rx;
+        Matcher rx;
         logger.debug(this.getClass());
         if ((rx = getRegex()) == null) {
             logger.error("Empty RX");
@@ -211,14 +208,14 @@ public class RegexFieldSettings  implements Serializable {
         if (bytes != null && bytes.length() > 0) {
             String[] split = StringUtils.split(bytes, "\r\n");
             String text = retValue;
-            Matcher m1 = rxVar.matcher(text);
+            Matcher m1 = rxVar.reset(text);
             ArrayList<Repl> repl = new ArrayList<>();
             while (m1.find()) {
                 repl.add(new Repl(m1.start(0), m1.end(0), Integer.parseInt(m1.group(1))));
             }
             StringBuilder s = new StringBuilder();
             for (String string : split) {
-                Matcher m = rx.matcher(string);
+                Matcher m = rx.reset(string);
                 while (m.find()) {
                     extendString(s, doRepl(text, repl, m));
                 }

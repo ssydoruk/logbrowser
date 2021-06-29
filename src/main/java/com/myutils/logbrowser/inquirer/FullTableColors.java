@@ -7,27 +7,27 @@ package com.myutils.logbrowser.inquirer;
 
 import Utils.Pair;
 import com.myutils.logbrowser.inquirer.gui.TabResultDataModel;
-import java.awt.Color;
+
+import java.awt.*;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashSet;
 
 /**
- *
  * @author Stepan
  */
 public class FullTableColors {
 
     private final ArrayList<ArrayList<Object>> data;
     private final ArrayList<Pair<Color, Color>> columnColors;
+    private final HashSet<String> hiddenFields = new HashSet<>();
     private int curColorIdx;
     private String fieldColorChange = null;
     private int colorIdx = -1;
     private Object prevColorCell = null;
     private ArrayList<String> columnNames = null;
     private ArrayList<Integer> columnTypes = null;
-    private final HashSet<String> hiddenFields = new HashSet<>();
 
     public FullTableColors() {
         data = new ArrayList<>();

@@ -9,7 +9,6 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 
 /**
- *
  * @author ssydoruk
  */
 public class OCSRecTreatmentTable extends DBTable {
@@ -54,7 +53,6 @@ public class OCSRecTreatmentTable extends DBTable {
     }
 
     /**
-     *
      * @throws Exception
      */
     @Override

@@ -5,17 +5,15 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- *
  * @author terry
  */
 public class DBServerParser extends Parser {
 
-    private static final Pattern regRI = Pattern.compile("^_R_I_\\s*");
+    private static final Matcher regRI = Pattern.compile("^_R_I_\\s*").matcher("");
 
-    private static final Pattern regCfgUpdate = Pattern.compile("^\\s+PopCfg");
-
-    long m_CurrentFilePos;
+    private static final Matcher regCfgUpdate = Pattern.compile("^\\s+PopCfg").matcher("");
     final int MSG_STRING_LIMIT = 200;
+    long m_CurrentFilePos;
     long m_HeaderOffset;
     ParserState m_ParserState;
     String m_Header;
@@ -97,11 +95,11 @@ public class DBServerParser extends Parser {
                     Main.logger.error("Exception in state " + m_ParserState, exception);
                 }
 
-                if ((m = regCfgUpdate.matcher(s)).find()) {
+                if ((m = regCfgUpdate.reset(s)).find()) {
                     setSavedFilePos(getFilePos());
                     m_MessageContents.add(s);
                     m_ParserState = ParserState.STATE_CONFIG;
-//                } else if ((m = regAgentStatusChanged.matcher(s)).find()) {
+//                } else if ((m = regAgentStatusChanged .reset(s)).find()) {
 //                    setSavedFilePos(getFilePos());
 //                    m_MessageContents.add(s.substring(m.end()));
 //                    m_ParserState = ParserState.STATEAGENTSTATUSNEW;
@@ -117,7 +115,7 @@ public class DBServerParser extends Parser {
     void init(HashMap<TableType, DBTable> m_tables) {
     }
 
-// parse state contants
+    // parse state contants
     enum ParserState {
 
         STATE_HEADER,

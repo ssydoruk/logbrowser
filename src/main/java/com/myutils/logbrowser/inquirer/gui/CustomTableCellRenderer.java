@@ -7,18 +7,13 @@ package com.myutils.logbrowser.inquirer.gui;
 
 import Utils.Pair;
 import com.myutils.logbrowser.inquirer.inquirer;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Font;
-import java.awt.FontMetrics;
-import java.awt.Rectangle;
-import javax.swing.JLabel;
-import javax.swing.JTable;
-import javax.swing.table.DefaultTableCellRenderer;
 import org.apache.commons.lang3.StringUtils;
 
+import javax.swing.*;
+import javax.swing.table.DefaultTableCellRenderer;
+import java.awt.*;
+
 /**
- *
  * @author stepan_sydoruk
  */
 class CustomTableCellRenderer extends DefaultTableCellRenderer {
@@ -28,14 +23,12 @@ class CustomTableCellRenderer extends DefaultTableCellRenderer {
      */
     private static final long serialVersionUID = 1L;
     private static final DefaultTableCellRenderer DEFAULT_RENDERER = new DefaultTableCellRenderer();
+    private static final int NUM_DOTS = 2;
+    private static final String DOTS_STRING = StringUtils.repeat('.', NUM_DOTS);
     private final Font selectFont;
-
     CustomTableCellRenderer(Font f) {
         selectFont = f;
     }
-
-    private static final int NUM_DOTS = 2;
-    private static final String DOTS_STRING = StringUtils.repeat('.', NUM_DOTS);
 
     @Override
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {

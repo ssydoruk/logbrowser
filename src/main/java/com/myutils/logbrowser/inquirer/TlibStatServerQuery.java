@@ -5,10 +5,10 @@
 package com.myutils.logbrowser.inquirer;
 
 import com.myutils.logbrowser.indexer.ReferenceType;
+
 import java.sql.SQLException;
 
 /**
- *
  * @author ssydoruk
  */
 public final class TlibStatServerQuery extends IQuery {
@@ -80,7 +80,7 @@ public final class TlibStatServerQuery extends IQuery {
             recLoaded(rec);
             return rec;
         }
-        inquirer.logger.debug("++ " + this.getClass().toString() + ": extracted " + recCnt + " records");
+        inquirer.logger.debug("++ " + this.getClass() + ": extracted " + recCnt + " records");
         return null;
     }
 

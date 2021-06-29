@@ -8,24 +8,19 @@ package com.myutils.logbrowser.inquirer;
 import Utils.Pair;
 import com.myutils.logbrowser.indexer.ReferenceType;
 import com.myutils.logbrowser.indexer.TableType;
-import static com.myutils.logbrowser.inquirer.QueryTools.getRefNames;
 import com.myutils.logbrowser.inquirer.gui.MyJTable;
+import org.apache.commons.io.FilenameUtils;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import org.apache.commons.io.FilenameUtils;
+import java.util.*;
+
+import static com.myutils.logbrowser.inquirer.QueryTools.getRefNames;
 
 /**
- *
  * @author ssydoruk
  */
 public class InquirerCfg implements Serializable {
@@ -41,23 +36,7 @@ public class InquirerCfg implements Serializable {
                     '*',
                     '<',
                     '>'));
-
-    public static String getFileUnique(String name) {
-        Integer currFileIdx = 0;
-
-        String baseName = FilenameUtils.getBaseName(name);
-        String extension = FilenameUtils.getExtension(name);
-        String ret;
-        while (true) {
-            ret = inquirer.getEe().getLogBrDir() + File.separator + baseName + "_" + String.format("%1$03d", currFileIdx) + "." + extension;
-            File f = new File(ret);
-            if (!f.exists()) {
-                return ret;
-            }
-            currFileIdx++;
-        }
-    }
-
+    HashMap<MsgType, ArrayList<CustomField>> customFieldsSettings = null;
     private HashMap<ReferenceType, ArrayList<OptionNode>> refsChecked = new HashMap<>(20);
     private HashMap<TableType, ArrayList<OptionNode>> logMessages = new HashMap<>();
     private int maxRecords;
@@ -86,8 +65,6 @@ public class InquirerCfg implements Serializable {
     private String FileNameLong;
     private HashMap<String, String> printFilters = new HashMap<>(2);
     private boolean messagesLoaded = false;
-    HashMap<MsgType, ArrayList<CustomField>> customFieldsSettings = null;
-
     public InquirerCfg() {
         this.constants = new GenesysConstants1();
         FileNameShort = ".logbr_short.txt";
@@ -109,6 +86,22 @@ public class InquirerCfg implements Serializable {
         refsLoaded = false;
         messagesLoaded = false;
         newTlibSearch = false;
+    }
+
+    public static String getFileUnique(String name) {
+        Integer currFileIdx = 0;
+
+        String baseName = FilenameUtils.getBaseName(name);
+        String extension = FilenameUtils.getExtension(name);
+        String ret;
+        while (true) {
+            ret = inquirer.getEe().getLogBrDir() + File.separator + baseName + "_" + String.format("%1$03d", currFileIdx) + "." + extension;
+            File f = new File(ret);
+            if (!f.exists()) {
+                return ret;
+            }
+            currFileIdx++;
+        }
     }
 
     private GenesysConstants1 getConsts() {
@@ -173,13 +166,13 @@ public class InquirerCfg implements Serializable {
 
     }
 
+    public void setFileNameShort(String FileNameShort) {
+        this.FileNameShort = FileNameShort;
+    }
+
     public String getFileNameShortAbs() {
         return new File(getFileUnique(FileNameShort)).getAbsoluteFile().getAbsolutePath();
 
-    }
-
-    public void setFileNameShort(String FileNameShort) {
-        this.FileNameShort = FileNameShort;
     }
 
     public String getFileNameLong() {
@@ -418,12 +411,12 @@ public class InquirerCfg implements Serializable {
         return LimitQueryResults;
     }
 
-    int getMaxQueryLines() {
-        return MaxQueryLines;
-    }
-
     void setLimitQueryResults(boolean selected) {
         LimitQueryResults = selected;
+    }
+
+    int getMaxQueryLines() {
+        return MaxQueryLines;
     }
 
     void setMaxQueryLines(Integer integer) {
@@ -434,10 +427,6 @@ public class InquirerCfg implements Serializable {
         this.titleRegex = rx;
     }
 
-    void setFileNameExcel(String text) {
-        this.FileNameExcel = text;
-    }
-
     public String getFileNameExcelBase() {
         return FileNameExcel;
     }
@@ -446,12 +435,16 @@ public class InquirerCfg implements Serializable {
         return getFileUnique(FileNameExcel);
     }
 
-    public void setFileSizeWarn(int fileSizeWarn) {
-        this.fileSizeWarn = fileSizeWarn;
+    void setFileNameExcel(String text) {
+        this.FileNameExcel = text;
     }
 
     public int getFileSizeWarn() {
         return fileSizeWarn;
+    }
+
+    public void setFileSizeWarn(int fileSizeWarn) {
+        this.fileSizeWarn = fileSizeWarn;
     }
 
     String getCaseExpr(String fieldName, String constantName) {
@@ -521,6 +514,17 @@ public class InquirerCfg implements Serializable {
         return logMessages;
     }
 
+    void setLogMessages(HashMap<TableType, ArrayList<OptionNode>> savedLogMessages) {
+        checkMessagesLoaded();
+        for (Map.Entry<TableType, ArrayList<OptionNode>> entry : savedLogMessages.entrySet()) {
+            ArrayList<OptionNode> currentLogMessages = logMessages.get(entry.getKey());
+            if (currentLogMessages.size() != entry.getValue().size()) {
+                logMessages.put(entry.getKey(), entry.getValue());
+            }
+
+        }
+    }
+
     private HashMap<ReferenceType, ArrayList<OptionNode>> getRefsChecked() {
         if (refsChecked == null) {
             refsChecked = new HashMap<>();
@@ -542,17 +546,6 @@ public class InquirerCfg implements Serializable {
 
     HashMap<String, Boolean> getLogsHash(TableType tableType) {
         return arrToHash(getLogMessages(tableType));
-    }
-
-    void setLogMessages(HashMap<TableType, ArrayList<OptionNode>> savedLogMessages) {
-        checkMessagesLoaded();
-        for (Map.Entry<TableType, ArrayList<OptionNode>> entry : savedLogMessages.entrySet()) {
-            ArrayList<OptionNode> currentLogMessages = logMessages.get(entry.getKey());
-            if (currentLogMessages.size() != entry.getValue().size()) {
-                logMessages.put(entry.getKey(), entry.getValue());
-            }
-
-        }
     }
 
     void setReferences(HashMap<ReferenceType, ArrayList<OptionNode>> savedRefs) {
@@ -624,8 +617,8 @@ public class InquirerCfg implements Serializable {
     public static class GenesysConstant implements Serializable {
 
         private static final long serialVersionUID = 1L;
-        private String name;
         private final ArrayList<Pair<String, Integer>> values;
+        private String name;
 
         public GenesysConstant() {
             this.values = new ArrayList<>();
@@ -819,8 +812,8 @@ public class InquirerCfg implements Serializable {
     public static class GenesysConstant1 implements Serializable {
 
         private static final long serialVersionUID = 1L;
-        private String name;
         private final ArrayList<Pair<String, Integer>> values;
+        private String name;
 
         public GenesysConstant1() {
             this.values = new ArrayList<>();

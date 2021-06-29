@@ -9,7 +9,6 @@ import java.sql.SQLException;
 import java.util.HashMap;
 
 /**
- *
  * @author ssydoruk
  */
 public class JsonMessage extends ILogRecord {

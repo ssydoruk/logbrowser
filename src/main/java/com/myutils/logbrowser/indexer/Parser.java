@@ -1,26 +1,95 @@
 package com.myutils.logbrowser.indexer;
 
-import java.io.*;
-import java.net.*;
-import java.sql.*;
-import java.text.*;
-import java.time.*;
-import java.time.format.*;
-import java.time.temporal.*;
+import org.apache.commons.lang3.StringUtils;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.text.ParseException;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalAccessor;
 import java.util.*;
-import java.util.regex.*;
-import org.apache.commons.lang3.*;
-import org.w3c.dom.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
- *
  * @author ssydoruk
  */
 public abstract class Parser {
 
     public static final int MAX_CUSTOM_FIELDS = 3;
     private static final int BASE_CUSTOM_FIELDS = 8;
-    private static final Pattern regORSSessionID = Pattern.compile("^[~\\w]{32}$");
+    private static final Matcher regORSSessionID = Pattern.compile("^[~\\w]{32}$").matcher("");
+    private final String m_StringType;
+    private final FileInfoType m_type;
+    private final DateParsers dateParsers = new DateParsers();
+    private final FilesParseSettings.FileParseSettings fileParseSettings;
+    private final HashMap<String, ArrayList<DateFmt>> appPreferedFormats = new HashMap<>();
+    private final ArrayList<CustomRegexLine> printedCustomLines = new ArrayList<>();
+    //</editor-fold>
+    private final CustomAttributeTable custAttrTab = null;
+    protected HashMap<TableType, DBTable> m_tables;
+    protected ArrayList<String> m_MessageContents;
+    protected DateParsed m_LastTimeStamp;
+    protected int m_lineStarted; // line where expression (TMessage) started
+    protected DateParsed dp;
+    protected FileInfo fileInfo;
+    //    protected static final Matcher regGenesysMessage = Pattern.compile(" (None|Debug|Trace|Interaction|Standard|Alarm|Unknown|Non|Dbg|Trc|Int|Std|Alr|Unk) (\\d{5}) ");
+    int m_CurrentLine;
+    DBAccessor m_accessor;
+    private String lastAppID = null;
+    private boolean collectingDates;
+    private boolean foundBodyDates;
+    private long bytesConsumed;
+    private long filePos;//begining of current line
+    private long savedFilePos; // to save the begining of block
+    private long endFilePos; //end of block
+    private long posDiff = 0;
+    private LocalDateTime lastKnownDate = null;
+    private int lastChangeValue = 0;
+    private String lastMatch;
+    private FilesParseSettings.FileParseCustomSearch lastCustomSearch;
+    private GenesysMsg lastLogMsg;
+    private ArrayList<DateFmt> currentAppDates; //unlikely to have more than 3 date formats in single app
+    private DateDiff dateDiff = null;
+    private CustomLineTable custLineTab = null;
+
+    public Parser(FileInfoType type, HashMap<TableType, DBTable> tables) {
+        super();
+
+        m_MessageContents = new ArrayList<>();
+        m_tables = tables;
+        m_type = type;
+        m_StringType = FileInfoType.getFileType(type);
+
+        /*
+        adding default formats for date
+         */
+        fileParseSettings = Main.getMain().xmlCfg.getFileParseSettings(type);
+        if (fileParseSettings != null) {
+            ArrayList<Parser.DateFmt> formats = fileParseSettings.getAllFormats();
+            if (formats != null) {
+                for (Parser.DateFmt f : formats) {
+                    if (f != null) {
+                        dateParsers.AddFormat(f);
+                    }
+                }
+            }
+        } else {
+            Main.logger.error("Parser constructor not found file settings for : " + type);
+        }
+        if (isParseTimeDiff()) {
+            dateDiff = new DateDiff(type);
+        }
+    }
 
     public static String getQueryKey(HashMap<String, List<String>> splitQuery, String[] keys) {
         for (String key : keys) {
@@ -101,75 +170,25 @@ public abstract class Parser {
     }
 
     static public boolean isSessionID(String resp) {
-        return resp != null && !resp.isEmpty() && regORSSessionID.matcher(resp).find();
+        return resp != null && !resp.isEmpty() && regORSSessionID.reset(resp).find();
     }
-    //    protected static final Pattern regGenesysMessage = Pattern.compile(" (None|Debug|Trace|Interaction|Standard|Alarm|Unknown|Non|Dbg|Trc|Int|Std|Alr|Unk) (\\d{5}) ");
-    int m_CurrentLine;
 
-    DBAccessor m_accessor;
-    protected HashMap<TableType, DBTable> m_tables;
+    public static void main(String[] args) {
+//        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss.SSS");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS");
+//            LocalDateTime parse = formatter.parse("20:22:45.234");
+        String d = "2020-09-28T03:41:37.895";
+//        TemporalAccessor parse = formatter.parse(d, LocalDateTime::from);
 
-    protected ArrayList<String> m_MessageContents;
-    protected DateParsed m_LastTimeStamp;
-    private String lastAppID = null;
-    private boolean collectingDates;
-    private final String m_StringType;
-    private boolean foundBodyDates;
-
-    protected int m_lineStarted; // line where expression (TMessage) started
-    private long bytesConsumed;
-
-    protected DateParsed dp;
-    private long filePos;//begining of current line
-    private long savedFilePos; // to save the begining of block
-    private long endFilePos; //end of block
-    private long posDiff = 0;
-    private final FileInfoType m_type;
-    private final DateParsers dateParsers = new DateParsers();
-    protected FileInfo fileInfo;
-    private LocalDateTime lastKnownDate = null;
-
-    private final FilesParseSettings.FileParseSettings fileParseSettings;
-    private int lastChangeValue = 0;
-    private String lastMatch;
-
-    private FilesParseSettings.FileParseCustomSearch lastCustomSearch;
-    private GenesysMsg lastLogMsg;
-    private ArrayList<DateFmt> currentAppDates; //unlikely to have more than 3 date formats in single app
-    private final HashMap<String, ArrayList<DateFmt>> appPreferedFormats = new HashMap<>();
-    private DateDiff dateDiff = null;
-    private final ArrayList<CustomRegexLine> printedCustomLines = new ArrayList<>();
-    //</editor-fold>
-    private final CustomAttributeTable custAttrTab = null;
-    private CustomLineTable custLineTab = null;
-
-    public Parser(FileInfoType type, HashMap<TableType, DBTable> tables) {
-        super();
-
-        m_MessageContents = new ArrayList<>();
-        m_tables = tables;
-        m_type = type;
-        m_StringType = FileInfoType.getFileType(type);
-
-        /*
-        adding default formats for date
-         */
-        fileParseSettings = Main.getMain().xmlCfg.getFileParseSettings(type);
-        if (fileParseSettings != null) {
-            ArrayList<Parser.DateFmt> formats = fileParseSettings.getAllFormats();
-            if (formats != null) {
-                for (Parser.DateFmt f : formats) {
-                    if (f != null) {
-                        dateParsers.AddFormat(f);
-                    }
-                }
-            }
-        } else {
-            Main.logger.error("Parser constructor not found file settings for : " + type);
-        }
-        if (isParseTimeDiff()) {
-            dateDiff = new DateDiff(type);
-        }
+        LocalDateTime parse1 = LocalDateTime.parse(d, formatter);
+        System.out.println("-1-");
+//        Instant i = Instant.from(parse);
+//            if (parse.isSupported(java.time.temporal.ChronoField.YEAR)) {
+//                LocalDateTime dt = LocalDateTime.from(parse);
+//            }
+//            System.out.println(parse.isSupported(java.time.temporal.ChronoField.YEAR));
+//            LocalDateTime dt = LocalDateTime.from(parse);
+//            System.out.println("d: " + parse.toString() + " dt:" + dt.toString());
     }
 
     protected void logError(String s) {
@@ -196,7 +215,7 @@ public abstract class Parser {
      *
      * @param str
      * @param changeValue used for SIP Server parser. If greater than zero, than
-     * return if found str not changed and this number not changed
+     *                    return if found str not changed and this number not changed
      * @return true if match is found and flag parserRest is false on the
      * CustomSearch in backend.xml
      * @throws Exception
@@ -253,27 +272,30 @@ public abstract class Parser {
         return ret;
     }
 
-    protected String ParseGenesysTServer(String str, TableType tabType, Pattern ptIgnore, Pattern ptSkip) throws Exception {
+    protected String ParseGenesysTServer(String str, TableType tabType, Matcher ptIgnore, Matcher ptSkip) throws Exception {
         return ParseGenesys(getTServerStart(str), tabType, ptIgnore, ptSkip);
     }
 
-    private String parserRet(String ret, Pattern ptSkip) {
+
+
+    private String parserRet(String ret, Matcher ptSkip) {
         if (dp != null && ptSkip != null && ret != null) {
             Matcher m;
-            if ((m = ptSkip.matcher(ret)).find()) {
+            if ((m = ptSkip.reset(ret)).find()) {
                 dp.rest = ret.substring(m.end());
-                Main.logger.trace("Skipped per regex [" + ptSkip.toString() + "]; new rest [" + dp.rest + "]");
+                Main.logger.trace("Skipped per regex [" + ptSkip + "]; new rest [" + dp.rest + "]");
             }
             return dp.rest;
         }
         return ret;
     }
 
-    protected String ParseGenesysSCS(String str, TableType tabType, Pattern ptIgnore, Pattern ptSkip) throws Exception {
+    protected String ParseGenesysSCS(String str, TableType tabType, Matcher ptIgnore, Matcher ptSkip) throws Exception {
         return parserRet(ParseGenesysSCS(str, tabType, ptIgnore), ptSkip);
     }
 
-    protected String ParseGenesys(String str, TableType tabType, Pattern ptIgnore, Pattern ptSkip) throws Exception {
+
+    protected String ParseGenesys(String str, TableType tabType, Matcher ptIgnore, Matcher ptSkip) throws Exception {
         return parserRet(ParseGenesys(str, tabType, ptIgnore), ptSkip);
 
     }
@@ -309,7 +331,7 @@ public abstract class Parser {
         }
     }
 
-    protected String ParseGenesysSCS(String str, TableType tabType, Pattern ptMSGsIgnore) throws Exception {
+    protected String ParseGenesysSCS(String str, TableType tabType, Matcher ptMSGsIgnore) throws Exception {
         dp = ParseTimestamp(str);
         if (dp != null) {
 
@@ -332,13 +354,9 @@ public abstract class Parser {
         return (lastLogMsg != null) ? StringUtils.isNotBlank(lastLogMsg.getLastGenesysMsgLevel()) ? lastLogMsg.getLastGenesysMsgLevel() : null : null;
     }
 
-    protected void fakeGenesysMsg(DateParsed dp, Parser p, TableType t, Pattern ignoreMSGIDs,
-            String _lastGenesysMsgLevel, String _lastGenesysMsgID, String generatedMsgID, String generatedMsg) {
-        lastLogMsg = GenesysMsg.postGenesysMsg(dp, p, t, ignoreMSGIDs,
-                _lastGenesysMsgLevel, _lastGenesysMsgID, generatedMsgID, generatedMsg);
-    }
 
-    protected String ParseGenesysGMS(String str, TableType tabType, Pattern ptMSGsIgnore) throws Exception {
+
+    protected String ParseGenesysGMS(String str, TableType tabType, Matcher ptMSGsIgnore) throws Exception {
         dp = ParseTimestamp(str);
         if (dp != null) {
             lastLogMsg = null;
@@ -350,7 +368,7 @@ public abstract class Parser {
         }
     }
 
-    protected String ParseGenesys(String str, TableType tabType, Pattern ptMSGsIgnore) throws Exception {
+    protected String ParseGenesys(String str, TableType tabType, Matcher ptMSGsIgnore) throws Exception {
         dp = ParseTimestamp(str);
         if (dp != null) {
             lastLogMsg = null;
@@ -361,8 +379,9 @@ public abstract class Parser {
         }
     }
 
+
     protected String ParseGenesys(String str, TableType tabType) throws Exception {
-        return ParseGenesys(str, tabType, null);
+        return ParseGenesys(str, tabType, (Matcher) null);
     }
 
     /**
@@ -399,7 +418,6 @@ public abstract class Parser {
     public FileInfoType getM_type() {
         return m_type;
     }
-
 
     /*Main method implementing parser*/
     public abstract int ParseFrom(BufferedReaderCrLf reader, long offset, int line, FileInfo fi);
@@ -527,7 +545,7 @@ public abstract class Parser {
         }
     }
 
-//    public DateParsed ParseDate(String s) throws Exception {
+    //    public DateParsed ParseDate(String s) throws Exception {
 //        DateParsed ret = adjustDay(dateParsers.parseDate(s), null);
 //        commitDateParsers();
 //        return ret;
@@ -589,7 +607,7 @@ public abstract class Parser {
 
             }
             collectingDates = true;
-            dateParsers.setPrefferedFormats(null);// 
+            dateParsers.setPrefferedFormats(null);//
         }
         Main.logger.trace("collectingDates = " + collectingDates);
         this.fileInfo.IncreaseFileID();
@@ -668,7 +686,7 @@ public abstract class Parser {
     }
 
     private void insertIntoCustom(Matcher m, String key, ArrayList<FilesParseSettings.FileParseCustomSearch.SearchComponent> value, int changeValue,
-            FilesParseSettings.FileParseCustomSearch fileParseCustomSearch) throws Exception {
+                                  FilesParseSettings.FileParseCustomSearch fileParseCustomSearch) throws Exception {
         if (custLineTab == null) {
             custLineTab = new CustomLineTable(m_type);
             custLineTab.InitDB();
@@ -695,17 +713,23 @@ public abstract class Parser {
 
     }
 
+    public enum DateIncluded {
+        DATE_INCUDED,
+        DATE_NOT_INCLUDED,
+        DATE_UNKNOWN
+    }
+
     public static class DateFmt {
 
-        Pattern pattern;
+        Matcher pattern;
 
         String fmt;
-        private DateTimeFormatter formatter = null;
         ArrayList<Pair<String, String>> repl = null;
         DateIncluded isDateIncluded;
+        private DateTimeFormatter formatter = null;
 
         public DateFmt(String p, String fmt, DateIncluded dateIncluded) {
-            this.pattern = Pattern.compile(p);
+            this.pattern = Pattern.compile(p).matcher("");
             this.fmt = fmt;
             isDateIncluded = dateIncluded;
             if (fmt != null) {
@@ -739,8 +763,8 @@ public abstract class Parser {
         @Override
         public String toString() {
             return "pattern: [" + pattern.pattern() + "] fmt: [" + fmt + "] fmt: ["
-                    + ((formatter == null) ? "(null)" : formatter.toString()
-                            + "] ");
+                    + ((formatter == null) ? "(null)" : formatter
+                    + "] ");
         }
 
         private void addReplace(String from, String to) {
@@ -788,7 +812,7 @@ public abstract class Parser {
                         break;
                     }
                 }
-                Main.logger.trace("ParseDate replaced src[" + d + "] res[" + s.toString() + "]");
+                Main.logger.trace("ParseDate replaced src[" + d + "] res[" + s + "]");
                 return parseDate(s.toString(), lastKnownDate);
             }
         }
@@ -808,7 +832,7 @@ public abstract class Parser {
             for (int i = 0; i < value.size(); i++) {
                 s.append(getValue(i)).append(" ");
             }
-            return "Custom{" + "keys=" + s.toString() + '}';
+            return "Custom{" + "keys=" + s + '}';
         }
 
         public int lastPrintedIdx(FilesParseSettings.FileParseCustomSearch fileParseCustomSearch) {
@@ -816,7 +840,7 @@ public abstract class Parser {
                 CustomRegexLine crl = printedCustomLines.get(j);
                 boolean valueEqual = true;
                 boolean otherEqual = true;
-                Main.logger.info("compare " + crl.toString() + " | " + this.toString());
+                Main.logger.info("compare " + crl.toString() + " | " + this);
                 for (int i = 0; i < value.size(); i++) {
                     FilesParseSettings.FileParseCustomSearch.SearchComponent savedSearch = crl.getValue().get(i);
                     FilesParseSettings.FileParseCustomSearch.SearchComponent curSearch = value.get(i);
@@ -909,7 +933,7 @@ public abstract class Parser {
             Main.logger.info("setPrinted: lastPrintedIdx:" + lastPrintedIdx + " mustChange:" + mustChange);
             if (mustChange) {
                 if (lastPrintedIdx < 0) {
-                    Main.logger.info("setPrinted: lastPrintedIdx:" + lastPrintedIdx + " mustChange:" + mustChange + "adding: " + this.toString());
+                    Main.logger.info("setPrinted: lastPrintedIdx:" + lastPrintedIdx + " mustChange:" + mustChange + "adding: " + this);
                     printedCustomLines.add(this);
                 } else {
                     printedCustomLines.set(lastPrintedIdx, this);
@@ -1033,7 +1057,7 @@ public abstract class Parser {
 
     }
 
-//<editor-fold defaultstate="collapsed" desc="comment">
+    //<editor-fold defaultstate="collapsed" desc="comment">
     class CustomAttribute extends Record {
 
         private CustomAttribute(String key, String key0, Integer value) {
@@ -1123,30 +1147,6 @@ public abstract class Parser {
             }
         }
 
-    }
-
-    public static void main(String[] args) {
-//        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss.SSS");
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS");
-//            LocalDateTime parse = formatter.parse("20:22:45.234");
-        String d = "2020-09-28T03:41:37.895";
-//        TemporalAccessor parse = formatter.parse(d, LocalDateTime::from);
-
-        LocalDateTime parse1 = LocalDateTime.parse(d, formatter);
-        System.out.println("-1-");
-//        Instant i = Instant.from(parse);
-//            if (parse.isSupported(java.time.temporal.ChronoField.YEAR)) {
-//                LocalDateTime dt = LocalDateTime.from(parse);
-//            }
-//            System.out.println(parse.isSupported(java.time.temporal.ChronoField.YEAR));
-//            LocalDateTime dt = LocalDateTime.from(parse);
-//            System.out.println("d: " + parse.toString() + " dt:" + dt.toString());
-    }
-
-    public enum DateIncluded {
-        DATE_INCUDED,
-        DATE_NOT_INCLUDED,
-        DATE_UNKNOWN
     }
 
 }

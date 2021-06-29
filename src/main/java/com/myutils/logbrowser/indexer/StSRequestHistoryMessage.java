@@ -1,9 +1,8 @@
 package com.myutils.logbrowser.indexer;
 
-import java.util.*;
+import java.util.ArrayList;
 
 /**
- *
  * @author akolo
  */
 public class StSRequestHistoryMessage extends Message {

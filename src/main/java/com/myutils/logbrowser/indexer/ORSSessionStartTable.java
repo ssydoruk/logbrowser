@@ -9,7 +9,6 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 
 /**
- *
  * @author ssydoruk
  */
 public class ORSSessionStartTable extends DBTable {
@@ -60,7 +59,6 @@ public class ORSSessionStartTable extends DBTable {
     }
 
     /**
-     *
      * @throws Exception
      */
     @Override

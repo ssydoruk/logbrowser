@@ -5,12 +5,12 @@
 package com.myutils.logbrowser.inquirer;
 
 import com.myutils.logbrowser.indexer.ReferenceType;
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Collection;
 
 /**
- *
  * @author ssydoruk
  */
 public class OrsByConnIdQuery extends IQuery {
@@ -59,7 +59,7 @@ public class OrsByConnIdQuery extends IQuery {
         this(new Integer[]{connId});
     }
 
-//    OrsByConnIdQuery(HashSet<Long> refIDs, ArrayList<Long> ids, HashSet<Long> idDNs) {
+    //    OrsByConnIdQuery(HashSet<Long> refIDs, ArrayList<Long> ids, HashSet<Long> idDNs) {
 //        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
 //    }
     OrsByConnIdQuery(Collection<Long> refIDs, Collection<Long> seqnoIDs) throws SQLException {

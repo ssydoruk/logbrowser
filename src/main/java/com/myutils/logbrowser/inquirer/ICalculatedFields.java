@@ -8,7 +8,6 @@ package com.myutils.logbrowser.inquirer;
 import java.util.Properties;
 
 /**
- *
  * @author ssydoruk
  */
 public interface ICalculatedFields {

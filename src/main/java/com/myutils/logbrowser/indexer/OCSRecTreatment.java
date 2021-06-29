@@ -4,19 +4,18 @@
  */
 package com.myutils.logbrowser.indexer;
 
-import java.util.*;
+import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- *
  * @author terry The class Replicates TLibMessage
  */
 public final class OCSRecTreatment extends Message {
 
-    private static final Pattern regRecHandle = Pattern.compile("^\\tRecordHandle = (\\d+)\\s+ChainID = (\\d+)\\s+ChainNum = (\\d+)");
-    private static final Pattern regCampaignName = Pattern.compile("^\\tCampaignName = (.+)");
-    private static final Pattern regRecordType = Pattern.compile("^\\tRecordType = (\\d+)");
+    private static final Matcher regRecHandle = Pattern.compile("^\\tRecordHandle = (\\d+)\\s+ChainID = (\\d+)\\s+ChainNum = (\\d+)").matcher("");
+    private static final Matcher regCampaignName = Pattern.compile("^\\tCampaignName = (.+)").matcher("");
+    private static final Matcher regRecordType = Pattern.compile("^\\tRecordType = (\\d+)").matcher("");
 
     private int recHandle = -1;
     private int chanID = -1;

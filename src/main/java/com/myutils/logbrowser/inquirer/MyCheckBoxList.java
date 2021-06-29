@@ -8,53 +8,34 @@ package com.myutils.logbrowser.inquirer;
 import Utils.ScreenInfo;
 import com.jidesoft.swing.CheckBoxList;
 import com.jidesoft.swing.CheckBoxListSelectionModel;
-import static com.myutils.logbrowser.inquirer.EnterRegexDialog.RET_OK;
-import java.awt.BorderLayout;
-import java.awt.Point;
-import java.awt.Window;
+
+import javax.swing.*;
+import javax.swing.event.ListSelectionListener;
+import javax.swing.event.PopupMenuEvent;
+import javax.swing.event.PopupMenuListener;
+import javax.swing.table.DefaultTableModel;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.HashMap;
-import javax.swing.AbstractAction;
-import javax.swing.BoxLayout;
-import javax.swing.DefaultListModel;
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JFrame;
-import javax.swing.JList;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
+
+import static com.myutils.logbrowser.inquirer.EnterRegexDialog.RET_OK;
 import static javax.swing.JOptionPane.INFORMATION_MESSAGE;
-import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.KeyStroke;
-import javax.swing.ListModel;
-import javax.swing.ListSelectionModel;
-import javax.swing.SwingUtilities;
-import javax.swing.event.ListSelectionListener;
-import javax.swing.event.PopupMenuEvent;
-import javax.swing.event.PopupMenuListener;
-import javax.swing.table.DefaultTableModel;
 
 /**
- *
  * @author ssydoruk
  */
 public class MyCheckBoxList extends CheckBoxList {
 
+    EnterRegexDialog dlg = null;
+    MyChBoxListPopup menu;
     private int lastIdx;
-
     private String lastRegEx = null;
     private JPanel jpo = null;
     private DefaultListModel lm = null;
-    EnterRegexDialog dlg = null;
-
-    MyChBoxListPopup menu;
     private ListSelectionListener[] listSelectionListeners = null;
 
     public MyCheckBoxList(JPanel jpo) {
@@ -241,6 +222,11 @@ public class MyCheckBoxList extends CheckBoxList {
     class MyChBoxListPopup extends JPopupMenu {
 
         private final CheckBoxList list;
+        private final JPanel w;
+        private final int lastIdx = -1;
+        JDialog jd = null;
+        JList jdList;
+        JDialog jdStat = null;
         private JMenuItem jmCheckAll;
         private JMenuItem jmCheckByRegex;
         private JMenuItem jmFindSelect;
@@ -252,17 +238,10 @@ public class MyCheckBoxList extends CheckBoxList {
         private JMenuItem jmHideChecked;
         private JMenuItem jmHideUnchecked;
         private JMenuItem jmShowStat;
-        private final JPanel w;
         private JMenuItem jmFind;
         private JMenuItem jmFindNext;
-        private final int lastIdx = -1;
         private JMenuItem jmFindPrev;
         private JMenuItem jmCopyValue;
-
-        JDialog jd = null;
-        JList jdList;
-
-        JDialog jdStat = null;
 
         private MyChBoxListPopup(MyCheckBoxList _list, JPanel w) {
             InitItems();
@@ -409,7 +388,7 @@ public class MyCheckBoxList extends CheckBoxList {
             inquirer.showInfoPanel(SwingUtilities.windowForComponent(jpo), "Statistic", jp, true);
         }
 
-        private HashMap< Integer, String> getMatchedItems() {
+        private HashMap<Integer, String> getMatchedItems() {
 
             if (dlg == null) {
                 dlg = new EnterRegexDialog(null, true);
@@ -564,13 +543,13 @@ public class MyCheckBoxList extends CheckBoxList {
             jmCheckAll.setText("Check all");
             jmCheckAll.addActionListener(new ActionListener() {
 
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    SetChecked(true);
+                                             @Override
+                                             public void actionPerformed(ActionEvent e) {
+                                                 SetChecked(true);
 //                    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-                }
+                                             }
 
-            }
+                                         }
             );
             jmCheckAll.addActionListener(new java.awt.event.ActionListener() {
                 @Override

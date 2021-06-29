@@ -5,14 +5,9 @@
  */
 package com.myutils.logbrowser.indexer;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 
 /**
- *
  * @author Stepan
  */
 public final class TextLog extends LogFileWrapper {
@@ -71,7 +66,7 @@ public final class TextLog extends LogFileWrapper {
         try {
             stream = new FileInputStream(getFile());
         } catch (FileNotFoundException ex) {
-            logger.error("fatal: ",  ex);
+            logger.error("fatal: ", ex);
             stream = null;
         }
     }
@@ -82,7 +77,7 @@ public final class TextLog extends LogFileWrapper {
             try {
                 stream.close();
             } catch (IOException ex) {
-                logger.error("fatal: ",  ex);
+                logger.error("fatal: ", ex);
             }
         }
     }

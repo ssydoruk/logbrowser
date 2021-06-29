@@ -5,10 +5,10 @@
 package com.myutils.logbrowser.inquirer;
 
 import com.myutils.logbrowser.indexer.ReferenceType;
+
 import java.sql.SQLException;
 
 /**
- *
  * @author ssydoruk
  */
 public class IxnSSQuery extends IQuery {

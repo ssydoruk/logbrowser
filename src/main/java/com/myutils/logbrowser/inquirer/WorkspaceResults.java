@@ -6,30 +6,28 @@ import com.myutils.logbrowser.indexer.FileInfoType;
 import com.myutils.logbrowser.indexer.ReferenceType;
 import com.myutils.logbrowser.indexer.TableType;
 import com.myutils.logbrowser.inquirer.IQuery.FieldType;
-import static com.myutils.logbrowser.inquirer.QueryTools.getWhere;
+import org.apache.logging.log4j.LogManager;
+
+import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import javax.swing.JOptionPane;
-import org.apache.logging.log4j.LogManager;
 
 public class WorkspaceResults extends IQueryResults {
-
-    private static final org.apache.logging.log4j.Logger logger = LogManager.getLogger();
 
     public static final int TLIB = 0x01;
     public static final int ISCC = 0x02;
     public static final int TC = 0x04;
     public static final int SIP = 0x08;
     public static final int PROXY = 0x10;
+    private static final org.apache.logging.log4j.Logger logger = LogManager.getLogger();
     private static final String[] RequestsToShow = {"RequestMakePredictiveCall", "RequestMakeCall"};
     private static final String[] EventsToShow = {"EventDialing", "EventNetworkReached"};
+    private final UTCTimeRange timeRange = null;
     private Object cidFinder;
     private ArrayList<NameID> appsType;
-
     private int m_componentFilter;
-    private final UTCTimeRange timeRange = null;
 
     public WorkspaceResults(QueryDialogSettings qdSettings) {
         super(qdSettings);
@@ -224,7 +222,7 @@ public class WorkspaceResults extends IQueryResults {
 //        Attr.addChild(AttrValue);
     }
 
-//    private void addSIPReportType(DynamicTreeNode<OptionNode> root) {
+    //    private void addSIPReportType(DynamicTreeNode<OptionNode> root) {
 //        DynamicTreeNode<OptionNode> nd = new DynamicTreeNode<OptionNode>(new OptionNode(true, "SIP"));
 //        root.addChild(nd);
 //        
@@ -291,7 +289,7 @@ public class WorkspaceResults extends IQueryResults {
             addCustom(rootA, FileInfoType.type_WorkSpace);
             addCustom(rootA, FileInfoType.type_SIPEP);
         } catch (SQLException ex) {
-            logger.error("fatal: ",  ex);
+            logger.error("fatal: ", ex);
         }
         addConfigUpdates(rootA);
 
@@ -328,7 +326,7 @@ public class WorkspaceResults extends IQueryResults {
         doSort();
     }
 
-//    private void retrieveSIP
+    //    private void retrieveSIP
     private void doRetrieve(QueryDialog dlg, SelectionType selectionType, String selection, boolean isRegex) throws SQLException {
         ILogRecord record = null;
         IDsFinder cidFinder = null;
@@ -364,7 +362,7 @@ public class WorkspaceResults extends IQueryResults {
         return TLibReq;
     }
 
-//    private void doRetrieveDN(QueryDialog dlg, String selection, boolean isRegex)  throws SQLException {
+    //    private void doRetrieveDN(QueryDialog dlg, String selection, boolean isRegex)  throws SQLException {
 //        Integer[] dnID = null;
 //        Integer[] dnSIPID = null;
 //        if (selection != null) {
@@ -410,11 +408,11 @@ public class WorkspaceResults extends IQueryResults {
                 if (connIDs != null && connIDs.length > 0 && DatabaseConnector.TableExist(ReferenceType.TEvent.toString())) {
                     TableQuery TLibReq = MakeTLibReq();
                     TLibReq.addWhere(TLibReq.getTabAlias() + ".connectionidid<=0 and \n"
-                            + getWhere(TLibReq.getTabAlias() + ".nameid", ReferenceType.TEvent, RequestsToShow, false)
-                            + "\n and \n"
-                            + getWhere(TLibReq.getTabAlias() + ".referenceid",
-                                    MakeQueryID("referenceid", "TLIB_logbr",
-                                            getWhere("connectionidid", connIDs, true)
+                                    + getWhere(TLibReq.getTabAlias() + ".nameid", ReferenceType.TEvent, RequestsToShow, false)
+                                    + "\n and \n"
+                                    + getWhere(TLibReq.getTabAlias() + ".referenceid",
+                            MakeQueryID("referenceid", "TLIB_logbr",
+                                    getWhere("connectionidid", connIDs, true)
                                             + "\n\tand referenceid>0"
                                             + "\n\tand "
                                             + getWhere("nameid", ReferenceType.TEvent, EventsToShow, false)), false),
@@ -537,7 +535,7 @@ public class WorkspaceResults extends IQueryResults {
             try {
                 return cidFinder.AnythingTLibRelated();
             } catch (SQLException ex) {
-                logger.error("fatal: ",  ex);
+                logger.error("fatal: ", ex);
             }
         }
         return true;

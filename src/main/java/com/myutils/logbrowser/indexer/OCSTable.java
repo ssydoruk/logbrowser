@@ -4,13 +4,13 @@
  */
 package com.myutils.logbrowser.indexer;
 
-import static Utils.Util.StripQuotes;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 
+import static Utils.Util.StripQuotes;
+
 /**
- *
  * @author ssydoruk
  */
 public class OCSTable extends DBTable {
@@ -86,7 +86,6 @@ public class OCSTable extends DBTable {
     }
 
     /**
-     *
      * @throws Exception
      */
     @Override

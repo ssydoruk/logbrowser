@@ -11,7 +11,7 @@ import java.util.regex.Pattern;
 
 public class OCSPASessionInfo extends Message {
 
-    final private static Pattern regCampInfo = Pattern.compile("\\sOwnerDBID: (\\d+); Campaign DBID: (\\d+); Group DBID: (\\d+); Name: (.+);\\s*$");
+    final private static Matcher regCampInfo = Pattern.compile("\\sOwnerDBID: (\\d+); Campaign DBID: (\\d+); Group DBID: (\\d+); Name: (.+);\\s*$").matcher("");
 
     private int cgDBID;
     private String cgName;
@@ -23,7 +23,7 @@ public class OCSPASessionInfo extends Message {
 
         try {
             Matcher m;
-            if (messageLines.size() >= 2 && (m = regCampInfo.matcher(messageLines.get(1))).find()) {
+            if (messageLines.size() >= 2 && (m = regCampInfo.reset(messageLines.get(1))).find()) {
                 cgDBID = Integer.parseInt(m.group(1));
                 CampaignDBID = Integer.parseInt(m.group(2));
                 GroupDBID = Integer.parseInt(m.group(3));

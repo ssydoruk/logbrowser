@@ -9,7 +9,6 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 
 /**
- *
  * @author ssydoruk
  */
 public class GMSORSTable extends DBTable {
@@ -55,7 +54,6 @@ public class GMSORSTable extends DBTable {
     }
 
     /**
-     *
      * @throws Exception
      */
     @Override

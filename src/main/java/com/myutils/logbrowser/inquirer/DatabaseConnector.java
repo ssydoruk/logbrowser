@@ -1,23 +1,18 @@
 package com.myutils.logbrowser.inquirer;
 
 import Utils.UTCTimeRange;
-import static Utils.Util.pDuration;
 import com.myutils.logbrowser.indexer.FileInfoType;
 import com.myutils.logbrowser.indexer.Main;
 import com.myutils.logbrowser.indexer.ReferenceType;
 import com.myutils.logbrowser.indexer.TableType;
-import static com.myutils.logbrowser.inquirer.QueryTools.getWhere;
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.logging.log4j.LogManager;
+import org.sqlite.Function;
+
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.sql.CallableStatement;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -28,24 +23,428 @@ import java.util.HashMap;
 import java.util.IllegalFormatException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.apache.commons.lang3.ArrayUtils;
-import org.apache.logging.log4j.LogManager;
-import org.sqlite.Function;
+
+import static Utils.Util.pDuration;
+import static com.myutils.logbrowser.inquirer.QueryTools.getWhere;
 import static org.sqlite.SQLiteErrorCode.SQLITE_INTERRUPT;
 
 public class DatabaseConnector {
 
-    private static final org.apache.logging.log4j.Logger logger = LogManager.getLogger();
-    private static final HashMap<String, DateTimeFormatter> parsedFormats = new HashMap<>();
-    private static DatabaseConnector databaseConnector = null;
     // List of function names;
     public static final String CampaignGroupDBIDtoName = "CampaignGroupDBIDtoName";
     public static final String CampaignDBIDtoName = "CampaignDBIDtoName";
     public static final String GroupDBIDtoName = "GroupDBIDtoName";
     public static final String ListDBIDtoName = "ListDBIDtoName";
+    private static final org.apache.logging.log4j.Logger logger = LogManager.getLogger();
+    private static final HashMap<String, DateTimeFormatter> parsedFormats = new HashMap<>();
     private static final HashMap<String, Boolean> tabExists = new HashMap<String, Boolean>();
     static public Statement currentStatement = null;
+    private static DatabaseConnector databaseConnector = null;
     static private int noAppTypes = -1;
+    private final String m_dbName;
+    private final String m_dbAlias;
+    private final Connection m_conn;
+    private final HashMap<ReferenceType, HashMap<Integer, String>> thePersistentRef = new HashMap<>();
+    private final IDsToName idsToName;
+    HashMap m_activeStatements;
+    ArrayList m_freeStatements;
+    ArrayList<PreparedStatement> m_statements;
+
+    protected DatabaseConnector(String dbName, String dbAlias) throws SQLException {
+        m_dbName = dbName;
+        m_dbAlias = dbAlias;
+
+        try {
+            Class.forName("org.sqlite.JDBC");
+        } catch (ClassNotFoundException ex) {
+            logger.error("fatal: ", ex);
+            throw new SQLException(ex);
+        }
+        String name = dbName + ".db";
+        File f = new File(name);
+        Path p = f.toPath();
+        if (!Files.isRegularFile(p)) {
+//            Main.logger.info("DB [" + name + "] does exists; terminating");
+            throw new SQLException("No DB [" + p + "]");
+        }
+
+        idsToName = new IDsToName();
+
+        m_conn = DriverManager.getConnection("jdbc:sqlite:" + name);
+        Function.create(m_conn, "REGEXP", new Function() {
+            @Override
+            protected void xFunc() throws SQLException {
+                String regex = value_text(0);
+                String compareString = value_text(1);
+                if (compareString == null) {
+                    compareString = "";
+                }
+
+                Pattern pattern = Pattern.compile(regex, Pattern.CASE_INSENSITIVE);
+//                boolean name = pattern.matcher(compareString).find();
+//                inquirer.logger.info("REGEXP: reg [" + regex.toString() + "] comp: [" + compareString + "]; result: " + name);
+                result(pattern.matcher(compareString).find() ? 1 : 0);
+            }
+        });
+
+        Function.create(m_conn, "filesize", new Function() {
+            @Override
+            protected void xFunc() throws SQLException {
+                try {
+                    String sizeText = value_text(0);
+//                    inquirer.logger.info("sizeText: [" + value_text(0) + "]");
+                    Long sizeL = Long.parseLong(sizeText);
+//                    inquirer.logger.info("parsed: [" + sizeL + "]");
+                    result(Main.formatSize(sizeL));
+                } catch (IllegalFormatException | NumberFormatException e) {
+                    result("");
+//            inquirer.ExceptionHandler.handleException(this.getClass().toString(), e);
+                    inquirer.logger.error("sizeText: [" + value_text(0) + "]", e);
+                }
+            }
+
+        });
+
+        Function.create(m_conn, "connectedName", new Function() {
+            @Override
+            protected void xFunc() throws SQLException {
+                try {
+                    String sizeText = value_text(0);
+//                    inquirer.logger.info("sizeText: [" + value_text(0) + "]");
+                    Integer val = Integer.parseInt(sizeText);
+//                    inquirer.logger.info("parsed: [" + sizeL + "]");
+                    if (val != null && val.intValue() == 1) {
+                        result("connected");
+                    } else {
+                        result("disconnected");
+                    }
+                } catch (IllegalFormatException | NumberFormatException e) {
+                    result("");
+//            inquirer.ExceptionHandler.handleException(this.getClass().toString(), e);
+                    inquirer.logger.error("sizeText: [" + value_text(0) + "]", e);
+                }
+            }
+
+        });
+
+        Function.create(m_conn, "UTCtoDateTime", new Function() {
+            @Override
+            protected void xFunc() throws SQLException {
+                String fieldValue = value_text(0);
+                String dtFormat = value_text(1);
+//                    inquirer.logger.info("sizeText: [" + value_text(0) + "]");
+//                    inquirer.logger.info("parsed: [" + sizeL + "]");
+                result(inquirer.UTCtoDateTime(fieldValue, dtFormat));
+            }
+
+        });
+
+        Function.create(m_conn, "jduration", new Function() {
+            @Override
+            protected void xFunc() throws SQLException {
+                try {
+                    String sizeText = value_text(0);
+                    if (sizeText != null && !sizeText.isEmpty()) {
+//                    inquirer.logger.info("sizeText: [" + value_text(0) + "]");
+                        Long sizeL = Long.parseLong(sizeText);
+//                    inquirer.logger.info("parsed: [" + sizeL + "]");
+                        result(Utils.Util.pDuration(sizeL));
+                    } else {
+                        result("");
+                    }
+                } catch (IllegalFormatException | NumberFormatException e) {
+                    result("0");
+                    inquirer.logger.error("sizeText: [" + value_text(0) + "]", e);
+                }
+            }
+
+        });
+
+        Function.create(m_conn, "constToStr", new Function() {
+            @Override
+            protected void xFunc() throws SQLException {
+                try {
+                    if (args() != 2 || value_text(1) == null) {
+                        result((String) null);
+                        return;
+                    }
+
+                    String constName = value_text(0);
+                    int theConst = value_int(1);
+
+//                    inquirer.logger.info("constToStr: constName[" + constName + "] theConst[" + theConst + "] theConst[" + value_text(1) + "]");
+                    String ret = null;
+                    if (constName != null && !constName.isEmpty()) {
+                        String val = inquirer.getCr().lookupConst(constName.trim(), theConst);
+                        String key = (val == null) ? constName.trim() : val;
+
+                        ret = key + "(" + theConst + ")";
+//                        inquirer.logger.info("ret=" + ret);
+                    }
+                    if (ret == null) {
+                        result((String) null);
+                    }
+                    if (ret != null && !ret.isEmpty()) {
+                        result(ret);
+                    } else {
+                        result(theConst);
+                    }
+                } catch (IllegalFormatException | NumberFormatException e) {
+                    result("");
+                    inquirer.logger.error("sizeText: [" + value_text(0) + "]", e);
+                }
+            }
+
+        });
+
+//<editor-fold defaultstate="collapsed" desc="CampaignGroupDBIDtoName">
+        idsToName.addFun(CampaignGroupDBIDtoName, new ILoadFun() {
+            @Override
+            public String[] getNames(String id) throws SQLException {
+                int cgDBID = Integer.parseInt(id);
+                if (cgDBID > 0 && (DatabaseConnector.TableExist("ocscg_logbr"))) {
+                    Integer[] iDs = getIDs(
+                            "select distinct cgnameid "
+                                    + "from ocscg_logbr "
+                                    + getWhere("cgDBID",
+                                    new Integer[]{cgDBID}, true));
+
+                    String[] refNames = getRefNames(ReferenceType.OCSCG, iDs);
+                    if (refNames != null && refNames.length > 0) {
+                        return refNames;
+                    }
+                }
+                return null;
+            }
+        });
+
+        Function.create(m_conn, CampaignGroupDBIDtoName, new Function() {
+            @Override
+            protected void xFunc() throws SQLException {
+                try {
+                    if (args() != 1 || value_text(0) == null) {
+                        result((String) null);
+                        return;
+                    }
+                    String names = idsToName.getNames(CampaignGroupDBIDtoName, value_text(0));
+                    if (names != null) {
+                        result(names);
+                    } else {
+                        result((String) null);
+                    }
+
+                } catch (SQLException e) {
+                    result(value_text(0));
+                    inquirer.logger.error(CampaignGroupDBIDtoName + ": [" + value_text(0) + "]", e);
+                    throw new SQLException(e);
+                }
+            }
+
+        });
+//</editor-fold>
+
+//<editor-fold defaultstate="collapsed" desc="CampaignDBIDtoName">
+        idsToName.addFun(CampaignDBIDtoName, new ILoadFun() {
+            @Override
+            public String[] getNames(String id) throws SQLException {
+                int cgDBID = Integer.parseInt(id);
+                if (cgDBID > 0 && (DatabaseConnector.TableExist("ocscg_logbr"))) {
+                    Integer[] iDs = getIDs(
+                            "select distinct campaignNameID "
+                                    + "from ocscg_logbr "
+                                    + getWhere("CampaignDBID",
+                                    new Integer[]{cgDBID}, true));
+
+                    String[] refNames = getRefNames(ReferenceType.OCSCAMPAIGN, iDs);
+                    if (refNames != null && refNames.length > 0) {
+                        inquirer.logger.debug(CampaignDBIDtoName + ": return [" + QueryTools.getIDString(refNames) + "]");
+                        return refNames;
+                    }
+                }
+                return null;
+            }
+        });
+        Function.create(m_conn, CampaignDBIDtoName, new Function() {
+            @Override
+            protected void xFunc() throws SQLException {
+                try {
+                    if (args() != 1 || value_text(0) == null) {
+                        result((String) null);
+                        return;
+                    }
+                    String names = idsToName.getNames(CampaignDBIDtoName, value_text(0));
+                    if (names != null) {
+                        result(names);
+                    } else {
+                        result((String) null);
+                    }
+
+                } catch (SQLException e) {
+                    result(value_text(0));
+                    inquirer.logger.error(CampaignDBIDtoName + ": [" + value_text(0) + "]", e);
+                    throw new SQLException(e);
+                }
+            }
+
+        });
+//</editor-fold>
+
+//<editor-fold defaultstate="collapsed" desc="GroupDBIDtoName">
+        idsToName.addFun(GroupDBIDtoName, new ILoadFun() {
+            @Override
+            public String[] getNames(String id) throws SQLException {
+                int cgDBID = Integer.parseInt(id);
+                if (cgDBID > 0 && (DatabaseConnector.TableExist("ocscg_logbr"))) {
+                    Integer[] iDs = getIDs(
+                            "select distinct groupNameID "
+                                    + "from ocscg_logbr "
+                                    + getWhere("GroupDBID",
+                                    new Integer[]{cgDBID}, true));
+
+                    String[] refNames = getRefNames(ReferenceType.AgentGroup, iDs);
+                    if (refNames != null && refNames.length > 0) {
+                        return refNames;
+                    }
+                }
+                return null;
+            }
+        });
+        Function.create(m_conn, GroupDBIDtoName, new Function() {
+            @Override
+            protected void xFunc() throws SQLException {
+                try {
+                    if (args() != 1 || value_text(0) == null) {
+                        result((String) null);
+                        return;
+                    }
+                    String names = idsToName.getNames(GroupDBIDtoName, value_text(0));
+                    if (names != null) {
+                        result(names);
+                    } else {
+                        result((String) null);
+                    }
+
+                } catch (SQLException e) {
+                    result(value_text(0));
+                    inquirer.logger.error(GroupDBIDtoName + ": [" + value_text(0) + "]", e);
+                    throw new SQLException(e);
+                }
+            }
+
+        });
+//</editor-fold>
+
+//<editor-fold defaultstate="collapsed" desc="ListDBIDtoName">
+        idsToName.addFun(ListDBIDtoName, new ILoadFun() {
+            @Override
+            public String[] getNames(String id) throws SQLException {
+                int cgDBID = Integer.parseInt(id);
+                if (cgDBID > 0 && (DatabaseConnector.TableExist("ocsdb_logbr"))) {
+                    Integer[] iDs = getIDs(
+                            "select distinct listNameID "
+                                    + "from ocsdb_logbr "
+                                    + getWhere("listDBID",
+                                    new Integer[]{cgDBID}, true));
+
+                    String[] refNames = getRefNames(ReferenceType.OCSCallList, iDs);
+                    if (refNames != null && refNames.length > 0) {
+                        return refNames;
+                    }
+                }
+                return null;
+            }
+        });
+        Function.create(m_conn, ListDBIDtoName, new Function() {
+            @Override
+            protected void xFunc() throws SQLException {
+                try {
+                    if (args() != 1 || value_text(0) == null) {
+                        result((String) null);
+                        return;
+                    }
+                    String names = idsToName.getNames(ListDBIDtoName, value_text(0));
+                    if (names != null) {
+                        result(names);
+                    } else {
+                        result((String) null);
+                    }
+
+                } catch (SQLException e) {
+                    result(value_text(0));
+                    inquirer.logger.error(ListDBIDtoName + ": [" + value_text(0) + "]", e);
+                    throw new SQLException(e);
+                }
+            }
+
+        });
+//</editor-fold>
+
+        Function.create(m_conn, "REGEXP_group", new Function() {
+
+            @Override
+            protected void xFunc() throws SQLException {
+                String regex = value_text(0);
+                String compareString = value_text(1);
+                Integer grpIdx;
+                String grpIdxS;
+                if (compareString == null) {
+                    compareString = "";
+                }
+                try {
+                    grpIdxS = value_text(2);
+                    grpIdx = Integer.parseInt(grpIdxS);
+                    Pattern pattern = Pattern.compile(regex, Pattern.CASE_INSENSITIVE);
+                    Matcher matcher = pattern.matcher(compareString);
+//                    inquirer.logger.debug("regexp: [" + regex + "] compareString[" + compareString + "]+");
+                    if (matcher.find()) {
+//                        inquirer.logger.debug("ret: [" + matcher.group(grpIdx) + "]");
+                        result(matcher.group(grpIdx));
+                    } else {
+                        result("");
+                    }
+                } catch (NumberFormatException e) {
+                    result("");
+                }
+
+            }
+        });
+
+        Function.create(m_conn, "timediff", new Function() {
+
+            @Override
+            protected void xFunc() throws SQLException {
+                String diff = value_text(0);
+                if (diff == null) {
+                    diff = "";
+                }
+                try {
+                    long val = Long.parseLong(diff);
+                    result(pDuration(val));
+                } catch (NumberFormatException e) {
+                    result("");
+                }
+            }
+        });
+
+        Function.create(m_conn, "intToHex", new Function() {
+
+            @Override
+            protected void xFunc() throws SQLException {
+                long val = value_long(0);
+
+                if (val <= 0) {
+                    result("");
+                } else {
+                    result(Long.toHexString(val));
+                }
+
+            }
+        });
+
+        m_activeStatements = new HashMap();
+        m_freeStatements = new ArrayList();
+        m_statements = new ArrayList<>();
+    }
 
     static void dropTable(String tab) throws SQLException {
 //        if (TableExist(tab, true)) {
@@ -403,7 +802,7 @@ public class DatabaseConnector {
 
     public static String[] getRefNames(ReferenceType refTab, Integer[] ids) throws SQLException {
         return (TableExist(refTab.toString()) && (ids != null && ids.length > 0))
-                ? getNames("select distinct name from " + refTab.toString() + getWhere("id", ids, true))
+                ? getNames("select distinct name from " + refTab + getWhere("id", ids, true))
                 : null;
     }
 
@@ -418,7 +817,7 @@ public class DatabaseConnector {
 
     public static HashMap<Integer, String> getRefs(ReferenceType refTab) throws SQLException {
         return (TableExist(refTab.toString()))
-                ? getRefs("select id, name from " + refTab.toString())
+                ? getRefs("select id, name from " + refTab)
                 : null;
     }
 
@@ -978,410 +1377,6 @@ public class DatabaseConnector {
         }
 
         return ret;
-    }
-    private final String m_dbName;
-    private final String m_dbAlias;
-    private final Connection m_conn;
-    HashMap m_activeStatements;
-    ArrayList m_freeStatements;
-    ArrayList<PreparedStatement> m_statements;
-    private final HashMap<ReferenceType, HashMap<Integer, String>> thePersistentRef = new HashMap<>();
-    private final IDsToName idsToName;
-
-    protected DatabaseConnector(String dbName, String dbAlias) throws SQLException {
-        m_dbName = dbName;
-        m_dbAlias = dbAlias;
-
-        try {
-            Class.forName("org.sqlite.JDBC");
-        } catch (ClassNotFoundException ex) {
-            logger.error("fatal: ",  ex);
-            throw new SQLException(ex);
-        }
-        String name = dbName + ".db";
-        File f = new File(name);
-        Path p = f.toPath();
-        if (!Files.isRegularFile(p)) {
-//            Main.logger.info("DB [" + name + "] does exists; terminating");
-            throw new SQLException("No DB [" + p.toString() + "]");
-        }
-
-        idsToName = new IDsToName();
-
-        m_conn = DriverManager.getConnection("jdbc:sqlite:" + name);
-        Function.create(m_conn, "REGEXP", new Function() {
-            @Override
-            protected void xFunc() throws SQLException {
-                String regex = value_text(0);
-                String compareString = value_text(1);
-                if (compareString == null) {
-                    compareString = "";
-                }
-
-                Pattern pattern = Pattern.compile(regex, Pattern.CASE_INSENSITIVE);
-//                boolean name = pattern.matcher(compareString).find();
-//                inquirer.logger.info("REGEXP: reg [" + regex.toString() + "] comp: [" + compareString + "]; result: " + name);
-                result(pattern.matcher(compareString).find() ? 1 : 0);
-            }
-        });
-
-        Function.create(m_conn, "filesize", new Function() {
-            @Override
-            protected void xFunc() throws SQLException {
-                try {
-                    String sizeText = value_text(0);
-//                    inquirer.logger.info("sizeText: [" + value_text(0) + "]");
-                    Long sizeL = Long.parseLong(sizeText);
-//                    inquirer.logger.info("parsed: [" + sizeL + "]");
-                    result(Main.formatSize(sizeL));
-                } catch (IllegalFormatException | NumberFormatException e) {
-                    result("");
-//            inquirer.ExceptionHandler.handleException(this.getClass().toString(), e);
-                    inquirer.logger.error("sizeText: [" + value_text(0) + "]", e);
-                }
-            }
-
-        });
-
-        Function.create(m_conn, "connectedName", new Function() {
-            @Override
-            protected void xFunc() throws SQLException {
-                try {
-                    String sizeText = value_text(0);
-//                    inquirer.logger.info("sizeText: [" + value_text(0) + "]");
-                    Integer val = Integer.parseInt(sizeText);
-//                    inquirer.logger.info("parsed: [" + sizeL + "]");
-                    if (val != null && val.intValue() == 1) {
-                        result("connected");
-                    } else {
-                        result("disconnected");
-                    }
-                } catch (IllegalFormatException | NumberFormatException e) {
-                    result("");
-//            inquirer.ExceptionHandler.handleException(this.getClass().toString(), e);
-                    inquirer.logger.error("sizeText: [" + value_text(0) + "]", e);
-                }
-            }
-
-        });
-
-        Function.create(m_conn, "UTCtoDateTime", new Function() {
-            @Override
-            protected void xFunc() throws SQLException {
-                String fieldValue = value_text(0);
-                String dtFormat = value_text(1);
-//                    inquirer.logger.info("sizeText: [" + value_text(0) + "]");
-//                    inquirer.logger.info("parsed: [" + sizeL + "]");
-                result(inquirer.UTCtoDateTime(fieldValue, dtFormat));
-            }
-
-        });
-
-        Function.create(m_conn, "jduration", new Function() {
-            @Override
-            protected void xFunc() throws SQLException {
-                try {
-                    String sizeText = value_text(0);
-                    if (sizeText != null && !sizeText.isEmpty()) {
-//                    inquirer.logger.info("sizeText: [" + value_text(0) + "]");
-                        Long sizeL = Long.parseLong(sizeText);
-//                    inquirer.logger.info("parsed: [" + sizeL + "]");
-                        result(Utils.Util.pDuration(sizeL));
-                    } else {
-                        result("");
-                    }
-                } catch (IllegalFormatException | NumberFormatException e) {
-                    result("0");
-                    inquirer.logger.error("sizeText: [" + value_text(0) + "]", e);
-                }
-            }
-
-        });
-
-        Function.create(m_conn, "constToStr", new Function() {
-            @Override
-            protected void xFunc() throws SQLException {
-                try {
-                    if (args() != 2 || value_text(1) == null) {
-                        result((String) null);
-                        return;
-                    }
-
-                    String constName = value_text(0);
-                    int theConst = value_int(1);
-
-//                    inquirer.logger.info("constToStr: constName[" + constName + "] theConst[" + theConst + "] theConst[" + value_text(1) + "]");
-                    String ret = null;
-                    if (constName != null && !constName.isEmpty()) {
-                        String val = inquirer.getCr().lookupConst(constName.trim(), theConst);
-                        String key = (val == null) ? constName.trim() : val;
-
-                        ret = key + "(" + theConst + ")";
-//                        inquirer.logger.info("ret=" + ret);
-                    }
-                    if (ret == null) {
-                        result((String) null);
-                    }
-                    if (ret != null && !ret.isEmpty()) {
-                        result(ret);
-                    } else {
-                        result(theConst);
-                    }
-                } catch (IllegalFormatException | NumberFormatException e) {
-                    result("");
-                    inquirer.logger.error("sizeText: [" + value_text(0) + "]", e);
-                }
-            }
-
-        });
-
-//<editor-fold defaultstate="collapsed" desc="CampaignGroupDBIDtoName">
-        idsToName.addFun(CampaignGroupDBIDtoName, new ILoadFun() {
-            @Override
-            public String[] getNames(String id) throws SQLException {
-                int cgDBID = Integer.parseInt(id);
-                if (cgDBID > 0 && (DatabaseConnector.TableExist("ocscg_logbr"))) {
-                    Integer[] iDs = getIDs(
-                            "select distinct cgnameid "
-                            + "from ocscg_logbr "
-                            + getWhere("cgDBID",
-                                    new Integer[]{cgDBID}, true));
-
-                    String[] refNames = getRefNames(ReferenceType.OCSCG, iDs);
-                    if (refNames != null && refNames.length > 0) {
-                        return refNames;
-                    }
-                }
-                return null;
-            }
-        });
-
-        Function.create(m_conn, CampaignGroupDBIDtoName, new Function() {
-            @Override
-            protected void xFunc() throws SQLException {
-                try {
-                    if (args() != 1 || value_text(0) == null) {
-                        result((String) null);
-                        return;
-                    }
-                    String names = idsToName.getNames(CampaignGroupDBIDtoName, value_text(0));
-                    if (names != null) {
-                        result(names);
-                    } else {
-                        result((String) null);
-                    }
-
-                } catch (SQLException e) {
-                    result(value_text(0));
-                    inquirer.logger.error(CampaignGroupDBIDtoName + ": [" + value_text(0) + "]", e);
-                    throw new SQLException(e);
-                }
-            }
-
-        });
-//</editor-fold>
-
-//<editor-fold defaultstate="collapsed" desc="CampaignDBIDtoName">
-        idsToName.addFun(CampaignDBIDtoName, new ILoadFun() {
-            @Override
-            public String[] getNames(String id) throws SQLException {
-                int cgDBID = Integer.parseInt(id);
-                if (cgDBID > 0 && (DatabaseConnector.TableExist("ocscg_logbr"))) {
-                    Integer[] iDs = getIDs(
-                            "select distinct campaignNameID "
-                            + "from ocscg_logbr "
-                            + getWhere("CampaignDBID",
-                                    new Integer[]{cgDBID}, true));
-
-                    String[] refNames = getRefNames(ReferenceType.OCSCAMPAIGN, iDs);
-                    if (refNames != null && refNames.length > 0) {
-                        inquirer.logger.debug(CampaignDBIDtoName + ": return [" + QueryTools.getIDString(refNames) + "]");
-                        return refNames;
-                    }
-                }
-                return null;
-            }
-        });
-        Function.create(m_conn, CampaignDBIDtoName, new Function() {
-            @Override
-            protected void xFunc() throws SQLException {
-                try {
-                    if (args() != 1 || value_text(0) == null) {
-                        result((String) null);
-                        return;
-                    }
-                    String names = idsToName.getNames(CampaignDBIDtoName, value_text(0));
-                    if (names != null) {
-                        result(names);
-                    } else {
-                        result((String) null);
-                    }
-
-                } catch (SQLException e) {
-                    result(value_text(0));
-                    inquirer.logger.error(CampaignDBIDtoName + ": [" + value_text(0) + "]", e);
-                    throw new SQLException(e);
-                }
-            }
-
-        });
-//</editor-fold>
-
-//<editor-fold defaultstate="collapsed" desc="GroupDBIDtoName">
-        idsToName.addFun(GroupDBIDtoName, new ILoadFun() {
-            @Override
-            public String[] getNames(String id) throws SQLException {
-                int cgDBID = Integer.parseInt(id);
-                if (cgDBID > 0 && (DatabaseConnector.TableExist("ocscg_logbr"))) {
-                    Integer[] iDs = getIDs(
-                            "select distinct groupNameID "
-                            + "from ocscg_logbr "
-                            + getWhere("GroupDBID",
-                                    new Integer[]{cgDBID}, true));
-
-                    String[] refNames = getRefNames(ReferenceType.AgentGroup, iDs);
-                    if (refNames != null && refNames.length > 0) {
-                        return refNames;
-                    }
-                }
-                return null;
-            }
-        });
-        Function.create(m_conn, GroupDBIDtoName, new Function() {
-            @Override
-            protected void xFunc() throws SQLException {
-                try {
-                    if (args() != 1 || value_text(0) == null) {
-                        result((String) null);
-                        return;
-                    }
-                    String names = idsToName.getNames(GroupDBIDtoName, value_text(0));
-                    if (names != null) {
-                        result(names);
-                    } else {
-                        result((String) null);
-                    }
-
-                } catch (SQLException e) {
-                    result(value_text(0));
-                    inquirer.logger.error(GroupDBIDtoName + ": [" + value_text(0) + "]", e);
-                    throw new SQLException(e);
-                }
-            }
-
-        });
-//</editor-fold>
-
-//<editor-fold defaultstate="collapsed" desc="ListDBIDtoName">
-        idsToName.addFun(ListDBIDtoName, new ILoadFun() {
-            @Override
-            public String[] getNames(String id) throws SQLException {
-                int cgDBID = Integer.parseInt(id);
-                if (cgDBID > 0 && (DatabaseConnector.TableExist("ocsdb_logbr"))) {
-                    Integer[] iDs = getIDs(
-                            "select distinct listNameID "
-                            + "from ocsdb_logbr "
-                            + getWhere("listDBID",
-                                    new Integer[]{cgDBID}, true));
-
-                    String[] refNames = getRefNames(ReferenceType.OCSCallList, iDs);
-                    if (refNames != null && refNames.length > 0) {
-                        return refNames;
-                    }
-                }
-                return null;
-            }
-        });
-        Function.create(m_conn, ListDBIDtoName, new Function() {
-            @Override
-            protected void xFunc() throws SQLException {
-                try {
-                    if (args() != 1 || value_text(0) == null) {
-                        result((String) null);
-                        return;
-                    }
-                    String names = idsToName.getNames(ListDBIDtoName, value_text(0));
-                    if (names != null) {
-                        result(names);
-                    } else {
-                        result((String) null);
-                    }
-
-                } catch (SQLException e) {
-                    result(value_text(0));
-                    inquirer.logger.error(ListDBIDtoName + ": [" + value_text(0) + "]", e);
-                    throw new SQLException(e);
-                }
-            }
-
-        });
-//</editor-fold>
-
-        Function.create(m_conn, "REGEXP_group", new Function() {
-
-            @Override
-            protected void xFunc() throws SQLException {
-                String regex = value_text(0);
-                String compareString = value_text(1);
-                Integer grpIdx;
-                String grpIdxS;
-                if (compareString == null) {
-                    compareString = "";
-                }
-                try {
-                    grpIdxS = value_text(2);
-                    grpIdx = Integer.parseInt(grpIdxS);
-                    Pattern pattern = Pattern.compile(regex, Pattern.CASE_INSENSITIVE);
-                    Matcher matcher = pattern.matcher(compareString);
-//                    inquirer.logger.debug("regexp: [" + regex + "] compareString[" + compareString + "]+");
-                    if (matcher.find()) {
-//                        inquirer.logger.debug("ret: [" + matcher.group(grpIdx) + "]");
-                        result(matcher.group(grpIdx));
-                    } else {
-                        result("");
-                    }
-                } catch (NumberFormatException e) {
-                    result("");
-                }
-
-            }
-        });
-
-        Function.create(m_conn, "timediff", new Function() {
-
-            @Override
-            protected void xFunc() throws SQLException {
-                String diff = value_text(0);
-                if (diff == null) {
-                    diff = "";
-                }
-                try {
-                    long val = Long.parseLong(diff);
-                    result(pDuration(val));
-                } catch (NumberFormatException e) {
-                    result("");
-                }
-            }
-        });
-
-        Function.create(m_conn, "intToHex", new Function() {
-
-            @Override
-            protected void xFunc() throws SQLException {
-                long val = value_long(0);
-
-                if (val <= 0) {
-                    result("");
-                } else {
-                    result(Long.toHexString(val));
-                }
-
-            }
-        });
-
-        m_activeStatements = new HashMap();
-        m_freeStatements = new ArrayList();
-        m_statements = new ArrayList<>();
     }
 
     public String getAlias() {

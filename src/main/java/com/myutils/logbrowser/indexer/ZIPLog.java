@@ -5,6 +5,8 @@
  */
 package com.myutils.logbrowser.indexer;
 
+import org.apache.commons.io.IOUtils;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -12,20 +14,17 @@ import java.io.InputStream;
 import java.util.Enumeration;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
-import org.apache.commons.io.IOUtils;
 
 /**
- *
  * @author Stepan
  */
 public final class ZIPLog extends LogFileWrapper {
 
     private static final org.apache.logging.log4j.Logger logger = Main.logger;
-
-    private int filesProcessed;
-    private InputStream curStream = null;
     int filesToProcess = 0;
     ZipFile logArchive = null;
+    private int filesProcessed;
+    private InputStream curStream = null;
 
     public ZIPLog(File file) throws IOException {
         super(file);
@@ -78,7 +77,7 @@ public final class ZIPLog extends LogFileWrapper {
         try {
             curStream = IOUtils.buffer(logArchive.getInputStream(entry));
         } catch (IOException ex) {
-            logger.error("fatal: ",  ex);
+            logger.error("fatal: ", ex);
             return null;
         }
         return curStream;

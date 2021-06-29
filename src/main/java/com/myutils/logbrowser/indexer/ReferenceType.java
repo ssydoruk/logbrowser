@@ -6,7 +6,6 @@
 package com.myutils.logbrowser.indexer;
 
 /**
- *
  * @author ssydoruk
  */
 public enum ReferenceType {
@@ -119,7 +118,8 @@ public enum ReferenceType {
     MiscParam("MiscParam"),
     BayeuxChannel("BayeuxChannel"),
     BayeuxMessageType("BayeuxMessageType"),
-    AlarmState("AlarmState"),;
+    AlarmState("AlarmState"),
+    ;
 
     private final String name;
 

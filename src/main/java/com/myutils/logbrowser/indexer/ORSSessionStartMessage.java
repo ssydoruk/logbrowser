@@ -5,25 +5,25 @@
 package com.myutils.logbrowser.indexer;
 
 import Utils.Pair;
+
+import java.util.ArrayList;
+
 import static Utils.Util.intOrDef;
-import java.util.*;
 
 /**
- *
  * @author terry The class Replicates TLibMessage
  */
 public class ORSSessionStartMessage extends Message {
 
+    private final boolean isTServerReq = false;
+    private final boolean POSTParsed = false;
+    private final Pair<String, String> parseORSURI = null;
     String m_MessageName;
-
+    ArrayList<String> params = new ArrayList<>();
     private String m_refID;
     private String m_ThisDN;
-    private final boolean isTServerReq = false;
     private String clientIP;
-    private final boolean POSTParsed = false;
     private String newSessionID;
-    private final Pair<String, String> parseORSURI = null;
-    ArrayList<String> params = new ArrayList<>();
 
     ORSSessionStartMessage(ArrayList<String> m_MessageContents) {
         super(TableType.ORSSessionStart, m_MessageContents);

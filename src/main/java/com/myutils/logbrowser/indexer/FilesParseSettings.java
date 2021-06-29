@@ -12,7 +12,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- *
  * @author ssydoruk
  */
 public class FilesParseSettings {
@@ -20,7 +19,6 @@ public class FilesParseSettings {
     private final HashMap<String, FileParseSettings> fileSettings = new HashMap<>();
 
     /**
-     *
      * @param t
      * @return
      */
@@ -81,21 +79,26 @@ public class FilesParseSettings {
 
     static class FileParseCustomSearch {
 
+        private final HashMap<String, ArrayList<SearchComponent>> components = new HashMap<>();
         private boolean trimmed = false;
-        private Pattern pt;
+        private Matcher pt;
         private boolean handlerOnly = false;
         private boolean parseRest;
         private String name;
         private boolean ignoreCase;
         private String ptString;
         private String[] groups;
-        private final HashMap<String, ArrayList<SearchComponent>> components = new HashMap<>();
 
         public boolean isParseRest() {
             return parseRest;
         }
 
-        public Pattern getPt() {
+        void setParseRest(String attribute) {
+            this.parseRest = boolAttr(attribute, true);
+
+        }
+
+        public Matcher getPt() {
             return pt;
         }
 
@@ -103,9 +106,13 @@ public class FilesParseSettings {
             return ptString;
         }
 
+        public void setPtString(String ptString) {
+            this.ptString = ptString;
+        }
+
         public Matcher parseCustom(String str, int handlerID) {
             if (!handlerOnly || handlerID > 0) {
-                Matcher m = pt.matcher(str);
+                Matcher m = pt.reset(str);
 //            Main.logger.info("Checking ["+str+"] against ["+ptString+"]");
 
                 if (m != null && m.find()) {
@@ -114,10 +121,6 @@ public class FilesParseSettings {
                 }
             }
             return null;
-        }
-
-        public void setPtString(String ptString) {
-            this.ptString = ptString;
         }
 
         public boolean isTrimmed() {
@@ -213,7 +216,7 @@ public class FilesParseSettings {
          * method uses other parameters too
          */
         void compilePattern() {
-            pt = Pattern.compile(ptString);
+            pt = Pattern.compile(ptString).matcher("");
         }
 
         private void publishComponents(Matcher m) {
@@ -241,11 +244,6 @@ public class FilesParseSettings {
 
         void setHandlerOnly(String attribute) {
             this.handlerOnly = boolAttr(attribute, false);
-        }
-
-        void setParseRest(String attribute) {
-            this.parseRest = boolAttr(attribute, true);
-
         }
 
         class SearchComponent {

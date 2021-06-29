@@ -6,20 +6,20 @@ package com.myutils.logbrowser.inquirer;
 
 import com.myutils.logbrowser.indexer.FileInfoType;
 import com.myutils.logbrowser.indexer.ReferenceType;
+import org.apache.commons.lang3.StringUtils;
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
-import org.apache.commons.lang3.StringUtils;
 
 /**
- *
  * @author ssydoruk
  */
 public class SIPEPQuery extends IQuery {
 
+    private final HashMap sipRecords = new HashMap();
     private String[] orderBy;
     private String tabName;
-
     private Integer[] m_CallIds;
     private boolean m_useProxy = true;
     private ResultSet m_resultSet;
@@ -27,7 +27,6 @@ public class SIPEPQuery extends IQuery {
     private int recCnt;
     private DynamicTreeNode<OptionNode> node = null;
     private IDsFinder cidFinder;
-    private final HashMap sipRecords = new HashMap();
 
     public SIPEPQuery() throws SQLException {
         addRef("ToUriID", "ToUri", ReferenceType.SIPURI.toString(), FieldType.Optional);
@@ -174,7 +173,18 @@ public class SIPEPQuery extends IQuery {
         return addWheres.makeWhere(ret, "AND", true);
     }
 
-//    void setRegexSearch(boolean regex) {
+    private String getOrderBy() {
+        if (inquirer.getCr().isAddOrderBy() && orderBy.length > 0) {
+            String join = StringUtils.join(orderBy, ";");
+            return "ORDER BY " + StringUtils.join(orderBy, ";");
+//        ORDER BY sip.time;
+
+        } else {
+            return "";
+        }
+    }
+
+    //    void setRegexSearch(boolean regex) {
 //        this.regexSearch = regex;
 //    }
 //
@@ -193,17 +203,6 @@ public class SIPEPQuery extends IQuery {
 
         }
         this.orderBy = arr;
-    }
-
-    private String getOrderBy() {
-        if (inquirer.getCr().isAddOrderBy() && orderBy.length > 0) {
-            String join = StringUtils.join(orderBy, ";");
-            return "ORDER BY " + StringUtils.join(orderBy, ";");
-//        ORDER BY sip.time;
-
-        } else {
-            return "";
-        }
     }
 
 }

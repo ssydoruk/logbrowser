@@ -8,14 +8,13 @@ package com.myutils.logbrowser.inquirer;
 import java.util.ArrayList;
 
 /**
- *
  * @author ssydoruk
  */
 public abstract class IReportConfigItem {
 
+    private final ArrayList<IReportConfigItem> children = new ArrayList<>();
     private IReportConfigItem parent = null;
     private String name;
-    private final ArrayList<IReportConfigItem> children = new ArrayList<>();
 
     public IReportConfigItem(IReportConfigItem _parent, String name) {
         parent = _parent;

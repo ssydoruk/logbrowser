@@ -11,7 +11,10 @@ import com.github.lgooddatepicker.components.TimePickerSettings;
 import com.github.lgooddatepicker.optionalusertools.PickerUtilities;
 import com.myutils.logbrowser.inquirer.UTCTimeRange;
 import com.myutils.logbrowser.inquirer.inquirer;
-import java.awt.FlowLayout;
+import org.apache.logging.log4j.LogManager;
+
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.SQLException;
@@ -19,17 +22,66 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import org.apache.logging.log4j.LogManager;
 
 /**
- *
  * @author Stepan
  */
 public class TDateRange extends javax.swing.JPanel {
 
+    public static final ZoneId zoneId = ZoneId.systemDefault();
     private static final org.apache.logging.log4j.Logger logger = LogManager.getLogger();
+    private final DateTimePicker dtFrom;
+    private final DateTimePicker dtTo;
+    /**
+     * Creates new form TDateRange
+     */
+    JLabel jlFrom;
+    JLabel jlTo;
+    private IRefresh refreshCB = null;
+    private JButton refreshBt;
+    public TDateRange() {
+
+        initComponents();
+//        setLocationRelativeTo(null);
+        setLayout(new FlowLayout());
+
+        jlFrom = new JLabel("From");
+        add(jlFrom);
+        dtFrom = newPicker();
+        add(dtFrom);
+        jlTo = new JLabel("To");
+        add(jlTo);
+        dtTo = newPicker();
+        add(dtTo);
+
+        dtFrom.getTimePicker().getSettings().setDisplayToggleTimeMenuButton(true);
+        dtTo.getTimePicker().getSettings().setDisplayToggleTimeMenuButton(true);
+    }
+
+    public static long getUTCTime(DateTimePicker dtp, int adjustment) {
+        return getUtcTime(dtp.getDateTimePermissive(), zoneId, adjustment);
+    }
+
+    public static void setTimeRange(DateTimePicker dtp, long time) {
+        ZonedDateTime zoneDateTime = (Instant.ofEpochMilli(time)).atZone(zoneId);
+
+        dtp.setDateTimePermissive(zoneDateTime.toLocalDateTime());
+        DatePickerSettings dateSettings = dtp.getDatePicker().getSettings();
+//        dateSettings.setDateRangeLimits(zoneDateTime.toLocalDate(), zoneDateTime.toLocalDate());
+
+//            long toEpochDay = dtFrom.getDatePicker().getDate().atTime(LocalTime.MIN)
+//            inquirer.logger.info("getTimeRange toEpochDay " + toEpochDay);
+//            long toNanoOfDay = dtFrom.getTimePicker().getTime().toNanoOfDay();
+//            inquirer.logger.info("getTimeRange toNanoOfDay " + toEpochDay +"total: "+toEpochDay*1000000+toNanoOfDay);
+//            instantFrom = dtLocalFrom.toInstant(ZoneOffset.UTC);
+//            inquirer.logger.info("instant: "+instantFrom+" getTimeRange " + instantFrom.getEpochSecond() + " to " + instantFrom.getNano());
+    }
+
+    static private Long getUtcTime(LocalDateTime dateTime, ZoneId zoneId, int adjustment) {
+        inquirer.logger.debug("getUtcTime " + dateTime);
+        return (dateTime.toInstant(zoneId.getRules().getOffset(dateTime)).getEpochSecond() + adjustment) * 1000;
+
+    }
 
     @Override
     public void setEnabled(boolean enabled) {
@@ -40,13 +92,6 @@ public class TDateRange extends javax.swing.JPanel {
         jlFrom.setEnabled(enabled);
         jlTo.setEnabled(enabled);
     }
-
-    public interface IRefresh {
-
-        UTCTimeRange Refresh();
-    }
-
-    private IRefresh refreshCB = null;
 
     public IRefresh getRefreshCB() {
         return refreshCB;
@@ -68,36 +113,6 @@ public class TDateRange extends javax.swing.JPanel {
         });
 
     }
-
-    private JButton refreshBt;
-
-    /**
-     * Creates new form TDateRange
-     */
-    JLabel jlFrom;
-    JLabel jlTo;
-
-    public TDateRange() {
-
-        initComponents();
-//        setLocationRelativeTo(null);
-        setLayout(new FlowLayout());
-
-        jlFrom = new JLabel("From");
-        add(jlFrom);
-        dtFrom = newPicker();
-        add(dtFrom);
-        jlTo = new JLabel("To");
-        add(jlTo);
-        dtTo = newPicker();
-        add(dtTo);
-
-        dtFrom.getTimePicker().getSettings().setDisplayToggleTimeMenuButton(true);
-        dtTo.getTimePicker().getSettings().setDisplayToggleTimeMenuButton(true);
-    }
-
-    private final DateTimePicker dtFrom;
-    private final DateTimePicker dtTo;
 
     private DateTimePicker newPicker() {
         DateTimePicker dateTimePicker1 = new DateTimePicker();
@@ -123,12 +138,12 @@ public class TDateRange extends javax.swing.JPanel {
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 463, Short.MAX_VALUE)
+                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGap(0, 463, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 154, Short.MAX_VALUE)
+                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGap(0, 154, Short.MAX_VALUE)
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -142,26 +157,6 @@ public class TDateRange extends javax.swing.JPanel {
             return range;
         }
         return null;
-    }
-    public static final ZoneId zoneId = ZoneId.systemDefault();
-
-    public static long getUTCTime(DateTimePicker dtp, int adjustment) {
-        return getUtcTime(dtp.getDateTimePermissive(), zoneId, adjustment);
-    }
-
-    public static void setTimeRange(DateTimePicker dtp, long time) {
-        ZonedDateTime zoneDateTime = (Instant.ofEpochMilli(time)).atZone(zoneId);
-
-        dtp.setDateTimePermissive(zoneDateTime.toLocalDateTime());
-        DatePickerSettings dateSettings = dtp.getDatePicker().getSettings();
-//        dateSettings.setDateRangeLimits(zoneDateTime.toLocalDate(), zoneDateTime.toLocalDate());
-
-//            long toEpochDay = dtFrom.getDatePicker().getDate().atTime(LocalTime.MIN)
-//            inquirer.logger.info("getTimeRange toEpochDay " + toEpochDay);
-//            long toNanoOfDay = dtFrom.getTimePicker().getTime().toNanoOfDay();
-//            inquirer.logger.info("getTimeRange toNanoOfDay " + toEpochDay +"total: "+toEpochDay*1000000+toNanoOfDay);
-//            instantFrom = dtLocalFrom.toInstant(ZoneOffset.UTC);
-//            inquirer.logger.info("instant: "+instantFrom+" getTimeRange " + instantFrom.getEpochSecond() + " to " + instantFrom.getNano());
     }
 
     public void setTimeRange(UTCTimeRange timeRange) {
@@ -181,10 +176,9 @@ public class TDateRange extends javax.swing.JPanel {
         }
     }
 
-    static private Long getUtcTime(LocalDateTime dateTime, ZoneId zoneId, int adjustment) {
-        inquirer.logger.debug("getUtcTime " + dateTime);
-        return (dateTime.toInstant(zoneId.getRules().getOffset(dateTime)).getEpochSecond() + adjustment) * 1000;
+    public interface IRefresh {
 
+        UTCTimeRange Refresh();
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

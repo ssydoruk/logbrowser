@@ -7,13 +7,13 @@ package com.myutils.logbrowser.inquirer;
 
 import Utils.UTCTimeRange;
 import com.myutils.logbrowser.indexer.FileInfoType;
+
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
 /**
- *
  * @author ssydoruk
  */
 public class AggrTLibAllCalls extends IAggregateQuery {
@@ -50,7 +50,7 @@ public class AggrTLibAllCalls extends IAggregateQuery {
                 inquirer.logger.info("report on urs");
                 break;
             default:
-                throw new UnsupportedOperationException("Not supported yet file type - " + rt.toString()); //To change body of generated methods, choose Tools | Templates.
+                throw new UnsupportedOperationException("Not supported yet file type - " + rt); //To change body of generated methods, choose Tools | Templates.
         }
     }
 

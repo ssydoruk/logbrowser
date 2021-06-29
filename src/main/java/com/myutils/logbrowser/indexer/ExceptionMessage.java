@@ -4,7 +4,7 @@
  */
 package com.myutils.logbrowser.indexer;
 
-import java.util.*;
+import java.util.ArrayList;
 
 public class ExceptionMessage extends Message {
 

@@ -5,22 +5,37 @@
  */
 package com.myutils.logbrowser.indexer;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import org.apache.commons.lang3.StringUtils;
+import java.util.*;
 
 public abstract class URSRIBase extends Message {
 
     public static final int MAX_WEB_PARAMS = 5;
     private static final HashMap<String, Integer> keysPos = new HashMap<>(MAX_WEB_PARAMS);
+    private final List<Pair<String, String>> allParams;
+    protected String url;
+    private String ConnID;
+    private String clientApp;
+    private String clientID;
+    private String ORSSID;
+    private String func;
+    private String subFunc;
+    private String refid;
+    private String UUID = null;
+    private String uriParams;
+    public URSRIBase(TableType t, ArrayList messageLines) {
+        this(t);
+        setMessageLines(m_MessageLines);
+    }
+    URSRIBase(TableType t) {
+        super(t);
+        allParams = new ArrayList<>();
+    }
 
     static void addIndexes(DBTable tab) {
         for (int i = 1; i <= MAX_WEB_PARAMS; i++) {
@@ -80,28 +95,6 @@ public abstract class URSRIBase extends Message {
             return null;
         }
     }
-    private final List<Pair<String, String>> allParams;
-
-    private String ConnID;
-    private String clientApp;
-    private String clientID;
-    private String ORSSID;
-    private String func;
-    private String subFunc;
-    private String refid;
-    private String UUID = null;
-    private String uriParams;
-    protected String url;
-
-    public URSRIBase(TableType t, ArrayList messageLines) {
-        this(t);
-        setMessageLines(m_MessageLines);
-    }
-
-    URSRIBase(TableType t) {
-        super(t);
-        allParams = new ArrayList<>();
-    }
 
     public int getRefid() {
         return getIntOrDef(refid, -1);
@@ -159,12 +152,12 @@ public abstract class URSRIBase extends Message {
         this.ORSSID = ORSSID;
     }
 
-    void setUUID(String substring) {
-        this.UUID = substring;
-    }
-
     String getUUID() {
         return UUID;
+    }
+
+    void setUUID(String substring) {
+        this.UUID = substring;
     }
 
     public String getUrl() {

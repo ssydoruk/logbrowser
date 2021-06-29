@@ -4,31 +4,25 @@
  */
 package com.myutils.logbrowser.indexer;
 
-import static Utils.Util.pDuration;
+import org.apache.logging.log4j.Logger;
+
 import java.io.File;
 import java.nio.file.Path;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
-import org.apache.logging.log4j.Logger;
+
+import static Utils.Util.pDuration;
 
 /**
- *
  * @author ssydoruk
  */
 public final class SqliteAccessor extends Thread implements DBAccessor {
 
     private static final Logger logger = Main.logger;
     /**
-     *
      * @param dbname database file name
      * @param alias postfix for table names
      */
@@ -92,6 +86,12 @@ public final class SqliteAccessor extends Thread implements DBAccessor {
 
     public ArrayList<Long> getFilesToDelete() {
         return filesToDelete;
+    }
+
+    void setFilesToDelete(ArrayList<Long> filesToDelete) {
+        if (!filesToDelete.isEmpty()) {
+            this.filesToDelete = filesToDelete;
+        }
     }
 
     public String getM_alias() {
@@ -469,7 +469,7 @@ public final class SqliteAccessor extends Thread implements DBAccessor {
                 return iDs[0];
             }
         } catch (Exception ex) {
-            logger.error("fatal: ",  ex);
+            logger.error("fatal: ", ex);
         }
 
         return def;
@@ -481,12 +481,6 @@ public final class SqliteAccessor extends Thread implements DBAccessor {
         }
 
         return def;
-    }
-
-    void setFilesToDelete(ArrayList<Long> filesToDelete) {
-        if (!filesToDelete.isEmpty()) {
-            this.filesToDelete = filesToDelete;
-        }
     }
 
     public boolean TableExist(String tab) throws Exception {

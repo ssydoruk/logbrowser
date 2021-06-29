@@ -5,17 +5,17 @@
  */
 package com.myutils.logbrowser.inquirer;
 
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.IOUtils;
+
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
-import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.io.IOUtils;
 
 /**
- *
  * @author Stepan
  */
 public class ZIPFileReader extends RandomFileReader {
@@ -23,9 +23,8 @@ public class ZIPFileReader extends RandomFileReader {
     private final LogFile logFile;
     ZipFile logArchive;
     ZipEntry entry;
-    private BufferedInputStream curStream;
-
     long currentPos;
+    private BufferedInputStream curStream;
 
     public ZIPFileReader(LogFile fileName) throws IOException {
         this.logFile = fileName;

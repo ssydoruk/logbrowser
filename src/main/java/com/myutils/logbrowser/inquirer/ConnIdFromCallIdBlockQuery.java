@@ -6,8 +6,8 @@ import java.util.ArrayList;
 
 public class ConnIdFromCallIdBlockQuery {
 
-    private ResultSet m_resultSet;
     private final ArrayList<Integer> m_callIds;
+    private ResultSet m_resultSet;
     private DatabaseConnector m_connector;
     private int recCnt;
 

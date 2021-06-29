@@ -4,18 +4,17 @@
  */
 package com.myutils.logbrowser.indexer;
 
-import java.util.*;
+import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- *
  * @author ssydoruk
  */
 public class IsccMessage extends Message {
 
-    final private static Pattern regRefID = Pattern.compile("\\s*ISCCAttributeReferenceID\\s*(\\d+)");
-    final private static Pattern regSrcSwitch = Pattern.compile("(?:from|to)\\s+server\\s+([^\\@]+)\\@([^/:\\s]+)");
+    final private static Matcher regRefID = Pattern.compile("\\s*ISCCAttributeReferenceID\\s*(\\d+)").matcher("");
+    final private static Matcher regSrcSwitch = Pattern.compile("(?:from|to)\\s+server\\s+([^\\@]+)\\@([^/:\\s]+)").matcher("");
     String m_MessageName;
     private String sw = null;
     private String app = null;
@@ -83,7 +82,7 @@ public class IsccMessage extends Message {
 
     String GetOtherConnID() {
         return checkDifferent(GetConnID(), new String[]{getAttribute("ISCCAttributeLastTransferConnID"),
-            getAttribute("ISCCAttributeFirstTransferConnID")});
+                getAttribute("ISCCAttributeFirstTransferConnID")});
     }
 
     private String checkDifferent(String toCompare, String[] strings) {

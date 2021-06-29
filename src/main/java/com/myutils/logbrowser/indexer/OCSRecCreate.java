@@ -4,21 +4,20 @@
  */
 package com.myutils.logbrowser.indexer;
 
-import java.util.*;
+import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- *
  * @author terry The class Replicates TLibMessage
  */
 public class OCSRecCreate extends Message {
 
-    private static final Pattern regRecHandle = Pattern.compile("^\\s*RecordHandle = (\\d+)\\s+ChainID = (\\d+)\\s+ChainNum = (\\d+)");
-    private static final Pattern regCampaignName = Pattern.compile("^\\s*CampaignName = (.+)");
-    private static final Pattern regRecordType = Pattern.compile("^\\s*tRecordType = (\\d+)");
-    private static final Pattern regListTab = Pattern.compile("^\\s*ListName = (.+) TableName = (.+)");
-    private static final Pattern regPhone = Pattern.compile("^\\s*Phone = (.+)");
+    private static final Matcher regRecHandle = Pattern.compile("^\\s*RecordHandle = (\\d+)\\s+ChainID = (\\d+)\\s+ChainNum = (\\d+)").matcher("");
+    private static final Matcher regCampaignName = Pattern.compile("^\\s*CampaignName = (.+)").matcher("");
+    private static final Matcher regRecordType = Pattern.compile("^\\s*tRecordType = (\\d+)").matcher("");
+    private static final Matcher regListTab = Pattern.compile("^\\s*ListName = (.+) TableName = (.+)").matcher("");
+    private static final Matcher regPhone = Pattern.compile("^\\s*Phone = (.+)").matcher("");
 
     private int recHandle = -2;
     private int chanID = -2;

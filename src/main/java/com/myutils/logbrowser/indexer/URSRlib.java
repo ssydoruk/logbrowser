@@ -6,31 +6,32 @@
 package com.myutils.logbrowser.indexer;
 
 import Utils.Util;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 public final class URSRlib extends Message {
 
-    final private static Pattern regrefid = Pattern.compile("^\\srefid.+\\s(\\d+)");
+    final private static Matcher regrefid = Pattern.compile("^\\srefid.+\\s(\\d+)").matcher("");
 
-    final private static Pattern regModule = Pattern.compile("^\\sfm.+\\s('[^']+')");
+    final private static Matcher regModule = Pattern.compile("^\\sfm.+\\s('[^']+')").matcher("");
 
-    final private static Pattern regMethod = Pattern.compile("^\\sfunction.+\\s('[^']+')");
+    final private static Matcher regMethod = Pattern.compile("^\\sfunction.+\\s('[^']+')").matcher("");
 
-    final private static Pattern regErrorMsg = Pattern.compile("^\\s+errmsg.+\\s'([^']+)'");
-    final private static Pattern regErrorCode = Pattern.compile("^\\serror.+\\s(\\d+)");
+    final private static Matcher regErrorMsg = Pattern.compile("^\\s+errmsg.+\\s'([^']+)'").matcher("");
+    final private static Matcher regErrorCode = Pattern.compile("^\\serror.+\\s(\\d+)").matcher("");
 
-    final private static Pattern regCall = Pattern.compile("^\\scallid.+\\s'\\**([\\w~]+)'");
+    final private static Matcher regCall = Pattern.compile("^\\scallid.+\\s'\\**([\\w~]+)'").matcher("");
 
-    final private static Pattern regSid = Pattern.compile("^\\ssessionid.+\\s'\\**([\\w~]+)'");
-    final private static Pattern regSource = Pattern.compile("RLIB: (request to|received from) \\d+\\((\\w+)\\) message (\\w+)");
-    final private static Pattern prnResult = Pattern.compile("^\\s*result\\(1000000004\\)\\s+'(.+)'$");
-    final private static Pattern prnParam = Pattern.compile("^\\s*args\\(1000000003\\)\\s+'(.+)'$");
+    final private static Matcher regSid = Pattern.compile("^\\ssessionid.+\\s'\\**([\\w~]+)'").matcher("");
+    final private static Matcher regSource = Pattern.compile("RLIB: (request to|received from) \\d+\\((\\w+)\\) message (\\w+)").matcher("");
+    final private static Matcher prnResult = Pattern.compile("^\\s*result\\(1000000004\\)\\s+'(.+)'$").matcher("");
+    final private static Matcher prnParam = Pattern.compile("^\\s*args\\(1000000003\\)\\s+'(.+)'$").matcher("");
     private String CallID = null;
     private String sid = null;
     private String source;
@@ -43,7 +44,7 @@ public final class URSRlib extends Message {
     public URSRlib(ArrayList messageLines) {
         super(TableType.URSRlib, messageLines);
         Matcher m;
-        if (messageLines.size() > 0 && (m = regSource.matcher((String) messageLines.get(0))).find()) {
+        if (messageLines.size() > 0 && (m = regSource.reset((String) messageLines.get(0))).find()) {
             this.source = m.group(2);
             SetInbound(m.group(1).endsWith("m")); // from
             this.message = m.group(3);
@@ -91,7 +92,7 @@ public final class URSRlib extends Message {
                                 JSONObject obj = jsonOrDef(_jsonBody, "data");
                                 if (obj != null) {
                                     StringBuilder dataRest = new StringBuilder();
-                                    for (Iterator<String> iterator = obj.keys(); iterator.hasNext();) {
+                                    for (Iterator<String> iterator = obj.keys(); iterator.hasNext(); ) {
                                         String key = iterator.next();
                                         if (key.equals("requestid")) {
                                             reqID = obj.getInt("requestid");

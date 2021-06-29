@@ -5,23 +5,23 @@
 package com.myutils.logbrowser.inquirer;
 
 import com.myutils.logbrowser.indexer.ReferenceType;
-import static com.myutils.logbrowser.inquirer.IQueryResults.addUnique;
+
 import java.sql.SQLException;
 import java.util.HashSet;
 
+import static com.myutils.logbrowser.inquirer.IQueryResults.addUnique;
+
 /**
- *
  * @author ssydoruk
  */
 final public class IsccQuery extends IQuery {
 
+    HashSet<Long> tmpIDs;
     private Integer[] m_connectionIds;
     private DynamicTreeNode<OptionNode> node;
     private IDsFinder cif;
     private HashSet<Long> refIDs;
-
     private boolean noSearchRequest = true;
-    HashSet<Long> tmpIDs;
 
     public IsccQuery(Integer[] connectionIds) throws SQLException {
         this.noSearchRequest = true;
@@ -39,13 +39,13 @@ final public class IsccQuery extends IQuery {
     }
 
     IsccQuery(DynamicTreeNode<OptionNode> _eventsSettings, IDsFinder _cidFinder,
-            QueryDialog dlg, IQueryResults frm) throws SQLException {
+              QueryDialog dlg, IQueryResults frm) throws SQLException {
         this(_eventsSettings, dlg, frm);
         cif = _cidFinder;
     }
 
     IsccQuery(DynamicTreeNode<OptionNode> _eventsSettings, HashSet<Long> refIDs,
-            QueryDialog dlg, IQueryResults frm) throws SQLException {
+              QueryDialog dlg, IQueryResults frm) throws SQLException {
         this(_eventsSettings, dlg, frm);
         this.refIDs = refIDs;
     }

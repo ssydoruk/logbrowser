@@ -10,6 +10,7 @@ package com.myutils.logbrowser.indexer;
  * Copyright (c) 2006, Oracle and/or its affiliates. All rights reserved.
  * ORACLE PROPRIETARY/CONFIDENTIAL. Use is subject to license terms.
  */
+
 import java.io.*;
 
 /**
@@ -31,7 +32,7 @@ import java.io.*;
  * BufferedReader in
  *   = new BufferedReader(new FileReader("foo.in"));
  * </pre>
- *
+ * <p>
  * will buffer the input from the specified file. Without buffering, each
  * invocation of read() or readLine() could cause bytes to be read from the
  * file, converted into characters, and then returned, which can be very
@@ -41,12 +42,11 @@ import java.io.*;
  * Programs that use DataInputStreams for textual input can be localized by
  * replacing each DataInputStream with an appropriate BufferedReader.
  *
+ * @version %I%, %E%
+ * @author Mark Reinhold
+ * @since JDK1.1
  * @see FileReader
  * @see InputStreamReader
- *
- * @version %I%, %E%
- * @author	Mark Reinhold
- * @since	JDK1.1
  */
 public class BufferedReaderCrLf {
 
@@ -54,13 +54,10 @@ public class BufferedReaderCrLf {
     private static final int INVALIDATED = -2;
     private static final int UNMARKED = -1;
     private static final int defaultCharBufferSize = 8_192;
+    public int charsSkippedOnReadLine;
     private InputStream in;
-
     private byte[] cb;
     private int nChars, nextChar;
-
-    public int charsSkippedOnReadLine;
-
     private int markedChar = UNMARKED;
     private int readAheadLimit = 0;
     /* Valid only when markedChar > 0 */
@@ -84,8 +81,7 @@ public class BufferedReaderCrLf {
      *
      * @param in A Reader
      * @param sz Input-buffer size
-     *
-     * @exception IllegalArgumentException If sz is <= 0
+     * @throws IllegalArgumentException If sz is <= 0
      */
     public BufferedReaderCrLf(InputStream in, int sz) {
 //	super(in);
@@ -165,12 +161,12 @@ public class BufferedReaderCrLf {
      *
      * @return The character read, as an integer in the range 0 to 65535
      * (<tt>0x00-0xffff</tt>), or -1 if the end of the stream has been reached
-     * @exception IOException If an I/O error occurs
+     * @throws IOException If an I/O error occurs
      */
     public int read() throws IOException {
         synchronized (lock) {
             ensureOpen();
-            for (;;) {
+            for (; ; ) {
                 if (nextChar >= nChars) {
                     fill();
                     if (nextChar >= nChars) {
@@ -274,13 +270,11 @@ public class BufferedReaderCrLf {
      * <code>BufferedReader</code>s will not copy data unnecessarily.
      *
      * @param cbuf Destination buffer
-     * @param off Offset at which to start storing characters
-     * @param len Maximum number of characters to read
-     *
+     * @param off  Offset at which to start storing characters
+     * @param len  Maximum number of characters to read
      * @return The number of characters read, or -1 if the end of the stream has
      * been reached
-     *
-     * @exception IOException If an I/O error occurs
+     * @throws IOException If an I/O error occurs
      */
     public int read(byte[] cbuf, int off, int len) throws IOException {
         synchronized (lock) {
@@ -313,14 +307,11 @@ public class BufferedReaderCrLf {
      * followed immediately by a linefeed.
      *
      * @param ignoreLF If true, the next '\n' will be skipped
-     *
      * @return A String containing the contents of the line, not including any
      * line-termination characters, or null if the end of the stream has been
      * reached
-     *
+     * @throws IOException If an I/O error occurs
      * @see java.io.LineNumberReader#readLine()
-     *
-     * @exception IOException If an I/O error occurs
      */
     String readLine(boolean ignoreLF) throws IOException {
         BArray s = null;
@@ -334,7 +325,7 @@ public class BufferedReaderCrLf {
             boolean omitLF = ignoreLF || skipLF;
 
             bufferLoop:
-            for (;;) {
+            for (; ; ) {
 
                 if (nextChar >= nChars) {
                     fill();
@@ -421,7 +412,7 @@ public class BufferedReaderCrLf {
             ensureOpen();
 
             bufferLoop:
-            for (;;) {
+            for (; ; ) {
 
                 if (nextChar >= nChars) {
                     fill();
@@ -432,7 +423,7 @@ public class BufferedReaderCrLf {
                         lastBytesConsumed = s.getPos();
 //                        System.out.println("Warn: lastBytesConsumed out of string");
 
-                        Main.logger.trace("return bytes:\n" + s.toString());
+                        Main.logger.trace("return bytes:\n" + s);
                         return s.toString();
                     } else {
                         Main.logger.trace("return null");
@@ -495,8 +486,7 @@ public class BufferedReaderCrLf {
      * @return A String containing the contents of the line, not including any
      * line-termination characters, or null if the end of the stream has been
      * reached
-     *
-     * @exception IOException If an I/O error occurs
+     * @throws IOException If an I/O error occurs
      */
     public String readLine() throws IOException {
         return readLine(false);
@@ -506,11 +496,9 @@ public class BufferedReaderCrLf {
      * Skips characters.
      *
      * @param n The number of characters to skip
-     *
      * @return The number of characters actually skipped
-     *
-     * @exception IllegalArgumentException If <code>n</code> is negative.
-     * @exception IOException If an I/O error occurs
+     * @throws IllegalArgumentException If <code>n</code> is negative.
+     * @throws IOException              If an I/O error occurs
      */
     public long skip(long n) throws IOException {
         if (n < 0L) {
@@ -554,19 +542,19 @@ public class BufferedReaderCrLf {
      * stream is ready.
      *
      * @return
-     * @exception IOException If an I/O error occurs
+     * @throws IOException If an I/O error occurs
      */
     public boolean ready() throws IOException {
         synchronized (lock) {
             ensureOpen();
 
             /*
-	     * If newline needs to be skipped and the next char to be read
-	     * is a newline character, then just skip it right away.
+             * If newline needs to be skipped and the next char to be read
+             * is a newline character, then just skip it right away.
              */
             if (skipLF) {
                 /* Note that in.ready() will return true if and only if the next
-		 * read on the stream will not block.
+                 * read on the stream will not block.
                  */
                 if (nextChar >= nChars /*&& in.ready()*/) {
                     fill();
@@ -597,14 +585,13 @@ public class BufferedReaderCrLf {
      * will attempt to reposition the stream to this point.
      *
      * @param readAheadLimit Limit on the number of characters that may be read
-     * while still preserving the mark. An attempt to reset the stream after
-     * reading characters up to this limit or beyond may fail. A limit value
-     * larger than the size of the input buffer will cause a new buffer to be
-     * allocated whose size is no smaller than limit. Therefore large values
-     * should be used with care.
-     *
-     * @exception IllegalArgumentException If readAheadLimit is < 0
-     * @exception IOException If an I/O error occurs
+     *                       while still preserving the mark. An attempt to reset the stream after
+     *                       reading characters up to this limit or beyond may fail. A limit value
+     *                       larger than the size of the input buffer will cause a new buffer to be
+     *                       allocated whose size is no smaller than limit. Therefore large values
+     *                       should be used with care.
+     * @throws IllegalArgumentException If readAheadLimit is < 0
+     * @throws IOException              If an I/O error occurs
      */
     public void mark(int readAheadLimit) throws IOException {
         if (readAheadLimit < 0) {
@@ -621,8 +608,8 @@ public class BufferedReaderCrLf {
     /**
      * Resets the stream to the most recent mark.
      *
-     * @exception IOException If the stream has never been marked, or if the
-     * mark has been invalidated
+     * @throws IOException If the stream has never been marked, or if the
+     *                     mark has been invalidated
      */
     public void reset() throws IOException {
         synchronized (lock) {

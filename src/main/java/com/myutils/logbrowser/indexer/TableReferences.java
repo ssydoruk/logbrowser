@@ -5,28 +5,26 @@
  */
 package com.myutils.logbrowser.indexer;
 
-import static com.myutils.logbrowser.indexer.Main.getSQLiteaccessor;
+import org.apache.commons.lang3.StringUtils;
+
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import org.apache.commons.lang3.StringUtils;
+
+import static com.myutils.logbrowser.indexer.Main.getSQLiteaccessor;
 
 /**
- *
  * @author ssydoruk
  */
 class TableReference {
 
     private static final org.apache.logging.log4j.Logger logger = Main.logger;
-
-    private int initialID = 0;
-
     private final ReferenceType type;
     private final HashMap<CIString, Integer> valRef;
-
+    private int initialID = 0;
     private int maxID;
 
     TableReference(ReferenceType type) {
@@ -37,8 +35,8 @@ class TableReference {
             SqliteAccessor dbAccessor = getSQLiteaccessor();
             try {
                 if (dbAccessor.TableExist(type.toString())) {
-                    ResultSet rs = dbAccessor.executeQuery("select name, id from " + type.toString());
-                    Main.logger.trace("Reading references from " + type.toString());
+                    ResultSet rs = dbAccessor.executeQuery("select name, id from " + type);
+                    Main.logger.trace("Reading references from " + type);
 
 //                    ResultSetMetaData rsmd = rs.getMetaData();
                     int cnt = 0;
@@ -60,7 +58,7 @@ class TableReference {
                     this.initialID = maxID;
                 }
             } catch (Exception ex) {
-                logger.error("fatal: ",  ex);
+                logger.error("fatal: ", ex);
             }
         }
     }
@@ -143,14 +141,14 @@ class TableReference {
 
 //                m_accessor.Commit();
                 m_accessor.ResetAutoCommit(true);
-                String idxID = type.toString() + "_id";
-                String idxName = type.toString() + "_name";
+                String idxID = type + "_id";
+                String idxName = type + "_name";
                 m_accessor.runQuery("DROP INDEX IF EXISTS " + idxID + " ;");
                 m_accessor.runQuery("DROP INDEX IF EXISTS " + idxName + " ;");
 
                 m_accessor.runQuery(query);
                 m_accessor.ResetAutoCommit(false);
-                int m_InsertStatementId = m_accessor.PrepareStatement("INSERT INTO " + type.toString() + " VALUES(?,?);");
+                int m_InsertStatementId = m_accessor.PrepareStatement("INSERT INTO " + type + " VALUES(?,?);");
 //            Main.logger.error("Ref ["+type.toString()+"]: "+valRef.size()+" recs");
                 PreparedStatement stmt = m_accessor.GetStatement(m_InsertStatementId);
 
@@ -191,16 +189,16 @@ class TableReference {
                 m_accessor.ResetAutoCommit(true);
 
 //                if (type != ReferenceType.HANDLER) {
-                m_accessor.runQuery("create unique index if not exists " + type.toString() + "_id on " + type.toString() + " (id);");
-                m_accessor.runQuery("create unique index if not exists " + type.toString() + "_name on " + type.toString() + " (name collate nocase);");
+                m_accessor.runQuery("create unique index if not exists " + type + "_id on " + type + " (id);");
+                m_accessor.runQuery("create unique index if not exists " + type + "_name on " + type + " (name collate nocase);");
 //                } else {
 //                    Main.logger.info("No indexes for " + type.toString());
 //                }
-                Main.logger.info("Finalized ref table " + type.toString() + "; added " + i + " recs (total " + iTotalRecs + " recs)");
+                Main.logger.info("Finalized ref table " + type + "; added " + i + " recs (total " + iTotalRecs + " recs)");
 //            m_accessor.Commit(stmt);
             }
         } catch (SQLException sQLException) {
-            Main.logger.error("Not able to finalize " + type.toString(), sQLException);
+            Main.logger.error("Not able to finalize " + type, sQLException);
             for (Map.Entry<CIString, Integer> entry : valRef.entrySet()) {
                 Main.logger.info("[" + entry.getKey() + "]->[" + entry.getValue() + "]");
             }
@@ -254,8 +252,8 @@ class TableReference {
 public class TableReferences {
 
     private final HashMap<ReferenceType, TableReference> tabRefs;
-    SqliteAccessor m_accessor;
     private final HashSet<ReferenceType> doNotSave;
+    SqliteAccessor m_accessor;
 
     TableReferences(SqliteAccessor m_accessor) {
         tabRefs = new HashMap();

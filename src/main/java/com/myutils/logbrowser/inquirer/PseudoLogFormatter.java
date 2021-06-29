@@ -10,16 +10,15 @@ import java.util.regex.Pattern;
 
 public class PseudoLogFormatter implements ILogRecordFormatter {
 
+    private final String m_markText = "***\n";
+    private final boolean m_navigate;
+    private final HashSet<String> m_components;
     protected String m_outputFileName;
     protected FileWriter m_fileWriter;
-
     private int m_lineCount;
-    private final String m_markText = "***\n";
     private int m_markedLine;
     private int m_actualLogMarkLine;
     private String m_actualLogFileName;
-    private final boolean m_navigate;
-    private final HashSet<String> m_components;
 
     public PseudoLogFormatter(String fileName, boolean navigate, HashSet<String> components) throws Exception {
         m_lineCount = 0;

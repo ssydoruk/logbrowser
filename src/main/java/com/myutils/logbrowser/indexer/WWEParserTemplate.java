@@ -18,17 +18,12 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- *
  * @author ssydoruk
  */
 public class WWEParserTemplate extends WebParser {
 
-    private static final Pattern regMsgStart = Pattern.compile("Handling update message:$");
-
-    private ParserState m_ParserState;
-
+    private static final Matcher regMsgStart = Pattern.compile("Handling update message:$").matcher("");
     private final HashMap<String, ParserState> threadParserState = new HashMap<>();
-
     /*	public OrsParser(DBAccessor accessor) {
      m_accessor = accessor;
      }
@@ -42,6 +37,7 @@ public class WWEParserTemplate extends WebParser {
      }
      */
     private final HashMap<String, String> ThreadAlias = new HashMap<>();
+    private ParserState m_ParserState;
     private String URL = null;
     private String app = null;
     private String m_msg1;
@@ -166,7 +162,7 @@ public class WWEParserTemplate extends WebParser {
                 }
 //                getThread(getDP());
 
-                if ((m = regMsgStart.matcher(s)).find()) {
+                if ((m = regMsgStart.reset(s)).find()) {
                     m_ParserState = ParserState.STATE_TMESSAGE_EVENT;
                     setSavedFilePos(getFilePos());
                     break;
@@ -207,7 +203,7 @@ public class WWEParserTemplate extends WebParser {
         STATE_READ_INFO,
     }
 
-//<editor-fold defaultstate="collapsed" desc="WWEDebugMsg">
+    //<editor-fold defaultstate="collapsed" desc="WWEDebugMsg">
     private class WWEDebugMsg extends Message {
 
         private String ip;
@@ -255,6 +251,10 @@ public class WWEParserTemplate extends WebParser {
 
         public String getParam2() {
             return param2;
+        }
+
+        public void setParam2(String param2) {
+            this.param2 = param2;
         }
 
         /**
@@ -321,16 +321,16 @@ public class WWEParserTemplate extends WebParser {
             return httpCode;
         }
 
+        private void setHttpCode(String s) {
+            httpCode = s;
+        }
+
         public String getMethod() {
             return method;
         }
 
         private void setMethod(String s) {
             method = s;
-        }
-
-        private void setHttpCode(String s) {
-            httpCode = s;
         }
 
         private void setDate(String s) {
@@ -363,6 +363,16 @@ public class WWEParserTemplate extends WebParser {
             return userName;
         }
 
+        private void setUserName(String get) {
+            if (userName != null && !userName.isEmpty()) {
+                setParam1(get);
+            } else {
+                checkDiffer(this.userName, get, "userName", m_CurrentLine);
+                this.userName = get;
+            }
+
+        }
+
         private void setUserKey(String s) {
 
             key = s;
@@ -385,39 +395,6 @@ public class WWEParserTemplate extends WebParser {
             }
         }
 
-        private void setUserName(String get) {
-            if (userName != null && !userName.isEmpty()) {
-                setParam1(get);
-            } else {
-                checkDiffer(this.userName, get, "userName", m_CurrentLine);
-                this.userName = get;
-            }
-
-        }
-
-        private void setLevel(String group) {
-            this.level = group;
-
-        }
-
-        private void setClassName(String group) {
-            this.className = group;
-
-        }
-
-        public void setMsgText(String msgText) {
-            this.msgText = msgText;
-        }
-
-        public void setParam1(String param1) {
-            checkDiffer(this.param1, param1, "param1", m_CurrentLine);
-
-        }
-
-        public void setParam2(String param2) {
-            this.param2 = param2;
-        }
-
         private void setMessageText(String group) {
             this.msgText = group;
         }
@@ -426,12 +403,26 @@ public class WWEParserTemplate extends WebParser {
             return level;
         }
 
+        private void setLevel(String group) {
+            this.level = group;
+
+        }
+
         public String getClassName() {
             return className;
         }
 
+        private void setClassName(String group) {
+            this.className = group;
+
+        }
+
         public String getMsgText() {
             return msgText;
+        }
+
+        public void setMsgText(String msgText) {
+            this.msgText = msgText;
         }
 
         private void setURIParam(String group) {
@@ -442,13 +433,18 @@ public class WWEParserTemplate extends WebParser {
             return param1;
         }
 
-        private void setUserID(String key) {
-            checkDiffer(this.userID, key, "userID", m_CurrentLine);
-            this.userID = key;
+        public void setParam1(String param1) {
+            checkDiffer(this.param1, param1, "param1", m_CurrentLine);
+
         }
 
         public String getUserID() {
             return userID;
+        }
+
+        private void setUserID(String key) {
+            checkDiffer(this.userID, key, "userID", m_CurrentLine);
+            this.userID = key;
         }
 
         private void setClientID(String key) {
@@ -459,14 +455,14 @@ public class WWEParserTemplate extends WebParser {
             return browserClient;
         }
 
+        public String getSessionID() {
+            return sessionID;
+        }
+
         private void setSessionID(String key) {
             checkDiffer(this.sessionID, key, "sessionID", m_CurrentLine);
 
             this.sessionID = key;
-        }
-
-        public String getSessionID() {
-            return sessionID;
         }
 
     }
@@ -548,7 +544,6 @@ public class WWEParserTemplate extends WebParser {
         }
 
         /**
-         *
          * @throws Exception
          */
         @Override

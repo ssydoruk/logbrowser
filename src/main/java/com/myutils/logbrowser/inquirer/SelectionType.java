@@ -5,7 +5,6 @@
 package com.myutils.logbrowser.inquirer;
 
 /**
- *
  * @author ssydoruk
  */
 public enum SelectionType {

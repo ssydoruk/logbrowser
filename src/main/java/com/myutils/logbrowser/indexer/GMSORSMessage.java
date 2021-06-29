@@ -5,12 +5,13 @@
 package com.myutils.logbrowser.indexer;
 
 import Utils.Pair;
-import java.util.*;
+
+import java.util.ArrayList;
 
 public class GMSORSMessage extends Message {
 
-    private String theThreadID;
     Pair<String, String> parseORSURI = null;
+    private String theThreadID;
     private String connID = null;
     private String gmsSessionID = null;
     private boolean isException = false;
@@ -61,35 +62,16 @@ public class GMSORSMessage extends Message {
         return ret;
     }
 
+    void setGMSSessionID(String gmsSessionID) {
+        this.gmsSessionID = gmsSessionID;
+    }
+
     String getORSSessionID() {
         if (parseORSURI != null) {
             return parseORSURI.getKey();
         } else {
             return getGMSAttributeString("ors_session_id");
         }
-    }
-
-    String getConnID() {
-        return (connID != null) ? connID : getGMSAttributeString("connid");
-    }
-
-    String getORSReq() {
-        if (req != null) {
-            return req;
-        }
-        if (isException) {
-            return (m_MessageLines.size() >= 2) ? m_MessageLines.get(1) : "[non-identified java exception]";
-        } else {
-            return (parseORSURI != null) ? parseORSURI.getValue() : null;
-        }
-    }
-
-    void setGMSSessionID(String gmsSessionID) {
-        this.gmsSessionID = gmsSessionID;
-    }
-
-    void setConnID(String connIDID) {
-        this.connID = connIDID;
     }
 
     void setORSSessionID(String orsSessionID) {
@@ -103,6 +85,25 @@ public class GMSORSMessage extends Message {
 //         else {
 //            Main.logger.error("parseORSURI not null");
 //        }
+    }
+
+    String getConnID() {
+        return (connID != null) ? connID : getGMSAttributeString("connid");
+    }
+
+    void setConnID(String connIDID) {
+        this.connID = connIDID;
+    }
+
+    String getORSReq() {
+        if (req != null) {
+            return req;
+        }
+        if (isException) {
+            return (m_MessageLines.size() >= 2) ? m_MessageLines.get(1) : "[non-identified java exception]";
+        } else {
+            return (parseORSURI != null) ? parseORSURI.getValue() : null;
+        }
     }
 
     void setException() {

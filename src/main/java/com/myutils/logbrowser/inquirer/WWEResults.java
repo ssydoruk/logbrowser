@@ -6,25 +6,26 @@ import com.myutils.logbrowser.indexer.FileInfoType;
 import com.myutils.logbrowser.indexer.ReferenceType;
 import com.myutils.logbrowser.indexer.TableType;
 import com.myutils.logbrowser.inquirer.IQuery.FieldType;
+import org.apache.logging.log4j.LogManager;
+
+import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.JOptionPane;
+
 import static org.apache.commons.lang3.ArrayUtils.isEmpty;
-import org.apache.logging.log4j.LogManager;
 
 public class WWEResults extends IQueryResults {
 
     private static final org.apache.logging.log4j.Logger logger = LogManager.getLogger();
     private static final String[] RequestsToShow = {"RequestMakePredictiveCall", "RequestMakeCall"};
     private static final String[] EventsToShow = {"EventDialing", "EventNetworkReached"};
-
-    private Object cidFinder;
-    ArrayList<NameID> appsType = null;
     private final UTCTimeRange timeRange = null;
+    ArrayList<NameID> appsType = null;
+    private Object cidFinder;
 
     /**
      *
@@ -274,7 +275,7 @@ public class WWEResults extends IQueryResults {
         try {
             addCustom(rootA, FileInfoType.type_ApacheWeb);
         } catch (SQLException ex) {
-            logger.error("fatal: ",  ex);
+            logger.error("fatal: ", ex);
         }
 
         nd = new DynamicTreeNode<>(new OptionNode(false, DialogItem.WWEEXCEPTIONS));
@@ -284,7 +285,7 @@ public class WWEResults extends IQueryResults {
         try {
             addCustom(rootA, FileInfoType.type_WWE);
         } catch (SQLException ex) {
-            logger.error("fatal: ",  ex);
+            logger.error("fatal: ", ex);
         }
         rootA.addLogMessagesReportType(TableType.MsgWWE);
         DoneSTDOptions();
@@ -323,7 +324,7 @@ public class WWEResults extends IQueryResults {
         doSort();
     }
 
-//    private void retrieveSIP
+    //    private void retrieveSIP
     private void doRetrieve(QueryDialog dlg, SelectionType selectionType, String selection, boolean isRegex) throws Exception {
         ILogRecord record = null;
         IDsFinder cidFinder = null;
@@ -571,7 +572,7 @@ public class WWEResults extends IQueryResults {
             try {
                 return cidFinder.AnythingTLibRelated();
             } catch (SQLException ex) {
-                logger.error("fatal: ",  ex);
+                logger.error("fatal: ", ex);
             }
         }
         return true;

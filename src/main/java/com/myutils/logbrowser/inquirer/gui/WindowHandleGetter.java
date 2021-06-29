@@ -6,14 +6,14 @@
 package com.myutils.logbrowser.inquirer.gui;
 
 import com.myutils.logbrowser.inquirer.inquirer;
-import java.awt.Frame;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.awt.*;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+
 /**
- *
  * @author ssydoruk
  */
 public class WindowHandleGetter {

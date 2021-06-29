@@ -7,7 +7,6 @@ package com.myutils.logbrowser.indexer;
 //import org.jdom.xpath.XPath;
 
 /**
- *
  * @author ssydoruk
  */
 

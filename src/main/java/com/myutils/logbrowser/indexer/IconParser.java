@@ -1,6 +1,6 @@
 /*
  * To change this template, choose Tools | Templates
- * and open the template in the editor. 
+ * and open the template in the editor.
  */
 package com.myutils.logbrowser.indexer;
 
@@ -9,16 +9,14 @@ import java.util.HashMap;
 
 public class IconParser extends Parser {
 
-    long m_CurrentFilePos;
-
     final int MSG_STRING_LIMIT = 200;
     // parse state contants
     final int STATE_COMMENTS = 0;
     final int STATE_TLIB_MESSAGE_IN = 5;
     /* T-Lib message as T-Server writes it */
     final int STATE_TLIB_MESSAGE_OUT = 6;
+    long m_CurrentFilePos;
     /* T-Lib message as T-Server writes it */
-
     long m_HeaderOffset;
     int m_ParserState;
     String m_Header;

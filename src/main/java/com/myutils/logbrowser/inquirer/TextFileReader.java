@@ -5,14 +5,14 @@
  */
 package com.myutils.logbrowser.inquirer;
 
+import org.apache.logging.log4j.LogManager;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import org.apache.logging.log4j.LogManager;
 
 /**
- *
  * @author Stepan
  */
 public class TextFileReader extends RandomFileReader {
@@ -64,7 +64,7 @@ public class TextFileReader extends RandomFileReader {
             reader.close();
 
         } catch (IOException ex) {
-            logger.error("fatal: ",  ex);
+            logger.error("fatal: ", ex);
         }
 
     }

@@ -9,10 +9,9 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 
 /**
- *
  * @author ssydoruk
- *
- *
+ * <p>
+ * <p>
  * Make Refactor/Copy of this class for new table type
  */
 public class OrsHTTPTable extends DBTable {
@@ -79,7 +78,6 @@ public class OrsHTTPTable extends DBTable {
     }
 
     /**
-     *
      * @throws Exception
      */
     @Override

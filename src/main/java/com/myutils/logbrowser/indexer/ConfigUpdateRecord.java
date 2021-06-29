@@ -5,8 +5,9 @@
  */
 package com.myutils.logbrowser.indexer;
 
-import static Utils.Util.intOrDef;
 import java.util.ArrayList;
+
+import static Utils.Util.intOrDef;
 
 public class ConfigUpdateRecord extends Message {
 

@@ -5,36 +5,27 @@
  */
 package com.myutils.logbrowser.inquirer;
 
-import java.io.File;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+
 /**
- *
  * @author Stepan
  */
 public class LogFile {
 
-    public static String makeString(String fileName, String arcName) {
-        if (arcName == null) {
-            return fileName;
-        } else {
-            return arcName + ":" + fileName;
-        }
-    }
-
     private String fileName;
     private String arcName;
-
     public LogFile(final String _fileName, final String _arcName) {
         this.fileName = _fileName;
         this.arcName = (StringUtils.isBlank(_arcName)) ? null : inquirer.getFullLogName(_arcName);
 
         if (Files.isRegularFile(Paths.get(this.fileName))) {
             if (arcName != null) {
-                inquirer.logger.info(this.toString() + ": archive in DB but file exists. Ignored archive");
+                inquirer.logger.info(this + ": archive in DB but file exists. Ignored archive");
                 arcName = null;
             }
         } else {
@@ -47,7 +38,7 @@ public class LogFile {
                         fileName = name;
 
                     } else {
-                        inquirer.logger.error(this.toString() + ": neither file nor archive exists (tried [" + name + "])");
+                        inquirer.logger.error(this + ": neither file nor archive exists (tried [" + name + "])");
                     }
                 }
             } else {
@@ -62,13 +53,21 @@ public class LogFile {
                         break;
                     }
                     if (!arcFound) {
-                        inquirer.logger.error(this.toString() + ": neither file nor archive exists");
+                        inquirer.logger.error(this + ": neither file nor archive exists");
                     }
                 }
             }
 
         }
 
+    }
+
+    public static String makeString(String fileName, String arcName) {
+        if (arcName == null) {
+            return fileName;
+        } else {
+            return arcName + ":" + fileName;
+        }
     }
 
     @Override

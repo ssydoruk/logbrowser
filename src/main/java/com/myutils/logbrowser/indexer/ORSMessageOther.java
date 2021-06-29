@@ -8,12 +8,12 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 /**
- *
  * @author ssydoruk
  */
 public class ORSMessageOther extends Record {
 
     private static int m_batchId;
+    private String m_text;
 
     public static String InitDB(DBAccessor accessor, int batchId) {
         m_batchId = batchId;
@@ -29,7 +29,6 @@ public class ORSMessageOther extends Record {
 
         return "INSERT INTO custom_" + m_alias + " VALUES(NULL,?,?,?,?,?);";
     }
-    private String m_text;
 
     public void SetText(String text) {
         m_text = text;

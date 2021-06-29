@@ -12,13 +12,13 @@ import java.util.regex.Pattern;
 public class OCSCG extends Message {
 
     //16:18:52.794 CampaignGroup(180) (CAMP_DORIVETTES@VAG_CAMP_DORIVETTES): CampGrMsg: OCS version: 8.1.500.18;  WorkTime: 24386;
-    final private static Pattern RegCGStart = Pattern.compile("^\\s*CampaignGroup\\((\\d+)\\)\\s+\\(([^\\)]+)\\):\\s+CampGrMsg:\\s+OCS version:\\s+([^;]+);\\s+WorkTime:\\s+(\\d+);");
+    final private static Matcher RegCGStart = Pattern.compile("^\\s*CampaignGroup\\((\\d+)\\)\\s+\\(([^\\)]+)\\):\\s+CampGrMsg:\\s+OCS version:\\s+([^;]+);\\s+WorkTime:\\s+(\\d+);").matcher("");
 
     //17:52:30.488 CampaignGroup(196) (OBN_IP_Skill5_Campaign@OBN_IP_Skill5_Group): Created
-    final private static Pattern regCGEnd = Pattern.compile("^\\s*CampaignGroup\\((\\d+)\\)\\s+\\(([^\\)]+)\\):\\s+(\\S+)$");
+    final private static Matcher regCGEnd = Pattern.compile("^\\s*CampaignGroup\\((\\d+)\\)\\s+\\(([^\\)]+)\\):\\s+(\\S+)$").matcher("");
 
-    final private static Pattern regGroupDBID = Pattern.compile("^\\s*GroupDBID: ([^;]+); GroupName: (.+);$");
-    final private static Pattern regCampaignDBID = Pattern.compile("^\\s*CampaignDBID: ([^;]+); CampaignName: (.+);$");
+    final private static Matcher regGroupDBID = Pattern.compile("^\\s*GroupDBID: ([^;]+); GroupName: (.+);$").matcher("");
+    final private static Matcher regCampaignDBID = Pattern.compile("^\\s*CampaignDBID: ([^;]+); CampaignName: (.+);$").matcher("");
     private int cgDBID;
     private String cgName;
     private String ocsVersion;
@@ -38,12 +38,12 @@ public class OCSCG extends Message {
 
         if (messageLines.size() > 0) {
             String s = messageLines.get(0);
-            if ((m = RegCGStart.matcher(s)).find()) {
+            if ((m = RegCGStart.reset(s)).find()) {
                 cgDBID = Integer.parseInt(m.group(1));
                 cgName = m.group(2);
                 ocsVersion = m.group(3);
                 workTime = m.group(4);
-            } else if ((m = regCGEnd.matcher(s)).find()) {
+            } else if ((m = regCGEnd.reset(s)).find()) {
                 cgDBID = Integer.parseInt(m.group(1));
                 cgName = m.group(2);
                 CgMsg = m.group(3);

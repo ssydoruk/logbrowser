@@ -5,7 +5,6 @@
 package com.myutils.logbrowser.indexer;
 
 /**
- *
  * @author ssydoruk
  */
 public class ConnIdRecord extends Message {
@@ -42,7 +41,7 @@ public class ConnIdRecord extends Message {
         return "ConnIdRecord{" + "m_connId=" + m_connId + ", m_created=" + m_created + '}' + super.toString();
     }
 
-//    public void AddToDB(DBAccessor accessor) {
+    //    public void AddToDB(DBAccessor accessor) {
 //        PreparedStatement stmt = accessor.GetStatement(m_batchId);
 //        try {
 //            setFieldString(stmt,1, m_connId);

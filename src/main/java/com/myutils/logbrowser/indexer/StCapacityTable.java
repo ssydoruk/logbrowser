@@ -10,10 +10,9 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 
 /**
- *
  * @author ssydoruk
- *
- *
+ * <p>
+ * <p>
  * Make Refactor/Copy of this class for new table type
  */
 public class StCapacityTable extends DBTable {
@@ -61,7 +60,7 @@ public class StCapacityTable extends DBTable {
                 + ",placeid integer"
                 + ",dnid integer"
                 + ",capacityid integer"
-                + buf.toString()
+                + buf
                 + ");";
 
         buf = new StringBuilder();
@@ -77,14 +76,13 @@ public class StCapacityTable extends DBTable {
                 + ",?"
                 + ",?"
                 + ",?"
-                + buf.toString()
+                + buf
                 + ");"
         );
 
     }
 
     /**
-     *
      * @throws Exception
      */
     @Override

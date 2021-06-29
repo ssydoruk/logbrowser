@@ -8,7 +8,6 @@ package com.myutils.logbrowser.inquirer;
 import com.myutils.logbrowser.indexer.Pair;
 
 /**
- *
  * @author Stepan
  */
 public class UTCTimeRange extends Pair<Long, Long> {
@@ -25,19 +24,19 @@ public class UTCTimeRange extends Pair<Long, Long> {
         super(new Long(0), new Long(0));
     }
 
-    public void setStart(Long t) {
-        setKey(t);
-    }
-
-    public void setEnd(Long t) {
-        setValue(t);
-    }
-
     public Long getStart() {
         return getKey();
     }
 
+    public void setStart(Long t) {
+        setKey(t);
+    }
+
     public Long getEnd() {
         return getValue();
+    }
+
+    public void setEnd(Long t) {
+        setValue(t);
     }
 }

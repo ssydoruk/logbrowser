@@ -7,7 +7,6 @@ package com.myutils.logbrowser.inquirer;
 import java.sql.SQLException;
 
 /**
- *
  * @author ssydoruk
  */
 public class RegisterQuery extends IQuery {

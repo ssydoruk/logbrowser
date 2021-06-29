@@ -1,21 +1,66 @@
 package com.myutils.logbrowser.inquirer;
 
 import Utils.UTCTimeRange;
-import com.myutils.logbrowser.indexer.*;
-import static com.myutils.logbrowser.inquirer.QueryTools.getRefSubQuery;
-import static com.myutils.logbrowser.inquirer.QueryTools.isChecked;
+import com.myutils.logbrowser.indexer.ReferenceType;
 import com.myutils.logbrowser.inquirer.Wheres.Where;
-import java.sql.*;
-import java.util.*;
-import java.util.logging.*;
 import org.apache.commons.lang3.StringUtils;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public abstract class IQuery extends QueryTools {
 
-    static private int queryTypes;
-
     private static final int SPLIT_ON = 1000;
     private static final String[] RequestsToShow = {"RequestMakePredictiveCall", "RequestMakeCall", "RequestMonitorNextCall", "EventError"};
+    static private int queryTypes;
+    private final ArrayList<String> outFields;
+    private final ArrayList<refTab> TabRefs;
+    private final ArrayList<JoinTab> joinTabs;
+    private final ArrayList<String> nullTab;
+    private final ArrayList<String> nullFields = new ArrayList<>();
+    private final ArrayList<String> idsToCollect = new ArrayList<>();
+    private final HashMap<String, HashSet<Long>> collectIDsValues = new HashMap<>();
+    protected IRecordLoadedProc recLoadedProc = null;
+    protected String query;
+    protected ArrayList<Integer> searchApps = null;
+    protected UTCTimeRange timeRange = null;
+    protected DatabaseConnector m_connector;
+    protected ResultSet m_resultSet;
+    protected int recCnt;
+    Wheres addWheres = new Wheres();
+    private ICalculatedFields calcFields = null;
+//    void AddCheckedWhere(String[] nameIDs, ReferenceType referenceType, DynamicTreeNode<OptionNode> node, String AndOr, DialogItem di) throws Exception {
+//        DynamicTreeNode<OptionNode> nameSettings = getChildByName(node, di);
+//        if (isChecked(nameSettings) && !OptionNode.AllChildrenChecked(nameSettings)) {
+//            
+//            String ret = "";
+//            for (String nameIDs : nameIDs) {
+//                if (ret.length() > 0) {
+//                    ret += " or ";
+//                }
+//                ret += getAttrsWhere(tabColumn, "id", "name", referenceType.toString(), node);
+//            }
+//            if (ret.length() > 0) {
+//                return " ( " + ret + " ) ";
+//            }
+//            
+//            AddCheckedWhere(nameID, referenceType, nameSettings, AndOr);
+//        }
+//
+//    }
+    private boolean limitQueryResults;
+    private int maxQueryLines;
+
+    IQuery() {
+        TabRefs = new ArrayList<>();
+        joinTabs = new ArrayList<>();
+        nullTab = new ArrayList<>();
+        this.outFields = new ArrayList<>();
+        incQueryTypes();
+    }
 
     static String theLimitClause() {
         return getLimitClause(inquirer.getCr().isLimitQueryResults(), inquirer.getCr().getMaxQueryLines());
@@ -152,25 +197,6 @@ public abstract class IQuery extends QueryTools {
         }
         return null;
     }
-//    void AddCheckedWhere(String[] nameIDs, ReferenceType referenceType, DynamicTreeNode<OptionNode> node, String AndOr, DialogItem di) throws Exception {
-//        DynamicTreeNode<OptionNode> nameSettings = getChildByName(node, di);
-//        if (isChecked(nameSettings) && !OptionNode.AllChildrenChecked(nameSettings)) {
-//            
-//            String ret = "";
-//            for (String nameIDs : nameIDs) {
-//                if (ret.length() > 0) {
-//                    ret += " or ";
-//                }
-//                ret += getAttrsWhere(tabColumn, "id", "name", referenceType.toString(), node);
-//            }
-//            if (ret.length() > 0) {
-//                return " ( " + ret + " ) ";
-//            }
-//            
-//            AddCheckedWhere(nameID, referenceType, nameSettings, AndOr);
-//        }
-//
-//    }
 
     static String getCheckedWhere(String nameID, ReferenceType referenceType, DynamicTreeNode<OptionNode> nameSettings, String andOr) {
         String ret = getCheckedWhere(nameID, referenceType, nameSettings);
@@ -526,41 +552,14 @@ public abstract class IQuery extends QueryTools {
                 ret.append(getAttrsWhere(tabColumn, "id", "name", referenceType.toString(), node));
             }
             if (ret.length() > 0) {
-                return " ( " + ret.append(" ) ").toString();
+                return " ( " + ret.append(" ) ");
             }
         }
         return "";
     }
-    protected IRecordLoadedProc recLoadedProc = null;
-    private final ArrayList<String> outFields;
-    private ICalculatedFields calcFields = null;
-    protected String query;
-    protected ArrayList<Integer> searchApps = null;
-    protected UTCTimeRange timeRange = null;
-    private boolean limitQueryResults;
-    private int maxQueryLines;
-    protected DatabaseConnector m_connector;
-    protected ResultSet m_resultSet;
-    protected int recCnt;
-    Wheres addWheres = new Wheres();
 
     public boolean isWheresEmpty() {
         return addWheres.isEmpty();
-    }
-
-    private final ArrayList<refTab> TabRefs;
-    private final ArrayList<JoinTab> joinTabs;
-    private final ArrayList<String> nullTab;
-    private final ArrayList<String> nullFields = new ArrayList<>();
-    private final ArrayList<String> idsToCollect = new ArrayList<>();
-    private final HashMap<String, HashSet<Long>> collectIDsValues = new HashMap<>();
-
-    IQuery() {
-        TabRefs = new ArrayList<>();
-        joinTabs = new ArrayList<>();
-        nullTab = new ArrayList<>();
-        this.outFields = new ArrayList<>();
-        incQueryTypes();
     }
 
     public IRecordLoadedProc getRecLoadedProc() {
@@ -996,8 +995,8 @@ public abstract class IQuery extends QueryTools {
     }
 
     protected String tlibReqs(String tabName, String id, Collection<Long> recIDs, String referenceID,
-            Collection<Long> refIDs,
-            String[] dnIDsFields, Collection<Long> dnIDs) {
+                              Collection<Long> refIDs,
+                              String[] dnIDsFields, Collection<Long> dnIDs) {
         String s = null;
         if (recIDs != null && !recIDs.isEmpty()) {
             s = getWhere(fullFieldName(tabName, "id"), recIDs, false);
@@ -1032,15 +1031,30 @@ public abstract class IQuery extends QueryTools {
         setSearchApps(dlg.getSearchApps());
     }
 
-    public interface IRecordLoadedProc {
+    public String stdFields(String alias) {
+        StringBuilder ret = new StringBuilder();
+        for (String s : new String[]{
+                "id",
+                "time",
+                "FileId",
+                "FileOffset",
+                "FileBytes",
+                "line"
+        }) {
+            if (ret.length() > 0) {
+                ret.append(",");
+            }
+            ret.append(alias).append(".").append(s);
 
-        void recordLoaded(ILogRecord rec);
+        }
+        return ret.toString();
     }
 
     public enum ANDOR {
 
         AND("AND"),
-        OR("OR"),;
+        OR("OR"),
+        ;
 
         private final String name;
 
@@ -1048,7 +1062,7 @@ public abstract class IQuery extends QueryTools {
             name = s;
         }
 
-//    public boolean equals(DialogItem item) {
+        //    public boolean equals(DialogItem item) {
 //
 //    }
         public boolean equalsName(String otherName) {
@@ -1065,6 +1079,11 @@ public abstract class IQuery extends QueryTools {
     enum FieldType {
         Mandatory,
         Optional
+    }
+
+    public interface IRecordLoadedProc {
+
+        void recordLoaded(ILogRecord rec);
     }
 
     class refTab {
@@ -1126,11 +1145,11 @@ public abstract class IQuery extends QueryTools {
 
     class JoinTab {
 
-        private String joinTable = null;
         private final String tabAlias;
+        private final FieldType ft;
+        private String joinTable = null;
         private String JoinExpr = null;
         private String JoinWhere = null;
-        private final FieldType ft;
 
         public JoinTab(String joinTable, String JoinExpr, String JoinWhere, FieldType ft, String tabAlias) {
             this.joinTable = joinTable;
@@ -1167,25 +1186,6 @@ public abstract class IQuery extends QueryTools {
         private String getJoinField() {
             return "";
         }
-    }
-
-    public String stdFields(String alias) {
-        StringBuilder ret = new StringBuilder();
-        for (String s : new String[]{
-            "id",
-            "time",
-            "FileId",
-            "FileOffset",
-            "FileBytes",
-            "line"
-        }) {
-            if (ret.length() > 0) {
-                ret.append(",");
-            }
-            ret.append(alias).append(".").append(s);
-
-        }
-        return ret.toString();
     }
 
 }

@@ -6,9 +6,9 @@ import java.util.HashMap;
 
 public class SipMessage extends ILogRecord {
 
+    int handlerId;
     private boolean m_isInbound;
     private int m_anchorid;
-    int handlerId;
     private String callId;
 
     public SipMessage(ResultSet rs) throws SQLException {

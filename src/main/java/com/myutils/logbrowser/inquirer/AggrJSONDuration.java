@@ -6,15 +6,16 @@
 package com.myutils.logbrowser.inquirer;
 
 import Utils.UTCTimeRange;
-import static Utils.Util.pDuration;
+
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 
+import static Utils.Util.pDuration;
+
 /**
- *
  * @author ssydoruk
  */
 public class AggrJSONDuration extends IAggregateQuery {
@@ -51,8 +52,8 @@ public class AggrJSONDuration extends IAggregateQuery {
         int unixtime = 0;
         Date reqDate = null;
         for (record = jsonQuery.GetNext();
-                record != null;
-                record = jsonQuery.GetNext()) {
+             record != null;
+             record = jsonQuery.GetNext()) {
             if (record.GetFieldInt("inbound") == 0) {
                 SipsReqId = record.GetFieldInt("sips_req");
                 reqDate = record.getDateTime();

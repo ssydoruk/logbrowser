@@ -5,8 +5,7 @@ import com.myutils.logbrowser.indexer.FileInfoType;
 import com.myutils.logbrowser.indexer.ReferenceType;
 import com.myutils.logbrowser.indexer.TableType;
 import com.myutils.logbrowser.inquirer.IQuery.FieldType;
-import static com.myutils.logbrowser.inquirer.QueryTools.getWhere;
-import static com.myutils.logbrowser.inquirer.QueryTools.getWhereNot;
+
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
 import java.sql.SQLException;
@@ -37,7 +36,7 @@ public class IxnServerResults extends IQueryResults {
 
     @Override
     public String getReportSummary() {
-        return "IxnServer \n\t" + (cidFinder != null ? "search: " + cidFinder.toString() : "");
+        return "IxnServer \n\t" + (cidFinder != null ? "search: " + cidFinder : "");
     }
 
     @Override

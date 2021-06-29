@@ -5,28 +5,25 @@
 package com.myutils.logbrowser.inquirer;
 
 import com.myutils.logbrowser.indexer.ReferenceType;
-import static com.myutils.logbrowser.inquirer.DatabaseConnector.TableExist;
-import static com.myutils.logbrowser.inquirer.QueryTools.isChecked;
-import java.sql.SQLException;
-import java.util.HashMap;
 import org.apache.commons.lang3.StringUtils;
 
+import java.sql.SQLException;
+import java.util.HashMap;
+
+import static com.myutils.logbrowser.inquirer.DatabaseConnector.TableExist;
+
 /**
- *
  * @author ssydoruk
  */
 public class SipMSQuery extends IQuery {
 
-    private String[] orderBy;
-
-    private Integer[] m_CallIds;
     private final boolean m_useProxy = true;
-
+    private final HashMap sipRecords = new HashMap();
+    private String[] orderBy;
+    private Integer[] m_CallIds;
     private DynamicTreeNode<OptionNode> node = null;
     private IDsFinder cidFinder;
-
     private boolean shouldRun = false;
-    private final HashMap sipRecords = new HashMap();
 
     public SipMSQuery() throws SQLException {
         addRef("ToUriID", "ToUri", ReferenceType.SIPURI.toString(), FieldType.Optional);
@@ -166,7 +163,18 @@ public class SipMSQuery extends IQuery {
         return addWheres.makeWhere(ret, "AND", true);
     }
 
-//    void setRegexSearch(boolean regex) {
+    private String getOrderBy() {
+        if (inquirer.getCr().isAddOrderBy() && orderBy.length > 0) {
+            String join = StringUtils.join(orderBy, ";");
+            return "ORDER BY " + StringUtils.join(orderBy, ";");
+//        ORDER BY sip.time;
+
+        } else {
+            return "";
+        }
+    }
+
+    //    void setRegexSearch(boolean regex) {
 //        this.regexSearch = regex;
 //    }
 //
@@ -185,17 +193,6 @@ public class SipMSQuery extends IQuery {
 
         }
         this.orderBy = arr;
-    }
-
-    private String getOrderBy() {
-        if (inquirer.getCr().isAddOrderBy() && orderBy.length > 0) {
-            String join = StringUtils.join(orderBy, ";");
-            return "ORDER BY " + StringUtils.join(orderBy, ";");
-//        ORDER BY sip.time;
-
-        } else {
-            return "";
-        }
     }
 
 }

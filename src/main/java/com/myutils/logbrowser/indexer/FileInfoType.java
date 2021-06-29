@@ -8,7 +8,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- *
  * @author ssydoruk
  */
 public enum FileInfoType {
@@ -70,6 +69,18 @@ public enum FileInfoType {
             put(type_URSHTTP, "URS_HTTP");
         }
     };
+    private static final Map map = new HashMap<>();
+
+    static {
+        for (FileInfoType fileInfoType : FileInfoType.values()) {
+            map.put(fileInfoType.value, fileInfoType);
+        }
+    }
+
+    private final int value;
+    FileInfoType(int value) {
+        this.value = value;
+    }
 
     public static FileInfoType FileType(String t) {
         for (Map.Entry<FileInfoType, String> entrySet : TypeFile.entrySet()) {
@@ -86,25 +97,8 @@ public enum FileInfoType {
         return TypeFile.get(t);
     }
 
-    private final int value;
-    private static final Map map = new HashMap<>();
-
-    FileInfoType(int value) {
-        this.value = value;
-    }
-
-    static {
-        for (FileInfoType fileInfoType : FileInfoType.values()) {
-            map.put(fileInfoType.value, fileInfoType);
-        }
-    }
-
     public static FileInfoType GetvalueOf(int fileInfoType) {
         return (FileInfoType) map.get(fileInfoType);
-    }
-
-    public int getValue() {
-        return value;
     }
 
     public static String getTableName(FileInfoType t) {
@@ -116,6 +110,10 @@ public enum FileInfoType {
             ret.append(toString);
         }
         return ret.append("_tdiff").toString();
+    }
+
+    public int getValue() {
+        return value;
     }
 
 }

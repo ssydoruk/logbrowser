@@ -16,7 +16,7 @@ public class Pair<K, V> implements Serializable {
     }
 
     /**
-     * @param key key to be set
+     * @param key   key to be set
      * @param value value to be set
      */
     public Pair(final K key, final V value) {
@@ -25,7 +25,7 @@ public class Pair<K, V> implements Serializable {
     }
 
     /**
-     * @param key key to be set
+     * @param key   key to be set
      * @param value value to be set
      * @return this
      */

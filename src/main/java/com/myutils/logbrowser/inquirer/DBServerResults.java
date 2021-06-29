@@ -5,6 +5,7 @@ import com.myutils.logbrowser.indexer.FileInfoType;
 import com.myutils.logbrowser.indexer.ReferenceType;
 import com.myutils.logbrowser.indexer.TableType;
 import com.myutils.logbrowser.inquirer.IQuery.FieldType;
+
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
 import java.sql.SQLException;
@@ -36,7 +37,7 @@ public class DBServerResults extends IQueryResults {
 
     @Override
     public String getReportSummary() {
-        return "DBServer \n\t" + (cidFinder != null ? "search: " + cidFinder.toString() : "");
+        return "DBServer \n\t" + (cidFinder != null ? "search: " + cidFinder : "");
     }
 
     @Override

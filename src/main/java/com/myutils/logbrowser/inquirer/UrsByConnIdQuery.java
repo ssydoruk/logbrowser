@@ -5,11 +5,11 @@
 package com.myutils.logbrowser.inquirer;
 
 import com.myutils.logbrowser.indexer.ReferenceType;
+
 import java.sql.SQLException;
 import java.util.Collection;
 
 /**
- *
  * @author ssydoruk
  */
 public final class UrsByConnIdQuery extends IQuery {

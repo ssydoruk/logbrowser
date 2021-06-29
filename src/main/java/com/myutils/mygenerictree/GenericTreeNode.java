@@ -57,20 +57,20 @@ public class GenericTreeNode<T> implements Serializable {
         return this.children;
     }
 
-    public int getNumberOfChildren() {
-        return getChildren().size();
-    }
-
-    public boolean hasChildren() {
-        return (getNumberOfChildren() > 0);
-    }
-
     public void setChildren(List<GenericTreeNode<T>> children) {
         for (GenericTreeNode<T> child : children) {
             child.parent = this;
         }
 
         this.children = children;
+    }
+
+    public int getNumberOfChildren() {
+        return getChildren().size();
+    }
+
+    public boolean hasChildren() {
+        return (getNumberOfChildren() > 0);
     }
 
     public void addChild(GenericTreeNode<T> child) {

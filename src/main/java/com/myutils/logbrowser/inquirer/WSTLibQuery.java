@@ -5,11 +5,11 @@
 package com.myutils.logbrowser.inquirer;
 
 import com.myutils.logbrowser.indexer.ReferenceType;
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
 /**
- *
  * @author ssydoruk
  */
 public class WSTLibQuery extends IQuery {
@@ -179,7 +179,7 @@ public class WSTLibQuery extends IQuery {
                 ret = getWhere("tlib.ConnectionIdid", m_connectionIds, false);
 
                 String s = " tlib.nameid NOT IN (select id from "
-                        + ReferenceType.TEvent.toString() + " where name in (\""
+                        + ReferenceType.TEvent + " where name in (\""
                         + m_msgFilter.replace(",", "\",\"") + "\")" + ") ";
 
                 ret += " AND " + s;

@@ -6,15 +6,11 @@
 package com.myutils.logbrowser.inquirer;
 
 import Utils.ScreenInfo;
-import java.awt.Dimension;
-import java.awt.HeadlessException;
-import javax.swing.BoxLayout;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
+
+import javax.swing.*;
+import java.awt.*;
 
 /**
- *
  * @author ssydoruk
  */
 final class AllCallsFrame extends JFrame {

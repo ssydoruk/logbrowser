@@ -1,20 +1,27 @@
 package com.myutils.logbrowser.inquirer;
 
-import Utils.*;
-import com.myutils.logbrowser.common.*;
-import com.myutils.logbrowser.inquirer.gui.*;
-import java.io.*;
-import java.nio.file.*;
-import java.sql.*;
-import java.util.*;
-import java.util.logging.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.regex.*;
+import Utils.FileWatcher;
+import com.myutils.logbrowser.common.JSRunner;
+import com.myutils.logbrowser.inquirer.gui.TabResultDataModel;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
-import org.graalvm.polyglot.*;
-import org.w3c.dom.*;
+import org.graalvm.polyglot.HostAccess;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.sql.CallableStatement;
+import java.sql.SQLException;
+import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public abstract class OutputSpecFormatter extends DefaultFormatter {
 
@@ -34,6 +41,19 @@ public abstract class OutputSpecFormatter extends DefaultFormatter {
 
     final static int MAX_NAME_LENGTH = 20;
     final static int DEFAULT_FILE_LINK_LENGTH = 40;
+    private static final org.apache.logging.log4j.Logger logger = LogManager.getLogger();
+    private final XmlCfg cfg;
+    private final HashMap<String, RecordLayout> outSpec = new HashMap<>();
+
+    public OutputSpecFormatter(XmlCfg cfg,
+                               boolean isLongFileNameEnabled,
+                               HashSet<String> components) throws Exception {
+        super(isLongFileNameEnabled, components);
+        inquirer.logger.debug("OutputSpecFormatter " + cfg.getXmlFile());
+        this.cfg = cfg;
+        doRefreshLayout();
+
+    }
 
     static private ArrayList<Element> getElementsChildByName(Element e, String name) {
         ArrayList<Element> ret = new ArrayList<>();
@@ -60,20 +80,6 @@ public abstract class OutputSpecFormatter extends DefaultFormatter {
             int ret = m_callIdCount - 1;
             return ret;
         }
-    }
-
-    private final XmlCfg cfg;
-
-    private final HashMap<String, RecordLayout> outSpec = new HashMap<>();
-
-    public OutputSpecFormatter(XmlCfg cfg,
-            boolean isLongFileNameEnabled,
-            HashSet<String> components) throws Exception {
-        super(isLongFileNameEnabled, components);
-        inquirer.logger.debug("OutputSpecFormatter " + cfg.getXmlFile());
-        this.cfg = cfg;
-        doRefreshLayout();
-
     }
 
     protected RecordLayout getLayout(MsgType GetType) {
@@ -117,8 +123,6 @@ public abstract class OutputSpecFormatter extends DefaultFormatter {
         }
     }
 
-    private static final org.apache.logging.log4j.Logger logger = LogManager.getLogger();
-
     @Override
     public void ProcessLayout() {
         for (RecordLayout lo : outSpec.values()) {
@@ -142,13 +146,36 @@ public abstract class OutputSpecFormatter extends DefaultFormatter {
         }
     }
 
+    enum ParamType {
+
+        embedded("embedded"),
+        database("database"),
+        file("file"),
+        script("script");
+
+        private final String name;
+
+        ParamType(String s) {
+            name = s;
+        }
+
+        public boolean equalsName(String otherName) {
+            return otherName != null && name.equals(otherName);
+        }
+
+        @Override
+        public String toString() {
+            return this.name;
+        }
+    }
+
     public static abstract class Parameter {
 
-        private String m_ShortFormat;
         private final String m_Title;
-        private boolean hidden;
         private final HashSet<RegexParam> m_match = new HashSet<>();
         private final HashSet<RegexParam> m_filter = new HashSet<>();
+        private String m_ShortFormat;
+        private boolean hidden;
         private String m_format;
         private boolean isStatus;
         private String prevValue = "";
@@ -166,6 +193,10 @@ public abstract class OutputSpecFormatter extends DefaultFormatter {
 
         public boolean isHidden() {
             return hidden;
+        }
+
+        public void setHidden(boolean attribute) {
+            this.hidden = attribute;
         }
 
         public String getTitle() {
@@ -233,10 +264,6 @@ public abstract class OutputSpecFormatter extends DefaultFormatter {
             return ret;
         }
 
-        public void setHidden(boolean attribute) {
-            this.hidden = attribute;
-        }
-
         abstract public String getType();
 
         protected String GetFileBytes(ILogRecord record) throws Exception {
@@ -281,14 +308,14 @@ public abstract class OutputSpecFormatter extends DefaultFormatter {
                 if (!ignorePatternForDBFields) {
                     ArrayList<Element> els = getElementsChildByName(e, "pattern");
                     if (els != null && els.size() > 0) {
-                        for (Iterator<Element> iterator = els.iterator(); iterator.hasNext();) {
+                        for (Iterator<Element> iterator = els.iterator(); iterator.hasNext(); ) {
                             Element next = iterator.next();
                             SetMatch(next);
                         }
                     }
                 }
                 for (Iterator<Element> el = getElementsChildByName(e, "filter").iterator();
-                        el != null && el.hasNext();) {
+                     el != null && el.hasNext(); ) {
                     SetFilter(el.next());
 
                 }
@@ -329,7 +356,7 @@ public abstract class OutputSpecFormatter extends DefaultFormatter {
                 if (CheckFilter(str)) {
                     /*
                     to implement - flag to ignore field or record
-                    
+
                     if return == null - ignore record
                     if str ="" - ignore field if filter triggered
                      */
@@ -389,13 +416,13 @@ public abstract class OutputSpecFormatter extends DefaultFormatter {
         class RegexParam {
 
             private final int m_group;
-            private final Pattern m_matchPattern;
-            private ArrayList<Integer> m_groups = null;
-            private String retAttribute = null;
+            private final Matcher m_matchPattern;
+            private final int iRetGroup;
+            private final Matcher mFileMatch;
             String expr = null;
             CallableStatement st;
-            private final int iRetGroup;
-            private final Pattern mFileMatch;
+            private ArrayList<Integer> m_groups = null;
+            private String retAttribute = null;
 
             public RegexParam(Element patternElement) {
                 //            Element patternElement = getElementChildByName(e, "pattern");
@@ -447,10 +474,10 @@ public abstract class OutputSpecFormatter extends DefaultFormatter {
                 }
                 flags |= Pattern.MULTILINE;
 
-                m_matchPattern = Pattern.compile(m_match1, flags);
+                m_matchPattern = Pattern.compile(m_match1, flags).matcher("");
 
                 if (fileMatch != null && !fileMatch.isEmpty()) {
-                    mFileMatch = Pattern.compile(fileMatch, flags);
+                    mFileMatch = Pattern.compile(fileMatch, flags).matcher("");
                 } else {
                     mFileMatch = null;
                 }
@@ -467,7 +494,7 @@ public abstract class OutputSpecFormatter extends DefaultFormatter {
                 return s;
             }
 
-//            String getMatchGroup(String value) throws Exception {
+            //            String getMatchGroup(String value) throws Exception {
 //                if (m_matchPattern != null) {
 //                    Matcher matcher = m_matchPattern.matcher(value);
 //                    if (matcher.find()) {
@@ -512,7 +539,7 @@ public abstract class OutputSpecFormatter extends DefaultFormatter {
 //            }
             String[] getFormatGroups(String value, ILogRecord record) throws SQLException {
                 if (m_matchPattern != null) {
-                    Matcher matcher = m_matchPattern.matcher(value);
+                    Matcher matcher = m_matchPattern.reset(value);
                     if (matcher.find()) {
                         if (retAttribute != null && retAttribute.length() > 0) {
                             inquirer.logger.trace("returning [" + retAttribute + "]");
@@ -544,7 +571,7 @@ public abstract class OutputSpecFormatter extends DefaultFormatter {
             }
 
             boolean find(String value) {
-                return m_matchPattern.matcher(value).find();
+                return m_matchPattern.reset(value).find();
             }
 
             private String evalFileMatch(ILogRecord record) {
@@ -555,7 +582,7 @@ public abstract class OutputSpecFormatter extends DefaultFormatter {
                         StringBuilder ret = new StringBuilder();
                         for (String s : split) {
                             Matcher m;
-                            if ((m = mFileMatch.matcher(s)).find()) {
+                            if ((m = mFileMatch.reset(s)).find()) {
                                 if (ret.length() > 0) {
                                     ret.append(" | ");
                                 }
@@ -582,8 +609,8 @@ public abstract class OutputSpecFormatter extends DefaultFormatter {
 
     static class EmbeddedParameter extends Parameter {
 
-        String m_id;
         private final boolean fileLink;
+        String m_id;
 
         private EmbeddedParameter(Element element, String defaultFieldName) throws Exception {
             super(defaultFieldName);
@@ -792,40 +819,36 @@ public abstract class OutputSpecFormatter extends DefaultFormatter {
         }
     }
 
-    public class IgnoreRecordException extends Exception {
+    public static class Inquirer {
+
+        private static ILogRecord curRec;
+
+        @HostAccess.Export
+        public static String recordField(String fld) {
+            if (curRec != null) {
+                return curRec.GetField(fld);
+            } else {
+                return "";
+            }
+        }
+
+        public static void setCurrentRec(ILogRecord record) {
+            curRec = record;
+        }
     }
 
-    enum ParamType {
-
-        embedded("embedded"),
-        database("database"),
-        file("file"),
-        script("script");
-
-        private final String name;
-
-        ParamType(String s) {
-            name = s;
-        }
-
-        public boolean equalsName(String otherName) {
-            return otherName != null && name.equals(otherName);
-        }
-
-        @Override
-        public String toString() {
-            return this.name;
-        }
+    public class IgnoreRecordException extends Exception {
     }
 
     class RecordLayout {
 
+        private final HashMap<String, Object> scriptFields = new HashMap<>();
+        private final String cfgFile;
         ArrayList<Parameter> parameters;
         String formatString;
         String formatStringFromXml;
         private String initScript = null;
-        private final HashMap<String, Object> scriptFields = new HashMap<>();
-        private final String cfgFile;
+        private Utils.FileWatcher jsFileWatcher = null;
 
         private RecordLayout(org.w3c.dom.Element el, String msgType, String cfgFile) throws Exception {
             // get format attribute, save format string
@@ -918,7 +941,7 @@ public abstract class OutputSpecFormatter extends DefaultFormatter {
 
             if (initScript != null) {
                 scriptFields.clear();
-                if (JSRunner.evalFields(initScript, record, scriptFields))// ignore record 
+                if (JSRunner.evalFields(initScript, record, scriptFields))// ignore record
                 {
                     ps.ignoreRecord();
                     return "";
@@ -1050,7 +1073,7 @@ public abstract class OutputSpecFormatter extends DefaultFormatter {
 
         List<String> readFile(String dir, String name) {
             Path get = Paths.get(dir, name);
-            logger.debug("Reading file " + get.toString());
+            logger.debug("Reading file " + get);
             if (Files.isReadable(get)) {
                 try {
                     List<String> ret = Files.readAllLines(get);
@@ -1064,18 +1087,16 @@ public abstract class OutputSpecFormatter extends DefaultFormatter {
             return null;
         }
 
-        private Utils.FileWatcher jsFileWatcher = null;
-
         private void setJSFile(Path get) {
             try {
                 if (jsFileWatcher != null) {
                     jsFileWatcher.stopThread();
                 }
-                jsFileWatcher = new FileWatcher(get.toFile(),100) {
+                jsFileWatcher = new FileWatcher(get.toFile(), 100) {
                     @Override
                     public void doOnChange(File f) {
                         try {
-                            logger.info("File changed "+f);
+                            logger.info("File changed " + f);
                             List<String> ret = Files.readAllLines(f.toPath());
                             if (ret != null) {
                                 initScript = StringUtils.join(ret, "\n");
@@ -1089,24 +1110,6 @@ public abstract class OutputSpecFormatter extends DefaultFormatter {
             } catch (IOException ex) {
                 Logger.getLogger(OutputSpecFormatter.class.getName()).log(Level.SEVERE, null, ex);
             }
-        }
-    }
-
-    public static class Inquirer {
-
-        private static ILogRecord curRec;
-
-        @HostAccess.Export
-        public static String recordField(String fld) {
-            if (curRec != null) {
-                return curRec.GetField(fld);
-            } else {
-                return "";
-            }
-        }
-
-        public static void setCurrentRec(ILogRecord record) {
-            curRec = record;
         }
     }
 }

@@ -4,100 +4,102 @@
  */
 package com.myutils.logbrowser.indexer;
 
+import org.apache.commons.lang3.StringUtils;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import javax.swing.*;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import static Utils.Util.intOrDef;
 import static com.myutils.logbrowser.indexer.SingleThreadParser.ParserState.*;
-import java.sql.*;
-import java.util.*;
-import java.util.regex.*;
-import javax.swing.*;
-import org.apache.commons.lang3.*;
-import org.json.*;
 
 /**
- *
  * @author ssydoruk
  */
 public class SingleThreadParser extends Parser {
 
+    public static final int MAX_1536_ATTRIBUTES = 40;
     static final String[] BlockNamesToIgnoreArray = {
-        "NET:TCO:EventResourceInfo:",
-        "NET:IPR:EventResourceInfo:",
-        "SIP:CTI:GVP_RESOURCES_CHANGED:",
-        "SIP:CTI:HA_SEND_SYNC_MESSAGE:",
-        "SIP:CTI:UNKNOWN_HA_MESSAGE:",
-        "NET:CTI:UNKNOWN_HA_MESSAGE:",
-        "SIP:CTI:DEVICE_REGISTERED:",
-        "NET:CTI:tControllerSync:",
-        "CTI:TCO:SIP_CTI_CLUSTER_NODE_CONTROL_SIP_REGISTRATION:",
-        "CTI:SIP:HA_TAKE_SYNC_MESSAGE:",
-        "SIP:CTI:sipStackSync:",
-        "NET:CTI:sipStackSync:",
-        "NET:IPR:RequestPrivateService:",
-        "SIP:CTI:tControllerSync:",
-        "CTI:TCO:SIP_CTI_CLUSTER_NODE_CONTROL_HA_TAKE_SYNC_MESSAGE:",
-        "SIP:CTI:callSync:"
+            "NET:TCO:EventResourceInfo:",
+            "NET:IPR:EventResourceInfo:",
+            "SIP:CTI:GVP_RESOURCES_CHANGED:",
+            "SIP:CTI:HA_SEND_SYNC_MESSAGE:",
+            "SIP:CTI:UNKNOWN_HA_MESSAGE:",
+            "NET:CTI:UNKNOWN_HA_MESSAGE:",
+            "SIP:CTI:DEVICE_REGISTERED:",
+            "NET:CTI:tControllerSync:",
+            "CTI:TCO:SIP_CTI_CLUSTER_NODE_CONTROL_SIP_REGISTRATION:",
+            "CTI:SIP:HA_TAKE_SYNC_MESSAGE:",
+            "SIP:CTI:sipStackSync:",
+            "NET:CTI:sipStackSync:",
+            "NET:IPR:RequestPrivateService:",
+            "SIP:CTI:tControllerSync:",
+            "CTI:TCO:SIP_CTI_CLUSTER_NODE_CONTROL_HA_TAKE_SYNC_MESSAGE:",
+            "SIP:CTI:callSync:"
     };
-
-//15:37:21.918 +++ CIFace::Request +++
+    //15:37:21.918 +++ CIFace::Request +++
 //   -- new invoke
 //  Parsed: RequestQueryAddress
 //  From: ICON_Voice[704]/16165
 //  Numbers: +<SIP to RM> -<none>
 //  Status: parsed:1 queued:0 sent:0 acked:0 preevent:0 event:0 context:0 transferred:0
 //  -----
-    private static final Pattern regFrom = Pattern.compile("From: .+/([0-9]+)");
-    private static final Pattern regNumbers = Pattern.compile("Numbers: \\+<([^>]+)> -<([^>]+)>");
-    private static final Pattern regSIPHeaderIP = Pattern.compile("(?:(\\S+) (>>>>>|<<<<<))$");
-    private static final Pattern regSIPHeaderNetwork = Pattern.compile("(?:(\\S+) (>>>|<<<))$");
-    private static final Pattern regTMessageContinue = Pattern.compile("^(\\t|message|\\d*\\s\\[BSYNC\\] Trace:)");
-    private static final Pattern regTBackupMessage = Pattern.compile("^\\d*\\s\\[BSYNC\\] Trace: Send");
-    private static final Pattern regTLibMessage = Pattern.compile("(: message)");
-    private static final Pattern regTLibMessageLog = Pattern.compile("^0454[12]");
-    private static final Pattern regTriggerStart = Pattern.compile("^\\$((\\*:)|\\+|-)");
-    private static final Pattern regConfigUpdate = Pattern.compile("^[\\d\\s]+\\[TCONF\\]");
-    private static final Pattern regTimerActions = Pattern.compile("^\\s+CIFace: Sent CRequest@(?:\\w+) (\\w+)-internal$");
-    private static final Pattern regTimerActionsParams = Pattern.compile("^\\s+-- aTmCall (\\w+)(?:\\sSetCause: (\\w+))?");
-
-    private static final Pattern regConfigOneLineDN = Pattern.compile("^\\s\\[(\\d+)\\] dn = '([^']+)' type = (\\w+)");
-    private static final Pattern ptSkip = Pattern.compile("^[:\\s]*");
-    private final static Pattern regProxy = Pattern.compile("^Proxy\\((\\w+):");
-    private final static Pattern regConnidChangeEnd = Pattern.compile("^\\S");
-    static private boolean ifSIPLines = false;
-    private final static Pattern SIPHeaderContinue = Pattern.compile("^\\s*(\\w.+)");
-    private final static Pattern SIPHeaderFound = Pattern.compile("^((\\w[\\w_\\-\\.\\s]+:)|\\s+;)");
-    private static boolean ifSIPLinesForce = false;
-    private static boolean gaveWarning = false;
-    private static final Pattern regSIPHeader = Pattern.compile("(\\d+) bytes .+ (>>>>>|<<<<<)$");
-//    15:22:50.980: Sending  [0,UDP] 3384 bytes to 10.82.10.146:5060 >>>>>
-    private static final Pattern regNotParseMessage = Pattern.compile("^(0454[1-5]"
-            + ")");
+    private static final Matcher regFrom = Pattern.compile("From: .+/([0-9]+)").matcher("");
+    private static final Matcher regNumbers = Pattern.compile("Numbers: \\+<([^>]+)> -<([^>]+)>").matcher("");
+    private static final Matcher regSIPHeaderIP = Pattern.compile("(?:(\\S+) (>>>>>|<<<<<))$").matcher("");
+    private static final Matcher regSIPHeaderNetwork = Pattern.compile("(?:(\\S+) (>>>|<<<))$").matcher("");
+    private static final Matcher regTMessageContinue = Pattern.compile("^(\\t|message|\\d*\\s\\[BSYNC\\] Trace:)").matcher("");
+    private static final Matcher regTBackupMessage = Pattern.compile("^\\d*\\s\\[BSYNC\\] Trace: Send").matcher("");
+    private static final Matcher regTLibMessage = Pattern.compile("(: message)").matcher("");
+    private static final Matcher regTLibMessageLog = Pattern.compile("^0454[12]").matcher("");
+    private static final Matcher regTriggerStart = Pattern.compile("^\\$((\\*:)|\\+|-)").matcher("");
+    private static final Matcher regConfigUpdate = Pattern.compile("^[\\d\\s]+\\[TCONF\\]").matcher("");
+    private static final Matcher regTimerActions = Pattern.compile("^\\s+CIFace: Sent CRequest@(?:\\w+) (\\w+)-internal$").matcher("");
+    private static final Matcher regTimerActionsParams = Pattern.compile("^\\s+-- aTmCall (\\w+)(?:\\sSetCause: (\\w+))?").matcher("");
+    private static final Matcher regConfigOneLineDN = Pattern.compile("^\\s\\[(\\d+)\\] dn = '([^']+)' type = (\\w+)").matcher("");
+    private static final Matcher ptSkip = Pattern.compile("^[:\\s]*").matcher("");
+    private final static Matcher regProxy = Pattern.compile("^Proxy\\((\\w+):").matcher("");
+    private final static Matcher regConnidChangeEnd = Pattern.compile("^\\S").matcher("");
+    private final static Matcher SIPHeaderContinue = Pattern.compile("^\\s*(\\w.+)").matcher("");
+    private final static Matcher SIPHeaderFound = Pattern.compile("^((\\w[\\w_\\-\\.\\s]+:)|\\s+;)").matcher("");
+    private static final Matcher regSIPHeader = Pattern.compile("(\\d+) bytes .+ (>>>>>|<<<<<)$").matcher("");
+    //    15:22:50.980: Sending  [0,UDP] 3384 bytes to 10.82.10.146:5060 >>>>>
+    private static final Matcher regNotParseMessage = Pattern.compile("^(0454[1-5]"
+            + ")").matcher("");
     private final static HashSet<String> eventsWithCallInfo = new HashSet<String>(
             Arrays.asList("EventRegistered",
                     "EventAddressInfo"));
-    static private final Pattern regISCCHead = Pattern.compile("^[\\d\\s]+\\[ISCC\\] (Received|Send).+: message (\\w+)$");
-    static private final Pattern regJSONFinished = Pattern.compile("^GenHttpRequest.+destroyed$");
-    static private final Pattern patternHandleBlock = Pattern.compile("^((([0-9a-zA-Z_-]*:)+)\\d+):?\\d*$");
-    private static final Pattern regHandlerCutSeconds = Pattern.compile("^((?:(?:\\D[^:]+):)++\\d+)");
-    private static final Pattern regOldConnID = Pattern.compile("was (\\w+)\\)$");
-    private static final Pattern regNewConnID = Pattern.compile("\\@ c:(\\w+),");
-    private static final Pattern regCfgObjectName = Pattern.compile("(?:name|userName|number|loginCode)='([^']+)'");
-    private static final Pattern regCfgObjectDBID = Pattern.compile("DBID=(\\d+)");
-    private static final Pattern regCfgObjectType = Pattern.compile("object Cfg(\\w+)=");
-    private static final Pattern regCfgOp = Pattern.compile("\\(type Object(\\w+)\\)");
-    private static final Pattern regSIPServerStartDN = Pattern.compile("^\\s*DN added \\(dbid (\\d+)\\) \\(number ([^\\(]+)\\) ");
+    static private final Matcher regISCCHead = Pattern.compile("^[\\d\\s]+\\[ISCC\\] (Received|Send).+: message (\\w+)$").matcher("");
+    static private final Matcher regJSONFinished = Pattern.compile("^GenHttpRequest.+destroyed$").matcher("");
+    static private final Matcher patternHandleBlock = Pattern.compile("^((([0-9a-zA-Z_-]*:)+)\\d+):?\\d*$").matcher("");
+    private static final Matcher regHandlerCutSeconds = Pattern.compile("^((?:(?:\\D[^:]+):)++\\d+)").matcher("");
+    private static final Matcher regOldConnID = Pattern.compile("was (\\w+)\\)$").matcher("");
+    private static final Matcher regNewConnID = Pattern.compile("\\@ c:(\\w+),").matcher("");
+    private static final Matcher regCfgObjectName = Pattern.compile("(?:name|userName|number|loginCode)='([^']+)'").matcher("");
+    private static final Matcher regCfgObjectDBID = Pattern.compile("DBID=(\\d+)").matcher("");
+    private static final Matcher regCfgObjectType = Pattern.compile("object Cfg(\\w+)=").matcher("");
+    private static final Matcher regCfgOp = Pattern.compile("\\(type Object(\\w+)\\)").matcher("");
+    private static final Matcher regSIPServerStartDN = Pattern.compile("^\\s*DN added \\(dbid (\\d+)\\) \\(number ([^\\(]+)\\) ").matcher("");
     private static final String sipTrunkStatistics = "sipTrunkStatistics ";
     private static final String sipRegGenerated = "requests GENERATED_";
     private static final String sipResGenerated = "response GENERATED_";
-    private static final Pattern regKeyValueLine = Pattern.compile("(\\w+)=(?:\"([^\"]+)\"|(\\w+))");
-    public static final int MAX_1536_ATTRIBUTES = 40;
+    private static final Matcher regKeyValueLine = Pattern.compile("(\\w+)=(?:\"([^\"]+)\"|(\\w+))").matcher("");
+    static private boolean ifSIPLines = false;
+    private static boolean ifSIPLinesForce = false;
+    private static boolean gaveWarning = false;
     final int MSG_STRING_LIMIT = 200;
+    private final ArrayList<String> extraBuff;
     // parse state contants
     HashSet m_BlockNamesToIgnoreHash;
     StringBuilder sipBuf = new StringBuilder();
     long m_CurrentFilePos;
     long m_HeaderOffset;
-
-    private ParserState m_ParserState;
     int m_PacketLength;
     Integer m_ContentLength;
     String m_Header;
@@ -110,18 +112,16 @@ public class SingleThreadParser extends Parser {
     // 0-tlib, 1-sip, 2-json
 
     String m_lastTime;
+    SIP1536OtherMessage sip1536OtherMessage = null;
+    private ParserState m_ParserState;
     private String msgName;
     private boolean inbound;
     private DateParsed dpHeader;
-
-    private final ArrayList<String> extraBuff;
     private boolean haMessage;
     private String handleAdd;
     private Message msgInProgress;
-
     private FileInfo.FileType fileType = FileInfo.FileType.UNKNOWN;
     private long lastSeqNo = 0;
-    SIP1536OtherMessage sip1536OtherMessage = null;
 
     public SingleThreadParser(HashMap<TableType, DBTable> m_tables) {
         super(FileInfoType.type_SessionController, m_tables);
@@ -278,7 +278,7 @@ public class SingleThreadParser extends Parser {
 
                 m_lineStarted = m_CurrentLine;
 
-                if ((m = regConfigOneLineDN.matcher(str)).find()) {
+                if ((m = regConfigOneLineDN.reset(str)).find()) {
                     ConfigUpdateRecord msg = new ConfigUpdateRecord(str);
                     try {
                         msg.setObjectType("DN");
@@ -290,14 +290,14 @@ public class SingleThreadParser extends Parser {
                         Main.logger.error("Not added \"" + msg.getM_type() + "\" record:" + e.getMessage(), e);
                     }
 
-                } else if ((m = regConfigUpdate.matcher(s)).find()) {
+                } else if ((m = regConfigUpdate.reset(s)).find()) {
                     setSavedFilePos(getFilePos());
                     m_MessageContents.add(s.substring(m.end()));
                     m_ParserState = STATE_CONFIG;
-                } else if ((m = regTriggerStart.matcher(s)).find()) {
+                } else if ((m = regTriggerStart.reset(s)).find()) {
                     HandleBlock(m.group(1), s.substring(m.end()));
 //                } else if (trimmed.contains(" Proxy(") || str.startsWith("Proxy(")) {
-                } else if ((m = regProxy.matcher(s)).find()) {
+                } else if ((m = regProxy.reset(s)).find()) {
                     ProxiedMessage msg = new ProxiedMessage(m.group(1), s.substring(m.end()));
                     SetStdFieldsAndAdd(msg);
 
@@ -306,7 +306,7 @@ public class SingleThreadParser extends Parser {
                     HandleConnId(s);
                     return null;
                 } //<editor-fold defaultstate="collapsed" desc="reading sip">
-                else if ((m = regSIPHeader.matcher(s)).find()) {
+                else if ((m = regSIPHeader.reset(s)).find()) {
                     Main.logger.trace("SIP header");
                     try {
                         m_PacketLength = Integer.parseInt(m.group(1));
@@ -393,7 +393,7 @@ public class SingleThreadParser extends Parser {
                     break;
 
 //</editor-fold>
-                } else if ((regTBackupMessage.matcher(s)).find()) {
+                } else if ((regTBackupMessage.reset(s)).find()) {
 //                    setSavedFilePos(getFilePos());
 //                    m_MessageContents.add(s);
                     m_ParserState = STATE_TLIB_BACKUP_MESSAGE;
@@ -401,7 +401,7 @@ public class SingleThreadParser extends Parser {
 //                } else if (str.startsWith("@")
 //                        && (str.contains("message ISCCEvent") || str.contains("message ISCCRequest"))) {
 
-                } else if ((m = regISCCHead.matcher(s)).find()) {
+                } else if ((m = regISCCHead.reset(s)).find()) {
 //                    Main.logger.trace("-8-");
                     String act = m.group(1);
                     inbound = (act.charAt(0) == 'R');
@@ -417,12 +417,12 @@ public class SingleThreadParser extends Parser {
                     m_ParserState = STATE_ISCC_MESSAGE;
                     setSavedFilePos(getFilePos());
                     break;
-                } else if ((regJSONFinished.matcher(s)).find()) {
+                } else if ((regJSONFinished.reset(s)).find()) {
                     Record.SetHandlerInProgress(false);
                     break;
 
-                } else if (((lastLogMsg = getLastLogMsg()) != null && (regTLibMessageLog.matcher(lastLogMsg.getLastGenesysMsgID())).find())
-                        || (regTLibMessage.matcher(s)).find()) {
+                } else if (((lastLogMsg = getLastLogMsg()) != null && (regTLibMessageLog.reset(lastLogMsg.getLastGenesysMsgID())).find())
+                        || (regTLibMessage.reset(s)).find()) {
 
                     Main.logger.trace("TLib message start");
                     m_Header = s;
@@ -461,7 +461,7 @@ public class SingleThreadParser extends Parser {
                     }
                     setSavedFilePos(getFilePos());
                     break;
-                } else if ((m = regTimerActions.matcher(str)).find()) {
+                } else if ((m = regTimerActions.reset(str)).find()) {
                     this.msgInProgress = new TLibTimerRedirectMessage(m.group(1));
                     setSavedFilePos(getFilePos());
                     m_ParserState = ParserState.STATE_TIMER_REDIRECT;
@@ -503,7 +503,7 @@ public class SingleThreadParser extends Parser {
                 }
                 break;
             case STATE_TIMER_REDIRECT: {
-                if ((m = regTimerActionsParams.matcher(str)).find()) {
+                if ((m = regTimerActionsParams.reset(str)).find()) {
                     ((TLibTimerRedirectMessage) msgInProgress).setConnID(m.group(1));
                     String cause = m.group(2);
                     if (cause != null && !cause.isEmpty()) {
@@ -517,7 +517,7 @@ public class SingleThreadParser extends Parser {
 
 //<editor-fold defaultstate="collapsed" desc="state_SIP_HEADER">
             case STATE_SIP_HEADER: {
-                if (!SIPHeaderFound.matcher(str).find()) {
+                if (!SIPHeaderFound.reset(str).find()) {
                     m_MessageContents.add(str);
                 } else {
                     m_ParserState = STATE_SIP_HEADER1;
@@ -529,7 +529,7 @@ public class SingleThreadParser extends Parser {
 
             case STATE_SIP_HEADER1: {
                 boolean doneParsing = false;
-                if ((SIPHeaderFound.matcher(str)).find()) {
+                if ((SIPHeaderFound.reset(str)).find()) {
                     ParseTimestamp(str);
                     if (dp != null) { // protection against stupid converters that remove empty line at the end of SIP message
                         doneParsing = true;
@@ -607,7 +607,7 @@ public class SingleThreadParser extends Parser {
             case STATE_SIP_BODY: {
                 m_PacketLength -= s.length() + 2;
 
-                if ((SIPHeaderContinue.matcher(str)).find()) {
+                if ((SIPHeaderContinue.reset(str)).find()) {
                     m_MessageContents.add(s);
 
                 } else {
@@ -742,7 +742,7 @@ public class SingleThreadParser extends Parser {
                 break;
 
             case STATE_TLIB_MESSAGE:
-                if (regTMessageContinue.matcher(str).find()) {
+                if (regTMessageContinue.reset(str).find()) {
                     m_MessageContents.add(s);
                 } else {
                     ParseGenesysTServer(str, TableType.MsgTServer, regNotParseMessage, ptSkip);
@@ -759,7 +759,7 @@ public class SingleThreadParser extends Parser {
                 break;
 
             case STATE_TLIB_BACKUP_MESSAGE:
-                if (!regTMessageContinue.matcher(str).find()
+                if (!regTMessageContinue.reset(str).find()
                         && !str.contains(": message EventAgent")) {
                     m_ParserState = STATE_COMMENTS;
                     Main.logger.trace("Ignored message to backup");
@@ -779,7 +779,7 @@ public class SingleThreadParser extends Parser {
 
             case STATE_ISCC_MESSAGE:
 
-                if (regTMessageContinue.matcher(str).find()) {
+                if (regTMessageContinue.reset(str).find()) {
                     m_MessageContents.add(s);
                 } else {
                     m_ParserState = STATE_COMMENTS;
@@ -801,7 +801,7 @@ public class SingleThreadParser extends Parser {
                 break;
 
             case STATE_CONNID_RECORD:
-                if (regConnidChangeEnd.matcher(str).find()) {
+                if (regConnidChangeEnd.reset(str).find()) {
                     //new message started
                     HandleConnIdChange(m_MessageContents);
                     m_ParserState = STATE_COMMENTS;
@@ -848,7 +848,7 @@ public class SingleThreadParser extends Parser {
             msg.HaName();
         }
 
-        if ((m = regSIPHeaderIP.matcher(header)).find()) {
+        if ((m = regSIPHeaderIP.reset(header)).find()) {
 //            workarround for this garbage
 //            12:53:33.355: {Authorization Failed:297} Wrong Checksum.12:53:33.355: Sending  [0,UDP] 629 bytes to 10.17.29.37:5061 >>>>>
 
@@ -861,7 +861,7 @@ public class SingleThreadParser extends Parser {
                 msg.SetSenderName(m.group(1));
                 m_isInbound = true;
             }
-        } else if ((m = regSIPHeaderNetwork.matcher(header)).find()) {
+        } else if ((m = regSIPHeaderNetwork.reset(header)).find()) {
             if (m.group(2).startsWith(">")) // sending
             {
                 msg.SetReceiverName(m.group(1));
@@ -1148,7 +1148,7 @@ public class SingleThreadParser extends Parser {
     }
 
     protected void HandleBlock(String blockPrefix, String rest) throws Exception {
-        Matcher m = patternHandleBlock.matcher(rest);
+        Matcher m = patternHandleBlock.reset(rest);
         if (m.find()) {
             String msgPrefix = m.group(2);
             if (msgPrefix != null && !msgPrefix.isEmpty()) {
@@ -1165,7 +1165,7 @@ public class SingleThreadParser extends Parser {
 
             String msg = m.group(1);
             String s;
-            if ((m = regHandlerCutSeconds.matcher(msg)).find()) {
+            if ((m = regHandlerCutSeconds.reset(msg)).find()) {
                 s = m.group(1);
             } else {
                 s = msg;
@@ -1247,9 +1247,9 @@ public class SingleThreadParser extends Parser {
         req.SetName(headerList[1]);
         for (Object oLine : contents) {
             String line = (String) oLine;
-            if ((m = regFrom.matcher(line)).find()) {
+            if ((m = regFrom.reset(line)).find()) {
                 req.SetRefId(m.group(1));
-            } else if ((m = regNumbers.matcher(line)).find()) {
+            } else if ((m = regNumbers.reset(line)).find()) {
                 req.SetThisDn(m.group(1));
                 req.SetOtherDn(m.group(2));
             }
@@ -1284,11 +1284,11 @@ public class SingleThreadParser extends Parser {
             if (!oldId.isEmpty() && !newId.isEmpty()) {
                 break;
             }
-            if ((m = regOldConnID.matcher(oLine)).find()) {
+            if ((m = regOldConnID.reset(oLine)).find()) {
                 oldId = m.group(1);
                 continue;
             }
-            if ((m = regNewConnID.matcher(oLine)).find()) {
+            if ((m = regNewConnID.reset(oLine)).find()) {
                 newId = m.group(1);
             }
         }
@@ -1311,7 +1311,7 @@ public class SingleThreadParser extends Parser {
         ConfigUpdateRecord msg = new ConfigUpdateRecord(m_MessageContents);
         try {
             Matcher m;
-            if (m_MessageContents.size() > 0 && (m = regSIPServerStartDN.matcher(m_MessageContents.get(0))).find()) {
+            if (m_MessageContents.size() > 0 && (m = regSIPServerStartDN.reset(m_MessageContents.get(0))).find()) {
                 msg.setObjectType("DN");
                 msg.setObjectDBID(m.group(1));
                 msg.setObjName(m.group(2));
@@ -1546,7 +1546,7 @@ public class SingleThreadParser extends Parser {
                     + ",line int"
                     + ",keyid int"
                     /* standard first */
-                    + buf.toString()
+                    + buf
                     + ");";
             getM_dbAccessor().runQuery(query);
 
@@ -1556,14 +1556,13 @@ public class SingleThreadParser extends Parser {
             }
             m_InsertStatementId = getM_dbAccessor().PrepareStatement("INSERT INTO " + getTabName() + " VALUES(NULL,?,?,?,?,?,?"
                     /*standard first*/
-                    + buf.toString()
+                    + buf
                     + ");"
             );
 
         }
 
         /**
-         *
          * @throws Exception
          */
         @Override
@@ -1592,7 +1591,7 @@ public class SingleThreadParser extends Parser {
                     setFieldString(stmt, baseRecNo + i * 2 + 1, entry.getValue());
                     if (++i >= MAX_1536_ATTRIBUTES) {
                         Main.logger.debug(rec.getM_line() + ": more attributes then max (" + MAX_1536_ATTRIBUTES + ") - "
-                                + attrs.size() + ":" + attrs.toString());
+                                + attrs.size() + ":" + attrs);
                         break;
                     }
                 }
@@ -1615,7 +1614,7 @@ public class SingleThreadParser extends Parser {
             if (string == null || string.isEmpty()) {
                 throw new Exception("Key cannot be empty");
             }
-            Matcher m = regKeyValueLine.matcher(string);
+            Matcher m = regKeyValueLine.reset(string);
             while (m.find()) {
                 if (trunk == null && m.group(1).equalsIgnoreCase("TRUNK")) {
                     trunk = getGroup2Or3(m);
@@ -1668,7 +1667,7 @@ public class SingleThreadParser extends Parser {
                     + ",line int"
                     + ",trunkid int"
                     /* standard first */
-                    + buf.toString()
+                    + buf
                     + ");";
             getM_dbAccessor().runQuery(query);
 
@@ -1678,14 +1677,13 @@ public class SingleThreadParser extends Parser {
             }
             m_InsertStatementId = getM_dbAccessor().PrepareStatement("INSERT INTO " + getTabName() + " VALUES(NULL,?,?,?,?,?,?"
                     /*standard first*/
-                    + buf.toString()
+                    + buf
                     + ");"
             );
 
         }
 
         /**
-         *
          * @throws Exception
          */
         @Override
@@ -1714,7 +1712,7 @@ public class SingleThreadParser extends Parser {
                     setFieldString(stmt, baseRecNo + i * 2 + 1, entry.getValue());
                     if (++i >= MAX_1536_ATTRIBUTES) {
                         Main.logger.error(rec.getM_line() + ": more attributes then max (" + MAX_1536_ATTRIBUTES + ") - "
-                                + attrs.size() + ":" + attrs.toString());
+                                + attrs.size() + ":" + attrs);
                         break;
                     }
                 }
@@ -1730,9 +1728,9 @@ public class SingleThreadParser extends Parser {
     private class SIP1536RequestResponse extends Message {
 
         private final boolean request;
+        HashMap<String, String> attrs = new HashMap<>();
         private String msg;
         private String amount;
-        HashMap<String, String> attrs = new HashMap<>();
 
         private SIP1536RequestResponse(String string, boolean request) throws Exception {
             super(TableType.SIP1536ReqResp);
@@ -1740,7 +1738,7 @@ public class SingleThreadParser extends Parser {
                 throw new Exception("Key cannot be empty");
             }
             this.request = request;
-            Matcher m = regKeyValueLine.matcher(string);
+            Matcher m = regKeyValueLine.reset(string);
             if (m.find()) {
                 this.msg = m.group(1);
                 this.amount = getGroup2Or3(m);
@@ -1808,7 +1806,7 @@ public class SingleThreadParser extends Parser {
                     + ",amount int"
                     + ",isrequest bit"
                     /* standard first */
-                    + buf.toString()
+                    + buf
                     + ");";
             getM_dbAccessor().runQuery(query);
 
@@ -1818,14 +1816,13 @@ public class SingleThreadParser extends Parser {
             }
             m_InsertStatementId = getM_dbAccessor().PrepareStatement("INSERT INTO " + getTabName() + " VALUES(NULL,?,?,?,?,?,?,?,?"
                     /*standard first*/
-                    + buf.toString()
+                    + buf
                     + ");"
             );
 
         }
 
         /**
-         *
          * @throws Exception
          */
         @Override
@@ -1856,7 +1853,7 @@ public class SingleThreadParser extends Parser {
                     setFieldString(stmt, baseRecNo + i * 2 + 1, entry.getValue());
                     if (++i >= MAX_1536_ATTRIBUTES) {
                         Main.logger.error(rec.getM_line() + ": more attributes then max (" + MAX_1536_ATTRIBUTES + ") - "
-                                + attrs.size() + ":" + attrs.toString());
+                                + attrs.size() + ":" + attrs);
                         break;
                     }
                 }
@@ -1884,20 +1881,20 @@ public class SingleThreadParser extends Parser {
             return connID;
         }
 
-        public String getCause() {
-            return cause;
-        }
-
-        public String getMsg() {
-            return msg;
-        }
-
         private void setConnID(String group) {
             this.connID = group;
         }
 
+        public String getCause() {
+            return cause;
+        }
+
         private void setCause(String cause) {
             this.cause = cause;
+        }
+
+        public String getMsg() {
+            return msg;
         }
 
     }
@@ -1942,7 +1939,6 @@ public class SingleThreadParser extends Parser {
         }
 
         /**
-         *
          * @throws Exception
          */
         @Override

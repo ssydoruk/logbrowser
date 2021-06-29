@@ -4,22 +4,20 @@
  */
 package com.myutils.logbrowser.indexer;
 
+import java.util.ArrayList;
+
 import static Utils.Util.intOrDef;
-import java.util.*;
 
 /**
- *
  * @author terry The class Replicates TLibMessage
  */
 public class WWEMessage extends Message {
 
-    String m_MessageName;
     private final String m_TserverSRC;
-
+    String m_MessageName;
     private boolean isTServerReq = false;
 
     /**
-     *
      * @param event
      * @param TserverSRC
      * @param newMessageLines

@@ -1,7 +1,7 @@
 package com.myutils.logbrowser.inquirer;
 
-import java.io.*;
-import java.util.*;
+import java.io.IOException;
+import java.util.HashMap;
 
 public class InquirerFileIo {
 
@@ -19,8 +19,8 @@ public class InquirerFileIo {
     }
 
     public static byte[] GetLogBytes(LogFile fileName,
-            long offset,
-            int bytes) throws Exception {
+                                     long offset,
+                                     int bytes) throws Exception {
         InqFile retInqFile = null;
 
         if (logReaderHash == null) {
@@ -77,7 +77,7 @@ public class InquirerFileIo {
     }
 
     public static String GetFileBytes(LogFile fileName,
-            long offSet, int bytes) {
+                                      long offSet, int bytes) {
         String logBytes = "";
         try {
             if (fileName != null) {
@@ -96,11 +96,11 @@ public class InquirerFileIo {
 
     private static class InqFile {
 
-        private long lastOffset = 0;
-        private int lastBytes = 0;
         private final RandomFileReader rfr;
         byte[] pseudoLogBuffer;
         int pseudoLogBufferSize = 0;
+        private long lastOffset = 0;
+        private int lastBytes = 0;
 
         public InqFile(LogFile lf) throws IOException {
             if (lf.isText()) {

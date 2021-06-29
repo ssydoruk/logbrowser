@@ -4,21 +4,21 @@
  */
 package com.myutils.logbrowser.indexer;
 
+import org.w3c.dom.Document;
+
 import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.w3c.dom.Document;
 
 /**
- *
  * @author ssydoruk
  */
 
 /*It extends TServer message, however there is now TServer message attributes*/
 public class ORSMetric extends Message {
 
-    private static final Pattern regTMessageStart = Pattern.compile("^<(\\w+) sid='([\\w~]+)");
-    private static final Pattern regReqID = Pattern.compile("^\\s*<eval_expr .+expression='system.LastSubmitRequestId;.+result='(\\d+)' />");
+    private static final Matcher regTMessageStart = Pattern.compile("^<(\\w+) sid='([\\w~]+)").matcher("");
+    private static final Matcher regReqID = Pattern.compile("^\\s*<eval_expr .+expression='system.LastSubmitRequestId;.+result='(\\d+)' />").matcher("");
 
     public String sid = "";
     public String Method = "";
@@ -44,7 +44,7 @@ public class ORSMetric extends Message {
         Matcher m;
         String s = m_MessageLines.get(0);
 
-        if (s != null && (m = regTMessageStart.matcher(s)).find()) {
+        if (s != null && (m = regTMessageStart.reset(s)).find()) {
             Method = m.group(1);
             sid = m.group(2);
         }
@@ -64,12 +64,12 @@ public class ORSMetric extends Message {
         }
     }
 
-//   expression='system.LastSubmitRequestId;system.LastSubmitRequestId=_event.data.requestid;' result='216731' />
+    //   expression='system.LastSubmitRequestId;system.LastSubmitRequestId=_event.data.requestid;' result='216731' />
     int getReqID() {
         Matcher m;
         String s = m_MessageLines.get(0);
 
-        if (s != null && (m = regReqID.matcher(s)).find()) {
+        if (s != null && (m = regReqID.reset(s)).find()) {
             try {
                 return Integer.parseInt(m.group(1));
             } catch (NumberFormatException e) {
@@ -96,12 +96,12 @@ public class ORSMetric extends Message {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
-    void setParam1(String group) {
-        this.param1 = group;
-    }
-
     public String getParam1() {
         return param1;
+    }
+
+    void setParam1(String group) {
+        this.param1 = group;
     }
 
 }

@@ -9,22 +9,24 @@ import Utils.Util;
 import com.jacob.com.ComFailException;
 import com.myutils.logbrowser.inquirer.LogFile;
 import com.myutils.logbrowser.inquirer.inquirer;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 /**
- *
  * @author ssydoruk
  */
 public abstract class ExternalEditor {
 
     private static final org.apache.logging.log4j.Logger logger = LogManager.getLogger();
+    final private static Matcher regNum = Pattern.compile("(\\d+)").matcher("");
     private static ExternalEditor editor = null;
-    final private static Pattern regNum = Pattern.compile("(\\d+)");
+    HashMap<String, Integer> loadedFiles = new HashMap<>();
 
     public static void editFiles(ArrayList<String> shortFileNames) {
         for (String name : shortFileNames) {
@@ -58,15 +60,15 @@ public abstract class ExternalEditor {
 
     static public void openTextpad(String fileName, int line) {
         String[] cmd = {
-            "C:\\Program Files\\TextPad 7\\TextPad.exe",
-            "-q",
-            "-u",
-            fileName + "(" + line + ")"
+                "C:\\Program Files\\TextPad 7\\TextPad.exe",
+                "-q",
+                "-u",
+                fileName + "(" + line + ")"
         };
         try {
             Runtime.getRuntime().exec(cmd, null, null);
         } catch (IOException ex) {
-            logger.error("fatal: ",  ex);
+            logger.error("fatal: ", ex);
             inquirer.ExceptionHandler.handleException("cannot run notepad", ex);
         }
     }
@@ -85,7 +87,7 @@ public abstract class ExternalEditor {
             }
             Runtime.getRuntime().exec(cmd, null, null);
         } catch (IOException ex) {
-            logger.error("fatal: ",  ex);
+            logger.error("fatal: ", ex);
             inquirer.ExceptionHandler.handleException("cannot run notepad", ex);
         }
 
@@ -94,19 +96,18 @@ public abstract class ExternalEditor {
     static public void openNotepad(String fileName, int line) {
 
         String[] cmd = {
-            "C:\\Program Files\\Notepad++\\notepad++.exe",
-            "-n" + line,
-            fileName
+                "C:\\Program Files\\Notepad++\\notepad++.exe",
+                "-n" + line,
+                fileName
         };
         try {
             Runtime.getRuntime().exec(cmd, null, null);
         } catch (IOException ex) {
-            logger.error("fatal: ",  ex);
+            logger.error("fatal: ", ex);
             inquirer.ExceptionHandler.handleException("cannot run notepad", ex);
         }
 
     }
-    HashMap<String, Integer> loadedFiles = new HashMap<>();
 
     abstract void ediFile(LogFile lf) throws IOException;
 

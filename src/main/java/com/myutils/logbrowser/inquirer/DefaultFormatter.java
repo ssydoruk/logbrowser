@@ -9,15 +9,10 @@ public class DefaultFormatter implements ILogRecordFormatter {
 
     static protected HashMap<String, Integer> m_callIdHash = new HashMap<>();
     static protected int m_callIdCount = 0;
-
-    public static String GetRelativePath(String canonicalPath) {
-
-        return PathManager.GetRelativePath(canonicalPath);
-    }
-
     protected int m_maxFileNameLength;
     protected boolean m_isLongFileNameEnabled;
     protected HashSet<String> m_components;
+    MsgType lastType = MsgType.UNKNOWN;
     private boolean headerOnTop = true;
     private boolean allFields = false;
     private boolean shouldAccessFiles = true;
@@ -27,12 +22,15 @@ public class DefaultFormatter implements ILogRecordFormatter {
     private boolean printFileLine = false;
     private Character delimiter;
 
-    MsgType lastType = MsgType.UNKNOWN;
-
     public DefaultFormatter(boolean isLongFileNameEnabled, HashSet<String> components) {
         m_isLongFileNameEnabled = isLongFileNameEnabled;
         m_maxFileNameLength = 0;
         m_components = components;
+    }
+
+    public static String GetRelativePath(String canonicalPath) {
+
+        return PathManager.GetRelativePath(canonicalPath);
     }
 
     public boolean isShouldPrintRecordType() {
@@ -43,8 +41,16 @@ public class DefaultFormatter implements ILogRecordFormatter {
         return printFileLine;
     }
 
+    void setPrintFileLine(boolean printFileLine) {
+        this.printFileLine = printFileLine;
+    }
+
     public boolean isShouldAccessFiles() {
         return shouldAccessFiles;
+    }
+
+    void setShouldAccessFiles(boolean shouldAccessFiles) {
+        this.shouldAccessFiles = shouldAccessFiles;
     }
 
     @Override
@@ -79,7 +85,6 @@ public class DefaultFormatter implements ILogRecordFormatter {
     }
 
     /**
-     *
      * @param loggedEvent
      * @param ps
      * @throws Exception
@@ -156,10 +161,6 @@ public class DefaultFormatter implements ILogRecordFormatter {
         this.delimiter = delimiter;
     }
 
-    void setPrintFileLine(boolean printFileLine) {
-        this.printFileLine = printFileLine;
-    }
-
     void setAllFields(boolean allFields) {
         this.allFields = allFields;
     }
@@ -172,10 +173,6 @@ public class DefaultFormatter implements ILogRecordFormatter {
         if (outString.length() > 0) {
             outString.append(delimiter);
         }
-    }
-
-    void setShouldAccessFiles(boolean shouldAccessFiles) {
-        this.shouldAccessFiles = shouldAccessFiles;
     }
 
     void setPrintRecordType(boolean shouldPrintRecordType) {

@@ -5,35 +5,37 @@
  */
 package com.myutils.logbrowser.indexer;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import static Utils.Util.intOrDef;
 import static com.myutils.logbrowser.indexer.Parser.getQueryKey;
 import static com.myutils.logbrowser.indexer.Parser.splitQuery;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.regex.Pattern;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 public class OrsHTTP extends Message {
 
     //    Set-Cookie:ORSSESSIONID=00FAVPM3BOBM3223H3CA9ATAES00000G.node1576
-    private static final Pattern regSIDCookie = Pattern.compile("ORSSESSIONID=([\\w~]+)");
-    private static final Pattern regHTTPMethod = Pattern.compile("^(\\w+)");
-    private static final Pattern regSessionID = Pattern.compile("session/([^\\/]+)");
-    private static final Pattern regHTTPURL = Pattern.compile("^(?:POST|GET) (.+) HTTP/");
-    private static final Pattern regHTTPResp = Pattern.compile("^HTTP/.\\.. (.+)");
+    private static final Matcher regSIDCookie = Pattern.compile("ORSSESSIONID=([\\w~]+)").matcher("");
+    private static final Matcher regHTTPMethod = Pattern.compile("^(\\w+)").matcher("");
+    private static final Matcher regSessionID = Pattern.compile("session/([^\\/]+)").matcher("");
+    private static final Matcher regHTTPURL = Pattern.compile("^(?:POST|GET) (.+) HTTP/").matcher("");
+    private static final Matcher regHTTPResp = Pattern.compile("^HTTP/.\\.. (.+)").matcher("");
+    JSONObject _jsonBody = null;
     private String ip = null;
     private int socket = 0;
     private int bytes = 0;
     private String sid = null;
-
     private String method = null;
     private String url = null;
     private String gmsService = null;
     private String httpResponseID;
     private int bodyLineIdx = -2;
     private String httpMessageBody = null;
-    JSONObject _jsonBody = null;
 
     public OrsHTTP(ArrayList<String> messageLines) {
         super(TableType.ORSHTTP, messageLines);
@@ -62,6 +64,10 @@ public class OrsHTTP extends Message {
         return socket;
     }
 
+    void setSocket(int socket) {
+        this.socket = socket;
+    }
+
     int getHTTPBytes() {
         return bytes;
     }
@@ -83,6 +89,10 @@ public class OrsHTTP extends Message {
         return sid;
     }
 
+    void setSID(String sid) {
+        this.sid = sid;
+    }
+
     String getNameSpace() {
         return "";
     }
@@ -91,16 +101,8 @@ public class OrsHTTP extends Message {
         this.ip = ip;
     }
 
-    void setSocket(int socket) {
-        this.socket = socket;
-    }
-
     void setBytes(int bytes) {
         this.bytes += bytes;
-    }
-
-    void setSID(String sid) {
-        this.sid = sid;
     }
 
     private String getHTTPMethod() {
@@ -282,16 +284,16 @@ public class OrsHTTP extends Message {
         return null;
     }
 
+    Long getHTTPResponseID() {
+        return intOrDef(httpResponseID, null, 16);
+    }
+
     void setHTTPResponseID(String group) {
         if (group != null && group.substring(0, 2).equalsIgnoreCase("0x")) {
             httpResponseID = group.substring(2);
         } else {
             httpResponseID = group;
         }
-    }
-
-    Long getHTTPResponseID() {
-        return intOrDef(httpResponseID, null, 16);
     }
 
 }

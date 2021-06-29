@@ -9,19 +9,18 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 
 /**
- *
  * @author ssydoruk
  */
 public class FileInfoTable extends DBTable {
 
     private static int filesAdded = 0;
 
-    public static int getFilesAdded() {
-        return filesAdded;
-    }
-
     public FileInfoTable(DBAccessor dbaccessor) {
         super(dbaccessor, TableType.File);
+    }
+
+    public static int getFilesAdded() {
+        return filesAdded;
     }
 
     @Override

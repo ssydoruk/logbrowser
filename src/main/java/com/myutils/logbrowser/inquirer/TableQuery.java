@@ -1,35 +1,35 @@
 package com.myutils.logbrowser.inquirer;
 
 import com.myutils.logbrowser.indexer.TableType;
+import org.apache.logging.log4j.LogManager;
+
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import org.apache.logging.log4j.LogManager;
 
 public class TableQuery extends IQuery {
 
     private static final org.apache.logging.log4j.Logger logger = LogManager.getLogger();
 
     private final String tabName;
-    private String idName;
     private final MsgType msgType;
-
+    private final ArrayList<String> whereFields = new ArrayList<>();
+    private String idName;
     private String idsSubQuery;
     private String existsTable;
     private String orderBy = null;
     private boolean addAll;
-//    private Class<ILogRecord> resultClass;
+    //    private Class<ILogRecord> resultClass;
     private Class<TLibEvent> myClass;
     private WhereType whereType = WhereType.WhereNone;
-    private final ArrayList<String> whereFields = new ArrayList<>();
 
     public TableQuery(MsgType msgType, String _tabName, String _idName, String _addWhere) {
         this(msgType, _tabName, _addWhere);
         idName = _idName;
     }
 
-//
+    //
 //    public void setResultClass(ILogRecord.class result1) {
 //        this.resultClass = result;
 //    }
@@ -274,15 +274,15 @@ public class TableQuery extends IQuery {
         return idsSubQuery;
     }
 
+    public void setIdsSubQuery(String idsSubQuery) {
+        this.idsSubQuery = idsSubQuery;
+    }
+
     /**
      * @param idsSubQuery the idsSubQuery to set
      */
     public void setIdsSubQuery(String idName, String idsSubQuery) {
         this.idName = idName;
-        this.idsSubQuery = idsSubQuery;
-    }
-
-    public void setIdsSubQuery(String idsSubQuery) {
         this.idsSubQuery = idsSubQuery;
     }
 

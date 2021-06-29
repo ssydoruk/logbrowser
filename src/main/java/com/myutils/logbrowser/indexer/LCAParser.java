@@ -6,40 +6,37 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- *
  * @author akolo
  */
 public class LCAParser extends Parser {
 
-    private static final Pattern reqNotifyStatus = Pattern.compile("^\\s*Notify STATUS: App\\<(\\w+),\\s*([^,]+), pid=(\\w+), ([^,]+), (\\w+)");
-    private static final Pattern regNotifyRunmode = Pattern.compile("^\\s*Notify RUNMODE: App\\<(\\w+),\\s*([^,]+), pid=(\\w+), ([^,]+), (\\w+)");
+    private static final Matcher reqNotifyStatus = Pattern.compile("^\\s*Notify STATUS: App\\<(\\w+),\\s*([^,]+), pid=(\\w+), ([^,]+), (\\w+)").matcher("");
+    private static final Matcher regNotifyRunmode = Pattern.compile("^\\s*Notify RUNMODE: App\\<(\\w+),\\s*([^,]+), pid=(\\w+), ([^,]+), (\\w+)").matcher("");
 
-    private static final Pattern reqSCSRequest = Pattern.compile("\\[Request[^\\]]+\\]$");
-    private static final Pattern reqSCSRequestStartApplication = Pattern.compile("\\[RequestStartApplication[^\\]]*\\]$");
-    private static final Pattern reqSCSDisconnected = Pattern.compile("SCSRequester '(.+)' disconnected, fd=(\\w+)");
+    private static final Matcher reqSCSRequest = Pattern.compile("\\[Request[^\\]]+\\]$").matcher("");
+    private static final Matcher reqSCSRequestStartApplication = Pattern.compile("\\[RequestStartApplication[^\\]]*\\]$").matcher("");
+    private static final Matcher reqSCSDisconnected = Pattern.compile("SCSRequester '(.+)' disconnected, fd=(\\w+)").matcher("");
 
-    private static final Pattern regNOtificationReceived = Pattern.compile("\\#{4} App\\{(\\w+),(\\w+)\\} status changed to (\\w+) mode=(\\w+), \\[prev=(\\w+)\\]");
-//    private static final Pattern regNotifyApp = Pattern.compile("'([^']+)': NotifyApp: status= (\\w+) mode=(\\w+) pid=(\\w+) \\{(\\w+), (\\w+)\\}");
-//    private static final Pattern regSelfServer = Pattern.compile("SelfServer: Internal Change RUNMODE from '(\\w+)' to '(\\w+)'");
-//    private static final Pattern regSCSReq = Pattern.compile("\\#{5} Request change RUNMODE for Application \\<(\\w+),(\\w+)\\> from '(\\w+)' to '(\\w+)'");
+    private static final Matcher regNOtificationReceived = Pattern.compile("\\#{4} App\\{(\\w+),(\\w+)\\} status changed to (\\w+) mode=(\\w+), \\[prev=(\\w+)\\]").matcher("");
+//    private static final Matcher regNotifyApp = Pattern.compile("'([^']+)': NotifyApp: status= (\\w+) mode=(\\w+) pid=(\\w+) \\{(\\w+), (\\w+)\\}").matcher("");
+//    private static final Matcher regSelfServer = Pattern.compile("SelfServer: Internal Change RUNMODE from '(\\w+)' to '(\\w+)'").matcher("");
+//    private static final Matcher regSCSReq = Pattern.compile("\\#{5} Request change RUNMODE for Application \\<(\\w+),(\\w+)\\> from '(\\w+)' to '(\\w+)'").matcher("");
 
-    private static final Pattern regLineSkip = Pattern.compile("^[>\\s]*");
-    private static final Pattern regNotParseMessage = Pattern.compile("(30201)");
-    private static final Pattern ptServerName = Pattern.compile("^Application\\s+name:\\s+(\\S+)");
-    private static final Pattern regCfgObjectName = Pattern.compile("(?:name|userName)='([^']+)'");
-    private static final Pattern regCfgObjectType = Pattern.compile("^Cfg([^=]+)=\\{DBID=(\\w+)");
-    private static final Pattern regCfgOp = Pattern.compile("^(Creating|Adding\\s[\\w]+)");
-    long m_CurrentFilePos;
+    private static final Matcher regLineSkip = Pattern.compile("^[>\\s]*").matcher("");
+    private static final Matcher regNotParseMessage = Pattern.compile("(30201)").matcher("");
+    private static final Matcher ptServerName = Pattern.compile("^Application\\s+name:\\s+(\\S+)").matcher("");
+    private static final Matcher regCfgObjectName = Pattern.compile("(?:name|userName)='([^']+)'").matcher("");
+    private static final Matcher regCfgObjectType = Pattern.compile("^Cfg([^=]+)=\\{DBID=(\\w+)").matcher("");
+    private static final Matcher regCfgOp = Pattern.compile("^(Creating|Adding\\s[\\w]+)").matcher("");
     final int MSG_STRING_LIMIT = 200;
+    private final HashMap m_BlockNamesToIgnoreHash;
     // parse state contants
-
+    long m_CurrentFilePos;
     long m_HeaderOffset;
-    private ParserState m_ParserState;
-
     String m_ServerName;
 
     int m_dbRecords = 0;
-    private final HashMap m_BlockNamesToIgnoreHash;
+    private ParserState m_ParserState;
 
     public LCAParser(HashMap<TableType, DBTable> m_tables) {
         super(FileInfoType.type_LCA, m_tables);
@@ -144,14 +141,14 @@ public class LCAParser extends Parser {
                     LCAClient msg = new LCAClient(s);
                     msg.parseDisconnect();
                     SetStdFieldsAndAdd(msg);
-                } else if ((m = reqSCSDisconnected.matcher(s)).find()) {
+                } else if ((m = reqSCSDisconnected.reset(s)).find()) {
                     LCAClient msg = new LCAClient(s);
                     msg.setAppName(m.group(1));
                     msg.setFD(m.group(2));
                     msg.setConnected(false);
                     msg.setSCS(true);
                     SetStdFieldsAndAdd(msg);
-                } else if ((reqSCSRequestStartApplication.matcher(s)).find()) {
+                } else if ((reqSCSRequestStartApplication.reset(s)).find()) {
                     setSavedFilePos(getFilePos());
                     m_MessageContents.add(s);
                     m_ParserState = ParserState.STATE_SCSREQUESTSTARTAPP;
@@ -159,11 +156,11 @@ public class LCAParser extends Parser {
                     setSavedFilePos(getFilePos());
                     m_MessageContents.add(s);
                     m_ParserState = ParserState.STATE_SCSREQUESTCHANGERUNMODE;
-                } else if ((reqSCSRequest.matcher(s)).find()) {
+                } else if ((reqSCSRequest.reset(s)).find()) {
                     setSavedFilePos(getFilePos());
                     m_MessageContents.add(s);
                     m_ParserState = ParserState.STATE_SCSREQUEST;
-                } else if ((m = reqNotifyStatus.matcher(s)).find()) {
+                } else if ((m = reqNotifyStatus.reset(s)).find()) {
                     LCAAppStatus msg = new LCAAppStatus();
                     msg.setMode(m.group(5));
                     msg.setAppDBID(m.group(1));
@@ -171,7 +168,7 @@ public class LCAParser extends Parser {
                     msg.setPID(m.group(3));
                     msg.setStatus(m.group(4));
                     SetStdFieldsAndAdd(msg);
-                } else if ((m = regNotifyRunmode.matcher(s)).find()) {
+                } else if ((m = regNotifyRunmode.reset(s)).find()) {
                     LCAAppStatus msg = new LCAAppStatus();
                     msg.setMode(m.group(5));
                     msg.setAppDBID(m.group(1));
@@ -256,7 +253,7 @@ public class LCAParser extends Parser {
                 break;
             }
             case STATE_APP_STATUS_CHANGED1: {
-                if ((m = regNOtificationReceived.matcher(str)).find()) {
+                if ((m = regNOtificationReceived.reset(str)).find()) {
                     m_MessageContents.add(str);
                     SCSAppStatus msg = new SCSAppStatus(m_MessageContents);
                     msg.setAppDBID(m.group(1));
@@ -279,7 +276,7 @@ public class LCAParser extends Parser {
 
     protected void ParseServerName(String str) {
 
-        Matcher matcher = ptServerName.matcher(str);
+        Matcher matcher = ptServerName.reset(str);
         if (matcher.find()) {
             try {
                 m_ServerName = matcher.group(1);

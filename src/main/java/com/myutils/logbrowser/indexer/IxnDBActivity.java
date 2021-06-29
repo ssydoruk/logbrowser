@@ -8,8 +8,8 @@ package com.myutils.logbrowser.indexer;
 public class IxnDBActivity extends Message {
 
     private final String activity;
-    private String reqid = null;
     private final String ixnid;
+    private String reqid = null;
 
     IxnDBActivity(String activity, String reqid, String ixnid) {
         super(TableType.IxnDB);

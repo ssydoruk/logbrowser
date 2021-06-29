@@ -10,7 +10,6 @@ import com.myutils.logbrowser.inquirer.inquirer;
 import org.apache.commons.lang3.ArrayUtils;
 
 /**
- *
  * @author stepan_sydoruk
  */
 public class Start {

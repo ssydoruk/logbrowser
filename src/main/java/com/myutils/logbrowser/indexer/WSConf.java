@@ -4,18 +4,19 @@
  */
 package com.myutils.logbrowser.indexer;
 
-import static Utils.Util.StripQuotes;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static Utils.Util.StripQuotes;
+
 /**
- *
  * @author terry The class Replicates TLibMessage
  */
 public class WSConf extends Message {
 
-    final private static Pattern regConnID = Pattern.compile("^AttributeConnID .+= (\\w+)$");
-    final private static Pattern regThisDN = Pattern.compile("^AttributeThisDN .+= \\\"([^\\\"]*)\\\"$");
+    final private static Matcher regConnID = Pattern.compile("^AttributeConnID .+= (\\w+)$").matcher("");
+    final private static Matcher regThisDN = Pattern.compile("^AttributeThisDN .+= \\\"([^\\\"]*)\\\"$").matcher("");
 
     private final String m_MessageName;
     private final String server;

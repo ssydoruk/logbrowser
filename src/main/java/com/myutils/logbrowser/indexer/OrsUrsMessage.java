@@ -5,13 +5,14 @@
  */
 package com.myutils.logbrowser.indexer;
 
-import static Utils.Util.intOrDef;
-import java.util.ArrayList;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+
+import static Utils.Util.intOrDef;
+
 /**
- *
  * @author ssydoruk
  */
 public class OrsUrsMessage extends Message {

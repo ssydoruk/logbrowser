@@ -6,7 +6,6 @@
 package com.myutils.mygenerictree;
 
 /**
- *
  * @author ssydoruk
  */
 public interface TClonable {

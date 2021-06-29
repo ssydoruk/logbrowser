@@ -8,7 +8,6 @@ package com.myutils.logbrowser.inquirer;
 import Utils.Pair;
 
 /**
- *
  * @author ssydoruk
  */
 public class MenuItem extends Pair<String, Object> {

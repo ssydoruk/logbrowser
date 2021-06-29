@@ -7,14 +7,15 @@ package com.myutils.logbrowser.inquirer;
 
 import Utils.UTCTimeRange;
 import com.myutils.logbrowser.indexer.ReferenceType;
-import static com.myutils.logbrowser.inquirer.inquirer.checkIntr;
+
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
+import static com.myutils.logbrowser.inquirer.inquirer.checkIntr;
+
 /**
- *
  * @author ssydoruk
  */
 public class AggrOCSDBServerDelays extends IAggregateQuery {

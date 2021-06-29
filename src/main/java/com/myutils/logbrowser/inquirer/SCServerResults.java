@@ -5,11 +5,12 @@ import com.myutils.logbrowser.indexer.FileInfoType;
 import com.myutils.logbrowser.indexer.ReferenceType;
 import com.myutils.logbrowser.indexer.TableType;
 import com.myutils.logbrowser.inquirer.IQuery.FieldType;
+import org.apache.logging.log4j.LogManager;
+
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import org.apache.logging.log4j.LogManager;
 
 public class SCServerResults extends IQueryResults {
 
@@ -39,7 +40,7 @@ public class SCServerResults extends IQueryResults {
 
     @Override
     public String getReportSummary() {
-        return "SCServer \n\t" + (cidFinder != null ? "search: " + cidFinder.toString() : "");
+        return "SCServer \n\t" + (cidFinder != null ? "search: " + cidFinder : "");
     }
 
     @Override
@@ -92,7 +93,7 @@ public class SCServerResults extends IQueryResults {
         try {
             addCustom(rootA, FileInfoType.type_SCS);
         } catch (SQLException ex) {
-            logger.error("fatal: ",  ex);
+            logger.error("fatal: ", ex);
         }
 
         subNode.addDynamicRef(DialogItem.SCS_Application_NAME, ReferenceType.App, "scs_appstatus", "theAppNameID");
@@ -181,7 +182,7 @@ public class SCServerResults extends IQueryResults {
         Sort();
     }
 
-//    private void retrieveSIP
+    //    private void retrieveSIP
     private void doRetrieve(QueryDialog dlg, SelectionType selectionType, String selection, boolean isRegex) throws SQLException {
         ILogRecord record = null;
 

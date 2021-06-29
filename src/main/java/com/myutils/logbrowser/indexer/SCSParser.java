@@ -1,5 +1,7 @@
 package com.myutils.logbrowser.indexer;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
@@ -7,40 +9,36 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.apache.commons.lang3.StringUtils;
 
 /**
- *
  * @author akolo
  */
 public class SCSParser extends Parser {
 
-    private static final Pattern regAppRunModeChanged = Pattern.compile("^AppRunModeChanged newMode='(\\w+)',\\s+App\\s+\\<DBID=(\\d+),\\s+([^,]+),\\s+PID=(\\d+)\\>,\\s+\\[prevMode=(\\w+)\\],\\s+(\\w+)");
-    private static final Pattern regClientMessage = Pattern.compile("^### MESSAGE#=(\\d+),\\s+'(.+)'$");
-    private static final Pattern regAlarmCleared = Pattern.compile("^Alarm   (\\S+)   (\\S+)   GCTI-00-04210   Active Alarm \"([^\"]+)\" Cleared");
-    private static final Pattern regAlarmCreated = Pattern.compile("^CREATE ActiveAlarm  <(\\d+), ([^>]+)> for  App=<(\\d+),\\s*([^>]+)>.+under control=1");
-    private static final Pattern regAlarmActive = Pattern.compile("^ActiveAlarm::SetDeleteTimer  <(\\d+), ([^>]+)> for App=<(\\d+), ([^>]+)>,");
+    private static final Matcher regAppRunModeChanged = Pattern.compile("^AppRunModeChanged newMode='(\\w+)',\\s+App\\s+\\<DBID=(\\d+),\\s+([^,]+),\\s+PID=(\\d+)\\>,\\s+\\[prevMode=(\\w+)\\],\\s+(\\w+)").matcher("");
+    private static final Matcher regClientMessage = Pattern.compile("^### MESSAGE#=(\\d+),\\s+'(.+)'$").matcher("");
+    private static final Matcher regAlarmCleared = Pattern.compile("^Alarm   (\\S+)   (\\S+)   GCTI-00-04210   Active Alarm \"([^\"]+)\" Cleared").matcher("");
+    private static final Matcher regAlarmCreated = Pattern.compile("^CREATE ActiveAlarm  <(\\d+), ([^>]+)> for  App=<(\\d+),\\s*([^>]+)>.+under control=1").matcher("");
+    private static final Matcher regAlarmActive = Pattern.compile("^ActiveAlarm::SetDeleteTimer  <(\\d+), ([^>]+)> for App=<(\\d+), ([^>]+)>,").matcher("");
 
-    private static final Pattern regNOtificationReceived = Pattern.compile("\\#{4} App\\{(\\d+),(\\w+)\\} status changed to (\\w+) mode=(\\w+), \\[prev=(\\w+)\\]");
-    private static final Pattern regNotifyApp = Pattern.compile("'([^']+)': NotifyApp: status= (\\w+) mode=(\\w+) pid=(\\d+) \\{(\\d+), (\\w+)\\}");
-    private static final Pattern regSelfServer = Pattern.compile("SelfServer: Internal Change RUNMODE from '(\\w+)' to '(\\w+)'");
-    private static final Pattern regSCSReq = Pattern.compile("\\#{5} Request change RUNMODE for Application \\<(\\d+),(\\w+)\\> from '(\\w+)' to '(\\w+)'");
+    private static final Matcher regNOtificationReceived = Pattern.compile("\\#{4} App\\{(\\d+),(\\w+)\\} status changed to (\\w+) mode=(\\w+), \\[prev=(\\w+)\\]").matcher("");
+    private static final Matcher regNotifyApp = Pattern.compile("'([^']+)': NotifyApp: status= (\\w+) mode=(\\w+) pid=(\\d+) \\{(\\d+), (\\w+)\\}").matcher("");
+    private static final Matcher regSelfServer = Pattern.compile("SelfServer: Internal Change RUNMODE from '(\\w+)' to '(\\w+)'").matcher("");
+    private static final Matcher regSCSReq = Pattern.compile("\\#{5} Request change RUNMODE for Application \\<(\\d+),(\\w+)\\> from '(\\w+)' to '(\\w+)'").matcher("");
 
-    private static final Pattern regLineSkip = Pattern.compile("^[>\\s]*");
-    private static final Pattern regNotParseMessage = Pattern.compile("(30201|04210)");
-    private static final Pattern ptServerName = Pattern.compile("^Application\\s+name:\\s+(\\S+)");
-    long m_CurrentFilePos;
+    private static final Matcher regLineSkip = Pattern.compile("^[>\\s]*").matcher("");
+    private static final Matcher regNotParseMessage = Pattern.compile("(30201|04210)").matcher("");
+    private static final Matcher ptServerName = Pattern.compile("^Application\\s+name:\\s+(\\S+)").matcher("");
     final int MSG_STRING_LIMIT = 200;
+    private final boolean customEvent = false;
     // parse state contants
-
+    long m_CurrentFilePos;
     long m_HeaderOffset;
-    private ParserState m_ParserState;
-
     String m_ServerName;
 
     int m_dbRecords = 0;
+    private ParserState m_ParserState;
     private String m_LastLine;
-    private final boolean customEvent = false;
     private Message msg = null;
     private String lastMSGID;
     private String lastMSGText;
@@ -137,11 +135,11 @@ public class SCSParser extends Parser {
 
                 s = ParseGenesysSCS(str, TableType.MsgSCServer, regNotParseMessage, regLineSkip);
 
-                if ((m = regClientMessage.matcher(s)).find()) {
+                if ((m = regClientMessage.reset(s)).find()) {
                     lastMSGID = m.group(1);
                     lastMSGText = m.group(2);
                     m_ParserState = ParserState.STATE_CLIENT_MESSAGE_RECEIVED;
-                } else if ((m = regAlarmCreated.matcher(s)).find()) {
+                } else if ((m = regAlarmCreated.reset(s)).find()) {
                     msg = new SCSAlarm(AlarmState.Creating);
                     ((SCSAlarm) msg).setAlarmDBID(m.group(1));
                     ((SCSAlarm) msg).setAlarmName(m.group(2));
@@ -151,7 +149,7 @@ public class SCSParser extends Parser {
                     m_MessageContents.add(s);
                     m_ParserState = ParserState.STATE_ALARM_CREATED;
                     setSavedFilePos(getFilePos());
-                } else if ((m = regAlarmCleared.matcher(s)).find()) {
+                } else if ((m = regAlarmCleared.reset(s)).find()) {
                     msg = new SCSAlarm(AlarmState.Releasing);
                     ((SCSAlarm) msg).setHost(m.group(1));
                     ((SCSAlarm) msg).setAppName(m.group(2));
@@ -160,7 +158,7 @@ public class SCSParser extends Parser {
                     m_MessageContents.add(s);
                     m_ParserState = ParserState.STATE_ALARM_PARAMS_CLEARED;
                     setSavedFilePos(getFilePos());
-                } else if ((m = regAppRunModeChanged.matcher(s)).find()) {
+                } else if ((m = regAppRunModeChanged.reset(s)).find()) {
                     SCSAppStatus _msg = new SCSAppStatus();
                     _msg.setNewMode(m.group(1));
                     _msg.setAppDBID(m.group(2));
@@ -170,7 +168,7 @@ public class SCSParser extends Parser {
                     _msg.setStatus(m.group(6));
                     _msg.setEvent("AppRunModeChanged");
                     SetStdFieldsAndAdd(_msg);
-                } else if ((m = regNotifyApp.matcher(s)).find()) {
+                } else if ((m = regNotifyApp.reset(s)).find()) {
                     SCSAppStatus _msg = new SCSAppStatus();
                     _msg.setNewMode(m.group(3));
                     _msg.setAppDBID(m.group(5));
@@ -181,7 +179,7 @@ public class SCSParser extends Parser {
                     _msg.setEvent("NotifyApp");
                     SetStdFieldsAndAdd(_msg);
 
-                } else if ((m = regSCSReq.matcher(s)).find()) {
+                } else if ((m = regSCSReq.reset(s)).find()) {
                     SCSAppStatus _msg = new SCSAppStatus();
                     _msg.setAppDBID(m.group(1));
                     _msg.setAppName(m.group(2));
@@ -190,7 +188,7 @@ public class SCSParser extends Parser {
                     _msg.setEvent("Request change RUNMODE");
                     SetStdFieldsAndAdd(_msg);
 
-                } else if ((m = regSelfServer.matcher(s)).find()) {
+                } else if ((m = regSelfServer.reset(s)).find()) {
                     SCSSelfStatus _msg = new SCSSelfStatus();
                     _msg.setNewMode(m.group(2));
                     _msg.setOldMode(m.group(1));
@@ -203,7 +201,7 @@ public class SCSParser extends Parser {
 
             case STATE_CLIENT_MESSAGE_RECEIVED: {
                 s = ParseGenesysSCS(str, TableType.MsgSCServer, regNotParseMessage, regLineSkip);
-                if ((m = regAlarmCreated.matcher(s)).find()) {
+                if ((m = regAlarmCreated.reset(s)).find()) {
                     msg = new SCSAlarm(AlarmState.Creating);
                     ((SCSAlarm) msg).setMsgID(lastMSGID);
                     ((SCSAlarm) msg).setMsgText(lastMSGText);
@@ -217,7 +215,7 @@ public class SCSParser extends Parser {
                     m_MessageContents.add(s);
                     m_ParserState = ParserState.STATE_ALARM_CREATED;
                     setSavedFilePos(getFilePos());
-                } else if ((m = regAlarmCleared.matcher(s)).find()) {
+                } else if ((m = regAlarmCleared.reset(s)).find()) {
                     msg = new SCSAlarm(AlarmState.Releasing);
                     ((SCSAlarm) msg).setMsgID(lastMSGID);
                     ((SCSAlarm) msg).setMsgText(lastMSGText);
@@ -230,7 +228,7 @@ public class SCSParser extends Parser {
                     m_MessageContents.add(s);
                     m_ParserState = ParserState.STATE_ALARM_PARAMS_CLEARED;
                     setSavedFilePos(getFilePos());
-                } else if ((m = regAlarmActive.matcher(s)).find()) {
+                } else if ((m = regAlarmActive.reset(s)).find()) {
                     msg = new SCSAlarm(AlarmState.ReActivate);
                     ((SCSAlarm) msg).setMsgID(lastMSGID);
                     ((SCSAlarm) msg).setMsgText(lastMSGText);
@@ -320,7 +318,7 @@ public class SCSParser extends Parser {
                 break;
             }
             case STATE_APP_STATUS_CHANGED1: {
-                if ((m = regNOtificationReceived.matcher(str)).find()) {
+                if ((m = regNOtificationReceived.reset(str)).find()) {
                     m_MessageContents.add(str);
                     SCSAppStatus _msg = new SCSAppStatus(m_MessageContents);
                     _msg.setAppDBID(m.group(1));
@@ -343,7 +341,7 @@ public class SCSParser extends Parser {
 
     protected void ParseServerName(String str) {
 
-        Matcher matcher = ptServerName.matcher(str);
+        Matcher matcher = ptServerName.reset(str);
         if (matcher.find()) {
             try {
                 m_ServerName = matcher.group(1);
@@ -448,6 +446,30 @@ public class SCSParser extends Parser {
 
     }
 
+    public enum AlarmState {
+
+        Creating("Creating"),
+        Releasing("Releasing"),
+        ReActivate("Existing"),
+        ;
+
+        private final String name;
+
+        AlarmState(String s) {
+            name = s.toLowerCase();
+        }
+
+        public boolean equalsName(String otherName) {
+            return otherName != null && name.equalsIgnoreCase(otherName);
+        }
+
+        @Override
+        public String toString() {
+            return this.name.toLowerCase();
+        }
+
+    }
+
     private class SCSClientLogMessage extends Message {
 
         private int msgID;
@@ -464,6 +486,10 @@ public class SCSParser extends Parser {
             setMsgText(msgText);
         }
 
+        public int getMsgID() {
+            return msgID;
+        }
+
         final public void setMsgID(String msgID) {
             try {
                 this.msgID = Integer.parseInt(msgID);
@@ -473,19 +499,16 @@ public class SCSParser extends Parser {
             }
         }
 
-        final public void setMsgText(String msgText) {
-            this.msgText = msgText;
-        }
-
-        public int getMsgID() {
-            return msgID;
-        }
-
         public String getMsgText() {
             return msgText;
         }
 
+        final public void setMsgText(String msgText) {
+            this.msgText = msgText;
+        }
+
     }
+//</editor-fold>d>
 
     private class SCSClientLogTable extends DBTable {
 
@@ -525,7 +548,6 @@ public class SCSParser extends Parser {
         }
 
         /**
-         *
          * @throws Exception
          */
         @Override
@@ -555,9 +577,8 @@ public class SCSParser extends Parser {
         }
 
     }
-//</editor-fold>d>
 
-//<editor-fold defaultstate="collapsed" desc="SCSAlarm">
+    //<editor-fold defaultstate="collapsed" desc="SCSAlarm">
     private class SCSAlarm extends SCSClientLogMessage {
 
         private final AlarmState alarmState;
@@ -575,34 +596,6 @@ public class SCSParser extends Parser {
             this.alarmState = st;
         }
 
-        private void setAlarmDBID(String group) {
-            alarmDBID = getIntOrDef(group, null, true);
-        }
-
-        private void setAlarmName(String group) {
-            alarmName = group;
-        }
-
-        private void setAppDBID(String group) {
-            appDBID = getIntOrDef(group, null, true);
-        }
-
-        private void setAppName(String group) {
-            appName = group;
-        }
-
-        private void setAlarmID(String string) {
-            alarmID = string;
-        }
-
-        private void setReason(String string) {
-            reason = string;
-        }
-
-        private void setCategory(String string) {
-            category = string;
-        }
-
         public String getAlarmState() {
             return alarmState.toString();
         }
@@ -611,28 +604,56 @@ public class SCSParser extends Parser {
             return alarmDBID;
         }
 
+        private void setAlarmDBID(String group) {
+            alarmDBID = getIntOrDef(group, null, true);
+        }
+
         public Integer getAppDBID() {
             return appDBID;
+        }
+
+        private void setAppDBID(String group) {
+            appDBID = getIntOrDef(group, null, true);
         }
 
         public String getAlarmName() {
             return alarmName;
         }
 
+        private void setAlarmName(String group) {
+            alarmName = group;
+        }
+
         public String getAppName() {
             return appName;
+        }
+
+        private void setAppName(String group) {
+            appName = group;
         }
 
         public String getAlarmID() {
             return alarmID;
         }
 
+        private void setAlarmID(String string) {
+            alarmID = string;
+        }
+
         public String getReason() {
             return reason;
         }
 
+        private void setReason(String string) {
+            reason = string;
+        }
+
         public String getCategory() {
             return category;
+        }
+
+        private void setCategory(String string) {
+            category = string;
         }
 
         private void setHost(String group) {
@@ -640,6 +661,7 @@ public class SCSParser extends Parser {
         }
 
     }
+//</editor-fold>
 
     private class SCSAlarmTable extends DBTable {
 
@@ -701,7 +723,6 @@ public class SCSParser extends Parser {
         }
 
         /**
-         *
          * @throws Exception
          */
         @Override
@@ -737,30 +758,6 @@ public class SCSParser extends Parser {
             } catch (SQLException e) {
                 Main.logger.error("Could not add record type " + m_type.toString() + ": " + e, e);
             }
-        }
-
-    }
-//</editor-fold>
-
-    public enum AlarmState {
-
-        Creating("Creating"),
-        Releasing("Releasing"),
-        ReActivate("Existing"),;
-
-        private final String name;
-
-        AlarmState(String s) {
-            name = s.toLowerCase();
-        }
-
-        public boolean equalsName(String otherName) {
-            return otherName != null && name.equalsIgnoreCase(otherName);
-        }
-
-        @Override
-        public String toString() {
-            return this.name.toLowerCase();
         }
 
     }
