@@ -1,6 +1,7 @@
 var cmd = RECORD.getField("command");
 switch (cmd) {
-  case "execution step": {
+  case "execution step":
+  case "cond": {
     var s = RECORD.getBytes();
     var m;
     var expr;
@@ -8,11 +9,9 @@ switch (cmd) {
       expr = m[1];
     }
     if (expr != undefined) {
-      if (expr.startsWith("Called for")) {
-        IGNORE_RECORD = true;
-      } else {
+   
         FIELDS.put("name", cmd + " ->" + expr);
-      }
+      
     }
     break;
   }

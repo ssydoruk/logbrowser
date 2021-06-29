@@ -74,6 +74,8 @@ public class MCPParser extends Parser {
         HashMap<String, String> ret = new HashMap<>();
         ret.put("EvaluateExpression():", "expression");
         ret.put("RuntimeHelper::GetStringProperty()", "expression");
+        ret.put("EvaluateCond():", "cond");
+        ret.put("RuntimeFactory():", "runtime");
         return ret;
     }
 
@@ -431,25 +433,33 @@ public class MCPParser extends Parser {
                 if (theFile.startsWith("Runtime.c")) {
                     String firstWord = null;
                     String noFirstWord = null;
+
+                    String cmd = "";
                     if ((m1 = ptFirstWord.reset(noFile)).find()) {
                         firstWord = m1.group(1);
                         noFirstWord = noFile.substring(m1.end());
                     }
-                    VXMLIntSteps steps = new VXMLIntSteps();
-                    steps.setMCPCallID(callID);
                     if (firstWord != null) {
-                        String get = FunctionMap.get(firstWord);
-                        if (get != null) {
-                            steps.setCommand(get);
-                        } else {
-                            steps.setCommand("execution step");
+                        cmd = FunctionMap.get(firstWord);
+
+                        if (cmd == null) {
+                            cmd = "execution step";
                         }
+                        if (cmd.equals("runtime") && (noFirstWord.startsWith("Called for")))
+                            return;
+                        if (cmd.equals("expression") && (noFirstWord.contains("__.savetmpfiles")
+                                || noFirstWord.contains("__.savetmpfilesmode")))
+                            return;
+
                         //steps.setParam1(noFirstWord);
                     } else {
                         //steps.setParam1(noFile);
                     }
 
-//                        steps.setStepParams(StringUtils.split(split[initalIndex], null));
+                    VXMLIntSteps steps = new VXMLIntSteps();
+                    steps.setMCPCallID(callID);
+                    steps.setCommand(cmd);
+
                     SetStdFieldsAndAdd(steps);
                 }
             } else { // file not specified
@@ -1026,6 +1036,7 @@ public class MCPParser extends Parser {
         private String GVPSession;
         private String Tenant;
         private String IVRProfile;
+
         private VXMLIntSteps() {
             super(TableType.VXMLIntStepsTable);
         }
