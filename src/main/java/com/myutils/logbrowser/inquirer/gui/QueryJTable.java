@@ -6,7 +6,6 @@
 package com.myutils.logbrowser.inquirer.gui;
 
 import Utils.Pair;
-import Utils.TableColumnAdjuster;
 import com.myutils.logbrowser.indexer.FileInfoType;
 import com.myutils.logbrowser.inquirer.FullTableColors;
 import com.myutils.logbrowser.inquirer.IQueryResults;
@@ -43,7 +42,7 @@ public class QueryJTable extends JTableCommon {
         Font font = this.getFont();
 
         setDefaultRenderer(Object.class, new QueryJTableCellRenderer(new Font(font.getName(), Font.BOLD, font.getSize())));
-        TableColumnAdjuster tca = getTca();
+        Utils.swing.TableColumnAdjuster tca = getTca();
         tca.setColumnHeaderIncluded(true);
         tca.adjustColumns();
 

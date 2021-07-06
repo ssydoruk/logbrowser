@@ -190,7 +190,7 @@ public class EditRegexFields extends javax.swing.JDialog {
         jcbMatchWholeWord.addActionListener(cbActioned);
         setOKButton();
 
-        Utils.Swing.restrictHeight(jtfRetValue);
+        Utils.swing.Swing.restrictHeight(jtfRetValue);
     }
     EditRegexFields() {
         throw new UnsupportedOperationException("Not supported yet."); // To change body of generated methods, choose

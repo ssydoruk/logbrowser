@@ -216,7 +216,7 @@ public final class QuerySetting extends javax.swing.JDialog {
 //
 //
 //        jtConstants.setPreferredSize(preferredSize);
-//        tca = new TableColumnAdjuster(jtConstants);
+//        tca = new Utils.swing.TableColumnAdjuster(jtConstants);
 //        tca.setColumnDataIncluded(true);
 //        tca.setColumnHeaderIncluded(false);
 //        tca.setDynamicAdjustment(true);

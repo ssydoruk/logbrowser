@@ -6,7 +6,6 @@
 package com.myutils.logbrowser.inquirer.gui;
 
 import Utils.Pair;
-import Utils.TableColumnAdjuster;
 import Utils.UTCTimeRange;
 import com.jidesoft.dialog.ButtonPanel;
 import com.jidesoft.dialog.StandardDialog;
@@ -44,7 +43,7 @@ abstract class JTableCommon extends JTablePopup {
     private final HashMap<Integer, AColumnFilter> columnFilters = new HashMap<>();
     private final TableCellRenderer savedHeaderRenderer;
     private final JMenuItem miCancelColumnFilter;
-    private final TableColumnAdjuster tca;
+    private final Utils.swing.TableColumnAdjuster tca;
     protected int copyItemsIdx = 0;
     Rectangle r = null;
     TableRowSorter<TableModel> sorter = null;
@@ -88,7 +87,7 @@ abstract class JTableCommon extends JTablePopup {
         popupMenu.add(new FindPrevius());
         popupMenu.add(new ExportExcel());
 
-        tca = new TableColumnAdjuster(this);
+        tca = new Utils.swing.TableColumnAdjuster(this);
         tca.setColumnDataIncluded(true);
         tca.setColumnHeaderIncluded(false);
         tca.setDynamicAdjustment(true);
@@ -176,7 +175,7 @@ abstract class JTableCommon extends JTablePopup {
         tca.adjustColumns();
     }
 
-    public TableColumnAdjuster getTca() {
+    public Utils.swing.TableColumnAdjuster getTca() {
         return tca;
     }
 
