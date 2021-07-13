@@ -5,36 +5,18 @@
  */
 package com.myutils.logbrowser.inquirer;
 
-import Utils.TDateRange;
+import Utils.*;
 import Utils.TDateRange.IRefresh;
 import Utils.UTCTimeRange;
-import com.jidesoft.swing.CheckBoxList;
-import com.jidesoft.swing.CheckBoxListSelectionModel;
-import com.jidesoft.swing.SearchableUtils;
-import com.myutils.logbrowser.inquirer.gui.ExternalEditor;
-import com.myutils.logbrowser.inquirer.gui.QueryJTable;
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.Window;
-import java.awt.event.ActionEvent;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import javax.swing.AbstractAction;
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.DefaultListModel;
-import javax.swing.JLabel;
-import javax.swing.JMenu;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.ListModel;
-import javax.swing.ListSelectionModel;
-import javax.swing.SwingUtilities;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
-import org.apache.logging.log4j.LogManager;
+import com.jidesoft.swing.*;
+import com.myutils.logbrowser.inquirer.gui.*;
+import java.awt.*;
+import java.awt.event.*;
+import java.sql.*;
+import java.util.*;
+import javax.swing.*;
+import javax.swing.event.*;
+import org.apache.logging.log4j.*;
 
 /**
  *
@@ -389,7 +371,6 @@ public class RequestParams extends javax.swing.JPanel {
         pSelectionType.setMaximumSize(new Dimension(pSelectionType.getMaximumSize().width, pSelectionType.getMinimumSize().height));
         pSearchLevel.setMaximumSize(new Dimension(pSearchLevel.getMaximumSize().width, pSearchLevel.getMinimumSize().height));
         pShowFiles.setMaximumSize(new Dimension(pShowFiles.getMaximumSize().width, pShowFiles.getMinimumSize().height));
-
     }
     private TDateRange timeRange;
 
@@ -695,12 +676,12 @@ public class RequestParams extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        rptAttrValues = new javax.swing.JPanel();
         jPanel5 = new javax.swing.JPanel();
         jPanel3 = new javax.swing.JPanel();
         rptType = new javax.swing.JPanel();
         rptComponents = new javax.swing.JPanel();
         rptCompAttr = new javax.swing.JPanel();
+        rptAttrValues = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
         jPanel6 = new javax.swing.JPanel();
         jPanel10 = new javax.swing.JPanel();
@@ -717,19 +698,6 @@ public class RequestParams extends javax.swing.JPanel {
         pShowFiles = new javax.swing.JPanel();
         jbShowFiles = new javax.swing.JButton();
 
-        rptAttrValues.setBorder(javax.swing.BorderFactory.createTitledBorder("Attribute values"));
-
-        javax.swing.GroupLayout rptAttrValuesLayout = new javax.swing.GroupLayout(rptAttrValues);
-        rptAttrValues.setLayout(rptAttrValuesLayout);
-        rptAttrValuesLayout.setHorizontalGroup(
-            rptAttrValuesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 0, Short.MAX_VALUE)
-        );
-        rptAttrValuesLayout.setVerticalGroup(
-            rptAttrValuesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 567, Short.MAX_VALUE)
-        );
-
         jPanel5.setLayout(new javax.swing.BoxLayout(jPanel5, javax.swing.BoxLayout.PAGE_AXIS));
 
         jPanel3.setLayout(new javax.swing.BoxLayout(jPanel3, javax.swing.BoxLayout.LINE_AXIS));
@@ -740,7 +708,7 @@ public class RequestParams extends javax.swing.JPanel {
         rptType.setLayout(rptTypeLayout);
         rptTypeLayout.setHorizontalGroup(
             rptTypeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 568, Short.MAX_VALUE)
+            .addGap(0, 563, Short.MAX_VALUE)
         );
         rptTypeLayout.setVerticalGroup(
             rptTypeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -759,7 +727,7 @@ public class RequestParams extends javax.swing.JPanel {
         );
         rptComponentsLayout.setVerticalGroup(
             rptComponentsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 286, Short.MAX_VALUE)
+            .addGap(0, 186, Short.MAX_VALUE)
         );
 
         jPanel3.add(rptComponents);
@@ -770,7 +738,7 @@ public class RequestParams extends javax.swing.JPanel {
         rptCompAttr.setLayout(rptCompAttrLayout);
         rptCompAttrLayout.setHorizontalGroup(
             rptCompAttrLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 592, Short.MAX_VALUE)
+            .addGap(0, 587, Short.MAX_VALUE)
         );
         rptCompAttrLayout.setVerticalGroup(
             rptCompAttrLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -778,6 +746,21 @@ public class RequestParams extends javax.swing.JPanel {
         );
 
         jPanel3.add(rptCompAttr);
+
+        rptAttrValues.setBorder(javax.swing.BorderFactory.createTitledBorder("Attribute values"));
+
+        javax.swing.GroupLayout rptAttrValuesLayout = new javax.swing.GroupLayout(rptAttrValues);
+        rptAttrValues.setLayout(rptAttrValuesLayout);
+        rptAttrValuesLayout.setHorizontalGroup(
+            rptAttrValuesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 0, Short.MAX_VALUE)
+        );
+        rptAttrValuesLayout.setVerticalGroup(
+            rptAttrValuesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 186, Short.MAX_VALUE)
+        );
+
+        jPanel3.add(rptAttrValues);
 
         jPanel5.add(jPanel3);
 
@@ -806,7 +789,7 @@ public class RequestParams extends javax.swing.JPanel {
 
         pSelectionType.setLayout(new javax.swing.BoxLayout(pSelectionType, javax.swing.BoxLayout.LINE_AXIS));
 
-        jLabel1.setText("Selection Type");
+        jLabel1.setText("Search type");
         pSelectionType.add(jLabel1);
 
         pSelectionType.add(jcbSelectionType);
@@ -815,7 +798,7 @@ public class RequestParams extends javax.swing.JPanel {
 
         pSearchLevel.setLayout(new javax.swing.BoxLayout(pSearchLevel, javax.swing.BoxLayout.LINE_AXIS));
 
-        lbSearchLevel.setText("search level");
+        lbSearchLevel.setText("Search level");
         pSearchLevel.add(lbSearchLevel);
 
         pSearchLevel.add(cbSearchLevel);
@@ -832,7 +815,7 @@ public class RequestParams extends javax.swing.JPanel {
         jpApps.setLayout(new java.awt.BorderLayout());
         jPanel4.add(jpApps);
 
-        pShowFiles.setLayout(new java.awt.BorderLayout());
+        pShowFiles.setLayout(new javax.swing.BoxLayout(pShowFiles, javax.swing.BoxLayout.LINE_AXIS));
 
         jbShowFiles.setText("Show files");
         jbShowFiles.addActionListener(new java.awt.event.ActionListener() {
@@ -840,7 +823,7 @@ public class RequestParams extends javax.swing.JPanel {
                 jbShowFilesActionPerformed(evt);
             }
         });
-        pShowFiles.add(jbShowFiles, java.awt.BorderLayout.EAST);
+        pShowFiles.add(jbShowFiles);
 
         jPanel4.add(pShowFiles);
 
@@ -855,17 +838,13 @@ public class RequestParams extends javax.swing.JPanel {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, 1199, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(rptAttrValues, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGap(4, 4, 4))
+                .addGap(22, 22, 22))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(rptAttrValues, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents

@@ -99,12 +99,6 @@
             <type>jar</type>
         </dependency>
         <dependency>
-            <groupId>com.github.lgooddatepicker</groupId>
-            <artifactId>LGoodDatePicker</artifactId>
-            <version>11.0.0</version>
-            <type>jar</type>
-        </dependency>
-        <dependency>
             <groupId>com.gliwka.hyperscan</groupId>
             <artifactId>hyperscan</artifactId>
             <version>1.0.0</version>

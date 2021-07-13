@@ -2,54 +2,27 @@ package com.myutils.logbrowser.inquirer;
 
 import Utils.ScreenInfo;
 import Utils.UTCTimeRange;
-import Utils.Util;
-import com.jidesoft.dialog.ButtonPanel;
-import com.jidesoft.dialog.JideOptionPane;
-import com.jidesoft.dialog.StandardDialog;
+import Utils.*;
+import com.jidesoft.dialog.*;
 import static com.jidesoft.dialog.StandardDialog.RESULT_AFFIRMED;
 import static com.jidesoft.dialog.StandardDialog.RESULT_CANCELLED;
-import com.jidesoft.swing.JideTabbedPane;
-import com.jidesoft.swing.TabEditingValidator;
-import com.myutils.logbrowser.indexer.FileInfoType;
+import com.jidesoft.swing.*;
+import com.myutils.logbrowser.indexer.*;
 import com.myutils.logbrowser.inquirer.IDsFinder.RequestLevel;
 import com.myutils.logbrowser.inquirer.IQueryResults.ProgressNotifications;
-import com.myutils.logbrowser.inquirer.gui.ExternalEditor;
-import com.myutils.logbrowser.inquirer.gui.MySwingWorker;
-import com.myutils.logbrowser.inquirer.gui.ReportFrame;
-import com.myutils.logbrowser.inquirer.gui.ReportFrameAggregate;
-import com.myutils.logbrowser.inquirer.gui.ReportFrameQuery;
-import com.myutils.logbrowser.inquirer.gui.RequestProgress;
-import com.myutils.logbrowser.inquirer.gui.WindowsSystemUtility;
-import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.GridLayout;
-import java.awt.Window;
-import java.awt.event.ActionEvent;
-import java.awt.event.MouseEvent;
-import java.sql.SQLException;
-import java.util.ArrayList;
+import com.myutils.logbrowser.inquirer.gui.*;
+import java.awt.*;
+import java.awt.event.*;
+import java.sql.*;
+import java.util.*;
 import java.util.List;
-import javax.swing.AbstractAction;
-import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
-import javax.swing.ButtonGroup;
-import javax.swing.JButton;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import static javax.swing.JOptionPane.ERROR_MESSAGE;
 import static javax.swing.JOptionPane.OK_OPTION;
-import javax.swing.JPanel;
-import javax.swing.JRadioButton;
-import javax.swing.JScrollPane;
-import javax.swing.SwingConstants;
-import javax.swing.SwingUtilities;
-import javax.swing.border.BevelBorder;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
+import javax.swing.*;
+import javax.swing.border.*;
+import javax.swing.event.*;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.*;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -112,7 +85,7 @@ public class QueryDialog extends javax.swing.JFrame {
         jpTabs.setLayout(new BoxLayout(jpTabs, BoxLayout.LINE_AXIS));
 //        jpTabs.add(new TabbedPaneDemo(),BorderLayout.CENTER);
 //        LookAndFeelFactory.installDefaultLookAndFeelAndExtension();
-
+        Utils.swing.Swing.restrictHeight(jcbSelection);
         try {
 
             jpTabs.add(createTabbedPane());
@@ -143,9 +116,11 @@ public class QueryDialog extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jPanel4 = new javax.swing.JPanel();
         jPanel3 = new javax.swing.JPanel();
-        jPanel2 = new javax.swing.JPanel();
+        jpTabs = new javax.swing.JPanel();
+        jpSelection = new javax.swing.JPanel();
+        jcbSelection = new javax.swing.JComboBox<>();
+        jcbIsRegex = new javax.swing.JCheckBox();
         jPanel5 = new javax.swing.JPanel();
         btOK = new javax.swing.JButton();
         jbReset = new javax.swing.JButton();
@@ -154,11 +129,6 @@ public class QueryDialog extends javax.swing.JFrame {
         jbCancel = new javax.swing.JButton();
         jbAggregate = new javax.swing.JButton();
         btRunSave = new javax.swing.JButton();
-        jpTabs = new javax.swing.JPanel();
-        jPanel1 = new javax.swing.JPanel();
-        jpSelection = new javax.swing.JPanel();
-        jcbSelection = new javax.swing.JComboBox<>();
-        jcbIsRegex = new javax.swing.JCheckBox();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Specify query parameters");
@@ -168,116 +138,7 @@ public class QueryDialog extends javax.swing.JFrame {
             }
         });
 
-        jPanel4.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
-        jPanel4.setFocusable(false);
-
-        javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
-        jPanel4.setLayout(jPanel4Layout);
-        jPanel4Layout.setHorizontalGroup(
-            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 918, Short.MAX_VALUE)
-        );
-        jPanel4Layout.setVerticalGroup(
-            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 0, Short.MAX_VALUE)
-        );
-
-        getContentPane().add(jPanel4, java.awt.BorderLayout.SOUTH);
-
-        jPanel3.setLayout(new java.awt.BorderLayout());
-
-        jPanel2.setLayout(new java.awt.BorderLayout());
-
-        jPanel5.setVerifyInputWhenFocusTarget(false);
-
-        btOK.setText("Run->Screen");
-        btOK.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btOKActionPerformed(evt);
-            }
-        });
-
-        jbReset.setText("Reset");
-        jbReset.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jbResetActionPerformed(evt);
-            }
-        });
-
-        jbSettings.setText("Settings");
-        jbSettings.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jbSettingsActionPerformed(evt);
-            }
-        });
-
-        btAllCalls.setText("All calls");
-        btAllCalls.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btAllCallsActionPerformed(evt);
-            }
-        });
-
-        jbCancel.setText("Close");
-        jbCancel.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jbCancelActionPerformed(evt);
-            }
-        });
-
-        jbAggregate.setText("Aggregate");
-        jbAggregate.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jbAggregateActionPerformed(evt);
-            }
-        });
-
-        btRunSave.setText("Run->File");
-        btRunSave.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btRunSaveActionPerformed(evt);
-            }
-        });
-
-        javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
-        jPanel5.setLayout(jPanel5Layout);
-        jPanel5Layout.setHorizontalGroup(
-            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel5Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(btAllCalls, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jbSettings, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jbCancel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(btOK, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jbReset, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jbAggregate, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(btRunSave, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap())
-        );
-        jPanel5Layout.setVerticalGroup(
-            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel5Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(btOK)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(btRunSave)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 15, Short.MAX_VALUE)
-                .addComponent(jbReset)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jbSettings)
-                .addGap(18, 18, 18)
-                .addComponent(btAllCalls)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jbAggregate)
-                .addGap(18, 18, 18)
-                .addComponent(jbCancel)
-                .addContainerGap())
-        );
-
-        jPanel2.add(jPanel5, java.awt.BorderLayout.NORTH);
-
-        jPanel3.add(jPanel2, java.awt.BorderLayout.EAST);
+        jPanel3.setLayout(new javax.swing.BoxLayout(jPanel3, javax.swing.BoxLayout.PAGE_AXIS));
 
         jpTabs.setBorder(javax.swing.BorderFactory.createTitledBorder("Report type"));
         jpTabs.setName("jpReports"); // NOI18N
@@ -286,19 +147,16 @@ public class QueryDialog extends javax.swing.JFrame {
         jpTabs.setLayout(jpTabsLayout);
         jpTabsLayout.setHorizontalGroup(
             jpTabsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 791, Short.MAX_VALUE)
+            .addGap(0, 910, Short.MAX_VALUE)
         );
         jpTabsLayout.setVerticalGroup(
             jpTabsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 414, Short.MAX_VALUE)
+            .addGap(0, 261, Short.MAX_VALUE)
         );
 
-        jPanel3.add(jpTabs, java.awt.BorderLayout.CENTER);
+        jPanel3.add(jpTabs);
 
-        jPanel1.setVerifyInputWhenFocusTarget(false);
-        jPanel1.setLayout(new java.awt.BorderLayout());
-
-        jpSelection.setBorder(javax.swing.BorderFactory.createTitledBorder("Selection"));
+        jpSelection.setBorder(javax.swing.BorderFactory.createTitledBorder("Search string"));
         jpSelection.setLayout(new javax.swing.BoxLayout(jpSelection, javax.swing.BoxLayout.LINE_AXIS));
 
         jcbSelection.setEditable(true);
@@ -308,9 +166,68 @@ public class QueryDialog extends javax.swing.JFrame {
         jcbIsRegex.setText("Is regex");
         jpSelection.add(jcbIsRegex);
 
-        jPanel1.add(jpSelection, java.awt.BorderLayout.CENTER);
+        jPanel3.add(jpSelection);
 
-        jPanel3.add(jPanel1, java.awt.BorderLayout.SOUTH);
+        jPanel5.setVerifyInputWhenFocusTarget(false);
+        jPanel5.setLayout(new javax.swing.BoxLayout(jPanel5, javax.swing.BoxLayout.LINE_AXIS));
+
+        btOK.setText("Run->Screen");
+        btOK.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btOKActionPerformed(evt);
+            }
+        });
+        jPanel5.add(btOK);
+
+        jbReset.setText("Reset");
+        jbReset.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jbResetActionPerformed(evt);
+            }
+        });
+        jPanel5.add(jbReset);
+
+        jbSettings.setText("Settings");
+        jbSettings.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jbSettingsActionPerformed(evt);
+            }
+        });
+        jPanel5.add(jbSettings);
+
+        btAllCalls.setText("All calls");
+        btAllCalls.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btAllCallsActionPerformed(evt);
+            }
+        });
+        jPanel5.add(btAllCalls);
+
+        jbCancel.setText("Close");
+        jbCancel.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jbCancelActionPerformed(evt);
+            }
+        });
+        jPanel5.add(jbCancel);
+
+        jbAggregate.setText("Aggregate");
+        jbAggregate.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jbAggregateActionPerformed(evt);
+            }
+        });
+        jPanel5.add(jbAggregate);
+
+        btRunSave.setText("Run->File");
+        btRunSave.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btRunSaveActionPerformed(evt);
+            }
+        });
+        jPanel5.add(btRunSave);
+
+        jPanel3.add(jPanel5);
 
         getContentPane().add(jPanel3, java.awt.BorderLayout.CENTER);
 
@@ -1266,10 +1183,7 @@ public class QueryDialog extends javax.swing.JFrame {
     private javax.swing.JButton btAllCalls;
     private javax.swing.JButton btOK;
     private javax.swing.JButton btRunSave;
-    private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
-    private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
     private javax.swing.JButton jbAggregate;
     private javax.swing.JButton jbCancel;

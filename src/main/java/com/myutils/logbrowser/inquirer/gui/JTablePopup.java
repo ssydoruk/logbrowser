@@ -5,27 +5,21 @@
  */
 package com.myutils.logbrowser.inquirer.gui;
 
-import Utils.Pair;
+import Utils.*;
 import Utils.ScreenInfo;
-import com.myutils.logbrowser.inquirer.EditRegexFields;
-import com.myutils.logbrowser.inquirer.EnterRegexDialog;
-import com.myutils.logbrowser.inquirer.gui.TabResultDataModel.TableRow;
-import com.myutils.logbrowser.inquirer.inquirer;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
-import javax.swing.*;
-import javax.swing.table.TableModel;
-import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.io.IOException;
-import java.util.HashSet;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import static com.myutils.logbrowser.inquirer.EnterRegexDialog.RET_OK;
+import com.myutils.logbrowser.inquirer.gui.SystemClipboard;
+import com.myutils.logbrowser.inquirer.gui.TabResultDataModel.TableRow;
+import com.myutils.logbrowser.inquirer.*;
+import java.awt.*;
+import java.awt.event.*;
+import java.io.*;
+import java.util.*;
+import java.util.regex.*;
 import static javax.swing.JOptionPane.INFORMATION_MESSAGE;
+import javax.swing.*;
+import javax.swing.table.*;
+import org.apache.logging.log4j.*;
 
 /**
  * @author ssydoruk
@@ -218,7 +212,7 @@ public abstract class JTablePopup extends JTable {
 
             if (search != null && !search.isEmpty()) {
                 boolean matchWholeWordSelected = findDlg.isMatchWholeWordSelected();
-                Matcher pt = (findDlg.isRegexChecked()) ? EnterRegexDialog.getRegex(search, matchWholeWordSelected) : null;
+                Matcher pt = (findDlg.isRegexChecked()) ? EnterRegexDialog.getRegex(search, matchWholeWordSelected).matcher(search) : null;
                 search = search.toLowerCase();
 
                 for (int i = 0; i < getRowCount(); i++) {
@@ -280,7 +274,7 @@ public abstract class JTablePopup extends JTable {
             int savePopupRow = popupRow;
             int savePopupCol = popupCol;
             boolean matchWholeWordSelected = findDlg.isMatchWholeWordSelected();
-            Matcher pt = (findDlg.isRegexChecked()) ? EnterRegexDialog.getRegex(search, matchWholeWordSelected) : null;
+            Matcher pt = (findDlg.isRegexChecked()) ? EnterRegexDialog.getRegex(search, matchWholeWordSelected).matcher(search) : null;
             search = search.toLowerCase();
 
             if (findDlg.isDownChecked()) {

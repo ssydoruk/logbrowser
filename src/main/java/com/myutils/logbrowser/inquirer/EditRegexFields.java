@@ -5,38 +5,18 @@
  */
 package com.myutils.logbrowser.inquirer;
 
-import Utils.TableDialog;
-import com.myutils.logbrowser.inquirer.gui.TabResultDataModel;
-import java.awt.Component;
-import java.awt.Point;
-import java.awt.Window;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
-import java.util.ArrayList;
-import java.util.Collections;
+import Utils.*;
+import com.myutils.logbrowser.inquirer.ScreenInfo;
+import com.myutils.logbrowser.inquirer.gui.*;
+import java.awt.*;
+import java.awt.event.*;
 import java.util.List;
-import java.util.Map;
-import javax.swing.AbstractAction;
-import javax.swing.ActionMap;
-import javax.swing.DefaultListModel;
-import javax.swing.InputMap;
-import javax.swing.JCheckBox;
-import javax.swing.JComponent;
-import javax.swing.JList;
-import javax.swing.JOptionPane;
-import javax.swing.JTextField;
-import javax.swing.KeyStroke;
-import javax.swing.ListSelectionModel;
-import javax.swing.SwingUtilities;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
-import org.apache.commons.lang3.ArrayUtils;
+import java.util.*;
+import javax.swing.*;
+import javax.swing.event.*;
+import org.apache.commons.lang3.*;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.*;
 
 /**
  *
@@ -233,7 +213,7 @@ public class EditRegexFields extends javax.swing.JDialog {
         jcbMatchWholeWord.addActionListener(cbActioned);
         setOKButton();
 
-        Utils.Swing.restrictHeight(jtfRetValue);
+        Utils.swing.Swing.restrictHeight(jtfRetValue);
     }
 
     private void jlSearchesChanged(ListSelectionEvent evt) {
