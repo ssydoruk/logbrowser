@@ -171,6 +171,9 @@ public class WindowsSystemUtility {
 
         Kernel32 INSTANCE = Native.load("kernel32", Kernel32.class);
 
+        /* todo: https://docs.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-formatmessagea
+             get text of windows error using FormatMessageA
+        */
         int GetLastError();
     }
 
