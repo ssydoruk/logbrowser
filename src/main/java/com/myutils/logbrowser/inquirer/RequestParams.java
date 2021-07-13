@@ -13,20 +13,31 @@ import com.jidesoft.swing.CheckBoxListSelectionModel;
 import com.jidesoft.swing.SearchableUtils;
 import com.myutils.logbrowser.inquirer.gui.ExternalEditor;
 import com.myutils.logbrowser.inquirer.gui.QueryJTable;
-import org.apache.logging.log4j.LogManager;
-
-import javax.swing.*;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import javax.swing.AbstractAction;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.DefaultListModel;
+import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.ListModel;
+import javax.swing.ListSelectionModel;
+import javax.swing.SwingUtilities;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import org.apache.logging.log4j.LogManager;
 
 /**
+ *
  * @author ssydoruk
  */
 public class RequestParams extends javax.swing.JPanel {
@@ -36,151 +47,8 @@ public class RequestParams extends javax.swing.JPanel {
     static private final int LEVEL = 1;
     static private final int CHILD_LISTBOX = 2;
 
-    private final HashMap<CheckBoxList, String> lastRegExp = new HashMap<>(4);
+    private HashMap<CheckBoxList, String> lastRegExp = new HashMap<>(4);
     private final QueryDialog qd;
-    private final MyCheckBoxList cblReportType;
-    private final DefaultListModel lmReportType;
-    private final MyCheckBoxList cblReportComp;
-    private final DefaultListModel lmReportComp;
-    private final IQueryResults qry;
-    private final MyCheckBoxList cblApps;
-    private final DefaultListModel lmApps;
-    private final DefaultListModel lmAttr;
-    private final MyCheckBoxList cblAttr;
-    private final DefaultListModel lmAttrValues;
-    private final MyCheckBoxList cblAttrValues;
-    private final TDateRange timeRange;
-    private final CheckBoxList _listComps = null;
-    private final DefaultListModel _modelComps = null;
-    private final HashMap<Integer, int[]> compChecked = new HashMap<>();
-    private final int rptSelected = -1;
-    private final HashMap<CheckBoxList, ChangeListItem> changeList = new HashMap<>();
-    ArrayList<ChangeListItem> CRIs;
-    // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JComboBox<String> cbSearchLevel;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JPanel jPanel10;
-    private javax.swing.JPanel jPanel2;
-    private javax.swing.JPanel jPanel3;
-    private javax.swing.JPanel jPanel4;
-    private javax.swing.JPanel jPanel5;
-    private javax.swing.JPanel jPanel6;
-    private javax.swing.JPanel jPanel9;
-    private javax.swing.JButton jbShowFiles;
-    private javax.swing.JComboBox jcbSelectionType;
-    private javax.swing.JPanel jpApps;
-    private javax.swing.JPanel jpDateTime;
-    private javax.swing.JLabel lbSearchLevel;
-    private javax.swing.JPanel pSearchLevel;
-    private javax.swing.JPanel pSelectionType;
-    private javax.swing.JPanel pShowFiles;
-    private javax.swing.JPanel rptAttrValues;
-    private javax.swing.JPanel rptCompAttr;
-    private javax.swing.JPanel rptComponents;
-    private javax.swing.JPanel rptType;
-
-    /**
-     * Creates new form RequestParams
-     *
-     * @param q
-     */
-    public RequestParams(IQueryResults q, QueryDialog aThis) throws Exception {
-        initComponents();
-        qd = aThis;
-        qry = q;
-        rptType.setLayout(new BorderLayout());
-        rptType.add(new JLabel("Report items"), BorderLayout.BEFORE_FIRST_LINE);
-        rptComponents.setLayout(new BorderLayout());
-        rptCompAttr.setLayout(new BorderLayout());
-        rptAttrValues.setLayout(new BorderLayout());
-        jpApps.setLayout(new BorderLayout());
-
-        lmReportType = new DefaultListModel();
-        cblReportType = new MyCheckBoxList(lmReportType, rptType);
-
-        lmReportComp = new DefaultListModel();
-        cblReportComp = new MyCheckBoxList(lmReportComp, rptComponents);
-
-        lmAttr = new DefaultListModel();
-        cblAttr = new MyCheckBoxList(lmAttr, rptCompAttr);
-        cblAttr.setCheckBoxEnabled(false);
-
-        lmAttrValues = new DefaultListModel();
-        cblAttrValues = new MyCheckBoxList(lmAttrValues, rptAttrValues);
-
-        InitCB(cblReportType, cblReportComp, rptType, 1);
-        InitCB(cblReportComp, cblAttr, rptComponents, 2);
-        InitCB(cblAttr, cblAttrValues, rptCompAttr, 3);
-        InitCB(cblAttrValues, null, rptAttrValues, 4);
-
-        cblReportType.setValueIsAdjusting(true);
-        FillElements(cblReportType, qry.getReportItems().getRoot(), true);
-
-//        cblReportType.setCheckBoxListSelectedIndex(0);
-//        for (int i = 0; i < lmReportType.size(); i++) {
-//            cblReportType.getCheckBoxListSelectionModel().setSelectionInterval(i, i);
-//        }
-//        cblReportType.initFullUpdate();
-//        jcbSelectionType.removeAll();
-        jcbSelectionType.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                qd.enableSearchItems(getSelectionType() != SelectionType.NO_SELECTION);
-                lbSearchLevel.setEnabled(getSelectionType() != SelectionType.NO_SELECTION);
-                cbSearchLevel.setEnabled(getSelectionType() != SelectionType.NO_SELECTION);
-            }
-        });
-
-        for (SelectionType t : qry.getSelectionTypes()) {
-            jcbSelectionType.addItem(t);
-        }
-        if (jcbSelectionType.getModel().getSize() > 1) {
-            jcbSelectionType.setSelectedIndex(1);
-        }
-
-//<editor-fold defaultstate="collapsed" desc="Fill apps list">
-        lmApps = new DefaultListModel();
-        cblApps = new MyCheckBoxList(lmApps, jpApps);
-
-        ArrayList<NameID> apps = qry.getApps();
-        if (apps != null) {
-            for (NameID nameID : apps) {
-                lmApps.addElement(nameID);
-            }
-            lmApps.insertElementAt(CheckBoxList.ALL_ENTRY, 0);
-            cblApps.getCheckBoxListSelectionModel().addSelectionInterval(0, 0);
-        }
-        JScrollPane jsp = new JScrollPane(cblApps);
-
-        cblApps.getCheckBoxListSelectionModel().setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-        SearchableUtils.installSearchable(cblApps);
-        jpApps.add(jsp);
-        jpApps.setMaximumSize(new Dimension(jpApps.getMaximumSize().width, jpApps.getPreferredSize().height + 10));
-        jpApps.setMinimumSize(new Dimension(jpApps.getPreferredSize().width, jpApps.getMinimumSize().height));
-
-//</editor-fold>
-        timeRange = new TDateRange();
-        timeRange.setTimeRange(qry.getTimeRange());
-        timeRange.setRefreshCB(new IRefresh() {
-            @Override
-            public UTCTimeRange Refresh() {
-                try {
-                    return q.refreshTimeRange(getSearchApps());
-                } catch (SQLException ex) {
-                    logger.error("fatal: ", ex);
-                }
-                return null;
-            }
-        });
-        jpDateTime.add(timeRange);
-        cbSearchLevel.setModel(new DefaultComboBoxModel(IDsFinder.RequestLevel.values()));
-        cbSearchLevel.setSelectedItem(q.getDefaultQueryLevel());
-
-        pSelectionType.setMaximumSize(new Dimension(pSelectionType.getMaximumSize().width, pSelectionType.getMinimumSize().height));
-        pSearchLevel.setMaximumSize(new Dimension(pSearchLevel.getMaximumSize().width, pSearchLevel.getMinimumSize().height));
-        pShowFiles.setMaximumSize(new Dimension(pShowFiles.getMaximumSize().width, pShowFiles.getMinimumSize().height));
-
-    }
 
     ArrayList<Integer> getSearchApps() {
         return getSearchApps(false);
@@ -266,6 +134,111 @@ public class RequestParams extends javax.swing.JPanel {
         }
     }
 
+    private class OpenVIM extends AbstractAction {
+
+        private QueryJTable tab;
+
+        public OpenVIM() {
+            super("VIM");
+        }
+
+        private OpenVIM(QueryJTable allAppsT) {
+            this();
+            this.tab = allAppsT;
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            String fileName = tab.getField("filename", tab.getPopupRow());
+            if (fileName != null) {
+                ArrayList<String> shortFileNames = new ArrayList<>(1);
+                shortFileNames.add(fileName);
+                ExternalEditor.editFiles(shortFileNames);
+            }
+        }
+
+    }
+
+    private class OpenNotepad extends AbstractAction {
+
+        private QueryJTable tab;
+
+        public OpenNotepad() {
+            super("Notepad++");
+        }
+
+        private OpenNotepad(QueryJTable allAppsT) {
+            this();
+            this.tab = allAppsT;
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            String fileName = tab.getField("filename", tab.getPopupRow());
+            if (fileName != null) {
+                ExternalEditor.openNotepad(fileName, 0);
+            }
+        }
+
+    }
+
+    private class OpenTextPad extends AbstractAction {
+
+        private QueryJTable tab;
+
+        public OpenTextPad() {
+            super("Textpad");
+        }
+
+        private OpenTextPad(QueryJTable allAppsT) {
+            this();
+            this.tab = allAppsT;
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            String fileName = tab.getField("filename", tab.getPopupRow());
+            if (fileName != null) {
+                ExternalEditor.openTextpad(fileName, 0);
+            }
+        }
+
+    }
+
+    class myListSelectionListener implements ListSelectionListener {
+
+        private final CheckBoxList list;
+        private final CheckBoxList listChild;
+
+        public myListSelectionListener(CheckBoxList list, CheckBoxList listChild) {
+            this.list = list;
+            this.listChild = listChild;
+        }
+
+        @Override
+        public void valueChanged(ListSelectionEvent e) {
+            ReportItemChanged(e, list, listChild);
+        }
+
+    }
+
+    class myListCheckListener implements ListSelectionListener {
+
+        private final CheckBoxList list;
+        private final CheckBoxList listChild;
+
+        public myListCheckListener(CheckBoxList list, CheckBoxList listChild) {
+            this.list = list;
+            this.listChild = listChild;
+        }
+
+        @Override
+        public void valueChanged(ListSelectionEvent e) {
+            ReportItemChecked(e, list, listChild);
+        }
+
+    }
+
     private void InitCB(CheckBoxList list, CheckBoxList clbChild, JPanel rptType, int i) {
         list.putClientProperty(LEVEL, i);
 
@@ -299,9 +272,126 @@ public class RequestParams extends javax.swing.JPanel {
         cb.doneFullUpdate(allChecked);
     }
 
+    private MyCheckBoxList cblReportType;
+    private DefaultListModel lmReportType;
+    private MyCheckBoxList cblReportComp;
+    private DefaultListModel lmReportComp;
+    private IQueryResults qry;
+
+    private MyCheckBoxList cblApps;
+    private DefaultListModel lmApps;
+
     public IQueryResults getQry() {
         return qry;
     }
+    private DefaultListModel lmAttr;
+    private MyCheckBoxList cblAttr;
+    private DefaultListModel lmAttrValues;
+    private MyCheckBoxList cblAttrValues;
+
+    /**
+     * Creates new form RequestParams
+     *
+     * @param q
+     */
+    public RequestParams(IQueryResults q, QueryDialog aThis) throws Exception {
+        initComponents();
+        qd = aThis;
+        qry = q;
+        rptType.setLayout(new BorderLayout());
+        rptType.add(new JLabel("Report items"), BorderLayout.BEFORE_FIRST_LINE);
+        rptComponents.setLayout(new BorderLayout());
+        rptCompAttr.setLayout(new BorderLayout());
+        rptAttrValues.setLayout(new BorderLayout());
+        jpApps.setLayout(new BorderLayout());
+
+        lmReportType = new DefaultListModel();
+        cblReportType = new MyCheckBoxList(lmReportType, rptType);
+
+        lmReportComp = new DefaultListModel();
+        cblReportComp = new MyCheckBoxList(lmReportComp, rptComponents);
+
+        lmAttr = new DefaultListModel();
+        cblAttr = new MyCheckBoxList(lmAttr, rptCompAttr);
+        cblAttr.setCheckBoxEnabled(false);
+
+        lmAttrValues = new DefaultListModel();
+        cblAttrValues = new MyCheckBoxList(lmAttrValues, rptAttrValues);
+
+        InitCB(cblReportType, cblReportComp, rptType, 1);
+        InitCB(cblReportComp, cblAttr, rptComponents, 2);
+        InitCB(cblAttr, cblAttrValues, rptCompAttr, 3);
+        InitCB(cblAttrValues, null, rptAttrValues, 4);
+
+        cblReportType.setValueIsAdjusting(true);
+        FillElements(cblReportType, (DynamicTreeNode<OptionNode>) qry.getReportItems().getRoot(), true);
+
+//        cblReportType.setCheckBoxListSelectedIndex(0);
+//        for (int i = 0; i < lmReportType.size(); i++) {
+//            cblReportType.getCheckBoxListSelectionModel().setSelectionInterval(i, i);
+//        }
+//        cblReportType.initFullUpdate();
+//        jcbSelectionType.removeAll();
+        jcbSelectionType.addItemListener(new ItemListener() {
+            @Override
+            public void itemStateChanged(ItemEvent e) {
+                qd.enableSearchItems(getSelectionType() != SelectionType.NO_SELECTION);
+                lbSearchLevel.setEnabled(getSelectionType() != SelectionType.NO_SELECTION);
+                cbSearchLevel.setEnabled(getSelectionType() != SelectionType.NO_SELECTION);
+            }
+        });
+
+        for (SelectionType t : qry.getSelectionTypes()) {
+            jcbSelectionType.addItem(t);
+        }
+        if (jcbSelectionType.getModel().getSize() > 1) {
+            jcbSelectionType.setSelectedIndex(1);
+        }
+
+//<editor-fold defaultstate="collapsed" desc="Fill apps list">
+        lmApps = new DefaultListModel();
+        cblApps = new MyCheckBoxList(lmApps, jpApps);
+
+        ArrayList<NameID> apps = qry.getApps();
+        if (apps != null) {
+            for (NameID nameID : apps) {
+                lmApps.addElement(nameID);
+            }
+            lmApps.insertElementAt(CheckBoxList.ALL_ENTRY, 0);
+            cblApps.getCheckBoxListSelectionModel().addSelectionInterval(0, 0);
+        }
+        JScrollPane jsp = new JScrollPane(cblApps);
+
+        cblApps.getCheckBoxListSelectionModel().setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+        SearchableUtils.installSearchable(cblApps);
+        jpApps.add(jsp);
+        jpApps.setMaximumSize(new Dimension(jpApps.getMaximumSize().width, jpApps.getPreferredSize().height + 10));
+        jpApps.setMinimumSize(new Dimension(jpApps.getPreferredSize().width, jpApps.getMinimumSize().height));
+
+//</editor-fold>
+        timeRange = new TDateRange();
+        timeRange.setTimeRange(qry.getTimeRange());
+        timeRange.setRefreshCB(new IRefresh() {
+            @Override
+            public UTCTimeRange Refresh() {
+                try {
+                    return q.refreshTimeRange(getSearchApps());
+                } catch (SQLException ex) {
+                    logger.error("fatal: ",  ex);
+                }
+                return null;
+            }
+        });
+        jpDateTime.add(timeRange);
+        cbSearchLevel.setModel(new DefaultComboBoxModel(IDsFinder.RequestLevel.values()));
+        cbSearchLevel.setSelectedItem(q.getDefaultQueryLevel());
+
+        pSelectionType.setMaximumSize(new Dimension(pSelectionType.getMaximumSize().width, pSelectionType.getMinimumSize().height));
+        pSearchLevel.setMaximumSize(new Dimension(pSearchLevel.getMaximumSize().width, pSearchLevel.getMinimumSize().height));
+        pShowFiles.setMaximumSize(new Dimension(pShowFiles.getMaximumSize().width, pShowFiles.getMinimumSize().height));
+
+    }
+    private TDateRange timeRange;
 
     public IDsFinder.RequestLevel getSearchLevel() {
         return (IDsFinder.RequestLevel) cbSearchLevel.getSelectedItem();
@@ -311,6 +401,82 @@ public class RequestParams extends javax.swing.JPanel {
 
         return (SelectionType) (jcbSelectionType.getModel().getSelectedItem());
     }
+
+    ArrayList<ChangeListItem> CRIs;
+
+    private CheckBoxList _listComps = null;
+    private DefaultListModel _modelComps = null;
+
+    private HashMap<Integer, int[]> compChecked = new HashMap<>();
+    private int rptSelected = -1;
+
+    class ChangeListItem {
+
+        private int parentSelected = -1;
+        private CheckBoxList chList = null;
+        private DefaultListModel chModel = null;
+        private JPanel parentPanel = null;
+        private ArrayList<String> valuesSource = null;
+        private ChangeListItem childList = null;
+        IReportConfigItem item = null;
+
+        public ChangeListItem(IReportConfigItem item, JPanel parentPanel) {
+            this.parentPanel = parentPanel;
+            this.item = item;
+        }
+
+        public ChangeListItem(CheckBoxList _list, DefaultListModel _model) {
+            this.chList = _list;
+            this.chModel = _model;
+        }
+
+        public void changeItem(int item, ArrayList<String> values) {
+            if (chList != null && parentSelected >= 0) {
+                //            _listComps.setValueIsAdjusting(true);
+                compChecked.put(parentSelected, chList.getCheckBoxListSelectedIndices());
+            }
+            chModel.removeAllElements();
+            if (values != null) {
+                chModel.insertElementAt(CheckBoxList.ALL_ENTRY, 0);
+                for (String value : values) {
+                    chModel.addElement(value);
+                }
+                chList.setEnabled(chList.getCheckBoxListSelectionModel().isSelectedIndex(item));
+                parentSelected = item;
+                if (compChecked.containsKey(parentSelected)) {
+                    chList.setCheckBoxListSelectedIndices(compChecked.get(parentSelected));
+                }
+
+                chList.revalidate();
+                chList.repaint();
+            }
+
+        }
+
+        /**
+         * @param parentPanel the parentPanel to set
+         */
+        public void setParentPanel(JPanel parentPanel) {
+            this.parentPanel = parentPanel;
+        }
+
+        /**
+         * @param valuesSource the valuesSource to set
+         */
+        public void setValuesSource(ArrayList<String> valuesSource) {
+            this.valuesSource = valuesSource;
+        }
+
+        /**
+         * @param childList the childList to set
+         */
+        public void setChildList(ChangeListItem childList) {
+            this.childList = childList;
+        }
+
+    }
+
+    private HashMap<CheckBoxList, ChangeListItem> changeList = new HashMap<>();
 
     private void setChildChecked(CheckBoxList lChild, boolean boxEnabled, boolean isCurrent) {
 //        inquirer.logger.debug("in setChildChecked " + boxEnabled);
@@ -453,7 +619,7 @@ public class RequestParams extends javax.swing.JPanel {
 //
 ////                    if( i>=minIndex && i<=maxIndex )
 ////                        node.getData().setChecked(true);
-////                    else
+////                    else 
 ////                        node.getData().setChecked(false);
 //                }
 //
@@ -556,12 +722,12 @@ public class RequestParams extends javax.swing.JPanel {
         javax.swing.GroupLayout rptAttrValuesLayout = new javax.swing.GroupLayout(rptAttrValues);
         rptAttrValues.setLayout(rptAttrValuesLayout);
         rptAttrValuesLayout.setHorizontalGroup(
-                rptAttrValuesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGap(0, 0, Short.MAX_VALUE)
+            rptAttrValuesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 0, Short.MAX_VALUE)
         );
         rptAttrValuesLayout.setVerticalGroup(
-                rptAttrValuesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGap(0, 567, Short.MAX_VALUE)
+            rptAttrValuesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 567, Short.MAX_VALUE)
         );
 
         jPanel5.setLayout(new javax.swing.BoxLayout(jPanel5, javax.swing.BoxLayout.PAGE_AXIS));
@@ -573,12 +739,12 @@ public class RequestParams extends javax.swing.JPanel {
         javax.swing.GroupLayout rptTypeLayout = new javax.swing.GroupLayout(rptType);
         rptType.setLayout(rptTypeLayout);
         rptTypeLayout.setHorizontalGroup(
-                rptTypeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGap(0, 568, Short.MAX_VALUE)
+            rptTypeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 568, Short.MAX_VALUE)
         );
         rptTypeLayout.setVerticalGroup(
-                rptTypeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGap(0, 0, Short.MAX_VALUE)
+            rptTypeLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 0, Short.MAX_VALUE)
         );
 
         jPanel3.add(rptType);
@@ -588,12 +754,12 @@ public class RequestParams extends javax.swing.JPanel {
         javax.swing.GroupLayout rptComponentsLayout = new javax.swing.GroupLayout(rptComponents);
         rptComponents.setLayout(rptComponentsLayout);
         rptComponentsLayout.setHorizontalGroup(
-                rptComponentsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGap(0, 0, Short.MAX_VALUE)
+            rptComponentsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 0, Short.MAX_VALUE)
         );
         rptComponentsLayout.setVerticalGroup(
-                rptComponentsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGap(0, 286, Short.MAX_VALUE)
+            rptComponentsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 286, Short.MAX_VALUE)
         );
 
         jPanel3.add(rptComponents);
@@ -603,12 +769,12 @@ public class RequestParams extends javax.swing.JPanel {
         javax.swing.GroupLayout rptCompAttrLayout = new javax.swing.GroupLayout(rptCompAttr);
         rptCompAttr.setLayout(rptCompAttrLayout);
         rptCompAttrLayout.setHorizontalGroup(
-                rptCompAttrLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGap(0, 592, Short.MAX_VALUE)
+            rptCompAttrLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 592, Short.MAX_VALUE)
         );
         rptCompAttrLayout.setVerticalGroup(
-                rptCompAttrLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGap(0, 0, Short.MAX_VALUE)
+            rptCompAttrLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 0, Short.MAX_VALUE)
         );
 
         jPanel3.add(rptCompAttr);
@@ -622,12 +788,12 @@ public class RequestParams extends javax.swing.JPanel {
         javax.swing.GroupLayout jPanel10Layout = new javax.swing.GroupLayout(jPanel10);
         jPanel10.setLayout(jPanel10Layout);
         jPanel10Layout.setHorizontalGroup(
-                jPanel10Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGap(0, 143, Short.MAX_VALUE)
+            jPanel10Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 143, Short.MAX_VALUE)
         );
         jPanel10Layout.setVerticalGroup(
-                jPanel10Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGap(0, 0, Short.MAX_VALUE)
+            jPanel10Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 0, Short.MAX_VALUE)
         );
 
         jPanel6.add(jPanel10);
@@ -685,22 +851,22 @@ public class RequestParams extends javax.swing.JPanel {
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
-                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, 1199, Short.MAX_VALUE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(rptAttrValues, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addGap(4, 4, 4))
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, 1199, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(rptAttrValues, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGap(4, 4, 4))
         );
         layout.setVerticalGroup(
-                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                        .addComponent(rptAttrValues, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                                .addContainerGap())
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(rptAttrValues, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -732,175 +898,27 @@ public class RequestParams extends javax.swing.JPanel {
         }
     }//GEN-LAST:event_jbShowFilesActionPerformed
 
-    private class OpenVIM extends AbstractAction {
-
-        private QueryJTable tab;
-
-        public OpenVIM() {
-            super("VIM");
-        }
-
-        private OpenVIM(QueryJTable allAppsT) {
-            this();
-            this.tab = allAppsT;
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            String fileName = tab.getField("filename", tab.getPopupRow());
-            if (fileName != null) {
-                ArrayList<String> shortFileNames = new ArrayList<>(1);
-                shortFileNames.add(fileName);
-                ExternalEditor.editFiles(shortFileNames);
-            }
-        }
-
-    }
-
-    private class OpenNotepad extends AbstractAction {
-
-        private QueryJTable tab;
-
-        public OpenNotepad() {
-            super("Notepad++");
-        }
-
-        private OpenNotepad(QueryJTable allAppsT) {
-            this();
-            this.tab = allAppsT;
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            String fileName = tab.getField("filename", tab.getPopupRow());
-            if (fileName != null) {
-                ExternalEditor.openNotepad(fileName, 0);
-            }
-        }
-
-    }
-
-    private class OpenTextPad extends AbstractAction {
-
-        private QueryJTable tab;
-
-        public OpenTextPad() {
-            super("Textpad");
-        }
-
-        private OpenTextPad(QueryJTable allAppsT) {
-            this();
-            this.tab = allAppsT;
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            String fileName = tab.getField("filename", tab.getPopupRow());
-            if (fileName != null) {
-                ExternalEditor.openTextpad(fileName, 0);
-            }
-        }
-
-    }
-
-    class myListSelectionListener implements ListSelectionListener {
-
-        private final CheckBoxList list;
-        private final CheckBoxList listChild;
-
-        public myListSelectionListener(CheckBoxList list, CheckBoxList listChild) {
-            this.list = list;
-            this.listChild = listChild;
-        }
-
-        @Override
-        public void valueChanged(ListSelectionEvent e) {
-            ReportItemChanged(e, list, listChild);
-        }
-
-    }
-
-    class myListCheckListener implements ListSelectionListener {
-
-        private final CheckBoxList list;
-        private final CheckBoxList listChild;
-
-        public myListCheckListener(CheckBoxList list, CheckBoxList listChild) {
-            this.list = list;
-            this.listChild = listChild;
-        }
-
-        @Override
-        public void valueChanged(ListSelectionEvent e) {
-            ReportItemChecked(e, list, listChild);
-        }
-
-    }
-
-    class ChangeListItem {
-
-        IReportConfigItem item = null;
-        private int parentSelected = -1;
-        private CheckBoxList chList = null;
-        private DefaultListModel chModel = null;
-        private JPanel parentPanel = null;
-        private ArrayList<String> valuesSource = null;
-        private ChangeListItem childList = null;
-
-        public ChangeListItem(IReportConfigItem item, JPanel parentPanel) {
-            this.parentPanel = parentPanel;
-            this.item = item;
-        }
-
-        public ChangeListItem(CheckBoxList _list, DefaultListModel _model) {
-            this.chList = _list;
-            this.chModel = _model;
-        }
-
-        public void changeItem(int item, ArrayList<String> values) {
-            if (chList != null && parentSelected >= 0) {
-                //            _listComps.setValueIsAdjusting(true);
-                compChecked.put(parentSelected, chList.getCheckBoxListSelectedIndices());
-            }
-            chModel.removeAllElements();
-            if (values != null) {
-                chModel.insertElementAt(CheckBoxList.ALL_ENTRY, 0);
-                for (String value : values) {
-                    chModel.addElement(value);
-                }
-                chList.setEnabled(chList.getCheckBoxListSelectionModel().isSelectedIndex(item));
-                parentSelected = item;
-                if (compChecked.containsKey(parentSelected)) {
-                    chList.setCheckBoxListSelectedIndices(compChecked.get(parentSelected));
-                }
-
-                chList.revalidate();
-                chList.repaint();
-            }
-
-        }
-
-        /**
-         * @param parentPanel the parentPanel to set
-         */
-        public void setParentPanel(JPanel parentPanel) {
-            this.parentPanel = parentPanel;
-        }
-
-        /**
-         * @param valuesSource the valuesSource to set
-         */
-        public void setValuesSource(ArrayList<String> valuesSource) {
-            this.valuesSource = valuesSource;
-        }
-
-        /**
-         * @param childList the childList to set
-         */
-        public void setChildList(ChangeListItem childList) {
-            this.childList = childList;
-        }
-
-    }
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JComboBox<String> cbSearchLevel;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JPanel jPanel10;
+    private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel3;
+    private javax.swing.JPanel jPanel4;
+    private javax.swing.JPanel jPanel5;
+    private javax.swing.JPanel jPanel6;
+    private javax.swing.JPanel jPanel9;
+    private javax.swing.JButton jbShowFiles;
+    private javax.swing.JComboBox jcbSelectionType;
+    private javax.swing.JPanel jpApps;
+    private javax.swing.JPanel jpDateTime;
+    private javax.swing.JLabel lbSearchLevel;
+    private javax.swing.JPanel pSearchLevel;
+    private javax.swing.JPanel pSelectionType;
+    private javax.swing.JPanel pShowFiles;
+    private javax.swing.JPanel rptAttrValues;
+    private javax.swing.JPanel rptCompAttr;
+    private javax.swing.JPanel rptComponents;
+    private javax.swing.JPanel rptType;
     // End of variables declaration//GEN-END:variables
 }

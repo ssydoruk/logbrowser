@@ -7,20 +7,15 @@ package com.myutils.logbrowser.inquirer;
 
 import com.myutils.logbrowser.indexer.FileInfoType;
 import com.myutils.logbrowser.inquirer.gui.JPSecSelect;
-
-import javax.swing.*;
+import javax.swing.ButtonGroup;
 
 /**
+ *
  * @author ssydoruk
  */
 public class TLibDelaysConfig extends javax.swing.JPanel {
 
     private final JPSecSelect jpTimeDiff;
-    private final ButtonGroup group = new ButtonGroup();
-    private final FileInfoType ft = FileInfoType.type_Unknown;
-    // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JPanel jpAppSettings;
-    private javax.swing.JPanel jpTimeSettings;
 
     /**
      * Creates new form TLibDelaysConfig
@@ -40,6 +35,9 @@ public class TLibDelaysConfig extends javax.swing.JPanel {
         return jpTimeDiff.getSeconds();
     }
 
+    private final ButtonGroup group = new ButtonGroup();
+    private final FileInfoType ft = FileInfoType.type_Unknown;
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -57,6 +55,10 @@ public class TLibDelaysConfig extends javax.swing.JPanel {
         add(jpAppSettings);
         add(jpTimeSettings);
     }// </editor-fold>//GEN-END:initComponents
+
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JPanel jpAppSettings;
+    private javax.swing.JPanel jpTimeSettings;
     // End of variables declaration//GEN-END:variables
 
     /**

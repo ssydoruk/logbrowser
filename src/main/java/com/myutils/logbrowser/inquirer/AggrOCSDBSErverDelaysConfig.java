@@ -6,13 +6,10 @@
 package com.myutils.logbrowser.inquirer;
 
 /**
+ *
  * @author ssydoruk
  */
 public class AggrOCSDBSErverDelaysConfig extends javax.swing.JPanel {
-
-    // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JPanel jPanel1;
-    private javax.swing.JTextArea jTextArea1;
 
     public AggrOCSDBSErverDelaysConfig() {
         initComponents();
@@ -44,6 +41,10 @@ public class AggrOCSDBSErverDelaysConfig extends javax.swing.JPanel {
 
         add(jPanel1, java.awt.BorderLayout.CENTER);
     }// </editor-fold>//GEN-END:initComponents
+
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JTextArea jTextArea1;
     // End of variables declaration//GEN-END:variables
 
 }

@@ -5,17 +5,26 @@
  */
 package com.myutils.logbrowser.inquirer;
 
-import javax.accessibility.AccessibleContext;
-import javax.swing.*;
-import java.awt.*;
+import java.awt.Point;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
+import javax.accessibility.AccessibleContext;
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.ActionMap;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.InputMap;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
+import javax.swing.KeyStroke;
+import javax.swing.SwingUtilities;
 
 /**
+ *
  * @author ssydoruk
  */
 public final class EnterRegexDialog extends javax.swing.JDialog {
@@ -28,20 +37,7 @@ public final class EnterRegexDialog extends javax.swing.JDialog {
      * A return status code - returned if OK button has been pressed
      */
     public static final int RET_OK = 1;
-    private Matcher selectedRegEx = null;
-    private String editLine;
-    // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton cancelButton;
-    private javax.swing.ButtonGroup group;
-    private javax.swing.JPanel jPanel1;
-    private javax.swing.JCheckBox jcbIsRegex;
-    private javax.swing.JCheckBox jcbMatchWholeWord;
-    private javax.swing.JComboBox<String> jcbRegex;
-    private javax.swing.JPanel jpUps;
-    private javax.swing.JRadioButton jrbDown;
-    private javax.swing.JRadioButton jrbUp;
-    private javax.swing.JButton okButton;
-    private int returnStatus = RET_CANCEL;
+    private Pattern selectedRegEx = null;
 
     /**
      * Creates new form EnterRegexDialog
@@ -52,7 +48,7 @@ public final class EnterRegexDialog extends javax.swing.JDialog {
 
         // Close the dialog when Esc is pressed
         if (parent != null) {
-            Window windowAncestor = SwingUtilities.getWindowAncestor(parent);
+            Window windowAncestor = (Window) SwingUtilities.getWindowAncestor(parent);
             Point location = parent.getMousePosition();
             setLocation(location);
             setLocationRelativeTo(windowAncestor);
@@ -100,11 +96,22 @@ public final class EnterRegexDialog extends javax.swing.JDialog {
 //        });
     }
 
+    private void setOKButton() {
+//        okButton.setEnabled(!jtfRegex.getText().isEmpty());
+    }
+
     EnterRegexDialog() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
-    public static Matcher getRegex(String lastRegEx, boolean wholeWord) {
+    /**
+     * @return the return status of this dialog - one of RET_OK or RET_CANCEL
+     */
+    public int getReturnStatus() {
+        return returnStatus;
+    }
+
+    public static Pattern getRegex(String lastRegEx, boolean wholeWord) {
         if (lastRegEx != null && !lastRegEx.isEmpty()) {
             if (wholeWord) {
                 StringBuilder rx = new StringBuilder(lastRegEx.length() + 2);
@@ -116,35 +123,12 @@ public final class EnterRegexDialog extends javax.swing.JDialog {
                     rx.append('$');
                 }
                 inquirer.logger.debug("Searching for [" + rx + "]");
-                return Pattern.compile(rx.toString(), Pattern.CASE_INSENSITIVE).matcher("");
+                return Pattern.compile(rx.toString(), Pattern.CASE_INSENSITIVE);
             } else {
-                return Pattern.compile(lastRegEx, Pattern.CASE_INSENSITIVE).matcher("");
+                return Pattern.compile(lastRegEx, Pattern.CASE_INSENSITIVE);
             }
         }
         return null;
-    }
-
-    static public void setJCBElements(JComboBox jcb, ArrayList<String> elements) {
-        DefaultComboBoxModel model = (DefaultComboBoxModel) jcb.getModel();
-        model.removeAllElements();
-        if (!elements.isEmpty()) {
-            for (String regEx : elements) {
-                model.addElement(regEx);
-            }
-            jcb.setSelectedIndex(0);
-            jcb.getEditor().selectAll();
-        }
-    }
-
-    private void setOKButton() {
-//        okButton.setEnabled(!jtfRegex.getText().isEmpty());
-    }
-
-    /**
-     * @return the return status of this dialog - one of RET_OK or RET_CANCEL
-     */
-    public int getReturnStatus() {
-        return returnStatus;
     }
 
     public boolean isMatchWholeWordSelected() {
@@ -159,7 +143,7 @@ public final class EnterRegexDialog extends javax.swing.JDialog {
             } catch (PatternSyntaxException e) {
                 inquirer.showError(this,
                         "Cannot compile regex [" + editLine + "]:\n"
-                                + e.getMessage(),
+                        + e.getMessage(),
                         "Regex error");
                 return;
             }
@@ -172,6 +156,8 @@ public final class EnterRegexDialog extends javax.swing.JDialog {
     public String getSearch() {
         return editLine;
     }
+
+    private String editLine;
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -214,22 +200,22 @@ public final class EnterRegexDialog extends javax.swing.JDialog {
         javax.swing.GroupLayout jpUpsLayout = new javax.swing.GroupLayout(jpUps);
         jpUps.setLayout(jpUpsLayout);
         jpUpsLayout.setHorizontalGroup(
-                jpUpsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(jpUpsLayout.createSequentialGroup()
-                                .addContainerGap()
-                                .addGroup(jpUpsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addComponent(jrbDown)
-                                        .addComponent(jrbUp))
-                                .addContainerGap())
+            jpUpsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jpUpsLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jpUpsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jrbDown)
+                    .addComponent(jrbUp))
+                .addContainerGap())
         );
         jpUpsLayout.setVerticalGroup(
-                jpUpsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(jpUpsLayout.createSequentialGroup()
-                                .addContainerGap()
-                                .addComponent(jrbUp)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jrbDown)
-                                .addContainerGap())
+            jpUpsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jpUpsLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jrbUp)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jrbDown)
+                .addContainerGap())
         );
 
         jcbRegex.setEditable(true);
@@ -251,28 +237,28 @@ public final class EnterRegexDialog extends javax.swing.JDialog {
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
-                jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addComponent(jcbRegex, 0, 483, Short.MAX_VALUE)
-                                .addGap(8, 8, 8)
-                                .addComponent(okButton, javax.swing.GroupLayout.PREFERRED_SIZE, 67, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(cancelButton)
-                                .addContainerGap())
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jcbRegex, 0, 483, Short.MAX_VALUE)
+                .addGap(8, 8, 8)
+                .addComponent(okButton, javax.swing.GroupLayout.PREFERRED_SIZE, 67, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(cancelButton)
+                .addContainerGap())
         );
 
-        jPanel1Layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, cancelButton, okButton);
+        jPanel1Layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {cancelButton, okButton});
 
         jPanel1Layout.setVerticalGroup(
-                jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                        .addComponent(cancelButton)
-                                        .addComponent(okButton)
-                                        .addComponent(jcbRegex, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addContainerGap())
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(cancelButton)
+                    .addComponent(okButton)
+                    .addComponent(jcbRegex, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap())
         );
 
         getRootPane().setDefaultButton(okButton);
@@ -280,32 +266,32 @@ public final class EnterRegexDialog extends javax.swing.JDialog {
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
-                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addGroup(layout.createSequentialGroup()
-                                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                                        .addComponent(jcbMatchWholeWord)
-                                                        .addComponent(jcbIsRegex))
-                                                .addGap(18, 18, 18)
-                                                .addComponent(jpUps, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                .addGap(0, 445, Short.MAX_VALUE))
-                                        .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jcbMatchWholeWord)
+                            .addComponent(jcbIsRegex))
+                        .addGap(18, 18, 18)
+                        .addComponent(jpUps, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 445, Short.MAX_VALUE))
+                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
         );
         layout.setVerticalGroup(
-                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addGroup(layout.createSequentialGroup()
-                                                .addComponent(jcbMatchWholeWord)
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                                .addComponent(jcbIsRegex))
-                                        .addComponent(jpUps, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addContainerGap())
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jcbMatchWholeWord)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jcbIsRegex))
+                    .addComponent(jpUps, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap())
         );
 
         pack();
@@ -341,7 +327,6 @@ public final class EnterRegexDialog extends javax.swing.JDialog {
     public boolean isRegexChecked() {
         return jcbIsRegex.isSelected();
     }
-    // End of variables declaration//GEN-END:variables
 
     public boolean isDownChecked() {
         return jrbDown.isSelected();
@@ -351,8 +336,35 @@ public final class EnterRegexDialog extends javax.swing.JDialog {
         return jrbDown.getAction();
     }
 
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton cancelButton;
+    private javax.swing.ButtonGroup group;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JCheckBox jcbIsRegex;
+    private javax.swing.JCheckBox jcbMatchWholeWord;
+    private javax.swing.JComboBox<String> jcbRegex;
+    private javax.swing.JPanel jpUps;
+    private javax.swing.JRadioButton jrbDown;
+    private javax.swing.JRadioButton jrbUp;
+    private javax.swing.JButton okButton;
+    // End of variables declaration//GEN-END:variables
+
+    private int returnStatus = RET_CANCEL;
+
     public void setRegex(ArrayList<String> regExs) {
         setJCBElements(jcbRegex, regExs);
+    }
+
+    static public void setJCBElements(JComboBox jcb, ArrayList<String> elements) {
+        DefaultComboBoxModel model = (DefaultComboBoxModel) jcb.getModel();
+        model.removeAllElements();
+        if (!elements.isEmpty()) {
+            for (String regEx : elements) {
+                model.addElement(regEx);
+            }
+            jcb.setSelectedIndex(0);
+            jcb.getEditor().selectAll();
+        }
     }
 
     public void setDown(boolean down) {
@@ -363,9 +375,9 @@ public final class EnterRegexDialog extends javax.swing.JDialog {
     boolean checkMatch(String toString) {
         if (selectedRegEx != null) {
             if (toString == null) {
-                return selectedRegEx.reset("").find();
+                return selectedRegEx.matcher("").find();
             } else {
-                return selectedRegEx.reset(toString).find();
+                return selectedRegEx.matcher(toString).find();
             }
 
         } else {

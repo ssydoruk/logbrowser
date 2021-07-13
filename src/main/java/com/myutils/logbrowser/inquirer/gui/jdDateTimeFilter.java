@@ -13,60 +13,29 @@ import com.github.lgooddatepicker.components.TimePickerSettings;
 import com.github.lgooddatepicker.optionalusertools.PickerUtilities;
 import com.myutils.logbrowser.inquirer.DatabaseConnector;
 import com.myutils.logbrowser.inquirer.gui.AColumnFilter.DateFilter;
-import org.apache.logging.log4j.LogManager;
-
-import javax.swing.*;
-import java.awt.*;
+import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import javax.swing.AbstractAction;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
+import javax.swing.JOptionPane;
+import javax.swing.KeyStroke;
+import static javax.swing.WindowConstants.DISPOSE_ON_CLOSE;
+import org.apache.logging.log4j.LogManager;
 
 /**
+ *
  * @author ssydoruk
  */
 public class jdDateTimeFilter extends javax.swing.JDialog {
 
     private static final org.apache.logging.log4j.Logger logger = LogManager.getLogger();
-    private final DateTimePicker dtFrom;
-    private final DateTimePicker dtTo;
+
     private UTCTimeRange timeRange;
     private DateFilter dateFilter;
-    private int closeCause = JOptionPane.CANCEL_OPTION;
-    // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton btEarlyFirst;
-    private javax.swing.JButton btEarlySecond;
-    private javax.swing.JButton btLateFirst;
-    private javax.swing.JButton btLateSecond;
-    private javax.swing.ButtonGroup buttonGroup1;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
-    private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel10;
-    private javax.swing.JPanel jPanel11;
-    private javax.swing.JPanel jPanel2;
-    private javax.swing.JPanel jPanel3;
-    private javax.swing.JPanel jPanel4;
-    private javax.swing.JPanel jPanel5;
-    private javax.swing.JPanel jPanel6;
-    private javax.swing.JPanel jPanel7;
-    private javax.swing.JPanel jPanel8;
-    private javax.swing.JPanel jPanel9;
-    private javax.swing.JButton jbCancel;
-    private javax.swing.JButton jbOK;
-    private javax.swing.JComboBox<String> jcbSelectionType;
-    private javax.swing.JLabel jlAnd;
-    private javax.swing.JLabel jlEarliest;
-    private javax.swing.JLabel jlLatest;
-    private javax.swing.JPanel jpButtons;
-    private javax.swing.JPanel jpFirstDate;
-    private javax.swing.JPanel jpOthers;
-    private javax.swing.JPanel jpRange;
-    private javax.swing.JPanel jpSecondDate;
-    private javax.swing.JPanel jpSelection;
-    private javax.swing.JPanel jpWorkArea;
-    private javax.swing.JRadioButton jrbHide;
-    private javax.swing.JRadioButton jrbShow;
+
     /**
      * Creates new form jdDateTimeFilter
      */
@@ -87,13 +56,13 @@ public class jdDateTimeFilter extends javax.swing.JDialog {
         getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
                 .put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "ESCAPE_KEY");
         getRootPane().getActionMap().put("ESCAPE_KEY", new AbstractAction() {
-                    private static final long serialVersionUID = 1L;
+            private static final long serialVersionUID = 1L;
 
-                    @Override
-                    public void actionPerformed(ActionEvent ae) {
-                        dispose();
-                    }
-                }
+            @Override
+            public void actionPerformed(ActionEvent ae) {
+                dispose();
+            }
+        }
         );
 
         AColumnFilter.FilterComboboxModel aModel = new AColumnFilter.FilterComboboxModel();
@@ -198,6 +167,19 @@ public class jdDateTimeFilter extends javax.swing.JDialog {
         pack();
     }
 
+    private int closeCause = JOptionPane.CANCEL_OPTION;
+
+    public int getCloseCause() {
+        return closeCause;
+    }
+
+    public void setCloseCause(int closeCause) {
+        this.closeCause = closeCause;
+    }
+
+    private DateTimePicker dtFrom;
+    private DateTimePicker dtTo;
+
     private static DateTimePicker newPicker() {
         DateTimePicker dateTimePicker1 = new DateTimePicker();
         TimePickerSettings timeSettings = dateTimePicker1.getTimePicker().getSettings();
@@ -206,14 +188,6 @@ public class jdDateTimeFilter extends javax.swing.JDialog {
         timeSettings.setFormatForMenuTimes(PickerUtilities.createFormatterFromPatternString(
                 "HH:mm:ss", timeSettings.getLocale()));
         return dateTimePicker1;
-    }
-
-    public int getCloseCause() {
-        return closeCause;
-    }
-
-    public void setCloseCause(int closeCause) {
-        this.closeCause = closeCause;
     }
 
     /**
@@ -358,12 +332,12 @@ public class jdDateTimeFilter extends javax.swing.JDialog {
         javax.swing.GroupLayout jpFirstDateLayout = new javax.swing.GroupLayout(jpFirstDate);
         jpFirstDate.setLayout(jpFirstDateLayout);
         jpFirstDateLayout.setHorizontalGroup(
-                jpFirstDateLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGap(0, 377, Short.MAX_VALUE)
+            jpFirstDateLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 377, Short.MAX_VALUE)
         );
         jpFirstDateLayout.setVerticalGroup(
-                jpFirstDateLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGap(0, 46, Short.MAX_VALUE)
+            jpFirstDateLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 46, Short.MAX_VALUE)
         );
 
         jPanel8.add(jpFirstDate);
@@ -375,12 +349,12 @@ public class jdDateTimeFilter extends javax.swing.JDialog {
         javax.swing.GroupLayout jpSecondDateLayout = new javax.swing.GroupLayout(jpSecondDate);
         jpSecondDate.setLayout(jpSecondDateLayout);
         jpSecondDateLayout.setHorizontalGroup(
-                jpSecondDateLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGap(0, 377, Short.MAX_VALUE)
+            jpSecondDateLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 377, Short.MAX_VALUE)
         );
         jpSecondDateLayout.setVerticalGroup(
-                jpSecondDateLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGap(0, 46, Short.MAX_VALUE)
+            jpSecondDateLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 46, Short.MAX_VALUE)
         );
 
         jPanel8.add(jpSecondDate);
@@ -487,6 +461,42 @@ public class jdDateTimeFilter extends javax.swing.JDialog {
         jbOK.requestFocus();
         pack();
     }//GEN-LAST:event_formWindowActivated
+
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btEarlyFirst;
+    private javax.swing.JButton btEarlySecond;
+    private javax.swing.JButton btLateFirst;
+    private javax.swing.JButton btLateSecond;
+    private javax.swing.ButtonGroup buttonGroup1;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel10;
+    private javax.swing.JPanel jPanel11;
+    private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel3;
+    private javax.swing.JPanel jPanel4;
+    private javax.swing.JPanel jPanel5;
+    private javax.swing.JPanel jPanel6;
+    private javax.swing.JPanel jPanel7;
+    private javax.swing.JPanel jPanel8;
+    private javax.swing.JPanel jPanel9;
+    private javax.swing.JButton jbCancel;
+    private javax.swing.JButton jbOK;
+    private javax.swing.JComboBox<String> jcbSelectionType;
+    private javax.swing.JLabel jlAnd;
+    private javax.swing.JLabel jlEarliest;
+    private javax.swing.JLabel jlLatest;
+    private javax.swing.JPanel jpButtons;
+    private javax.swing.JPanel jpFirstDate;
+    private javax.swing.JPanel jpOthers;
+    private javax.swing.JPanel jpRange;
+    private javax.swing.JPanel jpSecondDate;
+    private javax.swing.JPanel jpSelection;
+    private javax.swing.JPanel jpWorkArea;
+    private javax.swing.JRadioButton jrbHide;
+    private javax.swing.JRadioButton jrbShow;
     // End of variables declaration//GEN-END:variables
 
     void setTimeRange(UTCTimeRange timeRange) {

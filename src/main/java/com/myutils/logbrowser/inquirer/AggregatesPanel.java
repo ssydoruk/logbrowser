@@ -5,37 +5,79 @@
  */
 package com.myutils.logbrowser.inquirer;
 
-import javax.swing.*;
-import java.awt.*;
+import java.awt.FlowLayout;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import javax.swing.BoxLayout;
+import javax.swing.ButtonGroup;
+import javax.swing.JPanel;
+import javax.swing.JRadioButton;
+import javax.swing.JScrollPane;
+import javax.swing.ScrollPaneLayout;
+import javax.swing.SwingUtilities;
 
 /**
+ *
  * @author ssydoruk
  */
 public class AggregatesPanel extends javax.swing.JPanel {
 
-    ButtonGroup group = new ButtonGroup();
-    JPanel radioPanel;
-    JScrollPane jScrollPane1;
-    private IAggregateQuery AggregateQuerySelected = null;
-    // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.ButtonGroup buttonGroup1;
-    private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel2;
-    private javax.swing.JPanel jPanel3;
-    private javax.swing.JPanel jpAggregateParams;
-    private javax.swing.JPanel jpAggregates;
-    private javax.swing.JPanel jpReportSelection;
-    private javax.swing.JRadioButton jrbPrintToFile;
-    private javax.swing.JRadioButton jrbPrintToScreen;
+    public class JReferencingButton<T> extends JRadioButton {
+
+        private T value;
+
+        private JReferencingButton(String name, T qr) {
+            super(name);
+            setValue(qr);
+        }
+
+        public T getValue() {
+            return this.value;
+        }
+
+        public void setValue(T value) {
+            this.value = value;
+        }
+    }
+
     /**
      * Creates new form AggregateParams
      */
     public AggregatesPanel() {
         initComponents();
     }
+
+    ButtonGroup group = new ButtonGroup();
+    JPanel radioPanel;
+    JScrollPane jScrollPane1;
+    private IAggregateQuery AggregateQuerySelected = null;
+
+    public IAggregateQuery getSelected() {
+        return AggregateQuerySelected;
+    }
+
+    public boolean isPrintToScreen() {
+        return jrbPrintToScreen.isSelected();
+    }
+
+    private void btnAction(ActionEvent e) {
+        JReferencingButton<IAggregateQuery> qr = (JReferencingButton<IAggregateQuery>) e.getSource();
+        AggregateQuerySelected = qr.getValue();
+        JPanel cfgPane = qr.getValue().getJpConfig();
+        jpAggregateParams.removeAll();
+        if (cfgPane != null) {
+            jpAggregateParams.add(cfgPane);
+        }
+        jpAggregateParams.setVisible(cfgPane != null);
+        jpAggregateParams.invalidate();
+        Window f2 = SwingUtilities.getWindowAncestor(this);
+        if (f2 != null) {
+            f2.pack();
+        }
+    }
+
     AggregatesPanel(ArrayList<IAggregateQuery> queries) {
         this();
         //    jpAggregateParams.setLayout(new FlowLayout());
@@ -66,30 +108,6 @@ public class AggregatesPanel extends javax.swing.JPanel {
         jpReportSelection.setMinimumSize(jpReportSelection.getPreferredSize());
 //        radioPanel.setSize(100, 200);
 //        jScrollPane1.add(radioPanel,CENTER_ALIGNMENT);
-    }
-
-    public IAggregateQuery getSelected() {
-        return AggregateQuerySelected;
-    }
-
-    public boolean isPrintToScreen() {
-        return jrbPrintToScreen.isSelected();
-    }
-
-    private void btnAction(ActionEvent e) {
-        JReferencingButton<IAggregateQuery> qr = (JReferencingButton<IAggregateQuery>) e.getSource();
-        AggregateQuerySelected = qr.getValue();
-        JPanel cfgPane = qr.getValue().getJpConfig();
-        jpAggregateParams.removeAll();
-        if (cfgPane != null) {
-            jpAggregateParams.add(cfgPane);
-        }
-        jpAggregateParams.setVisible(cfgPane != null);
-        jpAggregateParams.invalidate();
-        Window f2 = SwingUtilities.getWindowAncestor(this);
-        if (f2 != null) {
-            f2.pack();
-        }
     }
 
     /**
@@ -144,22 +162,15 @@ public class AggregatesPanel extends javax.swing.JPanel {
         add(jpAggregateParams);
     }// </editor-fold>//GEN-END:initComponents
 
-    public class JReferencingButton<T> extends JRadioButton {
-
-        private T value;
-
-        private JReferencingButton(String name, T qr) {
-            super(name);
-            setValue(qr);
-        }
-
-        public T getValue() {
-            return this.value;
-        }
-
-        public void setValue(T value) {
-            this.value = value;
-        }
-    }
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.ButtonGroup buttonGroup1;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel3;
+    private javax.swing.JPanel jpAggregateParams;
+    private javax.swing.JPanel jpAggregates;
+    private javax.swing.JPanel jpReportSelection;
+    private javax.swing.JRadioButton jrbPrintToFile;
+    private javax.swing.JRadioButton jrbPrintToScreen;
     // End of variables declaration//GEN-END:variables
 }

@@ -13,30 +13,39 @@ import com.myutils.logbrowser.indexer.FileInfoType;
 import com.myutils.logbrowser.indexer.ReferenceType;
 import com.myutils.logbrowser.inquirer.gui.JPAppSelect;
 import com.myutils.logbrowser.inquirer.gui.JPSecSelect;
-import org.apache.logging.log4j.LogManager;
-
-import javax.swing.*;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
-import java.awt.*;
-import java.awt.event.*;
+import java.awt.BorderLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import javax.swing.ButtonGroup;
+import javax.swing.DefaultListModel;
+import javax.swing.JPanel;
+import javax.swing.JRadioButton;
+import javax.swing.JScrollPane;
+import javax.swing.ListSelectionModel;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import org.apache.logging.log4j.LogManager;
 
 /**
+ *
  * @author ssydoruk
  */
 public class AggrORSDurationConfig extends javax.swing.JPanel {
 
     private static final org.apache.logging.log4j.Logger logger = LogManager.getLogger();
-    private final JPAppSelect jpAppSelect;
-    private final TDateRange timeRange;
-    private final ButtonGroup group = new ButtonGroup();
+
     private DefaultListModel lmAttr;
     private MyCheckBoxList cblAttr;
     private DefaultListModel lmAttrValues;
     private MyCheckBoxList cblAttrValues;
+
     /**
      * Creates new form TLibDelaysConfig
      */
@@ -49,19 +58,13 @@ public class AggrORSDurationConfig extends javax.swing.JPanel {
     private DynamicTreeNode<OptionNode> rootTLib;
     private GroupByPanel gpOrderByTLib;
     private GroupByPanel gpGroupByTLib;
+    private final JPAppSelect jpAppSelect;
     private JPSecSelect jpSecSelect;
-    private FileInfoType ft = FileInfoType.type_Unknown;
-    // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JLabel jLabel6;
-    private javax.swing.JLabel jLabel7;
-    private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel3;
-    private javax.swing.JPanel jPanel9;
-    private javax.swing.JPanel jpAppSettings;
-    private javax.swing.JPanel jpAttrValues;
-    private javax.swing.JPanel jpComponents;
-    private javax.swing.JPanel jpOtherSettings;
-    private javax.swing.JPanel jpTimeSettings;
+    private final TDateRange timeRange;
+
+    public DynamicTreeNode<OptionNode> getAttrRoot() {
+        return root;
+    }
 
     public AggrORSDurationConfig() throws SQLException {
         initComponents();
@@ -88,7 +91,7 @@ public class AggrORSDurationConfig extends javax.swing.JPanel {
                     try {
                         timeRange.setTimeRange(DatabaseConnector.getTimeRangeByAppID(item.getId()));
                     } catch (SQLException ex) {
-                        logger.error("fatal: ", ex);
+                        logger.error("fatal: ",  ex);
                     }
                 }
             }
@@ -96,10 +99,6 @@ public class AggrORSDurationConfig extends javax.swing.JPanel {
         jpAppSelect.loadApps(FileInfoType.type_ORS);
         updateTimeRange(jpAppSelect.getAppID());
         InitFilter();
-    }
-
-    public DynamicTreeNode<OptionNode> getAttrRoot() {
-        return root;
     }
 
     public UTCTimeRange getTimeRange() throws SQLException {
@@ -163,6 +162,79 @@ public class AggrORSDurationConfig extends javax.swing.JPanel {
         return jpAppSelect.getAppID();
     }
 
+    class OrderField {
+
+        private final String fieldName;
+        private final String displayName;
+
+        public OrderField(String fieldName, String displayName) {
+            this.fieldName = fieldName;
+            this.displayName = displayName;
+        }
+
+        public String getFieldName() {
+            return fieldName;
+        }
+
+        public String getDisplayName() {
+            return displayName;
+        }
+
+        @Override
+        public String toString() {
+            return displayName;
+        }
+
+    }
+
+    class myListCheckListener implements ListSelectionListener {
+
+        private final MyCheckBoxList list;
+        private final MyCheckBoxList listChild;
+
+        public myListCheckListener(MyCheckBoxList list, MyCheckBoxList listChild) {
+            this.list = list;
+            this.listChild = listChild;
+        }
+
+        @Override
+        public void valueChanged(ListSelectionEvent e) {
+            ReportItemChecked(e, list, listChild);
+        }
+
+    }
+
+    class myListSelectionListener implements ListSelectionListener {
+
+        private final MyCheckBoxList list;
+        private final MyCheckBoxList listChild;
+
+        public myListSelectionListener(MyCheckBoxList list, MyCheckBoxList listChild) {
+            this.list = list;
+            this.listChild = listChild;
+        }
+
+        @Override
+        public void valueChanged(ListSelectionEvent e) {
+            ReportItemChanged(e, list, listChild);
+        }
+
+    }
+
+    class myFocusListener implements FocusListener {
+
+        @Override
+        public void focusGained(FocusEvent e) {
+            inquirer.logger.debug("focusGained", e);
+        }
+
+        @Override
+        public void focusLost(FocusEvent e) {
+            inquirer.logger.debug("focusLost", e);
+        }
+
+    }
+
     private void InitCB(MyCheckBoxList list, MyCheckBoxList clbChild, JPanel rptType, int i) {
 
         rptType.add(new JScrollPane(list));
@@ -175,6 +247,9 @@ public class AggrORSDurationConfig extends javax.swing.JPanel {
         list.addFocusListener(new myFocusListener());
 
     }
+
+    private final ButtonGroup group = new ButtonGroup();
+    private FileInfoType ft = FileInfoType.type_Unknown;
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -220,12 +295,12 @@ public class AggrORSDurationConfig extends javax.swing.JPanel {
         javax.swing.GroupLayout jpComponentsLayout = new javax.swing.GroupLayout(jpComponents);
         jpComponents.setLayout(jpComponentsLayout);
         jpComponentsLayout.setHorizontalGroup(
-                jpComponentsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGap(0, 0, Short.MAX_VALUE)
+            jpComponentsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 0, Short.MAX_VALUE)
         );
         jpComponentsLayout.setVerticalGroup(
-                jpComponentsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGap(0, 112, Short.MAX_VALUE)
+            jpComponentsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 112, Short.MAX_VALUE)
         );
 
         jpAttrValues.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
@@ -233,12 +308,12 @@ public class AggrORSDurationConfig extends javax.swing.JPanel {
         javax.swing.GroupLayout jpAttrValuesLayout = new javax.swing.GroupLayout(jpAttrValues);
         jpAttrValues.setLayout(jpAttrValuesLayout);
         jpAttrValuesLayout.setHorizontalGroup(
-                jpAttrValuesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGap(0, 389, Short.MAX_VALUE)
+            jpAttrValuesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 389, Short.MAX_VALUE)
         );
         jpAttrValuesLayout.setVerticalGroup(
-                jpAttrValuesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGap(0, 133, Short.MAX_VALUE)
+            jpAttrValuesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 133, Short.MAX_VALUE)
         );
 
         jLabel7.setText("Attribute value");
@@ -246,49 +321,62 @@ public class AggrORSDurationConfig extends javax.swing.JPanel {
         javax.swing.GroupLayout jPanel9Layout = new javax.swing.GroupLayout(jPanel9);
         jPanel9.setLayout(jPanel9Layout);
         jPanel9Layout.setHorizontalGroup(
-                jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(jPanel9Layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addGroup(jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                        .addComponent(jpComponents, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                        .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 211, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addComponent(jLabel7)
-                                        .addComponent(jpAttrValues, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addContainerGap())
+            jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel9Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jpComponents, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 211, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel7)
+                    .addComponent(jpAttrValues, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap())
         );
         jPanel9Layout.setVerticalGroup(
-                jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(jPanel9Layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addComponent(jLabel6)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jpComponents, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(jLabel7)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(jpAttrValues, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addContainerGap())
+            jPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel9Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jLabel6)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jpComponents, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jLabel7)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jpAttrValues, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
         );
 
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
-                jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(jPanel3Layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addComponent(jPanel9, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addContainerGap(428, Short.MAX_VALUE))
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel3Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jPanel9, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(428, Short.MAX_VALUE))
         );
         jPanel3Layout.setVerticalGroup(
-                jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addComponent(jPanel9, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addContainerGap(36, Short.MAX_VALUE))
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jPanel9, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(36, Short.MAX_VALUE))
         );
 
         add(jPanel3, java.awt.BorderLayout.CENTER);
     }// </editor-fold>//GEN-END:initComponents
+
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel jLabel6;
+    private javax.swing.JLabel jLabel7;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel3;
+    private javax.swing.JPanel jPanel9;
+    private javax.swing.JPanel jpAppSettings;
+    private javax.swing.JPanel jpAttrValues;
+    private javax.swing.JPanel jpComponents;
+    private javax.swing.JPanel jpOtherSettings;
+    private javax.swing.JPanel jpTimeSettings;
+    // End of variables declaration//GEN-END:variables
 
     private void addRadioButton(String btTitle, final FileInfoType fileInfoType) {
         JRadioButton btn = new JRadioButton(btTitle);
@@ -380,7 +468,6 @@ public class AggrORSDurationConfig extends javax.swing.JPanel {
 //        lChild.revalidate();
 //        lChild.repaint();
     }
-    // End of variables declaration//GEN-END:variables
 
     private void setChildChecked(MyCheckBoxList lChild, boolean boxEnabled) {
         inquirer.logger.debug("in setChildChecked " + boxEnabled);
@@ -446,7 +533,7 @@ public class AggrORSDurationConfig extends javax.swing.JPanel {
 //
 ////                    if( i>=minIndex && i<=maxIndex )
 ////                        node.getData().setChecked(true);
-////                    else
+////                    else 
 ////                        node.getData().setChecked(false);
 //                }
 //
@@ -464,79 +551,6 @@ public class AggrORSDurationConfig extends javax.swing.JPanel {
 ////                    (DynamicTreeNode<OptionNode>) lm.get(i)
 //                }
             }
-        }
-
-    }
-
-    class OrderField {
-
-        private final String fieldName;
-        private final String displayName;
-
-        public OrderField(String fieldName, String displayName) {
-            this.fieldName = fieldName;
-            this.displayName = displayName;
-        }
-
-        public String getFieldName() {
-            return fieldName;
-        }
-
-        public String getDisplayName() {
-            return displayName;
-        }
-
-        @Override
-        public String toString() {
-            return displayName;
-        }
-
-    }
-
-    class myListCheckListener implements ListSelectionListener {
-
-        private final MyCheckBoxList list;
-        private final MyCheckBoxList listChild;
-
-        public myListCheckListener(MyCheckBoxList list, MyCheckBoxList listChild) {
-            this.list = list;
-            this.listChild = listChild;
-        }
-
-        @Override
-        public void valueChanged(ListSelectionEvent e) {
-            ReportItemChecked(e, list, listChild);
-        }
-
-    }
-
-    class myListSelectionListener implements ListSelectionListener {
-
-        private final MyCheckBoxList list;
-        private final MyCheckBoxList listChild;
-
-        public myListSelectionListener(MyCheckBoxList list, MyCheckBoxList listChild) {
-            this.list = list;
-            this.listChild = listChild;
-        }
-
-        @Override
-        public void valueChanged(ListSelectionEvent e) {
-            ReportItemChanged(e, list, listChild);
-        }
-
-    }
-
-    class myFocusListener implements FocusListener {
-
-        @Override
-        public void focusGained(FocusEvent e) {
-            inquirer.logger.debug("focusGained", e);
-        }
-
-        @Override
-        public void focusLost(FocusEvent e) {
-            inquirer.logger.debug("focusLost", e);
         }
 
     }

@@ -6,76 +6,100 @@ import Utils.Util;
 import com.jidesoft.dialog.ButtonPanel;
 import com.jidesoft.dialog.JideOptionPane;
 import com.jidesoft.dialog.StandardDialog;
+import static com.jidesoft.dialog.StandardDialog.RESULT_AFFIRMED;
+import static com.jidesoft.dialog.StandardDialog.RESULT_CANCELLED;
 import com.jidesoft.swing.JideTabbedPane;
 import com.jidesoft.swing.TabEditingValidator;
 import com.myutils.logbrowser.indexer.FileInfoType;
 import com.myutils.logbrowser.inquirer.IDsFinder.RequestLevel;
 import com.myutils.logbrowser.inquirer.IQueryResults.ProgressNotifications;
-import com.myutils.logbrowser.inquirer.gui.*;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.logging.log4j.LogManager;
-
-import javax.swing.*;
-import javax.swing.border.BevelBorder;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-import java.awt.*;
+import com.myutils.logbrowser.inquirer.gui.ExternalEditor;
+import com.myutils.logbrowser.inquirer.gui.MySwingWorker;
+import com.myutils.logbrowser.inquirer.gui.ReportFrame;
+import com.myutils.logbrowser.inquirer.gui.ReportFrameAggregate;
+import com.myutils.logbrowser.inquirer.gui.ReportFrameQuery;
+import com.myutils.logbrowser.inquirer.gui.RequestProgress;
+import com.myutils.logbrowser.inquirer.gui.WindowsSystemUtility;
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.GridLayout;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-
+import javax.swing.AbstractAction;
+import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
+import javax.swing.ButtonGroup;
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import static javax.swing.JOptionPane.ERROR_MESSAGE;
 import static javax.swing.JOptionPane.OK_OPTION;
+import javax.swing.JPanel;
+import javax.swing.JRadioButton;
+import javax.swing.JScrollPane;
+import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
+import javax.swing.border.BevelBorder;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 /**
+ *
  * @author ssydoruk
  */
 public class QueryDialog extends javax.swing.JFrame {
 
-    private static final org.apache.logging.log4j.Logger logger = LogManager.getLogger();
-    private final boolean aggregateInitiated = false;
-    private final ArrayList<ReportFrame> reps = new ArrayList<>();
     /**
      * Creates new form QueryDialog
      */
     JideTabbedPane tabbedPane;
+    private static final org.apache.logging.log4j.Logger logger = LogManager.getLogger();
+
+    private int closeCause = 0;
+    private boolean aggregateInitiated = false;
+    private FileOutSettings fileOutSetting;
+
+    public int getCloseCause() {
+        return closeCause;
+    }
+
     ArrayList<IQueryResults> queries;
     ArrayList<IAggregateQuery> aggr = new ArrayList<>();
+
+    public void addAggregate(IAggregateQuery q) {
+        try {
+            aggr.add(q);
+        } catch (Exception e) {
+            inquirer.logger.error("cannot add query " + q, e);
+        }
+    }
+
     AggregatesPanel aggrParams = null;
-    RequestProgress rp = null;
-    DoneFileDialog dfg = null;
-    AggregateDialog aggregateDialog = null;
-    CancelRunDialog fileSaveSettings = null;
-    private int closeCause = 0;
-    private FileOutSettings fileOutSetting;
-    private JPanel aggregatePanel;
-    // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton btAllCalls;
-    private javax.swing.JButton btOK;
-    private javax.swing.JButton btRunSave;
-//<editor-fold defaultstate="collapsed" desc="Query thread definition">
-    private javax.swing.JPanel jPanel1;
-//</editor-fold>
-    private javax.swing.JPanel jPanel2;
-    private javax.swing.JPanel jPanel3;
-    private javax.swing.JPanel jPanel4;
-    private javax.swing.JPanel jPanel5;
-    private javax.swing.JButton jbAggregate;
-    private javax.swing.JButton jbCancel;
-    private javax.swing.JButton jbReset;
-    private javax.swing.JButton jbSettings;
-    private javax.swing.JCheckBox jcbIsRegex;
-    private javax.swing.JComboBox<String> jcbSelection;
-    private javax.swing.JPanel jpSelection;
-    private javax.swing.JPanel jpTabs;
+
+    public IAggregateQuery getAggregateQuery() {
+        if (tabbedPane.getSelectedIndex() == tabbedPane.getTabCount() - 1) {// last tab is aggregate
+            return aggrParams.getSelected();
+        } else {
+            return null;
+        }
+    }
+
+    public void CenterWindow() {
+        ScreenInfo.CenterWindow(this);
+    }
 
     public QueryDialog(ArrayList<IQueryResults> queries) throws Exception {
         super();
@@ -108,29 +132,7 @@ public class QueryDialog extends javax.swing.JFrame {
         }
     }
 
-    public int getCloseCause() {
-        return closeCause;
-    }
-
-    public void addAggregate(IAggregateQuery q) {
-        try {
-            aggr.add(q);
-        } catch (Exception e) {
-            inquirer.logger.error("cannot add query " + q, e);
-        }
-    }
-
-    public IAggregateQuery getAggregateQuery() {
-        if (tabbedPane.getSelectedIndex() == tabbedPane.getTabCount() - 1) {// last tab is aggregate
-            return aggrParams.getSelected();
-        } else {
-            return null;
-        }
-    }
-
-    public void CenterWindow() {
-        ScreenInfo.CenterWindow(this);
-    }
+    private JPanel aggregatePanel;
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -172,12 +174,12 @@ public class QueryDialog extends javax.swing.JFrame {
         javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
         jPanel4.setLayout(jPanel4Layout);
         jPanel4Layout.setHorizontalGroup(
-                jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGap(0, 918, Short.MAX_VALUE)
+            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 918, Short.MAX_VALUE)
         );
         jPanel4Layout.setVerticalGroup(
-                jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGap(0, 0, Short.MAX_VALUE)
+            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 0, Short.MAX_VALUE)
         );
 
         getContentPane().add(jPanel4, java.awt.BorderLayout.SOUTH);
@@ -240,37 +242,37 @@ public class QueryDialog extends javax.swing.JFrame {
         javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
         jPanel5.setLayout(jPanel5Layout);
         jPanel5Layout.setHorizontalGroup(
-                jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(jPanel5Layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addComponent(btAllCalls, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                        .addComponent(jbSettings, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                        .addComponent(jbCancel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                        .addComponent(btOK, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                        .addComponent(jbReset, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                        .addComponent(jbAggregate, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                        .addComponent(btRunSave, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                                .addContainerGap())
+            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel5Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(btAllCalls, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jbSettings, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jbCancel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(btOK, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jbReset, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jbAggregate, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(btRunSave, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
         );
         jPanel5Layout.setVerticalGroup(
-                jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(jPanel5Layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addComponent(btOK)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(btRunSave)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 15, Short.MAX_VALUE)
-                                .addComponent(jbReset)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jbSettings)
-                                .addGap(18, 18, 18)
-                                .addComponent(btAllCalls)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jbAggregate)
-                                .addGap(18, 18, 18)
-                                .addComponent(jbCancel)
-                                .addContainerGap())
+            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel5Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(btOK)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(btRunSave)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 15, Short.MAX_VALUE)
+                .addComponent(jbReset)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jbSettings)
+                .addGap(18, 18, 18)
+                .addComponent(btAllCalls)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jbAggregate)
+                .addGap(18, 18, 18)
+                .addComponent(jbCancel)
+                .addContainerGap())
         );
 
         jPanel2.add(jPanel5, java.awt.BorderLayout.NORTH);
@@ -283,12 +285,12 @@ public class QueryDialog extends javax.swing.JFrame {
         javax.swing.GroupLayout jpTabsLayout = new javax.swing.GroupLayout(jpTabs);
         jpTabs.setLayout(jpTabsLayout);
         jpTabsLayout.setHorizontalGroup(
-                jpTabsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGap(0, 791, Short.MAX_VALUE)
+            jpTabsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 791, Short.MAX_VALUE)
         );
         jpTabsLayout.setVerticalGroup(
-                jpTabsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGap(0, 414, Short.MAX_VALUE)
+            jpTabsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 414, Short.MAX_VALUE)
         );
 
         jPanel3.add(jpTabs, java.awt.BorderLayout.CENTER);
@@ -300,7 +302,7 @@ public class QueryDialog extends javax.swing.JFrame {
         jpSelection.setLayout(new javax.swing.BoxLayout(jpSelection, javax.swing.BoxLayout.LINE_AXIS));
 
         jcbSelection.setEditable(true);
-        jcbSelection.setModel(new javax.swing.DefaultComboBoxModel<>(new String[]{"Item 1", "Item 2", "Item 3", "Item 4"}));
+        jcbSelection.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
         jpSelection.add(jcbSelection);
 
         jcbIsRegex.setText("Is regex");
@@ -314,6 +316,206 @@ public class QueryDialog extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private ArrayList<ReportFrame> reps = new ArrayList<>();
+
+    RequestProgress rp = null;
+//<editor-fold defaultstate="collapsed" desc="Query thread definition">
+
+    class QueryTask extends MySwingWorker<Void, String> {
+
+        private String outFile;
+
+        private boolean displayForm;
+
+        private QueryDialog queryDialog;
+        private RequestProgress rp = null;
+        IQueryResults qry = null;
+
+        PrintStreams ps = null;
+
+        ArrayList<ILogRecordFormatter> formatters = null;
+
+        String theTitle = "";
+        ReportFrame frm = null;
+
+        private QueryTask(QueryDialog frm, IAggregateQuery selected) {
+            this.queryDialog = frm;
+            setQuery(selected);
+        }
+
+        public QueryTask(QueryDialog frm, IQueryResults theQuery, boolean displayForm) {
+            this.queryDialog = frm;
+            setQuery(theQuery);
+            this.displayForm = displayForm;
+        }
+
+        public void setDisplayForm(boolean displayForm) {
+            this.displayForm = displayForm;
+        }
+
+        @Override
+        protected void process(List<String> chunks) {
+            rp.addProgress(chunks);
+        }
+
+        public void setRp(RequestProgress rp) {
+            this.rp = rp;
+        }
+
+        public void setFormatters(ArrayList<ILogRecordFormatter> formatters) {
+            this.formatters = formatters;
+        }
+
+        public void setPs(PrintStreams ps) {
+            this.ps = ps;
+        }
+
+        @Override
+        protected Void myDoInBackground() throws Exception {
+
+            inquirer inq = inquirer.getInq();
+            InquirerCfg cfg = inquirer.getConfig();
+            addSelection(getSelection());
+
+            if (ps == null) {
+                ps = new PrintStreams(cfg);
+                ps.addMemoryPrint();
+            }
+
+            if (qry != null) {
+                qry.resetOutput();
+                if (qry instanceof IAggregateQuery) {
+                    ps.setAggregate(true);
+                    IAggregateQuery iaq = (IAggregateQuery) qry;
+                    if (formatters == null) {
+                        iaq.setFormatters(inq.getFormatters());
+                    } else {
+                        iaq.setFormatters(formatters);
+                    }
+
+                    inq.doRetrieve(iaq, queryDialog);
+                    if (!qry.isPrintAlone()) {
+                        iaq.doPrint(ps);
+                    }
+                    if (displayForm) {
+                        if (iaq.needPrint()) {
+                            if (displayForm) {
+                                frm = new ReportFrameQuery(ps);
+                            }
+                        } else {
+                            if (displayForm) {
+                                frm = new ReportFrameAggregate(ps, iaq);
+                            }
+
+                        }
+                        theTitle = iaq.getReportSummary().replaceAll("\n", " ");
+                    }
+                } else {
+                    try {
+                        qry.reset();
+                        if (formatters == null) {
+                            qry.setFormatters(inq.getFormatters());
+                        } else {
+                            qry.setFormatters(formatters);
+                        }
+                        if (Thread.currentThread().isInterrupted()) {
+                            throw new RuntimeInterruptException();
+                        }
+                        qry.doRetrieve(queryDialog);
+                        if (Thread.currentThread().isInterrupted()) {
+                            throw new RuntimeInterruptException();
+                        }
+                        if (!qry.isPrintAlone()) {
+                            qry.doPrint(ps);
+                        }
+                        if (Thread.currentThread().isInterrupted()) {
+                            throw new RuntimeInterruptException();
+                        }
+                        if (displayForm) {
+                            try {
+                                String reportSummary = qry.getReportSummary().replaceAll("\n", " ");
+                                theTitle = reportSummary;
+                            } catch (Exception e) {
+                                theTitle = qry.getName();
+                            }
+                            try {
+                                frm = new ReportFrameQuery(ps);
+                            } catch (Exception e) {
+                                inquirer.logger.error("error creating form", e);
+                            }
+                        }
+                    } catch (Exception exception) {
+                        inquirer.logger.error("interrupted: ", exception);
+                    }
+                }
+                InquirerFileIo.doneIO();
+                ps.closeStreams();
+            }
+            return null;
+        }
+
+        @Override
+        protected void done() {
+            inquirer.logger.debug("swingworker done");
+            rp.dispose();
+            if (isCancelled()) {
+                JOptionPane.showMessageDialog(queryDialog, "Query was cancelled", "Error", JOptionPane.ERROR_MESSAGE);
+                ps.closeStreams();
+            } else {
+                QueryTools.showQueryMessages(frm);
+
+                if (ps.getNrows() > 0 || ps.getTabDataModel().getRowCount() > 0) {
+                    if (displayForm) {
+                        if (frm != null) {
+                            frm.setTitle(inquirer.getDialogTitle(theTitle));
+//                            ScreenInfo.setVisible(queryDialog, frm, true);
+                            frm.setLocationRelativeTo(queryDialog);
+                            ScreenInfo.CenterWindowMaxWidth(queryDialog, frm);
+                            frm.setVisible(true);
+                        }
+                    } else {
+                        showDoneFileDialog(queryDialog, ps.getNrows(), outFile);
+                    }
+                } else {
+                    int objectsFound = qry.getObjectsFound();
+                    if (objectsFound == 0) {
+                        JideOptionPane.showMessageDialog(queryDialog, "Nothing found.\n"
+                                + "Try changing search parameters", "cannot run report", ERROR_MESSAGE);
+                    } else {
+                        JideOptionPane.showMessageDialog(queryDialog,
+                                "Your search yielded " + objectsFound + " objects, however\n"
+                                + "no records returned\n"
+                                + "Try changing filters or search", "cannot run report", JideOptionPane.WARNING_MESSAGE);
+                    }
+                    if (frm != null) {
+                        frm.dispose();
+                    }
+                }
+
+            }
+        }
+
+        private void setQuery(IQueryResults theQuery) {
+            if (theQuery != null) {
+                qry = theQuery;
+                qry.setProgressCallback(new ProgressNotifications() {
+                    @Override
+                    void sayProgress(String s) {
+                        publish(s);
+                    }
+                });
+            }
+        }
+
+        private void setOutFile(String outFile) {
+            this.outFile = outFile;
+        }
+
+    };
+//</editor-fold>
+
+    DoneFileDialog dfg = null;
 
     public IDsFinder.RequestLevel getRequestLevel() {
         RequestParams requestParams = getRequestParams();
@@ -424,9 +626,9 @@ public class QueryDialog extends javax.swing.JFrame {
 
                     private final QueryDialog frm;
                     private final IQueryResults qry;
-                    FullTableColors all;
                     private QueryAllJTable allCalls;
                     private RequestProgress rp;
+                    FullTableColors all;
 
                     public QueryAllTask(QueryDialog frm, IQueryResults qry) {
                         this.frm = frm;
@@ -469,7 +671,7 @@ public class QueryDialog extends javax.swing.JFrame {
                             try {
                                 this.allCalls = new QueryAllJTable(qry, frm, all);
                             } catch (Exception ex) {
-                                logger.error("fatal: ", ex);
+                                logger.error("fatal: ",  ex);
                             }
                             Dimension d = allCalls.getPreferredSize();
                             d.height = 400;
@@ -487,7 +689,8 @@ public class QueryDialog extends javax.swing.JFrame {
                     }
 
                 }
-                //</editor-fold>
+                ;
+//</editor-fold>
                 QueryTools.queryMessagesClear();
                 QueryAllTask tsk = new QueryAllTask(this, qry);
                 RequestProgress rp = new RequestProgress(this, true, tsk);
@@ -500,6 +703,314 @@ public class QueryDialog extends javax.swing.JFrame {
             inquirer.ExceptionHandler.handleException(this.getClass().toString(), exception);
         }
     }//GEN-LAST:event_btAllCallsActionPerformed
+
+    class DoneFileDialog extends StandardDialog {
+
+        private int closeCause = JOptionPane.CANCEL_OPTION;
+
+        protected JPanel aggregatesPanel;
+        private String outFile;
+        private int nrows;
+        private final JLabel lblFile;
+//        private final JRadioButton excelButton;
+
+        JRadioButton vimButton;
+        JRadioButton texpadButton;
+        JRadioButton notepadButton;
+        JRadioButton doneButton;
+        protected JPanel bannerPanel;
+        protected JLabel lbl;
+        JPanel listPane;
+
+        DoneFileDialog(Window parent) {
+            super(parent);
+
+            setTitle("Report complete");
+
+            listPane = new JPanel(new GridLayout(0, 1));
+
+            vimButton = new JRadioButton("Open in VIM");
+//            vimButton.addActionListener(this);
+            texpadButton = new JRadioButton("Open in TextPad");
+//            texpadButton.addActionListener(this);
+            notepadButton = new JRadioButton("Open in NotePad++");
+//            excelButton = new JRadioButton("Open in Excel");
+//            notepadButton.addActionListener(this);
+            doneButton = new JRadioButton("Done");
+//            doneButton.addActionListener(this);
+
+//Group the radio buttons.
+            ButtonGroup group = new ButtonGroup();
+            group.add(vimButton);
+            group.add(texpadButton);
+            group.add(notepadButton);
+            group.add(doneButton);
+//             group.add(excelButton);
+            listPane.add(vimButton);
+            listPane.add(texpadButton);
+            listPane.add(notepadButton);
+            listPane.add(doneButton);
+//            listPane.add(excelButton);
+
+            bannerPanel = new JPanel();
+            bannerPanel.setLayout(new GridLayout(0, 1));
+            lbl = new JLabel();
+            lblFile = new JLabel();
+            bannerPanel.add(lblFile);
+            bannerPanel.add(lbl);
+        }
+
+        public int getCloseCause() {
+            return closeCause;
+        }
+
+        public void setCloseCause(int closeCause) {
+            this.closeCause = closeCause;
+        }
+
+        boolean isVim() {
+            return vimButton.isSelected();
+        }
+
+        boolean isTextpad() {
+            return texpadButton.isSelected();
+        }
+
+        boolean isNotepad() {
+            return notepadButton.isSelected();
+        }
+//        boolean isExcel() {
+//            return excelButton.isSelected();
+//        }
+
+        public void doShow() {
+            lblFile.setText("Created file " + outFile);
+            lbl.setText("Extracted " + nrows + " records");
+
+            vimButton.setSelected(true);
+            setModal(true);
+
+            pack();
+            invalidate();
+//            ScreenInfo.CenterWindow(this);
+            this.setLocationRelativeTo(getParent());
+            setVisible(
+                    true);
+        }
+
+        @Override
+        public JComponent createBannerPanel() {
+            return bannerPanel;
+        }
+
+        @Override
+        public JComponent createContentPanel() {
+
+            return listPane;
+        }
+
+        private void cancelButtonAction(ActionEvent e) {
+            setDialogResult(RESULT_CANCELLED);
+            setCloseCause(JOptionPane.CANCEL_OPTION);
+            setVisible(false);
+            dispose();
+
+        }
+
+        private void runButtonAction(ActionEvent e) {
+            setDialogResult(RESULT_AFFIRMED);
+            setCloseCause(JOptionPane.OK_OPTION);
+            setVisible(false);
+            dispose();
+
+        }
+
+        @Override
+        public ButtonPanel createButtonPanel() {
+            ButtonPanel buttonPanel = new ButtonPanel();
+            JButton cancelButton = new JButton(new AbstractAction("Close") {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    cancelButtonAction(e);
+                }
+            });
+            buttonPanel.addButton(cancelButton);
+
+            JButton jbRun = new JButton(new AbstractAction("Select") {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    runButtonAction(e);
+                }
+            });
+            buttonPanel.addButton(jbRun);
+
+            setDefaultCancelAction(cancelButton.getAction());
+            setDefaultAction(jbRun.getAction());
+            getRootPane().setDefaultButton(jbRun);
+
+            buttonPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+            buttonPanel.setSizeConstraint(ButtonPanel.NO_LESS_THAN); // since the checkbox is quite wide, we don't want all of them have the same size.
+            return buttonPanel;
+        }
+
+        public void doShow(String theTitle) {
+            this.setTitle(theTitle);
+            doShow();
+        }
+
+        public void setContentPanel(JPanel aggregatesPanel) {
+            listPane.removeAll();
+            listPane.add(aggregatesPanel);
+            this.aggregatesPanel = aggregatesPanel;
+            listPane.invalidate();
+        }
+
+        private void doShow(int nrows, String outFile) {
+            this.nrows = nrows;
+            this.outFile = outFile;
+            doShow();
+        }
+
+    }
+
+    class CancelRunDialog extends StandardDialog {
+
+        private int closeCause = JOptionPane.CANCEL_OPTION;
+
+        protected JPanel aggregatesPanel;
+        JPanel listPane;
+
+        CancelRunDialog(Window parent) {
+            super(parent);
+            listPane = new JPanel(new BorderLayout(10, 10));
+        }
+
+        public int getCloseCause() {
+            return closeCause;
+        }
+
+        public void setCloseCause(int closeCause) {
+            this.closeCause = closeCause;
+        }
+
+        public void doShow() {
+            setModal(true);
+
+            pack();
+//            ScreenInfo.CenterWindow(this);
+            this.setLocationRelativeTo(getParent());
+            setVisible(
+                    true);
+        }
+
+        @Override
+        public JComponent createBannerPanel() {
+            return null;
+        }
+
+        @Override
+        public JComponent createContentPanel() {
+
+            return listPane;
+        }
+
+        private void cancelButtonAction(ActionEvent e) {
+            setDialogResult(RESULT_CANCELLED);
+            setCloseCause(JOptionPane.CANCEL_OPTION);
+            setVisible(false);
+            dispose();
+
+        }
+
+        private void runButtonAction(ActionEvent e) {
+            setDialogResult(RESULT_AFFIRMED);
+            setCloseCause(JOptionPane.OK_OPTION);
+            setVisible(false);
+            dispose();
+
+        }
+
+        @Override
+        public ButtonPanel createButtonPanel() {
+            ButtonPanel buttonPanel = new ButtonPanel();
+            JButton cancelButton = new JButton(new AbstractAction("Close") {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    cancelButtonAction(e);
+                }
+            });
+            buttonPanel.addButton(cancelButton);
+
+            JButton jbRun = new JButton(new AbstractAction("Execute") {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    runButtonAction(e);
+                }
+            });
+            buttonPanel.addButton(jbRun);
+
+            setDefaultCancelAction(cancelButton.getAction());
+            setDefaultAction(jbRun.getAction());
+            getRootPane().setDefaultButton(jbRun);
+
+            buttonPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+            buttonPanel.setSizeConstraint(ButtonPanel.NO_LESS_THAN); // since the checkbox is quite wide, we don't want all of them have the same size.
+            return buttonPanel;
+        }
+
+        public void doShow(String theTitle) {
+            this.setTitle(theTitle);
+            doShow();
+        }
+
+        public void setContentPanel(JPanel aggregatesPanel) {
+            listPane.removeAll();
+            listPane.add(aggregatesPanel);
+            this.aggregatesPanel = aggregatesPanel;
+            listPane.invalidate();
+        }
+
+    }
+
+    class AggregateDialog extends CancelRunDialog {
+
+        private final JPanel bannerPanel;
+
+        AggregateDialog(Window parent) {
+            super(parent);
+            this.bannerPanel = new JPanel(new BorderLayout(20, 20));
+            bannerPanel.setBorder(new BevelBorder(BevelBorder.RAISED));
+            JLabel ta = new JLabel();
+//            ta.setEditable(false);
+            ta.setFocusable(false);
+            ta.setHorizontalAlignment(SwingConstants.CENTER);
+            ta.setVerticalAlignment(SwingConstants.CENTER);
+            ta.setText("<html><b>On main window select application(s) and time range</b></html>");
+
+            bannerPanel.add(ta);
+        }
+
+        @Override
+        public JComponent createBannerPanel() {
+            return bannerPanel; //To change body of generated methods, choose Tools | Templates.
+        }
+
+        public IAggregateQuery getSelected() {
+            return ((AggregatesPanel) aggregatesPanel).getSelected();
+        }
+
+        public boolean isPrintToScreen() {
+            return ((AggregatesPanel) aggregatesPanel).isPrintToScreen();
+        }
+
+        @Override
+        public void doShow(String theTitle) {
+            super.doShow("Select and Configure aggregate for " + theTitle);
+        }
+
+    }
+
+    AggregateDialog aggregateDialog = null;
 
     private void jbAggregateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbAggregateActionPerformed
         IQueryResults qry = getSelectedQuery();
@@ -535,6 +1046,8 @@ public class QueryDialog extends javax.swing.JFrame {
             }
         }
     }//GEN-LAST:event_jbAggregateActionPerformed
+
+    CancelRunDialog fileSaveSettings = null;
 
     private void fileOutputConfig(QueryTools qry) {
         boolean isAggregate = qry instanceof IAggregateQuery;
@@ -749,6 +1262,25 @@ public class QueryDialog extends javax.swing.JFrame {
         enableSearchItems(selEnabled);
     }
 
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btAllCalls;
+    private javax.swing.JButton btOK;
+    private javax.swing.JButton btRunSave;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel3;
+    private javax.swing.JPanel jPanel4;
+    private javax.swing.JPanel jPanel5;
+    private javax.swing.JButton jbAggregate;
+    private javax.swing.JButton jbCancel;
+    private javax.swing.JButton jbReset;
+    private javax.swing.JButton jbSettings;
+    private javax.swing.JCheckBox jcbIsRegex;
+    private javax.swing.JComboBox<String> jcbSelection;
+    private javax.swing.JPanel jpSelection;
+    private javax.swing.JPanel jpTabs;
+    // End of variables declaration//GEN-END:variables
+
     public RequestParams getCurrentRequest() {
         Component selectedComponent = tabbedPane.getSelectedComponent();
         if (selectedComponent != null && selectedComponent instanceof RequestParams) {
@@ -782,7 +1314,6 @@ public class QueryDialog extends javax.swing.JFrame {
     public ArrayList<Integer> getSearchApps() {
         return getSearchApps(false);
     }
-    // End of variables declaration//GEN-END:variables
 
     public SelectionType getSelectionType() {
         Component selectedComponent = tabbedPane.getSelectedComponent();
@@ -876,496 +1407,6 @@ public class QueryDialog extends javax.swing.JFrame {
 //            ret.append(requestParams.getFiltersSummary());
         }
         return ret.toString();
-    }
-
-    class QueryTask extends MySwingWorker<Void, String> {
-
-        private final QueryDialog queryDialog;
-        IQueryResults qry = null;
-        PrintStreams ps = null;
-        ArrayList<ILogRecordFormatter> formatters = null;
-        String theTitle = "";
-        ReportFrame frm = null;
-        private String outFile;
-        private boolean displayForm;
-        private RequestProgress rp = null;
-
-        private QueryTask(QueryDialog frm, IAggregateQuery selected) {
-            this.queryDialog = frm;
-            setQuery(selected);
-        }
-
-        public QueryTask(QueryDialog frm, IQueryResults theQuery, boolean displayForm) {
-            this.queryDialog = frm;
-            setQuery(theQuery);
-            this.displayForm = displayForm;
-        }
-
-        public void setDisplayForm(boolean displayForm) {
-            this.displayForm = displayForm;
-        }
-
-        @Override
-        protected void process(List<String> chunks) {
-            rp.addProgress(chunks);
-        }
-
-        public void setRp(RequestProgress rp) {
-            this.rp = rp;
-        }
-
-        public void setFormatters(ArrayList<ILogRecordFormatter> formatters) {
-            this.formatters = formatters;
-        }
-
-        public void setPs(PrintStreams ps) {
-            this.ps = ps;
-        }
-
-        @Override
-        protected Void myDoInBackground() throws Exception {
-
-            inquirer inq = inquirer.getInq();
-            InquirerCfg cfg = inquirer.getConfig();
-            addSelection(getSelection());
-
-            if (ps == null) {
-                ps = new PrintStreams(cfg);
-                ps.addMemoryPrint();
-            }
-
-            if (qry != null) {
-                qry.resetOutput();
-                if (qry instanceof IAggregateQuery) {
-                    ps.setAggregate(true);
-                    IAggregateQuery iaq = (IAggregateQuery) qry;
-                    if (formatters == null) {
-                        iaq.setFormatters(inq.getFormatters());
-                    } else {
-                        iaq.setFormatters(formatters);
-                    }
-
-                    inq.doRetrieve(iaq, queryDialog);
-                    if (!qry.isPrintAlone()) {
-                        iaq.doPrint(ps);
-                    }
-                    if (displayForm) {
-                        if (iaq.needPrint()) {
-                            if (displayForm) {
-                                frm = new ReportFrameQuery(ps);
-                            }
-                        } else {
-                            if (displayForm) {
-                                frm = new ReportFrameAggregate(ps, iaq);
-                            }
-
-                        }
-                        theTitle = iaq.getReportSummary().replaceAll("\n", " ");
-                    }
-                } else {
-                    try {
-                        qry.reset();
-                        if (formatters == null) {
-                            qry.setFormatters(inq.getFormatters());
-                        } else {
-                            qry.setFormatters(formatters);
-                        }
-                        if (Thread.currentThread().isInterrupted()) {
-                            throw new RuntimeInterruptException();
-                        }
-                        qry.doRetrieve(queryDialog);
-                        if (Thread.currentThread().isInterrupted()) {
-                            throw new RuntimeInterruptException();
-                        }
-                        if (!qry.isPrintAlone()) {
-                            qry.doPrint(ps);
-                        }
-                        if (Thread.currentThread().isInterrupted()) {
-                            throw new RuntimeInterruptException();
-                        }
-                        if (displayForm) {
-                            try {
-                                String reportSummary = qry.getReportSummary().replaceAll("\n", " ");
-                                theTitle = reportSummary;
-                            } catch (Exception e) {
-                                theTitle = qry.getName();
-                            }
-                            try {
-                                frm = new ReportFrameQuery(ps);
-                            } catch (Exception e) {
-                                inquirer.logger.error("error creating form", e);
-                            }
-                        }
-                    } catch (Exception exception) {
-                        inquirer.logger.error("interrupted: ", exception);
-                    }
-                }
-                InquirerFileIo.doneIO();
-                ps.closeStreams();
-            }
-            return null;
-        }
-
-        @Override
-        protected void done() {
-            inquirer.logger.debug("swingworker done");
-            rp.dispose();
-            if (isCancelled()) {
-                JOptionPane.showMessageDialog(queryDialog, "Query was cancelled", "Error", JOptionPane.ERROR_MESSAGE);
-                ps.closeStreams();
-            } else {
-                QueryTools.showQueryMessages(frm);
-
-                if (ps.getNrows() > 0 || ps.getTabDataModel().getRowCount() > 0) {
-                    if (displayForm) {
-                        if (frm != null) {
-                            frm.setTitle(inquirer.getDialogTitle(theTitle));
-//                            ScreenInfo.setVisible(queryDialog, frm, true);
-                            frm.setLocationRelativeTo(queryDialog);
-                            ScreenInfo.CenterWindowMaxWidth(queryDialog, frm);
-                            frm.setVisible(true);
-                        }
-                    } else {
-                        showDoneFileDialog(queryDialog, ps.getNrows(), outFile);
-                    }
-                } else {
-                    int objectsFound = qry.getObjectsFound();
-                    if (objectsFound == 0) {
-                        JideOptionPane.showMessageDialog(queryDialog, "Nothing found.\n"
-                                + "Try changing search parameters", "cannot run report", ERROR_MESSAGE);
-                    } else {
-                        JideOptionPane.showMessageDialog(queryDialog,
-                                "Your search yielded " + objectsFound + " objects, however\n"
-                                        + "no records returned\n"
-                                        + "Try changing filters or search", "cannot run report", JideOptionPane.WARNING_MESSAGE);
-                    }
-                    if (frm != null) {
-                        frm.dispose();
-                    }
-                }
-
-            }
-        }
-
-        private void setQuery(IQueryResults theQuery) {
-            if (theQuery != null) {
-                qry = theQuery;
-                qry.setProgressCallback(new ProgressNotifications() {
-                    @Override
-                    void sayProgress(String s) {
-                        publish(s);
-                    }
-                });
-            }
-        }
-
-        private void setOutFile(String outFile) {
-            this.outFile = outFile;
-        }
-
-    }
-
-    class DoneFileDialog extends StandardDialog {
-
-        private final JLabel lblFile;
-        protected JPanel aggregatesPanel;
-        protected JPanel bannerPanel;
-        protected JLabel lbl;
-        JRadioButton vimButton;
-//        private final JRadioButton excelButton;
-        JRadioButton texpadButton;
-        JRadioButton notepadButton;
-        JRadioButton doneButton;
-        JPanel listPane;
-        private int closeCause = JOptionPane.CANCEL_OPTION;
-        private String outFile;
-        private int nrows;
-
-        DoneFileDialog(Window parent) {
-            super(parent);
-
-            setTitle("Report complete");
-
-            listPane = new JPanel(new GridLayout(0, 1));
-
-            vimButton = new JRadioButton("Open in VIM");
-//            vimButton.addActionListener(this);
-            texpadButton = new JRadioButton("Open in TextPad");
-//            texpadButton.addActionListener(this);
-            notepadButton = new JRadioButton("Open in NotePad++");
-//            excelButton = new JRadioButton("Open in Excel");
-//            notepadButton.addActionListener(this);
-            doneButton = new JRadioButton("Done");
-//            doneButton.addActionListener(this);
-
-//Group the radio buttons.
-            ButtonGroup group = new ButtonGroup();
-            group.add(vimButton);
-            group.add(texpadButton);
-            group.add(notepadButton);
-            group.add(doneButton);
-//             group.add(excelButton);
-            listPane.add(vimButton);
-            listPane.add(texpadButton);
-            listPane.add(notepadButton);
-            listPane.add(doneButton);
-//            listPane.add(excelButton);
-
-            bannerPanel = new JPanel();
-            bannerPanel.setLayout(new GridLayout(0, 1));
-            lbl = new JLabel();
-            lblFile = new JLabel();
-            bannerPanel.add(lblFile);
-            bannerPanel.add(lbl);
-        }
-
-        public int getCloseCause() {
-            return closeCause;
-        }
-
-        public void setCloseCause(int closeCause) {
-            this.closeCause = closeCause;
-        }
-
-        boolean isVim() {
-            return vimButton.isSelected();
-        }
-
-        boolean isTextpad() {
-            return texpadButton.isSelected();
-        }
-
-        boolean isNotepad() {
-            return notepadButton.isSelected();
-        }
-//        boolean isExcel() {
-//            return excelButton.isSelected();
-//        }
-
-        public void doShow() {
-            lblFile.setText("Created file " + outFile);
-            lbl.setText("Extracted " + nrows + " records");
-
-            vimButton.setSelected(true);
-            setModal(true);
-
-            pack();
-            invalidate();
-//            ScreenInfo.CenterWindow(this);
-            this.setLocationRelativeTo(getParent());
-            setVisible(
-                    true);
-        }
-
-        @Override
-        public JComponent createBannerPanel() {
-            return bannerPanel;
-        }
-
-        @Override
-        public JComponent createContentPanel() {
-
-            return listPane;
-        }
-
-        private void cancelButtonAction(ActionEvent e) {
-            setDialogResult(RESULT_CANCELLED);
-            setCloseCause(JOptionPane.CANCEL_OPTION);
-            setVisible(false);
-            dispose();
-
-        }
-
-        private void runButtonAction(ActionEvent e) {
-            setDialogResult(RESULT_AFFIRMED);
-            setCloseCause(JOptionPane.OK_OPTION);
-            setVisible(false);
-            dispose();
-
-        }
-
-        @Override
-        public ButtonPanel createButtonPanel() {
-            ButtonPanel buttonPanel = new ButtonPanel();
-            JButton cancelButton = new JButton(new AbstractAction("Close") {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    cancelButtonAction(e);
-                }
-            });
-            buttonPanel.addButton(cancelButton);
-
-            JButton jbRun = new JButton(new AbstractAction("Select") {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    runButtonAction(e);
-                }
-            });
-            buttonPanel.addButton(jbRun);
-
-            setDefaultCancelAction(cancelButton.getAction());
-            setDefaultAction(jbRun.getAction());
-            getRootPane().setDefaultButton(jbRun);
-
-            buttonPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-            buttonPanel.setSizeConstraint(ButtonPanel.NO_LESS_THAN); // since the checkbox is quite wide, we don't want all of them have the same size.
-            return buttonPanel;
-        }
-
-        public void doShow(String theTitle) {
-            this.setTitle(theTitle);
-            doShow();
-        }
-
-        public void setContentPanel(JPanel aggregatesPanel) {
-            listPane.removeAll();
-            listPane.add(aggregatesPanel);
-            this.aggregatesPanel = aggregatesPanel;
-            listPane.invalidate();
-        }
-
-        private void doShow(int nrows, String outFile) {
-            this.nrows = nrows;
-            this.outFile = outFile;
-            doShow();
-        }
-
-    }
-
-    class CancelRunDialog extends StandardDialog {
-
-        protected JPanel aggregatesPanel;
-        JPanel listPane;
-        private int closeCause = JOptionPane.CANCEL_OPTION;
-
-        CancelRunDialog(Window parent) {
-            super(parent);
-            listPane = new JPanel(new BorderLayout(10, 10));
-        }
-
-        public int getCloseCause() {
-            return closeCause;
-        }
-
-        public void setCloseCause(int closeCause) {
-            this.closeCause = closeCause;
-        }
-
-        public void doShow() {
-            setModal(true);
-
-            pack();
-//            ScreenInfo.CenterWindow(this);
-            this.setLocationRelativeTo(getParent());
-            setVisible(
-                    true);
-        }
-
-        @Override
-        public JComponent createBannerPanel() {
-            return null;
-        }
-
-        @Override
-        public JComponent createContentPanel() {
-
-            return listPane;
-        }
-
-        private void cancelButtonAction(ActionEvent e) {
-            setDialogResult(RESULT_CANCELLED);
-            setCloseCause(JOptionPane.CANCEL_OPTION);
-            setVisible(false);
-            dispose();
-
-        }
-
-        private void runButtonAction(ActionEvent e) {
-            setDialogResult(RESULT_AFFIRMED);
-            setCloseCause(JOptionPane.OK_OPTION);
-            setVisible(false);
-            dispose();
-
-        }
-
-        @Override
-        public ButtonPanel createButtonPanel() {
-            ButtonPanel buttonPanel = new ButtonPanel();
-            JButton cancelButton = new JButton(new AbstractAction("Close") {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    cancelButtonAction(e);
-                }
-            });
-            buttonPanel.addButton(cancelButton);
-
-            JButton jbRun = new JButton(new AbstractAction("Execute") {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    runButtonAction(e);
-                }
-            });
-            buttonPanel.addButton(jbRun);
-
-            setDefaultCancelAction(cancelButton.getAction());
-            setDefaultAction(jbRun.getAction());
-            getRootPane().setDefaultButton(jbRun);
-
-            buttonPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-            buttonPanel.setSizeConstraint(ButtonPanel.NO_LESS_THAN); // since the checkbox is quite wide, we don't want all of them have the same size.
-            return buttonPanel;
-        }
-
-        public void doShow(String theTitle) {
-            this.setTitle(theTitle);
-            doShow();
-        }
-
-        public void setContentPanel(JPanel aggregatesPanel) {
-            listPane.removeAll();
-            listPane.add(aggregatesPanel);
-            this.aggregatesPanel = aggregatesPanel;
-            listPane.invalidate();
-        }
-
-    }
-
-    class AggregateDialog extends CancelRunDialog {
-
-        private final JPanel bannerPanel;
-
-        AggregateDialog(Window parent) {
-            super(parent);
-            this.bannerPanel = new JPanel(new BorderLayout(20, 20));
-            bannerPanel.setBorder(new BevelBorder(BevelBorder.RAISED));
-            JLabel ta = new JLabel();
-//            ta.setEditable(false);
-            ta.setFocusable(false);
-            ta.setHorizontalAlignment(SwingConstants.CENTER);
-            ta.setVerticalAlignment(SwingConstants.CENTER);
-            ta.setText("<html><b>On main window select application(s) and time range</b></html>");
-
-            bannerPanel.add(ta);
-        }
-
-        @Override
-        public JComponent createBannerPanel() {
-            return bannerPanel; //To change body of generated methods, choose Tools | Templates.
-        }
-
-        public IAggregateQuery getSelected() {
-            return ((AggregatesPanel) aggregatesPanel).getSelected();
-        }
-
-        public boolean isPrintToScreen() {
-            return ((AggregatesPanel) aggregatesPanel).isPrintToScreen();
-        }
-
-        @Override
-        public void doShow(String theTitle) {
-            super.doShow("Select and Configure aggregate for " + theTitle);
-        }
-
     }
 
 }
