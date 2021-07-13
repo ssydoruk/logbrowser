@@ -145,7 +145,7 @@ public class WindowsSystemUtility {
 
     public interface User32 extends StdCallLibrary {
 
-        User32 INSTANCE = Native.loadLibrary("user32", User32.class);
+        User32 INSTANCE = Native.load("user32", User32.class);
 
         int GetWindowTextA(WinDef.HWND hWnd, byte[] lpString, int nMaxCount);
 
@@ -169,8 +169,11 @@ public class WindowsSystemUtility {
 
     public interface Kernel32 extends StdCallLibrary {
 
-        Kernel32 INSTANCE = Native.loadLibrary("kernel32", Kernel32.class);
+        Kernel32 INSTANCE = Native.load("kernel32", Kernel32.class);
 
+        /* todo: https://docs.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-formatmessagea
+             get text of windows error using FormatMessageA
+        */
         int GetLastError();
     }
 
