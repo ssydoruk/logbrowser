@@ -1,6 +1,7 @@
 package com.myutils.logbrowser.inquirer;
 
 import Utils.ScreenInfo;
+import static Utils.ScreenInfo.fixOversizedWindow;
 import Utils.UTCTimeRange;
 import Utils.*;
 import com.jidesoft.dialog.*;
@@ -238,6 +239,16 @@ public class QueryDialog extends javax.swing.JFrame {
 
     RequestProgress rp = null;
 //<editor-fold defaultstate="collapsed" desc="Query thread definition">
+
+    private static QuerySetting _querySetting = null;
+
+    private QuerySetting getQuerySetting() {
+        if (_querySetting == null) {
+            _querySetting = new QuerySetting(null, rootPaneCheckingEnabled, inquirer.getCr());
+            fixOversizedWindow(_querySetting);
+        }
+        return _querySetting;
+    }
 
     class QueryTask extends MySwingWorker<Void, String> {
 
@@ -507,7 +518,8 @@ public class QueryDialog extends javax.swing.JFrame {
     }//GEN-LAST:event_jbCancelActionPerformed
 
     private void jbSettingsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbSettingsActionPerformed
-        QuerySetting qs = new QuerySetting(null, rootPaneCheckingEnabled, inquirer.getCr());
+
+        QuerySetting qs = getQuerySetting();
         qs.setLocationRelativeTo(this);
         qs.setVisible(true);
         if (qs.getCloseCause() == 1) {
@@ -588,7 +600,7 @@ public class QueryDialog extends javax.swing.JFrame {
                             try {
                                 this.allCalls = new QueryAllJTable(qry, frm, all);
                             } catch (Exception ex) {
-                                logger.error("fatal: ",  ex);
+                                logger.error("fatal: ", ex);
                             }
                             Dimension d = allCalls.getPreferredSize();
                             d.height = 400;
