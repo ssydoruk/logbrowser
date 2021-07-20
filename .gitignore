@@ -52,3 +52,5 @@ package-lock.json
 .factorypath
 .classpath
 etc/logbrowser/aa.js
+logbrowser.iml
+logbrowser.iml

@@ -14,8 +14,10 @@ import org.apache.commons.io.FilenameUtils;
 
 import java.io.IOException;
 
-import static Utils.ScreenInfo.getScreenHeight;
-import static Utils.ScreenInfo.getScreenWidth;
+import static com.jidesoft.utils.SystemInfo.getCurrentDirectory;
+import static com.myutils.logbrowser.inquirer.ScreenInfo.getScreenHeight;
+import static com.myutils.logbrowser.inquirer.ScreenInfo.getScreenWidth;
+
 
 /**
  * @author Stepan
@@ -109,7 +111,7 @@ public class EditorWindows extends ExternalEditor {
         //        vim.invoke("SendKeys", ":e ++ff=dos<Enter>");
         // hide toolbar
         vim.invoke("SendKeys", ":set guioptions -=T<Enter>");
-        vim.invoke("SendKeys", ":cd " + Utils.FileUtils.getCurrentDirectory() + "<Enter>");
+        vim.invoke("SendKeys", ":cd " + getCurrentDirectory() + "<Enter>");
         vim.invoke("SendKeys", ":nmap<C-F> promptfind<Enter>");
         vim.invoke("SendKeys", "x!<Enter>");
 //        vim.invoke("SendKeys", ":set switchbuf=usetab<Enter>");

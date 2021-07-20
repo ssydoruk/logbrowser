@@ -227,21 +227,6 @@ public class Main {
         return isAll != null && isAll.length() != 0 && isAll.equals("1");
     }
 
-    private static void ParseZip(File file) {
-        try {
-            ZipFile logArchive = new ZipFile(file, ZipFile.OPEN_READ);
-            Enumeration e = logArchive.entries();
-            while (e.hasMoreElements()) {
-                ZipEntry entry = (ZipEntry) e.nextElement();
-                InputStreamReader reader = new InputStreamReader(logArchive.getInputStream(entry));
-
-            }
-        } catch (IOException e) {
-            System.out.println("ERROR parsing zip archive: " + e);
-            return;
-        }
-    }
-
     private void ScanDir(File file) throws IOException {
         logger.info("Processing directory " + file.getAbsolutePath());
         File[] filesInDir = file.listFiles();

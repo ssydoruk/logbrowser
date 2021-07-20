@@ -1,10 +1,11 @@
 package com.myutils.logbrowser.inquirer;
 
 import Utils.ScreenInfo;
-import static Utils.ScreenInfo.fixOversizedWindow;
 import Utils.UTCTimeRange;
 import Utils.*;
 import com.jidesoft.dialog.*;
+
+import static Utils.ScreenInfo.fixOversizedWindow;
 import static com.jidesoft.dialog.StandardDialog.RESULT_AFFIRMED;
 import static com.jidesoft.dialog.StandardDialog.RESULT_CANCELLED;
 import com.jidesoft.swing.*;
