@@ -5,19 +5,12 @@
 package com.myutils.logbrowser.indexer;
 
 import Utils.Pair;
-
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import static com.myutils.logbrowser.indexer.Message.getRx;
+import java.io.*;
+import java.net.*;
+import java.sql.*;
+import java.util.*;
+import java.util.regex.*;
 
 /**
  * @author ssydoruk
@@ -122,7 +115,6 @@ public class WWEParser extends WebParser {
 
     private static final WWEMessageCleanTool msgCleaner = new WWEMessageCleanTool();
 
-    //05/30/2019 13:35:39.159 DEBUG [graham.saludares@outreach.airbnb.com] [Ca6138neMXSzsR6ccjA7eA1ekz4a2zuirypscugq9fj67a1] [7c3316db-ae59-43a8-aa67-4990fe4506cc] [hystrix-ApiOperationPool-483] 203.153.14.144 /api/v2/me  c.g.c.v.a.t.u.o.StartContactCenterSessionApiTaskV2 https://esv1-cvt-gws-p.airbnb.biz/ui/crm-workspace/index.html?sfdcIFrameOrigin=https%3A%2F%2Fairbnb.my.salesforce.com&nonce=b205c3a50141a2989a23ce1abfc1f8c7bb46bf0dfa5da4bf898c3257d12dc8ee&isAdapterUrl=true&isdtp=vw& Place: [Configuration object: type = CfgPlace, properties = {
     private static final Matcher regConfigObjectRead = Pattern.compile("Configuration object: type = (\\S+), properties = \\{").matcher("");
     private final HashMap<String, ParserState> threadParserState = new HashMap<>();
     /*	public OrsParser(DBAccessor accessor) {
