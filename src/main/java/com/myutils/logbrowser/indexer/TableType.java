@@ -105,6 +105,7 @@ public enum TableType {
     LCAClient("LCAClient"),
     ORSCallID("ORSCallID"),
     CSUpdate("CSClientRequest1"),
+    CSConfigChange("configChange"),
     MsgConfServer("MsgConfServer"),
     CSClientConnect("CSClientConnect"),
     ORSAlarm("ORSAlarm"),

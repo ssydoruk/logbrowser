@@ -95,13 +95,25 @@ public class ConfServerResults extends IQueryResults {
         DynamicTreeNode<OptionNode> ndParams = new DynamicTreeNode<>(new OptionNode(DialogItem.CONFSERV_REQUESTS));
         nd.addChild(ndParams);
 
-//        ndParams.addDynamicRef(DialogItem.CONFSERV_REQUESTS_OBJTYPE, ReferenceType.CfgObjName, TableType.CSUpdate.toString(), "objNameID");
         ndParams.addDynamicRef(DialogItem.CONFSERV_REQUESTS_OBJTYPE, ReferenceType.ObjectType, TableType.CSUpdate.toString(), "objTypeID");
         ndParams.addDynamicRef(DialogItem.CONFSERV_REQUESTS_APP, ReferenceType.App, TableType.CSUpdate.toString(), "theAppNameID");
         ndParams.addDynamicRef(DialogItem.CONFSERV_REQUESTS_USER, ReferenceType.Agent, TableType.CSUpdate.toString(), "userNameID");
         ndParams.addDynamicRef(DialogItem.CONFSERV_REQUESTS_CLIENTTYPE, ReferenceType.AppType, TableType.CSUpdate.toString(), "clientTypeID");
         ndParams.addDynamicRef(DialogItem.CONFSERV_REQUESTS_OPERATION, ReferenceType.CfgOp, TableType.CSUpdate.toString(), "opID");
         ndParams.addDynamicRef(DialogItem.CONFSERV_CONFIGNOTIF_OBJNAME, ReferenceType.CfgObjName, TableType.CSUpdate.toString(), "objNameID");
+
+
+        nd = new DynamicTreeNode<>(new OptionNode(DialogItem.CONFSERV_OBJCHANGES));
+        rootA.addChild(nd);
+        ndParams = new DynamicTreeNode<>(new OptionNode(DialogItem.CONFSERV_OBJCHANGES));
+        nd.addChild(ndParams);
+
+        ndParams.addDynamicRef(DialogItem.CONFSERV_OBJCHANGES_OBJTYPE, ReferenceType.ObjectType, TableType.CSConfigChange.toString(), "objTypeID");
+        ndParams.addDynamicRef(DialogItem.CONFSERV_OBJCHANGES_APP, ReferenceType.App, TableType.CSConfigChange.toString(), "theAppNameID");
+        ndParams.addDynamicRef(DialogItem.CONFSERV_OBJCHANGES_USER, ReferenceType.Agent, TableType.CSConfigChange.toString(), "userNameID");
+        ndParams.addDynamicRef(DialogItem.CONFSERV_OBJCHANGES_CLIENTTYPE, ReferenceType.AppType, TableType.CSConfigChange.toString(), "clientTypeID");
+        ndParams.addDynamicRef(DialogItem.CONFSERV_OBJCHANGES_OPERATION, ReferenceType.CfgOp, TableType.CSConfigChange.toString(), "opID");
+        ndParams.addDynamicRef(DialogItem.CONFSERV_OBJCHANGES_OBJNAME, ReferenceType.CfgObjName, TableType.CSConfigChange.toString(), "objNameID");
 
 
 //<editor-fold defaultstate="collapsed" desc="connects">
@@ -173,9 +185,14 @@ public class ConfServerResults extends IQueryResults {
         retrieveUpdates(dlg,
                 FindNode(repComponents.getRoot(), DialogItem.CONFSERV_REQUESTS, DialogItem.CONFSERV_REQUESTS, null),
                 cidFinder);
+        retrieveObjectChanges(dlg,
+                FindNode(repComponents.getRoot(), DialogItem.CONFSERV_OBJCHANGES, DialogItem.CONFSERV_OBJCHANGES, null),
+                cidFinder);
+
         retrieveConnect(dlg,
                 FindNode(repComponents.getRoot(), DialogItem.CONFSERV_CLIENTCONN, DialogItem.CONFSERV_CLIENTCONN, null),
                 cidFinder);
+
 
         getCustom(FileInfoType.type_ConfServer, dlg, repComponents.getRoot(), cidFinder, null);
         getGenesysMessages(TableType.MsgConfServer, repComponents.getRoot(), dlg, this);
@@ -262,6 +279,70 @@ public class ConfServerResults extends IQueryResults {
 
     }
 
+    private void retrieveObjectChanges(QueryDialog dlg, DynamicTreeNode<OptionNode> reportSettings, IDsFinder cidFinder) throws SQLException {
+        if (isChecked(reportSettings) && DatabaseConnector.TableExist(TableType.CSConfigChange.toString())) {
+            tellProgress("ConfigServer object changes");
+            TableQuery csConfigChanges = newCSConfigChanges(dlg, reportSettings);
+
+            HashSet<Integer> refIDs = new HashSet<>();
+            HashSet<Integer> appNameIDs = new HashSet<>();
+            HashSet<Long> ids = new HashSet<>();
+
+            Integer[] iDs = cidFinder.getIDs(IDType.AGENT);
+            if (iDs != null) {
+                Wheres wh = new Wheres();
+                wh.addWhere(getWhere("userNameID", iDs), "OR");
+                csConfigChanges.addWhere(wh);
+            }
+
+            csConfigChanges.AddCheckedWhere(csConfigChanges.getTabAlias() + ".opID",
+                    ReferenceType.CfgOp,
+                    reportSettings,
+                    "AND",
+                    DialogItem.CONFSERV_OBJCHANGES_OPERATION);
+            csConfigChanges.AddCheckedWhere(csConfigChanges.getTabAlias() + ".userNameID",
+                    ReferenceType.Agent,
+                    reportSettings,
+                    "AND",
+                    DialogItem.CONFSERV_OBJCHANGES_USER);
+            csConfigChanges.AddCheckedWhere(csConfigChanges.getTabAlias() + ".theAppNameID",
+                    ReferenceType.App,
+                    reportSettings,
+                    "AND",
+                    DialogItem.CONFSERV_OBJCHANGES_APP);
+            csConfigChanges.AddCheckedWhere(csConfigChanges.getTabAlias() + ".objTypeID",
+                    ReferenceType.ObjectType,
+                    reportSettings,
+                    "AND",
+                    DialogItem.CONFSERV_OBJCHANGES_OBJTYPE);
+            csConfigChanges.AddCheckedWhere(csConfigChanges.getTabAlias() + ".objNameID",
+                    ReferenceType.CfgObjName,
+                    reportSettings,
+                    "AND",
+                    DialogItem.CONFSERV_OBJCHANGES_OBJNAME);
+
+            getRecords(csConfigChanges);
+        }
+
+    }
+
+    private TableQuery newCSConfigChanges(QueryDialog dlg, DynamicTreeNode<OptionNode> reportSettings) throws SQLException {
+
+        TableQuery CSConfigChange = new TableQuery(MsgType.CONFSERV_CONFIGCHANGE, TableType.CSConfigChange.toString());
+
+        CSConfigChange.addRef("theAppNameID", "appName", ReferenceType.App.toString(), FieldType.Optional);
+        CSConfigChange.addRef("objTypeID", "objType", ReferenceType.ObjectType.toString(), FieldType.Optional);
+        CSConfigChange.addRef("userNameID", "userName", ReferenceType.Agent.toString(), FieldType.Optional);
+        CSConfigChange.addRef("clientTypeID", "clientType", ReferenceType.AppType.toString(), FieldType.Optional);
+        CSConfigChange.addRef("opID", "op", ReferenceType.CfgOp.toString(), FieldType.Optional);
+        CSConfigChange.addRef("objNameID", "objName", ReferenceType.CfgObjName.toString(), FieldType.Optional);
+        CSConfigChange.addOutFields(new String[]{"theappnameid", "dbid"});
+        CSConfigChange.setCommonParams(this, dlg);
+
+        return CSConfigChange;
+
+    }
+
     private TableQuery newCSUpdates(QueryDialog dlg, DynamicTreeNode<OptionNode> reportSettings) throws SQLException {
 
         TableQuery CSUpdates = new TableQuery(MsgType.CONFSERV_UPDATES, TableType.CSUpdate.toString());
@@ -292,7 +373,7 @@ public class ConfServerResults extends IQueryResults {
             Wheres wh = new Wheres();
             wh.addWhere(getWhere("userNameID", cidFinder.getIDs(IDType.AGENT)), "OR");
             CSConnect.addWhere(wh);
-            CSConnect.addOutFields(new String[]{CSConnect.getTabAlias()+".socketNo", CSConnect.getTabAlias()+".isConnect"});
+            CSConnect.addOutFields(new String[]{CSConnect.getTabAlias() + ".socketNo", CSConnect.getTabAlias() + ".isConnect"});
 
             CSConnect.addRef("theAppNameID", "appName", ReferenceType.App.toString(), FieldType.Optional);
             CSConnect.addRef("clientTypeID", "clientType", ReferenceType.AppType.toString(), FieldType.Optional);
