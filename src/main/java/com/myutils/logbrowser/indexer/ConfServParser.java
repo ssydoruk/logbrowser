@@ -1,5 +1,7 @@
 package com.myutils.logbrowser.indexer;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
@@ -8,9 +10,15 @@ import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static Utils.Util.StripQuotes;
 import static Utils.Util.intOrDef;
 
+
 public class ConfServParser extends Parser {
+
+    private static final Matcher regConfigMessage = Pattern.compile("^Message (MSGCFG_\\w+) (received from|sent to) (\\d+) \\((.*)? '(.*)?'\\)").matcher("");
+
+    private static final Matcher regStartsWithSpace = Pattern.compile("^\\s").matcher("");
 
     final static Matcher ptOp = Pattern.compile("(MSGCFG\\S+)").matcher("");
     private static final Matcher regChangeRequest = Pattern.compile("^\\s*Message MSGCFG_((?:AD|CH|DE)\\w+)").matcher("");
@@ -139,6 +147,15 @@ public class ConfServParser extends Parser {
 
                 if (lastGenesysMsgID != null) {
                     if (lastGenesysMsgID.equals("04541")) {
+                        if ((m = regConfigMessage.reset(s)).find()) {
+                            setSavedFilePos(getFilePos());
+                            m_MessageContents.add(s);
+                            msgTmp = new CSClientRequest1(m.group(1), true,
+                                    m.group(3), m.group(4), m.group(5));
+                            m_ParserState = ParserState.STATE_CLIENT_REQUEST;
+                            return null;
+                        }
+
                         if ((regChangeRequest.reset(s)).find()) {
                             setSavedFilePos(getFilePos());
                             m_MessageContents.add(s);
@@ -153,6 +170,18 @@ public class ConfServParser extends Parser {
                             return null;
                         }
                     } else if (lastGenesysMsgID.equals("04542")) {
+                        if ((m = regConfigMessage.reset(s)).find()) {
+                            setSavedFilePos(getFilePos());
+                            m_MessageContents.add(s);
+                            msgTmp = new CSClientRequest1(m.group(1), false,
+                                    m.group(3), m.group(4), m.group(5));
+                            m_ParserState = ParserState.STATE_CLIENT_RESPONSE;
+                            return null;
+                        }
+                        if (s.startsWith("Message MSGCFG_OBJECTCHANGED2 (")) {
+                            return null;
+                        }
+
                         if ((m = regAuthResponse.reset(s)).find()) {
                             setSavedFilePos(getFilePos());
                             m_MessageContents.add(s);
@@ -161,6 +190,9 @@ public class ConfServParser extends Parser {
                                     m.group(3), m.group(4));
                             return null;
                         }
+                    } else if (lastGenesysMsgID.equals("24308")) {
+                        m_ParserState = ParserState.STATE_IGNORE_MESSAGE;
+                        return null;
                     } else if (lastGenesysMsgID.startsWith("2420")) {
                         if (lastGenesysMsgLevel != null && lastGenesysMsgLevel.equalsIgnoreCase("std")) {
                             if ((m = regChangeFinal.reset(s)).find()) {
@@ -182,16 +214,11 @@ public class ConfServParser extends Parser {
 
                     } else if (lastGenesysMsgID.startsWith("2421")) {
                         if ((m = regConfigToClients.reset(s)).find()) {
-                            CSConfToClient msg = new CSConfToClient();
-                            msg.setObjectsNumber(m.group(1));
-                            msg.setObjType(m.group(2));
-                            msg.setClientSocket(m.group(3));
-                            msg.setAppName(m.group(4));
-                            msg.setClientType(m.group(5));
-
-                            SetStdFieldsAndAdd(msg);
-                            m_ParserState = ParserState.STATE_COMMENTS;
-                            m_MessageContents.clear();
+                            CSClientRequest1 csClientRequest1 = new CSClientRequest1("OBJECTS_SENT", false,
+                                    m.group(3), m.group(5), m.group(4));
+                            csClientRequest1.setObjType(m.group(2));
+                            csClientRequest1.setObjNumber(m.group(1));
+                            SetStdFieldsAndAdd(csClientRequest1);
                             return null;
                         }
                     } else if (lastGenesysMsgID.startsWith("04520")) {
@@ -247,6 +274,43 @@ public class ConfServParser extends Parser {
                 break;
 //</editor-fold>
 
+            case STATE_CLIENT_REQUEST:
+                if (StringUtils.isEmpty(str) ||
+                        regStartsWithSpace.reset(str).find()) {
+                    m_MessageContents.add(str);
+                } else {
+                    msgTmp.setMessageLines(m_MessageContents);
+                    SetStdFieldsAndAdd(msgTmp);
+                    msgTmp = null;
+                    m_MessageContents.clear();
+                    m_ParserState = ParserState.STATE_COMMENTS;
+                    return str;
+                }
+                break;
+
+            case STATE_IGNORE_MESSAGE:
+                if (!StringUtils.isEmpty(str) &&
+                        !regStartsWithSpace.reset(str).find()) {
+                    m_ParserState = ParserState.STATE_COMMENTS;
+                    return str;
+                }
+                break;
+
+
+            case STATE_CLIENT_RESPONSE:
+                if (StringUtils.isEmpty(str) ||
+                        regStartsWithSpace.reset(str).find()) {
+                    m_MessageContents.add(str);
+                } else {
+                    msgTmp.setMessageLines(m_MessageContents);
+                    SetStdFieldsAndAdd(msgTmp);
+                    m_MessageContents.clear();
+                    msgTmp = null;
+                    m_ParserState = ParserState.STATE_COMMENTS;
+                    return str;
+                }
+                break;
+
             case STATE_AUTH1:
                 if ((regAuthStart.reset(s)).find()) {
                     m_MessageContents.add(str);
@@ -266,6 +330,7 @@ public class ConfServParser extends Parser {
                     msgTmp = null;
                     m_MessageContents.clear();
                     m_ParserState = ParserState.STATE_COMMENTS;
+                    return str;
                 }
                 break;
 
@@ -332,7 +397,6 @@ public class ConfServParser extends Parser {
     @Override
     void init(HashMap<TableType, DBTable> m_tables) {
         m_tables.put(TableType.CSUpdate, new CSClientRequestTable1(Main.getM_accessor(), TableType.CSUpdate));
-        m_tables.put(TableType.CSClientConf, new CSConfToClientTable(Main.getM_accessor(), TableType.CSClientConf));
         m_tables.put(TableType.CSClientConnect, new CSClientConnectTable(Main.getM_accessor(), TableType.CSClientConnect));
 
     }
@@ -341,11 +405,18 @@ public class ConfServParser extends Parser {
 
         STATE_HEADER,
         STATE_COMMENTS,
-        STATE_UPDATE, STATE_AUTH1, STATE_AUTH2
+        STATE_UPDATE,
+        STATE_AUTH1,
+        STATE_AUTH2,
+        STATE_CLIENT_REQUEST,
+        STATE_CLIENT_RESPONSE,
+        STATE_IGNORE_MESSAGE,
+        ;
     }
 
     private class CSClientRequest1 extends Message {
 
+        private Integer descriptor;
         private String ObjType;
         private String op;
         private String clientType;
@@ -353,10 +424,25 @@ public class ConfServParser extends Parser {
         private String userName;
         private Integer dbid = null;
         private String objName = null;
+        private Integer objNumber;
+
+        public Integer getDescriptor() {
+            return descriptor;
+        }
 
         private CSClientRequest1(String req, String descr, String appType, String appName) {
             super(TableType.CSUpdate);
             this.op = req;
+            this.clientType = appType;
+            this.appName = appName;
+        }
+
+        private CSClientRequest1(String req, boolean isRequest,
+                                 String descriptor, String appType, String appName) {
+            super(TableType.CSUpdate);
+            setM_isInbound(isRequest);
+            this.op = req;
+            this.descriptor = Integer.parseInt(descriptor);
             this.clientType = appType;
             this.appName = appName;
         }
@@ -391,7 +477,11 @@ public class ConfServParser extends Parser {
         }
 
         public String getClientType() {
+            if (StringUtils.isEmpty(clientType)) {
+                return cfgGetAttr("IATRCFG_APPTYPE");
+            }
             return clientType;
+
         }
 
         private void setClientType(String group) {
@@ -399,7 +489,11 @@ public class ConfServParser extends Parser {
         }
 
         public String getAppName() {
+            if (StringUtils.isEmpty(appName)) {
+                return cfgGetAttr("SATRCFG_APPNAME");
+            }
             return appName;
+
         }
 
         private void setAppName(String group) {
@@ -433,9 +527,6 @@ public class ConfServParser extends Parser {
             this.objName = group;
         }
 
-        private Integer getObjectsNumber() {
-            return null;
-        }
 
         private Integer getRefID() {
             return intOrDef(cfgGetAttr("IATRCFG_REQUESTID"), (Integer) null);
@@ -446,6 +537,13 @@ public class ConfServParser extends Parser {
 
         }
 
+        public void setObjNumber(String objNumber) {
+            this.objNumber = Integer.parseInt(objNumber);
+        }
+
+        public Integer getObjNumber() {
+            return objNumber;
+        }
     }
 
     private class CSClientRequestTable1 extends DBTable {
@@ -466,6 +564,8 @@ public class ConfServParser extends Parser {
             addIndex("opID");
             addIndex("msgID");
             addIndex("refID");
+            addIndex("descr");
+
 
             dropIndexes();
 
@@ -485,11 +585,15 @@ public class ConfServParser extends Parser {
                     + ",objNameID INTEGER"
                     + ",refID INTEGER"
                     + ",msgID INTEGER"
+                    + ",descr INTEGER"
+                    + ",objNumber INTEGER"
                     + ");";
             getM_dbAccessor().runQuery(query);
             m_InsertStatementId = getM_dbAccessor().PrepareStatement("INSERT INTO " + getTabName() + " VALUES(NULL,?,?,?,?,?"
                     /*standard first*/
                     /*standard first*/
+                    + ",?"
+                    + ",?"
                     + ",?"
                     + ",?"
                     + ",?"
@@ -514,6 +618,11 @@ public class ConfServParser extends Parser {
         @Override
         public void AddToDB(Record _rec) {
             CSClientRequest1 rec = (CSClientRequest1) _rec;
+
+            if (rec.getOp().equals("MSGCFG_OBJECTCHANGED2")) {
+                return;
+            }
+
             PreparedStatement stmt = getM_dbAccessor().GetStatement(m_InsertStatementId);
 
             try {
@@ -523,150 +632,17 @@ public class ConfServParser extends Parser {
                 stmt.setLong(4, rec.getM_FileBytes());
                 stmt.setLong(5, rec.getM_line());
 
-                setFieldInt(stmt, 6, Main.getRef(ReferenceType.App, rec.getAppName()));
+                setFieldInt(stmt, 6, Main.getRef(ReferenceType.App, StripQuotes(rec.getAppName())));
                 setFieldInt(stmt, 7, Main.getRef(ReferenceType.ObjectType, rec.getObjType()));
                 setFieldInt(stmt, 8, Main.getRef(ReferenceType.AppType, rec.getClientType()));
-                setFieldInt(stmt, 9, Main.getRef(ReferenceType.Agent, Utils.Util.StripQuotes(rec.getUserName())));
+                setFieldInt(stmt, 9, Main.getRef(ReferenceType.Agent, StripQuotes(rec.getUserName())));
                 setFieldInt(stmt, 10, Main.getRef(ReferenceType.CfgOp, rec.getOp()));
                 setFieldInt(stmt, 11, rec.getDbid());
                 setFieldInt(stmt, 12, Main.getRef(ReferenceType.CfgObjName, rec.getObjName()));
                 setFieldInt(stmt, 13, rec.getRefID());
                 setFieldInt(stmt, 14, Main.getRef(ReferenceType.CfgMsg, rec.getErrMessage()));
-
-                getM_dbAccessor().SubmitStatement(m_InsertStatementId);
-            } catch (SQLException e) {
-                Main.logger.error("Could not add record type " + m_type.toString() + ": " + e, e);
-            }
-        }
-
-    }
-
-    private class CSConfToClient extends Message {
-
-        private String ObjType;
-        private String clientType;
-        private String appName;
-        private Integer objectsNumber;
-        private int socket;
-
-        private CSConfToClient() {
-            super(TableType.CSClientConf);
-        }
-
-        private CSConfToClient(ArrayList<String> m_MessageContents) {
-            super(TableType.CSClientConf, m_MessageContents);
-        }
-
-        public String getObjType() {
-            return ObjType;
-        }
-
-        private void setObjType(String group) {
-            this.ObjType = group;
-        }
-
-        public String getClientType() {
-            return clientType;
-        }
-
-        private void setClientType(String group) {
-            this.clientType = group;
-        }
-
-        public String getAppName() {
-            return appName;
-        }
-
-        private void setAppName(String group) {
-            this.appName = group;
-        }
-
-        private void setClientSocket(String group) {
-            this.socket = getIntOrDef(group, 0);
-        }
-
-        public Integer getObjectsNumber() {
-            return objectsNumber;
-        }
-
-        private void setObjectsNumber(String group) {
-            this.objectsNumber = intOrDef(group, 0);
-        }
-
-        public int getSocket() {
-            return socket;
-        }
-
-    }
-
-    private class CSConfToClientTable extends DBTable {
-
-        public CSConfToClientTable(DBAccessor dbaccessor, TableType t) {
-            super(dbaccessor, t);
-        }
-
-        @Override
-        public void InitDB() {
-            addIndex("time");
-            addIndex("FileId");
-            addIndex("theAppNameID");
-            addIndex("objTypeID");
-            addIndex("clientTypeID");
-            addIndex("objectsNo");
-            addIndex("socketNo");
-
-            dropIndexes();
-
-            String query = "create table if not exists " + getTabName() + " (id INTEGER PRIMARY KEY ASC"
-                    + ",time timestamp"
-                    + ",FileId INTEGER"
-                    + ",FileOffset bigint"
-                    + ",FileBytes int"
-                    + ",line int"
-                    /* standard first */
-                    + ",theAppNameID INTEGER"
-                    + ",objTypeID INTEGER"
-                    + ",clientTypeID INTEGER"
-                    + ",objectsNo INTEGER"
-                    + ",socketNo INTEGER"
-                    + ");";
-            getM_dbAccessor().runQuery(query);
-            m_InsertStatementId = getM_dbAccessor().PrepareStatement("INSERT INTO " + getTabName() + " VALUES(NULL,?,?,?,?,?"
-                    /*standard first*/
-                    + ",?"
-                    + ",?"
-                    + ",?"
-                    + ",?"
-                    + ",?"
-                    + ");");
-
-        }
-
-        /**
-         * @throws Exception
-         */
-        @Override
-        public void FinalizeDB() throws Exception {
-            createIndexes();
-        }
-
-        @Override
-        public void AddToDB(Record _rec) {
-            CSConfToClient rec = (CSConfToClient) _rec;
-            PreparedStatement stmt = getM_dbAccessor().GetStatement(m_InsertStatementId);
-
-            try {
-                stmt.setTimestamp(1, new Timestamp(rec.GetAdjustedUsecTime()));
-                stmt.setInt(2, CSConfToClient.getFileId());
-                stmt.setLong(3, rec.getM_fileOffset());
-                stmt.setLong(4, rec.getM_FileBytes());
-                stmt.setLong(5, rec.getM_line());
-
-                setFieldInt(stmt, 6, Main.getRef(ReferenceType.App, rec.getAppName()));
-                setFieldInt(stmt, 7, Main.getRef(ReferenceType.ObjectType, rec.getObjType()));
-                setFieldInt(stmt, 8, Main.getRef(ReferenceType.AppType, rec.getClientType()));
-                setFieldInt(stmt, 9, rec.getObjectsNumber());
-                setFieldInt(stmt, 10, rec.getSocket());
+                setFieldInt(stmt, 15, rec.getDescriptor());
+                setFieldInt(stmt, 16, rec.getObjNumber());
 
                 getM_dbAccessor().SubmitStatement(m_InsertStatementId);
             } catch (SQLException e) {
@@ -807,7 +783,7 @@ public class ConfServParser extends Parser {
                 setFieldInt(stmt, 6, Main.getRef(ReferenceType.App, rec.getAppName()));
                 setFieldInt(stmt, 7, Main.getRef(ReferenceType.AppType, rec.getClientType()));
                 setFieldInt(stmt, 8, rec.getSocket());
-                setFieldInt(stmt, 9, Main.getRef(ReferenceType.Agent, Utils.Util.StripQuotes(rec.getUserName())));
+                setFieldInt(stmt, 9, Main.getRef(ReferenceType.Agent, StripQuotes(rec.getUserName())));
                 setFieldInt(stmt, 10, Main.getRef(ReferenceType.Host, rec.getClientAddr()));
                 stmt.setBoolean(11, rec.isConnect());
 

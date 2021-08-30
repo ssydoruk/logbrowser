@@ -106,7 +106,6 @@ public enum TableType {
     ORSCallID("ORSCallID"),
     CSUpdate("CSClientRequest1"),
     MsgConfServer("MsgConfServer"),
-    CSClientConf("CSClientConf"),
     CSClientConnect("CSClientConnect"),
     ORSAlarm("ORSAlarm"),
     GMSStart("GMSStart"),

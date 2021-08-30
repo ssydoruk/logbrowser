@@ -103,18 +103,6 @@ public class ConfServerResults extends IQueryResults {
         ndParams.addDynamicRef(DialogItem.CONFSERV_REQUESTS_OPERATION, ReferenceType.CfgOp, TableType.CSUpdate.toString(), "opID");
         ndParams.addDynamicRef(DialogItem.CONFSERV_CONFIGNOTIF_OBJNAME, ReferenceType.CfgObjName, TableType.CSUpdate.toString(), "objNameID");
 
-//</editor-fold>
-//<editor-fold defaultstate="collapsed" desc="client config messages">
-        nd = new DynamicTreeNode<>(new OptionNode(false, DialogItem.CONFSERV_CONFIGNOTIF));
-        rootA.addChild(nd);
-        ndParams = new DynamicTreeNode<>(new OptionNode(DialogItem.CONFSERV_CONFIGNOTIF));
-        nd.addChild(ndParams);
-
-//        ndParams.addDynamicRef(DialogItem.CONFSERV_REQUESTS_OBJTYPE, ReferenceType.CfgObjName, TableType.CSUpdate.toString(), "objNameID");
-        ndParams.addDynamicRef(DialogItem.CONFSERV_CONFIGNOTIF_APP, ReferenceType.App, TableType.CSClientConf.toString(), "theAppNameID");
-        ndParams.addDynamicRef(DialogItem.CONFSERV_CONFIGNOTIF_CLIENTTYPE, ReferenceType.AppType, TableType.CSClientConf.toString(), "clientTypeID");
-        ndParams.addDynamicRef(DialogItem.CONFSERV_CONFIGNOTIF_OBJTYPE, ReferenceType.ObjectType, TableType.CSClientConf.toString(), "objTypeID");
-//</editor-fold>
 
 //<editor-fold defaultstate="collapsed" desc="connects">
         nd = new DynamicTreeNode<>(new OptionNode(DialogItem.CONFSERV_CLIENTCONN));
@@ -123,8 +111,6 @@ public class ConfServerResults extends IQueryResults {
         nd.addChild(ndParams);
 
 //        ndParams.addDynamicRef(DialogItem.CONFSERV_REQUESTS_OBJTYPE, ReferenceType.CfgObjName, TableType.CSUpdate.toString(), "objNameID");
-        ndParams.addDynamicRef(DialogItem.CONFSERV_CONFIGNOTIF_APP, ReferenceType.App, TableType.CSClientConnect.toString(), "theAppNameID");
-        ndParams.addDynamicRef(DialogItem.CONFSERV_CONFIGNOTIF_CLIENTTYPE, ReferenceType.AppType, TableType.CSClientConnect.toString(), "clientTypeID");
         ndParams.addDynamicRef(DialogItem.CONFSERV_CLIENTCONN_USER, ReferenceType.Agent, TableType.CSClientConnect.toString(), "userNameID");
         ndParams.addDynamicRef(DialogItem.CONFSERV_CLIENTCONN_HOSTPORT, ReferenceType.Host, TableType.CSClientConnect.toString(), "hostportID");
         ndParams.addPairChildren(DialogItem.CONFSERV_CLIENTCONN_ISCONNECT,
@@ -186,9 +172,6 @@ public class ConfServerResults extends IQueryResults {
 
         retrieveUpdates(dlg,
                 FindNode(repComponents.getRoot(), DialogItem.CONFSERV_REQUESTS, DialogItem.CONFSERV_REQUESTS, null),
-                cidFinder);
-        retrieveNotifs(dlg,
-                FindNode(repComponents.getRoot(), DialogItem.CONFSERV_CONFIGNOTIF, DialogItem.CONFSERV_CONFIGNOTIF, null),
                 cidFinder);
         retrieveConnect(dlg,
                 FindNode(repComponents.getRoot(), DialogItem.CONFSERV_CLIENTCONN, DialogItem.CONFSERV_CLIENTCONN, null),
@@ -266,6 +249,11 @@ public class ConfServerResults extends IQueryResults {
                 topWh.addWhere(wh, "AND");
                 topWh.addWhere(CSUpdates.getTabAlias() + ".userNameID is null", "AND");
                 CSUpdates.addWhere(topWh);
+                CSUpdates.AddCheckedWhere(CSUpdates.getTabAlias() + ".opID",
+                        ReferenceType.CfgOp,
+                        reportSettings,
+                        "AND",
+                        DialogItem.CONFSERV_REQUESTS_OPERATION);
 
                 getRecords(CSUpdates);
 
@@ -285,7 +273,7 @@ public class ConfServerResults extends IQueryResults {
         CSUpdates.addRef("opID", "op", ReferenceType.CfgOp.toString(), FieldType.Optional);
         CSUpdates.addRef("objNameID", "objName", ReferenceType.CfgObjName.toString(), FieldType.Optional);
         CSUpdates.addRef("msgID", "message", ReferenceType.CfgMsg.toString(), FieldType.Optional);
-        CSUpdates.addOutFields(new String[]{"refid", "theappnameid", "dbid"});
+        CSUpdates.addOutFields(new String[]{"refid", "theappnameid", "dbid", "descr", "objNumber"});
         CSUpdates.setCommonParams(this, dlg);
 
         return CSUpdates;
@@ -293,40 +281,10 @@ public class ConfServerResults extends IQueryResults {
     }
 
     //</editor-fold>
-    private void retrieveNotifs(QueryDialog dlg, DynamicTreeNode<OptionNode> reportSettings, IDsFinder cidFinder) throws SQLException {
-//<editor-fold defaultstate="collapsed" desc="retrieveUpdates">
-        if (isChecked(reportSettings) && DatabaseConnector.TableExist(TableType.CSClientConf.toString())) {
-            tellProgress("ConfigServer update requests");
-            TableQuery CSRetrieve = new TableQuery(MsgType.CONFSERV_NOTIF, TableType.CSClientConf.toString());
-            CSRetrieve.addRef("theAppNameID", "appName", ReferenceType.App.toString(), FieldType.Optional);
-            CSRetrieve.addRef("objTypeID", "objType", ReferenceType.ObjectType.toString(), FieldType.Optional);
-            CSRetrieve.addRef("clientTypeID", "clientType", ReferenceType.AppType.toString(), FieldType.Optional);
 
-            CSRetrieve.AddCheckedWhere(CSRetrieve.getTabAlias() + ".theAppNameID",
-                    ReferenceType.App,
-                    reportSettings,
-                    "AND",
-                    DialogItem.CONFSERV_CONFIGNOTIF_APP);
-            CSRetrieve.AddCheckedWhere(CSRetrieve.getTabAlias() + ".objTypeID",
-                    ReferenceType.ObjectType,
-                    reportSettings,
-                    "AND",
-                    DialogItem.CONFSERV_CONFIGNOTIF_OBJTYPE);
-            CSRetrieve.AddCheckedWhere(CSRetrieve.getTabAlias() + ".clientTypeID",
-                    ReferenceType.AppType,
-                    reportSettings,
-                    "AND",
-                    DialogItem.CONFSERV_CONFIGNOTIF_CLIENTTYPE);
-
-            CSRetrieve.setCommonParams(this, dlg);
-            getRecords(CSRetrieve);
-        }
-//</editor-fold>
-
-    }
 
     private void retrieveConnect(QueryDialog dlg, DynamicTreeNode<OptionNode> reportSettings, IDsFinder cidFinder) throws SQLException {
-//<editor-fold defaultstate="collapsed" desc="retrieveUpdates">
+//<editor-fold defaultstate="collapsed" desc="retrieveConnect">
         if (isChecked(reportSettings) && DatabaseConnector.TableExist(TableType.CSClientConnect.toString())) {
             tellProgress("ConfigServer update requests");
             TableQuery CSConnect = new TableQuery(MsgType.CONFSERV_CONNECT, TableType.CSClientConnect.toString());
@@ -334,6 +292,7 @@ public class ConfServerResults extends IQueryResults {
             Wheres wh = new Wheres();
             wh.addWhere(getWhere("userNameID", cidFinder.getIDs(IDType.AGENT)), "OR");
             CSConnect.addWhere(wh);
+            CSConnect.addOutFields(new String[]{CSConnect.getTabAlias()+".socketNo", CSConnect.getTabAlias()+".isConnect"});
 
             CSConnect.addRef("theAppNameID", "appName", ReferenceType.App.toString(), FieldType.Optional);
             CSConnect.addRef("clientTypeID", "clientType", ReferenceType.AppType.toString(), FieldType.Optional);
@@ -346,16 +305,6 @@ public class ConfServerResults extends IQueryResults {
                     reportSettings,
                     "AND",
                     DialogItem.CONFSERV_CLIENTCONN_USER);
-            CSConnect.AddCheckedWhere(CSConnect.getTabAlias() + ".theAppNameID",
-                    ReferenceType.App,
-                    reportSettings,
-                    "AND",
-                    DialogItem.CONFSERV_CONFIGNOTIF_APP);
-            CSConnect.AddCheckedWhere(CSConnect.getTabAlias() + ".clientTypeID",
-                    ReferenceType.AppType,
-                    reportSettings,
-                    "AND",
-                    DialogItem.CONFSERV_CONFIGNOTIF_CLIENTTYPE);
             CSConnect.AddCheckedWhere(CSConnect.getTabAlias() + ".hostportID",
                     ReferenceType.Host,
                     reportSettings,

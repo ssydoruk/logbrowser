@@ -265,6 +265,7 @@ public class InquirerCfg implements Serializable {
         LoadRef(ReferenceType.GMSEvent);
         LoadRef(ReferenceType.ORSREQ);
         LoadRef(ReferenceType.VXMLCommand);
+        LoadRef(ReferenceType.CfgOp);
 
         LoadPrintFilters();
     }
