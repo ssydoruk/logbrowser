@@ -269,6 +269,7 @@ public class ReportFrameQuery extends ReportFrame {
             if (tBtn.isSelected()) {
                 ScreenInfo.refitMainToMsg(theForm, fullMsg);
                 fullMsg.setVisible(true);
+                fullMsg.toFront();
                 java.awt.EventQueue.invokeLater(new Runnable() {
                     @Override
                     public void run() {
