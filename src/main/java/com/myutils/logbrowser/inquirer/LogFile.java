@@ -92,7 +92,7 @@ public class LogFile {
 //                + File.separator + "++.++" + FilenameUtils.getName(getArcName()) + "}");
         StringBuilder ret = new StringBuilder();
         ret.append(inquirer.getEe().getLogBrDir()).append(File.separator);
-        String arc = FilenameUtils.getFullPathNoEndSeparator(arcName);
+        String arc = FilenameUtils.getPathNoEndSeparator(arcName);
         if (arc.startsWith("." + File.separator)) {
             ret.append(arc.substring(2));
         } else {
