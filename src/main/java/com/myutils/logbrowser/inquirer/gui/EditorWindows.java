@@ -6,6 +6,7 @@
 package com.myutils.logbrowser.inquirer.gui;
 
 import com.jacob.activeX.ActiveXComponent;
+import com.jacob.com.ComFailException;
 import com.jacob.com.Variant;
 import com.myutils.logbrowser.inquirer.LogFile;
 import com.myutils.logbrowser.inquirer.inquirer;
@@ -49,13 +50,25 @@ public class EditorWindows extends ExternalEditor {
     }
 
     private void setLocation() {
-        Variant vx = vim.invoke("Eval", "getwinposx()");
-        int wx = Integer.parseInt(vx.getString());
+        for (int i = 0; i < 10; i++) {
+            try {
+                Variant vx = vim.invoke("Eval", "getwinposx()");
+                int wx = Integer.parseInt(vx.getString());
 
-        Variant vy = vim.invoke("Eval", "getwinposy()");
-        int wy = Integer.parseInt(vy.getString());
+                Variant vy = vim.invoke("Eval", "getwinposy()");
+                int wy = Integer.parseInt(vy.getString());
 
-        inquirer.logger.trace("pos: x[" + wx + "] " + " y[" + wy + "] ");
+                inquirer.logger.trace("pos: x[" + wx + "] " + " y[" + wy + "] ");
+                break;
+            } catch (ComFailException e) {
+                try {
+                    Thread.sleep(300);
+                } catch (InterruptedException ex) {
+                    break;
+                }
+            }
+
+        }
         byte[] windowText = new byte[512];
 
 //        hwnd = User32.INSTANCE.GetForegroundWindow(); // then you can call it!

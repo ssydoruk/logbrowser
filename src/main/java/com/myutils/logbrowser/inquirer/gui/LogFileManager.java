@@ -9,6 +9,7 @@ import com.myutils.logbrowser.inquirer.LogFile;
 import com.myutils.logbrowser.inquirer.inquirer;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.logging.log4j.LogManager;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -26,6 +27,8 @@ public class LogFileManager {
 
     private final HashMap<String, LogFile> logFileStore = new HashMap();
     HashSet<String> usedArchives = new HashSet<>();
+    private static final org.apache.logging.log4j.Logger logger = LogManager.getLogger();
+
 
     public static File newFile(File destinationDir, ZipEntry zipEntry) throws IOException {
         File destFile = new File(destinationDir, zipEntry.getName());
@@ -72,8 +75,10 @@ public class LogFileManager {
     }
 
     public void clear() {
+        logger.info("clearing out");
         for (String usedArchive : usedArchives) {
             try {
+                logger.info("Archive ["+usedArchive+"] deleting ["+new File(FilenameUtils.getFullPathNoEndSeparator(usedArchive))+"]");
                 FileUtils.deleteDirectory(new File(FilenameUtils.getFullPathNoEndSeparator(usedArchive)));
             } catch (IOException ex) {
 //                logger.error("fatal: ",  ex);

@@ -116,6 +116,11 @@ public class inquirer {
         }
     }
 
+    @Override
+    protected void finalize() throws Throwable {
+        lfm.clear();
+    }
+
     private static DateTimeFormatter getDTFormat(String dtFormat) {
         DateTimeFormatter get = dateFormatters.get(dtFormat);
         if (get == null) {
@@ -835,6 +840,7 @@ public class inquirer {
             }
         }
         saveObject(getSerFile(), queryDialogSettings);
+        lfm.clear();
     }
 
     public static class InfoPanel extends StandardDialog {
