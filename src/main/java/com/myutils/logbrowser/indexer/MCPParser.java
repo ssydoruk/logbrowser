@@ -4,19 +4,11 @@
  */
 package com.myutils.logbrowser.indexer;
 
-import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.StringUtils;
-
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import static com.myutils.logbrowser.indexer.MCPParser.ParserState.*;
+import java.sql.*;
+import java.util.*;
+import java.util.regex.*;
+import org.apache.commons.lang3.*;
 
 /**
  * @author ssydoruk
@@ -24,11 +16,12 @@ import static com.myutils.logbrowser.indexer.MCPParser.ParserState.*;
 public class MCPParser extends Parser {
 
     static final String[] BlockNamesToIgnoreArray = {"SIP:CTI:callSync::0",
-            "SIP:CTI:sipStackSync:0"};
+        "SIP:CTI:sipStackSync:0"};
     private final static Matcher reqSIPRequest = Pattern.compile("Request (sent|received): (\\w+) (.+) SIP\\/2\\.0\\s*$").matcher("");
     private final static Matcher reqSIPResponse = Pattern.compile("Response (received|sent): SIP\\/2\\.0\\s+(.+)$").matcher("");
     private static final Matcher regHeaderEnd = Pattern.compile("^File:\\s+\\(").matcher("");
     private static final Matcher ptSkip = Pattern.compile("^[:\\s]*").matcher("");
+    private static final Matcher ptLogID = Pattern.compile("^n*LogID=(\\w+-\\w+)$").matcher("");
     private final static Matcher SIPHeaderContinue = Pattern.compile("^\\S").matcher("");
     //    15:22:50.980: Sending  [0,UDP] 3384 bytes to 10.82.10.146:5060 >>>>>
     private static final Matcher regNotParseMessage = Pattern.compile("^(33009|49005"
@@ -46,6 +39,49 @@ public class MCPParser extends Parser {
     private static final Matcher ptValidateURL = Pattern.compile("\\((\\w+)\\):(.+)$").matcher("");
     private static final VXMLStepsParams vXMLStepsParams = new VXMLStepsParams();
     private static final org.apache.logging.log4j.Logger logger = Main.logger;
+
+    private static final HashSet<String> IGNORE_MPC = getIGNORE_MPC();
+
+    private static HashSet<String> getIGNORE_MPC() {
+        HashSet<String> ret = new HashSet<>();
+        ret.add("MPCConnection::ConnectRoute");
+        ret.add("MPCConnection::Destroy");
+        ret.add("MPCConnection::DisconnectRoute");
+        ret.add("MPCConnection::GetFCRSink");
+        ret.add("MPCConnection::GetSinks");
+        ret.add("MPCConnection::Initialize");
+        ret.add("MPCConnection::MPCConnection");
+        ret.add("MPCConnection::Modify");
+        ret.add("MPCConnection::ProcessRTPSocketClosed");
+        ret.add("MPCConnection::ProcessSinkUnregisteredHelper");
+        ret.add("MPCConnection::QueueDestroyedEvent");
+        ret.add("MPCConnection::RecordStop");
+        ret.add("MPCConnection::RegisterReverseRoute");
+        ret.add("MPCConnection::RegisterSink");
+        ret.add("MPCConnection::UnregisterReverseRoute");
+        ret.add("MPCConnection::UnregisterSink");
+        ret.add("MPCConnection::~MPCConnection");
+        ret.add("MPCControlObject::RegisterSinkHelper");
+        ret.add("MPCControlObject::UnregisterSinkHelper");
+        ret.add("MPCDialog::ASRStart,");
+        ret.add("MPCDialog::ASRStop,");
+        ret.add("MPCDialog::ConnectRoute,");
+        ret.add("MPCDialog::Destroy,");
+        ret.add("MPCDialog::DisconnectRoute,");
+        ret.add("MPCDialog::GetSinks,");
+        ret.add("MPCDialog::MPCDialog");
+        ret.add("MPCDialog::PlayStart,");
+        ret.add("MPCDialog::ProcessPlayDone,");
+        ret.add("MPCDialog::QueueDestroyedEvent,");
+        ret.add("MPCDialog::RegisterASRSink,");
+        ret.add("MPCDialog::RegisterForwardRoute,");
+        ret.add("MPCDialog::RegisterReverseRoute,");
+        ret.add("MPCDialog::UnregisterASRSink,");
+        ret.add("MPCDialog::UnregisterReverseRoute,");
+        ret.add("MPCDialog::~MPCDialog");
+        return ret;
+    }
+
     private final ArrayList<String> extraBuff;
     HashMap m_BlockNamesToIgnoreHash;
     StringBuilder sipBuf = new StringBuilder();
@@ -254,6 +290,14 @@ public class MCPParser extends Parser {
                             String callID = split[callIDIdx];
                             if (callID.equals("00000000-00000000")) {
                                 boolean msgDone = false;
+                                if (StringUtils.isNotBlank(split[4])) {
+                                    String[] msgSplit = StringUtils.split(split[4], null, 4);
+                                    if (msgSplit.length >= 3 && StringUtils.isNotBlank(msgSplit[2])
+                                            && (m = ptLogID.reset(msgSplit[2])).find()) {
+                                        callMessage(m.group(1), msgSplit[1], msgSplit[3]);
+                                    }
+
+                                }
                                 if (genesysMsg != null) {
                                     if (!genesysMsg.isToIgnore()) {
                                         genesysMsg.setLine(split[messageTextIdx]);
@@ -422,6 +466,16 @@ public class MCPParser extends Parser {
 //        Main.logger.debug("noCallMessage "+StringUtils.join(split, ", ")+" "+initalIndex);
     }
 
+    private void callMessage(String callID, String cmd, String messageText) {
+        if (!IGNORE_MPC.contains(cmd)) {
+            VXMLIntSteps steps = new VXMLIntSteps();
+            steps.setMCPCallID(callID);
+            steps.setCommand(cmd);
+            //    steps.setRequestParams(messageText);
+            SetStdFieldsAndAdd(steps);
+        }
+    }
+
     private void callMessage(String callID, String messageText) {
         if (ptGVPCallID.reset(callID).find()) {
 //            if (split.length > 4) {
@@ -445,11 +499,13 @@ public class MCPParser extends Parser {
                         if (cmd == null) {
                             cmd = "execution step";
                         }
-                        if (cmd.equals("runtime") && (noFirstWord.startsWith("Called for")))
+                        if (cmd.equals("runtime") && (noFirstWord.startsWith("Called for"))) {
                             return;
+                        }
                         if (cmd.equals("expression") && (noFirstWord.contains("__.savetmpfiles")
-                                || noFirstWord.contains("__.savetmpfilesmode")))
+                                || noFirstWord.contains("__.savetmpfilesmode"))) {
                             return;
+                        }
 
                         //steps.setParam1(noFirstWord);
                     } else {
@@ -581,6 +637,7 @@ public class MCPParser extends Parser {
                 @Override
                 public void proc(VXMLIntSteps msg, String[] msgParams, String orig) {
                     msg.setCommand(msgParams[0]);
+                    setMsgParams(msg, msgParams, 1);
                 }
             });
 

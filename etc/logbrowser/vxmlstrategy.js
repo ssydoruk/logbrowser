@@ -17,6 +17,26 @@ switch (cmd) {
     break;
   }
 
+  case "MPCConnection::RecordStart":{
+    var s = RECORD.getBytes();
+    var m;
+    var expr = undefined;
+    if ((m = s.match(/(pszRecordDest=.+)/)) != undefined) {
+      FIELDS.put("name", cmd + " ->" +  m[1]);
+    }
+    break;
+  }
+
+  case "MPCConnection::ProcessRecordDone":{
+    var s = RECORD.getBytes();
+    var m;
+    var expr = undefined;
+    if ((m = s.match(/(nRecdoneReason=.+)/)) != undefined) {
+      FIELDS.put("name", cmd + " ->" +  m[1]);
+    }
+    break;
+  }
+
   case "expression": {
     var s = RECORD.getBytes();
     var m;
