@@ -5,6 +5,8 @@
  */
 package com.myutils.logbrowser.indexer;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -28,9 +30,12 @@ public final class URSTargetSet extends Message {
                     agentFound = true;
                 }
             }
-            if (agentFound == false) {
-                Main.logger.info("Not an agent [" + targetItem + "]; target[" + target + "]");
-                this.obj = targetItem;
+            else { // default object type
+                String s = targetItem.trim();
+                if(StringUtils.isNotBlank(s)){
+                    this.obj=s;
+                    this.objType=UrsParser.targetCode.get("A");
+                }
             }
         }
     }

@@ -89,8 +89,8 @@ public class WorkspaceParser extends Parser {
 
 //17:33:06.335_I_I_03350282382b556f [07:07] HERE IS TARGETS
 //TARGETS: OBN_IP_Skill1_Group@OBN_StatServerRouting.GA
-        regMultiLine.put("07:07", Pattern.compile("^TARGETS")).matcher("");
-        regMultiLine.put("10:17", Pattern.compile("^\\s*_\\S_\\S_\\s*\\[(\\S{2}:\\S{2})\\] ")).matcher("");
+//        regMultiLine.put("07:07", Pattern.compile("^TARGETS")).matcher("");
+//        regMultiLine.put("10:17", Pattern.compile("^\\s*_\\S_\\S_\\s*\\[(\\S{2}:\\S{2})\\] ")).matcher("");
 
     }
 
