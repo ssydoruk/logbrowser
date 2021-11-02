@@ -5,19 +5,15 @@
  */
 package com.myutils.logbrowser.inquirer.gui;
 
-import Utils.UnixProcess.ExtProcess;
-import Utils.Util;
-import com.myutils.logbrowser.inquirer.LogFile;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.logging.log4j.LogManager;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
+import Utils.UnixProcess.*;
+import Utils.*;
+import com.myutils.logbrowser.inquirer.*;
+import java.io.*;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
 
 /**
  * @author Stepan
@@ -25,7 +21,6 @@ import java.util.logging.Logger;
 public class EditorUnix extends ExternalEditor {
 
     private static final org.apache.logging.log4j.Logger logger = LogManager.getLogger();
-    private static final String gvim = "/usr/local/bin/mvim";
     private static final String gvimServer = "LOGBROWSER";
     private static ArrayList<String> errBuf;
     HashMap<String, Character> lastBookmark = new HashMap<>();
@@ -62,7 +57,7 @@ public class EditorUnix extends ExternalEditor {
 
     private static List<String> makeExecCmd(List cmd) {
         ArrayList<String> params = new ArrayList<>(3 + ((cmd == null) ? 0 : cmd.size()));
-        params.addAll(Arrays.asList(gvim,
+        params.addAll(Arrays.asList(inquirer.getCr().getLinuxEditor(),
                 "--servername",
                 gvimServer));
         if (cmd != null) {
@@ -233,7 +228,7 @@ public class EditorUnix extends ExternalEditor {
 
     private void confirmServer() throws IOException {
         while (true) {
-            List<String> execWaitSTDOut = execGetStdOut(Arrays.asList(gvim,
+            List<String> execWaitSTDOut = execGetStdOut(Arrays.asList(inquirer.getCr().getLinuxEditor(),
                     "--serverlist"));
             if (execWaitSTDOut != null && !execWaitSTDOut.isEmpty()
                     && execWaitSTDOut.contains(gvimServer)) {

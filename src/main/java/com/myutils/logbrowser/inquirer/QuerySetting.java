@@ -74,9 +74,9 @@ public final class QuerySetting extends javax.swing.JDialog {
         jScrollPane = new JScrollPane(lReferenceType);
         pRefTypes.add(jScrollPane);
         ArrayList<ReferenceType> ar = new ArrayList<>(savedRefs.keySet());
-         Collections.sort(ar, (o1, o2) -> {
-             return ((ReferenceType)o1).toString().compareToIgnoreCase(((ReferenceType)o2).toString());
-         });
+        Collections.sort(ar, (o1, o2) -> {
+            return ((ReferenceType) o1).toString().compareToIgnoreCase(((ReferenceType) o2).toString());
+        });
 
         for (ReferenceType rt : ar) {
             lm.addElement(rt);
@@ -179,6 +179,7 @@ public final class QuerySetting extends javax.swing.JDialog {
         jcbPrintLogFileName.setSelected(cr.isPrintLogFileName());
         jcbignoreFormatting.setSelected(cr.isIgnoreFormatting());
         jtfTitleRegex.setText(cr.getTitleRegex());
+        jtfLinuxEditor.setText(cr.getLinuxEditor());
         jcbNewTLibSearch.setSelected(cr.isNewTLibSearch());
 
         jcbShowFullDate.setSelected(cr.isFullTimeStamp());
@@ -430,10 +431,13 @@ public final class QuerySetting extends javax.swing.JDialog {
         jcbSort = new javax.swing.JCheckBox();
         jcbNewTLibSearch = new javax.swing.JCheckBox();
         jPanel12 = new javax.swing.JPanel();
+        jPanel35 = new javax.swing.JPanel();
+        jPanel34 = new javax.swing.JPanel();
+        jLabel12 = new javax.swing.JLabel();
+        jtfLinuxEditor = new javax.swing.JTextField();
         jPanel28 = new javax.swing.JPanel();
         jLabel6 = new javax.swing.JLabel();
         jtfTitleRegex = new javax.swing.JTextField();
-        jPanel33 = new javax.swing.JPanel();
         jpConstants = new javax.swing.JPanel();
         jPanel31 = new javax.swing.JPanel();
         jPanel13 = new javax.swing.JPanel();
@@ -485,11 +489,11 @@ public final class QuerySetting extends javax.swing.JDialog {
         pRefTypes.setLayout(pRefTypesLayout);
         pRefTypesLayout.setHorizontalGroup(
             pRefTypesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 0, Short.MAX_VALUE)
+            .addGap(0, 183, Short.MAX_VALUE)
         );
         pRefTypesLayout.setVerticalGroup(
             pRefTypesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 740, Short.MAX_VALUE)
+            .addGap(0, 491, Short.MAX_VALUE)
         );
 
         jPanel5.add(pRefTypes);
@@ -608,7 +612,7 @@ public final class QuerySetting extends javax.swing.JDialog {
                 .addGap(22, 22, 22)
                 .addComponent(jpFileTypes, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jpRegExps, javax.swing.GroupLayout.DEFAULT_SIZE, 1323, Short.MAX_VALUE)
+                .addComponent(jpRegExps, javax.swing.GroupLayout.DEFAULT_SIZE, 793, Short.MAX_VALUE)
                 .addContainerGap())
             .addGroup(jPanel7Layout.createSequentialGroup()
                 .addContainerGap()
@@ -624,7 +628,7 @@ public final class QuerySetting extends javax.swing.JDialog {
                     .addComponent(jpRegExps, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(jPanel7Layout.createSequentialGroup()
                         .addComponent(jpFileTypes, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 221, Short.MAX_VALUE)))
+                        .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
 
@@ -716,7 +720,7 @@ public final class QuerySetting extends javax.swing.JDialog {
                     .addComponent(jcbShowFullDate)
                     .addComponent(jcbignoreFormatting)
                     .addComponent(jcbPrintLogFileName))
-                .addContainerGap(1241, Short.MAX_VALUE))
+                .addContainerGap(711, Short.MAX_VALUE))
         );
         jPanel11Layout.setVerticalGroup(
             jPanel11Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -727,7 +731,7 @@ public final class QuerySetting extends javax.swing.JDialog {
                 .addComponent(jcbignoreFormatting)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jcbShowFullDate)
-                .addContainerGap(610, Short.MAX_VALUE))
+                .addContainerGap(361, Short.MAX_VALUE))
         );
 
         jTabbedPane2.addTab("Formated", jPanel11);
@@ -776,16 +780,23 @@ public final class QuerySetting extends javax.swing.JDialog {
 
         jPanel12.setLayout(new javax.swing.BoxLayout(jPanel12, javax.swing.BoxLayout.PAGE_AXIS));
 
-        jPanel28.setLayout(new javax.swing.BoxLayout(jPanel28, javax.swing.BoxLayout.LINE_AXIS));
+        jPanel34.setLayout(new java.awt.GridLayout(1, 1));
+
+        jLabel12.setText("Linux editor path and params");
+        jPanel34.add(jLabel12);
+        jPanel34.add(jtfLinuxEditor);
+
+        jPanel35.add(jPanel34);
+
+        jPanel28.setLayout(new java.awt.GridLayout(1, 1));
 
         jLabel6.setText("regex for current path to show in dialog title");
         jPanel28.add(jLabel6);
         jPanel28.add(jtfTitleRegex);
 
-        jPanel12.add(jPanel28);
+        jPanel35.add(jPanel28);
 
-        jPanel33.setLayout(new java.awt.BorderLayout());
-        jPanel12.add(jPanel33);
+        jPanel12.add(jPanel35);
 
         jTabbedPane1.addTab("GUI", jPanel12);
 
@@ -795,7 +806,7 @@ public final class QuerySetting extends javax.swing.JDialog {
         jPanel31.setLayout(jPanel31Layout);
         jPanel31Layout.setHorizontalGroup(
             jPanel31Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 1603, Short.MAX_VALUE)
+            .addGap(0, 1073, Short.MAX_VALUE)
         );
         jPanel31Layout.setVerticalGroup(
             jPanel31Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -858,7 +869,7 @@ public final class QuerySetting extends javax.swing.JDialog {
         jPanel29.setLayout(jPanel29Layout);
         jPanel29Layout.setHorizontalGroup(
             jPanel29Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 1057, Short.MAX_VALUE)
+            .addGap(0, 578, Short.MAX_VALUE)
         );
         jPanel29Layout.setVerticalGroup(
             jPanel29Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -931,11 +942,11 @@ public final class QuerySetting extends javax.swing.JDialog {
         jPanel32.setLayout(jPanel32Layout);
         jPanel32Layout.setHorizontalGroup(
             jPanel32Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 68, Short.MAX_VALUE)
+            .addGap(0, 26, Short.MAX_VALUE)
         );
         jPanel32Layout.setVerticalGroup(
             jPanel32Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 656, Short.MAX_VALUE)
+            .addGap(0, 407, Short.MAX_VALUE)
         );
 
         jPanel13.add(jPanel32);
@@ -971,7 +982,7 @@ public final class QuerySetting extends javax.swing.JDialog {
         jPanel25.setLayout(jPanel25Layout);
         jPanel25Layout.setHorizontalGroup(
             jPanel25Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 1463, Short.MAX_VALUE)
+            .addGap(0, 933, Short.MAX_VALUE)
         );
         jPanel25Layout.setVerticalGroup(
             jPanel25Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1036,6 +1047,7 @@ public final class QuerySetting extends javax.swing.JDialog {
                 inquirer.ExceptionHandler.handleException("Error compiling regex [" + rx + "]: " + e.getMessage(), e);
             }
             cr.setTitleRegex(rx);
+            cr.setLinuxEditor(jtfLinuxEditor.getText());
 
             try {
                 jsMaxRecords.commitEdit();
@@ -1144,7 +1156,7 @@ public final class QuerySetting extends javax.swing.JDialog {
                 mod.fireTableDataChanged();
             }
         } catch (Exception ex) {
-            logger.error("fatal: ",  ex);
+            logger.error("fatal: ", ex);
         }
 
     }//GEN-LAST:event_jbTheConstantPasteActionPerformed
@@ -1201,6 +1213,7 @@ public final class QuerySetting extends javax.swing.JDialog {
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
+    private javax.swing.JLabel jLabel12;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
@@ -1235,7 +1248,8 @@ public final class QuerySetting extends javax.swing.JDialog {
     private javax.swing.JPanel jPanel30;
     private javax.swing.JPanel jPanel31;
     private javax.swing.JPanel jPanel32;
-    private javax.swing.JPanel jPanel33;
+    private javax.swing.JPanel jPanel34;
+    private javax.swing.JPanel jPanel35;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
@@ -1276,6 +1290,7 @@ public final class QuerySetting extends javax.swing.JDialog {
     private javax.swing.JSpinner jsMaxRecords;
     private javax.swing.JTable jtConstants;
     private javax.swing.JFormattedTextField jtfFileSize;
+    private javax.swing.JTextField jtfLinuxEditor;
     private javax.swing.JTextField jtfTitleRegex;
     private javax.swing.JPanel pAppType;
     private javax.swing.JPanel pRefTypes;
