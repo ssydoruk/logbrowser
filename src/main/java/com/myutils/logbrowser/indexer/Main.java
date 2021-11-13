@@ -606,7 +606,7 @@ public class Main {
                     String logFileName = fi.getLogFileName();
                     if (logFileName != null && !logFileName.isEmpty()) { // fix for error resulting in empty DB. workspace file names are empty
                         ProcessedFiles pf = getProcessedFiles().get(fi.getLogFileName());
-                        if (pf==null) {
+                        if (pf == null) {
                             logger.debug("Will process file [" + fi.getM_path() + "]");
                             filesToProcess.add(fi);
                         } else {
@@ -1354,50 +1354,33 @@ public class Main {
         public void run() {
 //            Thread.currentThread().setName("parser");
             LogFileWrapper logFile = LogFileWrapper.getContainer(file);
-            for (FileInfo fi : logFile.getFileInfos()) {
-                logger.info("Processing added file: [" + fi.getM_path() + "] log name [" + fi.getLogFileName() + "]");
 
-                Pair<Long, Long> dbFile = null;
-//                try {
-                ProcessedFiles processedFiles = Main.getInstance().getProcessedFiles().get(fi.getLogFileName());
-                if (processedFiles != null) {
-                    if (processedFiles.getSize() < fi.getSize()) {
-                        logger.info(fi.getLogFileName()
-                                + " id(" + processedFiles.getId() + ")"
-                                + ": size[" + fi.getSize()
-                                + "] size in DB[" + processedFiles.getSize() + "]; file data to be removed");
-                        m_accessor.addFileToDelete(processedFiles.getId());
-                    } else {
-                        logger.info(fi.getLogFileName()
-                                + " id(" + processedFiles.getId() + ")"
-                                + ": size[" + fi.getSize()
-                                + "] size in DB[" + processedFiles.getSize() + "]; new file ignored");
-                        continue;
-                    }
+            if (logFile != null)
+                for (FileInfo fi : logFile.getFileInfos()) {
+                    parseFile(fi);
                 }
-//                    dbFile = getDBFile(fi.getLogFileName());
-//                    if (dbFile != null) {
-//                        long fileID = dbFile.getKey();
-//                        long size = dbFile.getValue();
-//                        if (size < fi.getSize()) {
-//                            logger.info(fi.getLogFileName()
-//                                    + " id(" + fileID + ")"
-//                                    + ": size[" + fi.getSize()
-//                                    + "] size in DB[" + size + "]; file data to be removed");
-//                            m_accessor.addFileToDelete(fileID);
-//                        } else {
-//                            logger.info(fi.getLogFileName()
-//                                    + " id(" + fileID + ")"
-//                                    + ": size[" + fi.getSize()
-//                                    + "] size in DB[" + size + "]; new file ignored");
-//                            continue;
-//                        }
-//                    }
-                Parse(fi);
-//                } catch (SQLException e) {
-//                    logger.error("Exception parsing file", e);
-//                }
+        }
+
+        private void parseFile(FileInfo fi) {
+            logger.info("Processing added file: [" + fi.getM_path() + "] log name [" + fi.getLogFileName() + "]");
+
+            ProcessedFiles processedFiles = Main.getInstance().getProcessedFiles().get(fi.getLogFileName());
+            if (processedFiles != null) {
+                if (processedFiles.getSize() < fi.getSize()) {
+                    logger.info(fi.getLogFileName()
+                            + " id(" + processedFiles.getId() + ")"
+                            + ": size[" + fi.getSize()
+                            + "] size in DB[" + processedFiles.getSize() + "]; file data to be removed");
+                    m_accessor.addFileToDelete(processedFiles.getId());
+                } else {
+                    logger.info(fi.getLogFileName()
+                            + " id(" + processedFiles.getId() + ")"
+                            + ": size[" + fi.getSize()
+                            + "] size in DB[" + processedFiles.getSize() + "]; new file ignored");
+                    return;
+                }
             }
+            Parse(fi);
         }
     }
 

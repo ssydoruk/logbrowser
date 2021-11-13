@@ -107,6 +107,7 @@
             <groupId>com.mycompany</groupId>
             <artifactId>Utils</artifactId>
             <version>1.0-SNAPSHOT</version>
+            <type>jar</type>
         </dependency>
         <dependency>
             <groupId>com.google.code.gson</groupId>
@@ -132,6 +133,17 @@
         </dependency>
 
     </dependencies>
+    <dependencyManagement>
+        <dependencies>
+           <dependency>
+                <groupId>com.mycompany</groupId>
+                <artifactId>Utils</artifactId>
+                <version>1.0-SNAPSHOT</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
     <build>
         <plugins>
             <plugin>

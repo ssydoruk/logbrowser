@@ -143,7 +143,7 @@ public class Start {
                 }
             }
         });
-//        Thread.sleep(10000);
+        Thread.sleep(10000);
         indexer.finishParsing();
     }
 }
