@@ -132,7 +132,7 @@ public class ApacheWebLogsParser extends WebParser {
 
     @Override
     void init(HashMap<TableType, DBTable> m_tables) {
-        m_tables.put(TableType.ApacheWeb, new ApacheWebTab(Main.getM_accessor(), TableType.ApacheWeb));
+        m_tables.put(TableType.ApacheWeb, new ApacheWebTab(Main.getInstance().getM_accessor(), TableType.ApacheWeb));
 
     }
 

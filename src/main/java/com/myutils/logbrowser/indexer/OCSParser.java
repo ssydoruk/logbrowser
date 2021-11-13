@@ -664,7 +664,7 @@ public class OCSParser extends Parser {
 
     @Override
     void init(HashMap<TableType, DBTable> m_tables) {
-        m_tables.put(TableType.OCSPredInfo, new OCSPredInfoTable(Main.getM_accessor(), TableType.OCSPredInfo));
+        m_tables.put(TableType.OCSPredInfo, new OCSPredInfoTable(Main.getInstance().getM_accessor(), TableType.OCSPredInfo));
     }
 
     private void AddConfigMessage(String s) {

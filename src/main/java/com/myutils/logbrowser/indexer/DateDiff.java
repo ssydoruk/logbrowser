@@ -23,7 +23,7 @@ public class DateDiff {
 
     DateDiff(FileInfoType type) {
         this.type = type;
-        dateDiffTable = new DateDiffTable(Main.getSQLiteaccessor(), type);
+        dateDiffTable = new DateDiffTable(Main.getInstance().getM_accessor(), type);
         prevTime = 0;
         prevAppID = 0;
 //        dateDiffTable.InitDB();

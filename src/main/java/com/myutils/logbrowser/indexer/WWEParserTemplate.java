@@ -190,7 +190,7 @@ public class WWEParserTemplate extends WebParser {
 
     @Override
     void init(HashMap<TableType, DBTable> m_tables) {
-        m_tables.put(TableType.WWEMessage, new WWEDebugMessageTable(Main.getM_accessor(), TableType.WWEMessage));
+        m_tables.put(TableType.WWEMessage, new WWEDebugMessageTable(Main.getInstance().getM_accessor(), TableType.WWEMessage));
 
     }
 

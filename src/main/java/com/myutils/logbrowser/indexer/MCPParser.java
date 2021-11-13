@@ -459,7 +459,7 @@ public class MCPParser extends Parser {
 
     @Override
     void init(HashMap<TableType, DBTable> m_tables) {
-        m_tables.put(TableType.VXMLIntStepsTable, new VXMLIntStepTable(Main.getM_accessor(), TableType.VXMLIntStepsTable));
+        m_tables.put(TableType.VXMLIntStepsTable, new VXMLIntStepTable(Main.getInstance().getM_accessor(), TableType.VXMLIntStepsTable));
     }
 
     private void noCallMessage(String[] split, int initalIndex) {

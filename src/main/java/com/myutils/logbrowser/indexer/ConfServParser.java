@@ -405,9 +405,9 @@ public class ConfServParser extends Parser {
 
     @Override
     void init(HashMap<TableType, DBTable> m_tables) {
-        m_tables.put(TableType.CSUpdate, new CSClientMessageTable(Main.getM_accessor(), TableType.CSUpdate));
-        m_tables.put(TableType.CSConfigChange, new CSObjectChangeTable(Main.getM_accessor(), TableType.CSConfigChange));
-        m_tables.put(TableType.CSClientConnect, new CSClientConnectTable(Main.getM_accessor(), TableType.CSClientConnect));
+        m_tables.put(TableType.CSUpdate, new CSClientMessageTable(Main.getInstance().getM_accessor(), TableType.CSUpdate));
+        m_tables.put(TableType.CSConfigChange, new CSObjectChangeTable(Main.getInstance().getM_accessor(), TableType.CSConfigChange));
+        m_tables.put(TableType.CSClientConnect, new CSClientConnectTable(Main.getInstance().getM_accessor(), TableType.CSClientConnect));
 
     }
 

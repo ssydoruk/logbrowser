@@ -1345,10 +1345,10 @@ public class SingleThreadParser extends Parser {
 
     @Override
     void init(HashMap<TableType, DBTable> m_tables) {
-        m_tables.put(TableType.SIP1536Other, new SIP1536OtherTable(Main.getM_accessor(), TableType.SIP1536Other));
-        m_tables.put(TableType.SIP1536Trunk, new SIP1536TrunkTable(Main.getM_accessor(), TableType.SIP1536Trunk));
-        m_tables.put(TableType.SIP1536ReqResp, new SIP1536RequestResponseTable(Main.getM_accessor(), TableType.SIP1536ReqResp));
-        m_tables.put(TableType.TLIBTimerRedirect, new TLibTimerRedirectTable(Main.getM_accessor(), TableType.TLIBTimerRedirect));
+        m_tables.put(TableType.SIP1536Other, new SIP1536OtherTable(Main.getInstance().getM_accessor(), TableType.SIP1536Other));
+        m_tables.put(TableType.SIP1536Trunk, new SIP1536TrunkTable(Main.getInstance().getM_accessor(), TableType.SIP1536Trunk));
+        m_tables.put(TableType.SIP1536ReqResp, new SIP1536RequestResponseTable(Main.getInstance().getM_accessor(), TableType.SIP1536ReqResp));
+        m_tables.put(TableType.TLIBTimerRedirect, new TLibTimerRedirectTable(Main.getInstance().getM_accessor(), TableType.TLIBTimerRedirect));
 
     }
 

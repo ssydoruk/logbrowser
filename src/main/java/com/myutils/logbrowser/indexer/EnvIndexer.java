@@ -6,10 +6,7 @@
 package com.myutils.logbrowser.indexer;
 
 import com.myutils.logbrowser.common.ExecutionEnvironment;
-import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.Option;
-import org.apache.commons.cli.Options;
-import org.apache.commons.cli.ParseException;
+import org.apache.commons.cli.*;
 import org.apache.commons.lang3.StringUtils;
 
 import java.nio.file.Paths;
@@ -18,27 +15,41 @@ import java.nio.file.Paths;
  * @author stepan_sydoruk
  */
 public class EnvIndexer extends ExecutionEnvironment {
+    protected final Options options;
+    protected final CommandLineParser parser;
+    protected CommandLine cmd;
 
-    private final Option optXMLCfg;
-    private final Option optAlias;
-    private final Option optDBName;
-    private final Option optLogsBaseDir;
-    private final Option optIgnoreZIP;
-    private final Option optTDiffParse;
-    private final Option optLogBrowserDir;
-    private final Option optSQLPragma;
+    private  Option optXMLCfg;
+    private  Option optAlias;
+    private  Option optDBName;
+    private  Option optLogsBaseDir;
+    private  Option optIgnoreZIP;
+    private  Option optTDiffParse;
+    private  Option optLogBrowserDir;
+    private  Option optSQLPragma;
     Option optHelp;
-    private boolean parseTDiff = false;
-    private boolean ignoreZIP = false;
-    private String baseDir;
-    private String xmlCFG;
-    private String alias;
-    private String dbname;
-    private String logbrowserDir;
-    private boolean sqlPragma;
+
+
+    protected String getStringOrDef(Option opt, String def) {
+        String ret = null;
+        try {
+            if (StringUtils.isNotEmpty(opt.getLongOpt())) {
+                ret = (String) cmd.getParsedOptionValue(opt.getLongOpt());
+            }
+            if (StringUtils.isEmpty(ret) && StringUtils.isNotEmpty(opt.getOpt())) {
+                ret = (String) cmd.getParsedOptionValue(opt.getOpt());
+            }
+        } catch (ParseException ex) {
+            System.out.println(ex);
+        }
+        return (StringUtils.isNotBlank(ret)) ? ret : def;
+    }
 
     EnvIndexer() {
         super();
+        this.options = new Options();
+        this.parser = new DefaultParser();
+
 
         optHelp = Option.builder("h")
                 .hasArg(false)
@@ -111,13 +122,6 @@ public class EnvIndexer extends ExecutionEnvironment {
 
     }
 
-    public String getBaseDir() {
-        return baseDir;
-    }
-
-    public String getLogbrowserDir() {
-        return logbrowserDir;
-    }
 
     public void printHelp() {
         HelpFormatter hf = new HelpFormatter();
@@ -135,9 +139,6 @@ public class EnvIndexer extends ExecutionEnvironment {
         return getStringOrDef(optAlias, "logbr");
     }
 
-    public boolean isParseTDiff() {
-        return parseTDiff;
-    }
 
     private String getOptValueDBName() {
         return getStringOrDef(optDBName, "logbr");
@@ -148,14 +149,10 @@ public class EnvIndexer extends ExecutionEnvironment {
     }
 
     private String getOptBaseDir() {
-        return getStringOrDef(optLogsBaseDir, Paths.get(".").toAbsolutePath().normalize().toString());
+        return getStringOrDef(optLogsBaseDir, null);
     }
 
-    public boolean isIgnoreZIP() {
-        return ignoreZIP;
-    }
-
-    public void parserCommandLine(String[] args) {
+     public void parserCommandLine(String[] args) {
         try {
             cmd = parser.parse(options, args, true);
         } catch (ParseException e) {
@@ -167,30 +164,22 @@ public class EnvIndexer extends ExecutionEnvironment {
             showHelpExit(options);
         }
 
-        alias = getOptionAlias();
-        dbname = getOptValueDBName();
+        setAlias( getOptionAlias());
+        setDbname(getOptValueDBName());
 
-        ignoreZIP = getOptIsIgnoreZIP();
+        setIgnoreZIP(getOptIsIgnoreZIP());
 
-        xmlCFG = getOptValueXMLCfg();
-        baseDir = getOptBaseDir();
+        setXmlCFG( getOptValueXMLCfg());
+        setBaseDir(getOptBaseDir());
 
-        parseTDiff = getOptValueParseTDiff();
-        logbrowserDir = getOptLogBrowserDir();
+        setParseTDiff( getOptValueParseTDiff());
+        setLogbrowserDir( getOptLogBrowserDir());
 
-        baseDir = getOptBaseDir();
+        setBaseDir(getOptBaseDir());
 
-        sqlPragma = getOptSQLPragma();
+        setSqlPragma(getOptSQLPragma());
     }
 
-
-    public String getXmlCFG() {
-        return xmlCFG;
-    }
-
-    public String getDbname() {
-        return dbname;
-    }
 
     private boolean getOptValueParseTDiff() {
 
@@ -210,29 +199,14 @@ public class EnvIndexer extends ExecutionEnvironment {
         return "true".equalsIgnoreCase(System.getProperty("sqlite.pragma"));
     }
 
-    public boolean isSqlPragma() {
-        return sqlPragma;
-    }
 
     private boolean getOptIsIgnoreZIP() {
         return cmd.hasOption(optIgnoreZIP.getLongOpt());
-
     }
 
-    public String getAlias() {
-        return alias;
-    }
 
     private String getOptLogBrowserDir() {
-        String ret = getStringOrDef(optLogBrowserDir, null);
-        if (ret == null) {
-            ret = System.getProperty("logbr.dir");
-        }
-        if (StringUtils.isEmpty(ret)) {
-            ret = ".logbr";
-        }
-
-        return Paths.get(ret).toAbsolutePath().normalize().toString();
+        return getStringOrDef(optLogBrowserDir, null);
     }
 
 }

@@ -6,10 +6,7 @@
 package com.myutils.logbrowser.inquirer;
 
 import com.myutils.logbrowser.common.ExecutionEnvironment;
-import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.Option;
-import org.apache.commons.cli.Options;
-import org.apache.commons.cli.ParseException;
+import org.apache.commons.cli.*;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -19,7 +16,9 @@ import java.nio.file.Paths;
 /**
  * @author stepan_sydoruk
  */
-public class EnvInquirer extends ExecutionEnvironment {
+public class EnvInquirer  {
+    protected  Options options;
+    protected  CommandLineParser parser;
 
     private final Option optOutSpec;
     private final Option optAlias;
@@ -40,9 +39,12 @@ public class EnvInquirer extends ExecutionEnvironment {
     private boolean refSyncDisabled;
     private boolean ignoreFileAccessErrors;
     private String logBrDir;
+    protected CommandLine cmd;
+
 
     EnvInquirer() {
-        super();
+        this.options = new Options();
+        this.parser = new DefaultParser();
 
         optHelp = Option.builder("h").hasArg(false).required(false).desc("Show help and exit").longOpt("help")
                 .build();
@@ -156,6 +158,21 @@ public class EnvInquirer extends ExecutionEnvironment {
 
     private String getOptValBaseDir() {
         return getStringOrDef(optLogsBaseDir, Paths.get(".").toAbsolutePath().normalize().toString());
+    }
+
+    protected String getStringOrDef(Option opt, String def) {
+        String ret = null;
+        try {
+            if (StringUtils.isNotEmpty(opt.getLongOpt())) {
+                ret = (String) cmd.getParsedOptionValue(opt.getLongOpt());
+            }
+            if (StringUtils.isEmpty(ret) && StringUtils.isNotEmpty(opt.getOpt())) {
+                ret = (String) cmd.getParsedOptionValue(opt.getOpt());
+            }
+        } catch (ParseException ex) {
+            System.out.println(ex);
+        }
+        return (StringUtils.isNotBlank(ret)) ? ret : def;
     }
 
     private String getAppConfigFile() {

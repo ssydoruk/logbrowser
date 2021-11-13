@@ -12,7 +12,9 @@ import java.sql.*;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 
 import static Utils.Util.pDuration;
 
@@ -38,10 +40,11 @@ public final class SqliteAccessor extends Thread implements DBAccessor {
 
     Stats stats;
 
-    private ArrayList<Long> filesToDelete;
+    private List<Long> filesToDelete;
 
     public SqliteAccessor(String dbname, String alias) throws Exception {
         m_alias = alias;
+        filesToDelete =  Collections.synchronizedList(new ArrayList<Long>());
 
         try {
             Class.forName("org.sqlite.JDBC");
@@ -65,7 +68,7 @@ public final class SqliteAccessor extends Thread implements DBAccessor {
                     //                    + "PRAGMA main.cache_size=5000;\n"
                     + "PRAGMA main.automatic_index=false;\n";
 
-            if (Main.ee.isSqlPragma()) {
+            if (Main.getInstance().getEe().isSqlPragma()) {
                 s += "PRAGMA main.journal_mode=MEMORY;\n";
             } else {
                 logger.info("SQLite pragmas not turned");
@@ -84,13 +87,13 @@ public final class SqliteAccessor extends Thread implements DBAccessor {
         }
     }
 
-    public ArrayList<Long> getFilesToDelete() {
+    public List<Long> getFilesToDelete() {
         return filesToDelete;
     }
 
     void setFilesToDelete(ArrayList<Long> filesToDelete) {
         if (!filesToDelete.isEmpty()) {
-            this.filesToDelete = filesToDelete;
+            this.filesToDelete.addAll( filesToDelete);
         }
     }
 
@@ -424,7 +427,7 @@ public final class SqliteAccessor extends Thread implements DBAccessor {
 
     public synchronized void exit() {
         m_exit = true;
-        Main.m_accessor.notify();
+        Main.getInstance().getM_accessor().notify();
     }
 
     @Override
@@ -555,6 +558,37 @@ public final class SqliteAccessor extends Thread implements DBAccessor {
         return ret.toArray(new Integer[ret.size()]);
     }
 
+    public ArrayList<ArrayList<Object>> getObjMultiple(String query, String tab) throws Exception {
+        if (TableExist(tab)) {
+            Statement stmt = getM_conn().createStatement();
+            Main.logger.debug("[" + query + "]");
+
+            ArrayList<ArrayList<Object>> ret;
+            try (ResultSet rs = stmt.executeQuery(query)) {
+                ResultSetMetaData rsmd = rs.getMetaData();
+                ret = new ArrayList<>();
+                int columnCount = rsmd.getColumnCount();
+                int cnt = 0;
+                while (rs.next()) {
+                    ArrayList<Object> row = new ArrayList<>();
+                    for (int i = 1; i <= columnCount; i++) {
+                        row.add(rs.getObject(i));
+                    }
+                    ret.add(row);
+                    cnt++;
+                }
+                Main.logger.debug("\tRetrieved " + cnt + " records");
+                rs.getStatement().close();
+            }
+
+            return ret;
+        }
+        else
+            return null;
+
+    }
+
+
     public ArrayList<ArrayList<Long>> getIDsMultiple(String query) throws SQLException {
 
         Statement stmt = getM_conn().createStatement();
@@ -580,6 +614,10 @@ public final class SqliteAccessor extends Thread implements DBAccessor {
 
         return ret;
 
+    }
+
+    public void addFileToDelete(long fileID) {
+        filesToDelete.add(fileID);
     }
 
     class Stat {

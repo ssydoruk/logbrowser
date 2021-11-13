@@ -382,7 +382,7 @@ public class IxnServerParser extends Parser {
 
     @Override
     void init(HashMap<TableType, DBTable> m_tables) {
-        m_tables.put(TableType.IxnNonIxn, new IxnNonIxnTable(Main.getM_accessor(), TableType.IxnNonIxn));
+        m_tables.put(TableType.IxnNonIxn, new IxnNonIxnTable(Main.getInstance().getM_accessor(), TableType.IxnNonIxn));
 
     }
 

@@ -409,8 +409,8 @@ public class SCSParser extends Parser {
 
     @Override
     void init(HashMap<TableType, DBTable> m_tables) {
-        m_tables.put(TableType.SCSClientLogMessage, new SCSClientLogTable(Main.getM_accessor(), TableType.SCSClientLogMessage));
-        m_tables.put(TableType.SCSAlarm, new SCSAlarmTable(Main.getM_accessor(), TableType.SCSAlarm));
+        m_tables.put(TableType.SCSClientLogMessage, new SCSClientLogTable(Main.getInstance().getM_accessor(), TableType.SCSClientLogMessage));
+        m_tables.put(TableType.SCSAlarm, new SCSAlarmTable(Main.getInstance().getM_accessor(), TableType.SCSAlarm));
 
     }
 

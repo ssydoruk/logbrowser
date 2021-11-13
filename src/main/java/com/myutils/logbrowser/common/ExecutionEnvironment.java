@@ -5,8 +5,9 @@
  */
 package com.myutils.logbrowser.common;
 
-import org.apache.commons.cli.*;
 import org.apache.commons.lang3.StringUtils;
+
+import java.nio.file.Paths;
 
 /**
  * This class should not contain Logger!!!
@@ -14,29 +15,88 @@ import org.apache.commons.lang3.StringUtils;
  * @author stepan_sydoruk
  */
 public class ExecutionEnvironment {
-
-    protected final Options options;
-    protected final CommandLineParser parser;
-    protected CommandLine cmd;
+    private Boolean parseTDiff = "true".equalsIgnoreCase(System.getProperty("timediff.parse"));
+    private boolean ignoreZIP = false;
+    private String baseDir = Paths.get(".").toAbsolutePath().normalize().toString();
+    private String xmlCFG = ".";
+    private String alias = "logbr";
+    private String dbname = "logbr";
+    private String logbrowserDir;
+    private boolean sqlPragma;
 
     public ExecutionEnvironment() {
-        this.options = new Options();
-        this.parser = new DefaultParser();
+        String _dir = System.getProperty("logbr.dir");
+        if (StringUtils.isEmpty(_dir)) {
+            _dir = ".logbr";
+        }
+
+        logbrowserDir = Paths.get(_dir).toAbsolutePath().normalize().toString();
     }
 
-    protected String getStringOrDef(Option opt, String def) {
-        String ret = null;
-        try {
-            if (StringUtils.isNotEmpty(opt.getLongOpt())) {
-                ret = (String) cmd.getParsedOptionValue(opt.getLongOpt());
-            }
-            if (StringUtils.isEmpty(ret) && StringUtils.isNotEmpty(opt.getOpt())) {
-                ret = (String) cmd.getParsedOptionValue(opt.getOpt());
-            }
-        } catch (ParseException ex) {
-            System.out.println(ex);
-        }
-        return (StringUtils.isNotBlank(ret)) ? ret : def;
+    public boolean isParseTDiff() {
+        return parseTDiff;
+    }
+
+    public void setParseTDiff(boolean parseTDiff) {
+        this.parseTDiff = parseTDiff;
+    }
+
+    public boolean isIgnoreZIP() {
+        return ignoreZIP;
+    }
+
+    public void setIgnoreZIP(boolean ignoreZIP) {
+        this.ignoreZIP = ignoreZIP;
+    }
+
+    public String getBaseDir() {
+        return baseDir;
+    }
+
+    public void setBaseDir(String baseDir) {
+        this.baseDir = baseDir;
+    }
+
+    public String getXmlCFG() {
+        return xmlCFG;
+    }
+
+    public void setXmlCFG(String xmlCFG) {
+        this.xmlCFG = xmlCFG;
+    }
+
+    public String getAlias() {
+        return alias;
+    }
+
+    public void setAlias(String alias) {
+        this.alias = alias;
+    }
+
+    public String getDbname() {
+        return dbname;
+    }
+
+    public void setDbname(String dbname) {
+        this.dbname = dbname;
+    }
+
+    public String getLogbrowserDir() {
+
+        return logbrowserDir;
+    }
+
+    public void setLogbrowserDir(String _dir) {
+        if (StringUtils.isNotEmpty(_dir))
+            this.logbrowserDir = Paths.get(_dir).toAbsolutePath().normalize().toString();
+    }
+
+    public boolean isSqlPragma() {
+        return sqlPragma;
+    }
+
+    public void setSqlPragma(boolean sqlPragma) {
+        this.sqlPragma = sqlPragma;
     }
 
 }

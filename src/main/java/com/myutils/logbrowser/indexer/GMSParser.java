@@ -602,10 +602,10 @@ public class GMSParser extends Parser {
 
     @Override
     void init(HashMap<TableType, DBTable> m_tables) {
-        m_tables.put(TableType.GMSStart, new GMSStartTable(Main.getM_accessor(), TableType.GMSStart));
-        m_tables.put(TableType.GMSStatServerMessage, new GMSStatServerMsgTable(Main.getM_accessor(), TableType.GMSStatServerMessage));
-        m_tables.put(TableType.GMSWebClientMessage, new GMSWebClientMsgTable(Main.getM_accessor(), TableType.GMSWebClientMessage));
-        m_tables.put(TableType.IxnGMS, new IxnGMSTable(Main.getM_accessor(), TableType.IxnGMS));
+        m_tables.put(TableType.GMSStart, new GMSStartTable(Main.getInstance().getM_accessor(), TableType.GMSStart));
+        m_tables.put(TableType.GMSStatServerMessage, new GMSStatServerMsgTable(Main.getInstance().getM_accessor(), TableType.GMSStatServerMessage));
+        m_tables.put(TableType.GMSWebClientMessage, new GMSWebClientMsgTable(Main.getInstance().getM_accessor(), TableType.GMSWebClientMessage));
+        m_tables.put(TableType.IxnGMS, new IxnGMSTable(Main.getInstance().getM_accessor(), TableType.IxnGMS));
 
     }
 

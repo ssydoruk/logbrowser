@@ -10,6 +10,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * @author ssydoruk
@@ -96,7 +97,7 @@ public abstract class DBTable {
     protected void dropIndexes() {
         try {
             if (Main.isDbExisted() && getM_dbAccessor().TableExist(tabName)) {
-                ArrayList<Long> filesToDelete = getM_dbAccessor().getFilesToDelete();
+                List<Long> filesToDelete = getM_dbAccessor().getFilesToDelete();
                 if (filesToDelete != null) {
                     String fileIDField1 = getFileIDField();
                     if (fileIDField1 != null) { //if tables do not use file ID field, they should set this to null
@@ -171,7 +172,7 @@ public abstract class DBTable {
             String tabName1 = getTabName();
             if (tabName1 != null) {
                 try {
-                    currentID = Main.getSQLiteaccessor().getID("select max(id) from " + tabName1, tabName1, -1);
+                    currentID = Main.getInstance().getM_accessor().getID("select max(id) from " + tabName1, tabName1, -1);
                     if (currentID == -1) {
                         currentID = 0;
                     }

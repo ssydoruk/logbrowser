@@ -1013,8 +1013,8 @@ public class UrsParser extends Parser {
 
     @Override
     void init(HashMap<TableType, DBTable> m_tables) {
-        m_tables.put(TableType.URSAgentGroupTable, new URSAgentGroupTable(Main.getM_accessor(), TableType.URSAgentGroupTable));
-        m_tables.put(TableType.URSGenesysMessage, new GenesysUrsMsgTable(Main.getM_accessor(), TableType.URSGenesysMessage));
+        m_tables.put(TableType.URSAgentGroupTable, new URSAgentGroupTable(Main.getInstance().getM_accessor(), TableType.URSAgentGroupTable));
+        m_tables.put(TableType.URSGenesysMessage, new GenesysUrsMsgTable(Main.getInstance().getM_accessor(), TableType.URSGenesysMessage));
     }
 
     // parse state contants

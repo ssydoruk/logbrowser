@@ -890,12 +890,12 @@ public class WWEParser extends WebParser {
 
     @Override
     void init(HashMap<TableType, DBTable> m_tables) {
-        m_tables.put(TableType.WWEMessage, new WWEDebugMessageTable(Main.getM_accessor(), TableType.WWEMessage));
-        m_tables.put(TableType.WWEUCSMessage, new WWEUCSTable(Main.getM_accessor(), TableType.WWEUCSMessage));
-        m_tables.put(TableType.WWEUCSConfigMessage, new WWEUCSConfigTable(Main.getM_accessor(), TableType.WWEUCSConfigMessage));
-        m_tables.put(TableType.WWEIxnMessage, new WWEIxnTable(Main.getM_accessor(), TableType.WWEIxnMessage));
-        m_tables.put(TableType.WWEBayeuxMessage, new WWEBayeuxSMsgTable(Main.getM_accessor(), TableType.WWEBayeuxMessage));
-        m_tables.put(TableType.WWEStatServerMessage, new WWEWWEStatServerMsgTable(Main.getM_accessor(), TableType.WWEStatServerMessage));
+        m_tables.put(TableType.WWEMessage, new WWEDebugMessageTable(Main.getInstance().getM_accessor(), TableType.WWEMessage));
+        m_tables.put(TableType.WWEUCSMessage, new WWEUCSTable(Main.getInstance().getM_accessor(), TableType.WWEUCSMessage));
+        m_tables.put(TableType.WWEUCSConfigMessage, new WWEUCSConfigTable(Main.getInstance().getM_accessor(), TableType.WWEUCSConfigMessage));
+        m_tables.put(TableType.WWEIxnMessage, new WWEIxnTable(Main.getInstance().getM_accessor(), TableType.WWEIxnMessage));
+        m_tables.put(TableType.WWEBayeuxMessage, new WWEBayeuxSMsgTable(Main.getInstance().getM_accessor(), TableType.WWEBayeuxMessage));
+        m_tables.put(TableType.WWEStatServerMessage, new WWEWWEStatServerMsgTable(Main.getInstance().getM_accessor(), TableType.WWEStatServerMessage));
 
     }
 

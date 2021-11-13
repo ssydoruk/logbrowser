@@ -331,8 +331,8 @@ public class URShttpinterfaceParser extends WebParser {
 
     @Override
     void init(HashMap<TableType, DBTable> m_tables) {
-        m_tables.put(TableType.URSHTTP, new ursHTTPMsgTable(Main.getM_accessor()));
-        m_tables.put(TableType.HTTP_TO_URS, new HTTPtoURSTable(Main.getM_accessor()));
+        m_tables.put(TableType.URSHTTP, new ursHTTPMsgTable(Main.getInstance().getM_accessor()));
+        m_tables.put(TableType.HTTP_TO_URS, new HTTPtoURSTable(Main.getInstance().getM_accessor()));
 
     }
 

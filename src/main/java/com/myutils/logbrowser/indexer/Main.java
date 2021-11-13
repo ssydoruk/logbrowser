@@ -4,6 +4,7 @@
  */
 package com.myutils.logbrowser.indexer;
 
+import com.myutils.logbrowser.common.ExecutionEnvironment;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
@@ -20,16 +21,16 @@ import javax.xml.parsers.ParserConfigurationException;
 import java.io.*;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.sql.SQLException;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
 
 import static Utils.FileUtils.setCurrentDirectory;
 import static Utils.Util.pDuration;
@@ -41,13 +42,11 @@ public class Main {
 
     private static final Constants constants = new Constants();
     private static final Matcher regFilesNotGood = Pattern.compile("(^\\.logbr|logbr.db)").matcher("");
-    public static SqliteAccessor m_accessor;
-    public static Logger logger;
-    public static EnvIndexer ee;
-    static Main theParser = null;
+    public static Logger logger = LogManager.getLogger();
     static String m_component = "all";
     static String m_executableName = "indexer.jar";
     static long totalBytes = 0;
+    ;
     private final ArrayList<File> m_files = new ArrayList();
     public XmlCfg xmlCfg = null;
     HashMap<FileInfoType, Parser> m_parsers = new HashMap<>();
@@ -55,14 +54,26 @@ public class Main {
     boolean m_scanDir = true;
     boolean m_parseZip = false;
     TableReferences tabRefs;
-    ArrayList<FileInfo> filesToAccess = new ArrayList();
+    AtomicBoolean initialRun = new AtomicBoolean(false);
+    boolean initFailed = false;
+    BlockingQueue<File> fileQueue = new LinkedBlockingDeque<>();
+    AtomicBoolean queueEnd = new AtomicBoolean(false);
+    ProcessedFilesSet processedFiles = new ProcessedFilesSet();
+    private String dbName;
+    private SqliteAccessor m_accessor;
+    private ExecutionEnvironment ee;
+    private String baseDir;
+    private String alias;
     private int totalFiles = 0;
     private boolean dbExisted = false;
     private FileInfoTable m_FileInfoTable;
     private HashMap<TableType, DBTable> m_tables;
+    private ThreadPoolExecutor managerThreads;
+    private ThreadPoolExecutor parserThreads;
+    private boolean ignoreZIP = false;
 
-    public Main(String dbname, String xmlCFG) throws Exception {
-        setXMLCfg(xmlCFG);
+    public static Main getInstance() {
+        return MainHolder.INSTANCE;
     }
 
     static String lookupConstant(GenesysConstants constName, Integer intOrDef) {
@@ -80,15 +91,7 @@ public class Main {
     }
 
     static public Main getMain() {
-        return theParser;
-    }
-
-    public static SqliteAccessor getM_accessor() {
-        return m_accessor;
-    }
-
-    public static SqliteAccessor getSQLiteaccessor() {
-        return m_accessor;
+        return Main.getInstance();
     }
 
     public static String getVersion() throws IOException {
@@ -107,7 +110,7 @@ public class Main {
 
     public static void main(String[] args) throws Exception {
 
-        ee = new EnvIndexer();
+        EnvIndexer ee = new EnvIndexer();
         ee.parserCommandLine(args);
 
         Thread.setDefaultUncaughtExceptionHandler(new ExceptionHandler());
@@ -134,9 +137,10 @@ public class Main {
         s.append("\n\tSqlPragma: ").append(ee.isSqlPragma());
         logger.info(s);
 
-        theParser = new Main(ee.getDbname(), ee.getXmlCFG());
+        Main theParser = Main.getInstance().init(ee);
 
-        theParser.parseAll(ee.getBaseDir(), ee.getDbname(), ee.getAlias());
+        theParser.setIgnoreZIP(ee.isIgnoreZIP());
+        theParser.parseAll();
 //        Thread.sleep(3000);
     }
 
@@ -154,7 +158,6 @@ public class Main {
 
         return ret;
     }
-//    static SqliteAccessor m_accessor; 
 
     public static Integer getRef(ReferenceType type, String name, int wordsToCompare) {
         Integer ret = getMain().tabRefs.getRef(type, name, wordsToCompare);
@@ -164,7 +167,7 @@ public class Main {
     }
 
     static boolean IgnoreTable(Message msg) {
-        return theParser.checkIgnoreTable(msg);
+        return Main.getInstance().checkIgnoreTable(msg);
     }
 
     static int getRefQuotes(ReferenceType referenceType, String m_ThisDN) {
@@ -206,13 +209,20 @@ public class Main {
                 && logFileName0 != null && !logFileName0.isEmpty()
                 && logFileName.equals(logFileName0);
     }
+//    static SqliteAccessor m_accessor; 
 
     static public boolean isDbExisted() {
         return Main.getMain().dbExisted;
     }
 
-    private static void initStatic(SqliteAccessor m_accessor) throws Exception {
-        Record.setFileId(m_accessor.getID("select max(id) from file_logbr;", 0));
+    public static boolean ifSIPLines() {
+        String isAll = (String) System.getProperties().get("SIPLINES");
+        return isAll != null && isAll.length() != 0 && isAll.equals("1");
+    }
+
+    private void initStatic(SqliteAccessor m_accessor) throws Exception {
+        processedFiles.loadFiles(m_accessor.getObjMultiple("select id, intfilename, size from file_logbr", "file_logbr"));
+        Record.setFileId(m_accessor.getID("select max(id) from file_logbr;", "file_logbr", 0));
         Record.m_handlerId = m_accessor.getID("select max(HandlerId) from sip_" + m_accessor.getM_alias() + ";", "sip_" + m_accessor.getM_alias(), 0);
         Record.m_handlerId = m_accessor.getID("select max(HandlerId) from tlib_" + m_accessor.getM_alias() + ";", "tlib_" + m_accessor.getM_alias(), Record.m_handlerId);
         Record.m_handlerId = m_accessor.getID("select max(HandlerId) from cireq_" + m_accessor.getM_alias() + ";", "cireq_" + m_accessor.getM_alias(), Record.m_handlerId);
@@ -222,27 +232,76 @@ public class Main {
         Record.m_jsonId = m_accessor.getID("select max(JsonId) from trigger_" + m_accessor.getM_alias() + ";", "trigger_" + m_accessor.getM_alias(), 0) + 1;
     }
 
-    public static boolean ifSIPLines() {
-        String isAll = (String) System.getProperties().get("SIPLINES");
-        return isAll != null && isAll.length() != 0 && isAll.equals("1");
+    public SqliteAccessor getM_accessor() {
+        return m_accessor;
     }
 
-    private void ScanDir(File file) throws IOException {
+    public boolean isIgnoreZIP() {
+        return ignoreZIP;
+    }
+
+    public void setIgnoreZIP(boolean ignoreZIP) {
+        this.ignoreZIP = ignoreZIP;
+    }
+
+    /**
+     * To be used instead of constructor
+     *
+     * @param dbname
+     * @param xmlCFG
+     * @param baseDir
+     * @param alias
+     * @throws Exception
+     */
+    public Main init(String dbname, String xmlCFG, String baseDir, String alias) throws Exception {
+        this.dbName = dbname;
+        this.baseDir = baseDir;
+        this.alias = alias;
+        setXMLCfg(xmlCFG);
+        initExecutor(1);
+        return this;
+    }
+
+    private void initExecutor(int maxThreads) {
+        if (managerThreads != null)
+            managerThreads.purge();
+
+        managerThreads = (ThreadPoolExecutor) Executors.newCachedThreadPool();
+        managerThreads.setCorePoolSize(1);
+        managerThreads.setMaximumPoolSize(1);
+
+        parserThreads = (ThreadPoolExecutor) Executors.newFixedThreadPool(1);
+    }
+
+    public ExecutionEnvironment getEe() {
+        return ee;
+    }
+
+    public void setEe(ExecutionEnvironment ee) {
+        this.ee = ee;
+    }
+
+    public Main init(ExecutionEnvironment ee) throws Exception {
+        this.dbName = ee.getDbname();
+        this.baseDir = ee.getBaseDir();
+        this.alias = ee.getAlias();
+        setEe(ee);
+        setXMLCfg(ee.getXmlCFG());
+        initExecutor(1);
+        return this;
+    }
+
+    private void ScanDir(File file, ArrayList<FileInfo> filesToAccess) throws IOException {
         logger.info("Processing directory " + file.getAbsolutePath());
         File[] filesInDir = file.listFiles();
         for (File filesInDir1 : filesInDir) {
-//            String fileType = Files.probeContentType(filesInDir[j].toPath());
-//
-//            logger.info(filesInDir[j].getName() + "- type:" + fileType);
             if (filesInDir1.isFile()) {
-//                FileInfo fileInfo = getFileInfo(filesInDir[j]);
-//                extendFilesList(filesToAccess, fileInfo);
                 LogFileWrapper logFile = LogFileWrapper.getContainer(filesInDir1);
                 if (logFile != null) {
                     extendFilesList(filesToAccess, logFile);
                 }
             } else if (filesInDir1.isDirectory() && m_scanDir && !isLogBRDir(filesInDir1)) {
-                ScanDir(filesInDir1);
+                ScanDir(filesInDir1, filesToAccess);
             }
         }
     }
@@ -274,6 +333,9 @@ public class Main {
                     parser.doneParsingFile();
                     fileInfo.setFileEndTime(parser.getLastTimeStamp());
                     m_FileInfoTable.AddToDB(fileInfo);
+                    Main.getMain().getProcessedFiles().put(fileInfo.getLogFileName(),
+                            new ProcessedFiles(fileInfo.getLogFileName(), fileInfo.getLastID(),
+                                    fileInfo.getSize()));
                     parsingInput.close();
                 }
 
@@ -444,19 +506,79 @@ public class Main {
         }
     }
 
-    @SuppressWarnings("UseOfSystemOutOrSystemErr")
-    private void parseAll(String scanDir, String dbname, String alias) throws Exception {
-        if (!setCurrentDirectory(scanDir)) {
-            logger.error("Cannot cd to directory [" + scanDir + "]. Exiting");
+    synchronized public void processAddedFile(File newFile) {
+        if (initialRun.get() == false) {
+            kickQeueueManager();
+            initialRun.set(true);
+        }
+        logger.info("queueing " + newFile);
+        fileQueue.add(newFile);
+    }
+
+    private void kickQeueueManager() {
+        managerThreads.execute(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    logger.info("Starting manager thread");
+                    initAndParse(false);
+                    logger.info("Done initial scan");
+                    while (!queueEnd.get() || !fileQueue.isEmpty()) {
+                        File fileFromQueue;
+                        while (
+                                (fileFromQueue = fileQueue.poll()) != null)
+                            parserThreads.execute(new TheParserThread(fileFromQueue));
+                        Thread.sleep(300);
+                    }
+                    logger.info("Done kickQeueueManager");
+                } catch (InterruptedException e) {
+                    logger.info("queue manager interrupted");
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
+
+    public void processAddedFile(Path newFile) {
+        processAddedFile(newFile.toFile());
+    }
+
+    private synchronized Pair<Long, Long> getDBFile(String f) throws SQLException {
+        ArrayList<ArrayList<Long>> iDs = m_accessor.getIDsMultiple(
+                "select id, size from file_logbr where intfilename = '"
+                        + f + "'"
+                        //                            + "and size=" + fi.getSize()
+                        + " ;");
+        if (iDs == null || iDs.size() == 0) {
+            return null;
+        } else {
+//            long fileID = iDs.get(0).get(0);
+//            long size = iDs.get(0).get(1);
+            return new Pair<>(iDs.get(0).get(0), iDs.get(0).get(1));
+        }
+    }
+
+    /**
+     * Initialize database and parse all files found in work directory
+     *
+     * @param exitOnEmpty exit if no new files found
+     * @return true if files were parsed and finalize needed; false otherwise
+     * @throws Exception
+     */
+    synchronized private boolean initAndParse(boolean exitOnEmpty) throws Exception {
+        ArrayList<FileInfo> filesToAccess = new ArrayList();
+
+        if (!setCurrentDirectory(baseDir)) {
+            logger.error("Cannot cd to directory [" + baseDir + "]. Exiting");
             System.exit(1);
         }
-        String startDir = ".";
+        String startDir = baseDir;
 
-        Instant start = Instant.now();
 
         File f = new File(startDir);
         if (f.isDirectory()) {
-            ScanDir(f);
+            ScanDir(f, filesToAccess);
         } else {
             LogFileWrapper log = LogFileWrapper.getContainer(f);
             if (log != null) {
@@ -465,11 +587,11 @@ public class Main {
         }
 
         try {
-            m_accessor = new SqliteAccessor(dbname, alias);
+            m_accessor = new SqliteAccessor(dbName, alias);
 
         } catch (Exception e) {
             System.out.println("Could not create accessor: " + e);
-            return;
+            return false;
         }
         boolean restartParsing = false;
         ArrayList<FileInfo> filesToProcess = new ArrayList();
@@ -477,31 +599,24 @@ public class Main {
 
         try {
             if (m_accessor.TableExist("file_logbr")) {
+                initStatic(m_accessor);
+
                 setDBExisted(true);
-                int i;
-                for (i = 0; i < filesToAccess.size(); i++) {
-                    String logFileName = filesToAccess.get(i).getLogFileName();
+                for (FileInfo fi : filesToAccess) {
+                    String logFileName = fi.getLogFileName();
                     if (logFileName != null && !logFileName.isEmpty()) { // fix for error resulting in empty DB. workspace file names are empty
-                        ArrayList<ArrayList<Long>> iDs = m_accessor.getIDsMultiple(
-                                "select id, size from file_logbr where intfilename = '"
-                                        + filesToAccess.get(i).getLogFileName() + "'"
-                                        //                            + "and size=" + filesToAccess.get(i).getSize()
-                                        + " ;");
-                        if (iDs == null || iDs.size() == 0) {
-                            logger.debug("Will process file [" + filesToAccess.get(i).getM_path() + "]");
-                            filesToProcess.add(filesToAccess.get(i));
+                        ProcessedFiles pf = getProcessedFiles().get(fi.getLogFileName());
+                        if (pf==null) {
+                            logger.debug("Will process file [" + fi.getM_path() + "]");
+                            filesToProcess.add(fi);
                         } else {
-                            long fileID = iDs.get(0).get(0);
-                            long size = iDs.get(0).get(1);
-                            if (size < filesToAccess.get(i).getSize()) {
-                                logger.info(filesToAccess.get(i).getLogFileName()
-                                        + " id(" + fileID + ")"
-                                        + ": size[" + filesToAccess.get(i).getSize()
-                                        + "] size in DB[" + size + "]; file data to be removed");
-                                filesToDelete.add(fileID);
-                                filesToProcess.add(filesToAccess.get(i));
-//                                restartParsing = true;
-//                                break;
+                            if (pf.getSize() < fi.getSize()) {
+                                logger.info(fi.getLogFileName()
+                                        + " id(" + pf.getId() + ")"
+                                        + ": size[" + fi.getSize()
+                                        + "] size in DB[" + pf.getSize() + "]; file data to be removed");
+                                filesToDelete.add(pf.getId());
+                                filesToProcess.add(fi);
                             }
                         }
                     }
@@ -520,7 +635,7 @@ public class Main {
                 filesToProcess.add(filesToAccess.get(i));
             }
             f = null;
-            for (String file : new String[]{dbname, dbname + ".db"}) {
+            for (String file : new String[]{dbName, dbName + ".db"}) {
                 try {
                     f = new File(file);
                     if (f.exists()) {
@@ -535,16 +650,17 @@ public class Main {
                     logger.error("Unable to delete file " + f, e);
                     JOptionPane.showMessageDialog(null, "Unable to delete file "
                             + f + "\n", "Error", JOptionPane.ERROR_MESSAGE);
-                    return;
+                    return false;
                 }
             }
-            m_accessor = new SqliteAccessor(dbname, alias);
-        } else if (filesToProcess.isEmpty()) {
-            logger.info("No new log files found; parser exit");
-            return;
-        } else {
-            initStatic(m_accessor);
+            m_accessor = new SqliteAccessor(dbName, alias);
         }
+        if (filesToProcess.isEmpty()) {
+            logger.info("No new log files found");
+            if (exitOnEmpty)
+                return false;
+        }
+        initStatic(m_accessor);
         m_accessor.setFilesToDelete(filesToDelete);
 
         logger.info("Initializing...");
@@ -558,26 +674,32 @@ public class Main {
             tabRefs.doNotSave(ReferenceType.HANDLER);
         }
 
-//        try {
-//            m_logDB = new LogDB(logdb);
-//        } catch (Exception e) {
-//            System.out.println("Could not init logs DB: " + e);
-//            return;
-//        }
-        Path dir = Paths.get(dbname);
+        Path dir = Paths.get(dbName);
         dir = dir.getParent();
         String dirName = dir.toString();
         FileInfo dirInfo = new FileInfo();
         dirInfo.m_path = dirName;
-        //dirInfo.AddToDB(m_accessor);
-//        m_FileInfoTable.AddToDB(dirInfo);
 
         for (int i = 0; i < filesToProcess.size(); i++) {
             FileInfo newFile = filesToProcess.get(i);
             Main.logger.info("processing file : " + newFile.getM_path() + ((newFile.getArchiveName() == null) ? "" : ", archive: " + newFile.getArchiveName()) + " (" + (i + 1) + " of " + filesToProcess.size() + ")");
             Parse(newFile);
         }
+        return true;
+    }
 
+    @SuppressWarnings("UseOfSystemOutOrSystemErr")
+    private void parseAll() throws Exception {
+        Instant start = Instant.now();
+
+        if (initAndParse(true)) {
+            logger.info("Parsing took " + pDuration(Duration.between(start, Instant.now()).toMillis()) + ".");
+            finalizeWork();
+        }
+        logger.info("All done. Completed in " + pDuration(Duration.between(start, Instant.now()).toMillis()) + "; processed " + totalFiles + " files (" + formatSize(totalBytes) + ")");
+    }
+
+    private void finalizeWork() throws Exception {
         m_accessor.DoneInserts();
         m_accessor.Commit();
         m_accessor.exit();
@@ -586,7 +708,6 @@ public class Main {
         tabRefs.Finalize();
 
         try {
-            logger.info("Parsing took " + pDuration(Duration.between(start, Instant.now()).toMillis()) + ".");
             if (FileInfoTable.getFilesAdded() == 0 || totalFiles == 0) {
                 logger.info("No Genesys logs found.");
             } else {
@@ -601,12 +722,9 @@ public class Main {
                 FinalizeParsers();
 
             }
-//            m_accessor.exit();
-//            m_logDB.Close();
             m_accessor.Commit();
             m_accessor.Close(true);
 
-            logger.info("All done. Completed in " + pDuration(Duration.between(start, Instant.now()).toMillis()) + "; processed " + totalFiles + " files (" + formatSize(totalBytes) + ")");
         } catch (Exception e) {
             logger.error("Exit exception " + e, e);
         }
@@ -741,6 +859,24 @@ public class Main {
     private boolean isLogBRDir(File file) {
         return FilenameUtils.normalizeNoEndSeparator(file.getAbsolutePath())
                 .equalsIgnoreCase(ee.getLogbrowserDir());
+    }
+
+    public void finishParsing() throws Exception {
+        queueEnd.set(true);
+        managerThreads.shutdown();
+        managerThreads.awaitTermination(5, TimeUnit.DAYS);
+        parserThreads.shutdown();
+        parserThreads.awaitTermination(5, TimeUnit.DAYS);
+        finalizeWork();
+    }
+
+    synchronized public ProcessedFilesSet getProcessedFiles() {
+        return processedFiles;
+    }
+
+    private static class MainHolder {
+
+        private static final Main INSTANCE = new Main();
     }
 
     static class Constants extends HashMap<GenesysConstants, HashMap<Integer, String>> {
@@ -953,7 +1089,7 @@ public class Main {
             String msg = "Uncaught Exception in thread '" + t + "'";
             logger.error(msg, e);
             StringWriter sw = new StringWriter();
-            sw.append("msg: " + t);
+            sw.append("msg: ").append(t);
             sw.append("\nCall stack:\n");
             e.printStackTrace(new PrintWriter(sw));
             if (errs != null) {
@@ -1187,6 +1323,82 @@ public class Main {
             }
         }
 
+    }
+
+    class ProcessedFilesSet extends HashMap<String, ProcessedFiles> {
+
+        //"select id, intfilename, size from file_logbr
+        public void loadFiles(ArrayList<ArrayList<Object>> objMultiple) {
+            clear();
+            if (objMultiple != null) {
+                for (ArrayList<Object> row : objMultiple) {
+                    Object id = row.get(0);
+                    Object size = row.get(2);
+                    put((String) row.get(1), new ProcessedFiles(row.get(1).toString(),
+                            (id == null) ? 0 : Long.valueOf(id.toString()),
+                            (size == null) ? 0 : Long.valueOf(size.toString())));
+                }
+            }
+        }
+    }
+
+    class TheParserThread implements Runnable {
+
+        private final File file;
+
+        public TheParserThread(File file) {
+            this.file = file;
+        }
+
+        @Override
+        public void run() {
+//            Thread.currentThread().setName("parser");
+            LogFileWrapper logFile = LogFileWrapper.getContainer(file);
+            for (FileInfo fi : logFile.getFileInfos()) {
+                logger.info("Processing added file: [" + fi.getM_path() + "] log name [" + fi.getLogFileName() + "]");
+
+                Pair<Long, Long> dbFile = null;
+//                try {
+                ProcessedFiles processedFiles = Main.getInstance().getProcessedFiles().get(fi.getLogFileName());
+                if (processedFiles != null) {
+                    if (processedFiles.getSize() < fi.getSize()) {
+                        logger.info(fi.getLogFileName()
+                                + " id(" + processedFiles.getId() + ")"
+                                + ": size[" + fi.getSize()
+                                + "] size in DB[" + processedFiles.getSize() + "]; file data to be removed");
+                        m_accessor.addFileToDelete(processedFiles.getId());
+                    } else {
+                        logger.info(fi.getLogFileName()
+                                + " id(" + processedFiles.getId() + ")"
+                                + ": size[" + fi.getSize()
+                                + "] size in DB[" + processedFiles.getSize() + "]; new file ignored");
+                        continue;
+                    }
+                }
+//                    dbFile = getDBFile(fi.getLogFileName());
+//                    if (dbFile != null) {
+//                        long fileID = dbFile.getKey();
+//                        long size = dbFile.getValue();
+//                        if (size < fi.getSize()) {
+//                            logger.info(fi.getLogFileName()
+//                                    + " id(" + fileID + ")"
+//                                    + ": size[" + fi.getSize()
+//                                    + "] size in DB[" + size + "]; file data to be removed");
+//                            m_accessor.addFileToDelete(fileID);
+//                        } else {
+//                            logger.info(fi.getLogFileName()
+//                                    + " id(" + fileID + ")"
+//                                    + ": size[" + fi.getSize()
+//                                    + "] size in DB[" + size + "]; new file ignored");
+//                            continue;
+//                        }
+//                    }
+                Parse(fi);
+//                } catch (SQLException e) {
+//                    logger.error("Exception parsing file", e);
+//                }
+            }
+        }
     }
 
 }

@@ -14,8 +14,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 
-import static com.myutils.logbrowser.indexer.Main.getSQLiteaccessor;
-
 /**
  * @author ssydoruk
  */
@@ -32,7 +30,7 @@ class TableReference {
         valRef = new HashMap<>();
         maxID = 0;
         if (Main.isDbExisted()) {
-            SqliteAccessor dbAccessor = getSQLiteaccessor();
+            SqliteAccessor dbAccessor = Main.getInstance().getM_accessor();
             try {
                 if (dbAccessor.TableExist(type.toString())) {
                     ResultSet rs = dbAccessor.executeQuery("select name, id from " + type);

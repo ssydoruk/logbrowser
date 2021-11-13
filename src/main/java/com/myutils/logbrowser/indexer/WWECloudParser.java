@@ -253,10 +253,10 @@ public class WWECloudParser extends Parser {
 
     @Override
     void init(HashMap<TableType, DBTable> m_tables) {
-        m_tables.put(TableType.WWECloud, new WWECloudTable(Main.getM_accessor(), TableType.WWECloud));
-        m_tables.put(TableType.WWECloudAuth, new WWECloudAuthTab(Main.getM_accessor(), TableType.WWECloudAuth));
-        m_tables.put(TableType.WWECloudException, new WWECloudExeptionTab(Main.getM_accessor(), TableType.WWECloudException));
-        m_tables.put(TableType.WWECloudLog, new WWECloudLogTab(Main.getM_accessor(), TableType.WWECloudLog));
+        m_tables.put(TableType.WWECloud, new WWECloudTable(Main.getInstance().getM_accessor(), TableType.WWECloud));
+        m_tables.put(TableType.WWECloudAuth, new WWECloudAuthTab(Main.getInstance().getM_accessor(), TableType.WWECloudAuth));
+        m_tables.put(TableType.WWECloudException, new WWECloudExeptionTab(Main.getInstance().getM_accessor(), TableType.WWECloudException));
+        m_tables.put(TableType.WWECloudLog, new WWECloudLogTab(Main.getInstance().getM_accessor(), TableType.WWECloudLog));
 
     }
 

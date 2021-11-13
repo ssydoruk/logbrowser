@@ -908,9 +908,9 @@ public class OrsParser extends Parser {
 
     @Override
     void init(HashMap<TableType, DBTable> m_tables) {
-        m_tables.put(TableType.ORSCallID, new ORSCallIDTable(Main.getM_accessor(), TableType.ORSCallID));
-        m_tables.put(TableType.ORSAlarm, new ORSAlarmTable(Main.getM_accessor(), TableType.ORSAlarm));
-        m_tables.put(TableType.ORSSessionStart, new ORSSessionStartTable(Main.getM_accessor(), TableType.ORSSessionStart));
+        m_tables.put(TableType.ORSCallID, new ORSCallIDTable(Main.getInstance().getM_accessor(), TableType.ORSCallID));
+        m_tables.put(TableType.ORSAlarm, new ORSAlarmTable(Main.getInstance().getM_accessor(), TableType.ORSAlarm));
+        m_tables.put(TableType.ORSSessionStart, new ORSSessionStartTable(Main.getInstance().getM_accessor(), TableType.ORSSessionStart));
 
     }
 

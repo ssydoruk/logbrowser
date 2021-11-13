@@ -166,7 +166,7 @@ public abstract class Parser {
     }
 
     public static boolean isParseTimeDiff() {
-        return Main.ee.isParseTDiff();
+        return Main.getInstance().getEe().isParseTDiff();
     }
 
     static public boolean isSessionID(String resp) {
@@ -969,7 +969,7 @@ public abstract class Parser {
         private final FileInfoType type;
 
         public CustomLineTable(FileInfoType t) {
-            super(Main.getSQLiteaccessor());
+            super(Main.getInstance().getM_accessor());
             this.type = t;
         }
 
@@ -1079,7 +1079,7 @@ public abstract class Parser {
         }
 
         public CustomAttributeTable(FileInfoType t) {
-            this(Main.getSQLiteaccessor());
+            this(Main.getInstance().getM_accessor());
             this.type = t;
         }
 
