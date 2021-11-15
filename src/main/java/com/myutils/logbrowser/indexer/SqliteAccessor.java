@@ -61,18 +61,21 @@ public final class SqliteAccessor extends Thread implements DBAccessor {
 //            }
             m_conn = DriverManager.getConnection("jdbc:sqlite:" + name);
 
-            String s = "PRAGMA main.page_size = 4096;\n"
-                    + "PRAGMA main.cache_size=10000;\n"
-                    + "PRAGMA main.locking_mode=EXCLUSIVE;\n"
-                    + "PRAGMA main.synchronous=OFF;\n"
+            String s = "PRAGMA page_size = 32768;\n"
+                    + "PRAGMA cache_size=10000;\n"
+                    + "PRAGMA locking_mode=EXCLUSIVE;\n"
+                    +"pragma temp_store = memory;\n"
+                    +"pragma mmap_size = 30000000000;\n"
+                    + "PRAGMA synchronous=OFF;\n"
                     //                    + "PRAGMA main.cache_size=5000;\n"
-                    + "PRAGMA main.automatic_index=false;\n";
+                    + "PRAGMA automatic_index=false;\n";
 
             if (Main.getInstance().getEe().isSqlPragma()) {
-                s += "PRAGMA main.journal_mode=MEMORY;\n";
+                s += "PRAGMA journal_mode=WAL;\n";
             } else {
                 logger.info("SQLite pragmas not turned");
             }
+
             logger.info("Executing pragmas: " + s);
             runQuery(s);
 
