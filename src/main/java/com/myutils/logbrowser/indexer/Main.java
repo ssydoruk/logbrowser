@@ -282,12 +282,12 @@ public class Main {
     }
 
     public Main init(ExecutionEnvironment ee) throws Exception {
+        initExecutor(1);
         this.dbName = ee.getDbname();
         this.baseDir = ee.getBaseDir();
         this.alias = ee.getAlias();
         setEe(ee);
         setXMLCfg(ee.getXmlCFG());
-        initExecutor(1);
         return this;
     }
 
@@ -507,37 +507,37 @@ public class Main {
     }
 
     synchronized public void processAddedFile(File newFile) {
-        if (initialRun.get() == false) {
-            kickQeueueManager();
-            initialRun.set(true);
-        }
+        kickQeueueManager();
         logger.info("queueing " + newFile);
         fileQueue.add(newFile);
     }
 
-    private void kickQeueueManager() {
-        managerThreads.execute(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    logger.info("Starting manager thread");
-                    initAndParse(false);
-                    logger.info("Done initial scan");
-                    while (!queueEnd.get() || !fileQueue.isEmpty()) {
-                        File fileFromQueue;
-                        while (
-                                (fileFromQueue = fileQueue.poll()) != null)
-                            parserThreads.execute(new TheParserThread(fileFromQueue));
-                        Thread.sleep(300);
+    public void kickQeueueManager() {
+        if (initialRun.get() == false) {
+            managerThreads.execute(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        logger.info("Starting manager thread");
+                        initAndParse(false);
+                        logger.info("Done initial scan");
+                        while (!queueEnd.get() || !fileQueue.isEmpty()) {
+                            File fileFromQueue;
+                            while (
+                                    (fileFromQueue = fileQueue.poll()) != null)
+                                parserThreads.execute(new TheParserThread(fileFromQueue));
+                            Thread.sleep(300);
+                        }
+                        logger.info("Done kickQeueueManager");
+                    } catch (InterruptedException e) {
+                        logger.info("queue manager interrupted");
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
-                    logger.info("Done kickQeueueManager");
-                } catch (InterruptedException e) {
-                    logger.info("queue manager interrupted");
-                } catch (Exception e) {
-                    e.printStackTrace();
                 }
-            }
-        });
+            });
+            initialRun.set(true);
+        }
     }
 
     public void processAddedFile(Path newFile) {
@@ -862,12 +862,14 @@ public class Main {
     }
 
     public void finishParsing() throws Exception {
+        logger.info("Finish parsing");
         queueEnd.set(true);
         managerThreads.shutdown();
         managerThreads.awaitTermination(5, TimeUnit.DAYS);
         parserThreads.shutdown();
         parserThreads.awaitTermination(5, TimeUnit.DAYS);
         finalizeWork();
+        logger.info("Finish done");
     }
 
     synchronized public ProcessedFilesSet getProcessedFiles() {
