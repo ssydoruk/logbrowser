@@ -71,11 +71,11 @@ public class ProxiedTable extends DBTable {
     }
 
     @Override
-    public void AddToDB(Record _rec) {
+        public void AddToDB(Record _rec) throws SQLException {
         ProxiedMessage rec = (ProxiedMessage) _rec;
-        PreparedStatement stmt = getM_dbAccessor().GetStatement(m_InsertStatementId);
-
-        try {
+         getM_dbAccessor().addToDB(m_InsertStatementId, new IFillStatement() {
+                @Override
+                public void fillStatement(PreparedStatement stmt) throws SQLException{
             stmt.setTimestamp(1, new Timestamp(rec.GetAdjustedUsecTime()));
             stmt.setInt(2, ProxiedMessage.getFileId());
             stmt.setLong(3, rec.getM_fileOffset());
@@ -86,15 +86,15 @@ public class ProxiedTable extends DBTable {
             setFieldInt(stmt, 7, Main.getRef(ReferenceType.TEvent, rec.getEvent()));
             setFieldInt(stmt, 8, Main.getRef(ReferenceType.App, rec.getTo()));
             setFieldInt(stmt, 9, Main.getRef(ReferenceType.App, rec.getFrom()));
-            setFieldInt(stmt, 10, Main.getRef(ReferenceType.DN, Record.cleanDN(rec.getDn())));
+            setFieldInt(stmt, 10, Main.getRef(ReferenceType.DN, rec.cleanDN(rec.getDn())));
             stmt.setInt(11, ProxiedMessage.m_tlibId);
             stmt.setInt(12, ProxiedMessage.m_handlerId);
             m_proxiedId++;
 
-            getM_dbAccessor().SubmitStatement(m_InsertStatementId);
-        } catch (SQLException e) {
-            Main.logger.error("Could not add record type " + m_type.toString() + ": " + e, e);
-        }
+                        }
+        });
     }
+
+
 
 }

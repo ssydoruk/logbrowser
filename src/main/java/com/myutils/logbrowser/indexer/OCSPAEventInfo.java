@@ -13,16 +13,16 @@ public class OCSPAEventInfo extends Message {
 
     //	OwnerDBID: 165; OriginDBID: 0; RecHandle: 0; ConnID: ; PlaceDBID: 279; AgentDBID: 452; Agent/Place: CINTIASA
 //	CurrentStatType: AgentBusy; CallType: Inbound; NotAvailableFlag: 0;  
-    final private static Matcher regCGDBID = Pattern.compile("\\sOwnerSessionDBID: (\\d+);").matcher("");
-    final private static Matcher regPlaceDBID = Pattern.compile("\\sPlaceDBID: (\\d+);").matcher("");
-    final private static Matcher regAgentDBID = Pattern.compile("\\sAgentDBID: (\\d+);").matcher("");
-    final private static Matcher regAgent = Pattern.compile("\\s+Agent/Place:\\s+(\\S.+)").matcher("");
-    final private static Matcher regAgentCurrentStatType = Pattern.compile("\\s*CurrentStatType:\\s(\\S[^;]+);").matcher("");
-    final private static Matcher regAgentStatType = Pattern.compile("\\s*StatType:\\s+(\\S[^;]+);").matcher("");
-    final private static Matcher regAgentSessionState = Pattern.compile("\\s*SessionState:\\s+(\\S[^;]+);").matcher("");
-    final private static Matcher regAgentCallType = Pattern.compile("\\sCallType:\\s+(\\S[^;]+);").matcher("");
-    final private static Matcher regRecHandle = Pattern.compile("RecHandle: (\\d+);").matcher("");
-    final private static Matcher regCallResult = Pattern.compile("CallResult: ([1-9][^;]*);$").matcher("");
+    private static final Pattern regCGDBID = Pattern.compile("\\sOwnerSessionDBID: (\\d+);");
+    private static final Pattern regPlaceDBID = Pattern.compile("\\sPlaceDBID: (\\d+);");
+    private static final Pattern regAgentDBID = Pattern.compile("\\sAgentDBID: (\\d+);");
+    private static final Pattern regAgent = Pattern.compile("\\s+Agent/Place:\\s+(\\S.+)");
+    private static final Pattern regAgentCurrentStatType = Pattern.compile("\\s*CurrentStatType:\\s(\\S[^;]+);");
+    private static final Pattern regAgentStatType = Pattern.compile("\\s*StatType:\\s+(\\S[^;]+);");
+    private static final Pattern regAgentSessionState = Pattern.compile("\\s*SessionState:\\s+(\\S[^;]+);");
+    private static final Pattern regAgentCallType = Pattern.compile("\\sCallType:\\s+(\\S[^;]+);");
+    private static final Pattern regRecHandle = Pattern.compile("RecHandle: (\\d+);");
+    private static final Pattern regCallResult = Pattern.compile("CallResult: ([1-9][^;]*);$");
 
     public OCSPAEventInfo(ArrayList<String> messageLines) {
         super(TableType.OCSPAEventInfo, messageLines);

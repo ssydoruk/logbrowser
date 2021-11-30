@@ -59,11 +59,12 @@ public class ORSSidIxnIDTable extends DBTable {
     }
 
     @Override
-    public void AddToDB(Record aRec) {
-        OrsSidIxnID rec = (OrsSidIxnID) aRec;
-        PreparedStatement stmt = getM_dbAccessor().GetStatement(m_InsertStatementId);
+        public void AddToDB(Record _rec) throws SQLException {
 
-        try {
+        OrsSidIxnID rec = (OrsSidIxnID) _rec;
+         getM_dbAccessor().addToDB(m_InsertStatementId, new IFillStatement() {
+                @Override
+                public void fillStatement(PreparedStatement stmt) throws SQLException{
             stmt.setTimestamp(1, new Timestamp(rec.GetAdjustedUsecTime()));
             stmt.setInt(2, OrsSidIxnID.getFileId());
             stmt.setLong(3, rec.getM_fileOffset());
@@ -74,11 +75,10 @@ public class ORSSidIxnIDTable extends DBTable {
             setFieldInt(stmt, 7, Main.getRef(ReferenceType.IxnID, rec.getIxnID()));
             setFieldInt(stmt, 8, Main.getRef(ReferenceType.URSStrategyName, rec.getURL()));
             setFieldInt(stmt, 9, Main.getRef(ReferenceType.URSStrategyName, rec.getApp()));
-            getM_dbAccessor().SubmitStatement(m_InsertStatementId);
-        } catch (SQLException e) {
-            Main.logger.error("Could not add message type " + getM_type() + ": " + e, e);
-        }
-
+                        }
+        });
     }
+
+
 
 }

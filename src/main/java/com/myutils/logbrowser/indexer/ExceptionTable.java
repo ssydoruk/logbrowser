@@ -54,11 +54,11 @@ public class ExceptionTable extends DBTable {
     }
 
     @Override
-    public void AddToDB(Record rec) {
+    public void AddToDB(Record rec) throws SQLException {
         ExceptionMessage exceptionRec = (ExceptionMessage) rec;
-        PreparedStatement stmt = getM_dbAccessor().GetStatement(m_InsertStatementId);
-
-        try {
+         getM_dbAccessor().addToDB(m_InsertStatementId, new IFillStatement() {
+                @Override
+                public void fillStatement(PreparedStatement stmt) throws SQLException{
 
             stmt.setTimestamp(1, new Timestamp(exceptionRec.GetAdjustedUsecTime()));
             stmt.setInt(2, ExceptionMessage.getFileId());
@@ -69,11 +69,10 @@ public class ExceptionTable extends DBTable {
             setFieldInt(stmt, 6, Main.getRef(ReferenceType.Exception, exceptionRec.getException()));
             setFieldInt(stmt, 7, Main.getRef(ReferenceType.ExceptionMessage, exceptionRec.getExceptionMessage()));
 
-            getM_dbAccessor().SubmitStatement(m_InsertStatementId);
-        } catch (SQLException e) {
-            Main.logger.error("Could not add message type " + getM_type() + ": " + e, e);
-        }
-
+                        }
+        });
     }
+
+
 
 }

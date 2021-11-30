@@ -11,9 +11,9 @@ import java.util.regex.Pattern;
 
 public class StStatus extends Message {
 
-    private static final Matcher regStatusLineAgent = Pattern.compile("^Status: (Capacity snapshot) for agent '([^']+)'(?:.+, place '([^']+)')?").matcher("");
-    private static final Matcher regStatusLinePlace = Pattern.compile("^Status: (Capacity snapshot) for place '([^']+)'(?:.+, agent '([^']+)')?").matcher("");
-    private static final Matcher regStatusLineDN = Pattern.compile("^Status: (Capacity snapshot) for \\w+ '([^@']+)").matcher("");
+    private static final Pattern regStatusLineAgent = Pattern.compile("^Status: (Capacity snapshot) for agent '([^']+)'(?:.+, place '([^']+)')?");
+    private static final Pattern regStatusLinePlace = Pattern.compile("^Status: (Capacity snapshot) for place '([^']+)'(?:.+, agent '([^']+)')?");
+    private static final Pattern regStatusLineDN = Pattern.compile("^Status: (Capacity snapshot) for \\w+ '([^@']+)");
 
     private String plGroup = null;
     private String agent = null;
@@ -26,15 +26,15 @@ public class StStatus extends Message {
     public StStatus(String name, ArrayList messageLines) {
         super(TableType.StStatus, messageLines);
         Matcher m;
-        if ((m = regStatusLineAgent.reset(name)).find()) {
+        if ((m = regStatusLineAgent.matcher(name)).find()) {
             plGroup = m.group(1);
             agent = m.group(2);
             place = m.group(3);
-        } else if ((m = regStatusLinePlace.reset(name)).find()) {
+        } else if ((m = regStatusLinePlace.matcher(name)).find()) {
             plGroup = m.group(1);
             place = m.group(2);
             agent = m.group(3);
-        } else if ((m = regStatusLineDN.reset(name)).find()) {
+        } else if ((m = regStatusLineDN.matcher(name)).find()) {
             plGroup = m.group(1);
             dn = m.group(2);
         } else {

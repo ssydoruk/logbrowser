@@ -87,11 +87,11 @@ public class WWETable extends DBTable {
     }
 
     @Override
-    public void AddToDB(Record rec) {
+    public void AddToDB(Record rec) throws SQLException {
         WWEMessage wweRec = (WWEMessage) rec;
-        PreparedStatement stmt = getM_dbAccessor().GetStatement(m_InsertStatementId);
-
-        try {
+         getM_dbAccessor().addToDB(m_InsertStatementId, new IFillStatement() {
+                @Override
+                public void fillStatement(PreparedStatement stmt) throws SQLException{
 
             stmt.setTimestamp(1, new Timestamp(wweRec.GetAdjustedUsecTime()));
             stmt.setInt(2, WWEMessage.getFileId());
@@ -104,21 +104,20 @@ public class WWETable extends DBTable {
             setFieldInt(stmt, 8, Main.getRef(ReferenceType.UUID, wweRec.getUUID()));
             setFieldInt(stmt, 9, wweRec.getM_refID());
             stmt.setBoolean(10, wweRec.isInbound());
-            setFieldInt(stmt, 11, Main.getRef(ReferenceType.DN, Record.cleanDN(wweRec.getThisDN())));
+            setFieldInt(stmt, 11, Main.getRef(ReferenceType.DN, rec.cleanDN(wweRec.getThisDN())));
             setFieldInt(stmt, 12, Main.getRef(ReferenceType.TEvent, wweRec.getEventName()));
             setFieldInt(stmt, 13, wweRec.getSeqNo());
             setFieldInt(stmt, 14, Main.getRef(ReferenceType.TEvent, wweRec.getIxnID()));
             setFieldInt(stmt, 15, Main.getRef(ReferenceType.App, wweRec.getServerID()));
-            setFieldInt(stmt, 16, Main.getRef(ReferenceType.DN, Record.cleanDN(wweRec.getOtherDN())));
+            setFieldInt(stmt, 16, Main.getRef(ReferenceType.DN, rec.cleanDN(wweRec.getOtherDN())));
             setFieldInt(stmt, 17, Main.getRef(ReferenceType.Agent, wweRec.getAgentID()));
-            setFieldInt(stmt, 18, Main.getRef(ReferenceType.DN, Record.cleanDN(wweRec.getDNIS())));
-            setFieldInt(stmt, 19, Main.getRef(ReferenceType.DN, Record.cleanDN(wweRec.getANI())));
+            setFieldInt(stmt, 18, Main.getRef(ReferenceType.DN, rec.cleanDN(wweRec.getDNIS())));
+            setFieldInt(stmt, 19, Main.getRef(ReferenceType.DN, rec.cleanDN(wweRec.getANI())));
 
-            getM_dbAccessor().SubmitStatement(m_InsertStatementId);
-        } catch (SQLException e) {
-            Main.logger.error("Could not add message type " + getM_type() + ": " + e, e);
-        }
-
+                        }
+        });
     }
+
+
 
 }

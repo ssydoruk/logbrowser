@@ -13,17 +13,17 @@ import static Utils.Util.intOrDef;
 
 public class LCAClient extends Message {
 
-    private static final Matcher reqCreateApplication = Pattern.compile("CREATE Application <(\\w+), ([^,]+), pid=(\\w+),").matcher("");
-    private static final Matcher reqRequestor = Pattern.compile("^([^:]+):").matcher(""); // implying that timestamp for first line is cut out
-    private static final Matcher reqModeChange = Pattern.compile("to (\\w+) for App<(\\w+), (.+), pid=(\\w+), ([^,]+), (\\w+)>$").matcher("");
-    private static final Matcher reqApp = Pattern.compile("App\\s*<(\\w+), (.+), pid=(\\w+),").matcher("");
-    private static final Matcher reqEvent = Pattern.compile("\\[(\\w+)").matcher(""); // implying that timestamp for first line is cut out
-    private static final Matcher reqRegisterApp = Pattern.compile("\\[RRequestRegisterApplication\\] App<(\\w+), ([^,]+), pid=(\\w+)").matcher("");
-    private static final Matcher reqIPAddress = Pattern.compile("IP-address: (\\w+\\.\\w+\\.\\w+\\.\\w+)").matcher("");
-    private static final Matcher reqSCS = Pattern.compile("CREATE SCSRequester .+:(\\w+),\\s*'(.+)'\\)").matcher("");
-    private static final Matcher reqFD = Pattern.compile("new client (\\w+)").matcher("");
-    private static final Matcher reqDisconnectApp = Pattern.compile("App<(\\w+), (.+), pid=(\\w+)").matcher("");
-    private static final Matcher reqDisconnectSCS = Pattern.compile("SCSRequester '(.+)' disconnected, fd=(\\w+)").matcher("");
+    private static final Pattern reqCreateApplication = Pattern.compile("CREATE Application <(\\w+), ([^,]+), pid=(\\w+),");
+    private static final Pattern reqRequestor = Pattern.compile("^([^:]+):"); // implying that timestamp for first line is cut out
+    private static final Pattern reqModeChange = Pattern.compile("to (\\w+) for App<(\\w+), (.+), pid=(\\w+), ([^,]+), (\\w+)>$");
+    private static final Pattern reqApp = Pattern.compile("App\\s*<(\\w+), (.+), pid=(\\w+),");
+    private static final Pattern reqEvent = Pattern.compile("\\[(\\w+)"); // implying that timestamp for first line is cut out
+    private static final Pattern reqRegisterApp = Pattern.compile("\\[RRequestRegisterApplication\\] App<(\\w+), ([^,]+), pid=(\\w+)");
+    private static final Pattern reqIPAddress = Pattern.compile("IP-address: (\\w+\\.\\w+\\.\\w+\\.\\w+)");
+    private static final Pattern reqSCS = Pattern.compile("CREATE SCSRequester .+:(\\w+),\\s*'(.+)'\\)");
+    private static final Pattern reqFD = Pattern.compile("new client (\\w+)");
+    private static final Pattern reqDisconnectApp = Pattern.compile("App<(\\w+), (.+), pid=(\\w+)");
+    private static final Pattern reqDisconnectSCS = Pattern.compile("SCSRequester '(.+)' disconnected, fd=(\\w+)");
 
     private String event = null;
     private String requestor;
@@ -133,7 +133,7 @@ public class LCAClient extends Message {
     void parseChangeRunMode() {
         requestor = FindByRx(reqRequestor, m_MessageLines.get(0), 1, null);
         Matcher m;
-        if (m_MessageLines.size() > 1 && (m = reqModeChange.reset(m_MessageLines.get(1))).find()) {
+        if (m_MessageLines.size() > 1 && (m = reqModeChange.matcher(m_MessageLines.get(1))).find()) {
             setMode(m.group(1));
             setAppName(m.group(3));
             setAppDBID(m.group(2));

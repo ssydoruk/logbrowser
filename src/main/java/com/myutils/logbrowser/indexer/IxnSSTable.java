@@ -94,11 +94,11 @@ public class IxnSSTable extends DBTable {
     }
 
     @Override
-    public void AddToDB(Record _rec) {
+        public void AddToDB(Record _rec) throws SQLException {
         IxnSS rec = (IxnSS) _rec;
-        PreparedStatement stmt = getM_dbAccessor().GetStatement(m_InsertStatementId);
-
-        try {
+         getM_dbAccessor().addToDB(m_InsertStatementId, new IFillStatement() {
+                @Override
+                public void fillStatement(PreparedStatement stmt) throws SQLException{
             stmt.setTimestamp(1, new Timestamp(rec.GetAdjustedUsecTime()));
             stmt.setInt(2, IxnSS.getFileId());
             stmt.setLong(3, rec.getM_fileOffset());
@@ -108,7 +108,7 @@ public class IxnSSTable extends DBTable {
             setFieldInt(stmt, 6, Main.getRef(ReferenceType.TEvent, rec.GetMessageName()));
             setFieldInt(stmt, 7, Main.getRef(ReferenceType.IxnID, rec.GetIxnID()));
             setFieldInt(stmt, 8, Main.getRef(ReferenceType.IxnMedia, rec.GetMedia()));
-            setFieldInt(stmt, 9, Main.getRef(ReferenceType.DN, Record.cleanDN(rec.GetIxnQueue())));
+            setFieldInt(stmt, 9, Main.getRef(ReferenceType.DN, rec.cleanDN(rec.GetIxnQueue())));
             stmt.setLong(10, rec.getM_refID());
             setFieldInt(stmt, 11, Main.getRef(ReferenceType.ConnID, rec.GetConnID()));
             stmt.setBoolean(12, rec.isInbound());
@@ -122,11 +122,11 @@ public class IxnSSTable extends DBTable {
 
             setFieldInt(stmt, 19, Main.getRef(ReferenceType.IxnService, rec.GetService()));
             setFieldInt(stmt, 20, Main.getRef(ReferenceType.IxnMethod, rec.GetMethod()));
-            getM_dbAccessor().SubmitStatement(m_InsertStatementId);
-        } catch (SQLException e) {
-            Main.logger.error("Could not add record type " + m_type.toString() + ": " + e, e);
-        }
+                        }
+        });
     }
+
+
 
     private void setIntOrNull(PreparedStatement stmt, int rec, Object val, Object def) throws SQLException {
         if (val == null || val.equals(def)) {

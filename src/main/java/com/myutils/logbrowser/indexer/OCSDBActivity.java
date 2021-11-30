@@ -13,10 +13,10 @@ import java.util.regex.Pattern;
 public class OCSDBActivity extends Message {
 
     //16:19:06.052 CM_DBCallList(236-136-336): DBServer 'DBServer_OCS for CL_CALLBACK (1440)' MSG_RETRIEVED(DBM_SUCCESS) [ReqID=877866]
-    private static final Matcher regDBServerReqID = Pattern.compile("\\[ReqID=([0-9]+)\\]$").matcher("");
-    private static final Matcher regDBServerReqIDError = Pattern.compile("\\[ReqID=([0-9]+)\\]").matcher("");
-    private static final Matcher regDBServerReq = Pattern.compile(
-            "DBServer\\s+'(\\S+) for (\\S+) \\(\\d+\\)'").matcher("");
+    private static final Pattern regDBServerReqID = Pattern.compile("\\[ReqID=([0-9]+)\\]$");
+    private static final Pattern regDBServerReqIDError = Pattern.compile("\\[ReqID=([0-9]+)\\]");
+    private static final Pattern regDBServerReq = Pattern.compile(
+            "DBServer\\s+'(\\S+) for (\\S+) \\(\\d+\\)'");
     private static final DBAction dbAction = new DBAction();
 
     private long listDBID = -1;
@@ -37,9 +37,9 @@ public class OCSDBActivity extends Message {
         this.groupDBID = Long.parseLong(groupDBID);
 
         Matcher m;
-        if ((m = regDBServerReqID.reset(line)).find()) {
+        if ((m = regDBServerReqID.matcher(line)).find()) {
             this.reqID = Long.parseLong(m.group(1));
-        } else if ((m = regDBServerReqIDError.reset(line)).find()) {
+        } else if ((m = regDBServerReqIDError.matcher(line)).find()) {
             this.reqID = Long.parseLong(m.group(1));
         }
 
@@ -98,7 +98,7 @@ public class OCSDBActivity extends Message {
             Matcher m;
             String l = (m_MessageLines.size() > 0) ? m_MessageLines.get(0) : null;
             dbact = null;
-            if (l != null && (m = regDBServerReq.reset(l)).find()) {
+            if (l != null && (m = regDBServerReq.matcher(l)).find()) {
                 DBServer = m.group(1);
                 this.listName = m.group(2);
                 dbact = dbAction.get(l.substring(m.end()));
@@ -128,7 +128,7 @@ public class OCSDBActivity extends Message {
 
     private static class DBAction {
 
-        private static final Map<Matcher, String> dbrecMap = new HashMap<>();
+        private static final Map<Pattern, String> dbrecMap = new HashMap<>();
 
         DBAction() {
             try {
@@ -164,13 +164,13 @@ public class OCSDBActivity extends Message {
         public String get(String logLine) {
             Main.logger.trace("get DBActivity: [" + dbrecMap + "] count: " + dbrecMap.size() + "]");
 
-            for (Map.Entry<Matcher, String> entry : dbrecMap.entrySet()) {
-                Matcher key = entry.getKey();
+            for (Map.Entry<Pattern, String> entry : dbrecMap.entrySet()) {
+                Pattern key = entry.getKey();
                 String value = entry.getValue();
                 Matcher m;
                 Main.logger.trace("Compare DBActivity: [" + logLine + "] vs [" + key.toString() + "]");
 
-                if ((m = key.reset(logLine)).find()) {
+                if ((m = key.matcher(logLine)).find()) {
                     Main.logger.trace("Compare DBActivity: [" + logLine + "] vs [" + key + "] :" + (((m.groupCount() > 0)) ? m.group(1) : ""));
                     if (m.groupCount() > 0) {
                         return m.group(1);
@@ -189,7 +189,7 @@ public class OCSDBActivity extends Message {
         }
 
         private void addAction(String pt, String retString) throws Exception {
-            dbrecMap.put(Pattern.compile(pt).matcher(""), retString);
+            dbrecMap.put(Pattern.compile(pt), retString);
         }
 
     }

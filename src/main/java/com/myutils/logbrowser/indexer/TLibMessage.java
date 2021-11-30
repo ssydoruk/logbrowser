@@ -15,11 +15,11 @@ import java.util.regex.Pattern;
  */
 public class TLibMessage extends Message {
 
-    private final static Matcher regTEvent = Pattern.compile("(?:: message (\\w+)$| (Request\\w+)\\s+received)").matcher("");
-    private final static Matcher regTRequest = Pattern.compile("^(\\w+)").matcher("");
-    private final static Matcher regTRequesSource = Pattern.compile("\\s+\\(\\w+\\s+([^\\s]+)").matcher("");
-    private final static Matcher regTEvtPrivateI = Pattern.compile("^(\\w+)").matcher("");
-    final private static Matcher regISCCRefID = Pattern.compile("^\\s+ISCCAttributeReferenceID\\s+(\\d+)").matcher("");
+    private static final Pattern regTEvent = Pattern.compile("(?:: message (\\w+)$| (Request\\w+)\\s+received)");
+    private static final Pattern regTRequest = Pattern.compile("^(\\w+)");
+    private static final Pattern regTRequesSource = Pattern.compile("\\s+\\(\\w+\\s+([^\\s]+)");
+    private static final Pattern regTEvtPrivateI = Pattern.compile("^(\\w+)");
+    private static final Pattern  regISCCRefID = Pattern.compile("^\\s+ISCCAttributeReferenceID\\s+(\\d+)");
     final private GenesysMsg lastLogMsg;
     String m_MessageName;
     private String m_source;
@@ -76,7 +76,7 @@ public class TLibMessage extends Message {
         Matcher m;
         boolean inbound = false;
 
-        if ((m = regTEvent.reset(hdr)).find()) {
+        if ((m = regTEvent.matcher(hdr)).find()) {
             m_MessageName = m.group(1);
 
             if (m_MessageName == null || m_MessageName.length() == 0) {
@@ -84,7 +84,7 @@ public class TLibMessage extends Message {
                 if (m_MessageName != null && !m_MessageName.isEmpty()) {
                     inbound = true;
                     Main.logger.trace("1Inbound; hdr=[" + hdr + "] l[" + hdr.substring(m.end()) + "]");
-                    if ((m = regTRequesSource.reset(hdr.substring(m.end()))).find()) {
+                    if ((m = regTRequesSource.matcher(hdr.substring(m.end()))).find()) {
                         m_source = m.group(1);
                     }
                     Main.logger.trace("src[" + m_source + "]");
@@ -92,14 +92,14 @@ public class TLibMessage extends Message {
             }
         } else if (lastLogMsg != null) {
 
-            if (lastLogMsg.getLastGenesysMsgID().equals("04541") && (m = regTRequest.reset(hdr)).find()) {
+            if (lastLogMsg.getLastGenesysMsgID().equals("04541") && (m = regTRequest.matcher(hdr)).find()) {
                 m_MessageName = m.group(1);
                 Main.logger.trace("1Inbound; hdr=[" + hdr + "] l[" + hdr.substring(m.end()) + "]");
-                if ((m = regTRequesSource.reset(hdr.substring(m.end()))).find()) {
+                if ((m = regTRequesSource.matcher(hdr.substring(m.end()))).find()) {
                     m_source = m.group(1);
                 }
                 Main.logger.trace("src[" + m_source + "]");
-            } else if (lastLogMsg.getLastGenesysMsgID().equals("04542") && (m = regTEvtPrivateI.reset(hdr)).find()) {
+            } else if (lastLogMsg.getLastGenesysMsgID().equals("04542") && (m = regTEvtPrivateI.matcher(hdr)).find()) {
                 m_MessageName = m.group(1);
             }
         }

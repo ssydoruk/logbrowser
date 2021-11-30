@@ -22,7 +22,7 @@ import java.util.regex.Pattern;
  */
 public class WWEParserTemplate extends WebParser {
 
-    private static final Matcher regMsgStart = Pattern.compile("Handling update message:$").matcher("");
+    private static final Pattern regMsgStart = Pattern.compile("Handling update message:$");
     private final HashMap<String, ParserState> threadParserState = new HashMap<>();
     /*	public OrsParser(DBAccessor accessor) {
      m_accessor = accessor;
@@ -162,7 +162,7 @@ public class WWEParserTemplate extends WebParser {
                 }
 //                getThread(getDP());
 
-                if ((m = regMsgStart.reset(s)).find()) {
+                if ((m = regMsgStart.matcher(s)).find()) {
                     m_ParserState = ParserState.STATE_TMESSAGE_EVENT;
                     setSavedFilePos(getFilePos());
                     break;
@@ -552,11 +552,11 @@ public class WWEParserTemplate extends WebParser {
         }
 
         @Override
-        public void AddToDB(Record _rec) {
+            public void AddToDB(Record _rec) throws SQLException {
             WWEDebugMsg rec = (WWEDebugMsg) _rec;
-            PreparedStatement stmt = getM_dbAccessor().GetStatement(m_InsertStatementId);
-
-            try {
+             getM_dbAccessor().addToDB(m_InsertStatementId, new IFillStatement() {
+                @Override
+                public void fillStatement(PreparedStatement stmt) throws SQLException{
                 stmt.setTimestamp(1, new Timestamp(rec.GetAdjustedUsecTime()));
                 stmt.setInt(2, WWEDebugMsg.getFileId());
                 stmt.setLong(3, rec.getM_fileOffset());
@@ -579,11 +579,11 @@ public class WWEParserTemplate extends WebParser {
                 setFieldInt(stmt, 19, Main.getRef(ReferenceType.WWEBrowserClient, rec.getBrowserClient()));
                 setFieldInt(stmt, 20, Main.getRef(ReferenceType.WWEBrowserSession, rec.getSessionID()));
 
-                getM_dbAccessor().SubmitStatement(m_InsertStatementId);
-            } catch (SQLException e) {
-                Main.logger.error("Could not add record type " + m_type.toString() + ": " + e, e);
-            }
-        }
+                            }
+        });
+    }
+
+
 
     }
 //</editor-fold>

@@ -15,8 +15,8 @@ import static Utils.Util.StripQuotes;
  */
 public class WSConf extends Message {
 
-    final private static Matcher regConnID = Pattern.compile("^AttributeConnID .+= (\\w+)$").matcher("");
-    final private static Matcher regThisDN = Pattern.compile("^AttributeThisDN .+= \\\"([^\\\"]*)\\\"$").matcher("");
+    private static final Pattern regConnID = Pattern.compile("^AttributeConnID .+= (\\w+)$");
+    private static final Pattern regThisDN = Pattern.compile("^AttributeThisDN .+= \\\"([^\\\"]*)\\\"$");
 
     private final String m_MessageName;
     private final String server;

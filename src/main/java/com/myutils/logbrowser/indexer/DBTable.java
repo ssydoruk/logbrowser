@@ -11,6 +11,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author ssydoruk
@@ -167,22 +168,23 @@ public abstract class DBTable {
     }
 
     void checkInit() {
-        if (!tabCreated) {
-            InitDB();
-            String tabName1 = getTabName();
-            if (tabName1 != null) {
-                try {
-                    currentID = Main.getInstance().getM_accessor().getID("select max(id) from " + tabName1, tabName1, -1);
-                    if (currentID == -1) {
+        synchronized (this) {
+            if (!tabCreated) {
+                InitDB();
+                String tabName1 = getTabName();
+                if (tabName1 != null) {
+                    try {
+                        currentID = Main.getInstance().getM_accessor().getID("select max(id) from " + tabName1, tabName1, -1);
+                        if (currentID == -1) {
+                            currentID = 0;
+                        }
+                    } catch (Exception ex) {
                         currentID = 0;
+                        logger.error("fatal: ", ex);
                     }
-//                    Main.logger.info("Table " + tabName1 + ": currentID: " + currentID);
-                } catch (Exception ex) {
-                    currentID = 0;
-                    logger.error("fatal: ", ex);
                 }
+                tabCreated = true;
             }
-            tabCreated = true;
         }
     }
 
@@ -203,11 +205,11 @@ public abstract class DBTable {
         }
     }
 
-    protected void generateID(PreparedStatement stmt, int i, Record _rec) throws SQLException {
+    protected synchronized void generateID(PreparedStatement stmt, int i, Record _rec) throws SQLException {
         currentID++;
-        Main.logger.debug("generate ID for table " + getTabName() + ": " + currentID + "; i:" + i + " rec: " + _rec.toString());
         stmt.setInt(i, currentID);
         _rec.setLastID(currentID);
+        Main.logger.debug("ID for table " + getTabName() + ": " + currentID + "; i:" + i + " rec: " + _rec.toString());
     }
 
     public int getCurrentID() {

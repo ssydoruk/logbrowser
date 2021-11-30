@@ -84,11 +84,11 @@ public class OCSIxnTable extends DBTable {
     }
 
     @Override
-    public void AddToDB(Record _rec) {
+    public void AddToDB(Record _rec) throws SQLException {
         OCSIxn rec = (OCSIxn) _rec;
-        PreparedStatement stmt = getM_dbAccessor().GetStatement(m_InsertStatementId);
-
-        try {
+        getM_dbAccessor().addToDB(m_InsertStatementId, new IFillStatement() {
+            @Override
+            public void fillStatement(PreparedStatement stmt) throws SQLException{
             stmt.setTimestamp(1, new Timestamp(rec.GetAdjustedUsecTime()));
             stmt.setInt(2, OCSIxn.getFileId());
             stmt.setLong(3, rec.getM_fileOffset());
@@ -98,15 +98,14 @@ public class OCSIxnTable extends DBTable {
             setFieldInt(stmt, 6, Main.getRef(ReferenceType.TEvent, rec.GetMessageName()));
             setFieldInt(stmt, 7, Main.getRef(ReferenceType.IxnID, rec.GetIxnID()));
             setFieldInt(stmt, 8, Main.getRef(ReferenceType.IxnMedia, rec.GetMedia()));
-            setFieldInt(stmt, 9, Main.getRef(ReferenceType.DN, Record.cleanDN(rec.GetIxnQueue())));
-            setFieldInt(stmt, 10, Main.getRef(ReferenceType.DN, Record.cleanDN(rec.GetOutPhone())));
+            setFieldInt(stmt, 9, Main.getRef(ReferenceType.DN, rec.cleanDN(rec.GetIxnQueue())));
+            setFieldInt(stmt, 10, Main.getRef(ReferenceType.DN, rec.cleanDN(rec.GetOutPhone())));
             stmt.setLong(11, rec.getRecHandle());
             stmt.setLong(12, rec.getM_refID());
             stmt.setLong(13, rec.getChainID());
-            getM_dbAccessor().SubmitStatement(m_InsertStatementId);
-        } catch (SQLException e) {
-            Main.logger.error("Could not add record type " + m_type.toString() + ": " + e, e);
-        }
+            }
+        });
     }
+
 
 }

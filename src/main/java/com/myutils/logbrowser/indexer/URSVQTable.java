@@ -59,11 +59,11 @@ public class URSVQTable extends DBTable {
     }
 
     @Override
-    public void AddToDB(Record _rec) {
+        public void AddToDB(Record _rec) throws SQLException {
         URSVQ rec = (URSVQ) _rec;
-        PreparedStatement stmt = getM_dbAccessor().GetStatement(m_InsertStatementId);
-
-        try {
+         getM_dbAccessor().addToDB(m_InsertStatementId, new IFillStatement() {
+                @Override
+                public void fillStatement(PreparedStatement stmt) throws SQLException{
             stmt.setTimestamp(1, new Timestamp(rec.GetAdjustedUsecTime()));
             stmt.setInt(2, URSStrategy.getFileId());
             stmt.setLong(3, rec.getM_fileOffset());
@@ -72,14 +72,14 @@ public class URSVQTable extends DBTable {
 
             setFieldInt(stmt, 6, Main.getRef(ReferenceType.ConnID, rec.GetConnID()));
             setFieldInt(stmt, 7, Main.getRef(ReferenceType.VQID, rec.getVQID()));
-            setFieldInt(stmt, 8, Main.getRef(ReferenceType.DN, Record.cleanDN(rec.getVqName())));
+            setFieldInt(stmt, 8, Main.getRef(ReferenceType.DN, rec.cleanDN(rec.getVqName())));
             setFieldInt(stmt, 9, Main.getRef(ReferenceType.URSTarget, rec.getTarget()));
 //                setFieldString(stmt,11, rec.getCgMsg());
 
-            getM_dbAccessor().SubmitStatement(m_InsertStatementId);
-        } catch (SQLException e) {
-            Main.logger.error("Could not add record type " + m_type.toString() + ": " + e, e);
-        }
+                        }
+        });
     }
+
+
 
 }

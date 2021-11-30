@@ -19,103 +19,103 @@ public class WWEParser extends WebParser {
 
     private static final org.apache.logging.log4j.Logger logger = Main.logger;
 
-    private static final Matcher regMsgStart = Pattern.compile("Handling update message:$").matcher("");
-    private static final Matcher regMsgRequest = Pattern.compile("(?: |=|\\[)'(\\w+)' \\(\\d+\\) attributes:\\s*$").matcher("");
-    private static final Matcher regMsgContactServerResponse = Pattern.compile("Received response \\[([^:\\[\\}]+):\\s*$").matcher("");
+    private static final Pattern regMsgStart = Pattern.compile("Handling update message:$");
+    private static final Pattern regMsgRequest = Pattern.compile("(?: |=|\\[)'(\\w+)' \\(\\d+\\) attributes:\\s*$");
+    private static final Pattern regMsgContactServerResponse = Pattern.compile("Received response \\[([^:\\[\\}]+):\\s*$");
 
-    private static final Matcher regMsgEventRegistered = Pattern.compile("message \\[?'(\\w+)' \\(\\d+\\) attributes:$").matcher("");
-//    private static final Matcher regMsgRequest1 = Pattern.compile("sent: \\['(\\w+)' \\(\\d+\\) attributes:$").matcher("");
+    private static final Pattern regMsgEventRegistered = Pattern.compile("message \\[?'(\\w+)' \\(\\d+\\) attributes:$");
+//    private static final Pattern regMsgRequest1 = Pattern.compile("sent: \\['(\\w+)' \\(\\d+\\) attributes:$");
 
     //    java.net.ConnectException: Connection refused
-    private static final Matcher regExceptionStart = Pattern.compile("^([\\w\\.]+Exception[\\w\\.]*):(.*)").matcher("");
-    //    static Matcher regMsgStart = Pattern.compile("^\\s*(?:Int 04543|Trc 04541).+essage \\\"*(\\w+).+from \\d+ \\(\\\"([^@\\\"]+)").matcher("");
+    private static final Pattern regExceptionStart = Pattern.compile("^([\\w\\.]+Exception[\\w\\.]*):(.*)");
+    //    static Matcher regMsgStart = Pattern.compile("^\\s*(?:Int 04543|Trc 04541).+essage \\\"*(\\w+).+from \\d+ \\(\\\"([^@\\\"]+)");
     // : message EventServerInfo
 //AgentMessage(super=BasicTelephonyMessage(message='EventAgentLogin' (73) attributes:
-    private static final Matcher regTMessageStart = Pattern.compile("^(?:\\w+)Message.+message='(\\w+)'").matcher("");
-    //static Matcher regMsgStart=Pattern.compile("^(Int 04543 |Trc 04541 )").matcher("");
+    private static final Pattern regTMessageStart = Pattern.compile("^(?:\\w+)Message.+message='(\\w+)'");
+    //static Matcher regMsgStart=Pattern.compile("^(Int 04543 |Trc 04541 )");
 
     //13:40:18.552 {SessionManager:2} URL [http://orswas.internal.gslb.service.nsw.gov.au/mod-routing/src-gen/IPD_default_mainWorkflow.scxml] associated with script [mod-routing]
-    private static final Matcher regAppURL = Pattern.compile("\\}\\sURL \\[([^\\]]+)\\] associated with script \\[([^\\]]+)\\]$").matcher("");
+    private static final Pattern regAppURL = Pattern.compile("\\}\\sURL \\[([^\\]]+)\\] associated with script \\[([^\\]]+)\\]$");
 
-    private static final Matcher regIndexList = Pattern.compile("^(\\s|\\})").matcher("");
+    private static final Pattern regIndexList = Pattern.compile("^(\\s|\\})");
 
-    private static final Matcher regWWELogMessage = Pattern.compile("^(\\w+)\\s+\\[([^\\]]*)\\] \\[([^\\]]*)\\] \\[([^\\]]*)\\] \\[([^\\]]*)\\]( [\\d\\.]*)? (\\S+)?\\s(\\s|(?:\\S+)\\s+)?(?:(\\S+)\\s+(.+))?").matcher("");
+    private static final Pattern regWWELogMessage = Pattern.compile("^(\\w+)\\s+\\[([^\\]]*)\\] \\[([^\\]]*)\\] \\[([^\\]]*)\\] \\[([^\\]]*)\\]( [\\d\\.]*)? (\\S+)?\\s(\\s|(?:\\S+)\\s+)?(?:(\\S+)\\s+(.+))?");
 
-    //    private static final Matcher regElasticSearch = Pattern.compile("\\s+o[^\\.]+\\.e[^\\.]+\\.[\\.\\w]+\\s+(.+)").matcher("");
-    private static final Matcher regKVList = Pattern.compile("reasons=KVList:\\s*$").matcher("");
-    private static final Matcher regIndexListStart = Pattern.compile("\\.IndexList = \\{\\s*$").matcher("");
-    private static final Matcher regWWEUCSStart = Pattern.compile("About to submit request .+\\.requests\\.([^:]+):\\s*$").matcher("");
+    //    private static final Pattern regElasticSearch = Pattern.compile("\\s+o[^\\.]+\\.e[^\\.]+\\.[\\.\\w]+\\s+(.+)");
+    private static final Pattern regKVList = Pattern.compile("reasons=KVList:\\s*$");
+    private static final Pattern regIndexListStart = Pattern.compile("\\.IndexList = \\{\\s*$");
+    private static final Pattern regWWEUCSStart = Pattern.compile("About to submit request .+\\.requests\\.([^:]+):\\s*$");
 
-    private static final Matcher regWWEIxnServerRequestStart = Pattern.compile("bout to submit request '([^']+)'").matcher("");
-    private static final Matcher regWWEIxnServerEventStart = Pattern.compile("eceived response '([^']+)'").matcher("");
+    private static final Pattern regWWEIxnServerRequestStart = Pattern.compile("bout to submit request '([^']+)'");
+    private static final Pattern regWWEIxnServerEventStart = Pattern.compile("eceived response '([^']+)'");
 
-    private static final Matcher regWWEUCSEvent = Pattern.compile("eceived response .+\\.events\\.([^:]+):\\s*$").matcher("");
-    private static final Matcher regWWEUCSEventOther = Pattern.compile("received message .+\\.events\\.([^:]+):\\s*$").matcher("");
-    private static final Matcher regWWEUCSHandlingEvent = Pattern.compile("handling message .+\\.events\\.([^:]+):\\s*$").matcher("");
+    private static final Pattern regWWEUCSEvent = Pattern.compile("eceived response .+\\.events\\.([^:]+):\\s*$");
+    private static final Pattern regWWEUCSEventOther = Pattern.compile("received message .+\\.events\\.([^:]+):\\s*$");
+    private static final Pattern regWWEUCSHandlingEvent = Pattern.compile("handling message .+\\.events\\.([^:]+):\\s*$");
 
-    private static final Matcher regCreateChatContext = Pattern.compile("createChatServerContextV2 ").matcher("");
-    private static final Matcher regItems = Pattern.compile("item\\(s\\)\\] = \\{\\s*$").matcher("");
-    private static final Matcher regGetRootCategories = Pattern.compile("RequestGetRootCategories:\\s*$").matcher("");
-    private static final Matcher regInteractionAttributes = Pattern.compile("contactserver\\.InteractionAttributes \\{\\s*$").matcher("");
-    private static final Matcher regInteractionProperties = Pattern.compile("interactionProperties=InteractionProperties:\\s*$").matcher("");
+    private static final Pattern regCreateChatContext = Pattern.compile("createChatServerContextV2 ");
+    private static final Pattern regItems = Pattern.compile("item\\(s\\)\\] = \\{\\s*$");
+    private static final Pattern regGetRootCategories = Pattern.compile("RequestGetRootCategories:\\s*$");
+    private static final Pattern regInteractionAttributes = Pattern.compile("contactserver\\.InteractionAttributes \\{\\s*$");
+    private static final Pattern regInteractionProperties = Pattern.compile("interactionProperties=InteractionProperties:\\s*$");
 
-    private static final Matcher regWWEUCSConfigErrorUser = Pattern.compile("failed for user \\[([^\\]]+)\\]:").matcher("");
-    private static final Matcher regWWEUCSConfigErrorContinue = Pattern.compile("^(SATRCFG_|IATRCFG)").matcher("");
+    private static final Pattern regWWEUCSConfigErrorUser = Pattern.compile("failed for user \\[([^\\]]+)\\]:");
+    private static final Pattern regWWEUCSConfigErrorContinue = Pattern.compile("^(SATRCFG_|IATRCFG)");
 
-    private static final Matcher regBayeuxId = Pattern.compile("channel=[^,]+, id=(\\d+),").matcher("");
-    private static final Matcher regBayeuxLastConnected = Pattern.compile("last connect (\\d+) ms ago$").matcher("");
-    private static final Matcher regBayeuxAction = Pattern.compile("\\s([><]+)\\s+\\{").matcher("");
-    private static final Matcher regBayeuxChannel = Pattern.compile("channel=([\\w/]+)").matcher("");
-    private static final Matcher regBayeuxMessageType = Pattern.compile("messageType=([\\w/]+)").matcher("");
-    private static final Matcher regURIChatIxnID = Pattern.compile("/chats/(\\w+)").matcher("");
+    private static final Pattern regBayeuxId = Pattern.compile("channel=[^,]+, id=(\\d+),");
+    private static final Pattern regBayeuxLastConnected = Pattern.compile("last connect (\\d+) ms ago$");
+    private static final Pattern regBayeuxAction = Pattern.compile("\\s([><]+)\\s+\\{");
+    private static final Pattern regBayeuxChannel = Pattern.compile("channel=([\\w/]+)");
+    private static final Pattern regBayeuxMessageType = Pattern.compile("messageType=([\\w/]+)");
+    private static final Pattern regURIChatIxnID = Pattern.compile("/chats/(\\w+)");
 
-    private static final Matcher regWWEReceivedInteractions = Pattern.compile(" received interactions from Interaction Server (.+)\\s*$").matcher("");
-    private static final Matcher regIxnContinue = Pattern.compile("^\\s").matcher("");
+    private static final Pattern regWWEReceivedInteractions = Pattern.compile(" received interactions from Interaction Server (.+)\\s*$");
+    private static final Pattern regIxnContinue = Pattern.compile("^\\s");
 
     //<editor-fold defaultstate="collapsed" desc="WWEStatServerMsg">
-    private static final Matcher ptStatStringValue = Pattern.compile("^\\s*'STRING_VALUE'.+= \"(.+)\"$").matcher("");
+    private static final Pattern ptStatStringValue = Pattern.compile("^\\s*'STRING_VALUE'.+= \"(.+)\"$");
 
     //<editor-fold defaultstate="collapsed" desc="WWEBayeuxSMsg">
-//    private static final Matcher regBayeuxMessageType = Pattern.compile("messageType=([^,\\}]+)").matcher("");
-    private static final Matcher regMessageUUID = Pattern.compile("Found call \\[(\\p{Alnum}+)\\]").matcher("");
+//    private static final Pattern regBayeuxMessageType = Pattern.compile("messageType=([^,\\}]+)");
+    private static final Pattern regMessageUUID = Pattern.compile("Found call \\[(\\p{Alnum}+)\\]");
 
-    private static final Matcher regMessageStartingHTTP = Pattern.compile("^https?://(\\S+)", Pattern.CASE_INSENSITIVE).matcher("");
+    private static final Pattern regMessageStartingHTTP = Pattern.compile("^https?://(\\S+)", Pattern.CASE_INSENSITIVE);
 
-    private static final Matcher regMessageUserID = Pattern.compile("(?:user(?:Id)?|agent):? \\[?(\\p{Alnum}{32})\\]?", Pattern.CASE_INSENSITIVE).matcher("");
-    private static final Matcher regMessageUserNameID = Pattern.compile("(?:(?<!No )[Ll]ogin *[Cc]ode|UserName:) \\[?((?!for)[^\\]\\s]+)\\]?").matcher("");
-    private static final Matcher regMessageUserNameID1 = Pattern.compile(" agentId=([^\\s,]+), ").matcher("");
-    private static final Matcher regMessageDeviceID = Pattern.compile("device .*(?:\\[(?:Id=)|DeviceV2\\(id=)([\\w\\-]+)", Pattern.CASE_INSENSITIVE).matcher("");
-    private static final Matcher regMessageDevice1ID = Pattern.compile("[Dd]evice \\[*([\\w\\-]+)\\]*").matcher("");
+    private static final Pattern regMessageUserID = Pattern.compile("(?:user(?:Id)?|agent):? \\[?(\\p{Alnum}{32})\\]?", Pattern.CASE_INSENSITIVE);
+    private static final Pattern regMessageUserNameID = Pattern.compile("(?:(?<!No )[Ll]ogin *[Cc]ode|UserName:) \\[?((?!for)[^\\]\\s]+)\\]?");
+    private static final Pattern regMessageUserNameID1 = Pattern.compile(" agentId=([^\\s,]+), ");
+    private static final Pattern regMessageDeviceID = Pattern.compile("device .*(?:\\[(?:Id=)|DeviceV2\\(id=)([\\w\\-]+)", Pattern.CASE_INSENSITIVE);
+    private static final Pattern regMessageDevice1ID = Pattern.compile("[Dd]evice \\[*([\\w\\-]+)\\]*");
 
-    private static final Matcher regMessageCalUUID1 = Pattern.compile("Call \\[(?:Id=)?([\\w\\-]{32})\\]", Pattern.CASE_INSENSITIVE).matcher("");
-    private static final Matcher regMessageCalUUID2 = Pattern.compile("call recording details \\[([\\w\\-]{32})\\]", Pattern.CASE_INSENSITIVE).matcher("");
-    private static final Matcher regMessageGSessionID = Pattern.compile(" session \\[*(\\p{Alnum}{20,}+)\\]*", Pattern.CASE_INSENSITIVE).matcher("");
-    //    private static final Matcher regMessageGSessionMonitorID = Pattern.compile("^Session \\[(\\p{Alnum}+)\\]", Pattern.CASE_INSENSITIVE).matcher("");
-    private static final Matcher regUserWithID = Pattern.compile("user(?: with ID| settings)? \\[?([^\\s\\]]{12,}+)\\]?", Pattern.CASE_INSENSITIVE).matcher("");
-    private static final Matcher regUserWithID1 = Pattern.compile("for (?:user|agent) \\[([^\\]]+)\\]").matcher("");
-    private static final Matcher regUserWithID2 = Pattern.compile("user \\[([^\\s\\]]+)\\] not", Pattern.CASE_INSENSITIVE).matcher("");
-    private static final Matcher regMessageWWESessionID = Pattern.compile("Session \\[(\\p{Alnum}+)\\] removed", Pattern.CASE_INSENSITIVE).matcher("");
+    private static final Pattern regMessageCalUUID1 = Pattern.compile("Call \\[(?:Id=)?([\\w\\-]{32})\\]", Pattern.CASE_INSENSITIVE);
+    private static final Pattern regMessageCalUUID2 = Pattern.compile("call recording details \\[([\\w\\-]{32})\\]", Pattern.CASE_INSENSITIVE);
+    private static final Pattern regMessageGSessionID = Pattern.compile(" session \\[*(\\p{Alnum}{20,}+)\\]*", Pattern.CASE_INSENSITIVE);
+    //    private static final Pattern regMessageGSessionMonitorID = Pattern.compile("^Session \\[(\\p{Alnum}+)\\]", Pattern.CASE_INSENSITIVE);
+    private static final Pattern regUserWithID = Pattern.compile("user(?: with ID| settings)? \\[?([^\\s\\]]{12,}+)\\]?", Pattern.CASE_INSENSITIVE);
+    private static final Pattern regUserWithID1 = Pattern.compile("for (?:user|agent) \\[([^\\]]+)\\]");
+    private static final Pattern regUserWithID2 = Pattern.compile("user \\[([^\\s\\]]+)\\] not", Pattern.CASE_INSENSITIVE);
+    private static final Pattern regMessageWWESessionID = Pattern.compile("Session \\[(\\p{Alnum}+)\\] removed", Pattern.CASE_INSENSITIVE);
 
-    private static final Matcher regUserID1 = Pattern.compile("userId=([^\\s,\\>\\<]+)", Pattern.CASE_INSENSITIVE).matcher("");
-    private static final Matcher regUserID2 = Pattern.compile("(?:for|with) userId ([^\\s,\\>\\<]+)", Pattern.CASE_INSENSITIVE).matcher("");
+    private static final Pattern regUserID1 = Pattern.compile("userId=([^\\s,\\>\\<]+)", Pattern.CASE_INSENSITIVE);
+    private static final Pattern regUserID2 = Pattern.compile("(?:for|with) userId ([^\\s,\\>\\<]+)", Pattern.CASE_INSENSITIVE);
 
-    private static final Matcher regUserID3ID = Pattern.compile("sessions from (\\w+)").matcher("");
-    private static final Matcher regUserRemovingSession = Pattern.compile("Removing session (\\w+)").matcher("");
-//    private static final Matcher regUserSettings = Pattern.compile("user settings \\[(\\p{Alnum}+)\\]").matcher("");
+    private static final Pattern regUserID3ID = Pattern.compile("sessions from (\\w+)");
+    private static final Pattern regUserRemovingSession = Pattern.compile("Removing session (\\w+)");
+//    private static final Pattern regUserSettings = Pattern.compile("user settings \\[(\\p{Alnum}+)\\]");
 
-    private static final Matcher regMessageBrowser1ID = Pattern.compile("browserId ([\\w\\-]+)").matcher("");
-    private static final Matcher regMessageBrowser2ID = Pattern.compile("clientId=([\\w\\-]+),").matcher("");
-    private static final Matcher regMessageIxnID = Pattern.compile("﻿interaction with identity \\[([\\w\\-]+)\\]").matcher("");
-    private static final Matcher regMessageIxn1ID = Pattern.compile("interactionId=(\\w+)").matcher("");
-    private static final Matcher regMessageIxn2ID = Pattern.compile("(?:interactionid|chat id) '*\\{*(\\w+)\\}*'*", Pattern.CASE_INSENSITIVE).matcher("");
-    private static final Matcher regMessageIxn3ID = Pattern.compile("ixnId=(\\w+)").matcher("");
-    private static final Matcher regMessageIxn4ID = Pattern.compile("(?:interactionId|interaction with identity) \\[(\\w+)\\]", Pattern.CASE_INSENSITIVE).matcher("");
-    //    private static final Matcher regMessageUserToken = Pattern.compile("userToken=(\\w+)").matcher("");
-    private static final Matcher regMessageIxnChatID = Pattern.compile("/(?:chats|calls)/(\\w+)").matcher("");
+    private static final Pattern regMessageBrowser1ID = Pattern.compile("browserId ([\\w\\-]+)");
+    private static final Pattern regMessageBrowser2ID = Pattern.compile("clientId=([\\w\\-]+),");
+    private static final Pattern regMessageIxnID = Pattern.compile("﻿interaction with identity \\[([\\w\\-]+)\\]");
+    private static final Pattern regMessageIxn1ID = Pattern.compile("interactionId=(\\w+)");
+    private static final Pattern regMessageIxn2ID = Pattern.compile("(?:interactionid|chat id) '*\\{*(\\w+)\\}*'*", Pattern.CASE_INSENSITIVE);
+    private static final Pattern regMessageIxn3ID = Pattern.compile("ixnId=(\\w+)");
+    private static final Pattern regMessageIxn4ID = Pattern.compile("(?:interactionId|interaction with identity) \\[(\\w+)\\]", Pattern.CASE_INSENSITIVE);
+    //    private static final Pattern regMessageUserToken = Pattern.compile("userToken=(\\w+)");
+    private static final Pattern regMessageIxnChatID = Pattern.compile("/(?:chats|calls)/(\\w+)");
 
     private static final WWEMessageCleanTool msgCleaner = new WWEMessageCleanTool();
 
-    private static final Matcher regConfigObjectRead = Pattern.compile("Configuration object: type = (\\S+), properties = \\{").matcher("");
+    private static final Pattern regConfigObjectRead = Pattern.compile("Configuration object: type = (\\S+), properties = \\{");
     private final HashMap<String, ParserState> threadParserState = new HashMap<>();
     /*	public OrsParser(DBAccessor accessor) {
     m_accessor = accessor;
@@ -258,23 +258,23 @@ public class WWEParser extends WebParser {
                 }
 //                getThread(getDP());
 
-                if ((regMsgStart.reset(s)).find()) {
+                if ((regMsgStart.matcher(s)).find()) {
                     m_ParserState = ParserState.STATE_TMESSAGE_EVENT;
                     setSavedFilePos(getFilePos());
                     break;
-                } else if ((m = regMsgRequest.reset(s)).find() || (m = regMsgContactServerResponse.reset(s)).find()) {
+                } else if ((m = regMsgRequest.matcher(s)).find() || (m = regMsgContactServerResponse.matcher(s)).find()) {
                     m_msgName = m.group(1);
                     m_ParserState = ParserState.STATE_TMESSAGE_ATTRIBUTES;
                     setSavedFilePos(getFilePos());
                     MessageType = MsgType.MSG_TLIB;
                     break;
-                } else if ((m = regMsgRequest.reset(s)).find() || (m = regMsgEventRegistered.reset(s)).find()) {
+                } else if ((m = regMsgRequest.matcher(s)).find() || (m = regMsgEventRegistered.matcher(s)).find()) {
                     m_msgName = m.group(1);
                     m_ParserState = ParserState.STATE_TMESSAGE_ATTRIBUTES;
                     setSavedFilePos(getFilePos());
                     MessageType = MsgType.MSG_TLIB;
                     break;
-                } else if ((m = regExceptionStart.reset(s)).find()) {
+                } else if ((m = regExceptionStart.matcher(s)).find()) {
                     m_msgName = m.group(1);
                     m_msg1 = m.group(2);
                     m_MessageContents.add(s);
@@ -286,14 +286,14 @@ public class WWEParser extends WebParser {
                     m_ParserState = ParserState.STATE_EXCEPTION;
                     setSavedFilePos(getFilePos());
                     break;
-                } else if ((m = regAppURL.reset(s)).find()) {
+                } else if ((m = regAppURL.matcher(s)).find()) {
                     if (URL != null || app != null) {
                         Main.logger.error("URL/app not used; URL: [" + ((URL == null) ? "NULL" : URL) + "]" + " app: [" + ((app == null) ? "NULL" : app) + "] line:" + m_CurrentLine);
                     }
                     this.URL = m.group(1);
                     this.app = m.group(2);
                     //m_ParserState=STATE_CLUSTER;
-                } else if ((m = regWWELogMessage.reset(s)).find()) {
+                } else if ((m = regWWELogMessage.matcher(s)).find()) {
                     WWEDebugMsg entry = new WWEDebugMsg();
 
                     entry.setLevel(m.group(1)); // save IP
@@ -307,7 +307,7 @@ public class WWEParser extends WebParser {
 
                     Matcher m1;
                     if (url != null && !url.trim().isEmpty()) {
-                        if (url.equalsIgnoreCase("/api/v2/me") && theMessage != null && (m1 = regConfigObjectRead.reset(theMessage)).find()) {
+                        if (url.equalsIgnoreCase("/api/v2/me") && theMessage != null && (m1 = regConfigObjectRead.matcher(theMessage)).find()) {
                             m_MessageContents.add(s);
                             stopParsingMsg = true;
                             m_ParserState = ParserState.STATE_CONFIG_OBJECT;
@@ -472,7 +472,7 @@ public class WWEParser extends WebParser {
                                 SetStdFieldsAndAdd(msg);
                                 msg = null;
                                 return null;
-                            } else if ((m3 = regWWEUCSConfigErrorUser.reset(theMessage)).find()) {
+                            } else if ((m3 = regWWEUCSConfigErrorUser.matcher(theMessage)).find()) {
                                 msg = new WWEUCSConfigMsg(entry, "EventError");
                                 m_ParserState = ParserState.STATE_CONFIG_ERROR;
                                 setSavedFilePos(getFilePos());
@@ -529,7 +529,7 @@ public class WWEParser extends WebParser {
 
                         if (!stopParsingMsg && (theMessage != null && !theMessage.isEmpty())) {
 //                            entry.setMessageText(theMessage);
-                            if (regKVList.reset(theMessage).find()) {
+                            if (regKVList.matcher(theMessage).find()) {
                                 m_ParserState = ParserState.STATE_KVLIST;
                                 m_MessageContents.add(s);
                                 setSavedFilePos(getFilePos());
@@ -538,11 +538,11 @@ public class WWEParser extends WebParser {
                                 setSavedFilePos(getFilePos());
                                 m_MessageContents.add(s);
                                 skipMessage = true;
-                            } else if (regIndexListStart.reset(theMessage).find()) {
+                            } else if (regIndexListStart.matcher(theMessage).find()) {
                                 m_ParserState = ParserState.STATE_IndexList;
                                 setSavedFilePos(getFilePos());
                                 skipMessage = true;
-                            } else if ((m2 = regWWEUCSStart.reset(theMessage)).find()) {
+                            } else if ((m2 = regWWEUCSStart.matcher(theMessage)).find()) {
                                 m_ParserState = ParserState.STATE_UCSREQUEST;
                                 setSavedFilePos(getFilePos());
                                 m_MessageContents.add(s);
@@ -550,60 +550,60 @@ public class WWEParser extends WebParser {
                                 msg = new WWEUCSMsg(entry, m2.group(1));
                                 return null; // do not insert debug message
 
-                            } else if ((m2 = regWWEIxnServerRequestStart.reset(theMessage)).find() || (m2 = regWWEIxnServerEventStart.reset(theMessage)).find()) {
+                            } else if ((m2 = regWWEIxnServerRequestStart.matcher(theMessage)).find() || (m2 = regWWEIxnServerEventStart.matcher(theMessage)).find()) {
                                 m_ParserState = ParserState.STATE_IXNSERVER_REQUEST;
                                 m_MessageContents.add(s);
                                 setSavedFilePos(getFilePos());
                                 msg = new WWEIxnServerMsg(m2.group(1));
                                 return null; // do not insert debug message
 
-                            } else if ((m2 = regWWEUCSEvent.reset(theMessage)).find()) {
+                            } else if ((m2 = regWWEUCSEvent.matcher(theMessage)).find()) {
                                 m_ParserState = ParserState.STATE_UCSRESPONSE;
                                 m_MessageContents.add(s);
                                 setSavedFilePos(getFilePos());
                                 msg = new WWEUCSMsg(entry, m2.group(1));
                                 return null; // do not insert debug message
 
-                            } else if ((m2 = regWWEUCSEventOther.reset(theMessage)).find()) {
+                            } else if ((m2 = regWWEUCSEventOther.matcher(theMessage)).find()) {
                                 m_ParserState = ParserState.STATE_UCSRESPONSEOTHER;
                                 m_MessageContents.add(s);
                                 setSavedFilePos(getFilePos());
                                 msg = new WWEUCSMsg(entry, m2.group(1));
                                 return null; // do not insert debug message
 
-                            } else if ((m2 = regWWEUCSHandlingEvent.reset(theMessage)).find()) {
+                            } else if ((m2 = regWWEUCSHandlingEvent.matcher(theMessage)).find()) {
                                 m_ParserState = ParserState.STATE_UCSHANDLINGRESPONSE;
                                 m_MessageContents.add(s);
                                 setSavedFilePos(getFilePos());
                                 msg = new WWEUCSMsg(entry, m2.group(1));
                                 return null; // do not insert debug message
 
-//                            } else if ((m2 = regWWEUCSPrepareTask.reset(theMessage)).find()) {
+//                            } else if ((m2 = regWWEUCSPrepareTask.matcher(theMessage)).find()) {
 //                                m_ParserState = ParserState.STATE_UCSPREPARETASK;
 //                                m_MessageContents.add(s);
 //                                setSavedFilePos(getFilePos());
 //                                return null; // do not insert debug message
-                            } else if ((regGetRootCategories.reset(theMessage)).find()) {
+                            } else if ((regGetRootCategories.matcher(theMessage)).find()) {
                                 m_ParserState = ParserState.STATE_GETROOTCATEGORIES;
                                 m_MessageContents.add(s);
                                 setSavedFilePos(getFilePos());
-                            } else if ((regInteractionAttributes.reset(theMessage)).find()) {
+                            } else if ((regInteractionAttributes.matcher(theMessage)).find()) {
                                 m_ParserState = ParserState.STATE_INTERACTION_ATTRIBUTES;
                                 m_MessageContents.add(s);
                                 setSavedFilePos(getFilePos());
-                            } else if ((regInteractionProperties.reset(theMessage)).find()) {
+                            } else if ((regInteractionProperties.matcher(theMessage)).find()) {
                                 m_ParserState = ParserState.STATE_INTERACTION_PROPERTIES;
                                 m_MessageContents.add(s);
                                 setSavedFilePos(getFilePos());
-                            } else if ((regCreateChatContext.reset(theMessage)).find()) {
+                            } else if ((regCreateChatContext.matcher(theMessage)).find()) {
                                 m_ParserState = ParserState.STATE_CREATECHATCONTEXT;
                                 m_MessageContents.add(s);
                                 setSavedFilePos(getFilePos());
-                            } else if ((regItems.reset(theMessage)).find()) {
+                            } else if ((regItems.matcher(theMessage)).find()) {
                                 m_ParserState = ParserState.STATE_ITEMS;
                                 m_MessageContents.add(s);
                                 setSavedFilePos(getFilePos());
-                            } else if ((m2 = regWWEReceivedInteractions.reset(theMessage)).find()) {
+                            } else if ((m2 = regWWEReceivedInteractions.matcher(theMessage)).find()) {
                                 String s1 = m2.group(1);
                                 if (s1 != null) {
                                     if (s1.startsWith("KVList")) {
@@ -620,7 +620,7 @@ public class WWEParser extends WebParser {
                     }
                     SetStdFieldsAndAdd(entry);
                     break;
-                } //                else if ((m = regElasticSearch.reset(s)).find()) {
+                } //                else if ((m = regElasticSearch.matcher(s)).find()) {
                 //                    fakeGenesysMsg(dp, this, TableType.MsgWWE, null, "Custom", "00000", "00000", m.group(1));
                 //                } 
                 else {
@@ -743,7 +743,7 @@ public class WWEParser extends WebParser {
             break;
 
             case STATE_RECEIVED_INTERACTION: {
-                if (regIxnContinue.reset(str).find()) {
+                if (regIxnContinue.matcher(str).find()) {
                     m_MessageContents.add(str);
                 } else {
                     msg = null;
@@ -771,7 +771,7 @@ public class WWEParser extends WebParser {
             break;
 
             case STATE_CONFIG_ERROR: {
-                if (regWWEUCSConfigErrorContinue.reset(str).find()) {
+                if (regWWEUCSConfigErrorContinue.matcher(str).find()) {
                     m_MessageContents.add(s.substring(1));
                 } else {
                     SetStdFieldsAndAdd(msg);
@@ -809,7 +809,7 @@ public class WWEParser extends WebParser {
             break;
 
 //            case STATE_EXCEPTION: {
-//                if (regExceptionContinue.reset(str).find()) {
+//                if (regExceptionContinue.matcher(str).find()) {
 //                    m_MessageContents.add(s.substring(1));
 //                } else {
 //                    addException();
@@ -820,7 +820,7 @@ public class WWEParser extends WebParser {
 //            }
 //            break;
             case STATE_IndexList: {
-                if (regIndexList.reset(str).find()) {
+                if (regIndexList.matcher(str).find()) {
                     m_MessageContents.add(str);
 
                 } else {
@@ -857,7 +857,7 @@ public class WWEParser extends WebParser {
             break;
 
             case STATE_TMESSAGE_EVENT:
-                if ((m = regTMessageStart.reset(str)).find()) {
+                if ((m = regTMessageStart.matcher(str)).find()) {
                     m_msgName = m.group(1);
                     m_ParserState = ParserState.STATE_TMESSAGE_ATTRIBUTES;
                 } else {
@@ -967,56 +967,56 @@ public class WWEParser extends WebParser {
             rxs.add(new ReplaceLiteral(" Creating setting for object", "<Creating setting for object>", true));
             rxs.add(new ReplaceLiteral(": TelephonyUserMonitorV2.UserSessionInfo", "<Creating setting for object>", true));
 
-            rxs.add(new ReplaceRx(Pattern.compile("^(UpdateRequest: index .+)$", Pattern.CASE_INSENSITIVE).matcher(""), 1, "<UpdateRequest: index>", true));
-            rxs.add(new ReplaceRx(Pattern.compile("^(Unregistering from TServer device .+)$", Pattern.CASE_INSENSITIVE).matcher(""), 1, "<Unregistering from TServer device>", true));
-            rxs.add(new ReplaceRx(Pattern.compile("^(Unregistering DN .+)$", Pattern.CASE_INSENSITIVE).matcher(""), 1, "<Unregistering DN>", true));
-            rxs.add(new ReplaceRx(Pattern.compile("^Successfully saved heartbeat qualifier(.+)").matcher(""), 1, "<...>", true));
-            rxs.add(new ReplaceRx(Pattern.compile("\\$Servlet3SaveToSessionRequestWrapper@(\\w+)", Pattern.CASE_INSENSITIVE).matcher(""),1, "<wrapperNo>"));
-            rxs.add(new ReplaceRx(Pattern.compile("last connect (\\d+) ms ago").matcher(""),1, "<secs>"));
-            rxs.add(new ReplaceRx(Pattern.compile("/meta/(?:dis)?connect, id=(\\d+)").matcher(""),1, "<id>"));
-//            rxs.add(new ReplaceRx(Pattern.compile("client ([\\w\\-]+) ").matcher(""),1, "<clientID>"));
-//            rxs.add(new ReplaceRx(Pattern.compile("^\\< client ([\\w\\-]+) ").matcher(""),1, "<clientId>"));
-//            rxs.add(new ReplaceRx(Pattern.compile("clientId=(\\w+),").matcher(""),1, "<clientID>"));
-//            rxs.add(new ReplaceRx(Pattern.compile("Session \\[(\\w+)\\]").matcher(""),1, "<session>"));
-            rxs.add(new ReplaceRx(Pattern.compile("contact center \\[([\\w\\-]+)\\]").matcher(""),1, "<ccID>"));
-            rxs.add(new ReplaceRx(Pattern.compile("referenceId \\[([\\w\\-]+)\\]", Pattern.CASE_INSENSITIVE).matcher(""),1, "<refID>"));
-            rxs.add(new ReplaceRx(Pattern.compile("[\\s\\[]Number=?\\[?([\\w\\-]+)\\]?", Pattern.CASE_INSENSITIVE).matcher(""),1, "<number>"));
-            rxs.add(new ReplaceRx(Pattern.compile("session\\.SessionInformation@(\\w+)").matcher(""),1, "<SessionInstance>"));
-            rxs.add(new ReplaceRx(Pattern.compile(" DN \\[?([\\w\\-]+)\\]?").matcher(""),1, "<DN>"));
-            rxs.add(new ReplaceRx(Pattern.compile(" Employee ID: (.+)\\]").matcher(""),1, "<Employee ID>"));
-            rxs.add(new ReplaceRx(Pattern.compile(" Place(?:(?: name| by name))? \\[?([^\\],]+)\\]?", Pattern.CASE_INSENSITIVE).matcher(""),1, "<Place>"));
-            rxs.add(new ReplaceRx(Pattern.compile(" took \\[(\\d+)ms\\]").matcher(""),1, "<xx>"));
-            rxs.add(new ReplaceRx(Pattern.compile("Object \\[*(\\S+)\\]*").matcher(""),1, "<obj>"));
-            rxs.add(new ReplaceRx(Pattern.compile("referenceid=(\\w+)", Pattern.CASE_INSENSITIVE).matcher(""),1, "<refID>"));
-            rxs.add(new ReplaceRx(Pattern.compile("userToken=\\[*(\\w+)\\]*").matcher(""),1, "<userToken>"));
-            rxs.add(new ReplaceRx(Pattern.compile("destination \\[*([^\\s\\]]+)\\]*").matcher(""),1, "<DN>"));
-            rxs.add(new ReplaceRx(Pattern.compile("DeviceRuntimeContext\\(dn=(\\S+)").matcher(""),1, "<DN>"));
-            rxs.add(new ReplaceRx(Pattern.compile("Place name \\[*(\\S+)\\]*").matcher(""),1, "<Place>"));
-            rxs.add(new ReplaceRx(Pattern.compile("[Cc]all \\[(\\S+)\\]").matcher(""),1, "<ConnID>"));
-            rxs.add(new ReplaceRx(Pattern.compile("(?:with parent|relatedConnId|related connId) \\[(\\S+)\\]").matcher(""),1, "<ConnID>"));
+            rxs.add(new ReplaceRx(Pattern.compile("^(UpdateRequest: index .+)$", Pattern.CASE_INSENSITIVE), 1, "<UpdateRequest: index>", true));
+            rxs.add(new ReplaceRx(Pattern.compile("^(Unregistering from TServer device .+)$", Pattern.CASE_INSENSITIVE), 1, "<Unregistering from TServer device>", true));
+            rxs.add(new ReplaceRx(Pattern.compile("^(Unregistering DN .+)$", Pattern.CASE_INSENSITIVE), 1, "<Unregistering DN>", true));
+            rxs.add(new ReplaceRx(Pattern.compile("^Successfully saved heartbeat qualifier(.+)"), 1, "<...>", true));
+            rxs.add(new ReplaceRx(Pattern.compile("\\$Servlet3SaveToSessionRequestWrapper@(\\w+)", Pattern.CASE_INSENSITIVE),1, "<wrapperNo>"));
+            rxs.add(new ReplaceRx(Pattern.compile("last connect (\\d+) ms ago"),1, "<secs>"));
+            rxs.add(new ReplaceRx(Pattern.compile("/meta/(?:dis)?connect, id=(\\d+)"),1, "<id>"));
+//            rxs.add(new ReplaceRx(Pattern.compile("client ([\\w\\-]+) "),1, "<clientID>"));
+//            rxs.add(new ReplaceRx(Pattern.compile("^\\< client ([\\w\\-]+) "),1, "<clientId>"));
+//            rxs.add(new ReplaceRx(Pattern.compile("clientId=(\\w+),"),1, "<clientID>"));
+//            rxs.add(new ReplaceRx(Pattern.compile("Session \\[(\\w+)\\]"),1, "<session>"));
+            rxs.add(new ReplaceRx(Pattern.compile("contact center \\[([\\w\\-]+)\\]"),1, "<ccID>"));
+            rxs.add(new ReplaceRx(Pattern.compile("referenceId \\[([\\w\\-]+)\\]", Pattern.CASE_INSENSITIVE),1, "<refID>"));
+            rxs.add(new ReplaceRx(Pattern.compile("[\\s\\[]Number=?\\[?([\\w\\-]+)\\]?", Pattern.CASE_INSENSITIVE),1, "<number>"));
+            rxs.add(new ReplaceRx(Pattern.compile("session\\.SessionInformation@(\\w+)"),1, "<SessionInstance>"));
+            rxs.add(new ReplaceRx(Pattern.compile(" DN \\[?([\\w\\-]+)\\]?"),1, "<DN>"));
+            rxs.add(new ReplaceRx(Pattern.compile(" Employee ID: (.+)\\]"),1, "<Employee ID>"));
+            rxs.add(new ReplaceRx(Pattern.compile(" Place(?:(?: name| by name))? \\[?([^\\],]+)\\]?", Pattern.CASE_INSENSITIVE),1, "<Place>"));
+            rxs.add(new ReplaceRx(Pattern.compile(" took \\[(\\d+)ms\\]"),1, "<xx>"));
+            rxs.add(new ReplaceRx(Pattern.compile("Object \\[*(\\S+)\\]*"),1, "<obj>"));
+            rxs.add(new ReplaceRx(Pattern.compile("referenceid=(\\w+)", Pattern.CASE_INSENSITIVE),1, "<refID>"));
+            rxs.add(new ReplaceRx(Pattern.compile("userToken=\\[*(\\w+)\\]*"),1, "<userToken>"));
+            rxs.add(new ReplaceRx(Pattern.compile("destination \\[*([^\\s\\]]+)\\]*"),1, "<DN>"));
+            rxs.add(new ReplaceRx(Pattern.compile("DeviceRuntimeContext\\(dn=(\\S+)"),1, "<DN>"));
+            rxs.add(new ReplaceRx(Pattern.compile("Place name \\[*(\\S+)\\]*"),1, "<Place>"));
+            rxs.add(new ReplaceRx(Pattern.compile("[Cc]all \\[(\\S+)\\]"),1, "<ConnID>"));
+            rxs.add(new ReplaceRx(Pattern.compile("(?:with parent|relatedConnId|related connId) \\[(\\S+)\\]"),1, "<ConnID>"));
 
-            rxs.add(new ReplaceRx(Pattern.compile("java.lang.Object;([^,]+),").matcher(""),1, "<SomeID>"));
-            rxs.add(new ReplaceRx(Pattern.compile("FirstName: (.+)").matcher(""),1, "<The guy>"));
-            rxs.add(new ReplaceRx(Pattern.compile("\\[DBID=([^\\]]+)\\]").matcher(""),1, "<DBID>"));
-            rxs.add(new ReplaceRx(Pattern.compile("Attempting to start contact center.+\\(([^\\)]+)\\)$").matcher(""),1, "<UserName>"));
-            rxs.add(new ReplaceRx(Pattern.compile("timestampMicros=(\\d+),").matcher(""),1, "<timestampMicros>"));
-            rxs.add(new ReplaceRx(Pattern.compile("^Starting registration for device \\[Id=([^,]+),").matcher(""),1, "<DeviceID>"));
-            rxs.add(new ReplaceRx(Pattern.compile("AgentStateDescriptorV2\\(id=([^,\\s]+)").matcher(""),1, "<AgentStateDescriptorID>"));
-            rxs.add(new ReplaceRx(Pattern.compile("contact \\[(\\w+)\\]").matcher(""),1, "<contactID>"));
-            rxs.add(new ReplaceRx(Pattern.compile("contact \\[(\\w+)\\]").matcher(""),1, "<contactID>"));
-            rxs.add(new ReplaceRx(Pattern.compile("with referenceId (\\d+)").matcher(""),1, "<refID>"));
-            rxs.add(new ReplaceRx(Pattern.compile("found [([^\\]]+)] documents").matcher(""),1, "<num>"));
-            rxs.add(new ReplaceRx(Pattern.compile("foundDocuments=([^,\\s]+),").matcher(""),1, "<num>"));
-            rxs.add(new ReplaceRx(Pattern.compile("sessions for (\\w+)").matcher(""),1, "<session>"));
-            rxs.add(new ReplaceRx(Pattern.compile(" client ([\\w\\-]+)").matcher(""),1, "<client>"));
-            rxs.add(new ReplaceRx(Pattern.compile("userToken=(\\w+)").matcher(""),1, "<userID?>"));
-            rxs.add(new ReplaceRx(Pattern.compile("referenceId (\\d+)").matcher(""),1, "<refID>"));
-            rxs.add(new ReplaceRx(Pattern.compile("universalcontactserver\\.tasks\\.UpdateUcsInteractionTaskV2@(\\w+)").matcher(""),1, "<instanceID>"));
-            rxs.add(new ReplaceRx(Pattern.compile(", index=(\\d+),").matcher(""),1, "<ID>"));
-            rxs.add(new ReplaceRx(Pattern.compile("﻿AgentState operation name \\[([^\\]]+)\\]").matcher(""),1, "<ACW>"));
-            rxs.add(new ReplaceRx(Pattern.compile("Extracted ReasonCode \\[([^\\]]+)\\]").matcher(""),1, "<ACW>"));
-            rxs.add(new ReplaceRx(Pattern.compile("﻿operationName=([^\\],]+)").matcher(""),1, "<ACW>"));
-            rxs.add(new ReplaceRx(Pattern.compile("Found \\[(\\d+)\\]").matcher(""),1, "<NUM>"));
+            rxs.add(new ReplaceRx(Pattern.compile("java.lang.Object;([^,]+),"),1, "<SomeID>"));
+            rxs.add(new ReplaceRx(Pattern.compile("FirstName: (.+)"),1, "<The guy>"));
+            rxs.add(new ReplaceRx(Pattern.compile("\\[DBID=([^\\]]+)\\]"),1, "<DBID>"));
+            rxs.add(new ReplaceRx(Pattern.compile("Attempting to start contact center.+\\(([^\\)]+)\\)$"),1, "<UserName>"));
+            rxs.add(new ReplaceRx(Pattern.compile("timestampMicros=(\\d+),"),1, "<timestampMicros>"));
+            rxs.add(new ReplaceRx(Pattern.compile("^Starting registration for device \\[Id=([^,]+),"),1, "<DeviceID>"));
+            rxs.add(new ReplaceRx(Pattern.compile("AgentStateDescriptorV2\\(id=([^,\\s]+)"),1, "<AgentStateDescriptorID>"));
+            rxs.add(new ReplaceRx(Pattern.compile("contact \\[(\\w+)\\]"),1, "<contactID>"));
+            rxs.add(new ReplaceRx(Pattern.compile("contact \\[(\\w+)\\]"),1, "<contactID>"));
+            rxs.add(new ReplaceRx(Pattern.compile("with referenceId (\\d+)"),1, "<refID>"));
+            rxs.add(new ReplaceRx(Pattern.compile("found [([^\\]]+)] documents"),1, "<num>"));
+            rxs.add(new ReplaceRx(Pattern.compile("foundDocuments=([^,\\s]+),"),1, "<num>"));
+            rxs.add(new ReplaceRx(Pattern.compile("sessions for (\\w+)"),1, "<session>"));
+            rxs.add(new ReplaceRx(Pattern.compile(" client ([\\w\\-]+)"),1, "<client>"));
+            rxs.add(new ReplaceRx(Pattern.compile("userToken=(\\w+)"),1, "<userID?>"));
+            rxs.add(new ReplaceRx(Pattern.compile("referenceId (\\d+)"),1, "<refID>"));
+            rxs.add(new ReplaceRx(Pattern.compile("universalcontactserver\\.tasks\\.UpdateUcsInteractionTaskV2@(\\w+)"),1, "<instanceID>"));
+            rxs.add(new ReplaceRx(Pattern.compile(", index=(\\d+),"),1, "<ID>"));
+            rxs.add(new ReplaceRx(Pattern.compile("﻿AgentState operation name \\[([^\\]]+)\\]"),1, "<ACW>"));
+            rxs.add(new ReplaceRx(Pattern.compile("Extracted ReasonCode \\[([^\\]]+)\\]"),1, "<ACW>"));
+            rxs.add(new ReplaceRx(Pattern.compile("﻿operationName=([^\\],]+)"),1, "<ACW>"));
+            rxs.add(new ReplaceRx(Pattern.compile("Found \\[(\\d+)\\]"),1, "<NUM>"));
 
         }
 
@@ -1065,15 +1065,15 @@ public class WWEParser extends WebParser {
 
         private class ReplaceRx extends ICleanString {
 
-            private final Matcher p;
+            private  final Pattern p;
             private final int idx;
             private final String replaceString;
 
-            public ReplaceRx(Matcher p, int idx, String replaceString) {
+            public ReplaceRx(Pattern p, int idx, String replaceString) {
                 this(p, idx, replaceString, false);
             }
 
-            public ReplaceRx(Matcher p, int idx, String replaceString, boolean isFinal) {
+            public ReplaceRx(Pattern p, int idx, String replaceString, boolean isFinal) {
                 super(isFinal);
                 this.p = p;
                 this.idx = idx;
@@ -1460,41 +1460,38 @@ public class WWEParser extends WebParser {
         }
 
         @Override
-        public void AddToDB(Record _rec) {
+            public void AddToDB(Record _rec) throws SQLException {
             WWEStatServerMsg rec = (WWEStatServerMsg) _rec;
-            PreparedStatement stmt = getM_dbAccessor().GetStatement(m_InsertStatementId);
+            getM_dbAccessor().addToDB(m_InsertStatementId, new IFillStatement() {
+                @Override
+                public void fillStatement(PreparedStatement stmt) throws SQLException {
+                    stmt.setTimestamp(1, new Timestamp(rec.GetAdjustedUsecTime()));
+                    stmt.setInt(2, WWEStatServerMsg.getFileId());
+                    stmt.setLong(3, rec.getM_fileOffset());
+                    stmt.setLong(4, rec.getM_FileBytes());
+                    stmt.setLong(5, rec.getM_line());
 
-            try {
-                stmt.setTimestamp(1, new Timestamp(rec.GetAdjustedUsecTime()));
-                stmt.setInt(2, WWEStatServerMsg.getFileId());
-                stmt.setLong(3, rec.getM_fileOffset());
-                stmt.setLong(4, rec.getM_FileBytes());
-                stmt.setLong(5, rec.getM_line());
+                    setFieldInt(stmt, 6, Main.getRef(ReferenceType.IP, rec.getIp()));
+                    setFieldInt(stmt, 7, Main.getRef(ReferenceType.JSessionID, rec.getjSessionID()));
+                    setFieldInt(stmt, 8, Main.getRef(ReferenceType.HTTPURL, rec.getUrl()));
+                    setFieldInt(stmt, 9, Main.getRef(ReferenceType.MSGLEVEL, rec.getLevel()));
+                    setFieldInt(stmt, 10, Main.getRef(ReferenceType.JAVA_CLASS, rec.getClassName()));
+                    setFieldInt(stmt, 11, Main.getRef(ReferenceType.Misc, rec.getMsgText()));
+                    setFieldInt(stmt, 12, Main.getRef(ReferenceType.Agent, rec.getUserName()));
+                    setFieldInt(stmt, 13, Main.getRef(ReferenceType.MiscParam, rec.getParam1()));
+                    setFieldInt(stmt, 14, Main.getRef(ReferenceType.UUID, rec.getUUID()));
+                    setFieldInt(stmt, 15, Main.getRef(ReferenceType.IxnID, rec.getIxnID()));
+                    setFieldInt(stmt, 16, Main.getRef(ReferenceType.GWSDeviceID, rec.getDeviceID()));
+                    setFieldInt(stmt, 17, Main.getRef(ReferenceType.MiscParam, rec.getParam2()));
+                    setFieldInt(stmt, 18, Main.getRef(ReferenceType.WWEUserID, rec.getUserID()));
+                    setFieldInt(stmt, 19, Main.getRef(ReferenceType.WWEBrowserClient, rec.getBrowserClient()));
+                    setFieldInt(stmt, 20, Main.getRef(ReferenceType.WWEBrowserSession, rec.getSessionID()));
 
-                setFieldInt(stmt, 6, Main.getRef(ReferenceType.IP, rec.getIp()));
-                setFieldInt(stmt, 7, Main.getRef(ReferenceType.JSessionID, rec.getjSessionID()));
-                setFieldInt(stmt, 8, Main.getRef(ReferenceType.HTTPURL, rec.getUrl()));
-                setFieldInt(stmt, 9, Main.getRef(ReferenceType.MSGLEVEL, rec.getLevel()));
-                setFieldInt(stmt, 10, Main.getRef(ReferenceType.JAVA_CLASS, rec.getClassName()));
-                setFieldInt(stmt, 11, Main.getRef(ReferenceType.Misc, rec.getMsgText()));
-                setFieldInt(stmt, 12, Main.getRef(ReferenceType.Agent, rec.getUserName()));
-                setFieldInt(stmt, 13, Main.getRef(ReferenceType.MiscParam, rec.getParam1()));
-                setFieldInt(stmt, 14, Main.getRef(ReferenceType.UUID, rec.getUUID()));
-                setFieldInt(stmt, 15, Main.getRef(ReferenceType.IxnID, rec.getIxnID()));
-                setFieldInt(stmt, 16, Main.getRef(ReferenceType.GWSDeviceID, rec.getDeviceID()));
-                setFieldInt(stmt, 17, Main.getRef(ReferenceType.MiscParam, rec.getParam2()));
-                setFieldInt(stmt, 18, Main.getRef(ReferenceType.WWEUserID, rec.getUserID()));
-                setFieldInt(stmt, 19, Main.getRef(ReferenceType.WWEBrowserClient, rec.getBrowserClient()));
-                setFieldInt(stmt, 20, Main.getRef(ReferenceType.WWEBrowserSession, rec.getSessionID()));
-
-                getM_dbAccessor().SubmitStatement(m_InsertStatementId);
-            } catch (SQLException e) {
-                Main.logger.error("Could not add record type " + m_type.toString() + ": " + e, e);
-            }
+                }
+            });
         }
-
     }
-//</editor-fold> 
+//</editor-fold>
 
     private class WWEDebugMsg extends Message {
 
@@ -1842,11 +1839,11 @@ public class WWEParser extends WebParser {
         }
 
         @Override
-        public void AddToDB(Record _rec) {
+            public void AddToDB(Record _rec) throws SQLException {
             WWEDebugMsg rec = (WWEDebugMsg) _rec;
-            PreparedStatement stmt = getM_dbAccessor().GetStatement(m_InsertStatementId);
-
-            try {
+            getM_dbAccessor().addToDB(m_InsertStatementId, new IFillStatement() {
+                @Override
+                public void fillStatement(PreparedStatement stmt) throws SQLException{
                 stmt.setTimestamp(1, new Timestamp(rec.GetAdjustedUsecTime()));
                 stmt.setInt(2, WWEDebugMsg.getFileId());
                 stmt.setLong(3, rec.getM_fileOffset());
@@ -1869,12 +1866,9 @@ public class WWEParser extends WebParser {
                 setFieldInt(stmt, 19, Main.getRef(ReferenceType.WWEBrowserClient, rec.getBrowserClient()));
                 setFieldInt(stmt, 20, Main.getRef(ReferenceType.WWEBrowserSession, rec.getSessionID()));
 
-                getM_dbAccessor().SubmitStatement(m_InsertStatementId);
-            } catch (SQLException e) {
-                Main.logger.error("Could not add record type " + m_type.toString() + ": " + e, e);
-            }
+                }
+            });
         }
-
     }
 //</editor-fold>
 
@@ -1925,11 +1919,11 @@ public class WWEParser extends WebParser {
 //                    if (txt.startsWith("<")) {
 //                        Matcher m;
 //                        boolean emptyMsg = false;
-//                        if ((m = regBayeuxNotificationType.reset(txt)).find()) {
+//                        if ((m = regBayeuxNotificationType.matcher(txt)).find()) {
 //                            super.setParam2(m.group(1));
 //                            emptyMsg = true;
 //                        }
-////                        if ((m = regBayeuxMessageType.reset(txt)).find()) {
+////                        if ((m = regBayeuxMessageType.matcher(txt)).find()) {
 ////                            super.setParam1(m.group(1));
 ////                            emptyMsg = true;
 ////                        }
@@ -2075,11 +2069,11 @@ public class WWEParser extends WebParser {
         }
 
         @Override
-        public void AddToDB(Record _rec) {
+            public void AddToDB(Record _rec) throws SQLException {
             WWEBayeuxSMsg rec = (WWEBayeuxSMsg) _rec;
-            PreparedStatement stmt = getM_dbAccessor().GetStatement(m_InsertStatementId);
-
-            try {
+            getM_dbAccessor().addToDB(m_InsertStatementId, new IFillStatement() {
+                @Override
+                public void fillStatement(PreparedStatement stmt) throws SQLException{
                 stmt.setTimestamp(1, new Timestamp(rec.GetAdjustedUsecTime()));
                 stmt.setInt(2, WWEBayeuxSMsg.getFileId());
                 stmt.setLong(3, rec.getM_fileOffset());
@@ -2105,11 +2099,10 @@ public class WWEParser extends WebParser {
                 setFieldInt(stmt, 22, Main.getRef(ReferenceType.BayeuxMessageType, rec.getMsgType()));
                 setFieldInt(stmt, 23, Main.getRef(ReferenceType.WWEBrowserClient, rec.getBrowserClient()));
 
-                getM_dbAccessor().SubmitStatement(m_InsertStatementId);
-            } catch (SQLException e) {
-                Main.logger.error("Could not add record type " + m_type.toString() + ": " + e, e);
-            }
+                }
+            });
         }
+
 
     }
 //</editor-fold>
@@ -2204,11 +2197,11 @@ public class WWEParser extends WebParser {
         }
 
         @Override
-        public void AddToDB(Record _rec) {
+            public void AddToDB(Record _rec) throws SQLException {
             WWEUCSMsg rec = (WWEUCSMsg) _rec;
-            PreparedStatement stmt = getM_dbAccessor().GetStatement(m_InsertStatementId);
-
-            try {
+            getM_dbAccessor().addToDB(m_InsertStatementId, new IFillStatement() {
+                @Override
+                public void fillStatement(PreparedStatement stmt) throws SQLException{
                 stmt.setTimestamp(1, new Timestamp(rec.GetAdjustedUsecTime()));
                 stmt.setInt(2, WWEUCSMsg.getFileId());
                 stmt.setLong(3, rec.getM_fileOffset());
@@ -2228,12 +2221,9 @@ public class WWEParser extends WebParser {
                 setFieldInt(stmt, 15, Main.getRef(ReferenceType.UUID, rec.getUUID()));
                 setFieldInt(stmt, 16, Main.getRef(ReferenceType.IxnID, rec.getIxnID()));
 
-                getM_dbAccessor().SubmitStatement(m_InsertStatementId);
-            } catch (SQLException e) {
-                Main.logger.error("Could not add record type " + m_type.toString() + ": " + e, e);
-            }
+                }
+            });
         }
-
     }
 //</editor-fold>
 
@@ -2456,11 +2446,11 @@ public class WWEParser extends WebParser {
         }
 
         @Override
-        public void AddToDB(Record _rec) {
+            public void AddToDB(Record _rec) throws SQLException {
             WWEIxnServerMsg rec = (WWEIxnServerMsg) _rec;
-            PreparedStatement stmt = getM_dbAccessor().GetStatement(m_InsertStatementId);
-
-            try {
+            getM_dbAccessor().addToDB(m_InsertStatementId, new IFillStatement() {
+                @Override
+                public void fillStatement(PreparedStatement stmt) throws SQLException{
                 stmt.setTimestamp(1, new Timestamp(rec.GetAdjustedUsecTime()));
                 stmt.setInt(2, WWEIxnServerMsg.getFileId());
                 stmt.setLong(3, rec.getM_fileOffset());
@@ -2469,12 +2459,9 @@ public class WWEParser extends WebParser {
 
                 setFieldInt(stmt, 6, Main.getRef(ReferenceType.TEvent, rec.getMsgName()));
 
-                getM_dbAccessor().SubmitStatement(m_InsertStatementId);
-            } catch (SQLException e) {
-                Main.logger.error("Could not add record type " + m_type.toString() + ": " + e, e);
-            }
+                }
+            });
         }
-
     }
 //</editor-fold>
 //<editor-fold defaultstate="collapsed" desc="WWEUCSConfigMsg">
@@ -2563,11 +2550,11 @@ public class WWEParser extends WebParser {
         }
 
         @Override
-        public void AddToDB(Record _rec) {
+            public void AddToDB(Record _rec) throws SQLException {
             WWEUCSConfigMsg rec = (WWEUCSConfigMsg) _rec;
-            PreparedStatement stmt = getM_dbAccessor().GetStatement(m_InsertStatementId);
-
-            try {
+            getM_dbAccessor().addToDB(m_InsertStatementId, new IFillStatement() {
+                @Override
+                public void fillStatement(PreparedStatement stmt) throws SQLException{
                 stmt.setTimestamp(1, new Timestamp(rec.GetAdjustedUsecTime()));
                 stmt.setInt(2, WWEUCSConfigMsg.getFileId());
                 stmt.setLong(3, rec.getM_fileOffset());
@@ -2584,11 +2571,10 @@ public class WWEParser extends WebParser {
 
                 setFieldInt(stmt, 13, Main.getRef(ReferenceType.TEvent, rec.getMsgName()));
 
-                getM_dbAccessor().SubmitStatement(m_InsertStatementId);
-            } catch (SQLException e) {
-                Main.logger.error("Could not add record type " + m_type.toString() + ": " + e, e);
-            }
+                }
+            });
         }
+
 
     }
 //</editor-fold>

@@ -56,7 +56,7 @@ public class IconMessage extends Message {
         return GetHeaderValue("AttributeTransferConnID");
     }
 
-    public void AddToDB(DBAccessor accessor) {
+    public void AddToDB(SqliteAccessor accessor) throws SQLException {
         String str;
         String thisDN = GetHeaderValue("AttributeThisDN ");
         if (thisDN == null) {
@@ -78,15 +78,18 @@ public class IconMessage extends Message {
             ani = GetHeaderValue("AttributeANI\t");
         }
 
-        PreparedStatement stmt = accessor.GetStatement(m_statementId);
-
-        try {
-            stmt.setTimestamp(1, new Timestamp(GetAdjustedUsecTime()));
+        String finalThisDN = thisDN;
+        String finalOtherDN = otherDN;
+        String finalAgentID = agentID;
+        String finalAni = ani;
+        accessor.addToDB(m_statementId, new IFillStatement() {
+            @Override
+            public void fillStatement(PreparedStatement stmt) throws SQLException{            stmt.setTimestamp(1, new Timestamp(GetAdjustedUsecTime()));
             DBTable.setFieldString(stmt, 2, GetMessageName());
-            DBTable.setFieldString(stmt, 3, thisDN);
-            DBTable.setFieldString(stmt, 4, otherDN);
-            DBTable.setFieldString(stmt, 5, agentID);
-            DBTable.setFieldString(stmt, 6, ani);
+            DBTable.setFieldString(stmt, 3, finalThisDN);
+            DBTable.setFieldString(stmt, 4, finalOtherDN);
+            DBTable.setFieldString(stmt, 5, finalAgentID);
+            DBTable.setFieldString(stmt, 6, finalAni);
             DBTable.setFieldString(stmt, 7, GetConnID());
             DBTable.setFieldString(stmt, 8, GetTransferConnID());
             stmt.setInt(9, getFileId());
@@ -95,10 +98,10 @@ public class IconMessage extends Message {
             stmt.setInt(12, 0);
             stmt.setInt(13, getM_line());
 
-            accessor.SubmitStatement(m_statementId);
-        } catch (SQLException e) {
-            Main.logger.error("Could not add TLib/ICON message: " + e, e);
-        }
+            }
+        });
     }
+
+
 
 }

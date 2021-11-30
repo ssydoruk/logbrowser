@@ -62,11 +62,11 @@ public class GMSORSTable extends DBTable {
     }
 
     @Override
-    public void AddToDB(Record rec) {
+    public void AddToDB(Record rec) throws SQLException {
         GMSORSMessage gmsRec = (GMSORSMessage) rec;
-        PreparedStatement stmt = getM_dbAccessor().GetStatement(m_InsertStatementId);
-
-        try {
+        getM_dbAccessor().addToDB(m_InsertStatementId, new IFillStatement() {
+            @Override
+            public void fillStatement(PreparedStatement stmt) throws SQLException{
 
             stmt.setTimestamp(1, new Timestamp(gmsRec.GetAdjustedUsecTime()));
             stmt.setInt(2, GMSORSMessage.getFileId());
@@ -80,11 +80,11 @@ public class GMSORSTable extends DBTable {
             setFieldInt(stmt, 9, Main.getRef(ReferenceType.ORSREQ, gmsRec.getORSReq()));
             stmt.setBoolean(10, gmsRec.isInbound());
 
-            getM_dbAccessor().SubmitStatement(m_InsertStatementId);
-        } catch (SQLException e) {
-            Main.logger.error("Could not add message type " + getM_type() + ": " + e, e);
-        }
-
+            }
+        });
     }
+
+
+
 
 }

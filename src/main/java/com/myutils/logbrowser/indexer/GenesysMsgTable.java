@@ -65,11 +65,11 @@ public class GenesysMsgTable extends DBTable {
     }
 
     @Override
-    public void AddToDB(Record _rec) {
+        public void AddToDB(Record _rec) throws SQLException {
         GenesysMsg rec = (GenesysMsg) _rec;
-        PreparedStatement stmt = getM_dbAccessor().GetStatement(m_InsertStatementId);
-
-        try {
+         getM_dbAccessor().addToDB(m_InsertStatementId, new IFillStatement() {
+                @Override
+                public void fillStatement(PreparedStatement stmt) throws SQLException{
             stmt.setTimestamp(1, new Timestamp(rec.GetAdjustedUsecTime()));
             stmt.setInt(2, GenesysMsg.getFileId());
             stmt.setLong(3, rec.getM_fileOffset());
@@ -79,11 +79,9 @@ public class GenesysMsgTable extends DBTable {
             stmt.setInt(6, rec.getLevel());
             stmt.setInt(7, rec.getMsgID());
 
-            getM_dbAccessor().SubmitStatement(m_InsertStatementId);
-            rec.setSavedToDB(true);
-        } catch (SQLException e) {
-            Main.logger.error("Could not add record type " + m_type.toString() + ": " + e, e);
-        }
+                }
+         });
     }
+
 
 }

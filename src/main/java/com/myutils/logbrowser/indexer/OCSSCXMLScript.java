@@ -13,7 +13,7 @@ public class OCSSCXMLScript extends Message {
     //-> SCXML : 0000017F-040206B5-0001  METRIC <extension name="set_flex_attr" namespace="http://genesyslabs.com/schemas/ocs/treatments" />
 //
 //-> SCXML : 0000017F-040206B5-0001  1 SetFlexAttrAction.Execute()
-    private static final Matcher regMetric = Pattern.compile("^\\s*METRIC <(\\w+)").matcher("");
+    private static final Pattern regMetric = Pattern.compile("^\\s*METRIC <(\\w+)");
     private final String sessID;
     private final String rest;
 

@@ -50,11 +50,11 @@ public class TriggerTable extends DBTable {
     }
 
     @Override
-    public void AddToDB(Record rec) {
+    public void AddToDB(Record rec) throws SQLException {
         Trigger theRec = (Trigger) rec;
-        PreparedStatement stmt = getM_dbAccessor().GetStatement(m_InsertStatementId);
-
-        try {
+        getM_dbAccessor().addToDB(m_InsertStatementId, new IFillStatement() {
+            @Override
+            public void fillStatement(PreparedStatement stmt) throws SQLException{
             stmt.setInt(1, Main.getRef(ReferenceType.HANDLER, theRec.getM_text()));
             Main.logger.trace("theRec.m_handlerId:"
                     + Trigger.m_handlerId + " theRec.m_msgId:"
@@ -68,11 +68,9 @@ public class TriggerTable extends DBTable {
             stmt.setLong(7, theRec.getM_fileOffset());
             stmt.setInt(8, theRec.getM_line());
 
-            getM_dbAccessor().SubmitStatement(m_InsertStatementId);
-        } catch (SQLException e) {
-            Main.logger.error("Could not add trigger: " + e, e);
-        }
-
+            }
+        });
     }
+
 
 }

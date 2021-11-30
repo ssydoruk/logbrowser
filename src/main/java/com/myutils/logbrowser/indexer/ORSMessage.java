@@ -17,10 +17,10 @@ import static Utils.Util.intOrDef;
  */
 public class ORSMessage extends Message {
 
-    private static final Matcher regShortConnID = Pattern.compile("^\\sIID:(.+)$").matcher("");
-    private static final Matcher regShortThisDN = Pattern.compile("^\\sTDN:(.+)$").matcher("");
-    private static final Matcher regShortThisDNIS = Pattern.compile("^\\sDNIS:(.+)$").matcher("");
-    private static final Matcher regShortANI = Pattern.compile("^\\sANI:(.+)$").matcher("");
+    private static final Pattern regShortConnID = Pattern.compile("^\\sIID:(.+)$");
+    private static final Pattern regShortThisDN = Pattern.compile("^\\sTDN:(.+)$");
+    private static final Pattern regShortThisDNIS = Pattern.compile("^\\sDNIS:(.+)$");
+    private static final Pattern regShortANI = Pattern.compile("^\\sANI:(.+)$");
     private final String m_TserverSRC;
     String m_MessageName;
     private String m_refID;

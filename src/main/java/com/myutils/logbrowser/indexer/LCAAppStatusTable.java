@@ -73,11 +73,11 @@ public class LCAAppStatusTable extends DBTable {
     }
 
     @Override
-    public void AddToDB(Record _rec) {
+        public void AddToDB(Record _rec) throws SQLException {
         LCAAppStatus rec = (LCAAppStatus) _rec;
-        PreparedStatement stmt = getM_dbAccessor().GetStatement(m_InsertStatementId);
-
-        try {
+        getM_dbAccessor().addToDB(m_InsertStatementId, new IFillStatement() {
+            @Override
+            public void fillStatement(PreparedStatement stmt) throws SQLException{
             stmt.setTimestamp(1, new Timestamp(rec.GetAdjustedUsecTime()));
             stmt.setInt(2, SCSAppStatus.getFileId());
             stmt.setLong(3, rec.getM_fileOffset());
@@ -93,10 +93,9 @@ public class LCAAppStatusTable extends DBTable {
             setFieldInt(stmt, 12, Main.getRef(ReferenceType.SCSEvent, rec.getEvent()));
             setFieldInt(stmt, 13, Main.getRef(ReferenceType.App, rec.getRequestor()));
 
-            getM_dbAccessor().SubmitStatement(m_InsertStatementId);
-        } catch (SQLException e) {
-            Main.logger.error("Could not add record type " + m_type.toString() + ": " + e, e);
-        }
+            }
+        });
     }
+
 
 }

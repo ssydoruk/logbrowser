@@ -19,9 +19,9 @@ public class OcsMessage extends Message {
      * @param newMessageLines
      * @param isTServerReq
      */
-    private static final Matcher regStartLine = Pattern.compile("^received from \\d+\\(([^\\)]+)\\).+message (\\S+)").matcher("");
-    private static final Matcher regSentMsg = Pattern.compile("^request to (\\d+)\\(([^\\)]+)\\) message (\\w+)").matcher("");
-    private static final Matcher regPrimBackup = Pattern.compile("^([^\\/]+)/(^\\/+)$").matcher("");
+    private static final Pattern regStartLine = Pattern.compile("^received from \\d+\\(([^\\)]+)\\).+message (\\S+)");
+    private static final Pattern regSentMsg = Pattern.compile("^request to (\\d+)\\(([^\\)]+)\\) message (\\w+)");
+    private static final Pattern regPrimBackup = Pattern.compile("^([^\\/]+)/(^\\/+)$");
     private final boolean isTServerReq = false;
     String m_MessageName;
     private String m_TserverSRCp;
@@ -34,15 +34,15 @@ public class OcsMessage extends Message {
         super(TableType.OCSTLib);
         m_MessageLines = newMessageLines;
         Matcher m;
-        if ((m = regStartLine.reset(m_MessageLines.get(0))).find()) {
+        if ((m = regStartLine.matcher(m_MessageLines.get(0))).find()) {
             m_MessageName = m.group(2);
             m_TserverSRCp = m.group(1);
         } else {
             for (int i : new int[]{0, 1}) {
-                if ((m = regSentMsg.reset(m_MessageLines.get(i))).find()) {
+                if ((m = regSentMsg.matcher(m_MessageLines.get(i))).find()) {
                     m_MessageName = m.group(3);
                     String TSvr = m.group(2);
-                    if ((m = regPrimBackup.reset(TSvr)).find()) {
+                    if ((m = regPrimBackup.matcher(TSvr)).find()) {
                         m_TserverSRCp = m.group(1);
                         m_TserverSRCb = m.group(2);
                     } else {

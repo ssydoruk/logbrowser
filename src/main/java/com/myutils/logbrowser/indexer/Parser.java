@@ -27,7 +27,7 @@ public abstract class Parser {
 
     public static final int MAX_CUSTOM_FIELDS = 3;
     private static final int BASE_CUSTOM_FIELDS = 8;
-    private static final Matcher regORSSessionID = Pattern.compile("^[~\\w]{32}$").matcher("");
+    private static final Pattern regORSSessionID = Pattern.compile("^[~\\w]{32}$");
     private final String m_StringType;
     private final FileInfoType m_type;
     private final DateParsers dateParsers = new DateParsers();
@@ -42,9 +42,9 @@ public abstract class Parser {
     protected int m_lineStarted; // line where expression (TMessage) started
     protected DateParsed dp;
     protected FileInfo fileInfo;
-    //    protected static final Matcher regGenesysMessage = Pattern.compile(" (None|Debug|Trace|Interaction|Standard|Alarm|Unknown|Non|Dbg|Trc|Int|Std|Alr|Unk) (\\d{5}) ");
+    //    protected static static final Pattern regGenesysMessage = Pattern.compile(" (None|Debug|Trace|Interaction|Standard|Alarm|Unknown|Non|Dbg|Trc|Int|Std|Alr|Unk) (\\d{5}) ");
     int m_CurrentLine;
-    DBAccessor m_accessor;
+    SqliteAccessor m_accessor;
     private String lastAppID = null;
     private boolean collectingDates;
     private boolean foundBodyDates;
@@ -90,6 +90,7 @@ public abstract class Parser {
             dateDiff = new DateDiff(type);
         }
     }
+
 
     public static String getQueryKey(HashMap<String, List<String>> splitQuery, String[] keys) {
         for (String key : keys) {
@@ -169,26 +170,8 @@ public abstract class Parser {
         return Main.getInstance().getEe().isParseTDiff();
     }
 
-    static public boolean isSessionID(String resp) {
-        return resp != null && !resp.isEmpty() && regORSSessionID.reset(resp).find();
-    }
-
-    public static void main(String[] args) {
-//        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss.SSS");
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS");
-//            LocalDateTime parse = formatter.parse("20:22:45.234");
-        String d = "2020-09-28T03:41:37.895";
-//        TemporalAccessor parse = formatter.parse(d, LocalDateTime::from);
-
-        LocalDateTime parse1 = LocalDateTime.parse(d, formatter);
-        System.out.println("-1-");
-//        Instant i = Instant.from(parse);
-//            if (parse.isSupported(java.time.temporal.ChronoField.YEAR)) {
-//                LocalDateTime dt = LocalDateTime.from(parse);
-//            }
-//            System.out.println(parse.isSupported(java.time.temporal.ChronoField.YEAR));
-//            LocalDateTime dt = LocalDateTime.from(parse);
-//            System.out.println("d: " + parse.toString() + " dt:" + dt.toString());
+    public static boolean isSessionID(String resp) {
+        return resp != null && !resp.isEmpty() && regORSSessionID.matcher(resp).find();
     }
 
     protected void logError(String s) {
@@ -272,16 +255,15 @@ public abstract class Parser {
         return ret;
     }
 
-    protected String ParseGenesysTServer(String str, TableType tabType, Matcher ptIgnore, Matcher ptSkip) throws Exception {
+    protected String ParseGenesysTServer(String str, TableType tabType, Pattern ptIgnore, Pattern ptSkip) throws Exception {
         return ParseGenesys(getTServerStart(str), tabType, ptIgnore, ptSkip);
     }
 
 
-
-    private String parserRet(String ret, Matcher ptSkip) {
+    private String parserRet(String ret, Pattern ptSkip) {
         if (dp != null && ptSkip != null && ret != null) {
             Matcher m;
-            if ((m = ptSkip.reset(ret)).find()) {
+            if ((m = ptSkip.matcher(ret)).find()) {
                 dp.rest = ret.substring(m.end());
                 Main.logger.trace("Skipped per regex [" + ptSkip + "]; new rest [" + dp.rest + "]");
             }
@@ -290,12 +272,12 @@ public abstract class Parser {
         return ret;
     }
 
-    protected String ParseGenesysSCS(String str, TableType tabType, Matcher ptIgnore, Matcher ptSkip) throws Exception {
+    protected String ParseGenesysSCS(String str, TableType tabType, Pattern ptIgnore, Pattern ptSkip) throws Exception {
         return parserRet(ParseGenesysSCS(str, tabType, ptIgnore), ptSkip);
     }
 
 
-    protected String ParseGenesys(String str, TableType tabType, Matcher ptIgnore, Matcher ptSkip) throws Exception {
+    protected String ParseGenesys(String str, TableType tabType, Pattern ptIgnore, Pattern ptSkip) throws Exception {
         return parserRet(ParseGenesys(str, tabType, ptIgnore), ptSkip);
 
     }
@@ -331,7 +313,7 @@ public abstract class Parser {
         }
     }
 
-    protected String ParseGenesysSCS(String str, TableType tabType, Matcher ptMSGsIgnore) throws Exception {
+    protected String ParseGenesysSCS(String str, TableType tabType, Pattern ptMSGsIgnore) throws Exception {
         dp = ParseTimestamp(str);
         if (dp != null) {
 
@@ -355,8 +337,7 @@ public abstract class Parser {
     }
 
 
-
-    protected String ParseGenesysGMS(String str, TableType tabType, Matcher ptMSGsIgnore) throws Exception {
+    protected String ParseGenesysGMS(String str, TableType tabType, Pattern ptMSGsIgnore) throws Exception {
         dp = ParseTimestamp(str);
         if (dp != null) {
             lastLogMsg = null;
@@ -368,12 +349,16 @@ public abstract class Parser {
         }
     }
 
-    protected String ParseGenesys(String str, TableType tabType, Matcher ptMSGsIgnore) throws Exception {
+    protected String ParseGenesys(String str, TableType tabType, Pattern ptMSGsIgnore) throws Exception {
         dp = ParseTimestamp(str);
         if (dp != null) {
             lastLogMsg = null;
             lastLogMsg = GenesysMsg.CheckGenesysMsg(dp, this, tabType, ptMSGsIgnore); // not using return value. Check through the rest
-            return dp.rest;
+            if (dp == null || dp.rest == null) {
+                Main.logger.error("!!!DP=null");
+                return "";
+            } else
+                return dp.rest;
         } else {
             return str;
         }
@@ -381,7 +366,7 @@ public abstract class Parser {
 
 
     protected String ParseGenesys(String str, TableType tabType) throws Exception {
-        return ParseGenesys(str, tabType, (Matcher) null);
+        return ParseGenesys(str, tabType, (Pattern) null);
     }
 
     /**
@@ -564,7 +549,7 @@ public abstract class Parser {
         return ret;
     }
 
-    private void commitDateParsers() {
+    synchronized private void commitDateParsers() {
         if (collectingDates) {
             DateFmt lastFmtMatched = dateParsers.getLastFmtMatched();
             if (lastFmtMatched != null) {
@@ -622,7 +607,7 @@ public abstract class Parser {
         }
     }
 
-    private DateParsed adjustDay(DateParsed parseDate, DateParsed fileLocalDate) {
+    private DateParsed adjustDay(DateParsed parseDate, DateParsed fileLocalDate) throws SQLException {
         if (parseDate != null) {
 //            cal.setTime(parseDate.fmtDate);
 //            if (cal.get(Calendar.YEAR) == 1970) {
@@ -721,7 +706,7 @@ public abstract class Parser {
 
     public static class DateFmt {
 
-        Matcher pattern;
+        Pattern pattern;
 
         String fmt;
         ArrayList<Pair<String, String>> repl = null;
@@ -729,7 +714,7 @@ public abstract class Parser {
         private DateTimeFormatter formatter = null;
 
         public DateFmt(String p, String fmt, DateIncluded dateIncluded) {
-            this.pattern = Pattern.compile(p).matcher("");
+            this.pattern = Pattern.compile(p);
             this.fmt = fmt;
             isDateIncluded = dateIncluded;
             if (fmt != null) {
@@ -1030,31 +1015,28 @@ public abstract class Parser {
         @Override
         public void AddToDB(Record _rec) throws Exception {
             CustomRegexLine rec = (CustomRegexLine) _rec;
-            PreparedStatement stmt = getM_dbAccessor().GetStatement(m_InsertStatementId);
+            getM_dbAccessor().addToDB(m_InsertStatementId, new IFillStatement() {
+                @Override
+                public void fillStatement(PreparedStatement stmt) throws SQLException {
+                    stmt.setTimestamp(1, new Timestamp(rec.GetAdjustedUsecTime()));
+                    stmt.setInt(2, CustomRegexLine.getFileId());
+                    stmt.setLong(3, rec.getM_fileOffset());
+                    stmt.setLong(4, rec.getM_FileBytes());
+                    stmt.setLong(5, rec.getM_line());
 
-            try {
-                stmt.setTimestamp(1, new Timestamp(rec.GetAdjustedUsecTime()));
-                stmt.setInt(2, CustomRegexLine.getFileId());
-                stmt.setLong(3, rec.getM_fileOffset());
-                stmt.setLong(4, rec.getM_FileBytes());
-                stmt.setLong(5, rec.getM_line());
+                    setFieldInt(stmt, 6, Main.getRef(ReferenceType.CUSTCOMP, rec.getComp()));
+                    setFieldInt(stmt, 7, rec.getHandlerID());
 
-                setFieldInt(stmt, 6, Main.getRef(ReferenceType.CUSTCOMP, rec.getComp()));
-                setFieldInt(stmt, 7, rec.getHandlerID());
-
-                for (int i = 0; i < MAX_CUSTOM_FIELDS; i++) {
-                    setFieldInt(stmt, BASE_CUSTOM_FIELDS + (i * 2), Main.getRef(ReferenceType.CUSTKKEY, rec.getKey(i)));
-                    setFieldInt(stmt, BASE_CUSTOM_FIELDS + (i * 2) + 1, Main.getRef(ReferenceType.CUSTVALUE, rec.getValue(i)));
+                    for (int i = 0; i < MAX_CUSTOM_FIELDS; i++) {
+                        setFieldInt(stmt, BASE_CUSTOM_FIELDS + (i * 2), Main.getRef(ReferenceType.CUSTKKEY, rec.getKey(i)));
+                        setFieldInt(stmt, BASE_CUSTOM_FIELDS + (i * 2) + 1, Main.getRef(ReferenceType.CUSTVALUE, rec.getValue(i)));
 //                    stmt.setString(BASE_CUSTOM_FIELDS + (i * 2), rec.getKey(i));
 //                    stmt.setString(BASE_CUSTOM_FIELDS + (i * 2) + 1, rec.getValue(i));
+                    }
+
                 }
-
-                getM_dbAccessor().SubmitStatement(m_InsertStatementId);
-            } catch (SQLException e) {
-                Main.logger.error("Could not add record type " + m_type.toString() + ": " + e, e);
-            }
+            });
         }
-
     }
 
     //<editor-fold defaultstate="collapsed" desc="comment">
@@ -1132,21 +1114,18 @@ public abstract class Parser {
         @Override
         public void AddToDB(Record _rec) throws Exception {
             CustomAttribute rec = (CustomAttribute) _rec;
-            PreparedStatement stmt = getM_dbAccessor().GetStatement(m_InsertStatementId);
-
-            try {
+            getM_dbAccessor().addToDB(m_InsertStatementId, new IFillStatement() {
+                @Override
+                public void fillStatement(PreparedStatement stmt) throws SQLException {
 //                stmt.setTimestamp(1, new Timestamp(rec.GetAdjustedUsecTime()));
-                stmt.setInt(2, SCSAppStatus.getFileId());
-                stmt.setLong(3, rec.getM_fileOffset());
+                    stmt.setInt(2, SCSAppStatus.getFileId());
+                    stmt.setLong(3, rec.getM_fileOffset());
 //                stmt.setLong(4, rec.getM_FileBytes());
-                stmt.setLong(5, rec.getM_line());
+                    stmt.setLong(5, rec.getM_line());
 
-                getM_dbAccessor().SubmitStatement(m_InsertStatementId);
-            } catch (SQLException e) {
-                Main.logger.error("Could not add record type " + m_type.toString() + ": " + e, e);
-            }
+                }
+            });
         }
-
     }
 
 }

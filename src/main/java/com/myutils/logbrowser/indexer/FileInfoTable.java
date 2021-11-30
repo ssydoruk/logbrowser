@@ -71,10 +71,11 @@ public class FileInfoTable extends DBTable {
     }
 
     @Override
-    public void AddToDB(Record rec) {
+    public void AddToDB(Record rec) throws SQLException {
         FileInfo fiRec = (FileInfo) rec;
-        try {
-            PreparedStatement stmt = getM_dbAccessor().GetStatement(m_InsertStatementId);
+        getM_dbAccessor().addToDB(m_InsertStatementId, new IFillStatement() {
+            @Override
+            public void fillStatement(PreparedStatement stmt) throws SQLException{
             generateID(stmt, 1, fiRec);
 
             setFieldString(stmt, 2, fiRec.getM_path());
@@ -93,10 +94,9 @@ public class FileInfoTable extends DBTable {
             stmt.setTimestamp(14, new Timestamp(fiRec.getEndTime()));
             setFieldString(stmt, 15, fiRec.getArchiveName());
 
-            getM_dbAccessor().SubmitStatement(m_InsertStatementId);
-        } catch (SQLException e) {
-            Main.logger.error("SetFileInfo failed: " + e, e);
-        }
+            }
+        });
     }
+
 
 }

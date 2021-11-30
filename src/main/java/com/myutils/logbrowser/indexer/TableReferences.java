@@ -102,7 +102,7 @@ class TableReference {
         }
     }
 
-    int getRef(String key) {
+    synchronized int getRef(String key) {
         CIString cis = new CIString(key);
         Integer ref = valRef.get(cis);
         Main.logger.trace("getRef key[" + key + "] ret[" + ((ref == null) ? "NULL" : ref) + "]");
@@ -147,8 +147,6 @@ class TableReference {
                 m_accessor.runQuery(query);
                 m_accessor.ResetAutoCommit(false);
                 int m_InsertStatementId = m_accessor.PrepareStatement("INSERT INTO " + type + " VALUES(?,?);");
-//            Main.logger.error("Ref ["+type.toString()+"]: "+valRef.size()+" recs");
-                PreparedStatement stmt = m_accessor.GetStatement(m_InsertStatementId);
 
                 int i = 0;
                 int iTotalRecs = 0;
@@ -163,9 +161,15 @@ class TableReference {
                         }
                     }
                     if (theID > 0) {
-                        stmt.setInt(1, theID);
-                        DBTable.setFieldString(stmt, 2, theKey.toString());
-                        m_accessor.SubmitStatement(m_InsertStatementId);
+                        int finalTheID = theID;
+                        String finalTheKey = theKey.toString();
+                        m_accessor.addToDB(m_InsertStatementId, new IFillStatement() {
+                            @Override
+                            public void fillStatement(PreparedStatement stmt) throws SQLException {
+                                stmt.setInt(1, finalTheID);
+                                DBTable.setFieldString(stmt, 2, finalTheKey);
+                            }
+                        });
                         i = 1;
                         iTotalRecs = 1;
                     }
@@ -175,9 +179,13 @@ class TableReference {
                         int theID = entrySet.getValue();
                         if (theID > initialID) {
                             Main.logger.trace("inserting [" + theID + ":" + entrySet.getKey() + "]");
-                            stmt.setInt(1, theID);
-                            DBTable.setFieldString(stmt, 2, entrySet.getKey().toString());
-                            m_accessor.SubmitStatement(m_InsertStatementId);
+                            m_accessor.addToDB(m_InsertStatementId, new IFillStatement() {
+                                @Override
+                                public void fillStatement(PreparedStatement stmt) throws SQLException {
+                                    stmt.setInt(1, theID);
+                                    DBTable.setFieldString(stmt, 2, entrySet.getKey().toString());
+                                }
+                            });
                             i++;
                         }
                         iTotalRecs++;
@@ -279,16 +287,20 @@ public class TableReferences {
         if (key == null || key.length() == 0) {
             return null;
         }
-        TableReference tr = tabRefs.get(type);
+        TableReference tr;
+        synchronized (tabRefs) {
+            tr = tabRefs.get(type);
 
-        if (tr == null) {
-            tr = new TableReference(type);
-            tabRefs.put(type, tr);
+            if (tr == null) {
+                tr = new TableReference(type);
+                tabRefs.put(type, tr);
+            }
         }
         return tr.getRef(key);
+
     }
 
-    public Integer getRef(ReferenceType type, String key, int wordsToCompare) {
+    synchronized public Integer getRef(ReferenceType type, String key, int wordsToCompare) {
         if (key == null || key.length() == 0) {
             return null;
         }

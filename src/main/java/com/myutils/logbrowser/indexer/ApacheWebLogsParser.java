@@ -17,10 +17,10 @@ import java.util.regex.Pattern;
 public class ApacheWebLogsParser extends WebParser {
 
     private static final org.apache.logging.log4j.Logger logger = Main.logger;
-    private final static Matcher ptJSessionID = Pattern.compile("JSESSIONID=([^;\\s\"\\.]+)").matcher("");
-    private final static Matcher ptBrowserClientID = Pattern.compile("BAYEUX_BROWSER=([^;\\s\"\\.]+)").matcher("");
-    private final static Matcher ENTRY_BEGIN_PATTERN = Pattern.compile(
-            "^(.*?) - (.*?) \\[(.*?)\\] \"((\\S+)(?:\\s+)(.+)?(?:\\s+)(HTTP/\\S+)?)?\" (\\d+) (.*)\\s+(\\d+)$").matcher("");
+    private static final Pattern ptJSessionID = Pattern.compile("JSESSIONID=([^;\\s\"\\.]+)");
+    private static final Pattern ptBrowserClientID = Pattern.compile("BAYEUX_BROWSER=([^;\\s\"\\.]+)");
+    private static final Pattern ENTRY_BEGIN_PATTERN = Pattern.compile(
+            "^(.*?) - (.*?) \\[(.*?)\\] \"((\\S+)(?:\\s+)(.+)?(?:\\s+)(HTTP/\\S+)?)?\" (\\d+) (.*)\\s+(\\d+)$");
     long m_CurrentFilePos;
     long m_HeaderOffset;
     String m_Header;
@@ -31,7 +31,7 @@ public class ApacheWebLogsParser extends WebParser {
         super(FileInfoType.type_WWECloud, m_tables);
     }
 
-    public static Matcher getENTRY_BEGIN_PATTERN() {
+    public static Pattern getENTRY_BEGIN_PATTERN() {
         return ENTRY_BEGIN_PATTERN;
     }
 
@@ -88,7 +88,7 @@ public class ApacheWebLogsParser extends WebParser {
 
                 m_lineStarted = m_CurrentLine;
 
-                if ((m = ENTRY_BEGIN_PATTERN.reset(str)).find()) {
+                if ((m = ENTRY_BEGIN_PATTERN.matcher(str)).find()) {
                     ApacheWebMsg entry = new ApacheWebMsg();
 
                     entry.setIP(m.group(1)); // save IP
@@ -112,10 +112,10 @@ public class ApacheWebLogsParser extends WebParser {
                     entry.setHttpCode(m.group(8));
 
                     Matcher m1;
-                    if ((m1 = ptJSessionID.reset(m.group(9))).find()) {
+                    if ((m1 = ptJSessionID.matcher(m.group(9))).find()) {
                         entry.setJSessionID(m1.group(1));
                     }
-                    if ((m1 = ptBrowserClientID.reset(m.group(9))).find()) {
+                    if ((m1 = ptBrowserClientID.matcher(m.group(9))).find()) {
                         entry.setBrowserClientID(m1.group(1));
                     }
                     entry.setExecutionTime(m.group(10));
@@ -360,11 +360,11 @@ public class ApacheWebLogsParser extends WebParser {
         }
 
         @Override
-        public void AddToDB(Record _rec) {
+            public void AddToDB(Record _rec) throws SQLException {
             ApacheWebMsg rec = (ApacheWebMsg) _rec;
-            PreparedStatement stmt = getM_dbAccessor().GetStatement(m_InsertStatementId);
-
-            try {
+            getM_dbAccessor().addToDB(m_InsertStatementId, new IFillStatement() {
+                @Override
+                public void fillStatement(PreparedStatement stmt) throws SQLException{
                 stmt.setTimestamp(1, new Timestamp(rec.GetAdjustedUsecTime()));
                 stmt.setInt(2, ApacheWebMsg.getFileId());
                 stmt.setLong(3, rec.getM_fileOffset());
@@ -384,11 +384,10 @@ public class ApacheWebLogsParser extends WebParser {
                 setFieldInt(stmt, 16, Main.getRef(ReferenceType.WWEBrowserClient, rec.getBrowserClientID()));
                 setFieldInt(stmt, 17, rec.getExecutionTime());
 
-                getM_dbAccessor().SubmitStatement(m_InsertStatementId);
-            } catch (SQLException e) {
-                Main.logger.error("Could not add record type " + m_type.toString() + ": " + e, e);
-            }
+                }
+            });
         }
+
 
     }
     // </editor-fold>

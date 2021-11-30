@@ -18,25 +18,25 @@ public class RMParser extends Parser {
 
     static final String[] BlockNamesToIgnoreArray = {"SIP:CTI:callSync::0",
             "SIP:CTI:sipStackSync:0"};
-    private static final Matcher ptSkip = Pattern.compile("^[:\\s]*").matcher("");
-    private final static Matcher regProxy = Pattern.compile("^Proxy\\((\\w+):").matcher("");
-    private final static Matcher regConnidChangeEnd = Pattern.compile("^\\S").matcher("");
+    private static final Pattern ptSkip = Pattern.compile("^[:\\s]*");
+    private static final Pattern regProxy = Pattern.compile("^Proxy\\((\\w+):");
+    private static final Pattern regConnidChangeEnd = Pattern.compile("^\\S");
     private static final boolean ifSIPLines = false;
-    private final static Matcher SIPHeaderContinue = Pattern.compile("^\\S").matcher("");
-    private final static Matcher SIPContentLength = Pattern.compile("^\\s").matcher("");
+    private static final Pattern SIPHeaderContinue = Pattern.compile("^\\S");
+    private static final Pattern SIPContentLength = Pattern.compile("^\\s");
     private static final boolean gaveWarning = false;
-    private static final Matcher regSIPHeader = Pattern.compile(" SIP Message ").matcher("");
+    private static final Pattern regSIPHeader = Pattern.compile(" SIP Message ");
     //    15:22:50.980: Sending  [0,UDP] 3384 bytes to 10.82.10.146:5060 >>>>>
-    private static final Matcher regNotParseMessage = Pattern.compile("^(0454[1-5]"
-            + ")").matcher("");
-    private static final Matcher regISCCStart = Pattern.compile("(\\d+) bytes .+ (>>>>>|<<<<<)$").matcher("");
-    private static final Matcher regSIPHeaderMsg = Pattern.compile("(sent to|received from) \\[([^:]+):([^\\]]+)\\][^:]+:\\s*(.+)$").matcher("");
-    static private final Matcher regISCCHead = Pattern.compile("^[\\d\\s]+\\[ISCC\\] (Received|Send).+: message (\\w+)$").matcher("");
-    private static final Matcher regCfgObjectName = Pattern.compile("(?:name|userName|number|loginCode)='([^']+)'").matcher("");
-    private static final Matcher regCfgObjectDBID = Pattern.compile("DBID=(\\d+)").matcher("");
-    private static final Matcher regCfgObjectType = Pattern.compile("object Cfg(\\w+)=").matcher("");
-    private static final Matcher regCfgOp = Pattern.compile("\\(type Object(\\w+)\\)").matcher("");
-    private static final Matcher regSIPServerStartDN = Pattern.compile("^\\s*DN added \\(dbid (\\d+)\\) \\(number ([^\\(]+)\\) ").matcher("");
+    private static final Pattern regNotParseMessage = Pattern.compile("^(0454[1-5]"
+            + ")");
+    private static final Pattern regISCCStart = Pattern.compile("(\\d+) bytes .+ (>>>>>|<<<<<)$");
+    private static final Pattern regSIPHeaderMsg = Pattern.compile("(sent to|received from) \\[([^:]+):([^\\]]+)\\][^:]+:\\s*(.+)$");
+    private static final Pattern regISCCHead = Pattern.compile("^[\\d\\s]+\\[ISCC\\] (Received|Send).+: message (\\w+)$");
+    private static final Pattern regCfgObjectName = Pattern.compile("(?:name|userName|number|loginCode)='([^']+)'");
+    private static final Pattern regCfgObjectDBID = Pattern.compile("DBID=(\\d+)");
+    private static final Pattern regCfgObjectType = Pattern.compile("object Cfg(\\w+)=");
+    private static final Pattern regCfgOp = Pattern.compile("\\(type Object(\\w+)\\)");
+    private static final Pattern regSIPServerStartDN = Pattern.compile("^\\s*DN added \\(dbid (\\d+)\\) \\(number ([^\\(]+)\\) ");
     private static boolean ifSIPLinesForce = false;
     final int MSG_STRING_LIMIT = 200;
     private final ArrayList<String> extraBuff;
@@ -211,14 +211,14 @@ public class RMParser extends Parser {
 
                 m_lineStarted = m_CurrentLine;
 
-                if ((m = regProxy.reset(s)).find()) {
+                if ((m = regProxy.matcher(s)).find()) {
 
                     ProxiedMessage msg = new ProxiedMessage(m.group(1), s.substring(m.end()));
                     SetStdFieldsAndAdd(msg);
 
                     return null;
                 } //<editor-fold defaultstate="collapsed" desc="reading sip">
-                else if ((regSIPHeader.reset(s)).find()) {
+                else if ((regSIPHeader.matcher(s)).find()) {
                     m_Header = s;
 
                     dpHeader = dp; // so time of the message correctly set in AddSipMessage
@@ -256,7 +256,7 @@ public class RMParser extends Parser {
 
 //<editor-fold defaultstate="collapsed" desc="state_SIP_HEADER">
             case STATE_SIP_HEADER: {
-                if ((SIPHeaderContinue.reset(str)).find()) {
+                if ((SIPHeaderContinue.matcher(str)).find()) {
                     m_MessageContents.add(str);
                     String contentL = Message.GetSIPHeader(str, "content-length", "l");
                     if (contentL != null) {
@@ -427,7 +427,7 @@ public class RMParser extends Parser {
         String peerIP = "";
         String peerPort = "";
         String SIPmsg;
-        if ((m = regSIPHeaderMsg.reset(header)).find()) {
+        if ((m = regSIPHeaderMsg.matcher(header)).find()) {
             String s = m.group(1);
             if (s != null) {
                 isInbound = s.substring(0, 1).toLowerCase().startsWith("r");
@@ -449,7 +449,7 @@ public class RMParser extends Parser {
         msg.setPeerPort(peerPort);
         msg.SetInbound(isInbound);
 
-//        if ((m = regSIPHeaderIP .reset(header)).find()) {
+//        if ((m = regSIPHeaderIP .matcher(header)).find()) {
 //            msg.SetInbound(m.group(1).startsWith("r"));
 //            msg.SetName(m.group(2));
 //        }
@@ -467,7 +467,7 @@ public class RMParser extends Parser {
         ConfigUpdateRecord msg = new ConfigUpdateRecord(m_MessageContents);
         try {
             Matcher m;
-            if (m_MessageContents.size() > 0 && (m = regSIPServerStartDN.reset(m_MessageContents.get(0))).find()) {
+            if (m_MessageContents.size() > 0 && (m = regSIPServerStartDN.matcher(m_MessageContents.get(0))).find()) {
                 msg.setObjectType("DN");
                 msg.setObjectDBID(m.group(1));
                 msg.setObjName(m.group(2));

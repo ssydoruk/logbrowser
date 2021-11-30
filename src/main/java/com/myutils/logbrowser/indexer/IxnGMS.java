@@ -15,9 +15,9 @@ import static Utils.Util.intOrDef;
 
 public final class IxnGMS extends Message {
 
-    //    final private static Matcher regGSW_RECORD_HANDLE = Pattern.compile("^\\s*\'GSW_RECORD_HANDLE\'.+= (\\d+)").matcher("");
-    final private static Matcher regIxnActor = Pattern.compile("^\\s*attr_actor_router_id .+ \"([^\"]+)\"$").matcher("");
-    final private static Matcher regIxnSubmitted = Pattern.compile("^\\s*attr_itx_submitted_by .+ \"([^\"]+)\"$").matcher("");
+    //    private static final Pattern regGSW_RECORD_HANDLE = Pattern.compile("^\\s*\'GSW_RECORD_HANDLE\'.+= (\\d+)");
+    private static final Pattern regIxnActor = Pattern.compile("^\\s*attr_actor_router_id .+ \"([^\"]+)\"$");
+    private static final Pattern regIxnSubmitted = Pattern.compile("^\\s*attr_itx_submitted_by .+ \"([^\"]+)\"$");
 
     private static final Regexs AgentIDs = new Regexs(new Pair[]{
             new Pair("^\\s*attr_agent_id.+ \"([^\"]+)\"$", 1),
@@ -65,9 +65,9 @@ public final class IxnGMS extends Message {
     private static final Regexs reConnID = new Regexs(new Pair[]{
             new Pair("^\\s*AttributeConnID .+ (\\w+)$", 1)}
     );
-    final private static Matcher regService = Pattern.compile("^\\s*'Service'.+= \"([^\"]+)\"$").matcher("");
-    final private static Matcher regMethod = Pattern.compile("^\\s*'Method'.+= \"([^\"]+)\"$").matcher("");
-    final private static Matcher regRouteType = Pattern.compile("^\\s*AttributeRouteType.+ = (\\d+)").matcher("");
+    private static final Pattern regService = Pattern.compile("^\\s*'Service'.+= \"([^\"]+)\"$");
+    private static final Pattern regMethod = Pattern.compile("^\\s*'Method'.+= \"([^\"]+)\"$");
+    private static final Pattern regRouteType = Pattern.compile("^\\s*AttributeRouteType.+ = (\\d+)");
     private final String clientName = null;
     //    private static final Regexs reContact = new Regexs(new Pair[]{
 //        new Pair("^\\s*\'GSW_PHONE\'.+= \"([^\"]+)\"", 1),

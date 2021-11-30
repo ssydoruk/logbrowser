@@ -53,11 +53,11 @@ public class JsonTable extends DBTable {
     }
 
     @Override
-    public void AddToDB(Record rec) {
+    public void AddToDB(Record rec) throws SQLException {
         JsonMessage theRec = (JsonMessage) rec;
-        PreparedStatement stmt = getM_dbAccessor().GetStatement(m_InsertStatementId);
-
-        try {
+         getM_dbAccessor().addToDB(m_InsertStatementId, new IFillStatement() {
+                @Override
+                public void fillStatement(PreparedStatement stmt) throws SQLException{
             generateID(stmt, 1, theRec);
 
             stmt.setTimestamp(2, new Timestamp(theRec.GetAdjustedUsecTime()));
@@ -74,11 +74,10 @@ public class JsonTable extends DBTable {
             stmt.setInt(13, theRec.getHanglerID());
             JsonMessage.SetJsonId(getCurrentID());
 
-            getM_dbAccessor().SubmitStatement(m_InsertStatementId);
-        } catch (SQLException e) {
-            Main.logger.error("Could not add trigger: " + e, e);
-        }
-
+                }
+         });
     }
+
+
 
 }

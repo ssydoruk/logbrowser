@@ -21,7 +21,7 @@ import static Utils.Util.pDuration;
 /**
  * @author ssydoruk
  */
-public final class SqliteAccessor extends Thread implements DBAccessor {
+public final class SqliteAccessor  implements DBAccessor {
 
     private static final Logger logger = Main.logger;
     /**
@@ -42,9 +42,12 @@ public final class SqliteAccessor extends Thread implements DBAccessor {
 
     private List<Long> filesToDelete;
 
-    public SqliteAccessor(String dbname, String alias) throws Exception {
+    private SqliteAccessor() {
+    }
+
+    public void init(String dbname, String alias) throws Exception {
         m_alias = alias;
-        filesToDelete =  Collections.synchronizedList(new ArrayList<Long>());
+        filesToDelete = Collections.synchronizedList(new ArrayList<Long>());
 
         try {
             Class.forName("org.sqlite.JDBC");
@@ -64,8 +67,8 @@ public final class SqliteAccessor extends Thread implements DBAccessor {
             String s = "PRAGMA page_size = 32768;\n"
                     + "PRAGMA cache_size=10000;\n"
                     + "PRAGMA locking_mode=EXCLUSIVE;\n"
-                    +"pragma temp_store = memory;\n"
-                    +"pragma mmap_size = 30000000000;\n"
+                    + "pragma temp_store = memory;\n"
+                    + "pragma mmap_size = 30000000000;\n"
                     + "PRAGMA synchronous=OFF;\n"
                     //                    + "PRAGMA main.cache_size=5000;\n"
                     + "PRAGMA automatic_index=false;\n";
@@ -90,13 +93,19 @@ public final class SqliteAccessor extends Thread implements DBAccessor {
         }
     }
 
+    private static SqliteAccessor INSTANCE = new SqliteAccessor();
+
+    public static SqliteAccessor getInstance() {
+        return INSTANCE;
+    }
+
     public List<Long> getFilesToDelete() {
         return filesToDelete;
     }
 
     void setFilesToDelete(ArrayList<Long> filesToDelete) {
         if (!filesToDelete.isEmpty()) {
-            this.filesToDelete.addAll( filesToDelete);
+            this.filesToDelete.addAll(filesToDelete);
         }
     }
 
@@ -128,16 +137,6 @@ public final class SqliteAccessor extends Thread implements DBAccessor {
         } catch (SQLException e) {
             logger.error("ExecuteQuery failed: " + e + " query " + query, e);
         }
-    }
-
-    @Override
-    public synchronized PreparedStatement GetStatement(int statementId) {
-        return stats.get(statementId);
-    }
-
-    @Override
-    public synchronized void SubmitStatement(int statementId) throws SQLException {
-        stats.Submit(statementId);
     }
 
     public void Commit(PreparedStatement stmt) throws SQLException {
@@ -433,32 +432,32 @@ public final class SqliteAccessor extends Thread implements DBAccessor {
         Main.getInstance().getM_accessor().notify();
     }
 
-    @Override
-    public void run() {
-        try {
-            while (true) {
-                synchronized (this) {
-                    wait();
-                }
-                if (m_exit) {
-//                    Close();
-                    return;
-                }
-//                synchronized (stToFlush) {
-//                    if (stToFlush != null) {
-//                        stToFlush.flush();
-//                    }
+//    @Override
+//    public void run() {
+//        try {
+//            while (true) {
+//                synchronized (this) {
+//                    wait();
 //                }
-                synchronized (m_conn) {
-                    m_conn.commit();
-                    ResetAutoCommit();
-                }
-            }
-        } catch (InterruptedException | SQLException e) {
-            logger.error("SubmitStatement failed: " + e, e);
-            ResetAutoCommit();
-        }
-    }
+//                if (m_exit) {
+////                    Close();
+//                    return;
+//                }
+////                synchronized (stToFlush) {
+////                    if (stToFlush != null) {
+////                        stToFlush.flush();
+////                    }
+////                }
+//                synchronized (m_conn) {
+//                    m_conn.commit();
+//                    ResetAutoCommit();
+//                }
+//            }
+//        } catch (InterruptedException | SQLException e) {
+//            logger.error("SubmitStatement failed: " + e, e);
+//            ResetAutoCommit();
+//        }
+//    }
 
     public void ResetAutoCommit(boolean b) {
         try {
@@ -585,8 +584,7 @@ public final class SqliteAccessor extends Thread implements DBAccessor {
             }
 
             return ret;
-        }
-        else
+        } else
             return null;
 
     }
@@ -623,14 +621,26 @@ public final class SqliteAccessor extends Thread implements DBAccessor {
         filesToDelete.add(fileID);
     }
 
+    public void addToDB(int m_insertStatementId, IFillStatement fillStatement) throws SQLException {
+        Stat stat = stats.get(m_insertStatementId);
+        synchronized (stat.getStat()) {
+            fillStatement.fillStatement(stat.getStat());
+            stats.Submit(stat);
+        }
+    }
+
     class Stat {
 
-        PreparedStatement stat;
-        int cnt;
+        private PreparedStatement stat;
+        private int cnt;
 
         Stat(PreparedStatement stat) {
             this.stat = stat;
             cnt = 0;
+        }
+
+        public PreparedStatement getStat() {
+            return stat;
         }
 
         public void Submit() throws SQLException {
@@ -678,12 +688,15 @@ public final class SqliteAccessor extends Thread implements DBAccessor {
             return stats.size() - 1;
         }
 
-        public PreparedStatement get(int statementId) {
-            return stats.get(statementId).stat;
+        public Stat get(int statementId) {
+            return stats.get(statementId);
         }
 
         public void Submit(int statementId) throws SQLException {
-            Stat st = stats.get(statementId);
+            Submit(stats.get(statementId));
+        }
+
+        public void Submit(Stat st) throws SQLException {
             st.Submit();
             if (st.cnt >= 10_000) {
 //                Main.m_accessor.flush(st);

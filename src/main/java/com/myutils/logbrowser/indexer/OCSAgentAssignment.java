@@ -11,14 +11,14 @@ import java.util.regex.Pattern;
 
 public class OCSAgentAssignment extends Message {
 
-    private static final Matcher regCampaignAssignment = Pattern.compile("^There are (\\d+) Agents/Places assigned to Session '([^']+)'").matcher("");
+    private static final Pattern regCampaignAssignment = Pattern.compile("^There are (\\d+) Agents/Places assigned to Session '([^']+)'");
     private String cgName;
     private int agsNo;
 
     public OCSAgentAssignment(ArrayList messageLines) {
         super(TableType.OCSAssignment, messageLines);
         Matcher m;
-        if ((m = regCampaignAssignment.reset((CharSequence) messageLines.get(0))).find()) {
+        if ((m = regCampaignAssignment.matcher((CharSequence) messageLines.get(0))).find()) {
             agsNo = Integer.parseInt(m.group(1));
             cgName = m.group(2);
         }

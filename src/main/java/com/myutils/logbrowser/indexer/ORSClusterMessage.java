@@ -15,7 +15,7 @@ import java.util.regex.Pattern;
  */
 public class ORSClusterMessage extends Message {
 
-    private static final Matcher patNewLine = Pattern.compile("\r\n").matcher("");
+    private static final Pattern patNewLine = Pattern.compile("\r\n");
     private static int m_statementId;
     private final String[] m_msgBody;
     private String SrcNodeType;
@@ -72,13 +72,15 @@ public class ORSClusterMessage extends Message {
         this.Direction = Direction;
     }
 
-    public void AddToDB(DBAccessor accessor) {
+    public void AddToDB(SqliteAccessor accessor) throws SQLException {
         String sReq = getMsgRequest();
         String sUUID = getMsgValue("e:");
 
-        PreparedStatement stmt = accessor.GetStatement(m_statementId);
 
-        try {
+            accessor.addToDB(m_statementId, new IFillStatement() {
+                @Override
+                public void fillStatement(PreparedStatement stmt) throws SQLException{
+
             stmt.setTimestamp(1, new Timestamp(GetAdjustedUsecTime()));
             stmt.setInt(2, getFileId());
             stmt.setLong(3, getM_fileOffset());
@@ -90,11 +92,10 @@ public class ORSClusterMessage extends Message {
             stmt.setBoolean(10, Direction);
             DBTable.setFieldString(stmt, 11, sUUID);
 
-            accessor.SubmitStatement(m_statementId);
-        } catch (SQLException e) {
-            Main.logger.error("Could not add message type " + getM_type() + ": " + e, e);
-        }
+                }
+            });
     }
+
 
     void SetSrcNode(String group) {
         throw new UnsupportedOperationException("Not yet implemented");

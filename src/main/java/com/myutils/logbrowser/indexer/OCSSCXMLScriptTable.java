@@ -61,11 +61,11 @@ public class OCSSCXMLScriptTable extends DBTable {
     }
 
     @Override
-    public void AddToDB(Record _rec) {
+    public void AddToDB(Record _rec) throws SQLException {
         OCSSCXMLScript rec = (OCSSCXMLScript) _rec;
-        PreparedStatement stmt = getM_dbAccessor().GetStatement(m_InsertStatementId);
-
-        try {
+        getM_dbAccessor().addToDB(m_InsertStatementId, new IFillStatement() {
+            @Override
+            public void fillStatement(PreparedStatement stmt) throws SQLException{
             stmt.setTimestamp(1, new Timestamp(rec.GetAdjustedUsecTime()));
             stmt.setInt(2, OCSSCXMLScript.getFileId());
             stmt.setLong(3, rec.getM_fileOffset());
@@ -75,10 +75,9 @@ public class OCSSCXMLScriptTable extends DBTable {
             setFieldInt(stmt, 6, Main.getRef(ReferenceType.OCSSCXMLSESSION, rec.getSessID()));
             setFieldInt(stmt, 7, Main.getRef(ReferenceType.METRIC, rec.getMetric()));
 
-            getM_dbAccessor().SubmitStatement(m_InsertStatementId);
-        } catch (SQLException e) {
-            Main.logger.error("Could not add record type " + m_type.toString() + ": " + e, e);
-        }
+            }
+        });
     }
+
 
 }

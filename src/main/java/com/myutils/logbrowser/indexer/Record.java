@@ -15,17 +15,11 @@ import java.util.regex.Pattern;
  */
 public abstract class Record implements Cloneable {
 
-    private static final Matcher regAllQuotes = Pattern.compile("^(['\"]).+\\1$").matcher("");
-    private static final Matcher regNoQuotes = Pattern.compile("^(['\"])(.+)\\1$").matcher("");
-    private static final Matcher regDNWithHost = Pattern.compile("^(\\w+)\\.").matcher("");
-    static boolean m_handlerInProgress;
+    private static final Pattern regAllQuotes = Pattern.compile("^(['\"]).+\\1$");
+    private static final Pattern regNoQuotes = Pattern.compile("^(['\"])(.+)\\1$");
+    private static final Pattern regDNWithHost = Pattern.compile("^(\\w+)\\.");
     static String m_alias;
     static int fileId = 0;
-    static int m_handlerId = 0;
-    static int m_sipId = 0;
-    static int m_tlibId = 0;
-    static int m_jsonId = 0;
-    static int m_proxiedId = 0;
     private static int objCreated;
     protected long m_FileBytes;
     private long m_fileOffset;
@@ -64,14 +58,14 @@ public abstract class Record implements Cloneable {
         objCreated = 0;
     }
 
-    public static String cleanDN(String key) {
+    public String cleanDN(String key) {
         Matcher m;
         String ret = NoQuotes(key);
         if (StringUtils.isNotBlank(ret)) {
             if (ret.startsWith("+")) {
                 ret = ret.substring(1);
             }
-            if ((m = regDNWithHost.reset(ret)).find()) {
+            if ((m = regDNWithHost.matcher(ret)).find()) {
                 ret = m.group(1);
             }
         }
@@ -83,35 +77,25 @@ public abstract class Record implements Cloneable {
 
         Matcher m;
 
-        if (key != null && (m = regNoQuotes.reset(key)).find()) {
+        if (key != null && (m = regNoQuotes.matcher(key)).find()) {
             return m.group(2);
         }
         return key;
     }
 
-    public static String SingleQuotes(String key) {
+    public  static String SingleQuotes(String key) {
         if (key != null && key.length() > 0) {
             return NoQuotes(key);
         }
         return null;
     }
 
-    public static void SetHandlerInProgress(boolean handlerInProgress) {
-        Main.logger.trace("SetHandlerInProgress: " + handlerInProgress);
-        m_handlerInProgress = handlerInProgress;
-    }
 
-    public static boolean isM_handlerInProgress() {
-        return m_handlerInProgress;
-    }
 
     public static void SetAlias(String alias) {
         m_alias = alias;
     }
 
-    public static void SetHandlerId(int handlerId) {
-        m_handlerId = handlerId;
-    }
 
     public static void SetSipId(int sipId) {
         m_sipId = sipId;
@@ -147,14 +131,15 @@ public abstract class Record implements Cloneable {
 
     @Override
     public String toString() {
-        return "Rec{type:" + m_type + ";line:" + m_line + ";off:" + m_fileOffset + ";bytes:" + m_FileBytes + '}';
+        return "Rec{id:"+lastID
+                +"t:" + m_type + ";l:" + m_line + ";off:" + m_fileOffset + ";b:" + m_FileBytes + '}';
     }
 
     public String CheckQuotes(String key) {
 
         Matcher m;
 
-        if ((m = regAllQuotes.reset(key)).find()) {
+        if ((m = regAllQuotes.matcher(key)).find()) {
             return key;
         }
         String sQ = key.substring(0, 1);

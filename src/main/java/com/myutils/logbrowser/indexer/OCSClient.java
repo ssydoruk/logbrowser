@@ -11,11 +11,11 @@ import java.util.regex.Pattern;
 
 public class OCSClient extends Message {
 
-    final private static Matcher regMsgName = Pattern.compile("^\\s*GSW_CM_MessageType.+\\[([^\\]]+)\\]$").matcher("");
+    private static final Pattern regMsgName = Pattern.compile("^\\s*GSW_CM_MessageType.+\\[([^\\]]+)\\]$");
 
-    final private static Matcher regCampID = Pattern.compile("^\\s*GSW_CM_AttrCampaignID\\s*(\\d+)").matcher("");
+    private static final Pattern regCampID = Pattern.compile("^\\s*GSW_CM_AttrCampaignID\\s*(\\d+)");
 
-    final private static Matcher regGetGroupID = Pattern.compile("^\\s*GSW_CM_AttrGroupID\\s*(\\d+)").matcher("");
+    private static final Pattern regGetGroupID = Pattern.compile("^\\s*GSW_CM_AttrGroupID\\s*(\\d+)");
 
     public OCSClient(ArrayList messageLines) {
         super(TableType.OCSClient, messageLines);

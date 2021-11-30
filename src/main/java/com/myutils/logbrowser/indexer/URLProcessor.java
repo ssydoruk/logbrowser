@@ -22,7 +22,7 @@ import static com.myutils.logbrowser.indexer.Parser.splitQuery;
  */
 public class URLProcessor {
 
-    private final ArrayList<Pair<String, Matcher>> pathProcessing = new ArrayList<>();
+    private final ArrayList<Pair<String, Pattern>> pathProcessing = new ArrayList<>();
 
     // in URL query, keyword:replaceWord
     private final HashMap<String, String> queryProcessing = new HashMap<>();
@@ -61,7 +61,7 @@ public class URLProcessor {
                     }
                 }
                 String uriPath = uri.getPath();
-                for (Pair<String, Matcher> entry : pathProcessing) {
+                for (Pair<String, Pattern> entry : pathProcessing) {
                     Utils.Pair<String, String> rxReplace;
                     if ((rxReplace = Message.getRxReplace(uriPath, entry.getValue(), 1, entry.getKey())) != null) {
                         uriPath = rxReplace.getValue();
@@ -133,7 +133,7 @@ public class URLProcessor {
         }
     }
 
-    void addPathProcessor(String PATH_UUID, Matcher compile) {
+    void addPathProcessor(String PATH_UUID, Pattern compile) {
         pathProcessing.add(new Pair(PATH_UUID, compile));
     }
 

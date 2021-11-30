@@ -67,9 +67,9 @@ public class VOIPEPTable extends DBTable {
     @Override
     public void AddToDB(Record rec) throws Exception {
         SipMessage theRec = (SipMessage) rec;
-        PreparedStatement stmt = getM_dbAccessor().GetStatement(m_InsertStatementId);
-
-        try {
+        getM_dbAccessor().addToDB(m_InsertStatementId, new IFillStatement() {
+            @Override
+            public void fillStatement(PreparedStatement stmt) throws SQLException{
             stmt.setTimestamp(1, new Timestamp(theRec.GetAdjustedUsecTime()));
             stmt.setBoolean(2, theRec.isInbound());
             setFieldInt(stmt, 3, Main.getRef(ReferenceType.SIPMETHOD, theRec.GetName()));
@@ -77,7 +77,7 @@ public class VOIPEPTable extends DBTable {
             setFieldInt(stmt, 5, Main.getRef(ReferenceType.SIPCSEQ, theRec.GetCSeq()));
             setFieldInt(stmt, 6, Main.getRef(ReferenceType.SIPURI, theRec.GetTo()));
             setFieldInt(stmt, 7, Main.getRef(ReferenceType.SIPURI, theRec.GetFrom()));
-            setFieldInt(stmt, 8, Main.getRef(ReferenceType.DN, transformDN(SipMessage.SingleQuotes(theRec.GetFromUserpart()))));
+            setFieldInt(stmt, 8, Main.getRef(ReferenceType.DN, transformDN(rec.SingleQuotes(theRec.GetFromUserpart()))));
             setFieldInt(stmt, 9, Main.getRef(ReferenceType.SIPURI, theRec.GetViaUri()));
             setFieldInt(stmt, 10, Main.getRef(ReferenceType.SIPVIABRANCH, theRec.GetViaBranch()));
             setFieldInt(stmt, 11, Main.getRef(ReferenceType.IP, theRec.GetPeerIp()));
@@ -90,15 +90,12 @@ public class VOIPEPTable extends DBTable {
             stmt.setBoolean(16, theRec.isCallRelated());
             stmt.setInt(17, theRec.getM_line());
             setFieldInt(stmt, 18, Main.getRef(ReferenceType.UUID, theRec.getUUID()));
-            setFieldInt(stmt, 19, Main.getRef(ReferenceType.DN, transformDN(SipMessage.SingleQuotes(theRec.getRequestURIDN()))));
+            setFieldInt(stmt, 19, Main.getRef(ReferenceType.DN, transformDN(rec.SingleQuotes(theRec.getRequestURIDN()))));
             setFieldInt(stmt, 20, Main.getRef(ReferenceType.SIPURI, theRec.getSipURI()));
 
-            getM_dbAccessor().SubmitStatement(m_InsertStatementId);
-        } catch (SQLException e) {
-            Main.logger.error("Could not add record type " + m_type.toString() + ": " + e, e);
-            throw e;
-        }
-
+            }
+        });
     }
+
 
 }

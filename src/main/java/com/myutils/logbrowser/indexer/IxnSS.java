@@ -13,15 +13,15 @@ import static Utils.Util.intOrDef;
 
 public class IxnSS extends Ixn {
 
-    final private static Matcher regIxnMessage = Pattern.compile("^Server: IxnEvent '([^']+)'").matcher("");
-    final private static Matcher regIxnCustomEvent = Pattern.compile("'([^']+)'$").matcher("");
+    private static final Pattern regIxnMessage = Pattern.compile("^Server: IxnEvent '([^']+)'");
+    private static final Pattern regIxnCustomEvent = Pattern.compile("'([^']+)'$");
 
-    final private static Matcher regConnID = Pattern.compile("^\\s+AttributeConnID .+ (\\w+)$").matcher("");
-    final private static Matcher regConnIDCustom = Pattern.compile("^\\s+ConnID\\s+(\\w+)").matcher("");
-    final private static Matcher regService = Pattern.compile("^\\s+'Service'.+= \"([^\"]+)\"$").matcher("");
-    final private static Matcher regMethod = Pattern.compile("^\\s+'Method'.+= \"([^\"]+)\"$").matcher("");
-    final private static Matcher regClientRef = Pattern.compile("^\\s+attr_esp_client_refid.+ = (\\d+)$").matcher("");
-    final private static Matcher regServerRef = Pattern.compile("^\\s+attr_esp_server_refid.+ = (\\d+)$").matcher("");
+    private static final Pattern regConnID = Pattern.compile("^\\s+AttributeConnID .+ (\\w+)$");
+    private static final Pattern regConnIDCustom = Pattern.compile("^\\s+ConnID\\s+(\\w+)");
+    private static final Pattern regService = Pattern.compile("^\\s+'Service'.+= \"([^\"]+)\"$");
+    private static final Pattern regMethod = Pattern.compile("^\\s+'Method'.+= \"([^\"]+)\"$");
+    private static final Pattern regClientRef = Pattern.compile("^\\s+attr_esp_client_refid.+ = (\\d+)$");
+    private static final Pattern regServerRef = Pattern.compile("^\\s+attr_esp_server_refid.+ = (\\d+)$");
 
     private final String messageName;
     private boolean customEvent = false;
@@ -39,11 +39,11 @@ public class IxnSS extends Ixn {
 
             Matcher m;
             if (customEvent) {
-                if ((m = regIxnCustomEvent.reset(m_MessageLines.get(1))).find()) {
+                if ((m = regIxnCustomEvent.matcher(m_MessageLines.get(1))).find()) {
                     SetInbound(true);
                     ret = m.group(1);
                 }
-            } else if ((m = regIxnMessage.reset(m_MessageLines.get(0))).find()) {
+            } else if ((m = regIxnMessage.matcher(m_MessageLines.get(0))).find()) {
                 SetInbound(true);
                 ret = m.group(1);
             }

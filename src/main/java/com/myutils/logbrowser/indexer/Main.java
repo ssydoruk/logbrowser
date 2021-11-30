@@ -28,7 +28,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
@@ -41,7 +40,7 @@ import static Utils.Util.pDuration;
 public class Main {
 
     private static final Constants constants = new Constants();
-    private static final Matcher regFilesNotGood = Pattern.compile("(^\\.logbr|logbr.db)").matcher("");
+    private static final Pattern regFilesNotGood = Pattern.compile("(^\\.logbr|logbr.db)");
     public static Logger logger = LogManager.getLogger();
     static String m_component = "all";
     static String m_executableName = "indexer.jar";
@@ -58,7 +57,7 @@ public class Main {
     boolean initFailed = false;
     BlockingQueue<File> fileQueue = new LinkedBlockingDeque<>();
     AtomicBoolean queueEnd = new AtomicBoolean(false);
-    ProcessedFilesSet processedFiles = new ProcessedFilesSet();
+     ProcessedFilesSet processedFiles = new ProcessedFilesSet();
     private String dbName;
     private SqliteAccessor m_accessor;
     private ExecutionEnvironment ee;
@@ -139,7 +138,9 @@ public class Main {
 
         Main theParser = Main.getInstance().init(ee);
 
+
         theParser.setIgnoreZIP(ee.isIgnoreZIP());
+//        theParser.initExecutor(1);
         theParser.parseAll();
 //        Thread.sleep(3000);
     }
@@ -174,8 +175,8 @@ public class Main {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
-    private static boolean fileOK(File fileInfo) {
-        return !regFilesNotGood.reset(fileInfo.getName()).find();
+    private  boolean fileOK(File fileInfo) {
+        return !regFilesNotGood.matcher(fileInfo.getName()).find();
     }
 
     private static void extendFilesList(ArrayList<FileInfo> filesToProcess, LogFileWrapper newLog) throws IOException {
@@ -204,7 +205,7 @@ public class Main {
         }
     }
 
-    private static boolean myEqual(String logFileName, String logFileName0) {
+    private boolean myEqual(String logFileName, String logFileName0) {
         return logFileName != null && !logFileName.isEmpty()
                 && logFileName0 != null && !logFileName0.isEmpty()
                 && logFileName.equals(logFileName0);
@@ -244,23 +245,6 @@ public class Main {
         this.ignoreZIP = ignoreZIP;
     }
 
-    /**
-     * To be used instead of constructor
-     *
-     * @param dbname
-     * @param xmlCFG
-     * @param baseDir
-     * @param alias
-     * @throws Exception
-     */
-    public Main init(String dbname, String xmlCFG, String baseDir, String alias) throws Exception {
-        this.dbName = dbname;
-        this.baseDir = baseDir;
-        this.alias = alias;
-        setXMLCfg(xmlCFG);
-        initExecutor(1);
-        return this;
-    }
 
     private void initExecutor(int maxThreads) {
         if (managerThreads != null)
@@ -270,7 +254,7 @@ public class Main {
         managerThreads.setCorePoolSize(1);
         managerThreads.setMaximumPoolSize(1);
 
-        parserThreads = (ThreadPoolExecutor) Executors.newFixedThreadPool(1);
+        parserThreads = (ThreadPoolExecutor) Executors.newFixedThreadPool(maxThreads);
     }
 
     public ExecutionEnvironment getEe() {
@@ -282,7 +266,7 @@ public class Main {
     }
 
     public Main init(ExecutionEnvironment ee) throws Exception {
-        initExecutor(1);
+        initExecutor(2);
         this.dbName = ee.getDbname();
         this.baseDir = ee.getBaseDir();
         this.alias = ee.getAlias();
@@ -493,17 +477,18 @@ public class Main {
     }
 
     private Parser GetParser(FileInfoType type) {
-        if (m_parsers.containsKey(type)) {
-            return m_parsers.get(type);
-        } else {
-            Parser parser = initParser(type);
-            if (parser == null) {
-                logger.error("Parser not yet implemented for " + type);
-                return null;
-            }
-            m_parsers.put(type, parser);
-            return parser;
-        }
+        return initParser(type);
+//        if (m_parsers.containsKey(type)) {
+//            return m_parsers.get(type);
+//        } else {
+//            Parser parser = initParser(type);
+//            if (parser == null) {
+//                logger.error("Parser not yet implemented for " + type);
+//                return null;
+//            }
+//            m_parsers.put(type, parser);
+//            return parser;
+//        }
     }
 
     synchronized public void processAddedFile(File newFile) {
@@ -587,7 +572,8 @@ public class Main {
         }
 
         try {
-            m_accessor = new SqliteAccessor(dbName, alias);
+            m_accessor = SqliteAccessor.getInstance();
+            m_accessor.init(dbName, alias);
 
         } catch (Exception e) {
             System.out.println("Could not create accessor: " + e);
@@ -653,7 +639,7 @@ public class Main {
                     return false;
                 }
             }
-            m_accessor = new SqliteAccessor(dbName, alias);
+            m_accessor.init(dbName, alias);
         }
         if (filesToProcess.isEmpty()) {
             logger.info("No new log files found");
@@ -666,7 +652,7 @@ public class Main {
         logger.info("Initializing...");
         InitTables();
         logger.info("Starting DB...");
-        m_accessor.start();
+//        m_accessor.start();
         logger.info("Done init");
 
         tabRefs = new TableReferences(m_accessor);
@@ -680,12 +666,32 @@ public class Main {
         FileInfo dirInfo = new FileInfo();
         dirInfo.m_path = dirName;
 
+        ArrayList<Callable<Integer>> parserTasks = new ArrayList<>();
         for (int i = 0; i < filesToProcess.size(); i++) {
             FileInfo newFile = filesToProcess.get(i);
-            Main.logger.info("processing file : " + newFile.getM_path() + ((newFile.getArchiveName() == null) ? "" : ", archive: " + newFile.getArchiveName()) + " (" + (i + 1) + " of " + filesToProcess.size() + ")");
-            Parse(newFile);
+            parserTasks.add(new Callable() {
+                @Override
+                public Object call() throws Exception {
+                    Main.logger.info("processing file1 : " + newFile.getM_path() + ((newFile.getArchiveName() == null) ? "" : ", archive: " + newFile.getArchiveName()));
+                    Parse(newFile);
+                    logger.info("Done thread");
+                    return 0;
+                }
+            });
         }
+        parserThreads.invokeAll(parserTasks);
+        logger.info("Done parsing");
         return true;
+    }
+
+    private void ParseThread(FileInfo newFile) {
+        parserThreads.execute(new Runnable() {
+            @Override
+            public void run() {
+                Main.logger.info("processing file2 : " + newFile.getM_path() + ((newFile.getArchiveName() == null) ? "" : ", archive: " + newFile.getArchiveName()));
+                Parse(newFile);
+            }
+        });
     }
 
     @SuppressWarnings("UseOfSystemOutOrSystemErr")
@@ -697,13 +703,18 @@ public class Main {
             finalizeWork();
         }
         logger.info("All done. Completed in " + pDuration(Duration.between(start, Instant.now()).toMillis()) + "; processed " + totalFiles + " files (" + formatSize(totalBytes) + ")");
+        managerThreads.shutdown();
+        managerThreads.awaitTermination(5, TimeUnit.DAYS);
+        parserThreads.shutdown();
+        parserThreads.awaitTermination(5, TimeUnit.DAYS);
+
     }
 
     private void finalizeWork() throws Exception {
         m_accessor.DoneInserts();
         m_accessor.Commit();
         m_accessor.exit();
-        m_accessor.join();
+//        m_accessor.join();
         GenesysMsg.updateMsg();
         tabRefs.Finalize();
 
@@ -872,7 +883,7 @@ public class Main {
         logger.info("Finish done");
     }
 
-    synchronized public ProcessedFilesSet getProcessedFiles() {
+    public ProcessedFilesSet getProcessedFiles() {
         return processedFiles;
     }
 

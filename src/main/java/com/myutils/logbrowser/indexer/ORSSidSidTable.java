@@ -46,20 +46,20 @@ public class ORSSidSidTable extends DBTable {
     }
 
     @Override
-    public void AddToDB(Record aRec) {
-        OrsSidSid rec = (OrsSidSid) aRec;
-        PreparedStatement stmt = getM_dbAccessor().GetStatement(m_InsertStatementId);
+        public void AddToDB(Record _rec) throws SQLException {
 
-        try {
+        OrsSidSid rec = (OrsSidSid) _rec;
+         getM_dbAccessor().addToDB(m_InsertStatementId, new IFillStatement() {
+                @Override
+                public void fillStatement(PreparedStatement stmt) throws SQLException{
             stmt.setInt(1, Record.getFileId());
 
             setFieldInt(stmt, 2, Main.getRef(ReferenceType.ORSSID, rec.getSID()));
             setFieldInt(stmt, 3, Main.getRef(ReferenceType.ORSSID, rec.getNewSID()));
-            getM_dbAccessor().SubmitStatement(m_InsertStatementId);
-        } catch (SQLException e) {
-            Main.logger.error("Could not add message type " + getM_type() + ": " + e, e);
-        }
-
+                }
+         });
     }
+
+
 
 }

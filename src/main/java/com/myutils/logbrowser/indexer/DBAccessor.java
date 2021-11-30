@@ -14,9 +14,5 @@ public interface DBAccessor {
 
     void runQuery(String query);
 
-    PreparedStatement GetStatement(int statementId);
-
-    void SubmitStatement(int statementId) throws SQLException;
-
     void Close(boolean shouldAnalyze);
 }

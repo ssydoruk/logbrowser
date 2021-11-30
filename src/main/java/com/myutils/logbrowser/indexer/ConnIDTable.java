@@ -58,11 +58,11 @@ public class ConnIDTable extends DBTable {
     }
 
     @Override
-    public void AddToDB(Record rec) {
+    public void AddToDB(Record rec) throws SQLException {
         ConnIdRecord theRec = (ConnIdRecord) rec;
-        PreparedStatement stmt = getM_dbAccessor().GetStatement(m_InsertStatementId);
-
-        try {
+        getM_dbAccessor().addToDB(m_InsertStatementId, new IFillStatement() {
+            @Override
+            public void fillStatement(PreparedStatement stmt) throws SQLException{
             stmt.setTimestamp(1, new Timestamp(theRec.GetAdjustedUsecTime()));
             stmt.setInt(2, ConnIdRecord.getFileId());
             stmt.setLong(3, theRec.getM_fileOffset());
@@ -77,11 +77,9 @@ public class ConnIDTable extends DBTable {
             stmt.setBoolean(9, theRec.isIsTemp());
             setFieldInt(stmt, 10, Main.getRef(ReferenceType.ConnID, theRec.getNewID()));
 
-            getM_dbAccessor().SubmitStatement(m_InsertStatementId);
-        } catch (SQLException e) {
-            Main.logger.error("Could not add ConnId manipulations record: " + e, e);
-        }
-
+            }
+        });
     }
+
 
 }

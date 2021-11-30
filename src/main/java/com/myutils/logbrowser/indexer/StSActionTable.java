@@ -45,13 +45,14 @@ public class StSActionTable extends DBTable {
     }
 
     @Override
-    public void AddToDB(Record aRec) {
-        StSActionMessage theRec = (StSActionMessage) aRec;
-        PreparedStatement stmt = getM_dbAccessor().GetStatement(m_InsertStatementId);
+        public void AddToDB(Record _rec) throws SQLException {
 
-        try {
+        StSActionMessage theRec = (StSActionMessage) _rec;
+         getM_dbAccessor().addToDB(m_InsertStatementId, new IFillStatement() {
+                @Override
+                public void fillStatement(PreparedStatement stmt) throws SQLException{
             stmt.setTimestamp(1, new Timestamp(theRec.GetAdjustedUsecTime()));
-            setFieldInt(stmt, 2, Main.getRef(ReferenceType.DN, Record.cleanDN(theRec.GetName())));
+            setFieldInt(stmt, 2, Main.getRef(ReferenceType.DN, theRec.cleanDN(theRec.GetName())));
             setFieldInt(stmt, 3, Main.getRef(ReferenceType.DNTYPE, theRec.GetType()));
             setFieldInt(stmt, 4, Main.getRef(ReferenceType.StatEvent, theRec.GetValue()));
             setFieldInt(stmt, 5, Main.getRef(ReferenceType.ConnID, theRec.GetConnID()));
@@ -60,11 +61,11 @@ public class StSActionTable extends DBTable {
             stmt.setLong(8, theRec.getFileBytes());
             setFieldInt(stmt, 9, theRec.getM_line());
 
-            getM_dbAccessor().SubmitStatement(m_InsertStatementId);
-        } catch (SQLException e) {
-            Main.logger.error("Could not add Action/StatServer message: " + e, e);
-        }
+                }
+         });
     }
+
+
 
     @Override
     public void FinalizeDB() throws Exception {

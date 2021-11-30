@@ -17,11 +17,11 @@ import java.util.regex.Pattern;
 /*It extends TServer message, however there is now TServer message attributes*/
 public class ORSMetricExtension extends Message {
 
-    private static final Matcher regTMessageStart = Pattern.compile("^<([\\w~]+) sid='([\\w~]+)").matcher("");
-    //    private static Matcher regReqID = Pattern.compile("^\\s*<eval_expr .+expression='system.LastSubmitRequestId;.+result='(\\d+)' />").matcher("");
-    private static final Matcher regFunc = Pattern.compile("(?:function|name)='([^']+)'").matcher("");
-    private static final Matcher regNS = Pattern.compile("namespace='.+\\/([^']+)'").matcher("");
-    private static final Matcher regNamespace = Pattern.compile("namespace='[^']/([^\\/]+)'").matcher("");
+    private static final Pattern regTMessageStart = Pattern.compile("^<([\\w~]+) sid='([\\w~]+)");
+    //    private static Matcher regReqID = Pattern.compile("^\\s*<eval_expr .+expression='system.LastSubmitRequestId;.+result='(\\d+)' />");
+    private static final Pattern regFunc = Pattern.compile("(?:function|name)='([^']+)'");
+    private static final Pattern regNS = Pattern.compile("namespace='.+\\/([^']+)'");
+    private static final Pattern regNamespace = Pattern.compile("namespace='[^']/([^\\/]+)'");
 
     public String sid = "";
     public String Method = "";
@@ -49,7 +49,7 @@ public class ORSMetricExtension extends Message {
         Matcher m;
         String s = m_MessageLines.get(0);
 
-        if (s != null && (m = regTMessageStart.reset(s)).find()) {
+        if (s != null && (m = regTMessageStart.matcher(s)).find()) {
             Method = m.group(1);
             sid = m.group(2);
         }
@@ -85,7 +85,7 @@ public class ORSMetricExtension extends Message {
         String line = m_MessageLines.get(0);
         Matcher m;
         String func;
-        if ((m = regFunc.reset(line)).find()) {
+        if ((m = regFunc.matcher(line)).find()) {
             func = m.group(1);
         } else {
             func = line;
@@ -97,7 +97,7 @@ public class ORSMetricExtension extends Message {
         if (ns == null) {
             String line = m_MessageLines.get(0);
             Matcher m;
-            if (line != null && (m = regNS.reset(line)).find()) {
+            if (line != null && (m = regNS.matcher(line)).find()) {
                 ns = m.group(1);
             }
         }
@@ -125,7 +125,7 @@ public class ORSMetricExtension extends Message {
         Main.logger.trace("r: " + rest);
         if (rest != null) {
             Matcher m1;
-            if ((m1 = regNamespace.reset(rest)).find()) {
+            if ((m1 = regNamespace.matcher(rest)).find()) {
                 ns = m1.group(1);
             }
         }

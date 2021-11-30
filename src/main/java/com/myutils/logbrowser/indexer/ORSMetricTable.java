@@ -56,24 +56,11 @@ public class ORSMetricTable extends DBTable {
     }
 
     @Override
-    public void AddToDB(Record rec) {
+    public void AddToDB(Record rec) throws SQLException {
         ORSMetric orsRec = (ORSMetric) rec;
-        PreparedStatement stmt = getM_dbAccessor().GetStatement(m_InsertStatementId);
-//        Document JDOMDoc;
-//        Element JDOMElement;
-//        Reader m_InReader = new StringReader(orsRec.GetText());
-//        String m_text=orsRec.GetText();
-
-        try {
-//            SAXBuilder m_saxBuilder = new SAXBuilder();
-//            JDOMDoc = m_saxBuilder.build(m_InReader);
-//            JDOMElement = JDOMDoc.getRootElement();
-
-//            DocumentBuilder db = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-//            Document doc = db.parse(new InputSource(new StringReader(orsRec.GetText())));
-//            System.out.println(doc.getFirstChild().getNodeName());
-            try {
-                stmt.setTimestamp(1, new Timestamp(orsRec.GetAdjustedUsecTime()));
+        getM_dbAccessor().addToDB(m_InsertStatementId, new IFillStatement() {
+            @Override
+            public void fillStatement(PreparedStatement stmt) throws SQLException{                stmt.setTimestamp(1, new Timestamp(orsRec.GetAdjustedUsecTime()));
                 stmt.setInt(2, ORSMetric.getFileId());
                 stmt.setLong(3, orsRec.getM_fileOffset());
                 stmt.setLong(4, orsRec.getM_FileBytes());
@@ -84,15 +71,9 @@ public class ORSMetricTable extends DBTable {
                 stmt.setInt(8, orsRec.getReqID());
                 setFieldInt(stmt, 9, Main.getRef(ReferenceType.METRIC_PARAM1, orsRec.getParam1()));
 
-                getM_dbAccessor().SubmitStatement(m_InsertStatementId);
-            } catch (SQLException e) {
-                Main.logger.error("Could not add trigger: " + e, e);
-                throw e;
             }
-        } catch (SQLException ex) {
-            Main.logger.error("Error adding ORS metric " + ex.getMessage() + "\n", ex);
-            //return;
-        }
-
+        });
     }
+
+
 }

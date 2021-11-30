@@ -87,11 +87,12 @@ public class URSRITable extends DBTable {
     }
 
     @Override
-    public void AddToDB(Record _rec) {
+        public void AddToDB(Record _rec) throws SQLException {
         URSRI rec = (URSRI) _rec;
-        PreparedStatement stmt = getM_dbAccessor().GetStatement(m_InsertStatementId);
-
-        try {
+        URSRITable tab = this;
+         getM_dbAccessor().addToDB(m_InsertStatementId, new IFillStatement() {
+                @Override
+                public void fillStatement(PreparedStatement stmt) throws SQLException{
             stmt.setTimestamp(1, new Timestamp(rec.GetAdjustedUsecTime()));
             stmt.setInt(2, URSRI.getFileId());
             stmt.setLong(3, rec.getM_fileOffset());
@@ -109,13 +110,13 @@ public class URSRITable extends DBTable {
             setFieldInt(stmt, 14, Main.getRef(ReferenceType.UUID, rec.getUUID()));
             setFieldInt(stmt, 15, Main.getRef(ReferenceType.HTTPRequest, rec.getUriParams()));
 
-            URSRI.setTableValues(16, stmt, rec, this);
+            URSRI.setTableValues(16, stmt, rec, tab);
 
 //                setFieldString(stmt,8, rec.sid);
-            getM_dbAccessor().SubmitStatement(m_InsertStatementId);
-        } catch (SQLException e) {
-            Main.logger.error("Could not add record type " + m_type.toString() + ": " + e, e);
-        }
+                        }
+        });
     }
+
+
 
 }

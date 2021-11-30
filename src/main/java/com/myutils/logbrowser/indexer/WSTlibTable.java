@@ -66,15 +66,15 @@ public class WSTlibTable extends DBTable {
     }
 
     @Override
-    public void AddToDB(Record rec) {
+    public void AddToDB(Record rec) throws SQLException {
         WSMessage theRec = (WSMessage) rec;
-        PreparedStatement stmt = getM_dbAccessor().GetStatement(m_InsertStatementId);
-
-        try {
+         getM_dbAccessor().addToDB(m_InsertStatementId, new IFillStatement() {
+                @Override
+                public void fillStatement(PreparedStatement stmt) throws SQLException{
             stmt.setTimestamp(1, new Timestamp(theRec.GetAdjustedUsecTime()));
             setFieldInt(stmt, 2, Main.getRef(ReferenceType.TEvent, theRec.GetMessageName()));
-            setFieldInt(stmt, 3, Main.getRef(ReferenceType.DN, Record.cleanDN(theRec.GetThisDN())));
-            setFieldInt(stmt, 4, Main.getRef(ReferenceType.DN, Record.cleanDN(theRec.GetOtherDN())));
+            setFieldInt(stmt, 3, Main.getRef(ReferenceType.DN, rec.cleanDN(theRec.GetThisDN())));
+            setFieldInt(stmt, 4, Main.getRef(ReferenceType.DN, rec.cleanDN(theRec.GetOtherDN())));
             setFieldInt(stmt, 5, Main.getRef(ReferenceType.Agent, theRec.GetAgentID()));
             setFieldInt(stmt, 6, Main.getRef(ReferenceType.ConnID, theRec.GetConnID()));
             setFieldInt(stmt, 7, Main.getRef(ReferenceType.ConnID, theRec.GetTransferConnID()));
@@ -92,11 +92,10 @@ public class WSTlibTable extends DBTable {
             stmt.setInt(19, theRec.getServerHandle());
             stmt.setInt(20, theRec.getRefID());
 
-            getM_dbAccessor().SubmitStatement(m_InsertStatementId);
-        } catch (SQLException e) {
-            Main.logger.error("Could not add message type " + getM_type() + ": " + e, e);
-        }
-
+                        }
+        });
     }
+
+
 
 }

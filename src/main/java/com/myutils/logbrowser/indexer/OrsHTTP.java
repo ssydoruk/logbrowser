@@ -20,11 +20,11 @@ import static com.myutils.logbrowser.indexer.Parser.splitQuery;
 public class OrsHTTP extends Message {
 
     //    Set-Cookie:ORSSESSIONID=00FAVPM3BOBM3223H3CA9ATAES00000G.node1576
-    private static final Matcher regSIDCookie = Pattern.compile("ORSSESSIONID=([\\w~]+)").matcher("");
-    private static final Matcher regHTTPMethod = Pattern.compile("^(\\w+)").matcher("");
-    private static final Matcher regSessionID = Pattern.compile("session/([^\\/]+)").matcher("");
-    private static final Matcher regHTTPURL = Pattern.compile("^(?:POST|GET) (.+) HTTP/").matcher("");
-    private static final Matcher regHTTPResp = Pattern.compile("^HTTP/.\\.. (.+)").matcher("");
+    private static final Pattern regSIDCookie = Pattern.compile("ORSSESSIONID=([\\w~]+)");
+    private static final Pattern regHTTPMethod = Pattern.compile("^(\\w+)");
+    private static final Pattern regSessionID = Pattern.compile("session/([^\\/]+)");
+    private static final Pattern regHTTPURL = Pattern.compile("^(?:POST|GET) (.+) HTTP/");
+    private static final Pattern regHTTPResp = Pattern.compile("^HTTP/.\\.. (.+)");
     JSONObject _jsonBody = null;
     private String ip = null;
     private int socket = 0;

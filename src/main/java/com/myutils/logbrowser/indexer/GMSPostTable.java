@@ -71,11 +71,11 @@ public class GMSPostTable extends DBTable {
     }
 
     @Override
-    public void AddToDB(Record rec) {
+    public void AddToDB(Record rec) throws SQLException {
         GMSPostMessage gmsRec = (GMSPostMessage) rec;
-        PreparedStatement stmt = getM_dbAccessor().GetStatement(m_InsertStatementId);
-
-        try {
+        getM_dbAccessor().addToDB(m_InsertStatementId, new IFillStatement() {
+            @Override
+            public void fillStatement(PreparedStatement stmt) throws SQLException{
 
             stmt.setTimestamp(1, new Timestamp(gmsRec.GetAdjustedUsecTime()));
             stmt.setInt(2, GMSPostMessage.getFileId());
@@ -87,16 +87,14 @@ public class GMSPostTable extends DBTable {
             setFieldInt(stmt, 7, Main.getRef(ReferenceType.GMSCallbackType, gmsRec.CallBackType()));
             setFieldInt(stmt, 8, Main.getRef(ReferenceType.GMSService, gmsRec.GMSService()));
             setFieldInt(stmt, 9, Main.getRef(ReferenceType.ORSSID, gmsRec.ORSSessionID()));
-            setFieldInt(stmt, 10, Main.getRef(ReferenceType.DN, Record.cleanDN(gmsRec.getPhone())));
+            setFieldInt(stmt, 10, Main.getRef(ReferenceType.DN, rec.cleanDN(gmsRec.getPhone())));
             stmt.setBoolean(11, gmsRec.isInbound());
             setFieldInt(stmt, 12, Main.getRef(ReferenceType.ORSREQ, gmsRec.ORSURI()));
             setFieldInt(stmt, 13, Main.getRef(ReferenceType.IP, gmsRec.getSourceIP()));
 
-            getM_dbAccessor().SubmitStatement(m_InsertStatementId);
-        } catch (SQLException e) {
-            Main.logger.error("Could not add message type " + getM_type() + ": " + e, e);
-        }
-
+            }
+        });
     }
+
 
 }

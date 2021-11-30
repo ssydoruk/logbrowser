@@ -17,7 +17,7 @@ import static Utils.Util.intOrDef;
  */
 public class GMSStartMessage extends Message {
 
-    final private static Matcher regPOSTMessage = Pattern.compile("^\\(POST\\) Client IP Address: ([0-9\\.]+),\\s*").matcher("");
+    private static final Pattern regPOSTMessage = Pattern.compile("^\\(POST\\) Client IP Address: ([0-9\\.]+),\\s*");
     private final boolean isTServerReq = false;
     String m_MessageName;
     private String m_refID;
@@ -111,7 +111,7 @@ public class GMSStartMessage extends Message {
     private void parsePOST() {
         if (!this.POSTParsed) {
             Matcher m;
-            if ((m = regPOSTMessage.reset(m_MessageLines.get(0))).find()) {
+            if ((m = regPOSTMessage.matcher(m_MessageLines.get(0))).find()) {
                 this.clientIP = m.group(1);
                 parseORSURI = parseORSURI(m_MessageLines.get(0).substring(m.end(), m_MessageLines.get(0).indexOf(", Params")));
             }

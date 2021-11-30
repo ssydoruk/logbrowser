@@ -63,11 +63,12 @@ public class OrsUrsTable extends DBTable {
     }
 
     @Override
-    public void AddToDB(Record aRec) {
+    public void AddToDB(Record aRec) throws SQLException {
         OrsUrsMessage theRec = (OrsUrsMessage) aRec;
 
-        PreparedStatement stmt = getM_dbAccessor().GetStatement(m_InsertStatementId);
-        try {
+        getM_dbAccessor().addToDB(m_InsertStatementId, new IFillStatement() {
+            @Override
+            public void fillStatement(PreparedStatement stmt) throws SQLException{
             stmt.setTimestamp(1, new Timestamp(theRec.GetAdjustedUsecTime()));
             stmt.setInt(2, OrsUrsMessage.getFileId());
             stmt.setLong(3, theRec.getM_fileOffset());
@@ -84,11 +85,10 @@ public class OrsUrsTable extends DBTable {
             setFieldInt(stmt, 12, Main.getRef(ReferenceType.ORSMODULE, theRec.GetHeaderValue("module")));
             setFieldInt(stmt, 13, Main.getRef(ReferenceType.ORSMETHOD, theRec.GetHeaderValue("method")));
 
-            getM_dbAccessor().SubmitStatement(m_InsertStatementId);
-        } catch (SQLException e) {
-            Main.logger.error("Could not add ORSURS message: " + e.getMessage() + "\n", e);
-        }
+            }
+        });
     }
+
 
     @Override
     public void FinalizeDB() throws Exception {

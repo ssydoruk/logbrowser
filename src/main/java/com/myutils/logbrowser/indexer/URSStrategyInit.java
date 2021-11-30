@@ -10,7 +10,7 @@ import java.util.regex.Pattern;
 
 public final class URSStrategyInit extends Message {
 
-    private static final Matcher uuidPattern = Pattern.compile("^calluuid ([\\w~]+) is bound").matcher("");
+    private static final Pattern uuidPattern = Pattern.compile("^calluuid ([\\w~]+) is bound");
     private final String ConnID;
     private final String strategyMsg;
     private final String strategyName;

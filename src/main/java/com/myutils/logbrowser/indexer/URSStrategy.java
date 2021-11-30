@@ -19,12 +19,12 @@ import java.util.regex.Pattern;
 public final class URSStrategy extends Message {
 
     private static final StrategySteps1 StrategySteps = new StrategySteps1();
-    private static final Matcher uuidPattern = Pattern.compile("^calluuid ([\\w~]+) is bound").matcher("");
-    private static final Matcher ptnMod = Pattern.compile("^ASSIGN: v:\\d+:_m.+\"([\\w~]+)\"$").matcher("");
-    private static final Matcher ptnFun = Pattern.compile("^ASSIGN: v:\\d+:_f.+\"([\\w~]+)\"$").matcher("");
-    private static final Matcher ptnParam = Pattern.compile("^ASSIGN: v:\\d+:_p.+(\\[.+\\])$").matcher("");
-    private static final Matcher ptnEventAll = Pattern.compile("^ASSIGN: v:\\d+:_eventdata\\(LOCAL\\) <- LIST: (.+)$").matcher("");
-    private static final Matcher ptnNotif = Pattern.compile("^ASSIGN: v:\\d+:_event\\(LOCAL\\) <- OBJECT:[^=]+=(.+)").matcher("");
+    private static final Pattern uuidPattern = Pattern.compile("^calluuid ([\\w~]+) is bound");
+    private static final Pattern ptnMod = Pattern.compile("^ASSIGN: v:\\d+:_m.+\"([\\w~]+)\"$");
+    private static final Pattern ptnFun = Pattern.compile("^ASSIGN: v:\\d+:_f.+\"([\\w~]+)\"$");
+    private static final Pattern ptnParam = Pattern.compile("^ASSIGN: v:\\d+:_p.+(\\[.+\\])$");
+    private static final Pattern ptnEventAll = Pattern.compile("^ASSIGN: v:\\d+:_eventdata\\(LOCAL\\) <- LIST: (.+)$");
+    private static final Pattern ptnNotif = Pattern.compile("^ASSIGN: v:\\d+:_event\\(LOCAL\\) <- OBJECT:[^=]+=(.+)");
 
     private final String FileLine;
     private final String ConnID;
@@ -32,7 +32,7 @@ public final class URSStrategy extends Message {
     private String ref2;
     private String ref1;
 
-    //    final private static Matcher regCampaignDBID= Pattern.compile("CampaignDBID: ([^;]+);");
+    //    private static final Pattern regCampaignDBID= Pattern.compile("CampaignDBID: ([^;]+);");
     URSStrategy(ArrayList m_MessageContents, String ConnID, String FileLine,
                 String lineRest) {
         super(TableType.URSStrategy);
@@ -223,12 +223,12 @@ public final class URSStrategy extends Message {
         private String get(String FileLine, String rest) {
             SS ret;
             if ((ret = ss1.get(FileLine)) != null) {
-                for (Matcher pattern : ret.pattString.keySet()) {
+                for (Pattern pattern : ret.pattString.keySet()) {
                     if (pattern == null) {
                         return ret.pattString.get(pattern);
                     } else {
                         Matcher m;
-                        if ((m = pattern.reset(rest)).find()) {
+                        if ((m = pattern.matcher(rest)).find()) {
                             return ret.pattString.get(pattern);
                         }
                     }
@@ -248,7 +248,7 @@ public final class URSStrategy extends Message {
 
         private static class SS {
 
-            private final HashMap<Matcher, String> pattString = new HashMap<>();
+            private final HashMap<Pattern, String> pattString = new HashMap<>();
 
             private SS(String Patt, String _ret) throws Exception {
                 if (Patt != null && Patt.length() > 0) {
@@ -262,7 +262,7 @@ public final class URSStrategy extends Message {
                 if (pt == null) {
                     throw new Exception("With more than one FileSearch, each need to have pattern");
                 }
-                pattString.put(Pattern.compile(pt).matcher(""), aliasString);
+                pattString.put(Pattern.compile(pt), aliasString);
             }
         }
     }

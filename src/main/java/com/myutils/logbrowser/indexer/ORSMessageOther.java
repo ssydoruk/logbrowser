@@ -34,10 +34,12 @@ public class ORSMessageOther extends Record {
         m_text = text;
     }
 
-    public void AddToDB(DBAccessor accessor) {
-        PreparedStatement stmt = accessor.GetStatement(m_batchId);
+    public void AddToDB(SqliteAccessor accessor) throws SQLException {
+            accessor.addToDB(m_batchId, new IFillStatement() {
+                @Override
+                public void fillStatement(PreparedStatement stmt) throws SQLException{
 
-        try {
+
             if (m_text.length() > 255) {
                 m_text = m_text.substring(0, 254);
             }
@@ -48,9 +50,9 @@ public class ORSMessageOther extends Record {
             stmt.setLong(4, getM_fileOffset());
             stmt.setLong(5, getM_line());
 
-            accessor.SubmitStatement(m_batchId);
-        } catch (SQLException e) {
-            Main.logger.error("Could not add trigger: " + e, e);
         }
-    }
+    });
+}
+
+
 }

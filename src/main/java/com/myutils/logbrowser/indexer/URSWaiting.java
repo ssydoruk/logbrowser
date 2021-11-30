@@ -10,7 +10,7 @@ import java.util.regex.Pattern;
 
 public class URSWaiting extends Message {
 
-    private static final Matcher regMedia = Pattern.compile("\\<([^\\>]+)\\> type \\<([^\\>]+)\\>").matcher("");
+    private static final Pattern regMedia = Pattern.compile("\\<([^\\>]+)\\> type \\<([^\\>]+)\\>");
     private final String connID;
     private String agent;
     private String targetType;
@@ -19,7 +19,7 @@ public class URSWaiting extends Message {
         super(TableType.URSWaiting);
         this.connID = connID;
         Matcher m;
-        if ((m = regMedia.reset(ag)).find()) {
+        if ((m = regMedia.matcher(ag)).find()) {
             this.agent = m.group(1);
             this.targetType = m.group(2);
         }

@@ -11,7 +11,7 @@ import java.util.regex.Pattern;
 public class OCSSCXMLTreatment extends Message {
 
     //Created scxml session '0000017F-040206B5-0001'
-    private static final Matcher regSessionID = Pattern.compile("Created scxml session '([\\w-]+)'").matcher("");
+    private static final Pattern regSessionID = Pattern.compile("Created scxml session '([\\w-]+)'");
     private final String campDBID;
     private final String recHandle;
     private final String chainID;

@@ -15,8 +15,8 @@ import java.util.regex.Pattern;
  */
 public class GMSPostMessage extends Message {
 
-    final private static Matcher regService = Pattern.compile("/service/callback/([^,\\s]+)").matcher("");
-    final private static Matcher regPOSTMessage = Pattern.compile("^\\(POST\\) Client IP Address: ([0-9\\.]+),.+(http[^,]+)").matcher("");
+    private static final Pattern regService = Pattern.compile("/service/callback/([^,\\s]+)");
+    private static final Pattern regPOSTMessage = Pattern.compile("^\\(POST\\) Client IP Address: ([0-9\\.]+),.+(http[^,]+)");
     private final boolean isTServerReq = false;
     String m_MessageName;
     private String clientIP;
@@ -91,7 +91,7 @@ public class GMSPostMessage extends Message {
     private void parsePOST() {
         if (!this.POSTParsed) {
             Matcher m;
-            if ((m = regPOSTMessage.reset(m_MessageLines.get(0))).find()) {
+            if ((m = regPOSTMessage.matcher(m_MessageLines.get(0))).find()) {
                 this.clientIP = m.group(1);
                 parseORSURI = parseORSURI(m.group(2));
             }

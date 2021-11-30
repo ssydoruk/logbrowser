@@ -58,11 +58,11 @@ public class TemplateTable extends DBTable {
     }
 
     @Override
-    public void AddToDB(Record _rec) {
+        public void AddToDB(Record _rec) throws SQLException {
         ORSMetric rec = (ORSMetric) _rec;
-        PreparedStatement stmt = getM_dbAccessor().GetStatement(m_InsertStatementId);
-
-        try {
+        getM_dbAccessor().addToDB(m_InsertStatementId, new IFillStatement() {
+            @Override
+            public void fillStatement(PreparedStatement stmt) throws SQLException{
             generateID(stmt, 1, rec);
             stmt.setTimestamp(2, new Timestamp(rec.GetAdjustedUsecTime()));
             stmt.setInt(3, ORSMetric.getFileId());
@@ -73,10 +73,9 @@ public class TemplateTable extends DBTable {
             stmt.setInt(7, ORSMetric.m_handlerId);
             setFieldString(stmt, 8, rec.sid);
 
-            getM_dbAccessor().SubmitStatement(m_InsertStatementId);
-        } catch (SQLException e) {
-            Main.logger.error("Could not add record type " + m_type.toString() + ": " + e, e);
-        }
+            }
+        });
     }
+
 
 }

@@ -15,13 +15,13 @@ import static Utils.Util.StripQuotes;
  */
 public class WSMessage extends Message {
 
-    final private static Matcher regConnID = Pattern.compile("^AttributeConnID .+= (\\w+)$").matcher("");
-    final private static Matcher regThisDN = Pattern.compile("^AttributeThisDN .+= \\\"([^\\\"]*)\\\"$").matcher("");
-    final private static Matcher regOtherDN = Pattern.compile("^AttributeOtherDN .+= \\\"([^\\\"]*)\\\"$").matcher("");
-    final private static Matcher regTransferConnID = Pattern.compile("^AttributeTransferConnID .+= (\\S+)$").matcher("");
-    final private static Matcher regUUID = Pattern.compile("^AttributeCallUuid .+= \\\"([^\\\"]*)\\\"$").matcher("");
-    final private static Matcher regAgentID = Pattern.compile("^AttributeAgentID .+= \\\"([^\\\"]*)\\\"$").matcher("");
-    final private static Matcher regSeqNo = Pattern.compile("^AttributeEventSequenceNumber .+= (\\w+)$").matcher("");
+    private static final Pattern regConnID = Pattern.compile("^AttributeConnID .+= (\\w+)$");
+    private static final Pattern regThisDN = Pattern.compile("^AttributeThisDN .+= \\\"([^\\\"]*)\\\"$");
+    private static final Pattern regOtherDN = Pattern.compile("^AttributeOtherDN .+= \\\"([^\\\"]*)\\\"$");
+    private static final Pattern regTransferConnID = Pattern.compile("^AttributeTransferConnID .+= (\\S+)$");
+    private static final Pattern regUUID = Pattern.compile("^AttributeCallUuid .+= \\\"([^\\\"]*)\\\"$");
+    private static final Pattern regAgentID = Pattern.compile("^AttributeAgentID .+= \\\"([^\\\"]*)\\\"$");
+    private static final Pattern regSeqNo = Pattern.compile("^AttributeEventSequenceNumber .+= (\\w+)$");
     private final String m_MessageName;
     private final String server;
     private final String fileHandle;

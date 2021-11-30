@@ -43,9 +43,11 @@ public class HandlerTable extends DBTable {
     }
 
     @Override
-    public void AddToDB(Record arec) {
+    public void AddToDB(Record arec) throws SQLException {
         Handler theRec = (Handler) arec;
-        PreparedStatement stmt = getM_dbAccessor().GetStatement(m_InsertStatementId);
+        getM_dbAccessor().addToDB(m_InsertStatementId, new IFillStatement() {
+            @Override
+            public void fillStatement(PreparedStatement stmt) throws SQLException{
 
         String m_text = theRec.getM_text();
 
@@ -56,17 +58,14 @@ public class HandlerTable extends DBTable {
 //        {
 //	    return;
 //        }
-        try {
             stmt.setInt(1, Main.getRef(ReferenceType.HANDLER, m_text));
             stmt.setInt(2, Handler.getFileId());
 //            stmt.setLong(3, (long) theRec.getM_fileOffset());
 //            stmt.setInt(4, theRec.getM_line());
             theRec.IncHandler();
-            getM_dbAccessor().SubmitStatement(m_InsertStatementId);
-        } catch (SQLException e) {
-            Main.logger.error("Could not add handler: " + e, e);
+        }
+            });
         }
 
-    }
 
-}
+    }

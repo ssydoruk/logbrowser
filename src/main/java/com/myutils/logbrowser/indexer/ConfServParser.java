@@ -16,32 +16,32 @@ import static Utils.Util.intOrDef;
 
 public class ConfServParser extends Parser {
 
-    private static final Matcher regConfigMessage = Pattern.compile("^Message (MSGCFG_\\w+) (received from|sent to) (\\d+) \\((.*)? '(.*)?'\\)").matcher("");
+    private static final Pattern regConfigMessage = Pattern.compile("^Message (MSGCFG_\\w+) (received from|sent to) (\\d+) \\((.*)? '(.*)?'\\)");
 
-    private static final Matcher regStartsWithSpace = Pattern.compile("^\\s").matcher("");
+    private static final Pattern regStartsWithSpace = Pattern.compile("^\\s");
 
-    final static Matcher ptOp = Pattern.compile("(MSGCFG\\S+)").matcher("");
-    private static final Matcher regChangeRequest = Pattern.compile("^\\s*Message MSGCFG_((?:AD|CH|DE)\\w+)").matcher("");
-    private static final Matcher regAuthRequest = Pattern.compile("^\\s*Message (MSGCFG_\\w+).+from (\\d+) \\((.+) '(.+)'\\)$").matcher("");
-    private static final Matcher regAuthResponse = Pattern.compile("^\\s*Message (MSGCFG_\\w+).+to (\\d+) \\((.+) '(.+)'\\)$").matcher("");
-    private static final Matcher regChangeFinal = Pattern.compile(" Object: \\[([^\\]]+)\\], name \\[([^\\]]+)\\], DBID: \\[(\\d+)\\] is ([^\\]]+) by client, type \\[([^\\]]+)\\], name: \\[([^\\]]+)\\], user: \\[([^\\]]+)\\]").matcher("");
-    private static final Matcher regChangeProxy = Pattern.compile(" Object \\[(\\w+)\\], name \\[([^\\]]*)\\], DBID: \\[(\\d+)\\] is ([^\\]]+) at server").matcher("");
-    private static final Matcher regConfigToClients = Pattern.compile("^\\s*There are \\[(\\d+)\\] objects of type \\[([^\\]]+)\\] sent to the client \\[([^\\]]+)\\] \\(application \\[([^\\]]+)\\], type \\[([^\\]]+)\\]\\)").matcher("");
-    private static final Matcher regNewClient = Pattern.compile("^\\s*New client (\\d+) connected").matcher("");
-    private static final Matcher regChangeEnd = Pattern.compile("^\\s*Trc 2421. Object \\[([^\\]]+)\\](?:, DBID \\[(\\d+)\\])? is to be ([^\\]]+) by client, type \\[([^\\]]+)\\], name: \\[([^\\]]+)\\], user: \\[([^\\]]+)\\]").matcher("");
-    private static final Matcher regAuthStart = Pattern.compile("^\\s*(MSGCFG_.+)*?$").matcher("");
-    private static final Matcher regAuthCont = Pattern.compile("^\\s*attr:").matcher("");
-    private static final Matcher regNewClientAuth = Pattern.compile("^\\s*Extended info : Client (\\d+) authorized, name \\[([^\\]]+)\\], type \\[([^\\]]+)\\], user name \\[([^\\]]+)\\], protocol \\[([^\\]]+)\\], address \\[([^\\]]+)\\]").matcher("");
-    private static final Matcher regClientDisconn = Pattern.compile("^\\s*Extended info : Client \\[([^\\]]+)\\] disconnected, application \\[([^\\]]+)\\], type \\[([^\\]]+)\\]").matcher("");
-    private static final Matcher regClientDisconn1 = Pattern.compile("^\\s*Client '(\\w+)' disconnected").matcher("");
-    private static final Matcher regNotParseMessage = Pattern.compile("^("
+    private static final Pattern ptOp = Pattern.compile("(MSGCFG\\S+)");
+    private static final Pattern regChangeRequest = Pattern.compile("^\\s*Message MSGCFG_((?:AD|CH|DE)\\w+)");
+    private static final Pattern regAuthRequest = Pattern.compile("^\\s*Message (MSGCFG_\\w+).+from (\\d+) \\((.+) '(.+)'\\)$");
+    private static final Pattern regAuthResponse = Pattern.compile("^\\s*Message (MSGCFG_\\w+).+to (\\d+) \\((.+) '(.+)'\\)$");
+    private static final Pattern regChangeFinal = Pattern.compile(" Object: \\[([^\\]]+)\\], name \\[([^\\]]+)\\], DBID: \\[(\\d+)\\] is ([^\\]]+) by client, type \\[([^\\]]+)\\], name: \\[([^\\]]+)\\], user: \\[([^\\]]+)\\]");
+    private static final Pattern regChangeProxy = Pattern.compile(" Object \\[(\\w+)\\], name \\[([^\\]]*)\\], DBID: \\[(\\d+)\\] is ([^\\]]+) at server");
+    private static final Pattern regConfigToClients = Pattern.compile("^\\s*There are \\[(\\d+)\\] objects of type \\[([^\\]]+)\\] sent to the client \\[([^\\]]+)\\] \\(application \\[([^\\]]+)\\], type \\[([^\\]]+)\\]\\)");
+    private static final Pattern regNewClient = Pattern.compile("^\\s*New client (\\d+) connected");
+    private static final Pattern regChangeEnd = Pattern.compile("^\\s*Trc 2421. Object \\[([^\\]]+)\\](?:, DBID \\[(\\d+)\\])? is to be ([^\\]]+) by client, type \\[([^\\]]+)\\], name: \\[([^\\]]+)\\], user: \\[([^\\]]+)\\]");
+    private static final Pattern regAuthStart = Pattern.compile("^\\s*(MSGCFG_.+)*?$");
+    private static final Pattern regAuthCont = Pattern.compile("^\\s*attr:");
+    private static final Pattern regNewClientAuth = Pattern.compile("^\\s*Extended info : Client (\\d+) authorized, name \\[([^\\]]+)\\], type \\[([^\\]]+)\\], user name \\[([^\\]]+)\\], protocol \\[([^\\]]+)\\], address \\[([^\\]]+)\\]");
+    private static final Pattern regClientDisconn = Pattern.compile("^\\s*Extended info : Client \\[([^\\]]+)\\] disconnected, application \\[([^\\]]+)\\], type \\[([^\\]]+)\\]");
+    private static final Pattern regClientDisconn1 = Pattern.compile("^\\s*Client '(\\w+)' disconnected");
+    private static final Pattern regNotParseMessage = Pattern.compile("^("
             + "04541|"
             + "04524|"
             + "24215|"
             + "24308|"
             + "24200|"
             + "04542"
-            + ")").matcher("");
+            + ")");
     long m_CurrentFilePos;
     // parse state contants
 
@@ -147,7 +147,7 @@ public class ConfServParser extends Parser {
 
                 if (lastGenesysMsgID != null) {
                     if (lastGenesysMsgID.equals("04541")) {
-                        if ((m = regConfigMessage.reset(s)).find()) {
+                        if ((m = regConfigMessage.matcher(s)).find()) {
                             setSavedFilePos(getFilePos());
                             m_MessageContents.add(s);
                             msgTmp = new CSClientMessage(m.group(1), true,
@@ -156,12 +156,12 @@ public class ConfServParser extends Parser {
                             return null;
                         }
 
-                        if ((regChangeRequest.reset(s)).find()) {
+                        if ((regChangeRequest.matcher(s)).find()) {
                             setSavedFilePos(getFilePos());
                             m_MessageContents.add(s);
                             m_ParserState = ParserState.STATE_UPDATE;
                             return null;
-                        } else if ((m = regAuthRequest.reset(s)).find()) {
+                        } else if ((m = regAuthRequest.matcher(s)).find()) {
                             setSavedFilePos(getFilePos());
                             m_MessageContents.add(s);
                             m_ParserState = ParserState.STATE_AUTH1;
@@ -170,7 +170,7 @@ public class ConfServParser extends Parser {
                             return null;
                         }
                     } else if (lastGenesysMsgID.equals("04542")) {
-                        if ((m = regConfigMessage.reset(s)).find()) {
+                        if ((m = regConfigMessage.matcher(s)).find()) {
                             setSavedFilePos(getFilePos());
                             m_MessageContents.add(s);
                             msgTmp = new CSClientMessage(m.group(1), false,
@@ -182,7 +182,7 @@ public class ConfServParser extends Parser {
                             return null;
                         }
 
-                        if ((m = regAuthResponse.reset(s)).find()) {
+                        if ((m = regAuthResponse.matcher(s)).find()) {
                             setSavedFilePos(getFilePos());
                             m_MessageContents.add(s);
                             m_ParserState = ParserState.STATE_AUTH1;
@@ -194,7 +194,7 @@ public class ConfServParser extends Parser {
                         m_ParserState = ParserState.STATE_IGNORE_MESSAGE;
                         return null;
                     } else if (lastGenesysMsgID.startsWith("2420")) {// config object update
-                        if ((m = regChangeFinal.reset(s)).find()) {
+                        if ((m = regChangeFinal.matcher(s)).find()) {
                             CSObjectChange msg = new CSObjectChange(m_MessageContents);
                             msg.setObjType(m.group(1));
                             msg.setDBID(m.group(3));
@@ -208,7 +208,7 @@ public class ConfServParser extends Parser {
                             m_ParserState = ParserState.STATE_COMMENTS;
                             m_MessageContents.clear();
                             return null;
-                        } else if ((m = regChangeProxy.reset(s)).find()) {
+                        } else if ((m = regChangeProxy.matcher(s)).find()) {
                             CSObjectChange msg = new CSObjectChange();
                             msg.setObjType(m.group(1));
                             msg.setDBID(m.group(3));
@@ -222,7 +222,7 @@ public class ConfServParser extends Parser {
 
 
                     } else if (lastGenesysMsgID.startsWith("2421")) {
-                        if ((m = regConfigToClients.reset(s)).find()) {
+                        if ((m = regConfigToClients.matcher(s)).find()) {
                             CSClientMessage csClientRequest1 = new CSClientMessage("OBJECTS_SENT", false,
                                     m.group(3), m.group(5), m.group(4));
                             csClientRequest1.setObjType(m.group(2));
@@ -231,7 +231,7 @@ public class ConfServParser extends Parser {
                             return null;
                         }
                     } else if (lastGenesysMsgID.startsWith("04520")) {
-                        if ((m = regNewClient.reset(s)).find()) {
+                        if ((m = regNewClient.matcher(s)).find()) {
                             CSClientConnect msg = new CSClientConnect();
                             msg.setConnect(true);
                             msg.setClientSocket(m.group(1));
@@ -241,7 +241,7 @@ public class ConfServParser extends Parser {
                             m_MessageContents.clear();
                             return null;
                         }
-                    } else if ((m = regNewClientAuth.reset(s)).find()) {
+                    } else if ((m = regNewClientAuth.matcher(s)).find()) {
                         CSClientConnect msg = new CSClientConnect();
                         msg.setConnect(true);
                         msg.setClientSocket(m.group(1));
@@ -254,7 +254,7 @@ public class ConfServParser extends Parser {
                         m_ParserState = ParserState.STATE_COMMENTS;
                         m_MessageContents.clear();
                         return null;
-                    } else if ((m = regClientDisconn.reset(s)).find()) {
+                    } else if ((m = regClientDisconn.matcher(s)).find()) {
                         CSClientConnect msg = new CSClientConnect();
                         msg.setConnect(false);
                         msg.setClientSocket(m.group(1));
@@ -265,7 +265,7 @@ public class ConfServParser extends Parser {
                         m_ParserState = ParserState.STATE_COMMENTS;
                         m_MessageContents.clear();
                         return null;
-                    } else if ((m = regClientDisconn1.reset(s)).find()) {
+                    } else if ((m = regClientDisconn1.matcher(s)).find()) {
                         CSClientConnect msg = new CSClientConnect();
                         msg.setConnect(false);
                         msg.setClientSocket(m.group(1));
@@ -278,14 +278,14 @@ public class ConfServParser extends Parser {
 
                 }
 
-                GenesysMsg.CheckGenesysMsg(dp, this, TableType.MsgConfServer, (Matcher) null);
+                GenesysMsg.CheckGenesysMsg(dp, this, TableType.MsgConfServer, (Pattern) null);
 
                 break;
 //</editor-fold>
 
             case STATE_CLIENT_REQUEST:
                 if (StringUtils.isEmpty(str) ||
-                        regStartsWithSpace.reset(str).find()) {
+                        regStartsWithSpace.matcher(str).find()) {
                     m_MessageContents.add(str);
                 } else {
                     msgTmp.setMessageLines(m_MessageContents);
@@ -299,7 +299,7 @@ public class ConfServParser extends Parser {
 
             case STATE_IGNORE_MESSAGE:
                 if (!StringUtils.isEmpty(str) &&
-                        !regStartsWithSpace.reset(str).find()) {
+                        !regStartsWithSpace.matcher(str).find()) {
                     m_ParserState = ParserState.STATE_COMMENTS;
                     return str;
                 }
@@ -308,7 +308,7 @@ public class ConfServParser extends Parser {
 
             case STATE_CLIENT_RESPONSE:
                 if (StringUtils.isEmpty(str) ||
-                        regStartsWithSpace.reset(str).find()) {
+                        regStartsWithSpace.matcher(str).find()) {
                     m_MessageContents.add(str);
                 } else {
                     msgTmp.setMessageLines(m_MessageContents);
@@ -321,7 +321,7 @@ public class ConfServParser extends Parser {
                 break;
 
             case STATE_AUTH1:
-                if ((regAuthStart.reset(s)).find()) {
+                if ((regAuthStart.matcher(s)).find()) {
                     m_MessageContents.add(str);
                 } else {
                     m_MessageContents.add(str);
@@ -330,7 +330,7 @@ public class ConfServParser extends Parser {
                 break;
 
             case STATE_AUTH2:
-                if ((regAuthCont.reset(s)).find()) {
+                if ((regAuthCont.matcher(s)).find()) {
                     m_MessageContents.add(str);
                 } else {
                     m_MessageContents.add(str);
@@ -345,7 +345,7 @@ public class ConfServParser extends Parser {
 
             case STATE_UPDATE: {
                 s = ParseGenesysLocal(str);
-                if ((m = regChangeEnd.reset(s)).find()) {
+                if ((m = regChangeEnd.matcher(s)).find()) {
                     m_MessageContents.add(str);
                     CSClientMessage msg = new CSClientMessage(m_MessageContents);
                     msg.setObjType(m.group(1));
@@ -358,7 +358,7 @@ public class ConfServParser extends Parser {
                     SetStdFieldsAndAdd(msg);
                     m_ParserState = ParserState.STATE_COMMENTS;
                     m_MessageContents.clear();
-                } else if ((m = regChangeFinal.reset(s)).find()) {
+                } else if ((m = regChangeFinal.matcher(s)).find()) {
                     m_MessageContents.add(str);
                     CSClientMessage msg = new CSClientMessage(m_MessageContents);
                     msg.setObjType(m.group(1));
@@ -372,7 +372,7 @@ public class ConfServParser extends Parser {
                     SetStdFieldsAndAdd(msg);
                     m_ParserState = ParserState.STATE_COMMENTS;
                     m_MessageContents.clear();
-                } else if ((m = regChangeProxy.reset(s)).find()) {
+                } else if ((m = regChangeProxy.matcher(s)).find()) {
                     m_MessageContents.add(str);
                     CSClientMessage msg = new CSClientMessage(m_MessageContents);
                     msg.setObjType(m.group(1));
@@ -387,7 +387,7 @@ public class ConfServParser extends Parser {
                     m_MessageContents.clear();
 
                 } else if (dp != null
-                        && (lastLogMsg = getLastLogMsg()) != null && regNotParseMessage.reset(lastLogMsg.getLastGenesysMsgID()).find()) {
+                        && (lastLogMsg = getLastLogMsg()) != null && regNotParseMessage.matcher(lastLogMsg.getLastGenesysMsgID()).find()) {
                     CSClientMessage msg = new CSClientMessage(m_MessageContents);
 
                     SetStdFieldsAndAdd(msg);
@@ -620,13 +620,14 @@ public class ConfServParser extends Parser {
         }
 
         @Override
-        public void AddToDB(Record _rec) {
+        public void AddToDB(Record _rec) throws SQLException {
             CSObjectChange rec = (CSObjectChange) _rec;
 
-            PreparedStatement stmt = getM_dbAccessor().GetStatement(m_InsertStatementId);
+            getM_dbAccessor().addToDB(m_InsertStatementId, new IFillStatement() {
+                @Override
+                public void fillStatement(PreparedStatement stmt) throws SQLException{
 
-            try {
-                stmt.setTimestamp(1, new Timestamp(rec.GetAdjustedUsecTime()));
+                    stmt.setTimestamp(1, new Timestamp(rec.GetAdjustedUsecTime()));
                 stmt.setInt(2, CSClientMessage.getFileId());
                 stmt.setLong(3, rec.getM_fileOffset());
                 stmt.setLong(4, rec.getM_FileBytes());
@@ -640,10 +641,8 @@ public class ConfServParser extends Parser {
                 setFieldInt(stmt, 11, rec.getDbid());
                 setFieldInt(stmt, 12, Main.getRef(ReferenceType.CfgObjName, rec.getObjName()));
 
-                getM_dbAccessor().SubmitStatement(m_InsertStatementId);
-            } catch (SQLException e) {
-                Main.logger.error("Could not add record type " + m_type.toString() + ": " + e, e);
-            }
+                }
+            });
         }
 
     }
@@ -851,16 +850,16 @@ public class ConfServParser extends Parser {
         }
 
         @Override
-        public void AddToDB(Record _rec) {
+        public void AddToDB(Record _rec) throws SQLException {
             CSClientMessage rec = (CSClientMessage) _rec;
 
             if (rec.getOp().equals("MSGCFG_OBJECTCHANGED2")) {
                 return;
             }
 
-            PreparedStatement stmt = getM_dbAccessor().GetStatement(m_InsertStatementId);
-
-            try {
+            getM_dbAccessor().addToDB(m_InsertStatementId, new IFillStatement() {
+                @Override
+                public void fillStatement(PreparedStatement stmt) throws SQLException{
                 stmt.setTimestamp(1, new Timestamp(rec.GetAdjustedUsecTime()));
                 stmt.setInt(2, CSClientMessage.getFileId());
                 stmt.setLong(3, rec.getM_fileOffset());
@@ -879,11 +878,10 @@ public class ConfServParser extends Parser {
                 setFieldInt(stmt, 15, rec.getDescriptor());
                 setFieldInt(stmt, 16, rec.getObjNumber());
 
-                getM_dbAccessor().SubmitStatement(m_InsertStatementId);
-            } catch (SQLException e) {
-                Main.logger.error("Could not add record type " + m_type.toString() + ": " + e, e);
-            }
+                }
+            });
         }
+
 
     }
 
@@ -1005,11 +1003,11 @@ public class ConfServParser extends Parser {
         }
 
         @Override
-        public void AddToDB(Record _rec) {
+        public void AddToDB(Record _rec) throws SQLException {
             CSClientConnect rec = (CSClientConnect) _rec;
-            PreparedStatement stmt = getM_dbAccessor().GetStatement(m_InsertStatementId);
-
-            try {
+            getM_dbAccessor().addToDB(m_InsertStatementId, new IFillStatement() {
+                @Override
+                public void fillStatement(PreparedStatement stmt) throws SQLException{
                 stmt.setTimestamp(1, new Timestamp(rec.GetAdjustedUsecTime()));
                 stmt.setInt(2, CSClientConnect.getFileId());
                 stmt.setLong(3, rec.getM_fileOffset());
@@ -1023,11 +1021,10 @@ public class ConfServParser extends Parser {
                 setFieldInt(stmt, 10, Main.getRef(ReferenceType.Host, rec.getClientAddr()));
                 stmt.setBoolean(11, rec.isConnect());
 
-                getM_dbAccessor().SubmitStatement(m_InsertStatementId);
-            } catch (SQLException e) {
-                Main.logger.error("Could not add record type " + m_type.toString() + ": " + e, e);
-            }
+                }
+            });
         }
+
 
     }
 

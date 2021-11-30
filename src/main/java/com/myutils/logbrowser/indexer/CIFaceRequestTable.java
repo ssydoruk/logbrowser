@@ -50,29 +50,29 @@ public class CIFaceRequestTable extends DBTable {
     }
 
     @Override
-    public void AddToDB(Record rec) {
+    public void AddToDB(Record rec) throws SQLException {
         CIFaceRequest theRec = (CIFaceRequest) rec;
-        PreparedStatement stmt = getM_dbAccessor().GetStatement(m_InsertStatementId);
 
         if (theRec.getM_refId() == null) {
             return;
         }
-        try {
+        getM_dbAccessor().addToDB(m_InsertStatementId, new IFillStatement() {
+            @Override
+            public void fillStatement(PreparedStatement stmt) throws SQLException{
+
             setFieldInt(stmt, 1, Main.getRef(ReferenceType.TEvent, theRec.getM_Name()));
             stmt.setLong(2, theRec.getM_refId());
-            setFieldInt(stmt, 3, Main.getRef(ReferenceType.DN, CIFaceRequest.SingleQuotes(theRec.getM_thisDN())));
-            setFieldInt(stmt, 4, Main.getRef(ReferenceType.DN, CIFaceRequest.SingleQuotes(theRec.getM_otherDN())));
+            setFieldInt(stmt, 3, Main.getRef(ReferenceType.DN, rec.SingleQuotes(theRec.getM_thisDN())));
+            setFieldInt(stmt, 4, Main.getRef(ReferenceType.DN, rec.SingleQuotes(theRec.getM_otherDN())));
             stmt.setInt(5, CIFaceRequest.m_handlerId);
             stmt.setInt(6, CIFaceRequest.getFileId());
             stmt.setLong(7, theRec.getM_fileOffset());
             stmt.setInt(8, theRec.getM_line());
             Main.logger.trace("theRec.m_handlerId:" + CIFaceRequest.m_handlerId);
 
-            getM_dbAccessor().SubmitStatement(m_InsertStatementId);
-        } catch (SQLException e) {
-            Main.logger.error("Could not add CIFace:Request record: " + e, e);
-        }
-
+            }
+        });
     }
+
 
 }

@@ -99,7 +99,7 @@ final class DateParsers {
             for (Parser.DateFmt dateFormat : formats) {
 //                Main.logger.trace("Parsing date for [" + s + "]" + " against format " + dateFormat);
 //                if (checkRegex) {
-                if ((m = dateFormat.pattern.reset(s)).find()) {
+                if ((m = dateFormat.pattern.matcher(s)).find()) {
                     lastFmtMatched = dateFormat;
                     moveTop(formats, dateFormat);
                     String d = s.substring(0, m.end(0));

@@ -82,15 +82,15 @@ public class URSTlibTable extends DBTable {
     }
 
     @Override
-    public void AddToDB(Record rec) {
+    public void AddToDB(Record rec) throws SQLException {
         UrsMessage theRec = (UrsMessage) rec;
-        PreparedStatement stmt = getM_dbAccessor().GetStatement(m_InsertStatementId);
-
-        try {
+         getM_dbAccessor().addToDB(m_InsertStatementId, new IFillStatement() {
+                @Override
+                public void fillStatement(PreparedStatement stmt) throws SQLException{
             stmt.setTimestamp(1, new Timestamp(theRec.GetAdjustedUsecTime()));
             setFieldInt(stmt, 2, Main.getRef(ReferenceType.TEvent, theRec.GetMessageName()));
-            setFieldInt(stmt, 3, Main.getRef(ReferenceType.DN, Record.cleanDN(theRec.getThisDN())));
-            setFieldInt(stmt, 4, Main.getRef(ReferenceType.DN, Record.cleanDN(theRec.getOtherDN())));
+            setFieldInt(stmt, 3, Main.getRef(ReferenceType.DN, rec.cleanDN(theRec.getThisDN())));
+            setFieldInt(stmt, 4, Main.getRef(ReferenceType.DN, rec.cleanDN(theRec.getOtherDN())));
             setFieldInt(stmt, 5, Main.getRef(ReferenceType.Agent, theRec.getHeaderTrim("AttributeAgentID")));
             setFieldInt(stmt, 6, Main.getRef(ReferenceType.ConnID, theRec.GetConnID()));
             setFieldInt(stmt, 7, Main.getRef(ReferenceType.ConnID, theRec.GetTransferConnID()));
@@ -100,22 +100,21 @@ public class URSTlibTable extends DBTable {
             setFieldLong(stmt, 11, theRec.getFileBytes());
             setFieldLong(stmt, 12, theRec.getAttributeHex("AttributeEventSequenceNumber"));
             setFieldInt(stmt, 13, theRec.getM_line());
-            setFieldInt(stmt, 14, Main.getRef(ReferenceType.UUID, Record.NoQuotes(theRec.getAttributeTrim("AttributeCallUUID", 32))));
-            setFieldInt(stmt, 15, Main.getRef(ReferenceType.IxnID, Record.NoQuotes(theRec.getIxnID())));
+            setFieldInt(stmt, 14, Main.getRef(ReferenceType.UUID, theRec.NoQuotes(theRec.getAttributeTrim("AttributeCallUUID", 32))));
+            setFieldInt(stmt, 15, Main.getRef(ReferenceType.IxnID, theRec.NoQuotes(theRec.getIxnID())));
             setFieldInt(stmt, 16, Main.getRef(ReferenceType.App, theRec.getServer()));
             setFieldInt(stmt, 17, theRec.getServerHandle());
             setFieldInt(stmt, 18, theRec.getRefID());
             setFieldInt(stmt, 19, Main.getRef(ReferenceType.TLIBERROR, theRec.getErrorMessage(theRec.GetMessageName())));
             setFieldInt(stmt, 20, Main.getRef(ReferenceType.TLIBATTR1, theRec.getAttr1()));
             setFieldInt(stmt, 21, Main.getRef(ReferenceType.TLIBATTR2, theRec.getAttr2()));
-            setFieldInt(stmt, 22, Main.getRef(ReferenceType.DN, Record.cleanDN(theRec.getDNIS())));
-            setFieldInt(stmt, 23, Main.getRef(ReferenceType.DN, Record.cleanDN(theRec.getANI())));
+            setFieldInt(stmt, 22, Main.getRef(ReferenceType.DN, rec.cleanDN(theRec.getDNIS())));
+            setFieldInt(stmt, 23, Main.getRef(ReferenceType.DN, rec.cleanDN(theRec.getANI())));
 
-            getM_dbAccessor().SubmitStatement(m_InsertStatementId);
-        } catch (SQLException e) {
-            Main.logger.error("Could not add message type " + getM_type() + ": " + e, e);
-        }
-
+                        }
+        });
     }
+
+
 
 }

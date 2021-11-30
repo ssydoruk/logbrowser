@@ -11,9 +11,9 @@ import java.util.regex.Pattern;
 
 public class URSStat extends Message {
 
-    private static final Matcher regStatObject = Pattern.compile("^(?:STATOBJECT|SO)\\(\\S+ (\\d+) \\d+\\) .+name=([^@]+)@([^\\.]+)\\.\\S+: CHANGE OF STATE \\((\\S+)->([^\\)]+)\\)").matcher("");
-    private static final Matcher regVoiceDN = Pattern.compile("^[\\+\\-]ready DN ([^\\@]+) \\@ (\\S+) .+ for ag(?:ent)* ([^,]+), pl(?:ace)* ([^,]+), (\\S+)").matcher("");
-    private static final Matcher regMedia = Pattern.compile("^[\\+\\-]ready MEDIA (\\w+).+, (\\S+) time=").matcher("");
+    private static final Pattern regStatObject = Pattern.compile("^(?:STATOBJECT|SO)\\(\\S+ (\\d+) \\d+\\) .+name=([^@]+)@([^\\.]+)\\.\\S+: CHANGE OF STATE \\((\\S+)->([^\\)]+)\\)");
+    private static final Pattern regVoiceDN = Pattern.compile("^[\\+\\-]ready DN ([^\\@]+) \\@ (\\S+) .+ for ag(?:ent)* ([^,]+), pl(?:ace)* ([^,]+), (\\S+)");
+    private static final Pattern regMedia = Pattern.compile("^[\\+\\-]ready MEDIA (\\w+).+, (\\S+) time=");
 
     private String statRef;
     private String statTypeOld;
@@ -31,7 +31,7 @@ public class URSStat extends Message {
         super(TableType.URSSTAT, messageLines);
 
         Matcher m;
-        if ((m = regStatObject.reset(m_MessageLines.get(0))).find()) {
+        if ((m = regStatObject.matcher(m_MessageLines.get(0))).find()) {
             statRef = m.group(1);
             voiceAgent = m.group(2);
             StatServer = m.group(3);
@@ -42,7 +42,7 @@ public class URSStat extends Message {
         if (m_MessageLines != null) {
             for (String s : m_MessageLines) {
                 if (s != null) {
-                    if ((m = regVoiceDN.reset(s)).find()) {
+                    if ((m = regVoiceDN.matcher(s)).find()) {
                         voiceDN = m.group(1);
                         VoiceSwitch = m.group(2);
                         if (voiceAgent != null) {
@@ -53,7 +53,7 @@ public class URSStat extends Message {
                         }
                         voicePlace = m.group(4);
                         voiceStat = m.group(5);
-                    } else if ((m = regMedia.reset(s)).find()) {
+                    } else if ((m = regMedia.matcher(s)).find()) {
                         String mediaType = m.group(1);
 
                         if (mediaType.equals("chat")) {

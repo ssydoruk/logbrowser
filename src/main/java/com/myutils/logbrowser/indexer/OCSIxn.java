@@ -11,23 +11,23 @@ import java.util.regex.Pattern;
 
 public class OCSIxn extends Message {
 
-    final private static Matcher regMsgName = Pattern.compile("^IxNServer .+- (SendRequest|EventReceived) : '([^']+)'").matcher("");
+    private static final Pattern regMsgName = Pattern.compile("^IxNServer .+- (SendRequest|EventReceived) : '([^']+)'");
 
-    final private static Matcher regIxnID = Pattern.compile("^\\s+'InteractionId'.+= \"([^\"]+)\"").matcher("");
+    private static final Pattern regIxnID = Pattern.compile("^\\s+'InteractionId'.+= \"([^\"]+)\"");
 
-    final private static Matcher regMediaType = Pattern.compile("^\\s+attr_media_type.+= \"([^\"]+)\"").matcher("");
+    private static final Pattern regMediaType = Pattern.compile("^\\s+attr_media_type.+= \"([^\"]+)\"");
 
-    final private static Matcher regQueue = Pattern.compile("^\\s+attr_queue.+= \"([^\"]+)\"").matcher("");
+    private static final Pattern regQueue = Pattern.compile("^\\s+attr_queue.+= \"([^\"]+)\"");
 
-    final private static Matcher regPhone = Pattern.compile("^\\s+'GSW_PHONE'.+= \"([^\"]+)\"").matcher("");
-    final private static Matcher regcontact_info = Pattern.compile("^\\s+'contact_info'.+= \"([^\"]+)\"").matcher("");
+    private static final Pattern regPhone = Pattern.compile("^\\s+'GSW_PHONE'.+= \"([^\"]+)\"");
+    private static final Pattern regcontact_info = Pattern.compile("^\\s+'contact_info'.+= \"([^\"]+)\"");
 
-    final private static Matcher regGSW_RECORD_HANDLE = Pattern.compile("^\\s+'GSW_RECORD_HANDLE'.+= (\\d+)").matcher("");
+    private static final Pattern regGSW_RECORD_HANDLE = Pattern.compile("^\\s+'GSW_RECORD_HANDLE'.+= (\\d+)");
 
-    final private static Matcher regRefID = Pattern.compile("^\\s+attr_ref_id.+ = (\\d+)").matcher("");
+    private static final Pattern regRefID = Pattern.compile("^\\s+attr_ref_id.+ = (\\d+)");
 
-    final private static Matcher regGSW_CHAIN_ID = Pattern.compile("^\\s+'GSW_CHAIN_ID'.+= (\\d+)").matcher("");
-    final private static Matcher regchain_id = Pattern.compile("^\\s+'chain_id'.+= (\\d+)").matcher("");
+    private static final Pattern regGSW_CHAIN_ID = Pattern.compile("^\\s+'GSW_CHAIN_ID'.+= (\\d+)");
+    private static final Pattern regchain_id = Pattern.compile("^\\s+'chain_id'.+= (\\d+)");
 
     public OCSIxn(ArrayList messageLines) {
         super(TableType.OCSIxn, messageLines);

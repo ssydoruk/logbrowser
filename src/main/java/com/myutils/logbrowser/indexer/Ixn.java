@@ -15,17 +15,17 @@ import static Utils.Util.intOrDef;
 
 public class Ixn extends Message {
 
-    final private static Matcher regMsgName = Pattern.compile("message '([^']+)").matcher("");
-    final private static Matcher regMsgNameSendingTo = Pattern.compile("Sending to .+ ([^:]+):\\s+'([^']+)' \\(").matcher("");
-    final private static Matcher regMsgNameReceivedfrom = Pattern.compile("Received from .+ ([^:]+):\\s+'([^']+)' \\(").matcher("");
-    final private static Matcher regMsgThirdParty = Pattern.compile("request to '([^']+)'").matcher("");
+    private static final Pattern regMsgName = Pattern.compile("message '([^']+)");
+    private static final Pattern regMsgNameSendingTo = Pattern.compile("Sending to .+ ([^:]+):\\s+'([^']+)' \\(");
+    private static final Pattern regMsgNameReceivedfrom = Pattern.compile("Received from .+ ([^:]+):\\s+'([^']+)' \\(");
+    private static final Pattern regMsgThirdParty = Pattern.compile("request to '([^']+)'");
 
-    final private static Matcher regMsgAndClient = Pattern.compile("message '([^']+)'.+(to|from) (?:client|server) '([^']+)'").matcher("");
-    final private static Matcher regMsgAndClientProxy = Pattern.compile("through proxy '([^']+)'").matcher("");
+    private static final Pattern regMsgAndClient = Pattern.compile("message '([^']+)'.+(to|from) (?:client|server) '([^']+)'");
+    private static final Pattern regMsgAndClientProxy = Pattern.compile("through proxy '([^']+)'");
 
-    //    final private static Matcher regGSW_RECORD_HANDLE = Pattern.compile("^\\s+\'GSW_RECORD_HANDLE\'.+= (\\d+)").matcher("");
-    final private static Matcher regIxnActor = Pattern.compile("^\\s+attr_actor_router_id .+ \"([^\"]+)\"$").matcher("");
-    final private static Matcher regIxnSubmitted = Pattern.compile("^\\s+attr_itx_submitted_by .+ \"([^\"]+)\"$").matcher("");
+    //    private static final Pattern regGSW_RECORD_HANDLE = Pattern.compile("^\\s+\'GSW_RECORD_HANDLE\'.+= (\\d+)");
+    private static final Pattern regIxnActor = Pattern.compile("^\\s+attr_actor_router_id .+ \"([^\"]+)\"$");
+    private static final Pattern regIxnSubmitted = Pattern.compile("^\\s+attr_itx_submitted_by .+ \"([^\"]+)\"$");
 
     private static final Regexs AgentIDs = new Regexs(new Pair[]{
             new Pair("^\\s+attr_agent_id.+ \"([^\"]+)\"$", 1),
@@ -74,9 +74,9 @@ public class Ixn extends Message {
     private static final Regexs reConnID = new Regexs(new Pair[]{
             new Pair("^\\s+AttributeConnID .+ (\\w+)$", 1)}
     );
-    final private static Matcher regService = Pattern.compile("^\\s+'Service'.+= \"([^\"]+)\"$").matcher("");
-    final private static Matcher regMethod = Pattern.compile("^\\s+'Method'.+= \"([^\"]+)\"$").matcher("");
-    final private static Matcher regRouteType = Pattern.compile("^\\s+AttributeRouteType.+ = (\\d+)").matcher("");
+    private static final Pattern regService = Pattern.compile("^\\s+'Service'.+= \"([^\"]+)\"$");
+    private static final Pattern regMethod = Pattern.compile("^\\s+'Method'.+= \"([^\"]+)\"$");
+    private static final Pattern regRouteType = Pattern.compile("^\\s+AttributeRouteType.+ = (\\d+)");
     //    private static final Regexs reContact = new Regexs(new Pair[]{
 //        new Pair("^\\s+\'GSW_PHONE\'.+= \"([^\"]+)\"", 1),
 //        new Pair("^\\s+\'contact_info\'.+= \"([^\"]+)\"", 1),});
@@ -154,14 +154,14 @@ public class Ixn extends Message {
         if (!m_MessageLines.isEmpty()) {
             Matcher m;
             Main.logger.debug("[" + m_MessageLines.get(0) + "]");
-            if ((m = regMsgNameReceivedfrom.reset(m_MessageLines.get(0))).find()) {
+            if ((m = regMsgNameReceivedfrom.matcher(m_MessageLines.get(0))).find()) {
                 clientName = m.group(1);
                 SetInbound(true);
                 Main.logger.debug("[-1-]");
                 return m.group(2);
             }
 
-            if ((m = regMsgNameSendingTo.reset(m_MessageLines.get(0))).find()) {
+            if ((m = regMsgNameSendingTo.matcher(m_MessageLines.get(0))).find()) {
                 clientName = m.group(1);
                 SetInbound(false);
                 Main.logger.debug("[-2-]");
@@ -173,7 +173,7 @@ public class Ixn extends Message {
 //                SetInbound(false);
 //                return ret;
 //            }
-            if ((m = regMsgAndClient.reset(m_MessageLines.get(0))).find()) {
+            if ((m = regMsgAndClient.matcher(m_MessageLines.get(0))).find()) {
                 clientName = m.group(3);
                 String msg = m.group(1);
 
@@ -187,7 +187,7 @@ public class Ixn extends Message {
                     SetInbound(false);
                 }
                 Matcher m1;
-                if ((m = regMsgAndClientProxy.reset(m_MessageLines.get(0).substring(m.end()))).find()) {
+                if ((m = regMsgAndClientProxy.matcher(m_MessageLines.get(0).substring(m.end()))).find()) {
                     clientName = m.group(1);
                 }
 

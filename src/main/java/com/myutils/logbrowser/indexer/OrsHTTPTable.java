@@ -86,12 +86,11 @@ public class OrsHTTPTable extends DBTable {
     }
 
     @Override
-    public void AddToDB(Record _rec) {
+        public void AddToDB(Record _rec) throws SQLException {
         OrsHTTP rec = (OrsHTTP) _rec;
-        PreparedStatement stmt = getM_dbAccessor().GetStatement(m_InsertStatementId);
-
-        try {
-            stmt.setTimestamp(1, new Timestamp(rec.GetAdjustedUsecTime()));
+        getM_dbAccessor().addToDB(m_InsertStatementId, new IFillStatement() {
+            @Override
+            public void fillStatement(PreparedStatement stmt) throws SQLException{            stmt.setTimestamp(1, new Timestamp(rec.GetAdjustedUsecTime()));
             stmt.setInt(2, OrsHTTP.getFileId());
             stmt.setLong(3, rec.getM_fileOffset());
             stmt.setLong(4, rec.getM_FileBytes());
@@ -108,10 +107,9 @@ public class OrsHTTPTable extends DBTable {
             setFieldInt(stmt, 14, Main.getRef(ReferenceType.GMSMisc, rec.getParam1()));
             setFieldInt(stmt, 15, Main.getRef(ReferenceType.GMSMisc, rec.getParam2()));
             setFieldLong(stmt, 16, rec.getHTTPResponseID());
-            getM_dbAccessor().SubmitStatement(m_InsertStatementId);
-        } catch (SQLException e) {
-            Main.logger.error("Could not add record type " + m_type.toString() + ": " + e, e);
-        }
+            }
+        });
     }
+
 
 }

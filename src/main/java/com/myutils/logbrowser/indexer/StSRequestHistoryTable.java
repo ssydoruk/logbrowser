@@ -42,11 +42,11 @@ public class StSRequestHistoryTable extends DBTable {
     }
 
     @Override
-    public void AddToDB(Record aRec) {
+    public void AddToDB(Record aRec) throws SQLException {
         StSRequestHistoryMessage theRec = (StSRequestHistoryMessage) aRec;
-        PreparedStatement stmt = getM_dbAccessor().GetStatement(m_InsertStatementId);
-
-        try {
+        getM_dbAccessor().addToDB(m_InsertStatementId, new IFillStatement() {
+            @Override
+            public void fillStatement(PreparedStatement stmt) throws SQLException{
             setFieldString(stmt, 1, theRec.GetRequestID());
             setFieldString(stmt, 2, theRec.GetRequestUserID());
             setFieldString(stmt, 3, theRec.GetAssocRequestID());
@@ -60,11 +60,10 @@ public class StSRequestHistoryTable extends DBTable {
             setFieldInt(stmt, 11, 0);
             setFieldInt(stmt, 12, theRec.getM_line());
 
-            getM_dbAccessor().SubmitStatement(m_InsertStatementId);
-        } catch (SQLException e) {
-            Main.logger.error("Could not add RequestHistory/StatServer message: " + e, e);
-        }
+            }
+        });
     }
+
 
     @Override
     public void FinalizeDB() throws Exception {

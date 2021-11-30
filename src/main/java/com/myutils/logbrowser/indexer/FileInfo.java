@@ -32,11 +32,11 @@ public final class FileInfo extends Record {
     private static final org.apache.logging.log4j.Logger logger = Main.logger;
 
     private static final int BUF_SIZE = 1024;
-    private static final Matcher regAppType = Pattern.compile("^Application type:\\s+([^\\(]+)", Pattern.CASE_INSENSITIVE).matcher("");
-    private static final Matcher RegAppCommandLine = Pattern.compile("^Command line:.+[/\\\\\\s]confserv", Pattern.CASE_INSENSITIVE).matcher("");
-    private static final Matcher regGWS = Pattern.compile("^GWS\\s+(\\w+)", Pattern.CASE_INSENSITIVE).matcher("");
-    private static final Matcher regGWSPIDHost = Pattern.compile("^PID@host: \\[(\\d+)@(.+)\\]$", Pattern.CASE_INSENSITIVE).matcher("");
-    private static final Matcher regGWSStart = Pattern.compile("Start time: \\[(.+)\\]$", Pattern.CASE_INSENSITIVE).matcher("");
+    private static final Pattern regAppType = Pattern.compile("^Application type:\\s+([^\\(]+)", Pattern.CASE_INSENSITIVE);
+    private static final Pattern RegAppCommandLine = Pattern.compile("^Command line:.+[/\\\\\\s]confserv", Pattern.CASE_INSENSITIVE);
+    private static final Pattern regGWS = Pattern.compile("^GWS\\s+(\\w+)", Pattern.CASE_INSENSITIVE);
+    private static final Pattern regGWSPIDHost = Pattern.compile("^PID@host: \\[(\\d+)@(.+)\\]$", Pattern.CASE_INSENSITIVE);
+    private static final Pattern regGWSStart = Pattern.compile("Start time: \\[(.+)\\]$", Pattern.CASE_INSENSITIVE);
     /*
     public static String InitDB(DBAccessor accessor, int statementId) {
     m_fileId = 1;
@@ -49,23 +49,23 @@ public final class FileInfo extends Record {
     }
      */
     private static final byte[] WS_BYTES = new byte[]{(byte) 0xef, (byte) 0xbb, (byte) 0xbf};
-    private static final Matcher patternLocalTime = Pattern.compile("^Local\\s+time:\\s+(\\S+)\\s*$", Pattern.CASE_INSENSITIVE).matcher("");
-    private static final Matcher startTimePattern = Pattern.compile("^Start\\s+time\\s+\\(UTC\\):\\s+(\\S+)\\s*$").matcher("");
-    private static final Matcher startTimePatternGMS = Pattern.compile("^UTC START TIME:\\s+(\\S+)\\s*$").matcher("");
-    private static final Matcher startTimeSIPEP = Pattern.compile("^UTC\\s+Start\\s+Time:\\s+(\\S+)\\s*$").matcher("");
-    private static final Matcher startTimePatternFinalDot = Pattern.compile("\\.\\d+$").matcher("");
-    private static final Matcher regAppName = Pattern.compile("^Application name:\\s+(\\S+)", Pattern.CASE_INSENSITIVE).matcher("");
-    private static final Matcher regHostName = Pattern.compile("^Host name:\\s+(\\S.+)").matcher("");
-    private static final Matcher regWorkSpaceHostName = Pattern.compile("^\\s+MachineName:\\s+(\\S.+)").matcher("");
-    private static final Matcher regGMSHostName = Pattern.compile("^APPLICATION HOST.+:\\s+(\\S.+)").matcher("");
-    private static final Matcher regHostSIPEP = Pattern.compile("^Application Host.+:\\s+(\\S.+)$").matcher("");
-    private static final Matcher regTimezone = Pattern.compile("^Time zone:\\s+(\\d+)").matcher("");
-    private static final Matcher regFileName = Pattern.compile("^File:\\s+\\((\\d+)\\)\\s+(\\S.+)").matcher("");
-    private static final Matcher regFileNameGMS = Pattern.compile("^FILE:\\s+(\\S.+)").matcher("");
-    private static final Matcher regWWECloud = Pattern.compile("(DEBUG|ERROR|WARN|INFO)\\s+\\[").matcher("");
+    private static final Pattern patternLocalTime = Pattern.compile("^Local\\s+time:\\s+(\\S+)\\s*$", Pattern.CASE_INSENSITIVE);
+    private static final Pattern startTimePattern = Pattern.compile("^Start\\s+time\\s+\\(UTC\\):\\s+(\\S+)\\s*$");
+    private static final Pattern startTimePatternGMS = Pattern.compile("^UTC START TIME:\\s+(\\S+)\\s*$");
+    private static final Pattern startTimeSIPEP = Pattern.compile("^UTC\\s+Start\\s+Time:\\s+(\\S+)\\s*$");
+    private static final Pattern startTimePatternFinalDot = Pattern.compile("\\.\\d+$");
+    private static final Pattern regAppName = Pattern.compile("^Application name:\\s+(\\S+)", Pattern.CASE_INSENSITIVE);
+    private static final Pattern regHostName = Pattern.compile("^Host name:\\s+(\\S.+)");
+    private static final Pattern regWorkSpaceHostName = Pattern.compile("^\\s+MachineName:\\s+(\\S.+)");
+    private static final Pattern regGMSHostName = Pattern.compile("^APPLICATION HOST.+:\\s+(\\S.+)");
+    private static final Pattern regHostSIPEP = Pattern.compile("^Application Host.+:\\s+(\\S.+)$");
+    private static final Pattern regTimezone = Pattern.compile("^Time zone:\\s+(\\d+)");
+    private static final Pattern regFileName = Pattern.compile("^File:\\s+\\((\\d+)\\)\\s+(\\S.+)");
+    private static final Pattern regFileNameGMS = Pattern.compile("^FILE:\\s+(\\S.+)");
+    private static final Pattern regWWECloud = Pattern.compile("(DEBUG|ERROR|WARN|INFO)\\s+\\[");
     private static final int NUM_PARAMS_TO_READ = 7;
-    private static final Matcher regFileNameTypeSIP = Pattern.compile("-(\\d+)\\.\\d{8}_\\d{6}_\\d{3}\\.log$").matcher("");
-    private static final Matcher regFileNameDate = Pattern.compile("\\.(\\d{8}_\\d{6}_\\d{3})\\.log").matcher("");
+    private static final Pattern regFileNameTypeSIP = Pattern.compile("-(\\d+)\\.\\d{8}_\\d{6}_\\d{3}\\.log$");
+    private static final Pattern regFileNameDate = Pattern.compile("\\.(\\d{8}_\\d{6}_\\d{3})\\.log");
     static private final DateTimeFormatter workSpaceDateTime = DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss_SSS");
     static HashMap m_runIds;
     private final DateParsers dateParsers;
@@ -330,7 +330,7 @@ public final class FileInfo extends Record {
             case type_SessionController: {
                 String f = getLogFileName();
                 Matcher m;
-                if (f != null && (m = regFileNameTypeSIP.reset(f)).find()) {
+                if (f != null && (m = regFileNameTypeSIP.matcher(f)).find()) {
                     String typeDigits = m.group(1);
                     if (typeDigits != null && typeDigits.equals("1536")) {
                         return FileType.SIP_1536;
@@ -406,7 +406,7 @@ public final class FileInfo extends Record {
                 switch (parserState) {
 //<editor-fold defaultstate="collapsed" desc="STATE_HEADER">
                     case STATE_HEADER: {
-                        if ((m = regAppType.reset(str)).find()) {
+                        if ((m = regAppType.matcher(str)).find()) {
                             numParamsToRead++;
                             if (m_componentType == FileInfoType.type_GMS) {
                                 appType = FileInfoType.getFileType(m_componentType);
@@ -458,22 +458,22 @@ public final class FileInfo extends Record {
 
                         } else if (m_componentType == FileInfoType.type_Unknown && str.contains("InteractionWorkspace - Version:")) {
                             checkWorkSpace(input);
-                        } else if ((m = regWorkSpaceHostName.reset(str)).find()) {
+                        } else if ((m = regWorkSpaceHostName.matcher(str)).find()) {
                             numParamsToRead++;
                             setM_app(m.group(1));
-                        } else if ((m = regAppName.reset(str)).find()) {
+                        } else if ((m = regAppName.matcher(str)).find()) {
                             numParamsToRead++;
                             setM_app(m.group(1));
-                        } else if ((m = regHostName.reset(str)).find()) {
+                        } else if ((m = regHostName.matcher(str)).find()) {
                             numParamsToRead++;
                             m_host = m.group(1);
-                        } else if ((m = regGMSHostName.reset(str)).find()) {
+                        } else if ((m = regGMSHostName.matcher(str)).find()) {
                             numParamsToRead++;
                             m_host = m.group(1);
-                        } else if ((m = regHostSIPEP.reset(str)).find()) {
+                        } else if ((m = regHostSIPEP.matcher(str)).find()) {
                             numParamsToRead++;
                             m_host = m.group(1);
-                        } else if ((m = patternLocalTime.reset(str)).find()) {
+                        } else if ((m = patternLocalTime.matcher(str)).find()) {
                             numParamsToRead++;
                             try {
                                 fileLocalTime = dateParsers.parseFormatDate(m.group(1));
@@ -482,7 +482,7 @@ public final class FileInfo extends Record {
                             } catch (Exception ex) {
                                 logger.error("fatal: ",  ex);
                             }
-                        } else if ((startTimePatternGMS.reset(str)).find()) {
+                        } else if ((startTimePatternGMS.matcher(str)).find()) {
                             numParamsToRead++;
                             try {
                                 fileStartTime = dateParsers.parseFormatDate(str);
@@ -491,11 +491,11 @@ public final class FileInfo extends Record {
                             } catch (Exception ex) {
                                 logger.error("fatal: ",  ex);
                             }
-                        } else if ((m = startTimePattern.reset(str)).find()) {
+                        } else if ((m = startTimePattern.matcher(str)).find()) {
                             numParamsToRead++;
                             try {
                                 String strDate = m.group(1);
-                                if (!startTimePattern.reset(strDate).find()) {
+                                if (!startTimePattern.matcher(strDate).find()) {
                                     strDate += ".000";
                                     fileStartTime = dateParsers.parseFormatDate(strDate);
                                 }
@@ -504,7 +504,7 @@ public final class FileInfo extends Record {
                             } catch (Exception ex) {
                                 logger.error("fatal: ",  ex);
                             }
-                        } else if ((m = startTimeSIPEP.reset(str)).find()) {
+                        } else if ((m = startTimeSIPEP.matcher(str)).find()) {
                             numParamsToRead++;
                             try {
                                 String strDate = m.group(1);
@@ -514,7 +514,7 @@ public final class FileInfo extends Record {
                             } catch (Exception ex) {
                                 logger.error("fatal: ",  ex);
                             }
-                        } else if ((m = regTimezone.reset(str)).find()) {
+                        } else if ((m = regTimezone.matcher(str)).find()) {
                             numParamsToRead++;
 //                else if (str.startsWith("Time zone: ")) {
                             String tz = m.group(1);
@@ -524,12 +524,12 @@ public final class FileInfo extends Record {
                                 Main.logger.error("Cannot parse timezone [" + tz + "]; default to +18000");
                                 Message.SetTimezone(18000);
                             }
-                        } else if ((m = regFileName.reset(str)).find()) {
+                        } else if ((m = regFileName.matcher(str)).find()) {
                             numParamsToRead++;
                             logFileNo = m.group(1);
                             logFileName = m.group(2);
 
-                        } else if ((m = regFileNameGMS.reset(str)).find()) {
+                        } else if ((m = regFileNameGMS.matcher(str)).find()) {
                             numParamsToRead++;
                             logFileName = m.group(1);
 
@@ -537,11 +537,11 @@ public final class FileInfo extends Record {
 //                    if (m_fileFilterId == FileInfoType.type_SessionController || m_fileFilterId == FileInfoType.type_Unknown) {
                             m_componentType = FileInfoType.type_SessionController;
 //                    }
-                        } else if ((regGWS.reset(str)).find()) {
+                        } else if ((regGWS.matcher(str)).find()) {
                             m_componentType = FileInfoType.type_WWE;
-                        } else if ((m = regGWSPIDHost.reset(str)).find()) {
+                        } else if ((m = regGWSPIDHost.matcher(str)).find()) {
                             m_host = m.group(2);
-                        } else if (fileStartTime == null && (m = regGWSStart.reset(str)).find()) {
+                        } else if (fileStartTime == null && (m = regGWSStart.matcher(str)).find()) {
                             try {
                                 fileStartTime = dateParsers.parseFormatDate(m.group(1));
                             } catch (Exception ex) {
@@ -551,9 +551,9 @@ public final class FileInfo extends Record {
                             if (str.startsWith("+++++++++++++++++++++++++++++++++++++++++")) {
                                 parserState = ParserState.WWE_DATE;
                             }
-                        } else if ((ApacheWebLogsParser.getENTRY_BEGIN_PATTERN().reset(str)).find()) {
+                        } else if ((ApacheWebLogsParser.getENTRY_BEGIN_PATTERN().matcher(str)).find()) {
                             parserState = ParserState.APACHE_LOG_SUSPECT;
-                        } else if (RegAppCommandLine.reset(str).find()) { // New configServer log does not have Application Type clause
+                        } else if (RegAppCommandLine.matcher(str).find()) { // New configServer log does not have Application Type clause
                             m_componentTypeSuspect = FileInfoType.type_ConfServer;
                         } else if (m_componentType == FileInfoType.type_Unknown) {
                             if (suspectedWWECloudLines > 5) {
@@ -567,7 +567,7 @@ public final class FileInfo extends Record {
                                 m_host = fileDir;
                                 doBreak = true;
                             } else {
-                                if (regWWECloud.reset(str).find()) {
+                                if (regWWECloud.matcher(str).find()) {
                                     suspectedWWECloudLines++;
                                 }
                             }
@@ -599,7 +599,7 @@ public final class FileInfo extends Record {
 
 //                            m_app=
                             doBreak = true;
-                        } else if (!(ApacheWebLogsParser.getENTRY_BEGIN_PATTERN().reset(str)).find()) {
+                        } else if (!(ApacheWebLogsParser.getENTRY_BEGIN_PATTERN().matcher(str)).find()) {
                             parserState = ParserState.STATE_HEADER;
                             doBreak = true;
                         }
@@ -824,7 +824,7 @@ public final class FileInfo extends Record {
         setM_app(FileInfoType.type_WorkSpace.name());
         Matcher m;
 
-        if ((m = regFileNameDate.reset(logFileName)).find()) {
+        if ((m = regFileNameDate.matcher(logFileName)).find()) {
             String d = m.group(1);
 
             try {

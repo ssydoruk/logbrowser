@@ -67,15 +67,15 @@ public class ISCCTable extends DBTable {
     }
 
     @Override
-    public void AddToDB(Record rec) {
+    public void AddToDB(Record rec) throws SQLException {
         IsccMessage theRec = (IsccMessage) rec;
-        PreparedStatement stmt = getM_dbAccessor().GetStatement(m_InsertStatementId);
-
-        try {
+         getM_dbAccessor().addToDB(m_InsertStatementId, new IFillStatement() {
+                @Override
+                public void fillStatement(PreparedStatement stmt) throws SQLException{
             stmt.setTimestamp(1, new Timestamp(theRec.GetAdjustedUsecTime()));
             setFieldInt(stmt, 2, Main.getRef(ReferenceType.ISCCEvent, theRec.GetMessageName()));
-            setFieldInt(stmt, 3, Main.getRef(ReferenceType.DN, Record.cleanDN(theRec.getThisDN())));
-            setFieldInt(stmt, 4, Main.getRef(ReferenceType.DN, Record.cleanDN(theRec.getOtherDN())));
+            setFieldInt(stmt, 3, Main.getRef(ReferenceType.DN, rec.cleanDN(theRec.getThisDN())));
+            setFieldInt(stmt, 4, Main.getRef(ReferenceType.DN, rec.cleanDN(theRec.getOtherDN())));
             setFieldInt(stmt, 5, Main.getRef(ReferenceType.ConnID, theRec.GetConnID()));
             stmt.setLong(6, theRec.getRefID());
             stmt.setBoolean(7, theRec.isInbound());
@@ -88,12 +88,10 @@ public class ISCCTable extends DBTable {
             setFieldInt(stmt, 14, Main.getRef(ReferenceType.Switch, theRec.GetSrcSwitch()));
             setFieldInt(stmt, 15, Main.getRef(ReferenceType.ConnID, theRec.GetOtherConnID()));
 
-            getM_dbAccessor().SubmitStatement(m_InsertStatementId);
-        } catch (SQLException e) {
-            Main.logger.error("Could not add message type " + getM_type() + ": " + e, e);
-
-        }
-
+                }
+         });
     }
+
+
 
 }

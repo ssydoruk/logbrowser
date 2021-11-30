@@ -29,7 +29,7 @@ public class DateDiff {
 //        dateDiffTable.InitDB();
     }
 
-    long newDate(DateParsed parseDate, int fileId, int appID, long filePos, long fileBytes, int fileLine) {
+    long newDate(DateParsed parseDate, int fileId, int appID, long filePos, long fileBytes, int fileLine) throws SQLException {
         long time = parseDate.getUTCms();
         long diff = 0;
         if (prevAppID != appID) //new app, init
@@ -100,25 +100,22 @@ public class DateDiff {
 //            dbaccessor.runQuery("create index if not exists I" + tabName + "_FileId on " + tabName + " (FileId);");
         }
 
-        private void AddToDB(int fileId, long filePos, long fileBytes, int fileLine, long time, long diff) {
+        private void AddToDB(int fileId, long filePos, long fileBytes, int fileLine, long time, long diff) throws SQLException {
             InitDB();
-            PreparedStatement stmt = dbaccessor.GetStatement(m_InsertStatementId);
+            dbaccessor.addToDB(m_InsertStatementId, new IFillStatement() {
+                @Override
+                public void fillStatement(PreparedStatement stmt) throws SQLException {
+                    stmt.setTimestamp(1, new Timestamp(time));
+                    stmt.setInt(2, fileId);
+                    stmt.setLong(3, filePos);
+                    stmt.setLong(4, fileBytes);
+                    stmt.setLong(5, fileLine);
 
-            try {
-                stmt.setTimestamp(1, new Timestamp(time));
-                stmt.setInt(2, fileId);
-                stmt.setLong(3, filePos);
-                stmt.setLong(4, fileBytes);
-                stmt.setLong(5, fileLine);
+                    stmt.setLong(6, diff);
 
-                stmt.setLong(6, diff);
-
-                dbaccessor.SubmitStatement(m_InsertStatementId);
-            } catch (SQLException e) {
-                Main.logger.error("Could not add datediff record for type " + type.toString() + ": " + e, e);
-            }
+                }
+            });
         }
 
     }
-
-}
+    }

@@ -84,11 +84,11 @@ public class URSStatTable extends DBTable {
     }
 
     @Override
-    public void AddToDB(Record _rec) {
+        public void AddToDB(Record _rec) throws SQLException {
         URSStat rec = (URSStat) _rec;
-        PreparedStatement stmt = getM_dbAccessor().GetStatement(m_InsertStatementId);
-
-        try {
+         getM_dbAccessor().addToDB(m_InsertStatementId, new IFillStatement() {
+                @Override
+                public void fillStatement(PreparedStatement stmt) throws SQLException{
             stmt.setTimestamp(1, new Timestamp(rec.GetAdjustedUsecTime()));
             stmt.setInt(2, URSStat.getFileId());
             stmt.setLong(3, rec.getM_fileOffset());
@@ -103,16 +103,16 @@ public class URSStatTable extends DBTable {
             setFieldInt(stmt, 11, Main.getRef(ReferenceType.StatType, rec.getStatNew()));
 
             setFieldInt(stmt, 12, Main.getRef(ReferenceType.Switch, rec.getVoicSwitchName()));
-            setFieldInt(stmt, 13, Main.getRef(ReferenceType.DN, URSStat.SingleQuotes(rec.getVoiceDN())));
+            setFieldInt(stmt, 13, Main.getRef(ReferenceType.DN, rec.SingleQuotes(rec.getVoiceDN())));
             setFieldInt(stmt, 14, Main.getRef(ReferenceType.StatType, rec.getVoiceStat()));
 
             setFieldInt(stmt, 15, Main.getRef(ReferenceType.StatType, rec.getChatStat()));
             setFieldInt(stmt, 16, Main.getRef(ReferenceType.StatType, rec.getEmailStat()));
 
-            getM_dbAccessor().SubmitStatement(m_InsertStatementId);
-        } catch (SQLException e) {
-            Main.logger.error("Could not add record type " + m_type.toString() + ": " + e, e);
-        }
+                        }
+        });
     }
+
+
 
 }

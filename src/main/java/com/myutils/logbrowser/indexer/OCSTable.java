@@ -94,11 +94,11 @@ public class OCSTable extends DBTable {
     }
 
     @Override
-    public void AddToDB(Record _rec) {
+        public void AddToDB(Record _rec) throws SQLException {
         OcsMessage rec = (OcsMessage) _rec;
-        PreparedStatement stmt = getM_dbAccessor().GetStatement(m_InsertStatementId);
-
-        try {
+        getM_dbAccessor().addToDB(m_InsertStatementId, new IFillStatement() {
+            @Override
+            public void fillStatement(PreparedStatement stmt) throws SQLException{
             stmt.setTimestamp(1, new Timestamp(rec.GetAdjustedUsecTime()));
             stmt.setInt(2, OcsMessage.getFileId());
             setFieldLong(stmt, 3, rec.getM_fileOffset());
@@ -106,8 +106,8 @@ public class OCSTable extends DBTable {
             setFieldInt(stmt, 5, rec.getM_line());
 
             setFieldInt(stmt, 6, Main.getRef(ReferenceType.TEvent, rec.GetMessageName()));
-            setFieldInt(stmt, 7, Main.getRef(ReferenceType.DN, Record.cleanDN(rec.getM_ThisDN())));
-            setFieldInt(stmt, 8, Main.getRef(ReferenceType.DN, Record.cleanDN(rec.getOtherDN())));
+            setFieldInt(stmt, 7, Main.getRef(ReferenceType.DN, rec.cleanDN(rec.getM_ThisDN())));
+            setFieldInt(stmt, 8, Main.getRef(ReferenceType.DN, rec.cleanDN(rec.getOtherDN())));
 
             setFieldString(stmt, 9, "");//+ "agentID char(32),"
             setFieldInt(stmt, 10, Main.getRef(ReferenceType.ConnID, rec.GetConnID()));
@@ -125,10 +125,9 @@ public class OCSTable extends DBTable {
             setFieldLong(stmt, 21, rec.getUData("GSW_CAMPAIGN_GROUP_DBID", -1, true));
             setFieldInt(stmt, 22, Main.getRef(ReferenceType.TLIBERROR, rec.getErrorMessage(rec.GetMessageName())));
 
-            getM_dbAccessor().SubmitStatement(m_InsertStatementId);
-        } catch (SQLException e) {
-            Main.logger.error("Could not add record type " + m_type.toString() + ": " + e, e);
-        }
+            }
+        });
     }
+
 
 }

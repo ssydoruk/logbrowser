@@ -29,24 +29,24 @@ public class VOIPEPParser extends Parser {
 //  Numbers: +<SIP to RM> -<none>
 //  Status: parsed:1 queued:0 sent:0 acked:0 preevent:0 event:0 context:0 transferred:0
 //  -----
-    private final static Matcher regSIPReq = Pattern.compile(" bytes (to|from) (\\S+)").matcher("");
+    private static final Pattern regSIPReq = Pattern.compile(" bytes (to|from) (\\S+)");
 
-    private static final Matcher regConfigUpdate = Pattern.compile("^[\\d\\s]+\\[TCONF\\]").matcher("");
+    private static final Pattern regConfigUpdate = Pattern.compile("^[\\d\\s]+\\[TCONF\\]");
 
-    private static final Matcher regConfigOneLineDN = Pattern.compile("^\\s\\[(\\d+)\\] dn = '([^']+)' type = (\\w+)").matcher("");
-    private static final Matcher regHeaderEnd = Pattern.compile("^File:\\s+").matcher("");
-    private static final Matcher ptSkip = Pattern.compile("^[:\\s]*").matcher("");
-    private final static Matcher regProxy = Pattern.compile("^Proxy\\((\\w+):").matcher("");
-    private final static Matcher SIPHeaderContinue = Pattern.compile("^\\S").matcher("");
-    private static final Matcher regSIPHeader = Pattern.compile("(\\d+) bytes .+ (>>>>>|<<<<<)$").matcher("");
+    private static final Pattern regConfigOneLineDN = Pattern.compile("^\\s\\[(\\d+)\\] dn = '([^']+)' type = (\\w+)");
+    private static final Pattern regHeaderEnd = Pattern.compile("^File:\\s+");
+    private static final Pattern ptSkip = Pattern.compile("^[:\\s]*");
+    private static final Pattern regProxy = Pattern.compile("^Proxy\\((\\w+):");
+    private static final Pattern SIPHeaderContinue = Pattern.compile("^\\S");
+    private static final Pattern regSIPHeader = Pattern.compile("(\\d+) bytes .+ (>>>>>|<<<<<)$");
     //    15:22:50.980: Sending  [0,UDP] 3384 bytes to 10.82.10.146:5060 >>>>>
-    private static final Matcher regNotParseMessage = Pattern.compile("^(0454[1-5]"
-            + ")").matcher("");
-    private static final Matcher regCfgObjectName = Pattern.compile("(?:name|userName|number|loginCode)='([^']+)'").matcher("");
-    private static final Matcher regCfgObjectDBID = Pattern.compile("DBID=(\\d+)").matcher("");
-    private static final Matcher regCfgObjectType = Pattern.compile("object Cfg(\\w+)=").matcher("");
-    private static final Matcher regCfgOp = Pattern.compile("\\(type Object(\\w+)\\)").matcher("");
-    private static final Matcher regSIPServerStartDN = Pattern.compile("^\\s*DN added \\(dbid (\\d+)\\) \\(number ([^\\(]+)\\) ").matcher("");
+    private static final Pattern regNotParseMessage = Pattern.compile("^(0454[1-5]"
+            + ")");
+    private static final Pattern regCfgObjectName = Pattern.compile("(?:name|userName|number|loginCode)='([^']+)'");
+    private static final Pattern regCfgObjectDBID = Pattern.compile("DBID=(\\d+)");
+    private static final Pattern regCfgObjectType = Pattern.compile("object Cfg(\\w+)=");
+    private static final Pattern regCfgOp = Pattern.compile("\\(type Object(\\w+)\\)");
+    private static final Pattern regSIPServerStartDN = Pattern.compile("^\\s*DN added \\(dbid (\\d+)\\) \\(number ([^\\(]+)\\) ");
     static private boolean ifSIPLines = false;
     private static boolean ifSIPLinesForce = false;
     private static boolean gaveWarning = false;
@@ -207,7 +207,7 @@ public class VOIPEPParser extends Parser {
 
         switch (m_ParserState) {
             case STATE_HEADER: {
-                if ((regHeaderEnd.reset(str)).find()) {
+                if ((regHeaderEnd.matcher(str)).find()) {
                     m_ParserState = STATE_COMMENTS;
                 }
             }
@@ -226,7 +226,7 @@ public class VOIPEPParser extends Parser {
 
                 m_lineStarted = m_CurrentLine;
 
-                if ((m = regConfigOneLineDN.reset(str)).find()) {
+                if ((m = regConfigOneLineDN.matcher(str)).find()) {
                     ConfigUpdateRecord msg = new ConfigUpdateRecord(str);
                     try {
                         msg.setObjectType("DN");
@@ -238,19 +238,19 @@ public class VOIPEPParser extends Parser {
                         Main.logger.error("Not added \"" + msg.getM_type() + "\" record:" + e.getMessage(), e);
                     }
 
-                } else if ((m = regConfigUpdate.reset(s)).find()) {
+                } else if ((m = regConfigUpdate.matcher(s)).find()) {
                     setSavedFilePos(getFilePos());
                     m_MessageContents.add(s.substring(m.end()));
                     m_ParserState = STATE_CONFIG;
 //                } else if (trimmed.contains(" Proxy(") || str.startsWith("Proxy(")) {
-                } else if ((m = regProxy.reset(s)).find()) {
+                } else if ((m = regProxy.matcher(s)).find()) {
 
                     ProxiedMessage msg = new ProxiedMessage(m.group(1), s.substring(m.end()));
                     SetStdFieldsAndAdd(msg);
 
                     return null;
                 } //<editor-fold defaultstate="collapsed" desc="reading sip">
-                else if ((m = regSIPHeader.reset(s)).find()) {
+                else if ((m = regSIPHeader.matcher(s)).find()) {
                     Main.logger.trace("SIP header");
                     try {
                         m_PacketLength = Integer.parseInt(m.group(1));
@@ -346,7 +346,7 @@ public class VOIPEPParser extends Parser {
 
 //<editor-fold defaultstate="collapsed" desc="state_SIP_HEADER">
             case STATE_SIP_HEADER: {
-                if ((SIPHeaderContinue.reset(str)).find()) {
+                if ((SIPHeaderContinue.matcher(str)).find()) {
                     m_MessageContents.add(str);
                     String contentL = Message.GetSIPHeader(str, "content-length", "l");
                     if (contentL != null) {
@@ -376,7 +376,7 @@ public class VOIPEPParser extends Parser {
             case STATE_SIP_BODY: {
                 m_PacketLength -= s.length() + 2;
 
-                if ((SIPHeaderContinue.reset(str)).find()) {
+                if ((SIPHeaderContinue.matcher(str)).find()) {
                     m_MessageContents.add(s);
 
                 } else {
@@ -422,7 +422,7 @@ public class VOIPEPParser extends Parser {
 
         msg = new SipMessage(contents, TableType.VOIPEP);
 
-        if ((m = regSIPReq.reset(header)).find()) {
+        if ((m = regSIPReq.matcher(header)).find()) {
             if (m.group(1).startsWith("f")) {
                 msg.SetInbound(true);
                 msg.SetSenderName(m.group(2));
@@ -446,7 +446,7 @@ public class VOIPEPParser extends Parser {
         ConfigUpdateRecord msg = new ConfigUpdateRecord(m_MessageContents);
         try {
             Matcher m;
-            if (m_MessageContents.size() > 0 && (m = regSIPServerStartDN.reset(m_MessageContents.get(0))).find()) {
+            if (m_MessageContents.size() > 0 && (m = regSIPServerStartDN.matcher(m_MessageContents.get(0))).find()) {
                 msg.setObjectType("DN");
                 msg.setObjectDBID(m.group(1));
                 msg.setObjName(m.group(2));

@@ -9,9 +9,9 @@ import java.util.regex.Pattern;
  */
 public class DBServerParser extends Parser {
 
-    private static final Matcher regRI = Pattern.compile("^_R_I_\\s*").matcher("");
+    private static final Pattern regRI = Pattern.compile("^_R_I_\\s*");
 
-    private static final Matcher regCfgUpdate = Pattern.compile("^\\s+PopCfg").matcher("");
+    private static final Pattern regCfgUpdate = Pattern.compile("^\\s+PopCfg");
     final int MSG_STRING_LIMIT = 200;
     long m_CurrentFilePos;
     long m_HeaderOffset;
@@ -95,11 +95,11 @@ public class DBServerParser extends Parser {
                     Main.logger.error("Exception in state " + m_ParserState, exception);
                 }
 
-                if ((m = regCfgUpdate.reset(s)).find()) {
+                if ((m = regCfgUpdate.matcher(s)).find()) {
                     setSavedFilePos(getFilePos());
                     m_MessageContents.add(s);
                     m_ParserState = ParserState.STATE_CONFIG;
-//                } else if ((m = regAgentStatusChanged .reset(s)).find()) {
+//                } else if ((m = regAgentStatusChanged .matcher(s)).find()) {
 //                    setSavedFilePos(getFilePos());
 //                    m_MessageContents.add(s.substring(m.end()));
 //                    m_ParserState = ParserState.STATEAGENTSTATUSNEW;

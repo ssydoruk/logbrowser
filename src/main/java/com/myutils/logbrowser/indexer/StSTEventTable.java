@@ -64,18 +64,19 @@ public class StSTEventTable extends DBTable {
     }
 
     @Override
-    public void AddToDB(Record aRec) {
-        StSTEventMessage theRec = (StSTEventMessage) aRec;
+        public void AddToDB(Record _rec) throws SQLException {
 
-        PreparedStatement stmt = getM_dbAccessor().GetStatement(m_InsertStatementId);
+        StSTEventMessage theRec = (StSTEventMessage) _rec;
 
-        try {
+         getM_dbAccessor().addToDB(m_InsertStatementId, new IFillStatement() {
+                @Override
+                public void fillStatement(PreparedStatement stmt) throws SQLException{
             stmt.setTimestamp(1, new Timestamp(theRec.GetAdjustedUsecTime()));
             setFieldInt(stmt, 2, Main.getRef(ReferenceType.TEvent, theRec.GetMessageName()));
-            setFieldInt(stmt, 3, Main.getRef(ReferenceType.DN, StSTEventMessage.SingleQuotes(theRec.getThisDN())));
+            setFieldInt(stmt, 3, Main.getRef(ReferenceType.DN, theRec.SingleQuotes(theRec.getThisDN())));
             setFieldInt(stmt, 4, Main.getRef(ReferenceType.Switch, theRec.getSwitch()));
             setFieldInt(stmt, 5, Main.getRef(ReferenceType.App, theRec.getTServer()));
-            setFieldInt(stmt, 6, Main.getRef(ReferenceType.DN, Record.cleanDN(theRec.getAttributeDN("AttributeOtherDN"))));
+            setFieldInt(stmt, 6, Main.getRef(ReferenceType.DN, theRec.cleanDN(theRec.getAttributeDN("AttributeOtherDN"))));
             setFieldInt(stmt, 7, Main.getRef(ReferenceType.Agent, theRec.getAgent()));
             setFieldInt(stmt, 8, Main.getRef(ReferenceType.ConnID, theRec.GetConnID()));
             setFieldInt(stmt, 9, Main.getRef(ReferenceType.ConnID, theRec.getAttributeTrim("AttributeFirstTransferConnID")));
@@ -88,10 +89,10 @@ public class StSTEventTable extends DBTable {
 //            setFieldString(stmt,10,theRec.GetDecConnID());
 //            setFieldString(stmt,11,theRec.GetDecTransferConnID());
 
-            getM_dbAccessor().SubmitStatement(m_InsertStatementId);
-        } catch (SQLException e) {
-            Main.logger.error("Could not add TEvent/StatServer message: " + e, e);
-        }
+                        }
+        });
     }
+
+
 
 }

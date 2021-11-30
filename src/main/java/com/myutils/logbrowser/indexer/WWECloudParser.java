@@ -22,34 +22,34 @@ public class WWECloudParser extends Parser {
 
     private static final org.apache.logging.log4j.Logger logger = Main.logger;
 
-    private static final HashMap<Matcher, String> IGNORE_LOG_WORDS = new HashMap<Matcher, String>() {
+    private static final HashMap<Pattern, String> IGNORE_LOG_WORDS = new HashMap<Pattern, String>() {
         {
-            put(Pattern.compile("place \\[[^\\]]+\\]").matcher(""), "place \\[...\\]");
-            put(Pattern.compile("User \\[[^\\]]+\\]").matcher(""), "User \\[...\\]");
-            put(Pattern.compile("name \\[[^\\]]+\\]").matcher(""), "name \\[...\\]");
-            put(Pattern.compile("user \\[[^\\]]+\\]").matcher(""), "user \\[...\\]");
-            put(Pattern.compile("Object \\p{XDigit}+").matcher(""), "Object ...");
-            put(Pattern.compile("CustomContact.+ in ").matcher(""), "CustomContact... in ");
-            put(Pattern.compile("Contact.+ in ").matcher(""), "Contact... in ");
-            put(Pattern.compile("index.html\\?\\S+").matcher(""), "index.html?<...>");
-            put(Pattern.compile("\\[\\p{XDigit}{32}\\]").matcher(""), "\\[...\\]");
-            put(Pattern.compile("\\[Number=[^\\]]+\\]").matcher(""), "\\[Number=...\\]");
-            put(Pattern.compile("\\[[\\p{XDigit}-]+\\]").matcher(""), "\\[...\\]");
+            put(Pattern.compile("place \\[[^\\]]+\\]"), "place \\[...\\]");
+            put(Pattern.compile("User \\[[^\\]]+\\]"), "User \\[...\\]");
+            put(Pattern.compile("name \\[[^\\]]+\\]"), "name \\[...\\]");
+            put(Pattern.compile("user \\[[^\\]]+\\]"), "user \\[...\\]");
+            put(Pattern.compile("Object \\p{XDigit}+"), "Object ...");
+            put(Pattern.compile("CustomContact.+ in "), "CustomContact... in ");
+            put(Pattern.compile("Contact.+ in "), "Contact... in ");
+            put(Pattern.compile("index.html\\?\\S+"), "index.html?<...>");
+            put(Pattern.compile("\\[\\p{XDigit}{32}\\]"), "\\[...\\]");
+            put(Pattern.compile("\\[Number=[^\\]]+\\]"), "\\[Number=...\\]");
+            put(Pattern.compile("\\[[\\p{XDigit}-]+\\]"), "\\[...\\]");
         }
     };
-    private static final Matcher regLineSkip = Pattern.compile("^[>\\s]*").matcher("");
-    private static final Matcher regNotParseMessage = Pattern.compile("(30201)").matcher("");
-    private static final Matcher regMsgStart = Pattern.compile("Handling update message:$").matcher("");
-    private static final Matcher regMsgRequest = Pattern.compile(" Sent '([^']+)' ").matcher("");
+    private static final Pattern regLineSkip = Pattern.compile("^[>\\s]*");
+    private static final Pattern regNotParseMessage = Pattern.compile("(30201)");
+    private static final Pattern regMsgStart = Pattern.compile("Handling update message:$");
+    private static final Pattern regMsgRequest = Pattern.compile(" Sent '([^']+)' ");
 
-    private static final Matcher regAuthResult = Pattern.compile("CloudWebBasicAuthenticationFilter\\s+(.+)$").matcher("");
-    private static final Matcher regTMessageStart = Pattern.compile("message='([^']+)'").matcher("");
-    private static final Matcher regTMessageAttributesContinue = Pattern.compile("^(Attr|\\s|Time|Call)").matcher("");
-    private static final Matcher regAuthAttributesContinue = Pattern.compile("^(SATR|IATR)").matcher("");
-    private static final Matcher regExceptionStart = Pattern.compile("^([\\w_\\.]+Exception[\\w\\.]*):(.*)").matcher("");
-    private static final Matcher regExceptionContinue = Pattern.compile("^(\\s|Caused by:)").matcher("");
-    private static final Matcher regLogMessage = Pattern.compile("^(WARN|ERROR|INFO)").matcher("");
-    private static final Matcher regLogMessageMsg = Pattern.compile("\\s(?:\\b[a-zA-Z][\\w\\.]*)+(.+)").matcher("");
+    private static final Pattern regAuthResult = Pattern.compile("CloudWebBasicAuthenticationFilter\\s+(.+)$");
+    private static final Pattern regTMessageStart = Pattern.compile("message='([^']+)'");
+    private static final Pattern regTMessageAttributesContinue = Pattern.compile("^(Attr|\\s|Time|Call)");
+    private static final Pattern regAuthAttributesContinue = Pattern.compile("^(SATR|IATR)");
+    private static final Pattern regExceptionStart = Pattern.compile("^([\\w_\\.]+Exception[\\w\\.]*):(.*)");
+    private static final Pattern regExceptionContinue = Pattern.compile("^(\\s|Caused by:)");
+    private static final Pattern regLogMessage = Pattern.compile("^(WARN|ERROR|INFO)");
+    private static final Pattern regLogMessageMsg = Pattern.compile("\\s(?:\\b[a-zA-Z][\\w\\.]*)+(.+)");
     private static final Message.Regexs regAuthUsers = new Message.Regexs(new Pair[]{
             new Pair("user \\[([^\\]]+)\\]", 1),
             new Pair("Username: ([^;]+);", 1)
@@ -136,12 +136,12 @@ public class WWECloudParser extends Parser {
 
                 String s = ParseGenesys(str, TableType.MsgWWECloud, regNotParseMessage, regLineSkip);
 
-                if ((regMsgStart.reset(s)).find()) {
+                if ((regMsgStart.matcher(s)).find()) {
                     m_HeaderOffset = m_CurrentFilePos;
                     m_ParserState = ParserState.STATE_TMESSAGE_EVENT;
                     setSavedFilePos(getFilePos());
                     isInbound = true;
-                } else if ((m = regMsgRequest.reset(s)).find()) {
+                } else if ((m = regMsgRequest.matcher(s)).find()) {
                     m_msgName = m.group(1);
                     m_HeaderOffset = m_CurrentFilePos;
                     m_ParserState = ParserState.STATE_TMESSAGE_ATTRIBUTES;
@@ -149,18 +149,18 @@ public class WWECloudParser extends Parser {
                     m_MessageContents.clear();
                     m_MessageContents.add(s);
                     isInbound = false;
-                } else if ((m = regExceptionStart.reset(s)).find()) {
+                } else if ((m = regExceptionStart.matcher(s)).find()) {
                     m_msgName = m.group(1);
                     m_msg1 = m.group(2);
                     m_MessageContents.add(s);
                     m_HeaderOffset = m_CurrentFilePos;
                     m_ParserState = ParserState.STATE_EXCEPTION;
                     setSavedFilePos(getFilePos());
-                } else if ((m = regLogMessage.reset(s)).find()) {
+                } else if ((m = regLogMessage.matcher(s)).find()) {
                     m_msgName = m.group(1);
                     String rest = s.substring(m.end());
                     String msgText;
-                    if ((m = regLogMessageMsg.reset(rest)).find()) {
+                    if ((m = regLogMessageMsg.matcher(rest)).find()) {
                         msgText = m.group(1);
                     } else {
                         msgText = rest;
@@ -168,7 +168,7 @@ public class WWECloudParser extends Parser {
                     WWECloudLogMsg theMsg = new WWECloudLogMsg(m_msgName, msgText);
                     SetStdFieldsAndAdd(theMsg);
 
-                } else if ((m = regAuthResult.reset(s)).find()) {
+                } else if ((m = regAuthResult.matcher(s)).find()) {
                     m_HeaderOffset = m_CurrentFilePos;
                     m_ParserState = ParserState.STATE_AUTHRESULT;
                     setSavedFilePos(getFilePos());
@@ -176,7 +176,7 @@ public class WWECloudParser extends Parser {
                     m_MessageContents.add(m.group(1));
                     isInbound = false;
 
-                } else if ((m = regExceptionStart.reset(s)).find()) {
+                } else if ((m = regExceptionStart.matcher(s)).find()) {
                     msg = new WWECloudExeptionMsg(m.group(1), m.group(2));
                     m_HeaderOffset = m_CurrentFilePos;
                     m_ParserState = ParserState.STATE_EXCEPTION;
@@ -189,7 +189,7 @@ public class WWECloudParser extends Parser {
                 break;
 
             case STATE_AUTHRESULT: {
-                if ((regAuthAttributesContinue.reset(str)).find()) {
+                if ((regAuthAttributesContinue.matcher(str)).find()) {
                     m_MessageContents.add(str);
                 } else {
                     addAuthResponse();
@@ -202,7 +202,7 @@ public class WWECloudParser extends Parser {
             }
 
             case STATE_EXCEPTION: {
-                if ((regExceptionContinue.reset(str)).find()) {
+                if ((regExceptionContinue.matcher(str)).find()) {
                     m_MessageContents.add(str);
                 } else {
                     if (msg instanceof WWECloudExeptionMsg) {
@@ -220,7 +220,7 @@ public class WWECloudParser extends Parser {
             }
 
             case STATE_TMESSAGE_EVENT: {
-                if ((m = regTMessageStart.reset(str)).find()) {
+                if ((m = regTMessageStart.matcher(str)).find()) {
                     m_msgName = m.group(1);
                     m_ParserState = ParserState.STATE_TMESSAGE_ATTRIBUTES;
                 } else {
@@ -232,7 +232,7 @@ public class WWECloudParser extends Parser {
             }
 
             case STATE_TMESSAGE_ATTRIBUTES: {
-                if (regTMessageAttributesContinue.reset(str).find()
+                if (regTMessageAttributesContinue.matcher(str).find()
                         || ParseTimestamp(str) == null) {
                     m_MessageContents.add(str);
 
@@ -433,328 +433,323 @@ public class WWECloudParser extends Parser {
         }
 
         @Override
-        public void AddToDB(Record rec) {
+        public void AddToDB(Record rec) throws SQLException {
             WWECloudMessage wweRec = (WWECloudMessage) rec;
-            PreparedStatement stmt = getM_dbAccessor().GetStatement(m_InsertStatementId);
+            getM_dbAccessor().addToDB(m_InsertStatementId, new IFillStatement() {
+                @Override
+                public void fillStatement(PreparedStatement stmt) throws SQLException {
 
-            try {
+                    stmt.setTimestamp(1, new Timestamp(wweRec.GetAdjustedUsecTime()));
+                    stmt.setInt(2, WWECloudMessage.getFileId());
+                    stmt.setLong(3, wweRec.getM_fileOffset());
+                    stmt.setLong(4, wweRec.getM_FileBytes());
+                    stmt.setLong(5, wweRec.getM_line());
 
-                stmt.setTimestamp(1, new Timestamp(wweRec.GetAdjustedUsecTime()));
-                stmt.setInt(2, WWECloudMessage.getFileId());
-                stmt.setLong(3, wweRec.getM_fileOffset());
-                stmt.setLong(4, wweRec.getM_FileBytes());
-                stmt.setLong(5, wweRec.getM_line());
+                    setFieldInt(stmt, 6, Main.getRef(ReferenceType.ConnID, wweRec.getConnID()));
+                    setFieldInt(stmt, 7, Main.getRef(ReferenceType.ConnID, wweRec.getTransferConnID()));
+                    setFieldInt(stmt, 8, Main.getRef(ReferenceType.UUID, wweRec.getUUID()));
+                    setFieldInt(stmt, 9, wweRec.getM_refID());
+                    stmt.setBoolean(10, wweRec.isInbound());
+                    setFieldInt(stmt, 11, Main.getRef(ReferenceType.DN, rec.cleanDN(wweRec.getThisDN())));
+                    setFieldInt(stmt, 12, Main.getRef(ReferenceType.TEvent, wweRec.getEventName()));
+                    setFieldInt(stmt, 13, wweRec.getSeqNo());
+                    setFieldInt(stmt, 14, Main.getRef(ReferenceType.TEvent, wweRec.getIxnID()));
+                    setFieldInt(stmt, 15, Main.getRef(ReferenceType.App, wweRec.getServerID()));
+                    setFieldInt(stmt, 16, Main.getRef(ReferenceType.DN, rec.cleanDN(wweRec.getOtherDN())));
+                    setFieldInt(stmt, 17, Main.getRef(ReferenceType.Agent, wweRec.getAgent()));
 
-                setFieldInt(stmt, 6, Main.getRef(ReferenceType.ConnID, wweRec.getConnID()));
-                setFieldInt(stmt, 7, Main.getRef(ReferenceType.ConnID, wweRec.getTransferConnID()));
-                setFieldInt(stmt, 8, Main.getRef(ReferenceType.UUID, wweRec.getUUID()));
-                setFieldInt(stmt, 9, wweRec.getM_refID());
-                stmt.setBoolean(10, wweRec.isInbound());
-                setFieldInt(stmt, 11, Main.getRef(ReferenceType.DN, Record.cleanDN(wweRec.getThisDN())));
-                setFieldInt(stmt, 12, Main.getRef(ReferenceType.TEvent, wweRec.getEventName()));
-                setFieldInt(stmt, 13, wweRec.getSeqNo());
-                setFieldInt(stmt, 14, Main.getRef(ReferenceType.TEvent, wweRec.getIxnID()));
-                setFieldInt(stmt, 15, Main.getRef(ReferenceType.App, wweRec.getServerID()));
-                setFieldInt(stmt, 16, Main.getRef(ReferenceType.DN, Record.cleanDN(wweRec.getOtherDN())));
-                setFieldInt(stmt, 17, Main.getRef(ReferenceType.Agent, wweRec.getAgent()));
-
-                getM_dbAccessor().SubmitStatement(m_InsertStatementId);
-            } catch (SQLException e) {
-                Main.logger.error("Could not add message type " + getM_type() + ": " + e, e);
-            }
-
+                }
+            });
         }
-
     }
+
+
 //</editor-fold>
 //<editor-fold defaultstate="collapsed" desc="CloudAuth">
 
-    private class WWECloudAuthMsg extends Message {
+        private class WWECloudAuthMsg extends Message {
 
-        private WWECloudAuthMsg(ArrayList<String> m_MessageContents) {
-            super(TableType.WWECloudAuth, m_MessageContents);
-        }
+            private WWECloudAuthMsg(ArrayList<String> m_MessageContents) {
+                super(TableType.WWECloudAuth, m_MessageContents);
+            }
 
-        private String getSuccess() {
-            if (m_MessageLines != null && !m_MessageLines.isEmpty()) {
-                if (m_MessageLines.get(0).contains("Authentication success")) {
-                    return "success";
-                } else if (m_MessageLines.get(0).contains("authentication failed")) {
-                    return "authentication failed";
+            private String getSuccess() {
+                if (m_MessageLines != null && !m_MessageLines.isEmpty()) {
+                    if (m_MessageLines.get(0).contains("Authentication success")) {
+                        return "success";
+                    } else if (m_MessageLines.get(0).contains("authentication failed")) {
+                        return "authentication failed";
+                    }
                 }
+
+                return "(unknown)";
             }
 
-            return "(unknown)";
-        }
-
-        private String getAgent() {
-            return FindByRx(regAuthUsers);
-        }
-
-        public String getError() {
-            return getIxnAttributeString("SATRCFG_DESCRIPTION");
-        }
-
-    }
-
-    private class WWECloudAuthTab extends DBTable {
-
-        public WWECloudAuthTab(DBAccessor dbaccessor, TableType t) {
-            super(dbaccessor, t);
-        }
-
-        @Override
-        public void InitDB() {
-            StringBuilder buf = new StringBuilder();
-            addIndex("time");
-            addIndex("FileId");
-            addIndex("successID");
-            addIndex("userID");
-            addIndex("errorID");
-
-            dropIndexes();
-
-            String query = "create table if not exists " + getTabName() + " (id INTEGER PRIMARY KEY ASC"
-                    + ",time timestamp"
-                    + ",FileId INTEGER"
-                    + ",FileOffset bigint"
-                    + ",FileBytes int"
-                    + ",line int"
-                    /* standard first */
-                    + ",successID int"
-                    + ",userID int"
-                    + ",errorID int"
-                    + ");";
-            getM_dbAccessor().runQuery(query);
-
-            m_InsertStatementId = getM_dbAccessor().PrepareStatement("INSERT INTO " + getTabName() + " VALUES(NULL,?,?,?,?,?"
-                    /*standard first*/
-                    + ",?"
-                    + ",?"
-                    + ",?"
-                    + ");"
-            );
-
-        }
-
-        /**
-         * @throws Exception
-         */
-        @Override
-        public void FinalizeDB() throws Exception {
-            createIndexes();
-        }
-
-        @Override
-        public void AddToDB(Record _rec) {
-            WWECloudAuthMsg rec = (WWECloudAuthMsg) _rec;
-            PreparedStatement stmt = getM_dbAccessor().GetStatement(m_InsertStatementId);
-
-            try {
-                stmt.setTimestamp(1, new Timestamp(rec.GetAdjustedUsecTime()));
-                stmt.setInt(2, WWECloudAuthMsg.getFileId());
-                stmt.setLong(3, rec.getM_fileOffset());
-                stmt.setLong(4, rec.getM_FileBytes());
-                stmt.setLong(5, rec.getM_line());
-
-                setFieldInt(stmt, 6, Main.getRef(ReferenceType.Misc, rec.getSuccess()));
-                setFieldInt(stmt, 7, Main.getRef(ReferenceType.Agent, rec.getAgent()));
-                setFieldInt(stmt, 8, Main.getRef(ReferenceType.ErrorDescr, rec.getError()));
-
-                getM_dbAccessor().SubmitStatement(m_InsertStatementId);
-            } catch (SQLException e) {
-                Main.logger.error("Could not add record type " + m_type.toString() + ": " + e, e);
+            private String getAgent() {
+                return FindByRx(regAuthUsers);
             }
+
+            public String getError() {
+                return getIxnAttributeString("SATRCFG_DESCRIPTION");
+            }
+
         }
 
-    }
+        private class WWECloudAuthTab extends DBTable {
+
+            public WWECloudAuthTab(DBAccessor dbaccessor, TableType t) {
+                super(dbaccessor, t);
+            }
+
+            @Override
+            public void InitDB() {
+                StringBuilder buf = new StringBuilder();
+                addIndex("time");
+                addIndex("FileId");
+                addIndex("successID");
+                addIndex("userID");
+                addIndex("errorID");
+
+                dropIndexes();
+
+                String query = "create table if not exists " + getTabName() + " (id INTEGER PRIMARY KEY ASC"
+                        + ",time timestamp"
+                        + ",FileId INTEGER"
+                        + ",FileOffset bigint"
+                        + ",FileBytes int"
+                        + ",line int"
+                        /* standard first */
+                        + ",successID int"
+                        + ",userID int"
+                        + ",errorID int"
+                        + ");";
+                getM_dbAccessor().runQuery(query);
+
+                m_InsertStatementId = getM_dbAccessor().PrepareStatement("INSERT INTO " + getTabName() + " VALUES(NULL,?,?,?,?,?"
+                        /*standard first*/
+                        + ",?"
+                        + ",?"
+                        + ",?"
+                        + ");"
+                );
+
+            }
+
+            /**
+             * @throws Exception
+             */
+            @Override
+            public void FinalizeDB() throws Exception {
+                createIndexes();
+            }
+
+            @Override
+            public void AddToDB(Record _rec) throws SQLException {
+                WWECloudAuthMsg rec = (WWECloudAuthMsg) _rec;
+                getM_dbAccessor().addToDB(m_InsertStatementId, new IFillStatement() {
+                    @Override
+                    public void fillStatement(PreparedStatement stmt) throws SQLException {
+                        stmt.setTimestamp(1, new Timestamp(rec.GetAdjustedUsecTime()));
+                        stmt.setInt(2, WWECloudAuthMsg.getFileId());
+                        stmt.setLong(3, rec.getM_fileOffset());
+                        stmt.setLong(4, rec.getM_FileBytes());
+                        stmt.setLong(5, rec.getM_line());
+
+                        setFieldInt(stmt, 6, Main.getRef(ReferenceType.Misc, rec.getSuccess()));
+                        setFieldInt(stmt, 7, Main.getRef(ReferenceType.Agent, rec.getAgent()));
+                        setFieldInt(stmt, 8, Main.getRef(ReferenceType.ErrorDescr, rec.getError()));
+
+                    }
+                });
+            }
+
+
+        }
 //</editor-fold>
 
-    private class WWECloudLogMsg extends Message {
+        private class WWECloudLogMsg extends Message {
 
-        private final String msg;
-        private final String msgText;
+            private final String msg;
+            private final String msgText;
 
-        private WWECloudLogMsg(String m_msgName, String msgText) {
-            super(TableType.WWECloudLog);
-            this.msg = m_msgName;
-            this.msgText = optimizeText(msgText);
-        }
-
-        public String getMsg() {
-            return msg;
-        }
-
-        public String getMsgText() {
-            return msgText;
-        }
-
-        private String optimizeText(String msgText) {
-            String ret = msgText;
-            for (Map.Entry<Matcher, String> entry : IGNORE_LOG_WORDS.entrySet()) {
-                ret = entry.getKey().reset(ret).replaceAll(entry.getValue());
+            private WWECloudLogMsg(String m_msgName, String msgText) {
+                super(TableType.WWECloudLog);
+                this.msg = m_msgName;
+                this.msgText = optimizeText(msgText);
             }
-            return ret;
 
-        }
-    }
+            public String getMsg() {
+                return msg;
+            }
 
-    private class WWECloudExeptionMsg extends Message {
+            public String getMsgText() {
+                return msgText;
+            }
 
-        private final String exceptionName;
+            private String optimizeText(String msgText) {
+                String ret = msgText;
+                for (Map.Entry<Pattern, String> entry : IGNORE_LOG_WORDS.entrySet()) {
+                    ret = entry.getKey().matcher(ret).replaceAll(entry.getValue());
+                }
+                return ret;
 
-        private final String msg;
-
-        private WWECloudExeptionMsg(String exName, String msg) {
-            super(TableType.WWECloudException);
-            this.exceptionName = exName;
-            this.msg = msg;
-        }
-
-        public String getExceptionName() {
-            return exceptionName;
-        }
-
-        public String getMsg() {
-            return msg;
-        }
-
-    }
-
-    private class WWECloudExeptionTab extends DBTable {
-
-        public WWECloudExeptionTab(DBAccessor dbaccessor, TableType t) {
-            super(dbaccessor, t);
-        }
-
-        @Override
-        public void InitDB() {
-            StringBuilder buf = new StringBuilder();
-            addIndex("time");
-            addIndex("FileId");
-            addIndex("exNameID");
-            addIndex("msgID");
-
-            dropIndexes();
-
-            String query = "create table if not exists " + getTabName() + " (id INTEGER PRIMARY KEY ASC"
-                    + ",time timestamp"
-                    + ",FileId INTEGER"
-                    + ",FileOffset bigint"
-                    + ",FileBytes int"
-                    + ",line int"
-                    /* standard first */
-                    + ",exNameID int"
-                    + ",msgID int"
-                    + ");";
-            getM_dbAccessor().runQuery(query);
-
-            m_InsertStatementId = getM_dbAccessor().PrepareStatement("INSERT INTO " + getTabName() + " VALUES(NULL,?,?,?,?,?"
-                    /*standard first*/
-                    + ",?"
-                    + ",?"
-                    + ");"
-            );
-
-        }
-
-        /**
-         * @throws Exception
-         */
-        @Override
-        public void FinalizeDB() throws Exception {
-            createIndexes();
-        }
-
-        @Override
-        public void AddToDB(Record _rec) {
-            WWECloudExeptionMsg rec = (WWECloudExeptionMsg) _rec;
-            PreparedStatement stmt = getM_dbAccessor().GetStatement(m_InsertStatementId);
-
-            try {
-                stmt.setTimestamp(1, new Timestamp(rec.GetAdjustedUsecTime()));
-                stmt.setInt(2, WWECloudExeptionMsg.getFileId());
-                stmt.setLong(3, rec.getM_fileOffset());
-                stmt.setLong(4, rec.getM_FileBytes());
-                stmt.setLong(5, rec.getM_line());
-
-                setFieldInt(stmt, 6, Main.getRef(ReferenceType.Exception, rec.getExceptionName()));
-                setFieldInt(stmt, 7, Main.getRef(ReferenceType.ExceptionMessage, rec.getMsg()));
-
-                getM_dbAccessor().SubmitStatement(m_InsertStatementId);
-            } catch (SQLException e) {
-                Main.logger.error("Could not add record type " + m_type.toString() + ": " + e, e);
             }
         }
 
-    }
+        private class WWECloudExeptionMsg extends Message {
 
-    private class WWECloudLogTab extends DBTable {
+            private final String exceptionName;
 
-        public WWECloudLogTab(DBAccessor dbaccessor, TableType t) {
-            super(dbaccessor, t);
-        }
+            private final String msg;
 
-        @Override
-        public void InitDB() {
-            addIndex("time");
-            addIndex("FileId");
-            addIndex("msgID");
-            addIndex("msgTextID");
+            private WWECloudExeptionMsg(String exName, String msg) {
+                super(TableType.WWECloudException);
+                this.exceptionName = exName;
+                this.msg = msg;
+            }
 
-            dropIndexes();
+            public String getExceptionName() {
+                return exceptionName;
+            }
 
-            String query = "create table if not exists " + getTabName() + " (id INTEGER PRIMARY KEY ASC"
-                    + ",time timestamp"
-                    + ",FileId INTEGER"
-                    + ",FileOffset bigint"
-                    + ",FileBytes int"
-                    + ",line int"
-                    /* standard first */
-                    + ",msgID int"
-                    + ",msgTextID int"
-                    + ");";
-            getM_dbAccessor().runQuery(query);
-
-            m_InsertStatementId = getM_dbAccessor().PrepareStatement("INSERT INTO " + getTabName() + " VALUES(NULL,?,?,?,?,?"
-                    /*standard first*/
-                    + ",?"
-                    + ",?"
-                    + ");"
-            );
+            public String getMsg() {
+                return msg;
+            }
 
         }
 
-        /**
-         * @throws Exception
-         */
-        @Override
-        public void FinalizeDB() throws Exception {
-            createIndexes();
+        private class WWECloudExeptionTab extends DBTable {
+
+            public WWECloudExeptionTab(DBAccessor dbaccessor, TableType t) {
+                super(dbaccessor, t);
+            }
+
+            @Override
+            public void InitDB() {
+                StringBuilder buf = new StringBuilder();
+                addIndex("time");
+                addIndex("FileId");
+                addIndex("exNameID");
+                addIndex("msgID");
+
+                dropIndexes();
+
+                String query = "create table if not exists " + getTabName() + " (id INTEGER PRIMARY KEY ASC"
+                        + ",time timestamp"
+                        + ",FileId INTEGER"
+                        + ",FileOffset bigint"
+                        + ",FileBytes int"
+                        + ",line int"
+                        /* standard first */
+                        + ",exNameID int"
+                        + ",msgID int"
+                        + ");";
+                getM_dbAccessor().runQuery(query);
+
+                m_InsertStatementId = getM_dbAccessor().PrepareStatement("INSERT INTO " + getTabName() + " VALUES(NULL,?,?,?,?,?"
+                        /*standard first*/
+                        + ",?"
+                        + ",?"
+                        + ");"
+                );
+
+            }
+
+            /**
+             * @throws Exception
+             */
+            @Override
+            public void FinalizeDB() throws Exception {
+                createIndexes();
+            }
+
+            @Override
+            public void AddToDB(Record _rec) throws SQLException {
+                WWECloudExeptionMsg rec = (WWECloudExeptionMsg) _rec;
+                getM_dbAccessor().addToDB(m_InsertStatementId, new IFillStatement() {
+                    @Override
+                    public void fillStatement(PreparedStatement stmt) throws SQLException {
+                        stmt.setTimestamp(1, new Timestamp(rec.GetAdjustedUsecTime()));
+                        stmt.setInt(2, WWECloudExeptionMsg.getFileId());
+                        stmt.setLong(3, rec.getM_fileOffset());
+                        stmt.setLong(4, rec.getM_FileBytes());
+                        stmt.setLong(5, rec.getM_line());
+
+                        setFieldInt(stmt, 6, Main.getRef(ReferenceType.Exception, rec.getExceptionName()));
+                        setFieldInt(stmt, 7, Main.getRef(ReferenceType.ExceptionMessage, rec.getMsg()));
+
+                    }
+                });
+            }
+
+
         }
 
-        @Override
-        public void AddToDB(Record _rec) {
-            WWECloudLogMsg rec = (WWECloudLogMsg) _rec;
-            PreparedStatement stmt = getM_dbAccessor().GetStatement(m_InsertStatementId);
+        private class WWECloudLogTab extends DBTable {
 
-            try {
-                stmt.setTimestamp(1, new Timestamp(rec.GetAdjustedUsecTime()));
-                stmt.setInt(2, WWECloudLogMsg.getFileId());
-                stmt.setLong(3, rec.getM_fileOffset());
-                stmt.setLong(4, rec.getM_FileBytes());
-                stmt.setLong(5, rec.getM_line());
+            public WWECloudLogTab(DBAccessor dbaccessor, TableType t) {
+                super(dbaccessor, t);
+            }
 
-                setFieldInt(stmt, 6, Main.getRef(ReferenceType.CLOUD_LOG_MESSAGE_TYPE, rec.getMsg()));
-                setFieldInt(stmt, 7, Main.getRef(ReferenceType.CLOUD_LOG_MESSAGE, rec.getMsgText()));
+            @Override
+            public void InitDB() {
+                addIndex("time");
+                addIndex("FileId");
+                addIndex("msgID");
+                addIndex("msgTextID");
 
-                getM_dbAccessor().SubmitStatement(m_InsertStatementId);
-            } catch (SQLException e) {
-                Main.logger.error("Could not add record type " + m_type.toString() + ": " + e, e);
+                dropIndexes();
+
+                String query = "create table if not exists " + getTabName() + " (id INTEGER PRIMARY KEY ASC"
+                        + ",time timestamp"
+                        + ",FileId INTEGER"
+                        + ",FileOffset bigint"
+                        + ",FileBytes int"
+                        + ",line int"
+                        /* standard first */
+                        + ",msgID int"
+                        + ",msgTextID int"
+                        + ");";
+                getM_dbAccessor().runQuery(query);
+
+                m_InsertStatementId = getM_dbAccessor().PrepareStatement("INSERT INTO " + getTabName() + " VALUES(NULL,?,?,?,?,?"
+                        /*standard first*/
+                        + ",?"
+                        + ",?"
+                        + ");"
+                );
+
+            }
+
+            /**
+             * @throws Exception
+             */
+            @Override
+            public void FinalizeDB() throws Exception {
+                createIndexes();
+            }
+
+            @Override
+            public void AddToDB(Record _rec) throws SQLException {
+                WWECloudLogMsg rec = (WWECloudLogMsg) _rec;
+                getM_dbAccessor().addToDB(m_InsertStatementId, new IFillStatement() {
+                    @Override
+                    public void fillStatement(PreparedStatement stmt) throws SQLException {
+                        stmt.setTimestamp(1, new Timestamp(rec.GetAdjustedUsecTime()));
+                        stmt.setInt(2, WWECloudLogMsg.getFileId());
+                        stmt.setLong(3, rec.getM_fileOffset());
+                        stmt.setLong(4, rec.getM_FileBytes());
+                        stmt.setLong(5, rec.getM_line());
+
+                        setFieldInt(stmt, 6, Main.getRef(ReferenceType.CLOUD_LOG_MESSAGE_TYPE, rec.getMsg()));
+                        setFieldInt(stmt, 7, Main.getRef(ReferenceType.CLOUD_LOG_MESSAGE, rec.getMsgText()));
+
+                    }
+                });
             }
         }
-
-    }
 //</editor-fold>
 
-}
+    }
+
+

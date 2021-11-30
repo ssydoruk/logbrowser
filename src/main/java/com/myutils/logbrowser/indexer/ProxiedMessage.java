@@ -14,10 +14,10 @@ import static Utils.Util.intOrDef;
  */
 public class ProxiedMessage extends Message {
 
-    private static final Matcher regAttributeReferenceID = Pattern.compile("AttributeReferenceID[\\s\\[]+(\\w+)").matcher("");
-    private static final Matcher regAttributeThisDN = Pattern.compile("AttributeThisDN[\\s\\[]+(\\w+)").matcher("");
-    private static final Matcher regFrom = Pattern.compile("from[\\s\\(]+\\([\\w]+\\s([^\\s]+)").matcher("");
-    private static final Matcher regTo = Pattern.compile("to[\\s\\(]+\\([\\w]+\\s([^\\s]+)").matcher("");
+    private static final Pattern regAttributeReferenceID = Pattern.compile("AttributeReferenceID[\\s\\[]+(\\w+)");
+    private static final Pattern regAttributeThisDN = Pattern.compile("AttributeThisDN[\\s\\[]+(\\w+)");
+    private static final Pattern regFrom = Pattern.compile("from[\\s\\(]+\\([\\w]+\\s([^\\s]+)");
+    private static final Pattern regTo = Pattern.compile("to[\\s\\(]+\\([\\w]+\\s([^\\s]+)");
     private final String event;
     private final String contents;
 
