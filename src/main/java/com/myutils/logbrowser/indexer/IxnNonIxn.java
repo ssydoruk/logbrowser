@@ -16,8 +16,8 @@ public class IxnNonIxn extends Message {
     private final Ixn parentMsg;
     MessageAttributes attrs = new MessageAttributes();
 
-    IxnNonIxn(TableType tableType, Ixn msg) {
-        super(tableType);
+    IxnNonIxn(TableType tableType, Ixn msg, int fileID) {
+        super(tableType, fileID);
         parentMsg = msg;
 //        setMessageLines(parentMsg.m_MessageLines);
 

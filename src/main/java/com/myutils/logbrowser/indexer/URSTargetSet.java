@@ -17,8 +17,8 @@ public final class URSTargetSet extends Message {
     private String objType;
     private String target;
 
-    URSTargetSet(String target, String targetItem) {
-        this(target);
+    URSTargetSet(String target, String targetItem, int fileID) {
+        this(target, fileID);
         Matcher m;
         boolean agentFound = false;
         if (targetItem != null) {
@@ -40,13 +40,13 @@ public final class URSTargetSet extends Message {
         }
     }
 
-    URSTargetSet(String target) {
-        this();
+    URSTargetSet(String target, int fileID) {
+        this( fileID);
         this.target = target;
     }
 
-    public URSTargetSet() {
-        super(TableType.URSTargetSet);
+    public URSTargetSet( int fileID) {
+        super(TableType.URSTargetSet, fileID);
     }
 
     public String getObject() {

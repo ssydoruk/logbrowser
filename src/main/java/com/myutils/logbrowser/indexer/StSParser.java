@@ -62,13 +62,13 @@ public class StSParser extends Parser {
     }
 
     private void AddSingleLineStatus(String plGroup, String name, String OldStatus, String NewStatus) {
-        StStatus msg = new StStatus(plGroup, name, OldStatus, NewStatus);
+        StStatus msg = new StStatus(plGroup, name, OldStatus, NewStatus,  fileInfo.getRecordID());
         SetStdFieldsAndAdd(msg);
 
     }
 
     private void AddCapacityMessage(String m_Header, ArrayList m_MessageContents) {
-        StCapacity msg = new StCapacity(m_Header, m_MessageContents);
+        StCapacity msg = new StCapacity(m_Header, m_MessageContents,  fileInfo.getRecordID());
         SetStdFieldsAndAdd(msg);
     }
 
@@ -76,6 +76,7 @@ public class StSParser extends Parser {
     public int ParseFrom(BufferedReaderCrLf input, long offset, int line, FileInfo fi) {
         m_CurrentFilePos = offset;
         m_CurrentLine = line;
+        setFileInfo(fi);
 
         m_dbRecords = 0;
 
@@ -430,10 +431,10 @@ public class StSParser extends Parser {
 
         if ((headerList.length == 6) && headerList[3].startsWith("Creating")) {
             String event = headerList[3];
-            msg = new StSRequestHistoryMessage(event, contents);
+            msg = new StSRequestHistoryMessage(event, contents,  fileInfo.getRecordID());
         } else if (headerList.length > 4) {
             String event = headerList[4].substring(1, headerList[4].length() - 1);
-            msg = new StSRequestHistoryMessage(event, contents);
+            msg = new StSRequestHistoryMessage(event, contents,  fileInfo.getRecordID());
         } else {
             return;
         }
@@ -465,22 +466,22 @@ public class StSParser extends Parser {
     protected void AddServerMessage() throws Exception {
         if (customEvent || (m_MessageContents.size() > 0 && m_MessageContents.get(0).startsWith("Server: IxnEvent"))) {
             Main.logger.trace("is IxnEvent");
-            IxnSS msg = new IxnSS(m_MessageContents, customEvent);
+            IxnSS msg = new IxnSS(m_MessageContents, customEvent,  fileInfo.getRecordID());
             SetStdFieldsAndAdd(msg);
             customEvent = false;
         } else {
-            StSTEventMessage msg = new StSTEventMessage(m_MessageContents);
+            StSTEventMessage msg = new StSTEventMessage(m_MessageContents,  fileInfo.getRecordID());
             SetStdFieldsAndAdd(msg);
         }
     }
 
     protected void AddActionMessage(ArrayList contents, String header) throws Exception {
-        StSActionMessage msg = new StSActionMessage(header, contents);
+        StSActionMessage msg = new StSActionMessage(header, contents,  fileInfo.getRecordID());
         SetStdFieldsAndAdd(msg);
     }
 
     private void AddConfigMessage(String substring) {
-        ConfigUpdateRecord msg = new ConfigUpdateRecord(substring);
+        ConfigUpdateRecord msg = new ConfigUpdateRecord(substring,  fileInfo.getRecordID());
         try {
             Matcher m;
 //            msg.setObjName(Message.FindByRx(m_MessageContents, regCfgObjectName, 1, ""));

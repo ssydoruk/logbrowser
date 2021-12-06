@@ -63,7 +63,7 @@ public class URSTargetSetTable extends DBTable {
             @Override
             public void fillStatement(PreparedStatement stmt) throws SQLException{
             stmt.setTimestamp(1, new Timestamp(rec.GetAdjustedUsecTime()));
-            stmt.setInt(2, URSStrategy.getFileId());
+            stmt.setInt(2, rec.getFileID());
             stmt.setLong(3, rec.getM_fileOffset());
             stmt.setLong(4, rec.getM_FileBytes());
             stmt.setLong(5, rec.getM_line());

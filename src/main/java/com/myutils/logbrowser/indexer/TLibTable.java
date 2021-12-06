@@ -84,55 +84,53 @@ public class TLibTable extends DBTable {
     }
 
     @Override
-        public void AddToDB(Record _rec) throws SQLException {
+    public void AddToDB(Record _rec) throws SQLException {
 
         TLibMessage theRec = (TLibMessage) _rec;
-         getM_dbAccessor().addToDB(m_InsertStatementId, new IFillStatement() {
-                @Override
-                public void fillStatement(PreparedStatement stmt) throws SQLException{
-            generateID(stmt, 1, theRec);
-            stmt.setTimestamp(2, new Timestamp(theRec.GetAdjustedUsecTime()));
+        getM_dbAccessor().addToDB(m_InsertStatementId, new IFillStatement() {
+            @Override
+            public void fillStatement(PreparedStatement stmt) throws SQLException {
+                stmt.setInt(1, theRec.getRecordID());
+                stmt.setTimestamp(2, new Timestamp(theRec.GetAdjustedUsecTime()));
 
-            String agentID = theRec.NoQuotes(theRec.getAttributeTrim("AttributeAgentID"));
-            String thisDN = theRec.cleanDN(theRec.getThisDN());
-            if (StringUtils.equals(thisDN, agentID)) {
-                agentID = null;
+                String agentID = theRec.NoQuotes(theRec.getAttributeTrim("AttributeAgentID"));
+                String thisDN = theRec.cleanDN(theRec.getThisDN());
+                if (StringUtils.equals(thisDN, agentID)) {
+                    agentID = null;
+                }
+
+                setFieldInt(stmt, 3, Main.getRef(ReferenceType.TEvent, theRec.GetMessageName()));
+                setFieldInt(stmt, 4, Main.getRef(ReferenceType.DN, thisDN));
+                setFieldInt(stmt, 5, Main.getRef(ReferenceType.DN, theRec.cleanDN(theRec.getAttributeDN("AttributeOtherDN"))));
+                setFieldInt(stmt, 6, Main.getRef(ReferenceType.Agent, agentID));
+                setFieldInt(stmt, 7, Main.getRef(ReferenceType.DN, theRec.cleanDN((theRec.getAttribute("AttributeANI")))));
+                setFieldInt(stmt, 8, Main.getRef(ReferenceType.ConnID, theRec.getConnID()));
+                setFieldInt(stmt, 9, Main.getRef(ReferenceType.ConnID, theRec.GetTransferConnID()));
+                setFieldLong(stmt, 10, theRec.getRefID());
+                stmt.setBoolean(11, theRec.isInbound());
+                setFieldInt(stmt, 12, Main.getRef(ReferenceType.App, theRec.getM_source()));
+                setFieldString(stmt, 13, theRec.getAttributeTrim("AttributePrivateMsgID"));
+                setFieldInt(stmt, 14, Main.getRef(ReferenceType.Switch, theRec.NoQuotes(theRec.getAttributeTrim("AttributeLocation"))));
+                setFieldInt(stmt, 15, theRec.getFileID());
+                setFieldLong(stmt, 16, theRec.getM_fileOffset());
+                setFieldLong(stmt, 17, theRec.getFileBytes());
+                setFieldInt(stmt, 18, (theRec.isM_handlerInProgress() ? theRec.getM_handlerId() : 0));
+                Main.logger.trace("theRec.m_handlerId:" + theRec.getM_handlerId() + " theRec.m_handlerInProgress :" + theRec.isM_handlerInProgress());
+
+                setFieldInt(stmt, 19, theRec.getM_line());
+                setFieldLong(stmt, 20, theRec.getSeqNo());
+                setFieldInt(stmt, 21, Main.getRef(ReferenceType.UUID, theRec.getUUID()));
+                setFieldLong(stmt, 22, theRec.getErrorCode());
+                setFieldLong(stmt, 23, theRec.getAttributeLong("AttributeCallType"));
+                setFieldInt(stmt, 24, Main.getRef(ReferenceType.TLIBERROR, theRec.getErrorMessage(theRec.GetMessageName())));
+                setFieldInt(stmt, 25, Main.getRef(ReferenceType.TLIBATTR1, theRec.getAttr1()));
+                setFieldInt(stmt, 26, Main.getRef(ReferenceType.TLIBATTR2, theRec.getAttr2()));
+                setFieldInt(stmt, 27, Main.getRef(ReferenceType.DN, theRec.cleanDN(theRec.getAttributeDN("AttributeDNIS"))));
+                setFieldInt(stmt, 28, Main.getRef(ReferenceType.Place, theRec.getAttributeDN("AttributePlace")));
+
             }
-
-            setFieldInt(stmt, 3, Main.getRef(ReferenceType.TEvent, theRec.GetMessageName()));
-            setFieldInt(stmt, 4, Main.getRef(ReferenceType.DN, thisDN));
-            setFieldInt(stmt, 5, Main.getRef(ReferenceType.DN, theRec.cleanDN(theRec.getAttributeDN("AttributeOtherDN"))));
-            setFieldInt(stmt, 6, Main.getRef(ReferenceType.Agent, agentID));
-            setFieldInt(stmt, 7, Main.getRef(ReferenceType.DN, theRec.cleanDN((theRec.getAttribute("AttributeANI")))));
-            setFieldInt(stmt, 8, Main.getRef(ReferenceType.ConnID, theRec.getConnID()));
-            setFieldInt(stmt, 9, Main.getRef(ReferenceType.ConnID, theRec.GetTransferConnID()));
-            setFieldLong(stmt, 10, theRec.getRefID());
-            stmt.setBoolean(11, theRec.isInbound());
-            setFieldInt(stmt, 12, Main.getRef(ReferenceType.App, theRec.getM_source()));
-            setFieldString(stmt, 13, theRec.getAttributeTrim("AttributePrivateMsgID"));
-            setFieldInt(stmt, 14, Main.getRef(ReferenceType.Switch, theRec.NoQuotes(theRec.getAttributeTrim("AttributeLocation"))));
-            setFieldInt(stmt, 15, TLibMessage.getFileId());
-            setFieldLong(stmt, 16, theRec.getM_fileOffset());
-            setFieldLong(stmt, 17, theRec.getFileBytes());
-            setFieldInt(stmt, 18, (TLibMessage.m_handlerInProgress ? TLibMessage.m_handlerId : 0));
-            Main.logger.trace("theRec.m_handlerId:" + TLibMessage.m_handlerId + " theRec.m_handlerInProgress :" + TLibMessage.m_handlerInProgress);
-
-            setFieldInt(stmt, 19, theRec.getM_line());
-            setFieldLong(stmt, 20, theRec.getSeqNo());
-            setFieldInt(stmt, 21, Main.getRef(ReferenceType.UUID, theRec.getUUID()));
-            setFieldLong(stmt, 22, theRec.getErrorCode());
-            setFieldLong(stmt, 23, theRec.getAttributeLong("AttributeCallType"));
-            setFieldInt(stmt, 24, Main.getRef(ReferenceType.TLIBERROR, theRec.getErrorMessage(theRec.GetMessageName())));
-            setFieldInt(stmt, 25, Main.getRef(ReferenceType.TLIBATTR1, theRec.getAttr1()));
-            setFieldInt(stmt, 26, Main.getRef(ReferenceType.TLIBATTR2, theRec.getAttr2()));
-            setFieldInt(stmt, 27, Main.getRef(ReferenceType.DN, theRec.cleanDN(theRec.getAttributeDN("AttributeDNIS"))));
-            setFieldInt(stmt, 28, Main.getRef(ReferenceType.Place, theRec.getAttributeDN("AttributePlace")));
-            TLibMessage.SetTlibId(getCurrentID());
-
-                        }
         });
     }
-
 
 
 }

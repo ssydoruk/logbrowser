@@ -59,10 +59,9 @@ public class HandlerTable extends DBTable {
 //	    return;
 //        }
             stmt.setInt(1, Main.getRef(ReferenceType.HANDLER, m_text));
-            stmt.setInt(2, Handler.getFileId());
+            stmt.setInt(2, theRec.getFileID());
 //            stmt.setLong(3, (long) theRec.getM_fileOffset());
 //            stmt.setInt(4, theRec.getM_line());
-            theRec.IncHandler();
         }
             });
         }

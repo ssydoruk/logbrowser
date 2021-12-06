@@ -17,8 +17,8 @@ public class OCSSCXMLScript extends Message {
     private final String sessID;
     private final String rest;
 
-    OCSSCXMLScript(String sessID, String rest) {
-        super(TableType.OCSSCXMLScript);
+    OCSSCXMLScript(String sessID, String rest, int fileID) {
+        super(TableType.OCSSCXMLScript, fileID);
         this.sessID = sessID;
         this.rest = rest;
     }

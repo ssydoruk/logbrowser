@@ -17,12 +17,12 @@ public class ConfigUpdateRecord extends Message {
     private String op = "";
     private String msg = null;
 
-    public ConfigUpdateRecord(ArrayList messageLines) {
-        super(TableType.ConfigUpdate, messageLines);
+    public ConfigUpdateRecord(ArrayList messageLines, int fileID) {
+        super(TableType.ConfigUpdate, messageLines, fileID);
     }
 
-    ConfigUpdateRecord(String line) {
-        super(TableType.ConfigUpdate, line);
+    ConfigUpdateRecord(String line, int fileID) {
+        super(TableType.ConfigUpdate, line, fileID);
     }
 
     public String GetOp() {

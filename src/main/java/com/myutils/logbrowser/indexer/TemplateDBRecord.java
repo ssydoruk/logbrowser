@@ -9,8 +9,8 @@ import java.util.ArrayList;
 
 public class TemplateDBRecord extends Message {
 
-    public TemplateDBRecord(ArrayList messageLines) {
-        super(TableType.ORSUrs, messageLines);
+    public TemplateDBRecord(ArrayList messageLines, int fileID) {
+        super(TableType.ORSUrs, messageLines, fileID);
     }
 
     public String GetSid() {

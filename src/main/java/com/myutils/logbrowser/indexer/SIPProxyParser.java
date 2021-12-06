@@ -105,6 +105,7 @@ public class SIPProxyParser extends Parser {
         long name = fi.getAppNameID() + fi.getFileStartTimeRound();
         this.handleAdd = "|" + name;
         Main.logger.debug("handlerAdd:" + handleAdd);
+        setFileInfo(fi);
 
         String unfinished = "";
 
@@ -210,13 +211,18 @@ public class SIPProxyParser extends Parser {
         }
     }
 
+    boolean m_handlerInProgress;
+    private int m_handlerId;
+
+
     String ParseLine(BufferedReaderCrLf input, String str) throws Exception {
         Matcher m;
 
+        m_handlerInProgress=false;
         String s = str;
 
         Main.logger.trace("Parser state: " + m_ParserState);
-        ParseCustom(str, (SipMessage.m_handlerInProgress ? SipMessage.m_handlerId : 0));
+        ParseCustom(str, (m_handlerInProgress ? m_handlerId : 0));
         switch (m_ParserState) {
             case STATE_HEADER: {
                 if (s.isEmpty()) {
@@ -240,7 +246,7 @@ public class SIPProxyParser extends Parser {
 
                 if ((m = regConfigOneLineDN.matcher(str)).find()) {
 //                    Main.logger.trace("-1-");
-                    ConfigUpdateRecord msg = new ConfigUpdateRecord(str);
+                    ConfigUpdateRecord msg = new ConfigUpdateRecord(str,  fileInfo.getRecordID());
                     try {
                         msg.setObjectType("DN");
                         msg.setObjectDBID(m.group(1));
@@ -258,7 +264,7 @@ public class SIPProxyParser extends Parser {
                     m_ParserState = STATE_CONFIG;
                 } else if ((m = regProxy.matcher(s)).find()) {
 //                    Main.logger.trace("-4-");
-                    ProxiedMessage msg = new ProxiedMessage(m.group(1), s.substring(m.end()));
+                    ProxiedMessage msg = new ProxiedMessage(m.group(1), s.substring(m.end()), getFileID());
                     SetStdFieldsAndAdd(msg);
 
                     return null;
@@ -573,7 +579,7 @@ public class SIPProxyParser extends Parser {
 //            PrintMsg(contents);
 //            return;
 //        }
-        msg = new SipMessage(contents, TableType.SIP);
+        msg = new SipMessage(contents,    TableType.SIP, m_handlerInProgress,  m_handlerId, fileInfo.getRecordID());
 
         if (msg.GetFrom() == null) {
             Main.logger.error("LOG ERROR: no From in SIP message, ignore, line " + m_CurrentLine);
@@ -754,7 +760,7 @@ public class SIPProxyParser extends Parser {
             if (contentType != null && contentType.equals("application/x-genesys-mediaserver-status")
                     && contentEvent != null && contentEvent.equals("x-genesys-mediaserver-status")) {
                 Main.logger.debug("Cancel trigger on NOTIFY (Event=x-genesys-mediaserver-status)");
-                Record.SetHandlerInProgress(false);
+                m_handlerInProgress=false;
             }
         }
 
@@ -768,7 +774,7 @@ public class SIPProxyParser extends Parser {
 
     protected void AddCireqMessage(ArrayList contents, String header) throws Exception {
         Matcher m;
-        CIFaceRequest req = new CIFaceRequest();
+        CIFaceRequest req = new CIFaceRequest(false, 0,  fileInfo.getRecordID());
 
         String[] headerList = header.split(" ");
         req.SetName(headerList[1]);
@@ -791,7 +797,7 @@ public class SIPProxyParser extends Parser {
     }
 
     private void AddConfigMessage(ArrayList<String> m_MessageContents) {
-        ConfigUpdateRecord msg = new ConfigUpdateRecord(m_MessageContents);
+        ConfigUpdateRecord msg = new ConfigUpdateRecord(m_MessageContents,  fileInfo.getRecordID());
         try {
             Matcher m;
             if (m_MessageContents.size() > 0 && (m = regSIPServerStartDN.matcher(m_MessageContents.get(0))).find()) {

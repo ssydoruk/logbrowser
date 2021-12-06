@@ -53,6 +53,7 @@ public enum TableType {
     OCSTLib("OCSTLib"),
     OCSIxn("OCSIxn"),
     OCSClient("OCSClient"),
+    ORSCluster("ORSCluster"),
     OCSHTTP("OCSHTTP"),
     OCSDBActivity("OCSDBActivity"),
     OCSCG("OCSCG"),
@@ -134,7 +135,7 @@ public enum TableType {
     IxnGMS("IxnGMS"),
     SCSAlarm("SCSAlarm"),
     IxnNonIxn("IxnNonIxn"),
-    HTTP_TO_URS("httpTOurs");
+    HTTP_TO_URS("httpTOurs"), ICONMessage("iconmessage");
 
     private final String name;
 

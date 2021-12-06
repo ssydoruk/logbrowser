@@ -65,7 +65,7 @@ public class ORSMetricExtensionTable extends DBTable {
             @Override
             public void fillStatement(PreparedStatement stmt) throws SQLException{
                 stmt.setTimestamp(1, new Timestamp(orsRec.GetAdjustedUsecTime()));
-                stmt.setInt(2, ORSMetric.getFileId());
+                stmt.setInt(2, rec.getFileID());
                 stmt.setLong(3, orsRec.getM_fileOffset());
                 stmt.setLong(4, orsRec.getM_FileBytes());
                 stmt.setLong(5, orsRec.getM_line());

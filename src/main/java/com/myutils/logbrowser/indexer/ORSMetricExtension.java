@@ -29,18 +29,18 @@ public class ORSMetricExtension extends Message {
     private String param2 = null;
     private String ns = null;
 
-    public ORSMetricExtension(String line) {
-        super(TableType.ORSMetricExtension, line);
+    public ORSMetricExtension(String line, int fileID) {
+        super(TableType.ORSMetricExtension, line, fileID);
         FindSID();
     }
 
-    ORSMetricExtension(ArrayList<String> m_MessageContents) {
-        super(TableType.ORSMetricExtension, m_MessageContents);
+    ORSMetricExtension(ArrayList<String> m_MessageContents, int fileID) {
+        super(TableType.ORSMetricExtension, m_MessageContents, fileID);
         FindSID();
     }
 
-    ORSMetricExtension(String line, String _Method, String _sid) {
-        super(TableType.ORSMetricExtension, line);
+    ORSMetricExtension(String line, String _Method, String _sid, int fileID) {
+        super(TableType.ORSMetricExtension, line, fileID);
         Method = _Method;
         sid = _sid;
     }

@@ -18,8 +18,8 @@ public class OrsSidUuid extends Message {
     private String theURL = null;
     private String app = null;
 
-    public OrsSidUuid(String UUID, String GID) {
-        super(TableType.ORSSidUUID);
+    public OrsSidUuid(String UUID, String GID, int fileID) {
+        super(TableType.ORSSidUUID, fileID);
 
         this.UUID = UUID;
         this.GID = GID;

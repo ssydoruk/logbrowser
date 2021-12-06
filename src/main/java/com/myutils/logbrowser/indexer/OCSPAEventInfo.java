@@ -24,8 +24,8 @@ public class OCSPAEventInfo extends Message {
     private static final Pattern regRecHandle = Pattern.compile("RecHandle: (\\d+);");
     private static final Pattern regCallResult = Pattern.compile("CallResult: ([1-9][^;]*);$");
 
-    public OCSPAEventInfo(ArrayList<String> messageLines) {
-        super(TableType.OCSPAEventInfo, messageLines);
+    public OCSPAEventInfo(ArrayList<String> messageLines, int fileID) {
+        super(TableType.OCSPAEventInfo, messageLines, fileID);
     }
 
     int GetRecHandle() {

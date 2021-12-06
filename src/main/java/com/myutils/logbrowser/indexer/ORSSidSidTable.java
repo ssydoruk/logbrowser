@@ -52,7 +52,7 @@ public class ORSSidSidTable extends DBTable {
          getM_dbAccessor().addToDB(m_InsertStatementId, new IFillStatement() {
                 @Override
                 public void fillStatement(PreparedStatement stmt) throws SQLException{
-            stmt.setInt(1, Record.getFileId());
+            stmt.setInt(1, rec.getFileID());
 
             setFieldInt(stmt, 2, Main.getRef(ReferenceType.ORSSID, rec.getSID()));
             setFieldInt(stmt, 3, Main.getRef(ReferenceType.ORSSID, rec.getNewSID()));

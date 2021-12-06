@@ -25,6 +25,11 @@ import java.util.regex.Pattern;
  */
 public abstract class Parser {
 
+    public int getFileID() {
+        return  fileInfo.getRecordID();
+    }
+
+
     public static final int MAX_CUSTOM_FIELDS = 3;
     private static final int BASE_CUSTOM_FIELDS = 8;
     private static final Pattern regORSSessionID = Pattern.compile("^[~\\w]{32}$");
@@ -541,7 +546,7 @@ public abstract class Parser {
         if (ret != null) {
             lastKnownDate = ret.fmtDate;
             if (isParseTimeDiff()) {
-                dateDiff.newDate(ret, FileInfo.getFileId(), fileInfo.getAppNameID(), getFilePos(), getEndFilePos() - getFilePos(), m_lineStarted);
+                dateDiff.newDate(ret,  fileInfo.getRecordID(), fileInfo.getAppNameID(), getFilePos(), getEndFilePos() - getFilePos(), m_lineStarted);
             }
 
             commitDateParsers();
@@ -595,7 +600,6 @@ public abstract class Parser {
             dateParsers.setPrefferedFormats(null);//
         }
         Main.logger.trace("collectingDates = " + collectingDates);
-        this.fileInfo.IncreaseFileID();
         this.foundBodyDates = false;
 
     }
@@ -636,7 +640,7 @@ public abstract class Parser {
         }
 
         if (isParseTimeDiff()) {
-            dateDiff.newDate(parseDate, FileInfo.getFileId(), fileInfo.getAppNameID(), getFilePos(), getEndFilePos() - getFilePos(), m_lineStarted);
+            dateDiff.newDate(parseDate,  fileInfo.getRecordID(), fileInfo.getAppNameID(), getFilePos(), getEndFilePos() - getFilePos(), m_lineStarted);
         }
         return parseDate;
     }
@@ -676,7 +680,7 @@ public abstract class Parser {
             custLineTab = new CustomLineTable(m_type);
             custLineTab.InitDB();
         }
-        CustomRegexLine cl = new CustomRegexLine();
+        CustomRegexLine cl = new CustomRegexLine(fileInfo.getM_type(),  fileInfo.getRecordID());
         cl.setParams(m, key, value);
 //        int lastPrintedIdx = cl.lastPrintedIdx(fileParseCustomSearch);
 //        Main.logger.info("insertIntoCustom custom [" + lastPrintedIdx + "]");
@@ -810,6 +814,10 @@ public abstract class Parser {
         private Matcher m;
         private Integer handlerID = null;
         private ArrayList<FilesParseSettings.FileParseCustomSearch.SearchComponent> value;
+
+        public CustomRegexLine(TableType type, int fileID) {
+            super(type, fileID);
+        }
 
         @Override
         public String toString() {
@@ -1019,7 +1027,7 @@ public abstract class Parser {
                 @Override
                 public void fillStatement(PreparedStatement stmt) throws SQLException {
                     stmt.setTimestamp(1, new Timestamp(rec.GetAdjustedUsecTime()));
-                    stmt.setInt(2, CustomRegexLine.getFileId());
+                    stmt.setInt(2, rec.getFileID());
                     stmt.setLong(3, rec.getM_fileOffset());
                     stmt.setLong(4, rec.getM_FileBytes());
                     stmt.setLong(5, rec.getM_line());
@@ -1042,8 +1050,9 @@ public abstract class Parser {
     //<editor-fold defaultstate="collapsed" desc="comment">
     class CustomAttribute extends Record {
 
-        private CustomAttribute(String key, String key0, Integer value) {
-            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+
+        public CustomAttribute(TableType type, int fileID) {
+            super(type, fileID);
         }
 
         private void setMatcher(Matcher m) {
@@ -1118,7 +1127,7 @@ public abstract class Parser {
                 @Override
                 public void fillStatement(PreparedStatement stmt) throws SQLException {
 //                stmt.setTimestamp(1, new Timestamp(rec.GetAdjustedUsecTime()));
-                    stmt.setInt(2, SCSAppStatus.getFileId());
+                    stmt.setInt(2, rec.getFileID());
                     stmt.setLong(3, rec.getM_fileOffset());
 //                stmt.setLong(4, rec.getM_FileBytes());
                     stmt.setLong(5, rec.getM_line());

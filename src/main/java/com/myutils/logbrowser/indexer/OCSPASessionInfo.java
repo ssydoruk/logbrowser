@@ -18,8 +18,8 @@ public class OCSPASessionInfo extends Message {
     private int GroupDBID;
     private int CampaignDBID;
 
-    public OCSPASessionInfo(ArrayList<String> messageLines) {
-        super(TableType.OCSPASessionInfo, messageLines);
+    public OCSPASessionInfo(ArrayList<String> messageLines, int fileID) {
+        super(TableType.OCSPASessionInfo, messageLines, fileID);
 
         try {
             Matcher m;

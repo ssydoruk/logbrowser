@@ -28,7 +28,6 @@ public abstract class DBTable {
     private String tabName;
     private int recordsAdded = 0;
     private String fileIDField;
-    private int currentID; // primary key on the table. Implies that each table has to have field named
     public DBTable(DBAccessor dbaccessor, TableType type) {
         m_dbAccessor = (SqliteAccessor) dbaccessor;
         m_type = type;
@@ -174,12 +173,11 @@ public abstract class DBTable {
                 String tabName1 = getTabName();
                 if (tabName1 != null) {
                     try {
-                        currentID = Main.getInstance().getM_accessor().getID("select max(id) from " + tabName1, tabName1, -1);
-                        if (currentID == -1) {
-                            currentID = 0;
+                        int currentID = Main.getInstance().getM_accessor().getID("select max(id) from " + tabName1, tabName1, -1);
+                        if (currentID > 0) {
+                            Record.setID(m_type, currentID);
                         }
                     } catch (Exception ex) {
-                        currentID = 0;
                         logger.error("fatal: ", ex);
                     }
                 }
@@ -205,23 +203,7 @@ public abstract class DBTable {
         }
     }
 
-    protected synchronized void generateID(PreparedStatement stmt, int i, Record _rec) throws SQLException {
-        currentID++;
-        stmt.setInt(i, currentID);
-        _rec.setLastID(currentID);
-        Main.logger.debug("ID for table " + getTabName() + ": " + currentID + "; i:" + i + " rec: " + _rec.toString());
-    }
-
-    public int getCurrentID() {
-        return currentID;
-    }
-
-    public void setCurrentID(int currentID) {
-        this.currentID = currentID;
-    }
-
     void recordAdded() {
         recordsAdded++;
     }
-
 }

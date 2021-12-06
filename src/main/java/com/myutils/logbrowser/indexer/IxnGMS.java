@@ -112,8 +112,8 @@ public final class IxnGMS extends Message {
     };
     private String messageName = null;
 
-    public IxnGMS(TableType t) {
-        super(t);
+    public IxnGMS(TableType t, int fileID) {
+        super(t, fileID);
         attrs.add(reIxnID);
         attrs.add(reAgentID);
         attrs.add(placeID);
@@ -125,8 +125,8 @@ public final class IxnGMS extends Message {
 
     }
 
-    public IxnGMS(String fromTo, String msgName) {
-        this(TableType.IxnGMS);
+    public IxnGMS(String fromTo, String msgName, int fileID) {
+        this(TableType.IxnGMS, fileID);
         this.messageName = msgName;
         SetInbound(fromTo != null && fromTo.toLowerCase().startsWith("from"));
     }

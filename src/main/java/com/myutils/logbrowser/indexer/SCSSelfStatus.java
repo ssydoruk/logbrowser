@@ -19,12 +19,12 @@ public class SCSSelfStatus extends Message {
     private String status;
     private String host;
 
-    public SCSSelfStatus() {
-        super(TableType.SCSSelfStatus);
+    public SCSSelfStatus( int fileID) {
+        super(TableType.SCSSelfStatus, fileID);
     }
 
-    SCSSelfStatus(ArrayList<String> m_MessageContents) {
-        super(TableType.SCSSelfStatus, m_MessageContents);
+    SCSSelfStatus(ArrayList<String> m_MessageContents, int fileID) {
+        super(TableType.SCSSelfStatus, m_MessageContents, fileID);
     }
 
     public String getHost() {

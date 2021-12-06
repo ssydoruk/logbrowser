@@ -34,8 +34,8 @@ public final class URSStrategy extends Message {
 
     //    private static final Pattern regCampaignDBID= Pattern.compile("CampaignDBID: ([^;]+);");
     URSStrategy(ArrayList m_MessageContents, String ConnID, String FileLine,
-                String lineRest) {
-        super(TableType.URSStrategy);
+                String lineRest,  int fileID) {
+        super(TableType.URSStrategy, fileID);
         this.m_MessageLines = m_MessageContents;
         this.FileLine = FileLine;
         this.ConnID = ConnID;
@@ -43,16 +43,16 @@ public final class URSStrategy extends Message {
         Main.logger.trace(this.toString());
     }
 
-    URSStrategy(String line, String ConnID, String FileLine, String lineRest) {
-        super(TableType.URSStrategy, line);
+    URSStrategy(String line, String ConnID, String FileLine, String lineRest, int fileID) {
+        super(TableType.URSStrategy, line, fileID);
         this.FileLine = FileLine;
         this.ConnID = ConnID;
         this.rest = lineRest;
         Main.logger.trace(this.toString());
     }
 
-    URSStrategy(String lastConnID, String FileLine, ArrayList m_MessageContents) {
-        super(TableType.URSStrategy);
+    URSStrategy(String lastConnID, String FileLine, ArrayList m_MessageContents, int fileID) {
+        super(TableType.URSStrategy, fileID);
         this.m_MessageLines = m_MessageContents;
         this.FileLine = FileLine;
         this.ConnID = lastConnID;

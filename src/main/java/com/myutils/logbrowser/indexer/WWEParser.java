@@ -163,6 +163,7 @@ public class WWEParser extends WebParser {
         m_CurrentLine = line;
         skipNextLine = false;
         skipMessage = false;
+        setFileInfo(fi);
 
         URL = null;
         app = null;
@@ -281,7 +282,7 @@ public class WWEParser extends WebParser {
                     msg = new ExceptionMessage(
                             m_MessageContents,
                             m_msgName,
-                            m_msg1
+                            m_msg1,  fileInfo.getRecordID()
                     );
                     m_ParserState = ParserState.STATE_EXCEPTION;
                     setSavedFilePos(getFilePos());
@@ -872,7 +873,7 @@ public class WWEParser extends WebParser {
     }
 
     private void addTLibMessage() throws Exception {
-        WWEMessage _msg = new WWEMessage(m_msgName, m_TserverSRC, m_MessageContents, isParseTimeDiff());
+        WWEMessage _msg = new WWEMessage(m_msgName, m_TserverSRC, m_MessageContents, isParseTimeDiff(),  fileInfo.getRecordID());
         SetStdFieldsAndAdd(_msg);
     }
 
@@ -882,7 +883,7 @@ public class WWEParser extends WebParser {
         ExceptionMessage _msg = new ExceptionMessage(
                 m_MessageContents,
                 m_msgName,
-                m_msg1
+                m_msg1,  fileInfo.getRecordID()
         );
         SetStdFieldsAndAdd(_msg);
 
@@ -1139,7 +1140,7 @@ public class WWEParser extends WebParser {
         private String ixnID;
 
         private WWEStatServerMsg(TableType t) {
-            super(t);
+            super(t,  fileInfo.getRecordID());
         }
 
         private WWEStatServerMsg() {
@@ -1466,7 +1467,7 @@ public class WWEParser extends WebParser {
                 @Override
                 public void fillStatement(PreparedStatement stmt) throws SQLException {
                     stmt.setTimestamp(1, new Timestamp(rec.GetAdjustedUsecTime()));
-                    stmt.setInt(2, WWEStatServerMsg.getFileId());
+                    stmt.setInt(2, rec.getFileID());
                     stmt.setLong(3, rec.getM_fileOffset());
                     stmt.setLong(4, rec.getM_FileBytes());
                     stmt.setLong(5, rec.getM_line());
@@ -1516,7 +1517,7 @@ public class WWEParser extends WebParser {
         private String ixnID;
 
         private WWEDebugMsg(TableType t) {
-            super(t);
+            super(t,  fileInfo.getRecordID());
         }
 
         private WWEDebugMsg() {
@@ -1845,7 +1846,7 @@ public class WWEParser extends WebParser {
                 @Override
                 public void fillStatement(PreparedStatement stmt) throws SQLException{
                 stmt.setTimestamp(1, new Timestamp(rec.GetAdjustedUsecTime()));
-                stmt.setInt(2, WWEDebugMsg.getFileId());
+                stmt.setInt(2, rec.getFileID());
                 stmt.setLong(3, rec.getM_fileOffset());
                 stmt.setLong(4, rec.getM_FileBytes());
                 stmt.setLong(5, rec.getM_line());
@@ -2075,7 +2076,7 @@ public class WWEParser extends WebParser {
                 @Override
                 public void fillStatement(PreparedStatement stmt) throws SQLException{
                 stmt.setTimestamp(1, new Timestamp(rec.GetAdjustedUsecTime()));
-                stmt.setInt(2, WWEBayeuxSMsg.getFileId());
+                stmt.setInt(2, rec.getFileID());
                 stmt.setLong(3, rec.getM_fileOffset());
                 stmt.setLong(4, rec.getM_FileBytes());
                 stmt.setLong(5, rec.getM_line());
@@ -2203,7 +2204,7 @@ public class WWEParser extends WebParser {
                 @Override
                 public void fillStatement(PreparedStatement stmt) throws SQLException{
                 stmt.setTimestamp(1, new Timestamp(rec.GetAdjustedUsecTime()));
-                stmt.setInt(2, WWEUCSMsg.getFileId());
+                stmt.setInt(2, rec.getFileID());
                 stmt.setLong(3, rec.getM_fileOffset());
                 stmt.setLong(4, rec.getM_FileBytes());
                 stmt.setLong(5, rec.getM_line());
@@ -2246,7 +2247,7 @@ public class WWEParser extends WebParser {
         private String ixnID;
 
         private WWEIxnServerMsg(String group) {
-            super(TableType.WWEIxnMessage);
+            super(TableType.WWEIxnMessage,  fileInfo.getRecordID());
             this.msgName = group;
         }
 
@@ -2452,7 +2453,7 @@ public class WWEParser extends WebParser {
                 @Override
                 public void fillStatement(PreparedStatement stmt) throws SQLException{
                 stmt.setTimestamp(1, new Timestamp(rec.GetAdjustedUsecTime()));
-                stmt.setInt(2, WWEIxnServerMsg.getFileId());
+                stmt.setInt(2, rec.getFileID());
                 stmt.setLong(3, rec.getM_fileOffset());
                 stmt.setLong(4, rec.getM_FileBytes());
                 stmt.setLong(5, rec.getM_line());
@@ -2556,7 +2557,7 @@ public class WWEParser extends WebParser {
                 @Override
                 public void fillStatement(PreparedStatement stmt) throws SQLException{
                 stmt.setTimestamp(1, new Timestamp(rec.GetAdjustedUsecTime()));
-                stmt.setInt(2, WWEUCSConfigMsg.getFileId());
+                stmt.setInt(2, rec.getFileID());
                 stmt.setLong(3, rec.getM_fileOffset());
                 stmt.setLong(4, rec.getM_FileBytes());
                 stmt.setLong(5, rec.getM_line());

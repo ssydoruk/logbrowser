@@ -27,8 +27,8 @@ public class URSStat extends Message {
     private String EmailStat;
     private String StatServer;
 
-    public URSStat(ArrayList messageLines) {
-        super(TableType.URSSTAT, messageLines);
+    public URSStat(ArrayList messageLines, int fileID) {
+        super(TableType.URSSTAT, messageLines, fileID);
 
         Matcher m;
         if ((m = regStatObject.matcher(m_MessageLines.get(0))).find()) {

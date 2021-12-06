@@ -23,8 +23,8 @@ public class GMSPostMessage extends Message {
     private boolean POSTParsed = false;
     private Pair<String, String> parseORSURI = null;
 
-    GMSPostMessage(ArrayList<String> m_MessageContents) {
-        super(TableType.GMSPOST, m_MessageContents);
+    GMSPostMessage(ArrayList<String> m_MessageContents, int fileID) {
+        super(TableType.GMSPOST, m_MessageContents, fileID);
     }
 
     public boolean isIsTServerReq() {

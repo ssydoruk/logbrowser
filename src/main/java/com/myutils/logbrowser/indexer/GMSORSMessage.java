@@ -17,23 +17,23 @@ public class GMSORSMessage extends Message {
     private boolean isException = false;
     private String req = null;
 
-    GMSORSMessage(ArrayList<String> m_MessageContents) {
-        super(TableType.GMSORSMessage, m_MessageContents);
+    GMSORSMessage(ArrayList<String> m_MessageContents, int fileID) {
+        super(TableType.GMSORSMessage, m_MessageContents, fileID);
     }
 
-    GMSORSMessage(String threadID, String rest) {
-        super(TableType.GMSORSMessage, rest);
+    GMSORSMessage(String threadID, String rest, int fileID) {
+        super(TableType.GMSORSMessage, rest, fileID);
         this.theThreadID = threadID;
         parseORSURI = parseORSURI(rest);
     }
 
-    GMSORSMessage(String newThread, ArrayList<String> m_MessageContents) {
-        super(TableType.GMSORSMessage, m_MessageContents);
+    GMSORSMessage(String newThread, ArrayList<String> m_MessageContents, int fileID) {
+        super(TableType.GMSORSMessage, m_MessageContents, fileID);
         this.theThreadID = newThread;
     }
 
-    GMSORSMessage(String newThread) {
-        super(TableType.GMSORSMessage);
+    GMSORSMessage(String newThread, int fileID) {
+        super(TableType.GMSORSMessage, fileID);
         this.theThreadID = newThread;
     }
 

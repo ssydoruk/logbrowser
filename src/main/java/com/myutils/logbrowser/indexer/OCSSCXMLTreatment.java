@@ -17,8 +17,8 @@ public class OCSSCXMLTreatment extends Message {
     private final String chainID;
     private final String rest;
 
-    OCSSCXMLTreatment(String campDBID, String recHandle, String chainID, String rest) {
-        super(TableType.OCSSCXMLTreatment);
+    OCSSCXMLTreatment(String campDBID, String recHandle, String chainID, String rest, int fileID) {
+        super(TableType.OCSSCXMLTreatment, fileID);
         this.campDBID = campDBID;
         this.recHandle = recHandle;
         this.chainID = chainID;

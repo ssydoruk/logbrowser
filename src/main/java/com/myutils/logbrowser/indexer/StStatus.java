@@ -23,8 +23,8 @@ public class StStatus extends Message {
 
     private String dn = null;
 
-    public StStatus(String name, ArrayList messageLines) {
-        super(TableType.StStatus, messageLines);
+    public StStatus(String name, ArrayList messageLines, int fileID) {
+        super(TableType.StStatus, messageLines, fileID);
         Matcher m;
         if ((m = regStatusLineAgent.matcher(name)).find()) {
             plGroup = m.group(1);
@@ -42,8 +42,8 @@ public class StStatus extends Message {
         }
     }
 
-    StStatus(String plGroup, String name, String _OldStatus, String _NewStatus) {
-        super(TableType.StStatus);
+    StStatus(String plGroup, String name, String _OldStatus, String _NewStatus, int fileID) {
+        super(TableType.StStatus,fileID);
         this.plGroup = plGroup;
         if (plGroup.startsWith("A")) {
             agent = name;

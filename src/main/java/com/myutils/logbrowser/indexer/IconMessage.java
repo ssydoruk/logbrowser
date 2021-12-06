@@ -17,7 +17,8 @@ public class IconMessage extends Message {
     private static int m_statementId;
     String m_MessageName;
 
-    public IconMessage(String event, ArrayList newMessageLines) {
+    public IconMessage(String event, ArrayList newMessageLines, int fileID) {
+        super(TableType.ICONMessage, fileID);
         m_MessageLines = newMessageLines;
         m_MessageName = event;
         m_MessageLines.add(0, event);
@@ -92,7 +93,7 @@ public class IconMessage extends Message {
             DBTable.setFieldString(stmt, 6, finalAni);
             DBTable.setFieldString(stmt, 7, GetConnID());
             DBTable.setFieldString(stmt, 8, GetTransferConnID());
-            stmt.setInt(9, getFileId());
+            stmt.setInt(9, getFileID());
             stmt.setLong(10, getM_fileOffset());
             stmt.setLong(11, getFileBytes());
             stmt.setInt(12, 0);

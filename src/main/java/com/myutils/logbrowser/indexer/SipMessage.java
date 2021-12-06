@@ -12,10 +12,8 @@ import java.util.HashSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-/**
- * @author aglagole
- */
-public class SipMessage extends Message {
+
+public class SipMessage extends SIPServerBaseMessage {
 
     private static final String _prefix = "\n";
     private static final String _suffix = "\r";
@@ -37,8 +35,12 @@ public class SipMessage extends Message {
     private String via;
     private String sipURI = null;
 
-    public SipMessage(ArrayList<String> contents, TableType t) {
-        super(t);
+    public SipMessage(ArrayList<String> contents, TableType t,  int fileID) {
+        this(contents, t, false, 0, fileID);
+    }
+
+    public SipMessage(ArrayList<String> contents, TableType t,boolean m_handlerInProgress, int m_handlerId,  int fileID) {
+        super(t,  m_handlerInProgress,  m_handlerId, fileID);
         m_MessageLines.clear();
         for (Object content : contents) {
             String s = (String) content;
@@ -75,7 +77,7 @@ public class SipMessage extends Message {
     }
 
     Integer getHandlerInProgress() {
-        return (m_handlerInProgress ? m_handlerId : 0);
+        return (isM_handlerInProgress() ? getM_handlerId() : 0);
     }
 
     public String getSipURI() {

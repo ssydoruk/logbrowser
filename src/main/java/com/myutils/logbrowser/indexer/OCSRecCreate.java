@@ -27,8 +27,8 @@ public class OCSRecCreate extends Message {
     private String tabName;
     private boolean isCreate = true;
 
-    public OCSRecCreate(ArrayList newMessageLines) {
-        this();
+    public OCSRecCreate(ArrayList newMessageLines, int fileID) {
+        this( fileID);
         m_MessageLines = newMessageLines;
         Matcher m;
 //        Main.logger.info("OCSRecCreate" + ((m_MessageLines == null) ? "NULL" : m_MessageLines.toString()));
@@ -40,8 +40,8 @@ public class OCSRecCreate extends Message {
         }
     }
 
-    OCSRecCreate() {
-        super(TableType.OCSRecCreate);
+    OCSRecCreate( int fileID) {
+        super(TableType.OCSRecCreate, fileID);
     }
 
     public void setIsCreate(boolean isCreate) {

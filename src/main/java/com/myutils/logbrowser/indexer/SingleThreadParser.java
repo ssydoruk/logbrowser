@@ -24,15 +24,6 @@ import static com.myutils.logbrowser.indexer.SingleThreadParser.ParserState.*;
  * @author ssydoruk
  */
 public class SingleThreadParser extends Parser {
-    boolean m_handlerInProgress;
-
-     static AtomicInteger m_handlerId = new AtomicInteger(0);
-    static AtomicInteger m_sipId = new AtomicInteger(0);
-    static AtomicInteger m_tlibId = new AtomicInteger(0);
-    static AtomicInteger m_jsonId = new AtomicInteger(0);
-    static AtomicInteger m_proxiedId = new AtomicInteger(0);
-
-
     public static final int MAX_1536_ATTRIBUTES = 40;
     static final String[] BlockNamesToIgnoreArray = {
             "NET:TCO:EventResourceInfo:",
@@ -84,9 +75,9 @@ public class SingleThreadParser extends Parser {
     private final static HashSet<String> eventsWithCallInfo = new HashSet<String>(
             Arrays.asList("EventRegistered",
                     "EventAddressInfo"));
-     private static final Pattern regISCCHead = Pattern.compile("^[\\d\\s]+\\[ISCC\\] (Received|Send).+: message (\\w+)$");
-     private static final Pattern regJSONFinished = Pattern.compile("^GenHttpRequest.+destroyed$");
-     private static final Pattern patternHandleBlock = Pattern.compile("^((([0-9a-zA-Z_-]*:)+)\\d+):?\\d*$");
+    private static final Pattern regISCCHead = Pattern.compile("^[\\d\\s]+\\[ISCC\\] (Received|Send).+: message (\\w+)$");
+    private static final Pattern regJSONFinished = Pattern.compile("^GenHttpRequest.+destroyed$");
+    private static final Pattern patternHandleBlock = Pattern.compile("^((([0-9a-zA-Z_-]*:)+)\\d+):?\\d*$");
     private static final Pattern regHandlerCutSeconds = Pattern.compile("^((?:(?:\\D[^:]+):)++\\d+)");
     private static final Pattern regOldConnID = Pattern.compile("was (\\w+)\\)$");
     private static final Pattern regNewConnID = Pattern.compile("\\@ c:(\\w+),");
@@ -99,11 +90,31 @@ public class SingleThreadParser extends Parser {
     private static final String sipRegGenerated = "requests GENERATED_";
     private static final String sipResGenerated = "response GENERATED_";
     private static final Pattern regKeyValueLine = Pattern.compile("(\\w+)=(?:\"([^\"]+)\"|(\\w+))");
-     private boolean ifSIPLines = false;
-    private  boolean ifSIPLinesForce = false;
-    private  boolean gaveWarning = false;
+
+    private int m_handlerId;
+    private int m_sipId;
+    private int m_tlibId;
+    private int m_jsonId;
+
+    public int getM_handlerId() {
+        return m_handlerId;
+    }
+
+    public int getM_sipId() {
+        return m_sipId;
+    }
+
+    public int getM_tlibId() {
+        return m_tlibId;
+    }
+
+    public int getM_jsonId() {
+        return m_jsonId;
+    }
+
     final int MSG_STRING_LIMIT = 200;
     private final ArrayList<String> extraBuff;
+    boolean m_handlerInProgress;
     // parse state contants
     HashSet m_BlockNamesToIgnoreHash;
     StringBuilder sipBuf = new StringBuilder();
@@ -115,13 +126,14 @@ public class SingleThreadParser extends Parser {
     int m_headerLine;
     boolean m_isInbound;
     boolean m_isContentLengthUnknown;
-
     //boolean m_lastMsgSip = false;
     int m_lastMsgType = -1;
-    // 0-tlib, 1-sip, 2-json
-
     String m_lastTime;
     SIP1536OtherMessage sip1536OtherMessage = null;
+    private boolean ifSIPLines = false;
+    // 0-tlib, 1-sip, 2-json
+    private boolean ifSIPLinesForce = false;
+    private boolean gaveWarning = false;
     private ParserState m_ParserState;
     private String msgName;
     private boolean inbound;
@@ -147,8 +159,9 @@ public class SingleThreadParser extends Parser {
     public int ParseFrom(BufferedReaderCrLf input, long offset, int line, FileInfo fi) {
         m_CurrentFilePos = offset;
         m_CurrentLine = line;
-        m_handlerInProgress=false;
-        fileType = fi.getFileType();
+        m_handlerInProgress = false;
+        setFileInfo(fi);
+
         long name = fi.getAppNameID() + fi.getFileStartTimeRound();
         this.handleAdd = "|" + name;
         Main.logger.debug("handlerAdd:" + handleAdd);
@@ -268,7 +281,7 @@ public class SingleThreadParser extends Parser {
                 return ParseLine1536(input, str);
         }
 
-        ParseCustom(str, (SipMessage.m_handlerInProgress ? SipMessage.m_handlerId : 0));
+        ParseCustom(str, (m_handlerInProgress ? m_handlerId : 0));
         switch (m_ParserState) {
             case STATE_HEADER: {
                 if (s.startsWith("File:")) {
@@ -290,7 +303,7 @@ public class SingleThreadParser extends Parser {
                 m_lineStarted = m_CurrentLine;
 
                 if ((m = regConfigOneLineDN.matcher(str)).find()) {
-                    ConfigUpdateRecord msg = new ConfigUpdateRecord(str);
+                    ConfigUpdateRecord msg = new ConfigUpdateRecord(str,  fileInfo.getRecordID());
                     try {
                         msg.setObjectType("DN");
                         msg.setObjectDBID(m.group(1));
@@ -309,7 +322,7 @@ public class SingleThreadParser extends Parser {
                     HandleBlock(m.group(1), s.substring(m.end()));
 //                } else if (trimmed.contains(" Proxy(") || str.startsWith("Proxy(")) {
                 } else if ((m = regProxy.matcher(s)).find()) {
-                    ProxiedMessage msg = new ProxiedMessage(m.group(1), s.substring(m.end()));
+                    ProxiedMessage msg = new ProxiedMessage(m.group(1), s.substring(m.end()), getFileID());
                     SetStdFieldsAndAdd(msg);
 
                     return null;
@@ -429,7 +442,7 @@ public class SingleThreadParser extends Parser {
                     setSavedFilePos(getFilePos());
                     break;
                 } else if ((regJSONFinished.matcher(s)).find()) {
-                    m_handlerInProgress=false;
+                    m_handlerInProgress = false;
                     break;
 
                 } else if (((lastLogMsg = getLastLogMsg()) != null && (regTLibMessageLog.matcher(lastLogMsg.getLastGenesysMsgID())).find())
@@ -442,7 +455,7 @@ public class SingleThreadParser extends Parser {
                     m_HeaderOffset = m_CurrentFilePos;
                     m_headerLine = m_CurrentLine;
                     m_MessageContents.clear();
-                    msgInProgress = new TLibMessage(lastLogMsg);
+                    msgInProgress = new TLibMessage(lastLogMsg, m_handlerInProgress,  m_handlerId, fileInfo.getRecordID());
                     m_ParserState = STATE_TLIB_MESSAGE;
                     setSavedFilePos(getFilePos());
                     break;
@@ -847,7 +860,7 @@ public class SingleThreadParser extends Parser {
 //            PrintMsg(contents);
 //            return;
 //        }
-        msg = new SipMessage(contents, TableType.SIP);
+        msg = new SipMessage(contents, TableType.SIP,  m_handlerInProgress,  m_handlerId,  fileInfo.getRecordID());
 
         if (msg.GetFrom() == null) {
             Main.logger.error("LOG ERROR: no From in SIP message, ignore, line " + m_CurrentLine);
@@ -1028,7 +1041,7 @@ public class SingleThreadParser extends Parser {
             if (contentType != null && contentType.equals("application/x-genesys-mediaserver-status")
                     && contentEvent != null && contentEvent.equals("x-genesys-mediaserver-status")) {
                 Main.logger.debug("Cancel trigger on NOTIFY (Event=x-genesys-mediaserver-status)");
-                m_handlerInProgress=false;
+                m_handlerInProgress = false;
             }
         }
 
@@ -1071,16 +1084,19 @@ public class SingleThreadParser extends Parser {
                         msg1.setUUID(extentionCall.getUUID());
                         if (newSeqNo(msg1)) {
                             SetStdFieldsAndAdd(msg1);
+                            m_tlibId=msg1.getRecordID();
                         }
                     }
                 }
                 if (newSeqNo(msg)) {
                     SetStdFieldsAndAdd(msg);
+                    m_tlibId=msg.getRecordID();
                 }
 
             } else {
                 if (newSeqNo(msg)) {
                     SetStdFieldsAndAdd(msg);
+                    m_tlibId=msg.getRecordID();
                 }
             }
             m_lastMsgType = 0;
@@ -1118,7 +1134,7 @@ public class SingleThreadParser extends Parser {
                 return;
             }
 
-            JsonMessage msg = new JsonMessage(obj);
+            JsonMessage msg = new JsonMessage(obj,   m_handlerInProgress,  m_handlerId,  fileInfo.getRecordID());
             msg.setM_Timestamp((dpHeader != null) ? dpHeader : ParseFormatDate(m_lastTime));
             msg.SetInbound(header.startsWith("HTTP/1."));
 //            int headerLine = m_CurrentLine - contents.size();
@@ -1140,6 +1156,7 @@ public class SingleThreadParser extends Parser {
             }
 
             SetStdFieldsAndAdd(msg);
+            m_jsonId=msg.getRecordID();
 
         } catch (Exception e) {
             Main.logger.error("l:" + m_CurrentLine + " - Could not parse JSON object: " + contents + "\n" + e);
@@ -1150,7 +1167,7 @@ public class SingleThreadParser extends Parser {
 
     protected void AddIsccMessage(ArrayList contents, String header) throws Exception {
         if (msgName != null) {
-            IsccMessage msg = new IsccMessage(msgName, contents);
+            IsccMessage msg = new IsccMessage(msgName, contents, m_handlerInProgress,  m_handlerId, fileInfo.getRecordID());
             msg.SetInbound(inbound);
             SetStdFieldsAndAdd(msg);
         } else {
@@ -1218,7 +1235,7 @@ public class SingleThreadParser extends Parser {
         Main.logger.trace("saveTrigger [" + text + "] [" + m_lastMsgType + "] [" + m_handlerInProgress + "]");
 //        if (!isIgnoreMsg(text)) {
         if (m_lastMsgType >= 0 && m_handlerInProgress) {
-            Trigger trigger = new Trigger();
+            Trigger trigger = new Trigger(getFileID(), this);
             trigger.SetMsgId(m_lastMsgType);
 //                trigger.SetLine(m_CurrentLine);
 //                trigger.SetOffset(m_CurrentFilePos);
@@ -1237,8 +1254,9 @@ public class SingleThreadParser extends Parser {
 //                    || text.startsWith("NET:CTI:deviceSync")) {
 //                haMessage = true;
 //            }
-            m_handlerInProgress=true;
-            Handler handler = new Handler();
+            m_handlerInProgress = true;
+            Handler handler = new Handler(getFileID());
+            m_handlerId = handler.getRecordID();
             handler.SetLine(m_CurrentLine);
             handler.SetOffset(m_CurrentFilePos);
             handler.SetText(text);
@@ -1246,13 +1264,13 @@ public class SingleThreadParser extends Parser {
 
         } else {
             haMessage = false;
-            m_handlerInProgress=false;
+            m_handlerInProgress = false;
         }
     }
 
     protected void AddCireqMessage(ArrayList contents, String header) throws Exception {
         Matcher m;
-        CIFaceRequest req = new CIFaceRequest();
+        CIFaceRequest req = new CIFaceRequest(  m_handlerInProgress,  m_handlerId,  fileInfo.getRecordID());
 
         String[] headerList = header.split(" ");
         req.SetName(headerList[1]);
@@ -1279,10 +1297,10 @@ public class SingleThreadParser extends Parser {
         start += 14;
         connId = str.substring(start, start + 16);
         if (str.contains("{constructed}")) {
-            ConnIdRecord rec = new ConnIdRecord(connId, true);
+            ConnIdRecord rec = new ConnIdRecord(connId, true,  m_handlerInProgress,  m_handlerId,   fileInfo.getRecordID());
             SetStdFieldsAndAdd(rec);
         } else if (str.contains("{destructed}")) {
-            ConnIdRecord rec = new ConnIdRecord(connId, false);
+            ConnIdRecord rec = new ConnIdRecord(connId, false,  m_handlerInProgress,  m_handlerId,  fileInfo.getRecordID());
             SetStdFieldsAndAdd(rec);
         }
     }
@@ -1307,7 +1325,7 @@ public class SingleThreadParser extends Parser {
         if (oldId.isEmpty() || newId.isEmpty()) {
             return; //something's wrong
         }
-        ConnIdRecord rec = new ConnIdRecord(oldId, newId, false);
+        ConnIdRecord rec = new ConnIdRecord(oldId, newId, false,  m_handlerInProgress,  m_handlerId,  fileInfo.getRecordID());
         rec.setTempConnid(true);
         SetStdFieldsAndAdd(rec);
 //        rec = new ConnIdRecord(newId, true);
@@ -1319,7 +1337,7 @@ public class SingleThreadParser extends Parser {
     }
 
     private void AddConfigMessage(ArrayList<String> m_MessageContents) {
-        ConfigUpdateRecord msg = new ConfigUpdateRecord(m_MessageContents);
+        ConfigUpdateRecord msg = new ConfigUpdateRecord(m_MessageContents,  fileInfo.getRecordID());
         try {
             Matcher m;
             if (m_MessageContents.size() > 0 && (m = regSIPServerStartDN.matcher(m_MessageContents.get(0))).find()) {
@@ -1357,14 +1375,14 @@ public class SingleThreadParser extends Parser {
     @Override
     void init(HashMap<TableType, DBTable> m_tables) {
         synchronized (m_tables) {
-            if(!m_tables.containsKey(TableType.SIP1536Other))
-            m_tables.put(TableType.SIP1536Other, new SIP1536OtherTable(Main.getInstance().getM_accessor(), TableType.SIP1536Other));
-            if(!m_tables.containsKey(TableType.SIP1536Trunk))
-            m_tables.put(TableType.SIP1536Trunk, new SIP1536TrunkTable(Main.getInstance().getM_accessor(), TableType.SIP1536Trunk));
-            if(!m_tables.containsKey(TableType.SIP1536ReqResp))
-            m_tables.put(TableType.SIP1536ReqResp, new SIP1536RequestResponseTable(Main.getInstance().getM_accessor(), TableType.SIP1536ReqResp));
-            if(!m_tables.containsKey(TableType.TLIBTimerRedirect))
-            m_tables.put(TableType.TLIBTimerRedirect, new TLibTimerRedirectTable(Main.getInstance().getM_accessor(), TableType.TLIBTimerRedirect));
+            if (!m_tables.containsKey(TableType.SIP1536Other))
+                m_tables.put(TableType.SIP1536Other, new SIP1536OtherTable(Main.getInstance().getM_accessor(), TableType.SIP1536Other));
+            if (!m_tables.containsKey(TableType.SIP1536Trunk))
+                m_tables.put(TableType.SIP1536Trunk, new SIP1536TrunkTable(Main.getInstance().getM_accessor(), TableType.SIP1536Trunk));
+            if (!m_tables.containsKey(TableType.SIP1536ReqResp))
+                m_tables.put(TableType.SIP1536ReqResp, new SIP1536RequestResponseTable(Main.getInstance().getM_accessor(), TableType.SIP1536ReqResp));
+            if (!m_tables.containsKey(TableType.TLIBTimerRedirect))
+                m_tables.put(TableType.TLIBTimerRedirect, new TLibTimerRedirectTable(Main.getInstance().getM_accessor(), TableType.TLIBTimerRedirect));
         }
     }
 
@@ -1493,7 +1511,7 @@ public class SingleThreadParser extends Parser {
         private final String key;
 
         private SIP1536OtherMessage(String string) throws Exception {
-            super(TableType.SIP1536Other);
+            super(TableType.SIP1536Other,  fileInfo.getRecordID());
             if (string == null || string.isEmpty()) {
                 throw new Exception("Key cannot be empty");
             }
@@ -1587,35 +1605,34 @@ public class SingleThreadParser extends Parser {
         }
 
         @Override
-            public void AddToDB(Record _rec) throws SQLException {
+        public void AddToDB(Record _rec) throws SQLException {
             SIP1536OtherMessage rec = (SIP1536OtherMessage) _rec;
-             getM_dbAccessor().addToDB(m_InsertStatementId, new IFillStatement() {
+            getM_dbAccessor().addToDB(m_InsertStatementId, new IFillStatement() {
                 @Override
-                public void fillStatement(PreparedStatement stmt) throws SQLException{
-                stmt.setTimestamp(1, new Timestamp(rec.GetAdjustedUsecTime()));
-                stmt.setInt(2, SCSAppStatus.getFileId());
-                stmt.setLong(3, rec.getM_fileOffset());
-                stmt.setLong(4, rec.getM_FileBytes());
-                stmt.setLong(5, rec.getM_line());
-                setFieldInt(stmt, 6, Main.getRef(ReferenceType.Misc, rec.getKey()));
+                public void fillStatement(PreparedStatement stmt) throws SQLException {
+                    stmt.setTimestamp(1, new Timestamp(rec.GetAdjustedUsecTime()));
+                    stmt.setInt(2, rec.getFileID());
+                    stmt.setLong(3, rec.getM_fileOffset());
+                    stmt.setLong(4, rec.getM_FileBytes());
+                    stmt.setLong(5, rec.getM_line());
+                    setFieldInt(stmt, 6, Main.getRef(ReferenceType.Misc, rec.getKey()));
 
-                int baseRecNo = 7;
-                Map<String, String> attrs = rec.getAttrs();
-                int i = 0;
-                for (Map.Entry<String, String> entry : attrs.entrySet()) {
-                    setFieldInt(stmt, baseRecNo + i * 2, Main.getRef(ReferenceType.Misc, entry.getKey()));
-                    setFieldString(stmt, baseRecNo + i * 2 + 1, entry.getValue());
-                    if (++i >= MAX_1536_ATTRIBUTES) {
-                        Main.logger.debug(rec.getM_line() + ": more attributes then max (" + MAX_1536_ATTRIBUTES + ") - "
-                                + attrs.size() + ":" + attrs);
-                        break;
+                    int baseRecNo = 7;
+                    Map<String, String> attrs = rec.getAttrs();
+                    int i = 0;
+                    for (Map.Entry<String, String> entry : attrs.entrySet()) {
+                        setFieldInt(stmt, baseRecNo + i * 2, Main.getRef(ReferenceType.Misc, entry.getKey()));
+                        setFieldString(stmt, baseRecNo + i * 2 + 1, entry.getValue());
+                        if (++i >= MAX_1536_ATTRIBUTES) {
+                            Main.logger.debug(rec.getM_line() + ": more attributes then max (" + MAX_1536_ATTRIBUTES + ") - "
+                                    + attrs.size() + ":" + attrs);
+                            break;
+                        }
                     }
+
                 }
-
-                            }
-        });
-    }
-
+            });
+        }
 
 
     }
@@ -1626,7 +1643,7 @@ public class SingleThreadParser extends Parser {
         private String trunk = null;
 
         private SIP1536TrunkStatistics(String string) throws Exception {
-            super(TableType.SIP1536Trunk);
+            super(TableType.SIP1536Trunk,  fileInfo.getRecordID());
             if (string == null || string.isEmpty()) {
                 throw new Exception("Key cannot be empty");
             }
@@ -1708,35 +1725,34 @@ public class SingleThreadParser extends Parser {
         }
 
         @Override
-            public void AddToDB(Record _rec) throws SQLException {
+        public void AddToDB(Record _rec) throws SQLException {
             SIP1536TrunkStatistics rec = (SIP1536TrunkStatistics) _rec;
-             getM_dbAccessor().addToDB(m_InsertStatementId, new IFillStatement() {
+            getM_dbAccessor().addToDB(m_InsertStatementId, new IFillStatement() {
                 @Override
-                public void fillStatement(PreparedStatement stmt) throws SQLException{
-                stmt.setTimestamp(1, new Timestamp(rec.GetAdjustedUsecTime()));
-                stmt.setInt(2, SCSAppStatus.getFileId());
-                stmt.setLong(3, rec.getM_fileOffset());
-                stmt.setLong(4, rec.getM_FileBytes());
-                stmt.setLong(5, rec.getM_line());
-                setFieldInt(stmt, 6, Main.getRef(ReferenceType.DN, rec.cleanDN(rec.getTrunk())));
+                public void fillStatement(PreparedStatement stmt) throws SQLException {
+                    stmt.setTimestamp(1, new Timestamp(rec.GetAdjustedUsecTime()));
+                    stmt.setInt(2, rec.getFileID());
+                    stmt.setLong(3, rec.getM_fileOffset());
+                    stmt.setLong(4, rec.getM_FileBytes());
+                    stmt.setLong(5, rec.getM_line());
+                    setFieldInt(stmt, 6, Main.getRef(ReferenceType.DN, rec.cleanDN(rec.getTrunk())));
 
-                int baseRecNo = 7;
-                Map<String, String> attrs = rec.getAttrs();
-                int i = 0;
-                for (Map.Entry<String, String> entry : attrs.entrySet()) {
-                    setFieldInt(stmt, baseRecNo + i * 2, Main.getRef(ReferenceType.Misc, entry.getKey()));
-                    setFieldString(stmt, baseRecNo + i * 2 + 1, entry.getValue());
-                    if (++i >= MAX_1536_ATTRIBUTES) {
-                        Main.logger.error(rec.getM_line() + ": more attributes then max (" + MAX_1536_ATTRIBUTES + ") - "
-                                + attrs.size() + ":" + attrs);
-                        break;
+                    int baseRecNo = 7;
+                    Map<String, String> attrs = rec.getAttrs();
+                    int i = 0;
+                    for (Map.Entry<String, String> entry : attrs.entrySet()) {
+                        setFieldInt(stmt, baseRecNo + i * 2, Main.getRef(ReferenceType.Misc, entry.getKey()));
+                        setFieldString(stmt, baseRecNo + i * 2 + 1, entry.getValue());
+                        if (++i >= MAX_1536_ATTRIBUTES) {
+                            Main.logger.error(rec.getM_line() + ": more attributes then max (" + MAX_1536_ATTRIBUTES + ") - "
+                                    + attrs.size() + ":" + attrs);
+                            break;
+                        }
                     }
+
                 }
-
-                            }
-        });
-    }
-
+            });
+        }
 
 
     }
@@ -1749,7 +1765,7 @@ public class SingleThreadParser extends Parser {
         private String amount;
 
         private SIP1536RequestResponse(String string, boolean request) throws Exception {
-            super(TableType.SIP1536ReqResp);
+            super(TableType.SIP1536ReqResp,  fileInfo.getRecordID());
             if (string == null || string.isEmpty()) {
                 throw new Exception("Key cannot be empty");
             }
@@ -1847,37 +1863,36 @@ public class SingleThreadParser extends Parser {
         }
 
         @Override
-            public void AddToDB(Record _rec) throws SQLException {
+        public void AddToDB(Record _rec) throws SQLException {
             SIP1536RequestResponse rec = (SIP1536RequestResponse) _rec;
-             getM_dbAccessor().addToDB(m_InsertStatementId, new IFillStatement() {
+            getM_dbAccessor().addToDB(m_InsertStatementId, new IFillStatement() {
                 @Override
-                public void fillStatement(PreparedStatement stmt) throws SQLException{
-                stmt.setTimestamp(1, new Timestamp(rec.GetAdjustedUsecTime()));
-                stmt.setInt(2, SCSAppStatus.getFileId());
-                stmt.setLong(3, rec.getM_fileOffset());
-                stmt.setLong(4, rec.getM_FileBytes());
-                stmt.setLong(5, rec.getM_line());
-                setFieldInt(stmt, 6, Main.getRef(ReferenceType.SIPMETHOD, rec.getMsg()));
-                setFieldInt(stmt, 7, rec.getAmount());
-                stmt.setBoolean(8, rec.isRequest());
+                public void fillStatement(PreparedStatement stmt) throws SQLException {
+                    stmt.setTimestamp(1, new Timestamp(rec.GetAdjustedUsecTime()));
+                    stmt.setInt(2, rec.getFileID());
+                    stmt.setLong(3, rec.getM_fileOffset());
+                    stmt.setLong(4, rec.getM_FileBytes());
+                    stmt.setLong(5, rec.getM_line());
+                    setFieldInt(stmt, 6, Main.getRef(ReferenceType.SIPMETHOD, rec.getMsg()));
+                    setFieldInt(stmt, 7, rec.getAmount());
+                    stmt.setBoolean(8, rec.isRequest());
 
-                int baseRecNo = 9;
-                Map<String, String> attrs = rec.getAttrs();
-                int i = 0;
-                for (Map.Entry<String, String> entry : attrs.entrySet()) {
-                    setFieldInt(stmt, baseRecNo + i * 2, Main.getRef(ReferenceType.Misc, entry.getKey()));
-                    setFieldString(stmt, baseRecNo + i * 2 + 1, entry.getValue());
-                    if (++i >= MAX_1536_ATTRIBUTES) {
-                        Main.logger.error(rec.getM_line() + ": more attributes then max (" + MAX_1536_ATTRIBUTES + ") - "
-                                + attrs.size() + ":" + attrs);
-                        break;
+                    int baseRecNo = 9;
+                    Map<String, String> attrs = rec.getAttrs();
+                    int i = 0;
+                    for (Map.Entry<String, String> entry : attrs.entrySet()) {
+                        setFieldInt(stmt, baseRecNo + i * 2, Main.getRef(ReferenceType.Misc, entry.getKey()));
+                        setFieldString(stmt, baseRecNo + i * 2 + 1, entry.getValue());
+                        if (++i >= MAX_1536_ATTRIBUTES) {
+                            Main.logger.error(rec.getM_line() + ": more attributes then max (" + MAX_1536_ATTRIBUTES + ") - "
+                                    + attrs.size() + ":" + attrs);
+                            break;
+                        }
                     }
+
                 }
-
-                            }
-        });
-    }
-
+            });
+        }
 
 
     }
@@ -1889,7 +1904,7 @@ public class SingleThreadParser extends Parser {
         private String connID = null;
 
         private TLibTimerRedirectMessage(String msg) throws Exception {
-            super(TableType.TLIBTimerRedirect);
+            super(TableType.TLIBTimerRedirect,  fileInfo.getRecordID());
             this.msg = msg;
         }
 
@@ -1963,24 +1978,23 @@ public class SingleThreadParser extends Parser {
         }
 
         @Override
-            public void AddToDB(Record _rec) throws SQLException {
+        public void AddToDB(Record _rec) throws SQLException {
             TLibTimerRedirectMessage rec = (TLibTimerRedirectMessage) _rec;
-             getM_dbAccessor().addToDB(m_InsertStatementId, new IFillStatement() {
+            getM_dbAccessor().addToDB(m_InsertStatementId, new IFillStatement() {
                 @Override
-                public void fillStatement(PreparedStatement stmt) throws SQLException{
-                stmt.setTimestamp(1, new Timestamp(rec.GetAdjustedUsecTime()));
-                stmt.setInt(2, SCSAppStatus.getFileId());
-                stmt.setLong(3, rec.getM_fileOffset());
-                stmt.setLong(4, rec.getM_FileBytes());
-                stmt.setLong(5, rec.getM_line());
-                setFieldInt(stmt, 6, Main.getRef(ReferenceType.TEvent, rec.getMsg()));
-                setFieldInt(stmt, 7, Main.getRef(ReferenceType.ConnID, rec.getConnID()));
-                setFieldInt(stmt, 8, Main.getRef(ReferenceType.TEventRedirectCause, rec.getCause()));
+                public void fillStatement(PreparedStatement stmt) throws SQLException {
+                    stmt.setTimestamp(1, new Timestamp(rec.GetAdjustedUsecTime()));
+                    stmt.setInt(2, rec.getFileID());
+                    stmt.setLong(3, rec.getM_fileOffset());
+                    stmt.setLong(4, rec.getM_FileBytes());
+                    stmt.setLong(5, rec.getM_line());
+                    setFieldInt(stmt, 6, Main.getRef(ReferenceType.TEvent, rec.getMsg()));
+                    setFieldInt(stmt, 7, Main.getRef(ReferenceType.ConnID, rec.getConnID()));
+                    setFieldInt(stmt, 8, Main.getRef(ReferenceType.TEventRedirectCause, rec.getCause()));
 
-                            }
-        });
-    }
-
+                }
+            });
+        }
 
 
     }

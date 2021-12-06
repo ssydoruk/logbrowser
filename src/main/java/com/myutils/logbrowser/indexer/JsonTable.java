@@ -55,29 +55,27 @@ public class JsonTable extends DBTable {
     @Override
     public void AddToDB(Record rec) throws SQLException {
         JsonMessage theRec = (JsonMessage) rec;
-         getM_dbAccessor().addToDB(m_InsertStatementId, new IFillStatement() {
-                @Override
-                public void fillStatement(PreparedStatement stmt) throws SQLException{
-            generateID(stmt, 1, theRec);
+        getM_dbAccessor().addToDB(m_InsertStatementId, new IFillStatement() {
+            @Override
+            public void fillStatement(PreparedStatement stmt) throws SQLException {
+                stmt.setInt(1, theRec.getRecordID());
 
-            stmt.setTimestamp(2, new Timestamp(theRec.GetAdjustedUsecTime()));
-            stmt.setBoolean(3, theRec.isInbound());
-            setFieldString(stmt, 4, theRec.GetOrigUri());
-            setFieldInt(stmt, 5, Main.getRef(ReferenceType.SIPURI, theRec.GetOrigUri()));
-            setFieldInt(stmt, 6, Main.getRef(ReferenceType.SIPURI, theRec.GetDestUri()));
-            stmt.setInt(7, theRec.GetSipsId());
-            stmt.setInt(8, JsonMessage.getFileId());
-            stmt.setLong(9, theRec.getM_fileOffset());
-            stmt.setLong(10, theRec.getFileBytes());
-            stmt.setInt(11, JsonMessage.m_sipId);
-            stmt.setInt(12, theRec.getM_line());
-            stmt.setInt(13, theRec.getHanglerID());
-            JsonMessage.SetJsonId(getCurrentID());
+                stmt.setTimestamp(2, new Timestamp(theRec.GetAdjustedUsecTime()));
+                stmt.setBoolean(3, theRec.isInbound());
+                setFieldString(stmt, 4, theRec.GetOrigUri());
+                setFieldInt(stmt, 5, Main.getRef(ReferenceType.SIPURI, theRec.GetOrigUri()));
+                setFieldInt(stmt, 6, Main.getRef(ReferenceType.SIPURI, theRec.GetDestUri()));
+                stmt.setInt(7, theRec.GetSipsId());
+                stmt.setInt(8, rec.getFileID());
+                stmt.setLong(9, theRec.getM_fileOffset());
+                stmt.setLong(10, theRec.getFileBytes());
+                stmt.setInt(11, theRec.getRecordID());
+                stmt.setInt(12, theRec.getM_line());
+                stmt.setInt(13, theRec.getHanglerID());
 
-                }
-         });
+            }
+        });
     }
-
 
 
 }

@@ -67,6 +67,7 @@ public class WWEParserTemplate extends WebParser {
         m_CurrentLine = line;
         skipNextLine = false;
         skipMessage = false;
+        setFileInfo(fi);
 
         URL = null;
         app = null;
@@ -227,16 +228,16 @@ public class WWEParserTemplate extends WebParser {
         private String UUID;
         private String ixnID;
 
-        private WWEDebugMsg(TableType t) {
-            super(t);
+        private WWEDebugMsg(TableType t, int fileID) {
+            super(t, fileID);
         }
 
-        private WWEDebugMsg() {
-            this(TableType.WWEMessage);
+        private WWEDebugMsg( int fileID) {
+            this(TableType.WWEMessage, fileID);
         }
 
-        private WWEDebugMsg(TableType t, WWEDebugMsg orig) {
-            this(t);
+        private WWEDebugMsg(TableType t, WWEDebugMsg orig, int fileID) {
+            this(t, fileID);
             this.setClassName(orig.getClassName());
             this.setJSessionID(orig.getjSessionID());
             this.setLevel(orig.getLevel());
@@ -558,7 +559,7 @@ public class WWEParserTemplate extends WebParser {
                 @Override
                 public void fillStatement(PreparedStatement stmt) throws SQLException{
                 stmt.setTimestamp(1, new Timestamp(rec.GetAdjustedUsecTime()));
-                stmt.setInt(2, WWEDebugMsg.getFileId());
+                stmt.setInt(2, rec.getFileID());
                 stmt.setLong(3, rec.getM_fileOffset());
                 stmt.setLong(4, rec.getM_FileBytes());
                 stmt.setLong(5, rec.getM_line());

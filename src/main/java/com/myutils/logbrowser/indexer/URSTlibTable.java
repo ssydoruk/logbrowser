@@ -95,7 +95,7 @@ public class URSTlibTable extends DBTable {
             setFieldInt(stmt, 6, Main.getRef(ReferenceType.ConnID, theRec.GetConnID()));
             setFieldInt(stmt, 7, Main.getRef(ReferenceType.ConnID, theRec.GetTransferConnID()));
             stmt.setBoolean(8, theRec.isInbound());
-            setFieldInt(stmt, 9, UrsMessage.getFileId());
+            setFieldInt(stmt, 9, rec.getFileID());
             setFieldLong(stmt, 10, theRec.getM_fileOffset());
             setFieldLong(stmt, 11, theRec.getFileBytes());
             setFieldLong(stmt, 12, theRec.getAttributeHex("AttributeEventSequenceNumber"));

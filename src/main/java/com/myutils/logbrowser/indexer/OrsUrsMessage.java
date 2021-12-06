@@ -21,8 +21,8 @@ public class OrsUrsMessage extends Message {
     String _Call = null;
     //    Properties m_fields;
 
-    public OrsUrsMessage(String event, ArrayList messageLines) {
-        super(TableType.ORSUrs);
+    public OrsUrsMessage(String event, ArrayList messageLines, int fileID) {
+        super(TableType.ORSUrs, fileID);
         m_MessageLines = messageLines;
         if (m_MessageLines != null && m_MessageLines.size() > 0) {
             String get = m_MessageLines.get(0);

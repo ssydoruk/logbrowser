@@ -19,12 +19,12 @@ public class OCSIcon extends Message {
     private String status;
     private String host;
 
-    public OCSIcon() {
-        super(TableType.OCSIcon);
+    public OCSIcon( int fileID) {
+        super(TableType.OCSIcon, fileID);
     }
 
-    OCSIcon(ArrayList<String> m_MessageContents) {
-        super(TableType.OCSIcon, m_MessageContents);
+    OCSIcon(ArrayList<String> m_MessageContents, int fileID) {
+        super(TableType.OCSIcon, m_MessageContents, fileID);
     }
 
     public String getHost() {

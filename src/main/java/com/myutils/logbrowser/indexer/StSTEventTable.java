@@ -81,7 +81,7 @@ public class StSTEventTable extends DBTable {
             setFieldInt(stmt, 8, Main.getRef(ReferenceType.ConnID, theRec.GetConnID()));
             setFieldInt(stmt, 9, Main.getRef(ReferenceType.ConnID, theRec.getAttributeTrim("AttributeFirstTransferConnID")));
             setFieldLong(stmt, 10, theRec.getAttributeLong("AttributeReferenceID"));
-            stmt.setInt(11, StSTEventMessage.getFileId());
+            stmt.setInt(11, theRec.getFileID());
             stmt.setLong(12, theRec.getM_fileOffset());
             stmt.setLong(13, theRec.getFileBytes());
             stmt.setInt(14, theRec.getM_line());

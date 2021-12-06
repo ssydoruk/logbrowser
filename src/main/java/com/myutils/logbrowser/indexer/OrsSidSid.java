@@ -17,8 +17,8 @@ public class OrsSidSid extends Message {
     private final String newSID;
     private final String app = null;
 
-    public OrsSidSid(String SID, String NewSID) {
-        super(TableType.ORSSidSid);
+    public OrsSidSid(String SID, String NewSID, int fileID) {
+        super(TableType.ORSSidSid, fileID);
 
         this.SID = SID;
         this.newSID = NewSID;

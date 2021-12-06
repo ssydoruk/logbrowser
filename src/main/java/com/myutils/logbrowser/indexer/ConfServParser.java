@@ -58,6 +58,7 @@ public class ConfServParser extends Parser {
     @Override
     public int ParseFrom(BufferedReaderCrLf input, long offset, int line, FileInfo fi) {
         m_CurrentLine = line;
+        setFileInfo(fi);
 
         m_ServerName = null;
 
@@ -441,7 +442,7 @@ public class ConfServParser extends Parser {
         }
 
         private CSObjectChange(){
-            super(TableType.CSConfigChange);
+            super(TableType.CSConfigChange,  fileInfo.getRecordID());
         }
         private CSObjectChange(String req, String descr, String appType, String appName) {
            this();
@@ -628,7 +629,7 @@ public class ConfServParser extends Parser {
                 public void fillStatement(PreparedStatement stmt) throws SQLException{
 
                     stmt.setTimestamp(1, new Timestamp(rec.GetAdjustedUsecTime()));
-                stmt.setInt(2, CSClientMessage.getFileId());
+                stmt.setInt(2, rec.getFileID());
                 stmt.setLong(3, rec.getM_fileOffset());
                 stmt.setLong(4, rec.getM_FileBytes());
                 stmt.setLong(5, rec.getM_line());
@@ -665,7 +666,7 @@ public class ConfServParser extends Parser {
         }
 
         private CSClientMessage(String req, String descr, String appType, String appName) {
-            super(TableType.CSUpdate);
+            super(TableType.CSUpdate,  fileInfo.getRecordID());
             this.op = req;
             this.clientType = appType;
             this.appName = appName;
@@ -673,7 +674,7 @@ public class ConfServParser extends Parser {
 
         private CSClientMessage(String req, boolean isRequest,
                                 String descriptor, String appType, String appName) {
-            super(TableType.CSUpdate);
+            super(TableType.CSUpdate,  fileInfo.getRecordID());
             setM_isInbound(isRequest);
             this.op = req;
             this.descriptor = Integer.parseInt(descriptor);
@@ -682,7 +683,7 @@ public class ConfServParser extends Parser {
         }
 
         private CSClientMessage(ArrayList<String> m_MessageContents) {
-            super(TableType.CSUpdate, m_MessageContents);
+            super(TableType.CSUpdate, m_MessageContents,  fileInfo.getRecordID());
         }
 
         public String getObjType() {
@@ -861,7 +862,7 @@ public class ConfServParser extends Parser {
                 @Override
                 public void fillStatement(PreparedStatement stmt) throws SQLException{
                 stmt.setTimestamp(1, new Timestamp(rec.GetAdjustedUsecTime()));
-                stmt.setInt(2, CSClientMessage.getFileId());
+                stmt.setInt(2, rec.getFileID());
                 stmt.setLong(3, rec.getM_fileOffset());
                 stmt.setLong(4, rec.getM_FileBytes());
                 stmt.setLong(5, rec.getM_line());
@@ -896,7 +897,7 @@ public class ConfServParser extends Parser {
         private Integer socket;
 
         private CSClientConnect() {
-            super(TableType.CSClientConnect);
+            super(TableType.CSClientConnect,  fileInfo.getRecordID());
         }
 
         public String getClientType() {
@@ -1009,7 +1010,7 @@ public class ConfServParser extends Parser {
                 @Override
                 public void fillStatement(PreparedStatement stmt) throws SQLException{
                 stmt.setTimestamp(1, new Timestamp(rec.GetAdjustedUsecTime()));
-                stmt.setInt(2, CSClientConnect.getFileId());
+                stmt.setInt(2, rec.getFileID());
                 stmt.setLong(3, rec.getM_fileOffset());
                 stmt.setLong(4, rec.getM_FileBytes());
                 stmt.setLong(5, rec.getM_line());

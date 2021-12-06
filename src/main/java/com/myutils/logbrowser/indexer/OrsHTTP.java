@@ -37,8 +37,8 @@ public class OrsHTTP extends Message {
     private int bodyLineIdx = -2;
     private String httpMessageBody = null;
 
-    public OrsHTTP(ArrayList<String> messageLines) {
-        super(TableType.ORSHTTP, messageLines);
+    public OrsHTTP(ArrayList<String> messageLines, int fileID) {
+        super(TableType.ORSHTTP, messageLines, fileID);
     }
 
     public boolean SessionStart() {

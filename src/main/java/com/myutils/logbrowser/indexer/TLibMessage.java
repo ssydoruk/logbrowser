@@ -10,10 +10,8 @@ import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-/**
- * @author aglagole
- */
-public class TLibMessage extends Message {
+
+public class TLibMessage extends SIPServerBaseMessage {
 
     private static final Pattern regTEvent = Pattern.compile("(?:: message (\\w+)$| (Request\\w+)\\s+received)");
     private static final Pattern regTRequest = Pattern.compile("^(\\w+)");
@@ -29,13 +27,13 @@ public class TLibMessage extends Message {
     private String thisDN = null;
     private Long _errorCode = null;
 
-    TLibMessage(GenesysMsg lastLogMsg) {
-        super(TableType.TLib);
+    TLibMessage(GenesysMsg lastLogMsg, boolean m_handlerInProgress, int m_handlerId, int fileID) {
+        super(TableType.TLib,m_handlerInProgress,  m_handlerId, fileID);
         this.lastLogMsg = lastLogMsg;
     }
 
     TLibMessage(TLibMessage msg, GenesysMsg lastLogMsg) {
-        super(TableType.TLib);
+        super(TableType.TLib, msg.isM_handlerInProgress(), msg.getM_handlerId(), msg.getFileID());
         this.m_MessageName = msg.GetMessageName();
         this.lastLogMsg = msg.getLastLogMsg();
         m_MessageLines = new ArrayList<>(msg.m_MessageLines.size());

@@ -15,8 +15,8 @@ public class URSWaiting extends Message {
     private String agent;
     private String targetType;
 
-    public URSWaiting(String ag, String connID) {
-        super(TableType.URSWaiting);
+    public URSWaiting(String ag, String connID, int fileID) {
+        super(TableType.URSWaiting, fileID);
         this.connID = connID;
         Matcher m;
         if ((m = regMedia.matcher(ag)).find()) {

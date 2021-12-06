@@ -39,6 +39,7 @@ public class ApacheWebLogsParser extends WebParser {
     public int ParseFrom(BufferedReaderCrLf input, long offset, int line, FileInfo fi) {
         m_CurrentFilePos = offset;
         m_CurrentLine = line;
+        setFileInfo(fi);
 
         m_dbRecords = 0;
 
@@ -158,7 +159,7 @@ public class ApacheWebLogsParser extends WebParser {
         private String ixnID;
 
         private ApacheWebMsg() {
-            super(TableType.ApacheWeb);
+            super(TableType.ApacheWeb,  fileInfo.getRecordID());
         }
 
         /**
@@ -366,7 +367,7 @@ public class ApacheWebLogsParser extends WebParser {
                 @Override
                 public void fillStatement(PreparedStatement stmt) throws SQLException{
                 stmt.setTimestamp(1, new Timestamp(rec.GetAdjustedUsecTime()));
-                stmt.setInt(2, ApacheWebMsg.getFileId());
+                stmt.setInt(2, rec.getFileID());
                 stmt.setLong(3, rec.getM_fileOffset());
                 stmt.setLong(4, rec.getM_FileBytes());
                 stmt.setLong(5, rec.getM_line());

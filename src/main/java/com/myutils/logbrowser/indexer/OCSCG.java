@@ -31,8 +31,8 @@ public class OCSCG extends Message {
     private boolean campaignParsed = false;
     private String campaignName;
 
-    public OCSCG(ArrayList<String> messageLines) {
-        super(TableType.OCSCG, messageLines);
+    public OCSCG(ArrayList<String> messageLines, int fileID) {
+        super(TableType.OCSCG, messageLines, fileID);
 
         Matcher m;
 

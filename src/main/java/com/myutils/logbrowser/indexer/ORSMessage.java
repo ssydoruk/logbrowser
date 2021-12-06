@@ -34,8 +34,8 @@ public class ORSMessage extends Message {
      * @param newMessageLines
      * @param isTServerReq
      */
-    public ORSMessage(String event, String TserverSRC, ArrayList<String> newMessageLines, boolean isTServerReq) {
-        super(TableType.ORSTlib);
+    public ORSMessage(String event, String TserverSRC, ArrayList<String> newMessageLines, boolean isTServerReq, int fileID) {
+        super(TableType.ORSTlib, fileID);
         m_MessageLines = newMessageLines;
         m_MessageName = event;
         m_TserverSRC = TserverSRC;

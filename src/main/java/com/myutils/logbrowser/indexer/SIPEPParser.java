@@ -94,6 +94,7 @@ public class SIPEPParser extends Parser {
     public int ParseFrom(BufferedReaderCrLf input, long offset, int line, FileInfo fi) {
         m_CurrentFilePos = offset;
         m_CurrentLine = line;
+        setFileInfo(fi);
 
         String unfinished = "";
 
@@ -228,7 +229,7 @@ public class SIPEPParser extends Parser {
                 m_lineStarted = m_CurrentLine;
 
                 if ((m = regConfigOneLineDN.matcher(str)).find()) {
-                    ConfigUpdateRecord msg = new ConfigUpdateRecord(str);
+                    ConfigUpdateRecord msg = new ConfigUpdateRecord(str,  fileInfo.getRecordID());
                     try {
                         msg.setObjectType("DN");
                         msg.setObjectDBID(m.group(1));
@@ -246,7 +247,7 @@ public class SIPEPParser extends Parser {
 //                } else if (trimmed.contains(" Proxy(") || str.startsWith("Proxy(")) {
                 } else if ((m = regProxy.matcher(s)).find()) {
 
-                    ProxiedMessage msg = new ProxiedMessage(m.group(1), s.substring(m.end()));
+                    ProxiedMessage msg = new ProxiedMessage(m.group(1), s.substring(m.end()), getFileID());
                     SetStdFieldsAndAdd(msg);
 
                     return null;
@@ -419,7 +420,7 @@ public class SIPEPParser extends Parser {
         // Populate our class representation of the message
         SipMessage msg;
 
-        msg = new SipMessage(contents, TableType.SIPEP);
+        msg = new SipMessage(contents, TableType.SIPEP,  fileInfo.getRecordID());
 
         if ((m = regSIPReq.matcher(header)).find()) {
             if (m.group(1).startsWith("f")) {
@@ -442,7 +443,7 @@ public class SIPEPParser extends Parser {
     }
 
     private void AddConfigMessage(ArrayList<String> m_MessageContents) {
-        ConfigUpdateRecord msg = new ConfigUpdateRecord(m_MessageContents);
+        ConfigUpdateRecord msg = new ConfigUpdateRecord(m_MessageContents,  fileInfo.getRecordID());
         try {
             Matcher m;
             if (m_MessageContents.size() > 0 && (m = regSIPServerStartDN.matcher(m_MessageContents.get(0))).find()) {

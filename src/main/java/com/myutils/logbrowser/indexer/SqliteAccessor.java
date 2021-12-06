@@ -353,79 +353,7 @@ public final class SqliteAccessor  implements DBAccessor {
         return -1;
     }
 
-    private void InitRecords(String alias) {
-        try {
-            int stmtId = 0;
-            stats = new Stats();
 
-            Record.SetAlias(alias);
-
-            String strQuery;
-            // Insert your records initialization here
-//            strQuery = FileInfo.InitDB(this, stmtId++);
-//            AddStatement(strQuery);
-
-//            strQuery = SipMessage.InitDB(this, stmtId++);
-//            AddStatement(strQuery);
-//            strQuery = TLibMessage.InitDB(this, stmtId++);
-//            AddStatement(strQuery);
-//            strQuery = Handler.InitDB(this, stmtId++);
-//            AddStatement(strQuery);
-//            strQuery = Trigger.InitDB(this, stmtId++);
-//            AddStatement(strQuery);
-            strQuery = CustomLine.InitDB(this, stmtId++);
-            AddStatement(strQuery);
-
-//            strQuery = UrsMessage.InitDB(this, stmtId++);
-//            AddStatement(strQuery);
-//            strQuery = ORSClusterMessage.InitDB(this, stmtId++);
-//            AddStatement(strQuery);
-//            strQuery = StSActionMessage.InitDB(this, stmtId++);
-//            AddStatement(strQuery);
-//            strQuery = StSTEventMessage.InitDB(this, stmtId++);
-//            AddStatement(strQuery);
-//            strQuery = StSRequestHistoryMessage.InitDB(this, stmtId++);
-//            AddStatement(strQuery);
-            strQuery = IconMessage.InitDB(this, stmtId++);
-            AddStatement(strQuery);
-
-//            strQuery = IsccMessage.InitDB(this, stmtId++);
-//            AddStatement(strQuery);
-//            strQuery = ProxiedMessage.InitDB(this, stmtId++);
-//            AddStatement(strQuery);
-//            strQuery = CIFaceRequest.InitDB(this, stmtId++);
-//            AddStatement(strQuery);
-//            strQuery = OrsEspMessage.InitDB(this, stmtId++);
-//            AddStatement(strQuery);
-            ResultSet result;
-            Statement stmt = m_conn.createStatement();
-            m_conn.setAutoCommit(true);
-
-//            result = stmt.executeQuery("select max(id) from file_" + m_alias + ";");
-//            Record.SetFileId(result.getInt(1));
-//
-//            result = stmt.executeQuery("select max(id) from handler_" + m_alias + ";");
-//            Record.SetHandlerId(result.getInt(1));
-//
-//            result = stmt.executeQuery("select max(id) from sip_" + m_alias + ";");
-//            Record.SetSipId(result.getInt(1));
-//
-//            result = stmt.executeQuery("select max(id) from tlib_" + m_alias + ";");
-//            Record.SetTlibId(result.getInt(1));
-//
-//            result = stmt.executeQuery("select max(id) from json_" + m_alias + ";");
-//            Record.SetJsonId(result.getInt(1));
-//
-//            result = stmt.executeQuery("select max(id) from proxied_" + m_alias + ";");
-//            Record.SetProxiedId(result.getInt(1));
-//            runQuery("create index if not exists ICON_time_" + m_alias +" on ICON_" + m_alias + " (time);");
-//            runQuery("create index if not exists ICON_ConnectionID_" + m_alias +" on ICON_" + m_alias + " (ConnectionID);");
-//            runQuery("create index if not exists ICON_time_" + m_alias +" on ICON_" + m_alias + " (time);");
-            ResetAutoCommit();
-        } catch (SQLException e) {
-            logger.error("Error while init: " + e, e);
-        }
-    }
 
     public synchronized void exit() {
         m_exit = true;

@@ -16,6 +16,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
@@ -128,7 +129,7 @@ public final class FileInfo extends Record {
     }
 
     public FileInfo() {
-        super();
+        super(TableType.File, 0);
         m_nodeId = "";
         m_runId = 0;
         m_componentType = FileInfoType.type_Unknown;
@@ -365,7 +366,6 @@ public final class FileInfo extends Record {
     }
 
     public FileInfoType CheckLog(BufferedReaderCrLf input) {
-        m_handlerInProgress = false;
         int num = 0;
         int numParamsToRead = 0;
 
@@ -711,13 +711,7 @@ public final class FileInfo extends Record {
         }
     }
      */
-    void IncreaseFileID() {
-        fileId++;
-    }
 
-    boolean alreadyProcessed(long length) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
 
     public long getSize() {
         return size;

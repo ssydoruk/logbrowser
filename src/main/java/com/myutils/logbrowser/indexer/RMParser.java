@@ -77,6 +77,7 @@ public class RMParser extends Parser {
     public int ParseFrom(BufferedReaderCrLf input, long offset, int line, FileInfo fi) {
         m_CurrentFilePos = offset;
         m_CurrentLine = line;
+        setFileInfo(fi);
 
         String unfinished = "";
 
@@ -213,7 +214,7 @@ public class RMParser extends Parser {
 
                 if ((m = regProxy.matcher(s)).find()) {
 
-                    ProxiedMessage msg = new ProxiedMessage(m.group(1), s.substring(m.end()));
+                    ProxiedMessage msg = new ProxiedMessage(m.group(1), s.substring(m.end()), getFileID());
                     SetStdFieldsAndAdd(msg);
 
                     return null;
@@ -439,7 +440,7 @@ public class RMParser extends Parser {
                 contents.add(0, SIPmsg);
             }
         }
-        msg = new SipMessage(contents, TableType.SIPMS);
+        msg = new SipMessage(contents, TableType.SIPMS,  fileInfo.getRecordID());
 
         if (msg.GetFrom() == null) {
             Main.logger.error("LOG ERROR: no From in SIP message, ignore, line " + m_CurrentLine);
@@ -464,7 +465,7 @@ public class RMParser extends Parser {
     }
 
     private void AddConfigMessage(ArrayList<String> m_MessageContents) {
-        ConfigUpdateRecord msg = new ConfigUpdateRecord(m_MessageContents);
+        ConfigUpdateRecord msg = new ConfigUpdateRecord(m_MessageContents,  fileInfo.getRecordID());
         try {
             Matcher m;
             if (m_MessageContents.size() > 0 && (m = regSIPServerStartDN.matcher(m_MessageContents.get(0))).find()) {

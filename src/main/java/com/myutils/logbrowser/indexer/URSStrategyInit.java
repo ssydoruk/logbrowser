@@ -16,8 +16,8 @@ public final class URSStrategyInit extends Message {
     private final String strategyName;
     private String FileLine;
 
-    URSStrategyInit(String line, String ConnID, String strategyName, String strategyMsg) {
-        super(TableType.URSStrategyInit, line);
+    URSStrategyInit(String line, String ConnID, String strategyName, String strategyMsg, int fileID) {
+        super(TableType.URSStrategyInit, line, fileID);
         this.ConnID = ConnID;
         this.strategyName = strategyName;
         this.strategyMsg = strategyMsg;

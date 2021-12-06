@@ -17,8 +17,8 @@ public class URSCONNIDIxnID extends Message {
 
     private final String ConnID;
 
-    public URSCONNIDIxnID(String ConnID, String IxnID) {
-        super(TableType.URSCONNIDIxnID);
+    public URSCONNIDIxnID(String ConnID, String IxnID, int fileID) {
+        super(TableType.URSCONNIDIxnID, fileID);
 
         this.IxnID = IxnID;
         this.ConnID = ConnID;

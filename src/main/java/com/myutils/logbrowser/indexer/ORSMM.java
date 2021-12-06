@@ -13,12 +13,12 @@ public class ORSMM extends Message {
     private String m_MessageName;
     private boolean isTServerReq;
 
-    public ORSMM(ArrayList messageLines) {
-        super(TableType.ORSMMessage, messageLines);
+    public ORSMM(ArrayList messageLines, int fileID) {
+        super(TableType.ORSMMessage, messageLines, fileID);
     }
 
-    ORSMM(String m_msgName, String m_TserverSRC, ArrayList m_MessageContents, boolean b) {
-        super(TableType.ORSMMessage);
+    ORSMM(String m_msgName, String m_TserverSRC, ArrayList m_MessageContents, boolean b, int fileID) {
+        super(TableType.ORSMMessage, fileID);
         m_MessageLines = m_MessageContents;
         m_MessageName = m_msgName;
         this.m_TserverSRC = m_TserverSRC;

@@ -25,8 +25,8 @@ public class OCSStatEvent extends Message {
 
     private final OCSParser.StatEventType statEventType;
 
-    OCSStatEvent(OCSParser.StatEventType statEventType, ArrayList m_MessageContents) {
-        super(TableType.OCSStatEvent, m_MessageContents);
+    OCSStatEvent(OCSParser.StatEventType statEventType, ArrayList m_MessageContents, int fileID) {
+        super(TableType.OCSStatEvent, m_MessageContents, fileID);
         this.statEventType = statEventType;
     }
 

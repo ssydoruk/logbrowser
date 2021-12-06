@@ -31,6 +31,7 @@ public class IconParser extends Parser {
     public int ParseFrom(BufferedReaderCrLf input, long offset, int line, FileInfo fi) {
         m_CurrentFilePos = offset;
         m_CurrentLine = line;
+        setFileInfo(fi);
 
         m_dbRecords = 0;
 
@@ -151,11 +152,11 @@ public class IconParser extends Parser {
         if (headerList.length >= 4) {
             if (headerList[3].equals("Message")) {
                 String event = headerList[4];
-                msg = new IconMessage(event, contents);
+                msg = new IconMessage(event, contents,  fileInfo.getRecordID());
 //              msg = new TLibMessage(event, contents);
             } else if (headerList[4].equals("message")) {
                 String event = headerList[5].substring(1, headerList[5].length() - 1);
-                msg = new IconMessage(event, contents);
+                msg = new IconMessage(event, contents,  fileInfo.getRecordID());
             }
         }
 

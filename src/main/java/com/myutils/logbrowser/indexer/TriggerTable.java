@@ -4,7 +4,6 @@
  */
 package com.myutils.logbrowser.indexer;
 
-import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 /**
@@ -52,23 +51,20 @@ public class TriggerTable extends DBTable {
     @Override
     public void AddToDB(Record rec) throws SQLException {
         Trigger theRec = (Trigger) rec;
-        getM_dbAccessor().addToDB(m_InsertStatementId, new IFillStatement() {
-            @Override
-            public void fillStatement(PreparedStatement stmt) throws SQLException{
-            stmt.setInt(1, Main.getRef(ReferenceType.HANDLER, theRec.getM_text()));
-            Main.logger.trace("theRec.m_handlerId:"
-                    + Trigger.m_handlerId + " theRec.m_msgId:"
-                    + theRec.m_msgId + " theRec.m_sipId:"
-                    + Trigger.m_sipId + " theRec.m_tlibId:" + Trigger.m_tlibId + " theRec.m_jsonId" + Trigger.m_jsonId);
-            stmt.setInt(2, Trigger.m_handlerId);
-            stmt.setInt(3, (theRec.m_msgId == 1 ? Trigger.m_sipId : 0));
-            stmt.setInt(4, (theRec.m_msgId == 0 ? Trigger.m_tlibId : 0));
-            stmt.setInt(5, (theRec.m_msgId == 2 ? Trigger.m_jsonId : 0));
-            stmt.setInt(6, Trigger.getFileId());
-            stmt.setLong(7, theRec.getM_fileOffset());
-            stmt.setInt(8, theRec.getM_line());
+        getM_dbAccessor().addToDB(m_InsertStatementId, stmt -> {
+        stmt.setInt(1, Main.getRef(ReferenceType.HANDLER, theRec.getM_text()));
+        Main.logger.trace("theRec.m_handlerId:"
+                + theRec.getM_handlerId() + " theRec.m_msgId:"
+                + theRec.m_msgId + " theRec.m_sipId:"
+                + theRec.getM_sipId() + " theRec.m_tlibId:" + theRec.getM_tlibId() + " theRec.m_jsonId" +theRec.getM_jsonId());
+        stmt.setInt(2, theRec.getM_handlerId());
+        stmt.setInt(3, (theRec.m_msgId == 1 ? theRec.getM_sipId() : 0));
+        stmt.setInt(4, (theRec.m_msgId == 0 ? theRec.getM_tlibId() :  0));
+        stmt.setInt(5, (theRec.m_msgId == 2 ? theRec.getM_jsonId() :  0));
+        stmt.setInt(6, rec.getFileID());
+        stmt.setLong(7, theRec.getM_fileOffset());
+        stmt.setInt(8, theRec.getM_line());
 
-            }
         });
     }
 

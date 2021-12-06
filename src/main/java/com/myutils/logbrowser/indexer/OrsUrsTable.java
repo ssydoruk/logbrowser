@@ -70,7 +70,7 @@ public class OrsUrsTable extends DBTable {
             @Override
             public void fillStatement(PreparedStatement stmt) throws SQLException{
             stmt.setTimestamp(1, new Timestamp(theRec.GetAdjustedUsecTime()));
-            stmt.setInt(2, OrsUrsMessage.getFileId());
+            stmt.setInt(2, theRec.getFileID());
             stmt.setLong(3, theRec.getM_fileOffset());
             stmt.setLong(4, theRec.getM_FileBytes());
             stmt.setLong(5, theRec.getM_line());

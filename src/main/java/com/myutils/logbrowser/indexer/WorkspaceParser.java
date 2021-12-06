@@ -95,7 +95,7 @@ public class WorkspaceParser extends Parser {
     }
 
     private void AddStrategyMessage(String FileLine, String URSRest1) {
-        URSStrategy msg = new URSStrategy(m_MessageContents, ConnID, FileLine, URSRest);
+        URSStrategy msg = new URSStrategy(m_MessageContents, ConnID, FileLine, URSRest,  fileInfo.getRecordID());
         try {
             msg.setM_TimestampDP(getCurrentTimestamp());
             msg.SetOffset(getSavedFilePos());
@@ -113,12 +113,12 @@ public class WorkspaceParser extends Parser {
         Matcher m;
         Message msg;
         if ((FileLine.equals("14:33") || FileLine.equals("1B:01")) && (m = regStrategy.matcher(line)).find()) {
-            msg = new URSStrategyInit(line, ConnID, m.group(1), "strategy is attached to the call");
+            msg = new URSStrategyInit(line, ConnID, m.group(1), "strategy is attached to the call",  fileInfo.getRecordID());
         } else if (FileLine.equals("01:08")) {
-            msg = new URSStrategyInit(line, ConnID, null, "call deleting truly");
+            msg = new URSStrategyInit(line, ConnID, null, "call deleting truly",  fileInfo.getRecordID());
 
         } else {
-            msg = new URSStrategy(line, ConnID, FileLine, URSRest);
+            msg = new URSStrategy(line, ConnID, FileLine, URSRest,  fileInfo.getRecordID());
         }
         try {
             msg.setM_TimestampDP(getCurrentTimestamp());
@@ -172,6 +172,7 @@ public class WorkspaceParser extends Parser {
         m_CurrentFilePos = offset;
         m_CurrentLine = line;
         m_dbRecords = 0;
+        setFileInfo(fi);
 
         try {
             input.skip(offset);
@@ -417,15 +418,15 @@ public class WorkspaceParser extends Parser {
             Message msg = null;
             if (event != null) {
                 if (isConfServ) {
-                    msg = new WSConf(event, server, fileHandle, refID, contents);
+                    msg = new WSConf(event, server, fileHandle, refID, contents,  fileInfo.getRecordID());
                 } else if (eventsStatServer.contains(event)) {
-                    msg = new WSStat(event, server, fileHandle, refID, contents);
+                    msg = new WSStat(event, server, fileHandle, refID, contents,  fileInfo.getRecordID());
                 } else if (eventsEServices.contains(event) || hasMMAttribute()) {
-                    msg = new WSEServ(event, server, fileHandle, refID, contents);
+                    msg = new WSEServ(event, server, fileHandle, refID, contents,  fileInfo.getRecordID());
 //            } else if (eventsConfig.contains(event)) {
 //                msg = new WSConf(event, server, fileHandle, refID, contents);
                 } else {
-                    msg = new WSMessage(event, server, fileHandle, refID, contents);
+                    msg = new WSMessage(event, server, fileHandle, refID, contents,  fileInfo.getRecordID());
                 }
 
             }
@@ -440,7 +441,7 @@ public class WorkspaceParser extends Parser {
     }
 
     private void AddConfigMessage(ArrayList<String> m_MessageContents) {
-        ConfigUpdateRecord msg = new ConfigUpdateRecord(m_MessageContents);
+        ConfigUpdateRecord msg = new ConfigUpdateRecord(m_MessageContents,  fileInfo.getRecordID());
         try {
             Matcher m;
             msg.setObjName(Message.FindByRx(m_MessageContents, regCfgObjectName, 1, ""));

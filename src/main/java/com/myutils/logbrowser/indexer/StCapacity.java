@@ -27,8 +27,8 @@ public class StCapacity extends Message {
 
     private String dn = null;
 
-    public StCapacity(String name, ArrayList messageLines) {
-        super(TableType.StCapacity, messageLines);
+    public StCapacity(String name, ArrayList messageLines, int fileID) {
+        super(TableType.StCapacity, messageLines, fileID);
         Matcher m;
         if ((m = regStatusLineAgent.matcher(name)).find()) {
             plGroup = m.group(1);

@@ -94,7 +94,7 @@ public class WWETable extends DBTable {
                 public void fillStatement(PreparedStatement stmt) throws SQLException{
 
             stmt.setTimestamp(1, new Timestamp(wweRec.GetAdjustedUsecTime()));
-            stmt.setInt(2, WWEMessage.getFileId());
+            stmt.setInt(2, rec.getFileID());
             stmt.setLong(3, wweRec.getM_fileOffset());
             stmt.setLong(4, wweRec.getM_FileBytes());
             stmt.setLong(5, wweRec.getM_line());

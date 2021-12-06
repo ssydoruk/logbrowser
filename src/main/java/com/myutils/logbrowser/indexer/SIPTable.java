@@ -76,7 +76,7 @@ public class SIPTable extends DBTable {
         getM_dbAccessor().addToDB(m_InsertStatementId, new IFillStatement() {
             @Override
             public void fillStatement(PreparedStatement stmt) throws SQLException{
-                generateID(stmt, 1, rec);
+                 stmt.setInt(1, rec.getRecordID());
                 stmt.setTimestamp(2, new Timestamp(theRec.GetAdjustedUsecTime()));
                 stmt.setBoolean(3, theRec.isInbound());
                 setFieldInt(stmt, 4, Main.getRef(ReferenceType.SIPMETHOD, theRec.GetName()));
@@ -89,18 +89,16 @@ public class SIPTable extends DBTable {
                 setFieldInt(stmt, 11, Main.getRef(ReferenceType.SIPVIABRANCH, theRec.GetViaBranch()));
                 setFieldInt(stmt, 12, Main.getRef(ReferenceType.IP, theRec.GetPeerIp()));
                 setFieldInt(stmt, 13, theRec.GetPeerPort());
-                setFieldInt(stmt, 14, SipMessage.getFileId());
+                setFieldInt(stmt, 14, rec.getFileID());
                 stmt.setLong(15, theRec.getM_fileOffset());
                 stmt.setLong(16, theRec.getFileBytes());
-                Main.logger.trace("theRec.m_handlerId :" + SipMessage.m_handlerId + " theRec.m_handlerInProgress" + SipMessage.m_handlerInProgress);
+                Main.logger.trace("theRec.m_handlerId :" +  theRec.getM_handlerId() + " theRec.m_handlerInProgress" +  theRec.isM_handlerInProgress());
 
                 setFieldInt(stmt, 17, theRec.getHandlerInProgress());
                 stmt.setBoolean(18, theRec.isCallRelated());
                 setFieldInt(stmt, 19, theRec.getM_line());
                 setFieldInt(stmt, 20, Main.getRef(ReferenceType.UUID, theRec.getUUID()));
                 setFieldInt(stmt, 21, Main.getRef(ReferenceType.DN, transformDN(rec.SingleQuotes(theRec.getRequestURIDN()))));
-                SipMessage.SetSipId(getCurrentID());
-
             }
         });
     }

@@ -22,8 +22,8 @@ public final class URSVQ extends Message {
     private String vqName;
     private String target;
 
-    public URSVQ() {
-        super(TableType.URSVQ);
+    public URSVQ( int fileID) {
+        super(TableType.URSVQ, fileID);
     }
 
     public String getVQID() {

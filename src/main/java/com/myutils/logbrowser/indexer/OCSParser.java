@@ -145,7 +145,7 @@ public class OCSParser extends Parser {
     }
 
     private void AddPAEventInfoMessage() throws Exception {
-        OCSPAEventInfo msg = new OCSPAEventInfo(m_MessageContents);
+        OCSPAEventInfo msg = new OCSPAEventInfo(m_MessageContents,  fileInfo.getRecordID());
         SetStdFieldsAndAdd(msg);
     }
 
@@ -181,52 +181,52 @@ public class OCSParser extends Parser {
 //There are 27 Agents/Places assigned to Session 'OBN_IP_EBlock_Campaign@OBN_IP_EBlock_Group'[268] OCS_Session_Loaded | OCS_Stat_Opened:
 
     private void AddAssignmentMessage() throws Exception {
-        OCSAgentAssignment msg = new OCSAgentAssignment(m_MessageContents);
+        OCSAgentAssignment msg = new OCSAgentAssignment(m_MessageContents,  fileInfo.getRecordID());
         SetStdFieldsAndAdd(msg);
     }
 
     private void AddRecCreateMessage() {
-        OCSRecCreate msg = new OCSRecCreate(m_MessageContents);
+        OCSRecCreate msg = new OCSRecCreate(m_MessageContents,  fileInfo.getRecordID());
         SetStdFieldsAndAdd(msg);
     }
 
     private void AddSCXMLTreatmentMessage(String campDBID, String recHandle, String chainID,
                                           String rest) {
-        OCSSCXMLTreatment msg = new OCSSCXMLTreatment(campDBID, chainID, recHandle, rest);
+        OCSSCXMLTreatment msg = new OCSSCXMLTreatment(campDBID, chainID, recHandle, rest,  fileInfo.getRecordID());
         SetStdFieldsAndAdd(msg);
 //        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     private void AddIxnMessage() {
-        OCSIxn msg = new OCSIxn(m_MessageContents);
+        OCSIxn msg = new OCSIxn(m_MessageContents,  fileInfo.getRecordID());
         SetStdFieldsAndAdd(msg);
     }
 
     private void AddHTTPMessage() {
-        OCSHTTP msg = new OCSHTTP(m_MessageContents);
+        OCSHTTP msg = new OCSHTTP(m_MessageContents,  fileInfo.getRecordID());
         SetStdFieldsAndAdd(msg);
     }
 
     private void AddOCSIconMessage() {
-        OCSIcon msg = new OCSIcon(m_MessageContents);
+        OCSIcon msg = new OCSIcon(m_MessageContents,  fileInfo.getRecordID());
         SetStdFieldsAndAdd(msg);
     }
 
     private void AddClientMessage() {
         if (m_MessageContents.size() > 1) { //to filter out
             //OCMClient[txrdn_ocs_01_bu]::Notifying backup, record handle: 28734
-            OCSClient msg = new OCSClient(m_MessageContents);
+            OCSClient msg = new OCSClient(m_MessageContents,  fileInfo.getRecordID());
             SetStdFieldsAndAdd(msg);
         }
     }
 
     private void AddSCXMLScript(String sessID, String rest) {
-        OCSSCXMLScript msg = new OCSSCXMLScript(sessID, rest);
+        OCSSCXMLScript msg = new OCSSCXMLScript(sessID, rest,  fileInfo.getRecordID());
         SetStdFieldsAndAdd(msg);
     }
 
     private void AddRecTreatmentMessage() {
-        OCSRecTreatment msg = new OCSRecTreatment(m_MessageContents);
+        OCSRecTreatment msg = new OCSRecTreatment(m_MessageContents,  fileInfo.getRecordID());
         SetStdFieldsAndAdd(msg);
 
     }
@@ -236,6 +236,7 @@ public class OCSParser extends Parser {
 
         Main.logger.trace("ParseFrom offset:" + offset + " line:" + line);
         m_CurrentLine = line;
+        setFileInfo(fi);
 
         try {
             input.skip(offset);
@@ -310,7 +311,7 @@ public class OCSParser extends Parser {
 //<editor-fold defaultstate="collapsed" desc="inserting DB Server related message">
                 if ((m = regDBServer.matcher(s)).find()) {
                     try {
-                        OCSDBActivity msg = new OCSDBActivity(m.group(1), m.group(2), m.group(3), s.substring(m.end()));
+                        OCSDBActivity msg = new OCSDBActivity(m.group(1), m.group(2), m.group(3), s.substring(m.end()),  fileInfo.getRecordID());
 //                        setSavedFilePos(getFilePos());
 //                        SetStdFieldsAndAdd(msg);
                         msg.setM_TimestampDP(getCurrentTimestamp());
@@ -378,7 +379,7 @@ public class OCSParser extends Parser {
                     m_MessageContents.add(s);
                     m_ParserState = ParserState.STATE_RECORD_CREATE;
                 } else if ((m = regRecordDelete.matcher(s)).find()) {
-                    OCSRecCreate msg = new OCSRecCreate();
+                    OCSRecCreate msg = new OCSRecCreate(  fileInfo.getRecordID());
                     msg.setRecHandle(m.group(1));
                     msg.setIsCreate(false);
                     SetStdFieldsAndAdd(msg);
@@ -631,23 +632,23 @@ public class OCSParser extends Parser {
     }
 
     private void AddCGMessage() throws Exception {
-        OCSCG msg = new OCSCG(m_MessageContents);
+        OCSCG msg = new OCSCG(m_MessageContents,  fileInfo.getRecordID());
         SetStdFieldsAndAdd(msg);
     }
 
     private void AddPASessionInfoMessage() throws Exception {
-        OCSPASessionInfo msg = new OCSPASessionInfo(m_MessageContents);
+        OCSPASessionInfo msg = new OCSPASessionInfo(m_MessageContents,  fileInfo.getRecordID());
         SetStdFieldsAndAdd(msg);
     }
 
     private void AddPAAgentInfoMessage() throws Exception {
-        OCSPAAgentInfo msg = new OCSPAAgentInfo(m_MessageContents);
+        OCSPAAgentInfo msg = new OCSPAAgentInfo(m_MessageContents,  fileInfo.getRecordID());
         SetStdFieldsAndAdd(msg);
     }
 
     private void AddStatEventMessage() throws Exception {
         try {
-            OCSStatEvent msg = new OCSStatEvent(statEventType, m_MessageContents);
+            OCSStatEvent msg = new OCSStatEvent(statEventType, m_MessageContents,  fileInfo.getRecordID());
             SetStdFieldsAndAdd(msg);
         } catch (Exception e) {
             Main.logger.error(e);
@@ -656,7 +657,7 @@ public class OCSParser extends Parser {
     }
 
     private void AddOCSTMessage(String recHandle) throws Exception {
-        OcsMessage msg = new OcsMessage(m_MessageContents);
+        OcsMessage msg = new OcsMessage(m_MessageContents,  fileInfo.getRecordID());
         msg.setRecordHandle(recHandle);
         SetStdFieldsAndAdd(msg);
 
@@ -668,7 +669,7 @@ public class OCSParser extends Parser {
     }
 
     private void AddConfigMessage(String s) {
-        ConfigUpdateRecord msg = new ConfigUpdateRecord(s);
+        ConfigUpdateRecord msg = new ConfigUpdateRecord(s,  fileInfo.getRecordID());
         try {
             Matcher m;
             msg.setObjectType(Message.getRx(s, regCfgObjectType, 1, ""));
@@ -755,7 +756,7 @@ public class OCSParser extends Parser {
         private double sentCalls;
 
         private OCSPredInfo() {
-            super(TableType.OCSPredInfo);
+            super(TableType.OCSPredInfo,  fileInfo.getRecordID());
         }
 
         private OCSPredInfo(Matcher m) {
@@ -850,7 +851,7 @@ public class OCSParser extends Parser {
                 @Override
                 public void fillStatement(PreparedStatement stmt) throws SQLException{
                 stmt.setTimestamp(1, new Timestamp(rec.GetAdjustedUsecTime()));
-                stmt.setInt(2, OCSPredInfo.getFileId());
+                stmt.setInt(2, rec.getFileID());
                 stmt.setLong(3, rec.getM_fileOffset());
                 stmt.setLong(4, rec.getM_FileBytes());
                 stmt.setLong(5, rec.getM_line());

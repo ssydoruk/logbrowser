@@ -30,8 +30,8 @@ public class OcsMessage extends Message {
     private String m_ThisDN;
     private Long recordHandle = null;
 
-    public OcsMessage(ArrayList newMessageLines) {
-        super(TableType.OCSTLib);
+    public OcsMessage(ArrayList newMessageLines, int fileID) {
+        super(TableType.OCSTLib, fileID);
         m_MessageLines = newMessageLines;
         Matcher m;
         if ((m = regStartLine.matcher(m_MessageLines.get(0))).find()) {

@@ -31,6 +31,7 @@ public class DBServerParser extends Parser {
         m_CurrentFilePos = offset;
         m_CurrentLine = line;
         m_dbRecords = 0;
+        setFileInfo(fi);
 
         try {
             input.skip(offset);

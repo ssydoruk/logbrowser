@@ -26,11 +26,7 @@ import java.util.regex.Pattern;
 import static com.myutils.logbrowser.indexer.Parser.MAX_CUSTOM_FIELDS;
 import static org.sqlite.SQLiteErrorCode.SQLITE_INTERRUPT;
 
-/**
- * IQueryResults To store and manipulate query result rows
- *
- * @author aglagole
- */
+
 public abstract class IQueryResults extends QueryTools
         implements ActionListener,
         PropertyChangeListener {

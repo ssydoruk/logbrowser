@@ -11,8 +11,8 @@ public class IxnDBActivity extends Message {
     private final String ixnid;
     private String reqid = null;
 
-    IxnDBActivity(String activity, String reqid, String ixnid) {
-        super(TableType.IxnDB);
+    IxnDBActivity(String activity, String reqid, String ixnid, int fileID) {
+        super(TableType.IxnDB, fileID);
         this.activity = activity;
         this.reqid = reqid;
         this.ixnid = ixnid;

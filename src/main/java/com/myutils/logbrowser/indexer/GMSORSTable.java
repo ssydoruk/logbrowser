@@ -69,7 +69,7 @@ public class GMSORSTable extends DBTable {
             public void fillStatement(PreparedStatement stmt) throws SQLException{
 
             stmt.setTimestamp(1, new Timestamp(gmsRec.GetAdjustedUsecTime()));
-            stmt.setInt(2, GMSORSMessage.getFileId());
+            stmt.setInt(2, rec.getFileID());
             stmt.setLong(3, gmsRec.getM_fileOffset());
             stmt.setLong(4, gmsRec.getM_FileBytes());
             stmt.setLong(5, gmsRec.getM_line());

@@ -11,8 +11,8 @@ public class ExceptionMessage extends Message {
     private final String exception;
     private final String msg;
 
-    ExceptionMessage(ArrayList<String> m_MessageContents, String m_msgName, String m_msg1) {
-        super(TableType.WWEException);
+    ExceptionMessage(ArrayList<String> m_MessageContents, String m_msgName, String m_msg1, int fileID) {
+        super(TableType.WWEException, fileID);
         this.exception = m_msgName;
         this.msg = m_msg1;
     }

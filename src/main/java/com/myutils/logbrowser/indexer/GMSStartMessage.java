@@ -26,8 +26,8 @@ public class GMSStartMessage extends Message {
     private boolean POSTParsed = false;
     private Pair<String, String> parseORSURI = null;
 
-    GMSStartMessage(ArrayList<String> m_MessageContents) {
-        super(TableType.GMSStart, m_MessageContents);
+    GMSStartMessage(ArrayList<String> m_MessageContents, int fileID) {
+        super(TableType.GMSStart, m_MessageContents, fileID);
     }
 
     public boolean isIsTServerReq() {

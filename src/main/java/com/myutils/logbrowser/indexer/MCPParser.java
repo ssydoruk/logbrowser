@@ -119,6 +119,7 @@ public class MCPParser extends Parser {
     public int ParseFrom(BufferedReaderCrLf input, long offset, int line, FileInfo fi) {
         m_CurrentFilePos = offset;
         m_CurrentLine = line;
+        setFileInfo(fi);
 
         String unfinished = "";
 
@@ -415,7 +416,7 @@ public class MCPParser extends Parser {
         // Populate our class representation of the message
         SipMessage msg;
 
-        msg = new SipMessage(contents, TableType.SIPMS);
+        msg = new SipMessage(contents, TableType.SIPMS,  fileInfo.getRecordID());
 
         if (StringUtils.isNotEmpty(SIPMessage)) {
             msg.SetInbound(isInbound);
@@ -436,7 +437,7 @@ public class MCPParser extends Parser {
     }
 
     private void AddConfigMessage(ArrayList<String> m_MessageContents) {
-        ConfigUpdateRecord msg = new ConfigUpdateRecord(m_MessageContents);
+        ConfigUpdateRecord msg = new ConfigUpdateRecord(m_MessageContents,  fileInfo.getRecordID());
         try {
             Matcher m;
             if (m_MessageContents.size() > 0 && (m = regSIPServerStartDN.matcher(m_MessageContents.get(0))).find()) {
@@ -468,7 +469,7 @@ public class MCPParser extends Parser {
 
     private void callMessage(String callID, String cmd, String messageText) {
         if (!IGNORE_MPC.contains(cmd)) {
-            VXMLIntSteps steps = new VXMLIntSteps();
+            VXMLIntSteps steps = new VXMLIntSteps( fileInfo.getRecordID());
             steps.setMCPCallID(callID);
             steps.setCommand(cmd);
             //    steps.setRequestParams(messageText);
@@ -512,14 +513,14 @@ public class MCPParser extends Parser {
                         //steps.setParam1(noFile);
                     }
 
-                    VXMLIntSteps steps = new VXMLIntSteps();
+                    VXMLIntSteps steps = new VXMLIntSteps( fileInfo.getRecordID());
                     steps.setMCPCallID(callID);
                     steps.setCommand(cmd);
 
                     SetStdFieldsAndAdd(steps);
                 }
             } else { // file not specified
-                VXMLIntSteps steps = new VXMLIntSteps();
+                VXMLIntSteps steps = new VXMLIntSteps( fileInfo.getRecordID());
                 steps.setMCPCallID(callID);
                 steps.setRequestParams(messageText);
 
@@ -1094,8 +1095,8 @@ public class MCPParser extends Parser {
         private String Tenant;
         private String IVRProfile;
 
-        private VXMLIntSteps() {
-            super(TableType.VXMLIntStepsTable);
+        private VXMLIntSteps( int fileID) {
+            super(TableType.VXMLIntStepsTable, fileID);
         }
 
         public String getParam2() {
@@ -1318,7 +1319,7 @@ public class MCPParser extends Parser {
                     @Override
                     public void fillStatement(PreparedStatement stmt) throws SQLException {
                         stmt.setTimestamp(1, new Timestamp(rec.GetAdjustedUsecTime()));
-                        stmt.setInt(2, SCSAppStatus.getFileId());
+                        stmt.setInt(2, rec.getFileID());
                         stmt.setLong(3, rec.getM_fileOffset());
                         stmt.setLong(4, rec.getM_FileBytes());
                         stmt.setLong(5, rec.getM_line());

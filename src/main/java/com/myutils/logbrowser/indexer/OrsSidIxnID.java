@@ -19,8 +19,8 @@ public class OrsSidIxnID extends Message {
     private String theURL = null;
     private String app = null;
 
-    public OrsSidIxnID(String IxnID, String GID) {
-        super(TableType.ORSSidIxnID);
+    public OrsSidIxnID(String IxnID, String GID, int fileID) {
+        super(TableType.ORSSidIxnID, fileID);
 
         this.IxnID = IxnID;
         this.GID = GID;

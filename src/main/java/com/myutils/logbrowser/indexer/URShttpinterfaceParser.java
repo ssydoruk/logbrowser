@@ -85,6 +85,7 @@ public class URShttpinterfaceParser extends WebParser {
         skipNextLine = false;
         skipMessage = false;
         m_input = input;
+        setFileInfo(fi);
 
         URL = null;
         app = null;
@@ -133,7 +134,7 @@ public class URShttpinterfaceParser extends WebParser {
         if (handlerID != null) {
             ursReqID = requestHandler.getURSReqID(handlerID);
         }
-        HTTPtoURS msg = new HTTPtoURS(ursRefID, ursReqID, isInbound);
+        HTTPtoURS msg = new HTTPtoURS(ursRefID, ursReqID, isInbound,  fileInfo.getRecordID());
         SetStdFieldsAndAdd(msg);
         requestHandler.remove(ursReqID);
 
@@ -189,7 +190,7 @@ public class URShttpinterfaceParser extends WebParser {
                         m_MessageContents.clear();
                         ReadHTTP(bytes);
 
-                        ursHTTPMsg _ursHTTP = new ursHTTPMsg(m_MessageContents);
+                        ursHTTPMsg _ursHTTP = new ursHTTPMsg(m_MessageContents,  fileInfo.getRecordID());
                         _ursHTTP.setHTTPServerID(httpServerID);
                         _ursHTTP.setSocket(socket);
                         _ursHTTP.setBytes(bytes);
@@ -216,7 +217,7 @@ public class URShttpinterfaceParser extends WebParser {
                             return null;
                         }
                     } else if ((m = regRespSent.matcher(s)).find()) {
-                        ursHTTP = new ursHTTPMsg();
+                        ursHTTP = new ursHTTPMsg( fileInfo.getRecordID());
                         ursHTTP.setHTTPServerID(m.group(1));
                         m_PacketLength = 0;
                         m_ContentLength = null;
@@ -460,12 +461,12 @@ public class URShttpinterfaceParser extends WebParser {
         private int bodyLineIdx = -2;
         private String httpMessageBody = null;
 
-        public ursHTTPMsg() {
-            super(TableType.URSHTTP);
+        public ursHTTPMsg( int fileID) {
+            super(TableType.URSHTTP, fileID);
         }
 
-        public ursHTTPMsg(ArrayList messageLines) {
-            this();
+        public ursHTTPMsg(ArrayList messageLines, int fileID) {
+            this( fileID);
             setMessageLines(messageLines);
         }
 
@@ -732,7 +733,7 @@ public class URShttpinterfaceParser extends WebParser {
                 @Override
                 public void fillStatement(PreparedStatement stmt) throws SQLException{
                 stmt.setTimestamp(1, new Timestamp(rec.GetAdjustedUsecTime()));
-                stmt.setInt(2, OrsHTTP.getFileId());
+                stmt.setInt(2, rec.getFileID());
                 stmt.setLong(3, rec.getM_fileOffset());
                 stmt.setLong(4, rec.getM_FileBytes());
                 stmt.setLong(5, rec.getM_line());
@@ -762,8 +763,8 @@ public class URShttpinterfaceParser extends WebParser {
         private final Long ursRefID;
         private final Long httpReqID;
 
-        private HTTPtoURS(Long ursRefID, Long httpReqID, boolean b) {
-            super(TableType.HTTP_TO_URS);
+        private HTTPtoURS(Long ursRefID, Long httpReqID, boolean b, int fileID) {
+            super(TableType.HTTP_TO_URS, fileID);
             this.ursRefID = ursRefID;
             this.httpReqID = httpReqID;
             setM_isInbound(b);
@@ -836,7 +837,7 @@ public class URShttpinterfaceParser extends WebParser {
                 @Override
                 public void fillStatement(PreparedStatement stmt) throws SQLException{
                 stmt.setTimestamp(1, new Timestamp(theRec.GetAdjustedUsecTime()));
-                stmt.setInt(2, HTTPtoURS.getFileId());
+                stmt.setInt(2, theRec.getFileID());
                 stmt.setLong(3, theRec.getM_fileOffset());
                 stmt.setLong(4, theRec.getM_FileBytes());
                 stmt.setLong(5, theRec.getM_line());

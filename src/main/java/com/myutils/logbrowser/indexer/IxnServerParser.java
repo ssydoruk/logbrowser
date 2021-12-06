@@ -40,9 +40,9 @@ public class IxnServerParser extends Parser {
     }
 
     private void AddIxnMessage() {
-        Ixn msg = new Ixn(m_MessageContents);
+        Ixn msg = new Ixn(m_MessageContents,  fileInfo.getRecordID());
         if (nonIxnMsg.contains(msg.GetMessageName())) {
-            IxnNonIxn nonIxn = new IxnNonIxn(TableType.IxnNonIxn, msg);
+            IxnNonIxn nonIxn = new IxnNonIxn(TableType.IxnNonIxn, msg,  fileInfo.getRecordID());
             SetStdFieldsAndAdd(nonIxn);
 
         } else {
@@ -54,6 +54,7 @@ public class IxnServerParser extends Parser {
     @Override
     public int ParseFrom(BufferedReaderCrLf input, long offset, int line, FileInfo fi) {
         m_CurrentLine = line;
+        setFileInfo(fi);
 
 //        for (Class<? extends Record> class1 : avail) {
 //            try {
@@ -155,7 +156,7 @@ public class IxnServerParser extends Parser {
                     m_ParserState = ParserState.STATE_TMESSAGE;
                     break;
                 } else if ((m = regDBActivity.matcher(s)).find()) {
-                    IxnDBActivity msg = new IxnDBActivity(m.group(1), m.group(2), m.group(3));
+                    IxnDBActivity msg = new IxnDBActivity(m.group(1), m.group(2), m.group(3),  fileInfo.getRecordID());
                     SetStdFieldsAndAdd(msg);
                     break;
                 }

@@ -7,6 +7,8 @@ package com.myutils.logbrowser.indexer;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -19,8 +21,21 @@ public abstract class Record implements Cloneable {
     private static final Pattern regNoQuotes = Pattern.compile("^(['\"])(.+)\\1$");
     private static final Pattern regDNWithHost = Pattern.compile("^(\\w+)\\.");
     static String m_alias;
-    static int fileId = 0;
     private static int objCreated;
+
+    public static void setID(TableType file, int id) {
+        getAtomicInteger(file).set(id);
+    }
+
+    public static int getID(TableType file) {
+        return getAtomicInteger(file).get();
+    }
+
+    public int getFileID() {
+        return fileID;
+    }
+
+    private final int fileID;
     protected long m_FileBytes;
     private long m_fileOffset;
     private int m_line;
@@ -29,26 +44,34 @@ public abstract class Record implements Cloneable {
     private DateParsed m_TimestampDP = null;
     private int lastID = 0;
 
-    public Record(TableType type) {
-        this();
+    private int recordID;
+
+    private static final ConcurrentHashMap<TableType, AtomicInteger> idStorage = new ConcurrentHashMap<>();
+
+    private static AtomicInteger getAtomicInteger(TableType type){
+        AtomicInteger atomicInteger;
+        synchronized (type){
+            atomicInteger = idStorage.get(type);
+            if(atomicInteger==null){
+                atomicInteger = new AtomicInteger(0);
+                idStorage.put(type, atomicInteger);
+            }
+        }
+        return atomicInteger;
+    }
+
+    public Record(TableType type, int fileID) {
+        this.fileID=fileID;
         m_type = type;
+        recordID=getAtomicInteger(type).incrementAndGet();
         Main.logger.trace("Creating record type " + type);
         objCreated++;
     }
 
-    public Record() {
-
+    public int getRecordID() {
+        return recordID;
     }
 
-    /*initial value - 1 because when record is inserted into
-    file_logbr, initial ID is also 1. Bad design, sure, correct it next time*/
-    public static int getFileId() {
-        return fileId;
-    }
-
-    public static void setFileId(int m_fileId) {
-        Record.fileId = m_fileId;
-    }
 
     public static Integer getObjCreated() {
         return objCreated;
@@ -96,22 +119,6 @@ public abstract class Record implements Cloneable {
         m_alias = alias;
     }
 
-
-    public static void SetSipId(int sipId) {
-        m_sipId = sipId;
-    }
-
-    public static void SetTlibId(int tlibId) {
-        m_tlibId = tlibId;
-    }
-
-    public static void SetJsonId(int jsonId) {
-        m_jsonId = jsonId;
-    }
-
-    public static void SetProxiedId(int proxiedId) {
-        m_proxiedId = proxiedId;
-    }
 
     @Override
     protected Object clone() throws CloneNotSupportedException {

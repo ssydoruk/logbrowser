@@ -7,7 +7,7 @@ package com.myutils.logbrowser.indexer;
 /**
  * @author ssydoruk
  */
-public class ConnIdRecord extends Message {
+public class ConnIdRecord extends SIPServerBaseMessage {
 
     private final String m_connId;
 
@@ -15,14 +15,14 @@ public class ConnIdRecord extends Message {
     private boolean isTemp;
     private String newID;
 
-    ConnIdRecord(String oldId, String newId, boolean b) {
-        this(oldId, b);
+    ConnIdRecord(String oldId, String newId, boolean b, boolean m_handlerInProgress, int m_handlerId, int fileID) {
+        this(oldId, b,  m_handlerInProgress,  m_handlerId,  fileID);
         this.newID = newId;
 //        Main.logger.info("ConnIdRecord: ["+oldId+"] new["+newId+"]");
     }
 
-    public ConnIdRecord(String connId, boolean created) {
-        super(TableType.ConnID);
+    public ConnIdRecord(String connId, boolean created, boolean m_handlerInProgress, int m_handlerId, int fileID) {
+        super(TableType.ConnID,  m_handlerInProgress,  m_handlerId, fileID);
         this.isTemp = false;
         m_connId = connId;
         m_created = created;

@@ -127,7 +127,7 @@ public class UrsParser extends Parser {
         if (lastConnID == null) {
             Main.logger.error("Not added StrategyMessage -  connID is null; m_lineStarted:" + m_lineStarted);
         } else {
-            URSStrategy msg = new URSStrategy(m_MessageContents, lastConnID, FileLine, URSRest1);
+            URSStrategy msg = new URSStrategy(m_MessageContents, lastConnID, FileLine, URSRest1,  fileInfo.getRecordID());
             SetStdFieldsAndAdd(msg);
 //            try {
 //                msg.setM_TimestampDP(getCurrentTimestamp());
@@ -147,12 +147,12 @@ public class UrsParser extends Parser {
         Matcher m;
         Message msg;
         if ((FileLine.equals("14:33") || FileLine.equals("1B:01")) && (m = regStrategy.matcher(line)).find()) {
-            msg = new URSStrategyInit(line, lastConnID, m.group(1), "strategy is attached to the call");
+            msg = new URSStrategyInit(line, lastConnID, m.group(1), "strategy is attached to the call",  fileInfo.getRecordID());
         } else if (FileLine.equals("01:08")) {
-            msg = new URSStrategyInit(line, lastConnID, null, "call deleting truly");
+            msg = new URSStrategyInit(line, lastConnID, null, "call deleting truly",  fileInfo.getRecordID());
 
         } else {
-            msg = new URSStrategy(line, lastConnID, FileLine, URSRest);
+            msg = new URSStrategy(line, lastConnID, FileLine, URSRest,  fileInfo.getRecordID());
         }
         try {
             msg.setM_TimestampDP(getCurrentTimestamp());
@@ -166,7 +166,7 @@ public class UrsParser extends Parser {
     }
 
     private void AddURSStatMessage(String URSFileID, String URSRest1) throws Exception {
-        URSStat msg = new URSStat(m_MessageContents);
+        URSStat msg = new URSStat(m_MessageContents,  fileInfo.getRecordID());
         SetStdFieldsAndAdd(msg);
     }
 
@@ -176,7 +176,7 @@ public class UrsParser extends Parser {
     }
 
     private void AddRLibMessage() throws Exception {
-        URSRlib msg = new URSRlib(m_MessageContents);
+        URSRlib msg = new URSRlib(m_MessageContents,  fileInfo.getRecordID());
         if (!msg.isInbound()) {
             String message = msg.getMessage();
             if (message != null && message.equals("RequestInvoke")) {
@@ -191,14 +191,14 @@ public class UrsParser extends Parser {
         switch (UUID.length()) {
             case 32: {
                 //SID in orchestration
-                URSCONNIDSID msg = new URSCONNIDSID(ConnID, UUID);
+                URSCONNIDSID msg = new URSCONNIDSID(ConnID, UUID,  fileInfo.getRecordID());
                 SetStdFieldsAndAdd(msg);
                 break;
             }
 //        SetStdFieldsAndAdd(msg);
             case 16: {
                 //IxnID
-                URSCONNIDIxnID msg = new URSCONNIDIxnID(ConnID, UUID);
+                URSCONNIDIxnID msg = new URSCONNIDIxnID(ConnID, UUID,  fileInfo.getRecordID());
                 SetStdFieldsAndAdd(msg);
                 break;
             }
@@ -208,7 +208,7 @@ public class UrsParser extends Parser {
     }
 
     private boolean processHTTPBridgeRequest(String s) {
-        URSRI msg = new URSRI();
+        URSRI msg = new URSRI( fileInfo.getRecordID());
         msg.setRefid(Message.getRx(m_MessageContents.get(0), regRequestRef, 1, null));
         String theUrl = Message.GetHeaderValue("URL", ':', m_MessageContents);
         if (theUrl != null) {
@@ -228,7 +228,7 @@ public class UrsParser extends Parser {
     }
 
     private boolean processWebResponse() {
-        URSRI msg = new URSRI();
+        URSRI msg = new URSRI( fileInfo.getRecordID());
         Matcher m;
         if ((m = regWebResponse.matcher(m_MessageContents.get(0))).find()) {
             msg.setSubFunc(m.group(1));
@@ -247,7 +247,7 @@ public class UrsParser extends Parser {
     }
 
     private boolean processWebNotification(String URSRest, String lastConnID) {
-        URSRI msg = new URSRI();
+        URSRI msg = new URSRI( fileInfo.getRecordID());
         String theUrl = Message.getRx(URSRest, regWebNotifURL, 1, null);
         if (theUrl != null) {
             Matcher m;
@@ -268,7 +268,7 @@ public class UrsParser extends Parser {
         Matcher m;
         if ((m = regRIGenerated.matcher(s)).find()) {
             Main.logger.trace("regRIGenerated");
-            URSRI msg = new URSRI();
+            URSRI msg = new URSRI( fileInfo.getRecordID());
             msg.setConnID(m.group(1));
             msg.setClientID(m.group(2));
             msg.setClientApp(m.group(3));
@@ -277,7 +277,7 @@ public class UrsParser extends Parser {
             SetStdFieldsAndAdd(msg);
         } else if ((m = regRIResp.matcher(s)).find()) {
             Main.logger.trace("regRIResp");
-            msgTmp = new URSRI();
+            msgTmp = new URSRI( fileInfo.getRecordID());
             ((URSRI) msgTmp).setFunc(m.group(1));
             ((URSRI) msgTmp).setClientID(m.group(2));
             ((URSRI) msgTmp).setClientApp(m.group(3));
@@ -293,7 +293,7 @@ public class UrsParser extends Parser {
 
         } else if ((m = regRIRequestStart.matcher(s)).find()) {
             Main.logger.trace("regRIRequestStart");
-            URSRI msg = new URSRI();
+            URSRI msg = new URSRI( fileInfo.getRecordID());
             msg.setClientID(m.group(3));
             msg.setClientApp(m.group(4));
             msg.setRefid(m.group(5));
@@ -306,7 +306,7 @@ public class UrsParser extends Parser {
 
         } else if ((m = regRIRequestShort.matcher(s)).find()) {
             Main.logger.trace("regRIRequestShort");
-            URSRI msg = new URSRI();
+            URSRI msg = new URSRI( fileInfo.getRecordID());
             msg.setClientID(m.group(2));
             msg.setClientApp(m.group(3));
             msg.setRefid(m.group(4));
@@ -351,6 +351,7 @@ public class UrsParser extends Parser {
         m_CurrentFilePos = offset;
         m_CurrentLine = line;
         m_dbRecords = 0;
+        setFileInfo(fi);
 
         try {
             input.skip(offset);
@@ -411,7 +412,7 @@ public class UrsParser extends Parser {
 
                 if (genesysMsg != null) {
                     if ((m = reIID.matcher(str)).find()) {
-                        URSGenesysMsg msg = new URSGenesysMsg(genesysMsg, m.group(1));
+                        URSGenesysMsg msg = new URSGenesysMsg(genesysMsg, m.group(1),  fileInfo.getRecordID());
                         msg.AddToDB(m_tables);
                         genesysMsg = null;
                         return null;
@@ -690,7 +691,7 @@ public class UrsParser extends Parser {
 //            }
             case STATE_RI_CALLSTART: {
                 if ((m = regRIConnIDGenerated.matcher(str)).find()) {
-                    URSRI msg = new URSRI();
+                    URSRI msg = new URSRI( fileInfo.getRecordID());
                     msg.setFunc(m.group(5));
                     msg.setClientID(m.group(2));
                     msg.setClientApp(m.group(3));
@@ -849,7 +850,7 @@ public class UrsParser extends Parser {
             }
         }
 
-        UrsMessage msg = new UrsMessage(event, server, fileHandle, refID, contents);
+        UrsMessage msg = new UrsMessage(event, server, fileHandle, refID, contents,  fileInfo.getRecordID());
 
         msg.SetInbound(isInbound);
         msg.setRefID(refID);
@@ -861,7 +862,7 @@ public class UrsParser extends Parser {
     }
 
     private void AddConfigMessage(ArrayList<String> m_MessageContents) {
-        ConfigUpdateRecord msg = new ConfigUpdateRecord(m_MessageContents);
+        ConfigUpdateRecord msg = new ConfigUpdateRecord(m_MessageContents,  fileInfo.getRecordID());
         try {
             Matcher m;
             msg.setObjName(Message.FindByRx(m_MessageContents, regCfgObjectName, 1, ""));
@@ -881,7 +882,7 @@ public class UrsParser extends Parser {
             if ((m = Message.FindMatcher(m_MessageContents, regCfgAgentGroup)) != null) {
                 String[] split = StringUtils.split(m.group(1), ',');
                 if (split != null && split.length > 0) {
-                    URSAgentGroup ag = new URSAgentGroup(msg.getLastID());
+                    URSAgentGroup ag = new URSAgentGroup(msg.getLastID(),  fileInfo.getRecordID());
                     for (String string : split) {
                         ag.setAgentDBID(string);
                         ag.AddToDB(m_tables);
@@ -898,7 +899,7 @@ public class UrsParser extends Parser {
 
         hs.addAll(Arrays.asList(split)); //hashset would guarantee unique connIDs if multiple target blocks hit
         for (String h : hs) {
-            URSWaiting msg = new URSWaiting(ag, h);
+            URSWaiting msg = new URSWaiting(ag, h,  fileInfo.getRecordID());
             SetStdFieldsAndAdd(msg);
 
         }
@@ -908,7 +909,7 @@ public class UrsParser extends Parser {
         if (lastConnID == null) {
             Main.logger.error("m_lineStarted:" + m_lineStarted + " - processGUID (empty ConnID; message ignored)");
         } else {
-            URSVQ msg = new URSVQ();
+            URSVQ msg = new URSVQ(  fileInfo.getRecordID());
             msg.setConnID(theConnID);
             msg.setGUIDMsg(GUIDMsg);
             SetStdFieldsAndAdd(msg);
@@ -923,11 +924,11 @@ public class UrsParser extends Parser {
             String target = m.group(1);
             if (agents != null && agents.length > 0) {
                 for (String agent : agents) {
-                    URSTargetSet msg = new URSTargetSet(target, agent);
+                    URSTargetSet msg = new URSTargetSet(target, agent,  fileInfo.getRecordID());
                     SetStdFieldsAndAdd(msg);
                 }
             } else {
-                URSTargetSet msg = new URSTargetSet(target);
+                URSTargetSet msg = new URSTargetSet(target,  fileInfo.getRecordID());
                 SetStdFieldsAndAdd(msg);
                 Main.logger.trace("l: " + m_CurrentLine + " groupUpdated [" + line1015 + "] empty agent list");
             }
@@ -939,7 +940,7 @@ public class UrsParser extends Parser {
     private void AddStrategySCXMLMessage(String FileLine) {
         Matcher m;
         URSStrategy msg;
-        msg = new URSStrategy(lastConnID, FileLine, m_MessageContents);
+        msg = new URSStrategy(lastConnID, FileLine, m_MessageContents,  fileInfo.getRecordID());
         msg.parseSCXMLAttributes();
         SetStdFieldsAndAdd(msg);
 
@@ -950,7 +951,7 @@ public class UrsParser extends Parser {
         if (lastConnID == null) {
             Main.logger.error("Not added StrategyMessage -  connID is null; m_lineStarted:" + m_lineStarted);
         } else {
-            msg = new URSStrategy(lastConnID, URSFileID, m_MessageContents);
+            msg = new URSStrategy(lastConnID, URSFileID, m_MessageContents,  fileInfo.getRecordID());
         }
 
         if (!contents.isEmpty()) {
@@ -1016,8 +1017,8 @@ public class UrsParser extends Parser {
         private final int updateID;
         private int agentDBID;
 
-        private URSAgentGroup(int lastID) {
-            super(TableType.URSAgentGroupTable);
+        private URSAgentGroup(int lastID, int fileID) {
+            super(TableType.URSAgentGroupTable, fileID);
             this.updateID = lastID;
         }
 
@@ -1079,8 +1080,8 @@ public class UrsParser extends Parser {
             getM_dbAccessor().addToDB(m_InsertStatementId, new IFillStatement() {
                 @Override
                 public void fillStatement(PreparedStatement stmt) throws SQLException {
-                    generateID(stmt, 1, rec);
-                    stmt.setInt(2, Record.getFileId());
+                     stmt.setInt(1, rec.getRecordID());
+                    stmt.setInt(2, rec.getFileID());
 
                     stmt.setInt(3, rec.getUpdateID());
                     stmt.setInt(4, rec.getAgentDBID());
@@ -1098,8 +1099,8 @@ public class UrsParser extends Parser {
         String objectName;
         private int objectDBID;
 
-        private ObjectDBID(int objectDBID, String objectType, String objectName) {
-            super(TableType.ObjectDBID);
+        private ObjectDBID(int objectDBID, String objectType, String objectName, int fileID) {
+            super(TableType.ObjectDBID, fileID);
         }
 
         private int getObjectDBID() {
@@ -1158,7 +1159,7 @@ public class UrsParser extends Parser {
             getM_dbAccessor().addToDB(m_InsertStatementId, new IFillStatement() {
                 @Override
                 public void fillStatement(PreparedStatement stmt) throws SQLException {
-                    generateID(stmt, 1, rec);
+                     stmt.setInt(1, rec.getRecordID());
 //                setFieldInt(stmt,6, Main.getRef(ReferenceType.ObjectType, rec.objType()));
 //                setFieldInt(stmt,7, Main.getRef(ReferenceType.ObjectType, rec.objType()));
 //
@@ -1177,8 +1178,8 @@ public class UrsParser extends Parser {
         private final String connID;
         private final GenesysMsg msg;
 
-        private URSGenesysMsg(GenesysMsg msg, String connID) {
-            super(TableType.URSGenesysMessage);
+        private URSGenesysMsg(GenesysMsg msg, String connID, int fileID) {
+            super(TableType.URSGenesysMessage, fileID);
             this.msg = msg;
             this.connID = connID;
         }
@@ -1254,7 +1255,7 @@ public class UrsParser extends Parser {
                 @Override
                 public void fillStatement(PreparedStatement stmt) throws SQLException {
                     stmt.setTimestamp(1, new Timestamp(rec.getMsg().GetAdjustedUsecTime()));
-                    stmt.setInt(2, GenesysMsg.getFileId());
+                    stmt.setInt(2, rec.getFileID());
                     stmt.setLong(3, rec.getMsg().getM_fileOffset());
                     stmt.setLong(4, rec.getMsg().getFileBytes());
                     stmt.setLong(5, rec.getMsg().getM_line());

@@ -19,8 +19,8 @@ public class UrsMessage extends Message {
     private String refID;
     private String thisDN;
 
-    public UrsMessage(String event, String server, String fileHandle, String _refID, ArrayList newMessageLines) {
-        super(TableType.URSTlib);
+    public UrsMessage(String event, String server, String fileHandle, String _refID, ArrayList newMessageLines, int fileID) {
+        super(TableType.URSTlib, fileID);
         Main.logger.trace("event=[" + event + "] " + "server=[" + server + "] " + "fileHandle=[" + fileHandle + "] " + "newMessageLines=[" + newMessageLines + "] ");
         m_MessageLines = newMessageLines;
         m_MessageName = event;

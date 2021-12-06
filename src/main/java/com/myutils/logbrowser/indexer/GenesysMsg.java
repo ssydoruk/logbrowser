@@ -28,8 +28,8 @@ public final class GenesysMsg extends Message {
     private FileInfoType msgType;
     private String line;
 
-    public GenesysMsg(TableType t, String level, String msgID, String line) {
-        super(t);
+    public GenesysMsg(TableType t, String level, String msgID, String line, int fileID) {
+        super(t, fileID);
         this.level = level;
         this.msgID = msgID;
         this.line = line;
@@ -47,7 +47,7 @@ public final class GenesysMsg extends Message {
                                             boolean saveToDB) {
         GenesysMsg msg;
 
-        msg = new GenesysMsg(t, _lastGenesysMsgLevel, generatedMsgID, generatedMsg);
+        msg = new GenesysMsg(t, _lastGenesysMsgLevel, generatedMsgID, generatedMsg, p. fileInfo.getRecordID());
 
         msg.setM_Timestamp(dp);
         msg.SetOffset(p.getFilePos());

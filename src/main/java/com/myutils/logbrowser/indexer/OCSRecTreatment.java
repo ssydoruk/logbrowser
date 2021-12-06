@@ -21,8 +21,8 @@ public final class OCSRecTreatment extends Message {
     private int chanID = -1;
     private int ChainNum = -1;
 
-    public OCSRecTreatment(ArrayList newMessageLines) {
-        super(TableType.OCSTreatment);
+    public OCSRecTreatment(ArrayList newMessageLines, int fileID) {
+        super(TableType.OCSTreatment, fileID);
         m_MessageLines = newMessageLines;
         Matcher m;
         if ((m = FindRx(regRecHandle)) != null) {

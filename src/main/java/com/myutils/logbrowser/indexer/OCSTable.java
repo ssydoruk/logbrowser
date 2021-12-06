@@ -100,7 +100,7 @@ public class OCSTable extends DBTable {
             @Override
             public void fillStatement(PreparedStatement stmt) throws SQLException{
             stmt.setTimestamp(1, new Timestamp(rec.GetAdjustedUsecTime()));
-            stmt.setInt(2, OcsMessage.getFileId());
+            stmt.setInt(2, rec.getFileID());
             setFieldLong(stmt, 3, rec.getM_fileOffset());
             setFieldLong(stmt, 4, rec.getM_FileBytes());
             setFieldInt(stmt, 5, rec.getM_line());

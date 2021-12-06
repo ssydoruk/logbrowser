@@ -40,16 +40,16 @@ public class LCAClient extends Message {
     private String status;
     private String host;
 
-    LCAClient(String s) {
-        super(TableType.LCAClient, s);
+    LCAClient(String s, int fileID) {
+        super(TableType.LCAClient, s, fileID);
     }
 
-    public LCAClient() {
-        super(TableType.LCAClient);
+    public LCAClient( int fileID) {
+        super(TableType.LCAClient, fileID);
     }
 
-    LCAClient(ArrayList<String> m_MessageContents) {
-        super(TableType.LCAClient, m_MessageContents);
+    LCAClient(ArrayList<String> m_MessageContents, int fileID) {
+        super(TableType.LCAClient, m_MessageContents, fileID);
     }
 
     public String getHost() {

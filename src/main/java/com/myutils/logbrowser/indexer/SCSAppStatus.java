@@ -21,12 +21,12 @@ public class SCSAppStatus extends Message {
     private String status;
     private String host;
 
-    public SCSAppStatus() {
-        super(TableType.SCSAppStatus);
+    public SCSAppStatus( int fileID) {
+        super(TableType.SCSAppStatus, fileID);
     }
 
-    SCSAppStatus(ArrayList<String> m_MessageContents) {
-        super(TableType.SCSAppStatus, m_MessageContents);
+    SCSAppStatus(ArrayList<String> m_MessageContents, int fileID) {
+        super(TableType.SCSAppStatus, m_MessageContents, fileID);
     }
 
     public String getHost() {

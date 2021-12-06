@@ -10,8 +10,8 @@ public class URSCONNIDSID extends Message {
     private final String ConnID;
     private final String SIDID;
 
-    URSCONNIDSID(String ConnID, String SIDID) {
-        super(TableType.URSCONNIDSID);
+    URSCONNIDSID(String ConnID, String SIDID, int fileID) {
+        super(TableType.URSCONNIDSID, fileID);
         this.ConnID = ConnID;
         this.SIDID = SIDID;
     }

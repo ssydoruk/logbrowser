@@ -10,18 +10,18 @@ import org.json.JSONObject;
 /**
  * @author ssydoruk
  */
-public class JsonMessage extends Message {
+public class JsonMessage extends SIPServerBaseMessage {
 
     JSONObject m_contents;
 
-    public JsonMessage(JSONObject contents) {
-        super(TableType.JSon);
+    public JsonMessage(JSONObject contents, boolean m_handlerInProgress, int m_handlerId, int fileID) {
+        super(TableType.JSon,m_handlerInProgress,m_handlerId, fileID);
         m_contents = contents;
     }
 
     @Override
     public String toString() {
-        return "JsonMessage{" + "m_contents=" + m_contents + "m_jsonId=" + m_jsonId + '}' + super.toString();
+        return "JsonMessage{" + "m_contents=" + m_contents + "m_jsonId=" + getRecordID() + '}' + super.toString();
     }
 
     public String GetOrigUri() {
@@ -57,6 +57,6 @@ public class JsonMessage extends Message {
     }
 
     int getHanglerID() {
-        return (m_handlerInProgress ? m_handlerId : 0);
+        return (isM_handlerInProgress()  ? getHanglerID() : 0);
     }
 }

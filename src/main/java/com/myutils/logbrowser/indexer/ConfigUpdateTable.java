@@ -73,9 +73,9 @@ public class ConfigUpdateTable extends DBTable {
          getM_dbAccessor().addToDB(m_InsertStatementId, new IFillStatement() {
                 @Override
                 public void fillStatement(PreparedStatement stmt) throws SQLException{
-            generateID(stmt, 1, rec);
+             stmt.setInt(1, rec.getRecordID());
             stmt.setTimestamp(2, new Timestamp(rec.GetAdjustedUsecTime()));
-            stmt.setInt(3, ConfigUpdateRecord.getFileId());
+            stmt.setInt(3, rec.getFileID());
             stmt.setLong(4, rec.getM_fileOffset());
             stmt.setLong(5, rec.getM_FileBytes());
             stmt.setLong(6, rec.getM_line());

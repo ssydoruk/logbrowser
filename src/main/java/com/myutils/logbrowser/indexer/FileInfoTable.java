@@ -75,25 +75,24 @@ public class FileInfoTable extends DBTable {
         FileInfo fiRec = (FileInfo) rec;
         getM_dbAccessor().addToDB(m_InsertStatementId, new IFillStatement() {
             @Override
-            public void fillStatement(PreparedStatement stmt) throws SQLException{
-            generateID(stmt, 1, fiRec);
+            public void fillStatement(PreparedStatement stmt) throws SQLException {
+                stmt.setInt(1, rec.getRecordID());
 
-            setFieldString(stmt, 2, fiRec.getM_path());
-            stmt.setLong(3, fiRec.getM_runId());
-            stmt.setInt(4, fiRec.getM_componentType().ordinal());
-            setFieldString(stmt, 5, fiRec.getM_nodeId());
-            filesAdded++;
-            setFieldInt(stmt, 6, Main.getRef(ReferenceType.App, fiRec.getAppName()));
-            setFieldString(stmt, 7, fiRec.getHost());
-            setFieldInt(stmt, 8, Main.getRef(ReferenceType.AppType, fiRec.getAppType()));
-            stmt.setInt(9, fiRec.getLogFileNo());
-            setFieldString(stmt, 10, fiRec.getLogFileName());
-            stmt.setTimestamp(11, new Timestamp(fiRec.getStartTime()));
-            stmt.setLong(12, fiRec.getSize());
-            stmt.setTimestamp(13, new Timestamp(fiRec.getFileStartTimeLong()));
-            stmt.setTimestamp(14, new Timestamp(fiRec.getEndTime()));
-            setFieldString(stmt, 15, fiRec.getArchiveName());
-
+                setFieldString(stmt, 2, fiRec.getM_path());
+                stmt.setLong(3, fiRec.getM_runId());
+                stmt.setInt(4, fiRec.getM_componentType().ordinal());
+                setFieldString(stmt, 5, fiRec.getM_nodeId());
+                filesAdded++;
+                setFieldInt(stmt, 6, Main.getRef(ReferenceType.App, fiRec.getAppName()));
+                setFieldString(stmt, 7, fiRec.getHost());
+                setFieldInt(stmt, 8, Main.getRef(ReferenceType.AppType, fiRec.getAppType()));
+                stmt.setInt(9, fiRec.getLogFileNo());
+                setFieldString(stmt, 10, fiRec.getLogFileName());
+                stmt.setTimestamp(11, new Timestamp(fiRec.getStartTime()));
+                stmt.setLong(12, fiRec.getSize());
+                stmt.setTimestamp(13, new Timestamp(fiRec.getFileStartTimeLong()));
+                stmt.setTimestamp(14, new Timestamp(fiRec.getEndTime()));
+                setFieldString(stmt, 15, fiRec.getArchiveName());
             }
         });
     }

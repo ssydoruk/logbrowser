@@ -24,18 +24,18 @@ public class ORSMetric extends Message {
     public String Method = "";
     private String param1;
 
-    public ORSMetric(String line) {
-        super(TableType.ORSMetric, line);
+    public ORSMetric(String line, int fileID) {
+        super(TableType.ORSMetric, line, fileID);
         FindSID();
     }
 
-    ORSMetric(ArrayList m_MessageContents) {
-        super(TableType.ORSMetric, m_MessageContents);
+    ORSMetric(ArrayList m_MessageContents, int fileID) {
+        super(TableType.ORSMetric, m_MessageContents, fileID);
         FindSID();
     }
 
-    ORSMetric(String line, String _Method, String _sid) {
-        super(TableType.ORSMetric, line);
+    ORSMetric(String line, String _Method, String _sid, int fileID) {
+        super(TableType.ORSMetric, line, fileID);
         Method = _Method;
         sid = _sid;
     }

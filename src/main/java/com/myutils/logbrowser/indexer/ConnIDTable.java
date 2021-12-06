@@ -64,14 +64,14 @@ public class ConnIDTable extends DBTable {
             @Override
             public void fillStatement(PreparedStatement stmt) throws SQLException{
             stmt.setTimestamp(1, new Timestamp(theRec.GetAdjustedUsecTime()));
-            stmt.setInt(2, ConnIdRecord.getFileId());
+            stmt.setInt(2, rec.getFileID());
             stmt.setLong(3, theRec.getM_fileOffset());
             stmt.setLong(4, theRec.getM_FileBytes());
             stmt.setInt(5, rec.getM_line());
 
             setFieldInt(stmt, 6, Main.getRef(ReferenceType.ConnID, theRec.getM_connId()));
-            stmt.setInt(7, (ConnIdRecord.m_handlerInProgress ? ConnIdRecord.m_handlerId : 0));
-            Main.logger.trace("theRec.m_handlerId :" + ConnIdRecord.m_handlerId + " theRec.m_handlerInProgress" + ConnIdRecord.m_handlerInProgress);
+            stmt.setInt(7, (theRec.isM_handlerInProgress()  ? theRec.getM_handlerId() : 0));
+            Main.logger.trace("theRec.m_handlerId :" +  theRec.getM_handlerId() + " theRec.m_handlerInProgress" + theRec.isM_handlerInProgress());
 
             stmt.setBoolean(8, theRec.isM_created());
             stmt.setBoolean(9, theRec.isIsTemp());

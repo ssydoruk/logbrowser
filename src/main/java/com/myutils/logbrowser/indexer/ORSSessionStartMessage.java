@@ -25,12 +25,12 @@ public class ORSSessionStartMessage extends Message {
     private String clientIP;
     private String newSessionID;
 
-    ORSSessionStartMessage(ArrayList<String> m_MessageContents) {
-        super(TableType.ORSSessionStart, m_MessageContents);
+    ORSSessionStartMessage(ArrayList<String> m_MessageContents, int fileID) {
+        super(TableType.ORSSessionStart, m_MessageContents, fileID);
     }
 
-    ORSSessionStartMessage() {
-        super(TableType.ORSSessionStart);
+    ORSSessionStartMessage( int fileID) {
+        super(TableType.ORSSessionStart, fileID);
     }
 
     public boolean isIsTServerReq() {

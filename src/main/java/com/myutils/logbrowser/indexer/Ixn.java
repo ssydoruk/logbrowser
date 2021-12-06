@@ -121,8 +121,8 @@ public class Ixn extends Message {
     private String clientName = null;
     private String messageName = null;
 
-    public Ixn(TableType t, ArrayList messageLines) {
-        super(t, messageLines);
+    public Ixn(TableType t, ArrayList messageLines, int fileID) {
+        super(t, messageLines, fileID);
         attrs.add(reIxnID);
         attrs.add(reAgentID);
         attrs.add(placeID);
@@ -135,8 +135,8 @@ public class Ixn extends Message {
         attrs.parseAttributes();
     }
 
-    public Ixn(ArrayList messageLines) {
-        this(TableType.Ixn, messageLines);
+    public Ixn(ArrayList messageLines, int fileID) {
+        this(TableType.Ixn, messageLines, fileID);
         this.messageName = parseMessageName();
     }
 

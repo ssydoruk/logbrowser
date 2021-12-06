@@ -223,14 +223,13 @@ public class Main {
 
     private void initStatic(SqliteAccessor m_accessor) throws Exception {
         processedFiles.loadFiles(m_accessor.getObjMultiple("select id, intfilename, size from file_logbr", "file_logbr"));
-        Record.setFileId(m_accessor.getID("select max(id) from file_logbr;", "file_logbr", 0));
-        Record.m_handlerId = m_accessor.getID("select max(HandlerId) from sip_" + m_accessor.getM_alias() + ";", "sip_" + m_accessor.getM_alias(), 0);
-        Record.m_handlerId = m_accessor.getID("select max(HandlerId) from tlib_" + m_accessor.getM_alias() + ";", "tlib_" + m_accessor.getM_alias(), Record.m_handlerId);
-        Record.m_handlerId = m_accessor.getID("select max(HandlerId) from cireq_" + m_accessor.getM_alias() + ";", "cireq_" + m_accessor.getM_alias(), Record.m_handlerId);
-        Record.m_handlerId++;
-        Record.m_sipId = m_accessor.getID("select max(SipId) from trigger_" + m_accessor.getM_alias() + ";", "trigger_" + m_accessor.getM_alias(), 0) + 1;
-        Record.m_tlibId = m_accessor.getID("select max(TlibId) from trigger_" + m_accessor.getM_alias() + ";", "trigger_" + m_accessor.getM_alias(), 0) + 1;
-        Record.m_jsonId = m_accessor.getID("select max(JsonId) from trigger_" + m_accessor.getM_alias() + ";", "trigger_" + m_accessor.getM_alias(), 0) + 1;
+        Record.setID(TableType.File, m_accessor.getID("select max(id) from file_logbr;", "file_logbr", 0));
+        Record.setID(TableType.Handler, m_accessor.getID("select max(HandlerId) from sip_" + m_accessor.getM_alias() + ";", "sip_" + m_accessor.getM_alias(), 0));
+        Record.setID(TableType.Handler, m_accessor.getID("select max(HandlerId) from tlib_" + m_accessor.getM_alias() + ";", "tlib_" + m_accessor.getM_alias(), Record.getID(TableType.Handler)));
+        Record.setID(TableType.Handler,m_accessor.getID("select max(HandlerId) from cireq_" + m_accessor.getM_alias() + ";", "cireq_" + m_accessor.getM_alias(),Record.getID(TableType.Handler)));
+        Record.setID(TableType.SIP,m_accessor.getID("select max(SipId) from trigger_" + m_accessor.getM_alias() + ";", "trigger_" + m_accessor.getM_alias(), 0) );
+        Record.setID(TableType.TLib, m_accessor.getID("select max(SipId) from trigger_" + m_accessor.getM_alias() + ";", "trigger_" + m_accessor.getM_alias(), 0) );
+        Record.setID(TableType.JSon, m_accessor.getID("select max(JsonId) from trigger_" + m_accessor.getM_alias() + ";", "trigger_" + m_accessor.getM_alias(), 0) );
     }
 
     public SqliteAccessor getM_accessor() {
@@ -356,14 +355,11 @@ public class Main {
         DBTable t;
         m_FileInfoTable = new FileInfoTable(m_accessor);
         m_FileInfoTable.InitDB();
-        m_FileInfoTable.setCurrentID(Record.getFileId());
-
         m_tables = new HashMap<>();
 
         m_tables.put(TableType.ConfigUpdate, new ConfigUpdateTable(m_accessor, TableType.ConfigUpdate));
 
         t = new TLibTable(m_accessor, TableType.TLib);
-        t.setCurrentID(Record.m_tlibId);
         m_tables.put(TableType.TLib, t);
         m_tables.put(TableType.TLibProxied, new ProxiedTable(m_accessor, TableType.TLibProxied));
 
@@ -371,12 +367,10 @@ public class Main {
         m_tables.put(TableType.CIFaceRequest, new CIFaceRequestTable(m_accessor, TableType.CIFaceRequest));
         m_tables.put(TableType.ISCC, new ISCCTable(m_accessor, TableType.ISCC));
         t = new SIPTable(m_accessor, TableType.SIP);
-        t.setCurrentID(Record.m_sipId);
         m_tables.put(TableType.SIP, t);
         m_tables.put(TableType.ConnID, new ConnIDTable(m_accessor, TableType.ConnID));
         m_tables.put(TableType.Trigger, new TriggerTable(m_accessor, TableType.Trigger));
         t = new JsonTable(m_accessor, TableType.JSon);
-        t.setCurrentID(Record.m_jsonId);
         m_tables.put(TableType.JSon, t);
 
         m_tables.put(TableType.URSWaiting, new URSWaitingTable(m_accessor, TableType.URSWaiting));

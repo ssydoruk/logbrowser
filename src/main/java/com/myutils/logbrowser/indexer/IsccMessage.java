@@ -11,7 +11,7 @@ import java.util.regex.Pattern;
 /**
  * @author ssydoruk
  */
-public class IsccMessage extends Message {
+public class IsccMessage extends SIPServerBaseMessage {
 
     private static final Pattern regRefID = Pattern.compile("\\s*ISCCAttributeReferenceID\\s*(\\d+)");
     private static final Pattern regSrcSwitch = Pattern.compile("(?:from|to)\\s+server\\s+([^\\@]+)\\@([^/:\\s]+)");
@@ -20,8 +20,8 @@ public class IsccMessage extends Message {
     private String app = null;
     private String connID = null;
 
-    public IsccMessage(String event, ArrayList newMessageLines) {
-        super(TableType.ISCC);
+    public IsccMessage(String event, ArrayList newMessageLines, boolean m_handlerInProgress, int m_handlerId, int fileID) {
+        super(TableType.ISCC,  m_handlerInProgress,  m_handlerId, fileID);
         m_MessageLines = newMessageLines;
         m_MessageName = event;
         m_MessageLines.add(0, event);

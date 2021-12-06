@@ -61,7 +61,7 @@ public class ExceptionTable extends DBTable {
                 public void fillStatement(PreparedStatement stmt) throws SQLException{
 
             stmt.setTimestamp(1, new Timestamp(exceptionRec.GetAdjustedUsecTime()));
-            stmt.setInt(2, ExceptionMessage.getFileId());
+            stmt.setInt(2, rec.getFileID());
             stmt.setLong(3, exceptionRec.getM_fileOffset());
             stmt.setLong(4, exceptionRec.getM_FileBytes());
             stmt.setLong(5, exceptionRec.getM_line());

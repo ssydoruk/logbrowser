@@ -4,6 +4,8 @@
  */
 package com.myutils.logbrowser.indexer;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 /**
  * @author ssydoruk
  */
@@ -11,13 +13,14 @@ public class Handler extends Record {
 
     private String m_text;
 
-    public Handler() {
-        super(TableType.Handler);
+
+    public Handler(int fileID) {
+        super(TableType.Handler, fileID);
     }
 
     @Override
     public String toString() {
-        return "Handler{" + "m_text=" + m_text + "m_handlerId=" + m_handlerId + '}' + super.toString();
+        return "Handler{" + "m_text=" + m_text + "m_handlerId=" + getRecordID() + '}' + super.toString();
     }
 
     public String getM_text() {
@@ -64,8 +67,4 @@ public class Handler extends Record {
         }
     }
      */
-    void IncHandler() {
-        m_handlerId++;
-        Main.logger.trace("IncHandler:" + m_handlerId);
-    }
 }

@@ -56,7 +56,7 @@ public class StSActionTable extends DBTable {
             setFieldInt(stmt, 3, Main.getRef(ReferenceType.DNTYPE, theRec.GetType()));
             setFieldInt(stmt, 4, Main.getRef(ReferenceType.StatEvent, theRec.GetValue()));
             setFieldInt(stmt, 5, Main.getRef(ReferenceType.ConnID, theRec.GetConnID()));
-            setFieldInt(stmt, 6, StSActionMessage.getFileId());
+            setFieldInt(stmt, 6, theRec.getFileID());
             stmt.setLong(7, theRec.getM_fileOffset());
             stmt.setLong(8, theRec.getFileBytes());
             setFieldInt(stmt, 9, theRec.getM_line());

@@ -73,6 +73,7 @@ public class WWECloudParser extends Parser {
     public int ParseFrom(BufferedReaderCrLf input, long offset, int line, FileInfo fi) {
         m_CurrentFilePos = offset;
         m_CurrentLine = line;
+        setFileInfo(fi);
 
         m_dbRecords = 0;
 
@@ -297,7 +298,7 @@ public class WWECloudParser extends Parser {
 
 
         public WWECloudMessage(String event, ArrayList newMessageLines, boolean isTServerReq) {
-            super(TableType.WWECloud);
+            super(TableType.WWECloud,  fileInfo.getRecordID());
             m_MessageLines = newMessageLines;
             m_MessageName = event;
             this.isTServerReq = isTServerReq;
@@ -440,7 +441,7 @@ public class WWECloudParser extends Parser {
                 public void fillStatement(PreparedStatement stmt) throws SQLException {
 
                     stmt.setTimestamp(1, new Timestamp(wweRec.GetAdjustedUsecTime()));
-                    stmt.setInt(2, WWECloudMessage.getFileId());
+                    stmt.setInt(2, rec.getFileID());
                     stmt.setLong(3, wweRec.getM_fileOffset());
                     stmt.setLong(4, wweRec.getM_FileBytes());
                     stmt.setLong(5, wweRec.getM_line());
@@ -470,7 +471,7 @@ public class WWECloudParser extends Parser {
         private class WWECloudAuthMsg extends Message {
 
             private WWECloudAuthMsg(ArrayList<String> m_MessageContents) {
-                super(TableType.WWECloudAuth, m_MessageContents);
+                super(TableType.WWECloudAuth, m_MessageContents,  fileInfo.getRecordID());
             }
 
             private String getSuccess() {
@@ -550,7 +551,7 @@ public class WWECloudParser extends Parser {
                     @Override
                     public void fillStatement(PreparedStatement stmt) throws SQLException {
                         stmt.setTimestamp(1, new Timestamp(rec.GetAdjustedUsecTime()));
-                        stmt.setInt(2, WWECloudAuthMsg.getFileId());
+                        stmt.setInt(2, rec.getFileID());
                         stmt.setLong(3, rec.getM_fileOffset());
                         stmt.setLong(4, rec.getM_FileBytes());
                         stmt.setLong(5, rec.getM_line());
@@ -573,7 +574,7 @@ public class WWECloudParser extends Parser {
             private final String msgText;
 
             private WWECloudLogMsg(String m_msgName, String msgText) {
-                super(TableType.WWECloudLog);
+                super(TableType.WWECloudLog,   fileInfo.getRecordID());
                 this.msg = m_msgName;
                 this.msgText = optimizeText(msgText);
             }
@@ -603,7 +604,7 @@ public class WWECloudParser extends Parser {
             private final String msg;
 
             private WWECloudExeptionMsg(String exName, String msg) {
-                super(TableType.WWECloudException);
+                super(TableType.WWECloudException,  fileInfo.getRecordID());
                 this.exceptionName = exName;
                 this.msg = msg;
             }
@@ -670,7 +671,7 @@ public class WWECloudParser extends Parser {
                     @Override
                     public void fillStatement(PreparedStatement stmt) throws SQLException {
                         stmt.setTimestamp(1, new Timestamp(rec.GetAdjustedUsecTime()));
-                        stmt.setInt(2, WWECloudExeptionMsg.getFileId());
+                        stmt.setInt(2, rec.getFileID());
                         stmt.setLong(3, rec.getM_fileOffset());
                         stmt.setLong(4, rec.getM_FileBytes());
                         stmt.setLong(5, rec.getM_line());
@@ -736,7 +737,7 @@ public class WWECloudParser extends Parser {
                     @Override
                     public void fillStatement(PreparedStatement stmt) throws SQLException {
                         stmt.setTimestamp(1, new Timestamp(rec.GetAdjustedUsecTime()));
-                        stmt.setInt(2, WWECloudLogMsg.getFileId());
+                        stmt.setInt(2, rec.getFileID());
                         stmt.setLong(3, rec.getM_fileOffset());
                         stmt.setLong(4, rec.getM_FileBytes());
                         stmt.setLong(5, rec.getM_line());

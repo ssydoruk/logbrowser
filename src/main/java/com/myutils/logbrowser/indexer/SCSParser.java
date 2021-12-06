@@ -51,6 +51,7 @@ public class SCSParser extends Parser {
     public int ParseFrom(BufferedReaderCrLf input, long offset, int line, FileInfo fi) {
         m_CurrentFilePos = offset;
         m_CurrentLine = line;
+        setFileInfo(fi);
 
         m_dbRecords = 0;
 
@@ -140,7 +141,7 @@ public class SCSParser extends Parser {
                     lastMSGText = m.group(2);
                     m_ParserState = ParserState.STATE_CLIENT_MESSAGE_RECEIVED;
                 } else if ((m = regAlarmCreated.matcher(s)).find()) {
-                    msg = new SCSAlarm(AlarmState.Creating);
+                    msg = new SCSAlarm(AlarmState.Creating,  fileInfo.getRecordID());
                     ((SCSAlarm) msg).setAlarmDBID(m.group(1));
                     ((SCSAlarm) msg).setAlarmName(m.group(2));
                     ((SCSAlarm) msg).setAppDBID(m.group(3));
@@ -150,7 +151,7 @@ public class SCSParser extends Parser {
                     m_ParserState = ParserState.STATE_ALARM_CREATED;
                     setSavedFilePos(getFilePos());
                 } else if ((m = regAlarmCleared.matcher(s)).find()) {
-                    msg = new SCSAlarm(AlarmState.Releasing);
+                    msg = new SCSAlarm(AlarmState.Releasing,  fileInfo.getRecordID());
                     ((SCSAlarm) msg).setHost(m.group(1));
                     ((SCSAlarm) msg).setAppName(m.group(2));
                     ((SCSAlarm) msg).setAlarmName(m.group(3));
@@ -159,7 +160,7 @@ public class SCSParser extends Parser {
                     m_ParserState = ParserState.STATE_ALARM_PARAMS_CLEARED;
                     setSavedFilePos(getFilePos());
                 } else if ((m = regAppRunModeChanged.matcher(s)).find()) {
-                    SCSAppStatus _msg = new SCSAppStatus();
+                    SCSAppStatus _msg = new SCSAppStatus(  fileInfo.getRecordID());
                     _msg.setNewMode(m.group(1));
                     _msg.setAppDBID(m.group(2));
                     _msg.setAppName(m.group(3));
@@ -169,7 +170,7 @@ public class SCSParser extends Parser {
                     _msg.setEvent("AppRunModeChanged");
                     SetStdFieldsAndAdd(_msg);
                 } else if ((m = regNotifyApp.matcher(s)).find()) {
-                    SCSAppStatus _msg = new SCSAppStatus();
+                    SCSAppStatus _msg = new SCSAppStatus(  fileInfo.getRecordID());
                     _msg.setNewMode(m.group(3));
                     _msg.setAppDBID(m.group(5));
                     _msg.setAppName(m.group(6));
@@ -180,7 +181,7 @@ public class SCSParser extends Parser {
                     SetStdFieldsAndAdd(_msg);
 
                 } else if ((m = regSCSReq.matcher(s)).find()) {
-                    SCSAppStatus _msg = new SCSAppStatus();
+                    SCSAppStatus _msg = new SCSAppStatus(  fileInfo.getRecordID());
                     _msg.setAppDBID(m.group(1));
                     _msg.setAppName(m.group(2));
                     _msg.setOldMode(m.group(3));
@@ -189,7 +190,7 @@ public class SCSParser extends Parser {
                     SetStdFieldsAndAdd(_msg);
 
                 } else if ((m = regSelfServer.matcher(s)).find()) {
-                    SCSSelfStatus _msg = new SCSSelfStatus();
+                    SCSSelfStatus _msg = new SCSSelfStatus( fileInfo.getRecordID());
                     _msg.setNewMode(m.group(2));
                     _msg.setOldMode(m.group(1));
                     SetStdFieldsAndAdd(_msg);
@@ -202,7 +203,7 @@ public class SCSParser extends Parser {
             case STATE_CLIENT_MESSAGE_RECEIVED: {
                 s = ParseGenesysSCS(str, TableType.MsgSCServer, regNotParseMessage, regLineSkip);
                 if ((m = regAlarmCreated.matcher(s)).find()) {
-                    msg = new SCSAlarm(AlarmState.Creating);
+                    msg = new SCSAlarm(AlarmState.Creating,  fileInfo.getRecordID());
                     ((SCSAlarm) msg).setMsgID(lastMSGID);
                     ((SCSAlarm) msg).setMsgText(lastMSGText);
                     lastMSGID = null;
@@ -216,7 +217,7 @@ public class SCSParser extends Parser {
                     m_ParserState = ParserState.STATE_ALARM_CREATED;
                     setSavedFilePos(getFilePos());
                 } else if ((m = regAlarmCleared.matcher(s)).find()) {
-                    msg = new SCSAlarm(AlarmState.Releasing);
+                    msg = new SCSAlarm(AlarmState.Releasing,  fileInfo.getRecordID());
                     ((SCSAlarm) msg).setMsgID(lastMSGID);
                     ((SCSAlarm) msg).setMsgText(lastMSGText);
                     lastMSGID = null;
@@ -229,7 +230,7 @@ public class SCSParser extends Parser {
                     m_ParserState = ParserState.STATE_ALARM_PARAMS_CLEARED;
                     setSavedFilePos(getFilePos());
                 } else if ((m = regAlarmActive.matcher(s)).find()) {
-                    msg = new SCSAlarm(AlarmState.ReActivate);
+                    msg = new SCSAlarm(AlarmState.ReActivate,  fileInfo.getRecordID());
                     ((SCSAlarm) msg).setMsgID(lastMSGID);
                     ((SCSAlarm) msg).setMsgText(lastMSGText);
                     lastMSGID = null;
@@ -243,7 +244,7 @@ public class SCSParser extends Parser {
                     m_MessageContents.clear();
                     m_ParserState = ParserState.STATE_COMMENTS;
                 } else {
-                    SCSClientLogMessage _msg = new SCSClientLogMessage(lastMSGID, lastMSGText);
+                    SCSClientLogMessage _msg = new SCSClientLogMessage(lastMSGID, lastMSGText,  fileInfo.getRecordID());
 
                     SetStdFieldsAndAdd(_msg);
                     m_ParserState = ParserState.STATE_COMMENTS;
@@ -320,7 +321,7 @@ public class SCSParser extends Parser {
             case STATE_APP_STATUS_CHANGED1: {
                 if ((m = regNOtificationReceived.matcher(str)).find()) {
                     m_MessageContents.add(str);
-                    SCSAppStatus _msg = new SCSAppStatus(m_MessageContents);
+                    SCSAppStatus _msg = new SCSAppStatus(m_MessageContents,  fileInfo.getRecordID());
                     _msg.setAppDBID(m.group(1));
                     _msg.setAppName(m.group(2));
                     _msg.setNewMode(m.group(3));
@@ -357,10 +358,10 @@ public class SCSParser extends Parser {
 
         if ((headerList.length == 6) && headerList[3].startsWith("Creating")) {
             String event = headerList[3];
-            _msg = new StSRequestHistoryMessage(event, contents);
+            _msg = new StSRequestHistoryMessage(event, contents,  fileInfo.getRecordID());
         } else if (headerList.length > 4) {
             String event = headerList[4].substring(1, headerList[4].length() - 1);
-            _msg = new StSRequestHistoryMessage(event, contents);
+            _msg = new StSRequestHistoryMessage(event, contents,  fileInfo.getRecordID());
         } else {
             return;
         }
@@ -390,7 +391,7 @@ public class SCSParser extends Parser {
     }
 
     private void addRunModeChanged(String substring) {
-        ConfigUpdateRecord _msg = new ConfigUpdateRecord(substring);
+        ConfigUpdateRecord _msg = new ConfigUpdateRecord(substring,  fileInfo.getRecordID());
         try {
             Matcher m;
 //            msg.setObjName(Message.FindByRx(m_MessageContents, regCfgObjectName, 1, ""));
@@ -475,12 +476,12 @@ public class SCSParser extends Parser {
         private int msgID;
         private String msgText;
 
-        SCSClientLogMessage(TableType t) {
-            super(t);
+        SCSClientLogMessage(TableType t,  int fileID) {
+            super(t, fileID);
         }
 
-        private SCSClientLogMessage(String msgID, String msgText) {
-            this(TableType.SCSClientLogMessage);
+        private SCSClientLogMessage(String msgID, String msgText, int fileID) {
+            this(TableType.SCSClientLogMessage, fileID);
 
             setMsgID(msgID);
             setMsgText(msgText);
@@ -562,7 +563,7 @@ public class SCSParser extends Parser {
                 @Override
                 public void fillStatement(PreparedStatement stmt) throws SQLException{
                 stmt.setTimestamp(1, new Timestamp(rec.GetAdjustedUsecTime()));
-                stmt.setInt(2, SCSClientLogMessage.getFileId());
+                stmt.setInt(2, rec.getFileID());
                 stmt.setLong(3, rec.getM_fileOffset());
                 stmt.setLong(4, rec.getM_FileBytes());
                 stmt.setLong(5, rec.getM_line());
@@ -590,8 +591,8 @@ public class SCSParser extends Parser {
         private String category;
         private String host;
 
-        private SCSAlarm(AlarmState st) {
-            super(TableType.SCSAlarm);
+        private SCSAlarm(AlarmState st, int fileID) {
+            super(TableType.SCSAlarm, fileID);
             this.alarmState = st;
         }
 
@@ -736,7 +737,7 @@ public class SCSParser extends Parser {
                 @Override
                 public void fillStatement(PreparedStatement stmt) throws SQLException{
                 stmt.setTimestamp(1, new Timestamp(rec.GetAdjustedUsecTime()));
-                stmt.setInt(2, SCSAlarm.getFileId());
+                stmt.setInt(2, rec.getFileID());
                 stmt.setLong(3, rec.getM_fileOffset());
                 stmt.setLong(4, rec.getM_FileBytes());
                 stmt.setLong(5, rec.getM_line());

@@ -30,12 +30,12 @@ public class LCAAppStatus extends Message {
     private String status;
     private String host;
 
-    public LCAAppStatus() {
-        super(TableType.LCAAppStatus);
+    public LCAAppStatus( int fileID) {
+        super(TableType.LCAAppStatus, fileID);
     }
 
-    LCAAppStatus(ArrayList<String> m_MessageContents) {
-        super(TableType.LCAAppStatus, m_MessageContents);
+    LCAAppStatus(ArrayList<String> m_MessageContents, int fileID) {
+        super(TableType.LCAAppStatus, m_MessageContents, fileID);
     }
 
     public String getHost() {

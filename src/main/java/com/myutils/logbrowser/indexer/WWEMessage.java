@@ -23,8 +23,8 @@ public class WWEMessage extends Message {
      * @param newMessageLines
      * @param isTServerReq
      */
-    public WWEMessage(String event, String TserverSRC, ArrayList newMessageLines, boolean isTServerReq) {
-        super(TableType.WWETable);
+    public WWEMessage(String event, String TserverSRC, ArrayList newMessageLines, boolean isTServerReq, int fileID) {
+        super(TableType.WWETable, fileID);
         m_MessageLines = newMessageLines;
         m_MessageName = event;
         m_TserverSRC = TserverSRC;

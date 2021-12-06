@@ -9,8 +9,8 @@ public class StSRequestHistoryMessage extends Message {
 
     String m_MessageName;
 
-    public StSRequestHistoryMessage(String event, ArrayList newMessageLines) {
-        super(TableType.StSRequestHistory);
+    public StSRequestHistoryMessage(String event, ArrayList newMessageLines, int fileID) {
+        super(TableType.StSRequestHistory, fileID);
         m_MessageLines = newMessageLines;
         m_MessageName = event;
         m_MessageLines.add(0, event);

@@ -54,7 +54,7 @@ public class StSRequestHistoryTable extends DBTable {
             setFieldString(stmt, 5, theRec.GetHeaderValue("CLUID"));
             stmt.setTimestamp(6, new Timestamp(theRec.GetAdjustedUsecTime()));
             setFieldInt(stmt, 7, Main.getRef(ReferenceType.StatEvent, theRec.GetMessageName()));
-            setFieldInt(stmt, 8, StSRequestHistoryMessage.getFileId());
+            setFieldInt(stmt, 8, theRec.getFileID());
             stmt.setLong(9, theRec.getM_fileOffset());
             stmt.setLong(10, theRec.getFileBytes());
             setFieldInt(stmt, 11, 0);

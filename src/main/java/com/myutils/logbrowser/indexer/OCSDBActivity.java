@@ -30,8 +30,8 @@ public class OCSDBActivity extends Message {
 
     private String listName;
 
-    public OCSDBActivity(String listDBID, String campaignDBID, String groupDBID, String line) {
-        super(TableType.OCSDBActivity, line);
+    public OCSDBActivity(String listDBID, String campaignDBID, String groupDBID, String line, int fileID) {
+        super(TableType.OCSDBActivity,  fileID);
         this.listDBID = Long.parseLong(listDBID);
         this.campaignDBID = Long.parseLong(campaignDBID);
         this.groupDBID = Long.parseLong(groupDBID);

@@ -7,15 +7,15 @@ package com.myutils.logbrowser.indexer;
 /**
  * @author ssydoruk
  */
-public class CIFaceRequest extends Record {
+public class CIFaceRequest extends SIPServerBaseMessage {
 
     private String m_Name;
     private Long m_refId;
     private String m_thisDN;
     private String m_otherDN;
 
-    public CIFaceRequest() {
-        super(TableType.CIFaceRequest);
+    public CIFaceRequest(boolean  m_handlerInProgress, int m_handlerId, int fileID) {
+        super(TableType.CIFaceRequest,  m_handlerInProgress,  m_handlerId, fileID);
     }
 
     @Override

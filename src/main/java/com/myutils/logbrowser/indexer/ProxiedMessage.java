@@ -21,8 +21,28 @@ public class ProxiedMessage extends Message {
     private final String event;
     private final String contents;
 
-    public ProxiedMessage(String evName, String contents) {
-        super(TableType.TLibProxied, contents);
+ private int m_tlibId;
+
+    public int getM_tlibId() {
+        return m_tlibId;
+    }
+
+    public void setM_tlibId(int m_tlibId) {
+        this.m_tlibId = m_tlibId;
+    }
+
+    public int getM_handlerId() {
+        return m_handlerId;
+    }
+
+    public void setM_handlerId(int m_handlerId) {
+        this.m_handlerId = m_handlerId;
+    }
+
+    private int m_handlerId;
+
+    public ProxiedMessage(String evName, String contents, int fileID) {
+        super(TableType.TLibProxied, contents, fileID);
         this.event = evName;
         this.contents = contents;
 

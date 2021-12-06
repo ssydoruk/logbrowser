@@ -28,12 +28,12 @@ public abstract class URSRIBase extends Message {
     private String refid;
     private String UUID = null;
     private String uriParams;
-    public URSRIBase(TableType t, ArrayList messageLines) {
-        this(t);
+    public URSRIBase(TableType t, ArrayList messageLines, int fileID) {
+        this(t, fileID);
         setMessageLines(m_MessageLines);
     }
-    URSRIBase(TableType t) {
-        super(t);
+    URSRIBase(TableType t, int fileID) {
+        super(t, fileID);
         allParams = new ArrayList<>();
     }
 

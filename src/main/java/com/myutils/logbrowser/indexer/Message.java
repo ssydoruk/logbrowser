@@ -18,9 +18,7 @@ import java.util.regex.Pattern;
 import static Utils.Util.StripQuotes;
 import static Utils.Util.intOrDef;
 
-/**
- * @author aglagole
- */
+
 public abstract class Message extends Record {
 
     //    private static final Pattern regSIPURI = Pattern.compile("^(?:\\\")?(?:[^<\\\"]*)(?:\\\")?[ ]*(?:<)?(?:sip(?:s)?|tel):([^@>]+)(?:@([^;>]+)(?:>)?)?");
@@ -37,7 +35,7 @@ public abstract class Message extends Record {
     private static final Pattern regSIPDN = Pattern.compile("^([^@]+)");
     private static final Pattern regSIPURI = Pattern.compile("^(?:\\\")?(?:[^<\\\"]*)(?:\\\")?[ ]*(?:<)?(?:sip(?:s)?|tel):(?<userpart>[^@>]+)(?:@(?<host>[^;>]+)(?:>)?)?");
     private static final Pattern regSIPURIMediaService = Pattern.compile("media-service=(\\w+)");
-    private static final Pattern  regErrorMessage = Pattern.compile("^\\s+\\((\\w.+)\\)$");
+    private static final Pattern regErrorMessage = Pattern.compile("^\\s+\\((\\w.+)\\)$");
     //    private static final Pattern regQuotes = Pattern.compile("^['\"]*(.+)['\"\\s]*$");
     // keeping track of current date
     // looking for hour reset at midnight
@@ -48,23 +46,19 @@ public abstract class Message extends Record {
     private ArrayList<String> m_MMUserData = null;
     private ArrayList<String> m_MMEnvelope = null;
 
-    public Message() {
-        super();
-    }
-
-    public Message(TableType type) {
-        super(type);
+    public Message(TableType type, int fileID) {
+        super(type, fileID);
         m_MessageLines = new ArrayList<>(1); // by default store only one line
     }
 
-    public Message(TableType type, String line) {
-        super(type);
+    public Message(TableType type, String line, int fileID) {
+        super(type, fileID);
         m_MessageLines = new ArrayList<>(1); // by default store only one line
         m_MessageLines.add(line);
     }
 
-    public Message(TableType type, ArrayList<String> m_MessageLines) {
-        super(type);
+    public Message(TableType type, ArrayList<String> m_MessageLines, int fileID) {
+        super(type, fileID);
         setMessageLines(m_MessageLines);
     }
 

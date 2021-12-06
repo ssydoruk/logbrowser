@@ -177,7 +177,7 @@ public class ORSTable extends DBTable {
             setFieldInt(stmt, 7, Main.getRef(ReferenceType.ConnID, orsRec.getAttributeTrim("AttributeTransferConnID")));
             setFieldInt(stmt, 8, orsRec.getM_refID());
             stmt.setBoolean(9, orsRec.isInbound());
-            setFieldInt(stmt, 10, ORSMessage.getFileId());
+            setFieldInt(stmt, 10, rec.getFileID());
             stmt.setLong(11, orsRec.getM_fileOffset());
             stmt.setLong(12, orsRec.getFileBytes());
             stmt.setInt(13, 0);
