@@ -70,6 +70,7 @@ public class Main {
     private ThreadPoolExecutor managerThreads;
     private ThreadPoolExecutor parserThreads;
     private boolean ignoreZIP = false;
+    private int maxThreads=1;
 
     public static Main getInstance() {
         return MainHolder.INSTANCE;
@@ -265,10 +266,11 @@ public class Main {
     }
 
     public Main init(ExecutionEnvironment ee) throws Exception {
-        initExecutor(2);
+        initExecutor(maxThreads);
         this.dbName = ee.getDbname();
         this.baseDir = ee.getBaseDir();
         this.alias = ee.getAlias();
+        this.maxThreads=ee.getMaxThreads();
         setEe(ee);
         setXMLCfg(ee.getXmlCFG());
         return this;
@@ -326,6 +328,7 @@ public class Main {
             } catch (Exception exception) {
                 logger.error("Uncought exception while parsing: " + exception);
             }
+            parser.doneParsing(fileInfo);
 
             totalBytes += fileInfo.getSize();
             totalFiles++;

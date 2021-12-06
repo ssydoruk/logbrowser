@@ -105,6 +105,11 @@ public final class FileInfo extends Record {
 
     }
 
+
+    public String getAppID() {
+      return getAppName() + "-" + m_componentType.toString();
+    }
+
     FileInfo(ZipFile logArchive, ZipEntry entry, ZIPLog aThis) throws IOException {
         this();
         m_path = entry.getName();

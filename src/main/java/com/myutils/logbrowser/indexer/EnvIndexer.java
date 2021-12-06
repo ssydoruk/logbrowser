@@ -17,6 +17,7 @@ import java.nio.file.Paths;
 public class EnvIndexer extends ExecutionEnvironment {
     protected final Options options;
     protected final CommandLineParser parser;
+    private final Option optMaxThreads;
     protected CommandLine cmd;
 
     private  Option optXMLCfg;
@@ -43,6 +44,21 @@ public class EnvIndexer extends ExecutionEnvironment {
             System.out.println(ex);
         }
         return (StringUtils.isNotBlank(ret)) ? ret : def;
+    }
+
+    protected Integer getIntOrDef(Option opt, Integer def) {
+        Integer ret = null;
+        try {
+            if (StringUtils.isNotEmpty(opt.getLongOpt())) {
+                ret = (Integer) cmd.getParsedOptionValue(opt.getLongOpt());
+            }
+            if (ret==null && StringUtils.isNotEmpty(opt.getOpt())) {
+                ret = (Integer) cmd.getParsedOptionValue(opt.getOpt());
+            }
+        } catch (ParseException ex) {
+            System.out.println(ex);
+        }
+        return (ret==null) ? ret : def;
     }
 
     EnvIndexer() {
@@ -90,6 +106,15 @@ public class EnvIndexer extends ExecutionEnvironment {
                 .longOpt("basedir")
                 .build();
         options.addOption(optLogsBaseDir);
+
+        optMaxThreads = Option.builder()
+                .hasArg(true)
+                .required(false)
+                .type(Integer.class)
+                .desc("Number of parsing threads")
+                .longOpt("threads")
+                .build();
+        options.addOption(optMaxThreads);
 
         optTDiffParse = Option.builder()
                 .hasArg(false)
@@ -169,15 +194,19 @@ public class EnvIndexer extends ExecutionEnvironment {
 
         setIgnoreZIP(getOptIsIgnoreZIP());
 
+        setMaxThreads(getOptMaxThreads());
+
         setXmlCFG( getOptValueXMLCfg());
         setBaseDir(getOptBaseDir());
 
         setParseTDiff( getOptValueParseTDiff());
         setLogbrowserDir( getOptLogBrowserDir());
 
-        setBaseDir(getOptBaseDir());
-
         setSqlPragma(getOptSQLPragma());
+    }
+
+    private int getOptMaxThreads() {
+        return getIntOrDef(optMaxThreads, 2);
     }
 
 

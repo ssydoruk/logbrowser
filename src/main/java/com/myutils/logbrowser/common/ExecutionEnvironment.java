@@ -17,6 +17,16 @@ import java.nio.file.Paths;
 public class ExecutionEnvironment {
     private Boolean parseTDiff = "true".equalsIgnoreCase(System.getProperty("timediff.parse"));
     private boolean ignoreZIP = false;
+    private int maxThreads = 2;
+
+    public int getMaxThreads() {
+        return maxThreads;
+    }
+
+    public void setMaxThreads(int maxThreads) {
+        this.maxThreads = maxThreads;
+    }
+
     private String baseDir = Paths.get(".").toAbsolutePath().normalize().toString();
     private String xmlCFG = ".";
     private String alias = "logbr";

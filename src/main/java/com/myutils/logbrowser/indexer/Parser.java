@@ -25,19 +25,14 @@ import java.util.regex.Pattern;
  */
 public abstract class Parser {
 
-    public int getFileID() {
-        return  fileInfo.getRecordID();
-    }
-
-
     public static final int MAX_CUSTOM_FIELDS = 3;
     private static final int BASE_CUSTOM_FIELDS = 8;
     private static final Pattern regORSSessionID = Pattern.compile("^[~\\w]{32}$");
+    private final static HashMap<String, ArrayList<DateFmt>> appPreferedFormats = new HashMap<>();
     private final String m_StringType;
     private final FileInfoType m_type;
     private final DateParsers dateParsers = new DateParsers();
     private final FilesParseSettings.FileParseSettings fileParseSettings;
-    private final HashMap<String, ArrayList<DateFmt>> appPreferedFormats = new HashMap<>();
     private final ArrayList<CustomRegexLine> printedCustomLines = new ArrayList<>();
     //</editor-fold>
     private final CustomAttributeTable custAttrTab = null;
@@ -50,7 +45,6 @@ public abstract class Parser {
     //    protected static static final Pattern regGenesysMessage = Pattern.compile(" (None|Debug|Trace|Interaction|Standard|Alarm|Unknown|Non|Dbg|Trc|Int|Std|Alr|Unk) (\\d{5}) ");
     int m_CurrentLine;
     SqliteAccessor m_accessor;
-    private String lastAppID = null;
     private boolean collectingDates;
     private boolean foundBodyDates;
     private long bytesConsumed;
@@ -95,7 +89,6 @@ public abstract class Parser {
             dateDiff = new DateDiff(type);
         }
     }
-
 
     public static String getQueryKey(HashMap<String, List<String>> splitQuery, String[] keys) {
         for (String key : keys) {
@@ -177,6 +170,10 @@ public abstract class Parser {
 
     public static boolean isSessionID(String resp) {
         return resp != null && !resp.isEmpty() && regORSSessionID.matcher(resp).find();
+    }
+
+    public int getFileID() {
+        return fileInfo.getRecordID();
     }
 
     protected void logError(String s) {
@@ -371,7 +368,7 @@ public abstract class Parser {
 
 
     protected String ParseGenesys(String str, TableType tabType) throws Exception {
-        return ParseGenesys(str, tabType, (Pattern) null);
+        return ParseGenesys(str, tabType, null);
     }
 
     /**
@@ -546,7 +543,7 @@ public abstract class Parser {
         if (ret != null) {
             lastKnownDate = ret.fmtDate;
             if (isParseTimeDiff()) {
-                dateDiff.newDate(ret,  fileInfo.getRecordID(), fileInfo.getAppNameID(), getFilePos(), getEndFilePos() - getFilePos(), m_lineStarted);
+                dateDiff.newDate(ret, fileInfo.getRecordID(), fileInfo.getAppNameID(), getFilePos(), getEndFilePos() - getFilePos(), m_lineStarted);
             }
 
             commitDateParsers();
@@ -565,43 +562,46 @@ public abstract class Parser {
         }
     }
 
+    public void doneParsing(FileInfo fileInfo) {
+        String appID = fileInfo.getAppID();
+        synchronized (appPreferedFormats) {
+            if (!appPreferedFormats.containsKey(appID)) {
+                if (currentAppDates == null || currentAppDates.isEmpty()) {
+                    Main.logger.error("No dates found in previous file, too bad");
+                } else {
+                    appPreferedFormats.put(appID, currentAppDates);
+                }
+            }
+        }
+    }
+
+
     void setFileInfo(FileInfo _fileInfo) {
         this.fileInfo = _fileInfo;
         setM_LastTimeStamp(fileInfo.getFileLocalTime());
 
-        Main.logger.trace("lastAppID = " + lastAppID);
-        if (lastAppID != null) { // saving previous file prefered date formats
-            if (!appPreferedFormats.containsKey(lastAppID)) {
-                if (currentAppDates == null || currentAppDates.isEmpty()) {
-                    Main.logger.error("No dates found in previous file, too bad");
-                } else {
-                    appPreferedFormats.put(lastAppID, currentAppDates);
-                }
-            }
-        }
-        String appID = fileInfo.getAppName() + "-" + fileInfo.m_componentType.toString();
+        String appID = fileInfo.getAppID();
         Main.logger.trace("appID = " + appID);
-        if (appPreferedFormats.containsKey(appID)) {
-            dateParsers.setPrefferedFormats(appPreferedFormats.get(appID));
-            dateParsers.setCheckRegex(false);
-            collectingDates = false;
-        } else {
-            if (ignoreFileDates(fileInfo)) //file size is less the a 1 MB
-            {
-                if (currentAppDates == null) {
+        synchronized (appPreferedFormats) {
+            if (appPreferedFormats.containsKey(appID)) {
+                dateParsers.setPrefferedFormats(appPreferedFormats.get(appID));
+                dateParsers.setCheckRegex(false);
+                collectingDates = false;
+            } else {
+                if (ignoreFileDates(fileInfo)) //file size is less the a 1 MB
+                {
+                    if (currentAppDates == null) {
+                        currentAppDates = new ArrayList<>(3);
+                    }
+                } else {
                     currentAppDates = new ArrayList<>(3);
                 }
-            } else {
-                currentAppDates = new ArrayList<>(3);
-                lastAppID = appID;
-
+                collectingDates = true;
+                dateParsers.setPrefferedFormats(null);//
             }
-            collectingDates = true;
-            dateParsers.setPrefferedFormats(null);//
         }
-        Main.logger.trace("collectingDates = " + collectingDates);
+        Main.logger.info("collectingDates = " + collectingDates);
         this.foundBodyDates = false;
-
     }
 
     public void setM_LastTimeStamp(DateParsed m_LastTimeStamp) {
@@ -640,7 +640,7 @@ public abstract class Parser {
         }
 
         if (isParseTimeDiff()) {
-            dateDiff.newDate(parseDate,  fileInfo.getRecordID(), fileInfo.getAppNameID(), getFilePos(), getEndFilePos() - getFilePos(), m_lineStarted);
+            dateDiff.newDate(parseDate, fileInfo.getRecordID(), fileInfo.getAppNameID(), getFilePos(), getEndFilePos() - getFilePos(), m_lineStarted);
         }
         return parseDate;
     }
@@ -680,7 +680,7 @@ public abstract class Parser {
             custLineTab = new CustomLineTable(m_type);
             custLineTab.InitDB();
         }
-        CustomRegexLine cl = new CustomRegexLine(fileInfo.getM_type(),  fileInfo.getRecordID());
+        CustomRegexLine cl = new CustomRegexLine(fileInfo.getM_type(), fileInfo.getRecordID());
         cl.setParams(m, key, value);
 //        int lastPrintedIdx = cl.lastPrintedIdx(fileParseCustomSearch);
 //        Main.logger.info("insertIntoCustom custom [" + lastPrintedIdx + "]");
