@@ -67,7 +67,7 @@ public class WWEParserTemplate extends WebParser {
         m_CurrentLine = line;
         skipNextLine = false;
         skipMessage = false;
-        setFileInfo(fi);
+
 
         URL = null;
         app = null;

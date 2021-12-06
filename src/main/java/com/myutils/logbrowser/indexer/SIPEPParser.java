@@ -94,7 +94,7 @@ public class SIPEPParser extends Parser {
     public int ParseFrom(BufferedReaderCrLf input, long offset, int line, FileInfo fi) {
         m_CurrentFilePos = offset;
         m_CurrentLine = line;
-        setFileInfo(fi);
+
 
         String unfinished = "";
 

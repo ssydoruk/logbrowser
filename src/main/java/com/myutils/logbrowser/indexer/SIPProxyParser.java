@@ -105,7 +105,6 @@ public class SIPProxyParser extends Parser {
         long name = fi.getAppNameID() + fi.getFileStartTimeRound();
         this.handleAdd = "|" + name;
         Main.logger.debug("handlerAdd:" + handleAdd);
-        setFileInfo(fi);
 
         String unfinished = "";
 

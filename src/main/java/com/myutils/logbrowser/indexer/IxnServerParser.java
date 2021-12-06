@@ -54,7 +54,6 @@ public class IxnServerParser extends Parser {
     @Override
     public int ParseFrom(BufferedReaderCrLf input, long offset, int line, FileInfo fi) {
         m_CurrentLine = line;
-        setFileInfo(fi);
 
 //        for (Class<? extends Record> class1 : avail) {
 //            try {

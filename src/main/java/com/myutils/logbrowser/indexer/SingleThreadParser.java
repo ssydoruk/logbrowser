@@ -160,7 +160,7 @@ public class SingleThreadParser extends Parser {
         m_CurrentFilePos = offset;
         m_CurrentLine = line;
         m_handlerInProgress = false;
-        setFileInfo(fi);
+
 
         long name = fi.getAppNameID() + fi.getFileStartTimeRound();
         this.handleAdd = "|" + name;

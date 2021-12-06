@@ -236,7 +236,7 @@ public class OCSParser extends Parser {
 
         Main.logger.trace("ParseFrom offset:" + offset + " line:" + line);
         m_CurrentLine = line;
-        setFileInfo(fi);
+
 
         try {
             input.skip(offset);

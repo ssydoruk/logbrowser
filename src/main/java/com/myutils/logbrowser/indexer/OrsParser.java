@@ -207,7 +207,7 @@ public class OrsParser extends Parser {
         m_input = input; // to use from subroutines
         m_CurrentFilePos = offset;
         m_CurrentLine = line;
-        setFileInfo(fi);
+
 
         URL = null;
         app = null;

@@ -58,7 +58,7 @@ public class ConfServParser extends Parser {
     @Override
     public int ParseFrom(BufferedReaderCrLf input, long offset, int line, FileInfo fi) {
         m_CurrentLine = line;
-        setFileInfo(fi);
+
 
         m_ServerName = null;
 

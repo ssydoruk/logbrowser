@@ -85,7 +85,7 @@ public class URShttpinterfaceParser extends WebParser {
         skipNextLine = false;
         skipMessage = false;
         m_input = input;
-        setFileInfo(fi);
+
 
         URL = null;
         app = null;

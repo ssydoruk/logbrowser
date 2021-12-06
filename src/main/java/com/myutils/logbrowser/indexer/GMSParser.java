@@ -245,7 +245,7 @@ public class GMSParser extends Parser {
         m_input = input; // to use from subroutines
         m_CurrentFilePos = offset;
         m_CurrentLine = line;
-        setFileInfo(fi);
+
 
         m_dbRecords = 0;
         URL = null;
