@@ -17,7 +17,7 @@ import java.nio.file.Paths;
 public class EnvIndexer extends ExecutionEnvironment {
     protected final Options options;
     protected final CommandLineParser parser;
-    private final Option optMaxThreads;
+    private  Option optMaxThreads;
     protected CommandLine cmd;
 
     private  Option optXMLCfg;
@@ -46,19 +46,19 @@ public class EnvIndexer extends ExecutionEnvironment {
         return (StringUtils.isNotBlank(ret)) ? ret : def;
     }
 
-    protected Integer getIntOrDef(Option opt, Integer def) {
+    protected int getIntOrDef(Option opt, int def) {
         Integer ret = null;
-        try {
-            if (StringUtils.isNotEmpty(opt.getLongOpt())) {
-                ret = (Integer) cmd.getParsedOptionValue(opt.getLongOpt());
-            }
-            if (ret==null && StringUtils.isNotEmpty(opt.getOpt())) {
-                ret = (Integer) cmd.getParsedOptionValue(opt.getOpt());
-            }
-        } catch (ParseException ex) {
-            System.out.println(ex);
+        if (StringUtils.isNotEmpty(opt.getLongOpt())) {
+            String s =cmd.getOptionValue(opt.getLongOpt());
+            if(StringUtils.isNotEmpty(s))
+            ret = Integer.parseInt(s);
         }
-        return (ret==null) ? ret : def;
+        if (ret==null && StringUtils.isNotEmpty(opt.getOpt())) {
+            String s =cmd.getOptionValue(opt.getOpt());
+            if(StringUtils.isNotEmpty(s))
+                ret = Integer.parseInt(s);
+        }
+        return (ret!=null) ? ret : def;
     }
 
     EnvIndexer() {
@@ -205,8 +205,9 @@ public class EnvIndexer extends ExecutionEnvironment {
         setSqlPragma(getOptSQLPragma());
     }
 
-    private int getOptMaxThreads() {
-        return getIntOrDef(optMaxThreads, 2);
+    private Integer getOptMaxThreads() {
+        Integer ret = getIntOrDef(optMaxThreads, 2);
+        return ret;
     }
 
 

@@ -146,7 +146,7 @@ public class SingleThreadParser extends Parser {
 
     public SingleThreadParser(HashMap<TableType, DBTable> m_tables) {
         super(FileInfoType.type_SessionController, m_tables);
-        Main.logger.info("SingleThreadParser");
+        Main.logger.debug("SingleThreadParser");
         this.extraBuff = new ArrayList<>();
         //m_accessor = accessor;
         m_BlockNamesToIgnoreHash = new HashSet();

@@ -134,6 +134,7 @@ public class Main {
         s.append("\n\txmlCFG: ").append(ee.getXmlCFG());
         s.append("\n\tIgnoreZIP: ").append(ee.isIgnoreZIP());
         s.append("\n\tParseTDiff: ").append(ee.isParseTDiff());
+        s.append("\n\tparsing threads: ").append(ee.getMaxThreads());
         s.append("\n\tSqlPragma: ").append(ee.isSqlPragma());
         logger.info(s);
 
@@ -266,13 +267,13 @@ public class Main {
     }
 
     public Main init(ExecutionEnvironment ee) throws Exception {
-        initExecutor(maxThreads);
         this.dbName = ee.getDbname();
         this.baseDir = ee.getBaseDir();
         this.alias = ee.getAlias();
         this.maxThreads=ee.getMaxThreads();
         setEe(ee);
         setXMLCfg(ee.getXmlCFG());
+        initExecutor(maxThreads);
         return this;
     }
 

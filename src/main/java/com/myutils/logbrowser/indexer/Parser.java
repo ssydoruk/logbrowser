@@ -600,7 +600,7 @@ public abstract class Parser {
                 dateParsers.setPrefferedFormats(null);//
             }
         }
-        Main.logger.info("collectingDates = " + collectingDates);
+        Main.logger.trace("collectingDates = " + collectingDates);
         this.foundBodyDates = false;
     }
 
