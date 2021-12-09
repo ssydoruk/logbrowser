@@ -21,7 +21,7 @@ import static Utils.Util.pDuration;
 /**
  * @author ssydoruk
  */
-public final class SqliteAccessor  implements DBAccessor {
+public final class SqliteAccessor implements DBAccessor {
 
     private static final Logger logger = Main.logger;
     /**
@@ -29,20 +29,20 @@ public final class SqliteAccessor  implements DBAccessor {
      * @param alias postfix for table names
      */
     private static final HashMap<String, Boolean> tabExists = new HashMap<String, Boolean>();
-
+    private static SqliteAccessor INSTANCE = new SqliteAccessor();
     String m_alias;
-
     Connection m_conn;
-
-    boolean m_exit;
 //    ArrayList<PreparedStatement> m_statements;
 //    ArrayList<Integer> m_queueLength;
-
+    boolean m_exit;
     Stats stats;
-
     private List<Long> filesToDelete;
 
     private SqliteAccessor() {
+    }
+
+    public static SqliteAccessor getInstance() {
+        return INSTANCE;
     }
 
     public void init(String dbname, String alias) throws Exception {
@@ -91,12 +91,6 @@ public final class SqliteAccessor  implements DBAccessor {
             logger.error("Creating accessor failed: " + e, e);
             throw e;
         }
-    }
-
-    private static SqliteAccessor INSTANCE = new SqliteAccessor();
-
-    public static SqliteAccessor getInstance() {
-        return INSTANCE;
     }
 
     public List<Long> getFilesToDelete() {
@@ -354,7 +348,6 @@ public final class SqliteAccessor  implements DBAccessor {
     }
 
 
-
     public synchronized void exit() {
         m_exit = true;
         Main.getInstance().getM_accessor().notify();
@@ -572,13 +565,11 @@ public final class SqliteAccessor  implements DBAccessor {
         }
 
         public void Submit() throws SQLException {
-            synchronized (this) {
-                stat.addBatch();
-                cnt++;
-            }
+            stat.addBatch();
+            cnt++;
         }
 
-        private void DoneInserts() throws SQLException {
+        synchronized private void DoneInserts() throws SQLException {
             try {
                 flush();
             } catch (SQLException sQLException) {
@@ -597,7 +588,12 @@ public final class SqliteAccessor  implements DBAccessor {
                 }
                 cnt = 0;
                 Main.logger.trace("flushed " + ret.length + " records");
-                m_conn.commit();
+                try {
+                    m_conn.commit();
+                }
+                catch(SQLException e){
+                    Main.logger.error("Exception while commit", e);
+                    }
                 ResetAutoCommit();
             }
         }
@@ -624,7 +620,7 @@ public final class SqliteAccessor  implements DBAccessor {
             Submit(stats.get(statementId));
         }
 
-        public void Submit(Stat st) throws SQLException {
+        synchronized public void Submit(Stat st) throws SQLException {
             st.Submit();
             if (st.cnt >= 10_000) {
 //                Main.m_accessor.flush(st);

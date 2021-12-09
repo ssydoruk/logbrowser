@@ -7,6 +7,7 @@ package com.myutils.logbrowser.indexer;
 import com.myutils.logbrowser.common.ExecutionEnvironment;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.concurrent.BasicThreadFactory;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.w3c.dom.Document;
@@ -57,7 +58,7 @@ public class Main {
     boolean initFailed = false;
     BlockingQueue<File> fileQueue = new LinkedBlockingDeque<>();
     AtomicBoolean queueEnd = new AtomicBoolean(false);
-     ProcessedFilesSet processedFiles = new ProcessedFilesSet();
+    ProcessedFilesSet processedFiles = new ProcessedFilesSet();
     private String dbName;
     private SqliteAccessor m_accessor;
     private ExecutionEnvironment ee;
@@ -70,7 +71,7 @@ public class Main {
     private ThreadPoolExecutor managerThreads;
     private ThreadPoolExecutor parserThreads;
     private boolean ignoreZIP = false;
-    private int maxThreads=1;
+    private int maxThreads = 1;
 
     public static Main getInstance() {
         return MainHolder.INSTANCE;
@@ -124,19 +125,7 @@ public class Main {
 
         logger = LogManager.getLogger("indexer");
         logger.info("starting");
-        StringBuilder s = new StringBuilder();
-        s.append("Command line: ").append(StringUtils.join(args, " "));
-        s.append("\n\tBase directory: ").append(ee.getBaseDir());
-        s.append("\n\tCurrent directory: ").append(Utils.FileUtils.getCurrentDirectory());
-        s.append("\n\talias: ").append(ee.getAlias());
-        s.append("\n\tdbname: ").append(ee.getDbname());
-        s.append("\n\tlogBrDir: ").append(ee.getLogbrowserDir());
-        s.append("\n\txmlCFG: ").append(ee.getXmlCFG());
-        s.append("\n\tIgnoreZIP: ").append(ee.isIgnoreZIP());
-        s.append("\n\tParseTDiff: ").append(ee.isParseTDiff());
-        s.append("\n\tparsing threads: ").append(ee.getMaxThreads());
-        s.append("\n\tSqlPragma: ").append(ee.isSqlPragma());
-        logger.info(s);
+        logger.info(new StringBuilder().append("Command line: ").append(StringUtils.join(args, " ")));
 
         Main theParser = Main.getInstance().init(ee);
 
@@ -177,10 +166,6 @@ public class Main {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
-    private  boolean fileOK(File fileInfo) {
-        return !regFilesNotGood.matcher(fileInfo.getName()).find();
-    }
-
     private static void extendFilesList(ArrayList<FileInfo> filesToProcess, LogFileWrapper newLog) throws IOException {
         if (newLog != null) {
             for (FileInfo fileInfo : newLog.getFileInfos()) {
@@ -207,13 +192,6 @@ public class Main {
         }
     }
 
-    private boolean myEqual(String logFileName, String logFileName0) {
-        return logFileName != null && !logFileName.isEmpty()
-                && logFileName0 != null && !logFileName0.isEmpty()
-                && logFileName.equals(logFileName0);
-    }
-//    static SqliteAccessor m_accessor; 
-
     static public boolean isDbExisted() {
         return Main.getMain().dbExisted;
     }
@@ -222,16 +200,27 @@ public class Main {
         String isAll = (String) System.getProperties().get("SIPLINES");
         return isAll != null && isAll.length() != 0 && isAll.equals("1");
     }
+//    static SqliteAccessor m_accessor; 
+
+    private boolean fileOK(File fileInfo) {
+        return !regFilesNotGood.matcher(fileInfo.getName()).find();
+    }
+
+    private boolean myEqual(String logFileName, String logFileName0) {
+        return logFileName != null && !logFileName.isEmpty()
+                && logFileName0 != null && !logFileName0.isEmpty()
+                && logFileName.equals(logFileName0);
+    }
 
     private void initStatic(SqliteAccessor m_accessor) throws Exception {
         processedFiles.loadFiles(m_accessor.getObjMultiple("select id, intfilename, size from file_logbr", "file_logbr"));
         Record.setID(TableType.File, m_accessor.getID("select max(id) from file_logbr;", "file_logbr", 0));
         Record.setID(TableType.Handler, m_accessor.getID("select max(HandlerId) from sip_" + m_accessor.getM_alias() + ";", "sip_" + m_accessor.getM_alias(), 0));
         Record.setID(TableType.Handler, m_accessor.getID("select max(HandlerId) from tlib_" + m_accessor.getM_alias() + ";", "tlib_" + m_accessor.getM_alias(), Record.getID(TableType.Handler)));
-        Record.setID(TableType.Handler,m_accessor.getID("select max(HandlerId) from cireq_" + m_accessor.getM_alias() + ";", "cireq_" + m_accessor.getM_alias(),Record.getID(TableType.Handler)));
-        Record.setID(TableType.SIP,m_accessor.getID("select max(SipId) from trigger_" + m_accessor.getM_alias() + ";", "trigger_" + m_accessor.getM_alias(), 0) );
-        Record.setID(TableType.TLib, m_accessor.getID("select max(SipId) from trigger_" + m_accessor.getM_alias() + ";", "trigger_" + m_accessor.getM_alias(), 0) );
-        Record.setID(TableType.JSon, m_accessor.getID("select max(JsonId) from trigger_" + m_accessor.getM_alias() + ";", "trigger_" + m_accessor.getM_alias(), 0) );
+        Record.setID(TableType.Handler, m_accessor.getID("select max(HandlerId) from cireq_" + m_accessor.getM_alias() + ";", "cireq_" + m_accessor.getM_alias(), Record.getID(TableType.Handler)));
+        Record.setID(TableType.SIP, m_accessor.getID("select max(SipId) from trigger_" + m_accessor.getM_alias() + ";", "trigger_" + m_accessor.getM_alias(), 0));
+        Record.setID(TableType.TLib, m_accessor.getID("select max(SipId) from trigger_" + m_accessor.getM_alias() + ";", "trigger_" + m_accessor.getM_alias(), 0));
+        Record.setID(TableType.JSon, m_accessor.getID("select max(JsonId) from trigger_" + m_accessor.getM_alias() + ";", "trigger_" + m_accessor.getM_alias(), 0));
     }
 
     public SqliteAccessor getM_accessor() {
@@ -251,11 +240,14 @@ public class Main {
         if (managerThreads != null)
             managerThreads.purge();
 
-        managerThreads = (ThreadPoolExecutor) Executors.newCachedThreadPool();
+        managerThreads = (ThreadPoolExecutor) Executors.newCachedThreadPool(
+                new BasicThreadFactory.Builder().namingPattern("managerthreads-%d").build()
+        );
         managerThreads.setCorePoolSize(1);
         managerThreads.setMaximumPoolSize(1);
 
-        parserThreads = (ThreadPoolExecutor) Executors.newFixedThreadPool(maxThreads);
+        parserThreads = (ThreadPoolExecutor) Executors.newFixedThreadPool(maxThreads,
+                new BasicThreadFactory.Builder().priority(Thread.MAX_PRIORITY).namingPattern("parser-%d").build());
     }
 
     public ExecutionEnvironment getEe() {
@@ -267,13 +259,17 @@ public class Main {
     }
 
     public Main init(ExecutionEnvironment ee) throws Exception {
+        logger.info("Init :"+ee.toString());
+        logger.info("current directory :"+Utils.FileUtils.getCurrentDirectory() );
+
         this.dbName = ee.getDbname();
         this.baseDir = ee.getBaseDir();
         this.alias = ee.getAlias();
-        this.maxThreads=ee.getMaxThreads();
+        this.maxThreads = ee.getMaxThreads();
         setEe(ee);
         setXMLCfg(ee.getXmlCFG());
         initExecutor(maxThreads);
+
         return this;
     }
 

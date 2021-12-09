@@ -109,4 +109,18 @@ public class ExecutionEnvironment {
         this.sqlPragma = sqlPragma;
     }
 
+    @Override
+    public String toString() {
+        return "ExecutionEnvironment{" +
+                "parseTDiff=" + parseTDiff +
+                ", ignoreZIP=" + ignoreZIP +
+                ", maxThreads=" + maxThreads +
+                ", baseDir='" + baseDir + '\'' +
+                ", xmlCFG='" + xmlCFG + '\'' +
+                ", alias='" + alias + '\'' +
+                ", dbname='" + dbname + '\'' +
+                ", logbrowserDir='" + logbrowserDir + '\'' +
+                ", sqlPragma=" + sqlPragma +
+                '}';
+    }
 }
