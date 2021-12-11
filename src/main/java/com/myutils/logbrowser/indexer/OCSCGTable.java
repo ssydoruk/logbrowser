@@ -13,13 +13,13 @@ import java.sql.Timestamp;
  */
 public class OCSCGTable extends DBTable {
 
-    public OCSCGTable(DBAccessor dbaccessor, TableType t) {
-        super(dbaccessor, t);
+    public OCSCGTable(SqliteAccessor dbaccessor, TableType t) {
+        super(dbaccessor, t,"OCSCG_" + dbaccessor.getM_alias());
     }
 
     @Override
     public void InitDB() {
-        setTabName("OCSCG_" + getM_dbAccessor().getM_alias());
+        
 
         addIndex("time");
         addIndex("FileId");

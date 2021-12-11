@@ -11,13 +11,13 @@ import java.sql.SQLException;
  */
 public class TriggerTable extends DBTable {
 
-    public TriggerTable(DBAccessor dbaccessor, TableType t) {
-        super(dbaccessor, t);
+    public TriggerTable(SqliteAccessor dbaccessor, TableType t) {
+        super(dbaccessor, t,"trigger_" + dbaccessor.getM_alias());
     }
 
     @Override
     public void InitDB() {
-        setTabName("trigger_" + getM_dbAccessor().getM_alias());
+        
 //        addIndex("time");
         addIndex("FileId");
         addIndex("textid");

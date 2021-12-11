@@ -16,7 +16,7 @@ import java.sql.Timestamp;
  */
 public class OCSStatEventTable extends DBTable {
 
-    public OCSStatEventTable(DBAccessor dbaccessor, TableType t) {
+    public OCSStatEventTable(SqliteAccessor dbaccessor, TableType t) {
         super(dbaccessor, t);
     }
 

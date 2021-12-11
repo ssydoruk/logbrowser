@@ -470,7 +470,7 @@ public class WWEParserTemplate extends WebParser {
 
     private class WWEDebugMessageTable extends DBTable {
 
-        public WWEDebugMessageTable(DBAccessor dbaccessor, TableType t) {
+        public WWEDebugMessageTable(SqliteAccessor dbaccessor, TableType t) {
             super(dbaccessor, t);
         }
 

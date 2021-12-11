@@ -1378,7 +1378,7 @@ public class WWEParser extends WebParser {
 
     private class WWEWWEStatServerMsgTable extends DBTable {
 
-        public WWEWWEStatServerMsgTable(DBAccessor dbaccessor, TableType t) {
+        public WWEWWEStatServerMsgTable(SqliteAccessor dbaccessor, TableType t) {
             super(dbaccessor, t);
         }
 
@@ -1757,7 +1757,7 @@ public class WWEParser extends WebParser {
 
     private class WWEDebugMessageTable extends DBTable {
 
-        public WWEDebugMessageTable(DBAccessor dbaccessor, TableType t) {
+        public WWEDebugMessageTable(SqliteAccessor dbaccessor, TableType t) {
             super(dbaccessor, t);
         }
 
@@ -1981,7 +1981,7 @@ public class WWEParser extends WebParser {
 
     private class WWEBayeuxSMsgTable extends DBTable {
 
-        public WWEBayeuxSMsgTable(DBAccessor dbaccessor, TableType t) {
+        public WWEBayeuxSMsgTable(SqliteAccessor dbaccessor, TableType t) {
             super(dbaccessor, t);
         }
 
@@ -2127,7 +2127,7 @@ public class WWEParser extends WebParser {
 
     private class WWEUCSTable extends DBTable {
 
-        public WWEUCSTable(DBAccessor dbaccessor, TableType t) {
+        public WWEUCSTable(SqliteAccessor dbaccessor, TableType t) {
             super(dbaccessor, t);
         }
 
@@ -2406,7 +2406,7 @@ public class WWEParser extends WebParser {
 
     private class WWEIxnTable extends DBTable {
 
-        public WWEIxnTable(DBAccessor dbaccessor, TableType t) {
+        public WWEIxnTable(SqliteAccessor dbaccessor, TableType t) {
             super(dbaccessor, t);
         }
 
@@ -2489,7 +2489,7 @@ public class WWEParser extends WebParser {
 
     private class WWEUCSConfigTable extends DBTable {
 
-        public WWEUCSConfigTable(DBAccessor dbaccessor, TableType t) {
+        public WWEUCSConfigTable(SqliteAccessor dbaccessor, TableType t) {
             super(dbaccessor, t);
         }
 

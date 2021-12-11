@@ -798,7 +798,7 @@ public class OCSParser extends Parser {
 
     private class OCSPredInfoTable extends DBTable {
 
-        public OCSPredInfoTable(DBAccessor dbaccessor, TableType t) {
+        public OCSPredInfoTable(SqliteAccessor dbaccessor, TableType t) {
             super(dbaccessor, t);
         }
 

@@ -1123,7 +1123,7 @@ public class OrsParser extends Parser {
 
     private class ORSCallIDTable extends DBTable {
 
-        public ORSCallIDTable(DBAccessor dbaccessor, TableType t) {
+        public ORSCallIDTable(SqliteAccessor dbaccessor, TableType t) {
             super(dbaccessor, t);
         }
 
@@ -1226,7 +1226,7 @@ public class OrsParser extends Parser {
 
         public static final int MAX_ALARMS = 15;
 
-        public ORSAlarmTable(DBAccessor dbaccessor, TableType t) {
+        public ORSAlarmTable(SqliteAccessor dbaccessor, TableType t) {
             super(dbaccessor, t);
         }
 

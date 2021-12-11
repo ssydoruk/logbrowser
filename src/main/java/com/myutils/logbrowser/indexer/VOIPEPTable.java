@@ -15,7 +15,7 @@ import static com.myutils.logbrowser.indexer.Message.transformDN;
  */
 public class VOIPEPTable extends DBTable {
 
-    public VOIPEPTable(DBAccessor dbaccessor, TableType t) {
+    public VOIPEPTable(SqliteAccessor dbaccessor, TableType t) {
         super(dbaccessor, t);
     }
 

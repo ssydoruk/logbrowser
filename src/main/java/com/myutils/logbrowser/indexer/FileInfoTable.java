@@ -15,8 +15,8 @@ public class FileInfoTable extends DBTable {
 
     private static int filesAdded = 0;
 
-    public FileInfoTable(DBAccessor dbaccessor) {
-        super(dbaccessor, TableType.File);
+    public FileInfoTable(SqliteAccessor dbaccessor) {
+        super(dbaccessor, TableType.File,"file_" + dbaccessor.getM_alias());
     }
 
     public static int getFilesAdded() {
@@ -25,7 +25,6 @@ public class FileInfoTable extends DBTable {
 
     @Override
     public void InitDB() {
-        setTabName("file_" + getM_dbAccessor().getM_alias());
         setFileIDField("id");
         addIndex("name");
         addIndex("Component");

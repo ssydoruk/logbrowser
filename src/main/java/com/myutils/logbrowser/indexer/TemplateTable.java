@@ -16,13 +16,13 @@ import java.sql.Timestamp;
  */
 public class TemplateTable extends DBTable {
 
-    public TemplateTable(DBAccessor dbaccessor, TableType t) {
-        super(dbaccessor, t);
+    public TemplateTable(SqliteAccessor dbaccessor, TableType t) {
+        super(dbaccessor, t,"cfg");
     }
 
     @Override
     public void InitDB() {
-        setTabName("cfg");
+        
         addIndex("time");
         addIndex("FileId");
 

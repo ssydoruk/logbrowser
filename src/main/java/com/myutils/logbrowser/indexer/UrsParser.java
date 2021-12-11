@@ -877,11 +877,11 @@ public class UrsParser extends Parser {
 //            }
 
             SetStdFieldsAndAdd(msg);
-            Main.logger.trace("new ID: " + msg.getLastID());
+            Main.logger.trace("new ID: " + msg.getRecordID());
             if ((m = Message.FindMatcher(m_MessageContents, regCfgAgentGroup)) != null) {
                 String[] split = StringUtils.split(m.group(1), ',');
                 if (split != null && split.length > 0) {
-                    URSAgentGroup ag = new URSAgentGroup(msg.getLastID(),  fileInfo.getRecordID());
+                    URSAgentGroup ag = new URSAgentGroup(msg.getRecordID(),  fileInfo.getRecordID());
                     for (String string : split) {
                         ag.setAgentDBID(string);
                         ag.AddToDB(m_tables);
@@ -1037,13 +1037,13 @@ public class UrsParser extends Parser {
 
     private class URSAgentGroupTable extends DBTable {
 
-        public URSAgentGroupTable(DBAccessor dbaccessor, TableType t) {
-            super(dbaccessor, t);
+        public URSAgentGroupTable(SqliteAccessor dbaccessor, TableType t) {
+            super(dbaccessor, t,"ursAgentGroupAgent");
         }
 
         @Override
         public void InitDB() {
-            setTabName("ursAgentGroupAgent");
+            
             addIndex("updateId");
             addIndex("agentDBID");
             addIndex("FileId");
@@ -1114,13 +1114,13 @@ public class UrsParser extends Parser {
 
     private class ObjectDBIDTable extends DBTable {
 
-        public ObjectDBIDTable(DBAccessor dbaccessor, TableType t) {
-            super(dbaccessor, t);
+        public ObjectDBIDTable(SqliteAccessor dbaccessor, TableType t) {
+            super(dbaccessor, t,"objectDBID");
         }
 
         @Override
         public void InitDB() {
-            setTabName("objectDBID");
+            
             addIndex("updateId");
             addIndex("agentDBID");
             addIndex("FileId");
@@ -1195,8 +1195,8 @@ public class UrsParser extends Parser {
 
     public class GenesysUrsMsgTable extends DBTable {
 
-        public GenesysUrsMsgTable(DBAccessor dbaccessor, TableType type) {
-            super(dbaccessor, type);
+        public GenesysUrsMsgTable(SqliteAccessor dbaccessor, TableType type) {
+            super(dbaccessor, type, type.toString());
         }
 
         private String tabName() {
@@ -1206,7 +1206,6 @@ public class UrsParser extends Parser {
         @Override
         public void InitDB() {
 
-            setTabName(tabName());
             addIndex("time");
             addIndex("FileId");
             addIndex("levelID");

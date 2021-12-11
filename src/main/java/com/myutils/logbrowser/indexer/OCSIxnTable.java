@@ -16,7 +16,7 @@ import java.sql.Timestamp;
  */
 public class OCSIxnTable extends DBTable {
 
-    public OCSIxnTable(DBAccessor dbaccessor, TableType t) {
+    public OCSIxnTable(SqliteAccessor dbaccessor, TableType t) {
         super(dbaccessor, t);
     }
 

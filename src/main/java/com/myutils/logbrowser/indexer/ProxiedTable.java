@@ -17,13 +17,13 @@ import java.sql.Timestamp;
  */
 public class ProxiedTable extends DBTable {
 
-    public ProxiedTable(DBAccessor dbaccessor, TableType t) {
-        super(dbaccessor, t);
+    public ProxiedTable(SqliteAccessor dbaccessor, TableType t) {
+        super(dbaccessor, t,"proxied_" + dbaccessor.getM_alias());
     }
 
     @Override
     public void InitDB() {
-        setTabName("proxied_" + getM_dbAccessor().getM_alias());
+        
         addIndex("time");
         addIndex("FileId");
         addIndex("nameID");

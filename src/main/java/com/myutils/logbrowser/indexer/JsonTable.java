@@ -13,13 +13,13 @@ import java.sql.Timestamp;
  */
 public class JsonTable extends DBTable {
 
-    public JsonTable(DBAccessor dbaccessor, TableType t) {
-        super(dbaccessor, t);
+    public JsonTable(SqliteAccessor dbaccessor, TableType t) {
+        super(dbaccessor, t,"json_" + dbaccessor.getM_alias());
     }
 
     @Override
     public void InitDB() {
-        setTabName("json_" + getM_dbAccessor().getM_alias());
+        
         addIndex("FileId");
         addIndex("origUriID");
         addIndex("destUriID");

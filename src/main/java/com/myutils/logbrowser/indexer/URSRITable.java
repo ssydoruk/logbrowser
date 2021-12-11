@@ -16,14 +16,14 @@ import java.sql.Timestamp;
  */
 public class URSRITable extends DBTable {
 
-    public URSRITable(DBAccessor dbaccessor, TableType t) {
-        super(dbaccessor, t);
+    public URSRITable(SqliteAccessor dbaccessor, TableType t) {
+        super(dbaccessor, t,"ursri");
     }
 
     @Override
     public void InitDB() {
 
-        setTabName("ursri");
+        
         addIndex("time");
         addIndex("FileId");
         addIndex("connidid");

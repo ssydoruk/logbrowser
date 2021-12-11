@@ -1251,7 +1251,7 @@ public class MCPParser extends Parser {
 
     private class VXMLIntStepTable extends DBTable {
 
-        public VXMLIntStepTable(DBAccessor dbaccessor, TableType t) {
+        public VXMLIntStepTable(SqliteAccessor dbaccessor, TableType t) {
             super(dbaccessor, t);
         }
 

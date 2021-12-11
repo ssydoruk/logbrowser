@@ -16,14 +16,14 @@ import java.sql.Timestamp;
  */
 public class URSStatTable extends DBTable {
 
-    public URSStatTable(DBAccessor dbaccessor, TableType t) {
-        super(dbaccessor, t);
+    public URSStatTable(SqliteAccessor dbaccessor, TableType t) {
+        super(dbaccessor, t,"URSSTAT");
     }
 
     @Override
     public void InitDB() {
 
-        setTabName("URSSTAT");
+        
         addIndex("time");
         addIndex("FileId");
         addIndex("agentNameID");

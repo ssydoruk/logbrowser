@@ -12,13 +12,12 @@ import java.sql.SQLException;
  */
 public class CIFaceRequestTable extends DBTable {
 
-    public CIFaceRequestTable(DBAccessor dbaccessor, TableType t) {
-        super(dbaccessor, t);
+    public CIFaceRequestTable(SqliteAccessor dbaccessor, TableType t) {
+        super(dbaccessor, t, "cireq_" + dbaccessor.getM_alias());
     }
 
     @Override
     public void InitDB() {
-        setTabName("cireq_" + getM_dbAccessor().getM_alias());
         addIndex("time");
         addIndex("FileId");
         addIndex("nameID");

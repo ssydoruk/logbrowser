@@ -16,13 +16,13 @@ import java.sql.Timestamp;
  */
 public class StStatusTable extends DBTable {
 
-    public StStatusTable(DBAccessor dbaccessor, TableType t) {
-        super(dbaccessor, t);
+    public StStatusTable(SqliteAccessor dbaccessor, TableType t) {
+        super(dbaccessor, t,"ststatus");
     }
 
     @Override
     public void InitDB() {
-        setTabName("ststatus");
+        
         addIndex("time");
         addIndex("FileId");
         addIndex("typeid");

@@ -16,13 +16,13 @@ import java.sql.Timestamp;
  */
 public class SCSSelfStatusTable extends DBTable {
 
-    public SCSSelfStatusTable(DBAccessor dbaccessor) {
-        super(dbaccessor, TableType.SCSSelfStatus);
+    public SCSSelfStatusTable(SqliteAccessor dbaccessor) {
+        super(dbaccessor, TableType.SCSSelfStatus,"SCS_SelfStatus");
     }
 
     @Override
     public void InitDB() {
-        setTabName("SCS_SelfStatus");
+        
         addIndex("time");
         addIndex("FileId");
         addIndex("newModeID");

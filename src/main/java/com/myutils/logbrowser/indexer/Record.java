@@ -9,6 +9,7 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.IntUnaryOperator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -20,21 +21,9 @@ public abstract class Record implements Cloneable {
     private static final Pattern regAllQuotes = Pattern.compile("^(['\"]).+\\1$");
     private static final Pattern regNoQuotes = Pattern.compile("^(['\"])(.+)\\1$");
     private static final Pattern regDNWithHost = Pattern.compile("^(\\w+)\\.");
+    private static final ConcurrentHashMap<TableType, AtomicInteger> idStorage = new ConcurrentHashMap<>();
     static String m_alias;
     private static int objCreated;
-
-    public static void setID(TableType file, int id) {
-        getAtomicInteger(file).set(id);
-    }
-
-    public static int getID(TableType file) {
-        return getAtomicInteger(file).get();
-    }
-
-    public int getFileID() {
-        return fileID;
-    }
-
     private final int fileID;
     protected long m_FileBytes;
     private long m_fileOffset;
@@ -42,17 +31,34 @@ public abstract class Record implements Cloneable {
     private TableType m_type;
     //    protected Date m_Timestamp = null;
     private DateParsed m_TimestampDP = null;
-    private int lastID = 0;
-
     private int recordID;
+    public Record(TableType type, int fileID) {
+        this.fileID = fileID;
+        m_type = type;
+        recordID = getAtomicInteger(type).incrementAndGet();
+        Main.logger.trace("Creating record type " + type);
+        objCreated++;
+    }
 
-    private static final ConcurrentHashMap<TableType, AtomicInteger> idStorage = new ConcurrentHashMap<>();
+    public static void setID(TableType file, int id) {
+//        getAtomicInteger(file).set(id);
+        getAtomicInteger(file).updateAndGet(new IntUnaryOperator() {
+            @Override
+            public int applyAsInt(int operand) {
+                return (id > operand) ? id : operand;
+            }
+        });
+    }
 
-    private static AtomicInteger getAtomicInteger(TableType type){
+    public static int getID(TableType file) {
+        return getAtomicInteger(file).get();
+    }
+
+    private static AtomicInteger getAtomicInteger(TableType type) {
         AtomicInteger atomicInteger;
-        synchronized (type){
+        synchronized (type) {
             atomicInteger = idStorage.get(type);
-            if(atomicInteger==null){
+            if (atomicInteger == null) {
                 atomicInteger = new AtomicInteger(0);
                 idStorage.put(type, atomicInteger);
             }
@@ -60,25 +66,41 @@ public abstract class Record implements Cloneable {
         return atomicInteger;
     }
 
-    public Record(TableType type, int fileID) {
-        this.fileID=fileID;
-        m_type = type;
-        recordID=getAtomicInteger(type).incrementAndGet();
-        Main.logger.trace("Creating record type " + type);
-        objCreated++;
-    }
-
-    public int getRecordID() {
-        return recordID;
-    }
-
-
     public static Integer getObjCreated() {
         return objCreated;
     }
 
     public static void resetCounter() {
         objCreated = 0;
+    }
+
+    public static String NoQuotes(String key) {
+
+        Matcher m;
+
+        if (key != null && (m = regNoQuotes.matcher(key)).find()) {
+            return m.group(2);
+        }
+        return key;
+    }
+
+    public static String SingleQuotes(String key) {
+        if (key != null && key.length() > 0) {
+            return NoQuotes(key);
+        }
+        return null;
+    }
+
+    public static void SetAlias(String alias) {
+        m_alias = alias;
+    }
+
+    public int getFileID() {
+        return fileID;
+    }
+
+    public int getRecordID() {
+        return recordID;
     }
 
     public String cleanDN(String key) {
@@ -96,30 +118,6 @@ public abstract class Record implements Cloneable {
         return ret;
     }
 
-    public static String NoQuotes(String key) {
-
-        Matcher m;
-
-        if (key != null && (m = regNoQuotes.matcher(key)).find()) {
-            return m.group(2);
-        }
-        return key;
-    }
-
-    public  static String SingleQuotes(String key) {
-        if (key != null && key.length() > 0) {
-            return NoQuotes(key);
-        }
-        return null;
-    }
-
-
-
-    public static void SetAlias(String alias) {
-        m_alias = alias;
-    }
-
-
     @Override
     protected Object clone() throws CloneNotSupportedException {
         Record ret = (Record) super.clone(); //To change body of generated methods, choose Tools | Templates.
@@ -128,18 +126,11 @@ public abstract class Record implements Cloneable {
         return ret;
     }
 
-    public int getLastID() {
-        return lastID;
-    }
-
-    void setLastID(int currentID) {
-        this.lastID = currentID;
-    }
 
     @Override
     public String toString() {
-        return "Rec{id:"+lastID
-                +"t:" + m_type + ";l:" + m_line + ";off:" + m_fileOffset + ";b:" + m_FileBytes + '}';
+        return "Rec{id:" + recordID
+                + ";t:" + m_type + ";l:" + m_line + ";off:" + m_fileOffset + ";b:" + m_FileBytes + '}';
     }
 
     public String CheckQuotes(String key) {

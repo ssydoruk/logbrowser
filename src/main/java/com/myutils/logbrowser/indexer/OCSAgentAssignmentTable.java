@@ -16,7 +16,7 @@ import java.sql.Timestamp;
  */
 public class OCSAgentAssignmentTable extends DBTable {
 
-    public OCSAgentAssignmentTable(DBAccessor dbaccessor, TableType t) {
+    public OCSAgentAssignmentTable(SqliteAccessor dbaccessor, TableType t) {
         super(dbaccessor, t);
 
     }
@@ -24,7 +24,7 @@ public class OCSAgentAssignmentTable extends DBTable {
     @Override
     public void InitDB() {
         if (Main.isDbExisted()) {
-            getM_dbAccessor().runQuery("drop index if exists OCSASGN_fileid_" + getM_dbAccessor().getM_alias() + ";");
+            getM_dbAccessor().runQuery("drop index if exists OCSASGN_fileid_" + getM_dbAccessor() .getM_alias() + ";");
             getM_dbAccessor().runQuery("drop index if exists OCSASGN_cgnameID_" + getM_dbAccessor().getM_alias() + ";");
             getM_dbAccessor().runQuery("drop index if exists OCSASGN_time_" + getM_dbAccessor().getM_alias() + ";");
 

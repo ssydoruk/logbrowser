@@ -564,7 +564,7 @@ public class ConfServParser extends Parser {
 
     private class CSObjectChangeTable extends DBTable {
 
-        public CSObjectChangeTable(DBAccessor dbaccessor, TableType t) {
+        public CSObjectChangeTable(SqliteAccessor dbaccessor, TableType t) {
             super(dbaccessor, t);
         }
 
@@ -783,7 +783,7 @@ public class ConfServParser extends Parser {
 
     private class CSClientMessageTable extends DBTable {
 
-        public CSClientMessageTable(DBAccessor dbaccessor, TableType t) {
+        public CSClientMessageTable(SqliteAccessor dbaccessor, TableType t) {
             super(dbaccessor, t);
         }
 
@@ -952,7 +952,7 @@ public class ConfServParser extends Parser {
 
     private class CSClientConnectTable extends DBTable {
 
-        public CSClientConnectTable(DBAccessor dbaccessor, TableType t) {
+        public CSClientConnectTable(SqliteAccessor dbaccessor, TableType t) {
             super(dbaccessor, t);
         }
 

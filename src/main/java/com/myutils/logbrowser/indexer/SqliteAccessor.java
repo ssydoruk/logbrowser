@@ -580,6 +580,7 @@ public final class SqliteAccessor implements DBAccessor {
 
         private void flush() throws SQLException {
             int[] ret = stat.executeBatch();
+            logger.trace("flashing "+stat+" ret: "+ret.length);
             if (ret.length > 0) {
                 for (int i = 0; i < ret.length; i++) {
                     if (ret[i] < 0) {
@@ -621,6 +622,7 @@ public final class SqliteAccessor implements DBAccessor {
         }
 
         synchronized public void Submit(Stat st) throws SQLException {
+            logger.trace("Submitting "+st);
             st.Submit();
             if (st.cnt >= 10_000) {
 //                Main.m_accessor.flush(st);

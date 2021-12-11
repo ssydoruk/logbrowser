@@ -13,13 +13,13 @@ import java.sql.Timestamp;
  */
 public class OCSRecCreateTable extends DBTable {
 
-    public OCSRecCreateTable(DBAccessor dbaccessor, TableType t) {
-        super(dbaccessor, t);
+    public OCSRecCreateTable(SqliteAccessor dbaccessor, TableType t) {
+        super(dbaccessor, t,"OCSRECCR");
     }
 
     @Override
     public void InitDB() {
-        setTabName("OCSRECCR");
+        
         addIndex("recHandle");
         addIndex("chID");
         addIndex("FileId");

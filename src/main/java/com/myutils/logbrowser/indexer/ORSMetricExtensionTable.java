@@ -13,13 +13,13 @@ import java.sql.Timestamp;
  */
 public class ORSMetricExtensionTable extends DBTable {
 
-    public ORSMetricExtensionTable(DBAccessor dbaccessor, TableType t) {
-        super(dbaccessor, t);
+    public ORSMetricExtensionTable(SqliteAccessor dbaccessor, TableType t) {
+        super(dbaccessor, t,"ORSmetrExt_" + dbaccessor.getM_alias());
     }
 
     @Override
     public void InitDB() {
-        setTabName("ORSmetrExt_" + getM_dbAccessor().getM_alias());
+        
         addIndex("time");
         addIndex("FileId");
         addIndex("sidid");

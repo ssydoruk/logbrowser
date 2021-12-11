@@ -13,13 +13,13 @@ import java.sql.Timestamp;
  */
 public class URSTlibTable extends DBTable {
 
-    public URSTlibTable(DBAccessor dbaccessor, TableType t) {
-        super(dbaccessor, t);
+    public URSTlibTable(SqliteAccessor dbaccessor, TableType t) {
+        super(dbaccessor, t,"URS_" + dbaccessor.getM_alias());
     }
 
     @Override
     public void InitDB() {
-        setTabName("URS_" + getM_dbAccessor().getM_alias());
+        
         addIndex("ConnectionIDID");
         addIndex("TransferIdID");
         addIndex("UUIDID");

@@ -16,7 +16,7 @@ import java.sql.Timestamp;
  */
 public class IxnGMSTable extends DBTable {
 
-    public IxnGMSTable(DBAccessor dbaccessor, TableType t) {
+    public IxnGMSTable(SqliteAccessor dbaccessor, TableType t) {
         super(dbaccessor, t);
     }
 

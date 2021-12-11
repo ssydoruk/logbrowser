@@ -15,13 +15,13 @@ import static com.myutils.logbrowser.indexer.Message.transformDN;
  */
 public class SIPEPTable extends DBTable {
 
-    public SIPEPTable(DBAccessor dbaccessor, TableType t) {
-        super(dbaccessor, t);
+    public SIPEPTable(SqliteAccessor dbaccessor, TableType t) {
+        super(dbaccessor, t,"sipep");
     }
 
     @Override
     public void InitDB() {
-        setTabName("sipep");
+        
 
         addIndex("CallIDID");
         addIndex("time");

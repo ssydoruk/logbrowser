@@ -16,13 +16,13 @@ import java.sql.Timestamp;
  */
 public class WSEServTable extends DBTable {
 
-    public WSEServTable(DBAccessor dbaccessor, TableType t) {
-        super(dbaccessor, t);
+    public WSEServTable(SqliteAccessor dbaccessor, TableType t) {
+        super(dbaccessor, t,"wseserv");
     }
 
     @Override
     public void InitDB() {
-        setTabName("wseserv");
+        
         addIndex("time");
         addIndex("FileId");
         addIndex("nameID");

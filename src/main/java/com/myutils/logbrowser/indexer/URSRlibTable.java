@@ -16,17 +16,17 @@ import java.sql.Timestamp;
  */
 public class URSRlibTable extends DBTable {
 
-    public URSRlibTable(DBAccessor dbaccessor) {
+    public URSRlibTable(SqliteAccessor dbaccessor) {
         super(dbaccessor, TableType.URSRlib);
     }
 
     URSRlibTable(SqliteAccessor m_accessor, TableType tableType) {
-        super(m_accessor, tableType);
+        super(m_accessor, tableType,"URSRLIB");
     }
 
     @Override
     public void InitDB() {
-        setTabName("URSRLIB");
+        
         addIndex("time");
         addIndex("FileId");
 

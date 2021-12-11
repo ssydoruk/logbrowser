@@ -16,13 +16,13 @@ import java.sql.Timestamp;
  */
 public class OCSPAEventInfoTable extends DBTable {
 
-    public OCSPAEventInfoTable(DBAccessor dbaccessor, TableType t) {
-        super(dbaccessor, t);
+    public OCSPAEventInfoTable(SqliteAccessor dbaccessor, TableType t) {
+        super(dbaccessor, t,"OCSPAEVI_" + dbaccessor.getM_alias());
     }
 
     @Override
     public void InitDB() {
-        setTabName("OCSPAEVI_" + getM_dbAccessor().getM_alias());
+        
         addIndex("FileId");
         addIndex("time");
         addIndex("cgDBID");

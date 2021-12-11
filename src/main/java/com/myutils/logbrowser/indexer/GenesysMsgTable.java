@@ -16,8 +16,8 @@ import java.sql.Timestamp;
  */
 public class GenesysMsgTable extends DBTable {
 
-    public GenesysMsgTable(DBAccessor dbaccessor, TableType type) {
-        super(dbaccessor, type);
+    public GenesysMsgTable(SqliteAccessor dbaccessor, TableType type) {
+        super(dbaccessor, type, type.toString());
     }
 
     private String tabName() {
@@ -27,7 +27,6 @@ public class GenesysMsgTable extends DBTable {
     @Override
     public void InitDB() {
 
-        setTabName(tabName());
         addIndex("time");
         addIndex("FileId");
         addIndex("levelID");

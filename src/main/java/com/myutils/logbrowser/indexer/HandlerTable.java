@@ -12,13 +12,12 @@ import java.sql.SQLException;
  */
 public class HandlerTable extends DBTable {
 
-    public HandlerTable(DBAccessor dbaccessor, TableType t) {
-        super(dbaccessor, t);
+    public HandlerTable(SqliteAccessor dbaccessor, TableType t) {
+        super(dbaccessor, t,"handler_" + dbaccessor.getM_alias());
     }
 
     @Override
     public void InitDB() {
-        setTabName("handler_" + getM_dbAccessor().getM_alias());
         addIndex("textid");
         addIndex("FileId");
         dropIndexes();

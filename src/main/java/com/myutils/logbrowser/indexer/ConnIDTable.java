@@ -13,13 +13,12 @@ import java.sql.Timestamp;
  */
 public class ConnIDTable extends DBTable {
 
-    public ConnIDTable(DBAccessor dbaccessor, TableType t) {
-        super(dbaccessor, t);
+    public ConnIDTable(SqliteAccessor dbaccessor, TableType t) {
+        super(dbaccessor, t,"connid_" + dbaccessor.getM_alias());
     }
 
     @Override
     public void InitDB() {
-        setTabName("connid_" + getM_dbAccessor().getM_alias());
         addIndex("time");
         addIndex("FileId");
         addIndex("ConnectionIdID");

@@ -14,13 +14,13 @@ import java.sql.Timestamp;
  */
 public class OrsUrsTable extends DBTable {
 
-    public OrsUrsTable(DBAccessor dbaccessor, TableType t) {
-        super(dbaccessor, t);
+    public OrsUrsTable(SqliteAccessor dbaccessor, TableType t) {
+        super(dbaccessor, t, "ORSURS_" + dbaccessor.getM_alias());
     }
 
     @Override
     public void InitDB() {
-        setTabName("ORSURS_" + getM_dbAccessor().getM_alias());
+        
         addIndex("time");
         addIndex("FileId");
         addIndex("uuidid");

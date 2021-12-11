@@ -962,7 +962,7 @@ public abstract class Parser {
         private final FileInfoType type;
 
         public CustomLineTable(FileInfoType t) {
-            super(Main.getInstance().getM_accessor());
+            super(Main.getInstance().getM_accessor(), getCustomTab(t));
             this.type = t;
         }
 
@@ -972,7 +972,6 @@ public abstract class Parser {
 
         @Override
         public void InitDB() {
-            setTabName(getCustomTab(type));
             addIndex("time");
             addIndex("FileId");
             addIndex("keyid");
@@ -1065,18 +1064,17 @@ public abstract class Parser {
 
         private FileInfoType type;
 
-        public CustomAttributeTable(DBAccessor dbaccessor) {
-            super(dbaccessor);
+        public CustomAttributeTable(SqliteAccessor dbaccessor, String tabName) {
+            super(dbaccessor, tabName);
         }
 
         public CustomAttributeTable(FileInfoType t) {
-            this(Main.getInstance().getM_accessor());
+            this(Main.getInstance().getM_accessor(), FileInfoType.getFileType(t) + "_attr");
             this.type = t;
         }
 
         @Override
         public void InitDB() {
-            setTabName(FileInfoType.getFileType(type) + "_attr");
             addIndex("custom_id");
             addIndex("FileId");
             addIndex("newModeID");

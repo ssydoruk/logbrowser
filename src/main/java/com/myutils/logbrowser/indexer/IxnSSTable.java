@@ -18,14 +18,12 @@ import static java.sql.Types.INTEGER;
  */
 public class IxnSSTable extends DBTable {
 
-    public IxnSSTable(DBAccessor dbaccessor, TableType t) {
-        super(dbaccessor, t);
+    public IxnSSTable(SqliteAccessor dbaccessor, TableType t) {
+        super(dbaccessor, t,"IxnSS");
     }
 
     @Override
     public void InitDB() {
-        setTabName("IxnSS");
-
         addIndex("nameID");
         addIndex("IxnID");
         addIndex("PARENTIXNIDID");

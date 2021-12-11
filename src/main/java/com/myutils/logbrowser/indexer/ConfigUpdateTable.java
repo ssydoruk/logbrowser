@@ -16,13 +16,12 @@ import java.sql.Timestamp;
  */
 public class ConfigUpdateTable extends DBTable {
 
-    public ConfigUpdateTable(DBAccessor dbaccessor, TableType t) {
-        super(dbaccessor, t);
+    public ConfigUpdateTable(SqliteAccessor dbaccessor, TableType t) {
+        super(dbaccessor, t, "cfg");
     }
 
     @Override
     public void InitDB() {
-        setTabName("cfg");
         addIndex("time");
         addIndex("FileId");
 

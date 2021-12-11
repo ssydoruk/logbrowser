@@ -1550,7 +1550,7 @@ public class SingleThreadParser extends Parser {
 
     public class SIP1536OtherTable extends DBTable {
 
-        public SIP1536OtherTable(DBAccessor dbaccessor, TableType t) {
+        public SIP1536OtherTable(SqliteAccessor dbaccessor, TableType t) {
             super(dbaccessor, t);
         }
 
@@ -1670,7 +1670,7 @@ public class SingleThreadParser extends Parser {
 
     public class SIP1536TrunkTable extends DBTable {
 
-        public SIP1536TrunkTable(DBAccessor dbaccessor, TableType t) {
+        public SIP1536TrunkTable(SqliteAccessor dbaccessor, TableType t) {
             super(dbaccessor, t);
         }
 
@@ -1806,7 +1806,7 @@ public class SingleThreadParser extends Parser {
 
     public class SIP1536RequestResponseTable extends DBTable {
 
-        public SIP1536RequestResponseTable(DBAccessor dbaccessor, TableType t) {
+        public SIP1536RequestResponseTable(SqliteAccessor dbaccessor, TableType t) {
             super(dbaccessor, t);
         }
 
@@ -1932,7 +1932,7 @@ public class SingleThreadParser extends Parser {
 
     public class TLibTimerRedirectTable extends DBTable {
 
-        public TLibTimerRedirectTable(DBAccessor dbaccessor, TableType t) {
+        public TLibTimerRedirectTable(SqliteAccessor dbaccessor, TableType t) {
             super(dbaccessor, t);
         }
 

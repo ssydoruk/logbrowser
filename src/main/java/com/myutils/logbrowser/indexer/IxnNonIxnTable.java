@@ -16,7 +16,7 @@ import java.sql.Timestamp;
  */
 public class IxnNonIxnTable extends DBTable {
 
-    public IxnNonIxnTable(DBAccessor dbaccessor, TableType t) {
+    public IxnNonIxnTable(SqliteAccessor dbaccessor, TableType t) {
         super(dbaccessor, t);
     }
 

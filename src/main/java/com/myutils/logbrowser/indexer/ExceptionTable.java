@@ -13,13 +13,12 @@ import java.sql.Timestamp;
  */
 public class ExceptionTable extends DBTable {
 
-    public ExceptionTable(DBAccessor dbaccessor, TableType t) {
-        super(dbaccessor, t);
+    public ExceptionTable(SqliteAccessor dbaccessor, TableType t) {
+        super(dbaccessor, t,"WWEExceptions");
     }
 
     @Override
     public void InitDB() {
-        setTabName("WWEExceptions");
         addIndex("time");
         addIndex("FileId");
         addIndex("exceptionID");

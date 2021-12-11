@@ -15,13 +15,13 @@ import static Utils.Util.StripQuotes;
  */
 public class ORSTable extends DBTable {
 
-    public ORSTable(DBAccessor dbaccessor, TableType t) {
-        super(dbaccessor, t);
+    public ORSTable(SqliteAccessor dbaccessor, TableType t) {
+        super(dbaccessor, t,"ORS_" + dbaccessor.getM_alias());
     }
 
     @Override
     public void InitDB() {
-        setTabName("ORS_" + getM_dbAccessor().getM_alias());
+        
         addIndex("TransferIDID");
         addIndex("time");
         addIndex("uuidID");

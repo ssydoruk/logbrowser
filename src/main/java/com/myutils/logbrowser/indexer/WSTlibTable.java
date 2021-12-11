@@ -13,13 +13,14 @@ import java.sql.Timestamp;
  */
 public class WSTlibTable extends DBTable {
 
-    public WSTlibTable(DBAccessor dbaccessor, TableType t) {
-        super(dbaccessor, t);
+    public WSTlibTable(SqliteAccessor dbaccessor, TableType t) {
+
+        super(dbaccessor, t,"WSTlib");
     }
 
     @Override
     public void InitDB() {
-        setTabName("WSTlib");
+        
         addIndex("time");
         addIndex("FileId");
         addIndex("nameID");

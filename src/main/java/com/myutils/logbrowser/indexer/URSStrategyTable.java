@@ -13,13 +13,13 @@ import java.sql.Timestamp;
  */
 public class URSStrategyTable extends DBTable {
 
-    public URSStrategyTable(DBAccessor dbaccessor, TableType t) {
-        super(dbaccessor, t);
+    public URSStrategyTable(SqliteAccessor dbaccessor, TableType t) {
+        super(dbaccessor, "URSSTR_" + dbaccessor.getM_alias());
     }
 
     @Override
     public void InitDB() {
-        setTabName("URSSTR_" + getM_dbAccessor().getM_alias());
+        
         addIndex("time");
         addIndex("FileId");
         addIndex("ConnIDID");

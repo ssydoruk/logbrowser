@@ -13,7 +13,7 @@ import java.sql.Timestamp;
  */
 public class ORSSessionStartTable extends DBTable {
 
-    public ORSSessionStartTable(DBAccessor dbaccessor, TableType t) {
+    public ORSSessionStartTable(SqliteAccessor dbaccessor, TableType t) {
         super(dbaccessor, t);
     }
 

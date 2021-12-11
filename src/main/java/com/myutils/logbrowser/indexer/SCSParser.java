@@ -513,7 +513,7 @@ public class SCSParser extends Parser {
 
     private class SCSClientLogTable extends DBTable {
 
-        public SCSClientLogTable(DBAccessor dbaccessor, TableType t) {
+        public SCSClientLogTable(SqliteAccessor dbaccessor, TableType t) {
             super(dbaccessor, t);
         }
 
@@ -665,7 +665,7 @@ public class SCSParser extends Parser {
 
     private class SCSAlarmTable extends DBTable {
 
-        public SCSAlarmTable(DBAccessor dbaccessor, TableType t) {
+        public SCSAlarmTable(SqliteAccessor dbaccessor, TableType t) {
             super(dbaccessor, t);
         }
 

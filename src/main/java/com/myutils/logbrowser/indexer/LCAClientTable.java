@@ -16,7 +16,7 @@ import java.sql.Timestamp;
  */
 public class LCAClientTable extends DBTable {
 
-    public LCAClientTable(DBAccessor dbaccessor) {
+    public LCAClientTable(SqliteAccessor dbaccessor) {
         super(dbaccessor, TableType.LCAClient);
     }
 

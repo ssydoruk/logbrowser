@@ -15,13 +15,13 @@ import static com.myutils.logbrowser.indexer.Message.transformDN;
  */
 public class SIPMSTable extends DBTable {
 
-    public SIPMSTable(DBAccessor dbaccessor, TableType t) {
-        super(dbaccessor, t);
+    public SIPMSTable(SqliteAccessor dbaccessor, TableType t) {
+        super(dbaccessor, t,"sipms");
     }
 
     @Override
     public void InitDB() {
-        setTabName("sipms");
+        
         addIndex("time");
         addIndex("FileId");
         addIndex("nameID");

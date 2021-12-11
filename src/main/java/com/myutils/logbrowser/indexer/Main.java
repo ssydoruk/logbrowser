@@ -42,6 +42,7 @@ public class Main {
 
     private static final Constants constants = new Constants();
     private static final Pattern regFilesNotGood = Pattern.compile("(^\\.logbr|logbr.db)");
+    private static final int MAX_OPEN_ATTEMPT = 20;
     public static Logger logger = LogManager.getLogger();
     static String m_component = "all";
     static String m_executableName = "indexer.jar";
@@ -241,7 +242,7 @@ public class Main {
             managerThreads.purge();
 
         managerThreads = (ThreadPoolExecutor) Executors.newCachedThreadPool(
-                new BasicThreadFactory.Builder().namingPattern("managerthreads-%d").build()
+                new BasicThreadFactory.Builder().namingPattern("indexer-%d").build()
         );
         managerThreads.setCorePoolSize(1);
         managerThreads.setMaximumPoolSize(1);
@@ -259,8 +260,8 @@ public class Main {
     }
 
     public Main init(ExecutionEnvironment ee) throws Exception {
-        logger.info("Init :"+ee.toString());
-        logger.info("current directory :"+Utils.FileUtils.getCurrentDirectory() );
+        logger.info("Init :" + ee.toString());
+        logger.info("current directory :" + Utils.FileUtils.getCurrentDirectory());
 
         this.dbName = ee.getDbname();
         this.baseDir = ee.getBaseDir();
@@ -278,9 +279,22 @@ public class Main {
         File[] filesInDir = file.listFiles();
         for (File filesInDir1 : filesInDir) {
             if (filesInDir1.isFile()) {
-                LogFileWrapper logFile = LogFileWrapper.getContainer(filesInDir1);
-                if (logFile != null) {
-                    extendFilesList(filesToAccess, logFile);
+                for (int attempt = 0; attempt < MAX_OPEN_ATTEMPT; attempt++) {
+                    try {
+                        LogFileWrapper logFile = LogFileWrapper.getContainer(filesInDir1);
+                        if (logFile != null) {
+                            extendFilesList(filesToAccess, logFile);
+                        }
+                        break;
+                    } catch (java.util.zip.ZipException e) {
+                        logger.info("Exception opening ZIP file " + e.getMessage());
+                        try {
+                            Thread.sleep(500);
+                        } catch (InterruptedException ex) {
+                            logger.debug("Interrupted wait");
+                            return;
+                        }
+                    }
                 }
             } else if (filesInDir1.isDirectory() && m_scanDir && !isLogBRDir(filesInDir1)) {
                 ScanDir(filesInDir1, filesToAccess);
@@ -316,7 +330,7 @@ public class Main {
                     fileInfo.setFileEndTime(parser.getLastTimeStamp());
                     m_FileInfoTable.AddToDB(fileInfo);
                     Main.getMain().getProcessedFiles().put(fileInfo.getLogFileName(),
-                            new ProcessedFiles(fileInfo.getLogFileName(), fileInfo.getLastID(),
+                            new ProcessedFiles(fileInfo.getLogFileName(), fileInfo.getRecordID(),
                                     fileInfo.getSize()));
                     parsingInput.close();
                 }
@@ -547,6 +561,7 @@ public class Main {
      */
     synchronized private boolean initAndParse(boolean exitOnEmpty) throws Exception {
         ArrayList<FileInfo> filesToAccess = new ArrayList();
+        boolean restartParsing = false;
 
         if (!setCurrentDirectory(baseDir)) {
             logger.error("Cannot cd to directory [" + baseDir + "]. Exiting");
@@ -554,6 +569,17 @@ public class Main {
         }
         String startDir = baseDir;
 
+        try {
+            m_accessor = SqliteAccessor.getInstance();
+            m_accessor.init(dbName, alias);
+            if (m_accessor.TableExist("file_logbr")) {
+                initStatic(m_accessor);
+                setDBExisted(true);
+            }
+        } catch (Exception e) {
+            System.out.println("Could not create accessor: " + e);
+            restartParsing=true;
+        }
 
         File f = new File(startDir);
         if (f.isDirectory()) {
@@ -565,23 +591,11 @@ public class Main {
             }
         }
 
-        try {
-            m_accessor = SqliteAccessor.getInstance();
-            m_accessor.init(dbName, alias);
-
-        } catch (Exception e) {
-            System.out.println("Could not create accessor: " + e);
-            return false;
-        }
-        boolean restartParsing = false;
         ArrayList<FileInfo> filesToProcess = new ArrayList();
         ArrayList<Long> filesToDelete = new ArrayList<>();
 
         try {
-            if (m_accessor.TableExist("file_logbr")) {
-                initStatic(m_accessor);
-
-                setDBExisted(true);
+            if (!restartParsing) {
                 for (FileInfo fi : filesToAccess) {
                     String logFileName = fi.getLogFileName();
                     if (logFileName != null && !logFileName.isEmpty()) { // fix for error resulting in empty DB. workspace file names are empty
@@ -601,13 +615,12 @@ public class Main {
                         }
                     }
                 }
-            } else {
-                restartParsing = true;
-
             }
         } catch (Exception exception) {
             logger.error("Failed to verify for new log files. Will parse a new");
+            restartParsing=true;
         }
+
         if (restartParsing) {
             logger.debug("Restart parsing");
             m_accessor.Close(false);
@@ -634,19 +647,18 @@ public class Main {
                 }
             }
             m_accessor.init(dbName, alias);
+            initStatic(m_accessor);
         }
         if (filesToProcess.isEmpty()) {
             logger.info("No new log files found");
             if (exitOnEmpty)
                 return false;
         }
-        initStatic(m_accessor);
         m_accessor.setFilesToDelete(filesToDelete);
 
         logger.info("Initializing...");
         InitTables();
         logger.info("Starting DB...");
-//        m_accessor.start();
         logger.info("Done init");
 
         tabRefs = new TableReferences(m_accessor);
@@ -668,7 +680,6 @@ public class Main {
                 public Object call() throws Exception {
                     Main.logger.info("processing file1 : " + newFile.getM_path() + ((newFile.getArchiveName() == null) ? "" : ", archive: " + newFile.getArchiveName()));
                     Parse(newFile);
-                    logger.info("Done thread");
                     return 0;
                 }
             });

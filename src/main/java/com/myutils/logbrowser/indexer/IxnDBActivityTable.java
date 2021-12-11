@@ -16,13 +16,12 @@ import java.sql.Timestamp;
  */
 public class IxnDBActivityTable extends DBTable {
 
-    public IxnDBActivityTable(DBAccessor dbaccessor, TableType t) {
-        super(dbaccessor, t);
+    public IxnDBActivityTable(SqliteAccessor dbaccessor, TableType t) {
+        super(dbaccessor, t, "ixndb");
     }
 
     @Override
     public void InitDB() {
-        setTabName("ixndb");
         addIndex("time");
         addIndex("FileId");
         addIndex("activityid");
@@ -64,25 +63,24 @@ public class IxnDBActivityTable extends DBTable {
     }
 
     @Override
-        public void AddToDB(Record _rec) throws SQLException {
+    public void AddToDB(Record _rec) throws SQLException {
         IxnDBActivity rec = (IxnDBActivity) _rec;
-         getM_dbAccessor().addToDB(m_InsertStatementId, new IFillStatement() {
-                @Override
-                public void fillStatement(PreparedStatement stmt) throws SQLException{
-            stmt.setTimestamp(1, new Timestamp(rec.GetAdjustedUsecTime()));
-            stmt.setInt(2, rec.getFileID());
-            stmt.setLong(3, rec.getM_fileOffset());
-            stmt.setLong(4, rec.getM_FileBytes());
-            stmt.setLong(5, rec.getM_line());
+        getM_dbAccessor().addToDB(m_InsertStatementId, new IFillStatement() {
+            @Override
+            public void fillStatement(PreparedStatement stmt) throws SQLException {
+                stmt.setTimestamp(1, new Timestamp(rec.GetAdjustedUsecTime()));
+                stmt.setInt(2, rec.getFileID());
+                stmt.setLong(3, rec.getM_fileOffset());
+                stmt.setLong(4, rec.getM_FileBytes());
+                stmt.setLong(5, rec.getM_line());
 
-            setFieldInt(stmt, 6, Main.getRef(ReferenceType.DBActivity, rec.getActivity()));
-            stmt.setInt(7, rec.getReqid());
-            setFieldInt(stmt, 8, Main.getRef(ReferenceType.IxnID, rec.getIxnid()));
+                setFieldInt(stmt, 6, Main.getRef(ReferenceType.DBActivity, rec.getActivity()));
+                stmt.setInt(7, rec.getReqid());
+                setFieldInt(stmt, 8, Main.getRef(ReferenceType.IxnID, rec.getIxnid()));
 
-                        }
+            }
         });
     }
-
 
 
 }

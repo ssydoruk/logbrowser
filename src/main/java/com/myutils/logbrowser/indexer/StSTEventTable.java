@@ -11,8 +11,8 @@ public class StSTEventTable extends DBTable {
 
     String m_MessageName;
 
-    public StSTEventTable(DBAccessor dbaccessor, TableType t) {
-        super(dbaccessor, t);
+    public StSTEventTable(SqliteAccessor dbaccessor, TableType t) {
+        super(dbaccessor, t,"STSTEVENT_" + dbaccessor.getM_alias());
     }
 
     @Override
@@ -22,7 +22,7 @@ public class StSTEventTable extends DBTable {
 
     @Override
     public void InitDB() {
-        setTabName("STSTEVENT_" + getM_dbAccessor().getM_alias());
+        
         addIndex("time");
         addIndex("FileId");
         addIndex("nameID");

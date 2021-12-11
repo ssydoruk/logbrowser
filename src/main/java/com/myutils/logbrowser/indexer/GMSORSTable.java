@@ -13,13 +13,12 @@ import java.sql.Timestamp;
  */
 public class GMSORSTable extends DBTable {
 
-    public GMSORSTable(DBAccessor dbaccessor, TableType t) {
-        super(dbaccessor, t);
+    public GMSORSTable(SqliteAccessor dbaccessor, TableType t) {
+        super(dbaccessor, t,"gmsors");
     }
 
     @Override
     public void InitDB() {
-        setTabName("gmsors");
         addIndex("time");
         addIndex("FileId");
 

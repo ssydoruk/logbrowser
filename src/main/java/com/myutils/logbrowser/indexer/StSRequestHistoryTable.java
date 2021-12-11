@@ -9,13 +9,13 @@ import java.sql.Timestamp;
  */
 public class StSRequestHistoryTable extends DBTable {
 
-    public StSRequestHistoryTable(DBAccessor dbaccessor, TableType t) {
-        super(dbaccessor, t);
+    public StSRequestHistoryTable(SqliteAccessor dbaccessor, TableType t) {
+        super(dbaccessor, t,"STSREQHISTORY_" + dbaccessor.getM_alias());
     }
 
     @Override
     public void InitDB() {
-        setTabName("STSREQHISTORY_" + getM_dbAccessor().getM_alias());
+        
         addIndex("time");
         addIndex("FileId");
         addIndex(new String[]{"clnameid", "rid"});

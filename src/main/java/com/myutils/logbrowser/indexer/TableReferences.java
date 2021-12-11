@@ -31,32 +31,34 @@ class TableReference {
         maxID = 0;
         if (Main.isDbExisted()) {
             SqliteAccessor dbAccessor = Main.getInstance().getM_accessor();
-            try {
-                if (dbAccessor.TableExist(type.toString())) {
-                    ResultSet rs = dbAccessor.executeQuery("select name, id from " + type);
-                    Main.logger.trace("Reading references from " + type);
+            synchronized (dbAccessor) {
+                try {
+                    if (dbAccessor.TableExist(type.toString())) {
+                        ResultSet rs = dbAccessor.executeQuery("select name, id from " + type);
+                        Main.logger.trace("Reading references from " + type);
 
-//                    ResultSetMetaData rsmd = rs.getMetaData();
-                    int cnt = 0;
-                    while (rs.next()) {
-                        String n = rs.getString(1);
-                        if (n != null && !n.isEmpty()) {
-                            int aInt = rs.getInt(2);
-                            if (aInt > maxID) {
-                                maxID = aInt;
+    //                    ResultSetMetaData rsmd = rs.getMetaData();
+                        int cnt = 0;
+                        while (rs.next()) {
+                            String n = rs.getString(1);
+                            if (n != null && !n.isEmpty()) {
+                                int aInt = rs.getInt(2);
+                                if (aInt > maxID) {
+                                    maxID = aInt;
+                                }
+                                Main.logger.trace("Added name/key: [" + rs.getString(1) + "] / " + aInt);
+                                valRef.put(new CIString(rs.getString(1)), aInt);
+                                cnt++;
                             }
-                            Main.logger.trace("Added name/key: [" + rs.getString(1) + "] / " + aInt);
-                            valRef.put(new CIString(rs.getString(1)), aInt);
-                            cnt++;
                         }
+                        Main.logger.debug("\tRetrieved " + cnt + " records");
+                        rs.close();
+                        rs.getStatement().close();
+                        this.initialID = maxID;
                     }
-                    Main.logger.debug("\tRetrieved " + cnt + " records");
-                    rs.close();
-                    rs.getStatement().close();
-                    this.initialID = maxID;
+                } catch (Exception ex) {
+                    logger.error("fatal: ", ex);
                 }
-            } catch (Exception ex) {
-                logger.error("fatal: ", ex);
             }
         }
     }

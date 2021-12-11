@@ -16,13 +16,13 @@ import java.sql.Timestamp;
  */
 public class URSWaitingTable extends DBTable {
 
-    public URSWaitingTable(DBAccessor dbaccessor, TableType t) {
-        super(dbaccessor, t);
+    public URSWaitingTable(SqliteAccessor dbaccessor, TableType t) {
+        super(dbaccessor, t,"urswaiting");
     }
 
     @Override
     public void InitDB() {
-        setTabName("urswaiting");
+        
         addIndex("time");
         addIndex("FileId");
         addIndex("connIDID");

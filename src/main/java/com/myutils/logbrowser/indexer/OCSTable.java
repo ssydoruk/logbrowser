@@ -15,13 +15,13 @@ import static Utils.Util.StripQuotes;
  */
 public class OCSTable extends DBTable {
 
-    public OCSTable(DBAccessor dbaccessor, TableType t) {
-        super(dbaccessor, t);
+    public OCSTable(SqliteAccessor dbaccessor, TableType t) {
+        super(dbaccessor, t,"OCS_" + dbaccessor.getM_alias());
     }
 
     @Override
     public void InitDB() {
-        setTabName("OCS_" + getM_dbAccessor().getM_alias());
+        
         addIndex("FileId");
         addIndex("cgDBID");
         addIndex("recHandle");

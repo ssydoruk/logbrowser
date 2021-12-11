@@ -666,7 +666,7 @@ public class URShttpinterfaceParser extends WebParser {
 
     public class ursHTTPMsgTable extends DBTable {
 
-        public ursHTTPMsgTable(DBAccessor dbaccessor) {
+        public ursHTTPMsgTable(SqliteAccessor dbaccessor) {
             super(dbaccessor, TableType.URSHTTP);
         }
 
@@ -782,7 +782,7 @@ public class URShttpinterfaceParser extends WebParser {
 
     private class HTTPtoURSTable extends DBTable {
 
-        public HTTPtoURSTable(DBAccessor dbaccessor, TableType t) {
+        public HTTPtoURSTable(SqliteAccessor dbaccessor, TableType t) {
             super(dbaccessor, t);
         }
 

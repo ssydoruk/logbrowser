@@ -16,13 +16,13 @@ import java.sql.Timestamp;
  */
 public class OCSPAAgentInfoTable extends DBTable {
 
-    public OCSPAAgentInfoTable(DBAccessor dbaccessor, TableType t) {
-        super(dbaccessor, t);
+    public OCSPAAgentInfoTable(SqliteAccessor dbaccessor, TableType t) {
+        super(dbaccessor, t,"OcsPAAgI_" + dbaccessor.getM_alias());
     }
 
     @Override
     public void InitDB() {
-        setTabName("OcsPAAgI_" + getM_dbAccessor().getM_alias());
+        
         addIndex("FileId");
         addIndex("cgDBID");
         addIndex("recHandle");

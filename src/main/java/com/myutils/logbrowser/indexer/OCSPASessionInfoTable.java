@@ -16,7 +16,7 @@ import java.sql.Timestamp;
  */
 public class OCSPASessionInfoTable extends DBTable {
 
-    public OCSPASessionInfoTable(DBAccessor dbaccessor, TableType t) {
+    public OCSPASessionInfoTable(SqliteAccessor dbaccessor, TableType t) {
         super(dbaccessor, t);
     }
 

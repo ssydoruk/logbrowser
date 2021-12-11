@@ -16,7 +16,7 @@ import java.sql.Timestamp;
  */
 public class LCAAppStatusTable extends DBTable {
 
-    public LCAAppStatusTable(DBAccessor dbaccessor) {
+    public LCAAppStatusTable(SqliteAccessor dbaccessor) {
         super(dbaccessor, TableType.LCAAppStatus);
     }
 

@@ -16,13 +16,12 @@ import java.sql.Timestamp;
  */
 public class IxnTable extends DBTable {
 
-    public IxnTable(DBAccessor dbaccessor, TableType t) {
-        super(dbaccessor, t);
+    public IxnTable(SqliteAccessor dbaccessor, TableType t) {
+        super(dbaccessor, t,"Ixn");
     }
 
     @Override
     public void InitDB() {
-        setTabName("Ixn");
         addIndex("FileId");
         addIndex("time");
         addIndex("nameID");

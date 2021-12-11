@@ -16,7 +16,7 @@ import java.sql.Timestamp;
  */
 public class OCSClientTable extends DBTable {
 
-    public OCSClientTable(DBAccessor dbaccessor, TableType t) {
+    public OCSClientTable(SqliteAccessor dbaccessor, TableType t) {
         super(dbaccessor, t);
     }
 

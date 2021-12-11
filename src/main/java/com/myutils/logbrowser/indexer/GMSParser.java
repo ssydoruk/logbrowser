@@ -743,7 +743,7 @@ public class GMSParser extends Parser {
 
     private class GMSStatServerMsgTable extends DBTable {
 
-        public GMSStatServerMsgTable(DBAccessor dbaccessor, TableType t) {
+        public GMSStatServerMsgTable(SqliteAccessor dbaccessor, TableType t) {
             super(dbaccessor, t);
         }
 
@@ -898,7 +898,7 @@ public class GMSParser extends Parser {
 
     private class GMSWebClientMsgTable extends DBTable {
 
-        public GMSWebClientMsgTable(DBAccessor dbaccessor, TableType t) {
+        public GMSWebClientMsgTable(SqliteAccessor dbaccessor, TableType t) {
             super(dbaccessor, t);
         }
 

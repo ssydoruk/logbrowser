@@ -19,13 +19,13 @@ public class StCapacityTable extends DBTable {
 
     private static final int MAX_MEDIA = 5;
 
-    public StCapacityTable(DBAccessor dbaccessor, TableType t) {
-        super(dbaccessor, t);
+    public StCapacityTable(SqliteAccessor dbaccessor, TableType t) {
+        super(dbaccessor, t,"stcapacity");
     }
 
     @Override
     public void InitDB() {
-        setTabName("stcapacity");
+        
         addIndex("time");
         addIndex("FileId");
 

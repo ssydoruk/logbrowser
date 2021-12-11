@@ -16,13 +16,13 @@ import java.sql.Timestamp;
  */
 public class OCSDBActivityTable extends DBTable {
 
-    public OCSDBActivityTable(DBAccessor dbaccessor, TableType t) {
-        super(dbaccessor, t);
+    public OCSDBActivityTable(SqliteAccessor dbaccessor, TableType t) {
+        super(dbaccessor, t,"OCSDB_" + dbaccessor.getM_alias());
     }
 
     @Override
     public void InitDB() {
-        setTabName("OCSDB_" + getM_dbAccessor().getM_alias());
+        
         addIndex("campaignDBID");
         addIndex("groupDBID");
         addIndex("FileId");

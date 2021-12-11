@@ -13,13 +13,12 @@ import java.sql.Timestamp;
  */
 public class GMSPostTable extends DBTable {
 
-    public GMSPostTable(DBAccessor dbaccessor, TableType t) {
-        super(dbaccessor, t);
+    public GMSPostTable(SqliteAccessor dbaccessor, TableType t) {
+        super(dbaccessor, t,"GMSPost");
     }
 
     @Override
     public void InitDB() {
-        setTabName("GMSPost");
         addIndex("time");
         addIndex("FileId");
 

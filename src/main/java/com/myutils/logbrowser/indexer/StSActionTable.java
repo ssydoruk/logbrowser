@@ -11,17 +11,13 @@ public class StSActionTable extends DBTable {
 
     String m_MessageName;
 
-    public StSActionTable(DBAccessor dbaccessor, TableType t) {
-        super(dbaccessor, t);
-//        m_MessageLines = newMessageLines;
-//        m_MessageName = event;
-//        m_MessageLines.add(0, event);
-
+    public StSActionTable(SqliteAccessor dbaccessor, TableType t) {
+        super(dbaccessor, t,"STSACTION_" + dbaccessor.getM_alias());
     }
 
     @Override
     public void InitDB() {
-        setTabName("STSACTION_" + getM_dbAccessor().getM_alias());
+        
         addIndex("time");
         addIndex("FileId");
         addIndex("nameID");

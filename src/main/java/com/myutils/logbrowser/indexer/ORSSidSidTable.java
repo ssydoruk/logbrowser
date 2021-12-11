@@ -12,7 +12,7 @@ import java.sql.SQLException;
  */
 public class ORSSidSidTable extends DBTable {
 
-    public ORSSidSidTable(DBAccessor dbaccessor, TableType t) {
+    public ORSSidSidTable(SqliteAccessor dbaccessor, TableType t) {
         super(dbaccessor, t);
     }
 

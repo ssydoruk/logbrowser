@@ -16,13 +16,13 @@ import java.sql.Timestamp;
  */
 public class WSConfTable extends DBTable {
 
-    public WSConfTable(DBAccessor dbaccessor, TableType t) {
-        super(dbaccessor, t);
+    public WSConfTable(SqliteAccessor dbaccessor, TableType t) {
+        super(dbaccessor, t,"wsconf");
     }
 
     @Override
     public void InitDB() {
-        setTabName("wsconf");
+        
         addIndex("time");
         addIndex("FileId");
         addIndex("nameID");

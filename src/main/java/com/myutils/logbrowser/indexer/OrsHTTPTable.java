@@ -16,13 +16,13 @@ import java.sql.Timestamp;
  */
 public class OrsHTTPTable extends DBTable {
 
-    public OrsHTTPTable(DBAccessor dbaccessor) {
-        super(dbaccessor, TableType.ORSHTTP);
+    public OrsHTTPTable(SqliteAccessor dbaccessor) {
+        super(dbaccessor, TableType.ORSHTTP,"orshttp");
     }
 
     @Override
     public void InitDB() {
-        setTabName("orshttp");
+        
 
         addIndex("time");
         addIndex("FileId");

@@ -16,13 +16,13 @@ import java.sql.Timestamp;
  */
 public class OCSIconTable extends DBTable {
 
-    public OCSIconTable(DBAccessor dbaccessor) {
-        super(dbaccessor, TableType.SCSSelfStatus);
+    public OCSIconTable(SqliteAccessor dbaccessor) {
+        super(dbaccessor, TableType.SCSSelfStatus,"OCSIcon");
     }
 
     @Override
     public void InitDB() {
-        setTabName("OCSIcon");
+        
         addIndex("time");
         addIndex("FileId");
         addIndex("eventID");

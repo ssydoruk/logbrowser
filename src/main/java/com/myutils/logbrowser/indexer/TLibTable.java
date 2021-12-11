@@ -15,13 +15,13 @@ import java.sql.Timestamp;
  */
 public class TLibTable extends DBTable {
 
-    public TLibTable(DBAccessor dbaccessor, TableType type) {
-        super(dbaccessor, type);
+    public TLibTable(SqliteAccessor dbaccessor, TableType type) {
+        super(dbaccessor, type,"tlib_" + dbaccessor.getM_alias() );
     }
 
     @Override
     public void InitDB() {
-        setTabName("tlib_" + getM_dbAccessor().getM_alias());
+        
         addIndex("ConnectionIDID");
         addIndex("TransferIDID");
         addIndex("HandlerId");

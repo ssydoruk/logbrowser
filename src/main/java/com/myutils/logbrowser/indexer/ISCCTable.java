@@ -13,13 +13,12 @@ import java.sql.Timestamp;
  */
 public class ISCCTable extends DBTable {
 
-    public ISCCTable(DBAccessor dbaccessor, TableType t) {
-        super(dbaccessor, t);
+    public ISCCTable(SqliteAccessor dbaccessor, TableType t) {
+        super(dbaccessor, t,"ISCC_" + dbaccessor.getM_alias());
     }
 
     @Override
     public void InitDB() {
-        setTabName("ISCC_" + getM_dbAccessor().getM_alias());
         addIndex("time");
         addIndex("FileId");
         addIndex("nameID");

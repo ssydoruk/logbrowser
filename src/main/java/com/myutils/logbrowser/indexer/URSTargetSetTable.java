@@ -13,14 +13,14 @@ import java.sql.Timestamp;
  */
 public class URSTargetSetTable extends DBTable {
 
-    public URSTargetSetTable(DBAccessor dbaccessor, TableType t) {
-        super(dbaccessor, t);
+    public URSTargetSetTable(SqliteAccessor dbaccessor, TableType t) {
+        super(dbaccessor, t,"urstargetset");
     }
 
     @Override
     public void InitDB() {
 
-        setTabName("urstargetset");
+        
         addIndex("time");
         addIndex("FileId");
         addIndex("targetid");

@@ -315,7 +315,7 @@ public class ApacheWebLogsParser extends WebParser {
 
     private class ApacheWebTab extends DBTable {
 
-        public ApacheWebTab(DBAccessor dbaccessor, TableType t) {
+        public ApacheWebTab(SqliteAccessor dbaccessor, TableType t) {
             super(dbaccessor, t);
         }
 

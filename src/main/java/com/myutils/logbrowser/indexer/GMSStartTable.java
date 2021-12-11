@@ -13,7 +13,7 @@ import java.sql.Timestamp;
  */
 public class GMSStartTable extends DBTable {
 
-    public GMSStartTable(DBAccessor dbaccessor, TableType t) {
+    public GMSStartTable(SqliteAccessor dbaccessor, TableType t) {
         super(dbaccessor, t);
     }
 

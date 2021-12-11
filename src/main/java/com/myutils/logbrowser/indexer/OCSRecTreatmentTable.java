@@ -13,7 +13,7 @@ import java.sql.Timestamp;
  */
 public class OCSRecTreatmentTable extends DBTable {
 
-    public OCSRecTreatmentTable(DBAccessor dbaccessor, TableType t) {
+    public OCSRecTreatmentTable(SqliteAccessor dbaccessor, TableType t) {
         super(dbaccessor, t);
     }
 

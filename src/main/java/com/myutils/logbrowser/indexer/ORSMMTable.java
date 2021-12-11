@@ -16,13 +16,13 @@ import java.sql.Timestamp;
  */
 public class ORSMMTable extends DBTable {
 
-    public ORSMMTable(DBAccessor dbaccessor) {
-        super(dbaccessor, TableType.ORSMMessage);
+    public ORSMMTable(SqliteAccessor dbaccessor) {
+        super(dbaccessor, TableType.ORSMMessage,"ORSMM");
     }
 
     @Override
     public void InitDB() {
-        setTabName("ORSMM");
+        
         addIndex("time");
         addIndex("FileId");
         addIndex("nameID");

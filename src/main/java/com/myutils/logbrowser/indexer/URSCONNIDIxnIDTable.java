@@ -13,13 +13,13 @@ import java.sql.Timestamp;
  */
 public class URSCONNIDIxnIDTable extends DBTable {
 
-    public URSCONNIDIxnIDTable(DBAccessor dbaccessor, TableType t) {
-        super(dbaccessor, t);
+    public URSCONNIDIxnIDTable(SqliteAccessor dbaccessor, TableType t) {
+        super(dbaccessor, t,"URSConnIDIxnID");
     }
 
     @Override
     public void InitDB() {
-        setTabName("URSConnIDIxnID");
+        
         addIndex("time");
         addIndex("FileId");
         addIndex("connid");

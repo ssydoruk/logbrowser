@@ -16,7 +16,7 @@ import java.sql.Timestamp;
  */
 public class OCSSCXMLTreatmentTable extends DBTable {
 
-    public OCSSCXMLTreatmentTable(DBAccessor dbaccessor, TableType t) {
+    public OCSSCXMLTreatmentTable(SqliteAccessor dbaccessor, TableType t) {
         super(dbaccessor, t);
     }
 

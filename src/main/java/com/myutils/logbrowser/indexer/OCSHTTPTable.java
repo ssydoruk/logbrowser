@@ -16,13 +16,13 @@ import java.sql.Timestamp;
  */
 public class OCSHTTPTable extends DBTable {
 
-    public OCSHTTPTable(DBAccessor dbaccessor, TableType t) {
-        super(dbaccessor, t);
+    public OCSHTTPTable(SqliteAccessor dbaccessor, TableType t) {
+        super(dbaccessor, t,"OCSHTTP");
     }
 
     @Override
     public void InitDB() {
-        setTabName("OCSHTTP");
+        
         addIndex("FileId");
         addIndex("RecHandle");
         addIndex("ReqNameID");

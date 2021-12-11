@@ -367,7 +367,7 @@ public class WWECloudParser extends Parser {
 
     private class WWECloudTable extends DBTable {
 
-        public WWECloudTable(DBAccessor dbaccessor, TableType t) {
+        public WWECloudTable(SqliteAccessor dbaccessor, TableType t) {
             super(dbaccessor, t);
         }
 
@@ -498,7 +498,7 @@ public class WWECloudParser extends Parser {
 
         private class WWECloudAuthTab extends DBTable {
 
-            public WWECloudAuthTab(DBAccessor dbaccessor, TableType t) {
+            public WWECloudAuthTab(SqliteAccessor dbaccessor, TableType t) {
                 super(dbaccessor, t);
             }
 
@@ -621,7 +621,7 @@ public class WWECloudParser extends Parser {
 
         private class WWECloudExeptionTab extends DBTable {
 
-            public WWECloudExeptionTab(DBAccessor dbaccessor, TableType t) {
+            public WWECloudExeptionTab(SqliteAccessor dbaccessor, TableType t) {
                 super(dbaccessor, t);
             }
 
@@ -688,7 +688,7 @@ public class WWECloudParser extends Parser {
 
         private class WWECloudLogTab extends DBTable {
 
-            public WWECloudLogTab(DBAccessor dbaccessor, TableType t) {
+            public WWECloudLogTab(SqliteAccessor dbaccessor, TableType t) {
                 super(dbaccessor, t);
             }
 
