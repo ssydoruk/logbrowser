@@ -181,7 +181,7 @@ public abstract class Record implements Cloneable {
         if (tab != null) {
             tab.checkInit();
             try {
-                Main.logger.debug("Adding to db " + this);
+                Main.logger.trace("Adding to db " + this);
                 tab.AddToDB(this);
                 tab.recordAdded();
             } catch (Exception exception) {

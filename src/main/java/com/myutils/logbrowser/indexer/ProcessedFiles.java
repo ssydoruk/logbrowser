@@ -2,7 +2,7 @@ package com.myutils.logbrowser.indexer;
 
 import java.util.ArrayList;
 
-public class ProcessedFiles {
+public class  ProcessedFiles {
     private String fileName;
     private long id;
 

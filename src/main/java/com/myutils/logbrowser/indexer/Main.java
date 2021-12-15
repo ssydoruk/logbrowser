@@ -512,14 +512,16 @@ public class Main {
                 public void run() {
                     try {
                         logger.info("Starting manager thread");
-                        initAndParse(false);
-                        logger.info("Done initial scan");
+                        if( !initDB(false) ){
+                            logger.error("Failed to init DB; exiting");
+                            return;
+                        }
                         while (!queueEnd.get() || !fileQueue.isEmpty()) {
                             File fileFromQueue;
+                            logger.info("queueEnd: "+queueEnd.get());
                             while (
-                                    (fileFromQueue = fileQueue.poll()) != null)
+                                    (fileFromQueue = fileQueue.poll(100, TimeUnit.MILLISECONDS)) != null)
                                 parserThreads.execute(new TheParserThread(fileFromQueue));
-                            Thread.sleep(300);
                         }
                         logger.info("Done kickQeueueManager");
                     } catch (InterruptedException e) {
@@ -555,31 +557,13 @@ public class Main {
     /**
      * Initialize database and parse all files found in work directory
      *
-     * @param exitOnEmpty exit if no new files found
      * @return true if files were parsed and finalize needed; false otherwise
      * @throws Exception
      */
-    synchronized private boolean initAndParse(boolean exitOnEmpty) throws Exception {
+    synchronized private boolean scanLogDirectory() throws Exception {
+
         ArrayList<FileInfo> filesToAccess = new ArrayList();
-        boolean restartParsing = false;
-
-        if (!setCurrentDirectory(baseDir)) {
-            logger.error("Cannot cd to directory [" + baseDir + "]. Exiting");
-            System.exit(1);
-        }
         String startDir = baseDir;
-
-        try {
-            m_accessor = SqliteAccessor.getInstance();
-            m_accessor.init(dbName, alias);
-            if (m_accessor.TableExist("file_logbr")) {
-                initStatic(m_accessor);
-                setDBExisted(true);
-            }
-        } catch (Exception e) {
-            System.out.println("Could not create accessor: " + e);
-            restartParsing=true;
-        }
 
         File f = new File(startDir);
         if (f.isDirectory()) {
@@ -595,76 +579,36 @@ public class Main {
         ArrayList<Long> filesToDelete = new ArrayList<>();
 
         try {
-            if (!restartParsing) {
-                for (FileInfo fi : filesToAccess) {
-                    String logFileName = fi.getLogFileName();
-                    if (logFileName != null && !logFileName.isEmpty()) { // fix for error resulting in empty DB. workspace file names are empty
-                        ProcessedFiles pf = getProcessedFiles().get(fi.getLogFileName());
-                        if (pf == null) {
-                            logger.debug("Will process file [" + fi.getM_path() + "]");
+            for (FileInfo fi : filesToAccess) {
+                String logFileName = fi.getLogFileName();
+                if (logFileName != null && !logFileName.isEmpty()) { // fix for error resulting in empty DB. workspace file names are empty
+                    ProcessedFiles pf = getProcessedFiles().get(fi.getLogFileName());
+                    if (pf == null) {
+                        logger.debug("Will process file [" + fi.getM_path() + "]");
+                        filesToProcess.add(fi);
+                    } else {
+                        if (pf.getSize() < fi.getSize()) {
+                            logger.info(fi.getLogFileName()
+                                    + " id(" + pf.getId() + ")"
+                                    + ": size[" + fi.getSize()
+                                    + "] size in DB[" + pf.getSize() + "]; file data to be removed");
+                            filesToDelete.add(pf.getId());
                             filesToProcess.add(fi);
-                        } else {
-                            if (pf.getSize() < fi.getSize()) {
-                                logger.info(fi.getLogFileName()
-                                        + " id(" + pf.getId() + ")"
-                                        + ": size[" + fi.getSize()
-                                        + "] size in DB[" + pf.getSize() + "]; file data to be removed");
-                                filesToDelete.add(pf.getId());
-                                filesToProcess.add(fi);
-                            }
                         }
                     }
                 }
             }
         } catch (Exception exception) {
             logger.error("Failed to verify for new log files. Will parse a new");
-            restartParsing=true;
-        }
-
-        if (restartParsing) {
-            logger.debug("Restart parsing");
-            m_accessor.Close(false);
-            for (int i = 0; i < filesToAccess.size(); i++) {
-                filesToProcess.add(filesToAccess.get(i));
-            }
-            f = null;
-            for (String file : new String[]{dbName, dbName + ".db"}) {
-                try {
-                    f = new File(file);
-                    if (f.exists()) {
-                        boolean delete = f.delete();
-                        if (!delete) {
-                            throw new Exception("likely busy");
-                        } else {
-                            logger.info("Removed database " + f);
-                        }
-                    }
-                } catch (Exception e) {
-                    logger.error("Unable to delete file " + f, e);
-                    JOptionPane.showMessageDialog(null, "Unable to delete file "
-                            + f + "\n", "Error", JOptionPane.ERROR_MESSAGE);
-                    return false;
-                }
-            }
-            m_accessor.init(dbName, alias);
-            initStatic(m_accessor);
-        }
-        if (filesToProcess.isEmpty()) {
-            logger.info("No new log files found");
-            if (exitOnEmpty)
+            if (!initDB(true))
                 return false;
         }
-        m_accessor.setFilesToDelete(filesToDelete);
 
-        logger.info("Initializing...");
-        InitTables();
-        logger.info("Starting DB...");
-        logger.info("Done init");
-
-        tabRefs = new TableReferences(m_accessor);
-        if (!logger.isDebugEnabled()) {
-            tabRefs.doNotSave(ReferenceType.HANDLER);
+        if (filesToProcess.isEmpty()) {
+            logger.info("No new log files found");
+            return false;
         }
+        m_accessor.setFilesToDelete(filesToDelete);
 
         Path dir = Paths.get(dbName);
         dir = dir.getParent();
@@ -689,6 +633,83 @@ public class Main {
         return true;
     }
 
+    /**
+     * Initialize database and parse all files found in work directory
+     *
+     * @return true if files were parsed and finalize needed; false otherwise
+     * @throws Exception
+     */
+    synchronized private boolean initDB(boolean forceNew) throws Exception {
+        boolean restartParsing = false;
+
+        if (!setCurrentDirectory(baseDir)) {
+            logger.error("Cannot cd to directory [" + baseDir + "]. Exiting");
+            System.exit(1);
+        }
+        String startDir = baseDir;
+
+        m_accessor = SqliteAccessor.getInstance();
+
+        if (!forceNew) {
+            try {
+                m_accessor.init(dbName, alias);
+                if (m_accessor.TableExist("file_logbr")) {
+                    initStatic(m_accessor);
+                    setDBExisted(true);
+                }
+            } catch (Exception e) {
+                System.out.println("Could not create accessor: " + e);
+                restartParsing = true;
+            }
+        } else
+            restartParsing = true;
+
+        if (restartParsing) {
+            logger.debug("Restart parsing");
+            m_accessor.Close(false);
+            File f = null;
+            for (String file : new String[]{dbName, dbName + ".db"}) {
+                try {
+                    f = new File(file);
+                    if (f.exists()) {
+                        boolean delete = f.delete();
+                        if (!delete) {
+                            throw new Exception("likely busy");
+                        } else {
+                            logger.info("Removed database " + f);
+                        }
+                    }
+                } catch (Exception e) {
+                    logger.error("Unable to delete file " + f, e);
+                    JOptionPane.showMessageDialog(null, "Unable to delete file "
+                            + f + "\n", "Error", JOptionPane.ERROR_MESSAGE);
+                    return false;
+                }
+            }
+            m_accessor.init(dbName, alias);
+            initStatic(m_accessor);
+        }
+
+        logger.info("Initializing...");
+        InitTables();
+        logger.info("Starting DB...");
+
+        tabRefs = new TableReferences(m_accessor);
+        if (!logger.isDebugEnabled()) {
+            tabRefs.doNotSave(ReferenceType.HANDLER);
+        }
+
+        Path dir = Paths.get(dbName);
+        dir = dir.getParent();
+        String dirName = dir.toString();
+        FileInfo dirInfo = new FileInfo();
+        dirInfo.m_path = dirName;
+
+        logger.info("Done init");
+        return true;
+    }
+
+
     private void ParseThread(FileInfo newFile) {
         parserThreads.execute(new Runnable() {
             @Override
@@ -702,8 +723,10 @@ public class Main {
     @SuppressWarnings("UseOfSystemOutOrSystemErr")
     private void parseAll() throws Exception {
         Instant start = Instant.now();
+        if (!initDB(false))
+            return;
 
-        if (initAndParse(true)) {
+        if (scanLogDirectory()) {
             logger.info("Parsing took " + pDuration(Duration.between(start, Instant.now()).toMillis()) + ".");
             finalizeWork();
         }
@@ -882,8 +905,9 @@ public class Main {
         queueEnd.set(true);
         managerThreads.shutdown();
         managerThreads.awaitTermination(5, TimeUnit.DAYS);
-        parserThreads.shutdown();
-        parserThreads.awaitTermination(5, TimeUnit.DAYS);
+//        parserThreads.shutdown();
+//        parserThreads.awaitTermination(5, TimeUnit.DAYS);
+        scanLogDirectory();
         finalizeWork();
         logger.info("Finish done");
     }
@@ -1399,6 +1423,7 @@ public class Main {
                 }
             }
             Parse(fi);
+            logger.info("Done "+fi.toString());
         }
     }
 
