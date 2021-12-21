@@ -777,13 +777,15 @@ public abstract class Message extends Record {
     }
 
     private String lookupAttribute(String s) {
-        synchronized (m_MessageLines) {
-            if (s != null && s.length() > 0 && m_MessageLines != null && m_MessageLines.size() > 0) {
-                for (String m_MessageLine : m_MessageLines) {
-                    if (m_MessageLine != null && m_MessageLine.startsWith(s)) {
-                        if (m_MessageLine.length() > s.length() + 1) {
-                            if (Character.isWhitespace(m_MessageLine.charAt(s.length()))) {
-                                return m_MessageLine.substring(s.length() + 1);
+        if(m_MessageLines!=null)        {
+            synchronized (m_MessageLines) {
+                if (s != null && s.length() > 0 && m_MessageLines != null && m_MessageLines.size() > 0) {
+                    for (String m_MessageLine : m_MessageLines) {
+                        if (m_MessageLine != null && m_MessageLine.startsWith(s)) {
+                            if (m_MessageLine.length() > s.length() + 1) {
+                                if (Character.isWhitespace(m_MessageLine.charAt(s.length()))) {
+                                    return m_MessageLine.substring(s.length() + 1);
+                                }
                             }
                         }
                     }

@@ -92,28 +92,27 @@ final class DateParsers {
 
     public DateParsed parseFormatDate(String s, LocalDateTime lastKnownDate) throws Exception {
         Matcher m;
-//        s = checkDateStr(s);
         if (s != null && !s.isEmpty()) {
             ArrayList<Parser.DateFmt> formats = getFormats();
 
-            for (Parser.DateFmt dateFormat : formats) {
-//                Main.logger.trace("Parsing date for [" + s + "]" + " against format " + dateFormat);
-//                if (checkRegex) {
-                if ((m = dateFormat.pattern.matcher(s)).find()) {
-                    lastFmtMatched = dateFormat;
-                    moveTop(formats, dateFormat);
-                    String d = s.substring(0, m.end(0));
+            synchronized (formats) {
+                for (Parser.DateFmt dateFormat : formats) {
+                    if ((m = dateFormat.pattern.matcher(s)).find()) {
+                        lastFmtMatched = dateFormat;
+                        moveTop(formats, dateFormat);
+                        String d = s.substring(0, m.end(0));
 
-                    try {
-                        return new DateParsed(s, d,
-                                s.substring(m.end(0)),
-                                dateFormat.parseDate(d, m, lastKnownDate));
-                    } catch (ParseException parseException) {
-                        Main.logger.error("Cannot parse [" + d + "]: " + parseException.getMessage() + " format: " + dateFormat, parseException);
-                        return null;
+                        try {
+                            return new DateParsed(s, d,
+                                    s.substring(m.end(0)),
+                                    dateFormat.parseDate(d, m, lastKnownDate));
+                        } catch (ParseException parseException) {
+                            Main.logger.error("Cannot parse [" + d + "]: " + parseException.getMessage() + " format: " + dateFormat, parseException);
+                            return null;
+                        }
                     }
-                }
 
+                }
             }
         }
         Main.logger.trace("parseFormatDate() date NOT parsed from [" + s + "]");
