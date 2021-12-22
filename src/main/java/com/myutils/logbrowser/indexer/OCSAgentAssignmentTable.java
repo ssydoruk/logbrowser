@@ -24,7 +24,7 @@ public class OCSAgentAssignmentTable extends DBTable {
     @Override
     public void InitDB() {
         if (Main.isDbExisted()) {
-            getM_dbAccessor().runQuery("drop index if exists OCSASGN_fileid_" + getM_dbAccessor() .getM_alias() + ";");
+            getM_dbAccessor().runQuery("drop index if exists OCSASGN_fileid_" + getM_dbAccessor().getM_alias() + ";");
             getM_dbAccessor().runQuery("drop index if exists OCSASGN_cgnameID_" + getM_dbAccessor().getM_alias() + ";");
             getM_dbAccessor().runQuery("drop index if exists OCSASGN_time_" + getM_dbAccessor().getM_alias() + ";");
 
@@ -61,25 +61,24 @@ public class OCSAgentAssignmentTable extends DBTable {
     }
 
     @Override
-        public void AddToDB(Record _rec) throws SQLException {
+    public void AddToDB(Record _rec) throws SQLException {
         OCSAgentAssignment rec = (OCSAgentAssignment) _rec;
-         getM_dbAccessor().addToDB(m_InsertStatementId, new IFillStatement() {
-                @Override
-                public void fillStatement(PreparedStatement stmt) throws SQLException{
-            stmt.setTimestamp(1, new Timestamp(rec.GetAdjustedUsecTime()));
-            stmt.setInt(2, rec.getFileID());
-            stmt.setLong(3, rec.getM_fileOffset());
-            stmt.setLong(4, rec.getM_FileBytes());
-            stmt.setLong(5, rec.getM_line());
+        getM_dbAccessor().addToDB(m_InsertStatementId, new IFillStatement() {
+            @Override
+            public void fillStatement(PreparedStatement stmt) throws SQLException {
+                stmt.setTimestamp(1, new Timestamp(rec.GetAdjustedUsecTime()));
+                stmt.setInt(2, rec.getFileID());
+                stmt.setLong(3, rec.getM_fileOffset());
+                stmt.setLong(4, rec.getM_FileBytes());
+                stmt.setLong(5, rec.getM_line());
 
-            setFieldInt(stmt, 6, Main.getRef(ReferenceType.OCSCG, rec.getCgName()));
-            stmt.setInt(7, rec.getAgentsNo());
-            stmt.setBoolean(7, rec.getAssignmentUsed());
+                setFieldInt(stmt, 6, Main.getRef(ReferenceType.OCSCG, rec.getCgName()));
+                stmt.setInt(7, rec.getAgentsNo());
+                stmt.setBoolean(7, rec.getAssignmentUsed());
 
-                        }
+            }
         });
     }
-
 
 
 }

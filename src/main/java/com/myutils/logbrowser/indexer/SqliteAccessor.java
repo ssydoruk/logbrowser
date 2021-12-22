@@ -124,8 +124,10 @@ public final class SqliteAccessor implements DBAccessor {
     public void runQuery(String query) {
         try {
             logger.debug("[" + query + "]");
-            Statement statement = m_conn.createStatement();
-            statement.executeUpdate(query);
+            synchronized (m_conn) {
+                Statement statement = m_conn.createStatement();
+                statement.executeUpdate(query);
+            }
 //            ResetAutoCommit();
 //            m_conn.commit();
         } catch (SQLException e) {
@@ -326,12 +328,14 @@ public final class SqliteAccessor implements DBAccessor {
         }
     }
 
-    public synchronized ResultSet GetRecords(String query) {
+    public ResultSet GetRecords(String query) {
         try {
-            ResultSet ret;
-            Statement statement = m_conn.createStatement();
-            ret = statement.executeQuery(query);
-            return ret;
+            synchronized (m_conn) {
+                ResultSet ret;
+                Statement statement = m_conn.createStatement();
+                ret = statement.executeQuery(query);
+                return ret;
+            }
         } catch (SQLException e) {
             logger.error("ExecuteQuery failed: " + e + " query " + query, e);
         }
