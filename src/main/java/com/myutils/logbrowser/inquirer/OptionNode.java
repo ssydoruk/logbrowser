@@ -250,7 +250,7 @@ public class OptionNode implements Serializable, TClonable, Comparable {
     }
 
     String getValue() {
-        return (String) thePr.getValue();
+        return (thePr!=null && thePr.getValue()!=null) ?(String) thePr.getValue():"";
     }
 
     private Integer nameID() {
