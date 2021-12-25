@@ -1546,6 +1546,30 @@ public class SingleThreadParser extends Parser {
             return ret;
         }
 
+        @Override
+        public boolean fillStat(PreparedStatement stmt) throws SQLException {
+            stmt.setTimestamp(1, new Timestamp(GetAdjustedUsecTime()));
+            stmt.setInt(2, getFileID());
+            stmt.setLong(3, getM_fileOffset());
+            stmt.setLong(4, getM_FileBytes());
+            stmt.setLong(5, getM_line());
+            setFieldInt(stmt, 6, Main.getRef(ReferenceType.Misc, getKey()));
+
+            int baseRecNo = 7;
+            Map<String, String> attrs = getAttrs();
+            int i = 0;
+            for (Map.Entry<String, String> entry : attrs.entrySet()) {
+                setFieldInt(stmt, baseRecNo + i * 2, Main.getRef(ReferenceType.Misc, entry.getKey()));
+                setFieldString(stmt, baseRecNo + i * 2 + 1, entry.getValue());
+                if (++i >= MAX_1536_ATTRIBUTES) {
+                    Main.logger.debug(getM_line() + ": more attributes then max (" + MAX_1536_ATTRIBUTES + ") - "
+                            + attrs.size() + ":" + attrs);
+                    break;
+                }
+            }
+            return true;
+
+        }
     }
 
     public class SIP1536OtherTable extends DBTable {
@@ -1584,16 +1608,20 @@ public class SingleThreadParser extends Parser {
                     + ");";
             getM_dbAccessor().runQuery(query);
 
-            buf = new StringBuilder();
+
+
+        }
+
+        @Override
+        public String getInsert() {
+            StringBuilder buf = new StringBuilder();
             for (int i = 1; i <= MAX_1536_ATTRIBUTES; i++) {
                 buf.append(",?,?");
             }
-            m_InsertStatementId = getM_dbAccessor().PrepareStatement("INSERT INTO " + getTabName() + " VALUES(NULL,?,?,?,?,?,?"
+            return "INSERT INTO " + getTabName() + " VALUES(NULL,?,?,?,?,?,?"
                     /*standard first*/
                     + buf
-                    + ");"
-            );
-
+                    + ");"            ;
         }
 
         /**
@@ -1602,36 +1630,6 @@ public class SingleThreadParser extends Parser {
         @Override
         public void FinalizeDB() throws Exception {
             createIndexes();
-        }
-
-        @Override
-        public void AddToDB(Record _rec) throws SQLException {
-            SIP1536OtherMessage rec = (SIP1536OtherMessage) _rec;
-            getM_dbAccessor().addToDB(m_InsertStatementId, new IFillStatement() {
-                @Override
-                public void fillStatement(PreparedStatement stmt) throws SQLException {
-                    stmt.setTimestamp(1, new Timestamp(rec.GetAdjustedUsecTime()));
-                    stmt.setInt(2, rec.getFileID());
-                    stmt.setLong(3, rec.getM_fileOffset());
-                    stmt.setLong(4, rec.getM_FileBytes());
-                    stmt.setLong(5, rec.getM_line());
-                    setFieldInt(stmt, 6, Main.getRef(ReferenceType.Misc, rec.getKey()));
-
-                    int baseRecNo = 7;
-                    Map<String, String> attrs = rec.getAttrs();
-                    int i = 0;
-                    for (Map.Entry<String, String> entry : attrs.entrySet()) {
-                        setFieldInt(stmt, baseRecNo + i * 2, Main.getRef(ReferenceType.Misc, entry.getKey()));
-                        setFieldString(stmt, baseRecNo + i * 2 + 1, entry.getValue());
-                        if (++i >= MAX_1536_ATTRIBUTES) {
-                            Main.logger.debug(rec.getM_line() + ": more attributes then max (" + MAX_1536_ATTRIBUTES + ") - "
-                                    + attrs.size() + ":" + attrs);
-                            break;
-                        }
-                    }
-
-                }
-            });
         }
 
 
@@ -1666,6 +1664,30 @@ public class SingleThreadParser extends Parser {
             return trunk;
         }
 
+        @Override
+        public boolean fillStat(PreparedStatement stmt) throws SQLException {
+            stmt.setTimestamp(1, new Timestamp(GetAdjustedUsecTime()));
+            stmt.setInt(2, getFileID());
+            stmt.setLong(3, getM_fileOffset());
+            stmt.setLong(4, getM_FileBytes());
+            stmt.setLong(5, getM_line());
+            setFieldInt(stmt, 6, Main.getRef(ReferenceType.DN, cleanDN(getTrunk())));
+
+            int baseRecNo = 7;
+            Map<String, String> attrs = getAttrs();
+            int i = 0;
+            for (Map.Entry<String, String> entry : attrs.entrySet()) {
+                setFieldInt(stmt, baseRecNo + i * 2, Main.getRef(ReferenceType.Misc, entry.getKey()));
+                setFieldString(stmt, baseRecNo + i * 2 + 1, entry.getValue());
+                if (++i >= MAX_1536_ATTRIBUTES) {
+                    Main.logger.error(getM_line() + ": more attributes then max (" + MAX_1536_ATTRIBUTES + ") - "
+                            + attrs.size() + ":" + attrs);
+                    break;
+                }
+            }
+            return true;
+
+        }
     }
 
     public class SIP1536TrunkTable extends DBTable {
@@ -1704,16 +1726,20 @@ public class SingleThreadParser extends Parser {
                     + ");";
             getM_dbAccessor().runQuery(query);
 
-            buf = new StringBuilder();
+
+
+        }
+
+        @Override
+        public String getInsert() {
+            StringBuilder buf = new StringBuilder();
             for (int i = 1; i <= MAX_1536_ATTRIBUTES; i++) {
                 buf.append(",?,?");
             }
-            m_InsertStatementId = getM_dbAccessor().PrepareStatement("INSERT INTO " + getTabName() + " VALUES(NULL,?,?,?,?,?,?"
+            return "INSERT INTO " + getTabName() + " VALUES(NULL,?,?,?,?,?,?"
                     /*standard first*/
                     + buf
-                    + ");"
-            );
-
+                    + ");"            ;
         }
 
         /**
@@ -1723,37 +1749,6 @@ public class SingleThreadParser extends Parser {
         public void FinalizeDB() throws Exception {
             createIndexes();
         }
-
-        @Override
-        public void AddToDB(Record _rec) throws SQLException {
-            SIP1536TrunkStatistics rec = (SIP1536TrunkStatistics) _rec;
-            getM_dbAccessor().addToDB(m_InsertStatementId, new IFillStatement() {
-                @Override
-                public void fillStatement(PreparedStatement stmt) throws SQLException {
-                    stmt.setTimestamp(1, new Timestamp(rec.GetAdjustedUsecTime()));
-                    stmt.setInt(2, rec.getFileID());
-                    stmt.setLong(3, rec.getM_fileOffset());
-                    stmt.setLong(4, rec.getM_FileBytes());
-                    stmt.setLong(5, rec.getM_line());
-                    setFieldInt(stmt, 6, Main.getRef(ReferenceType.DN, rec.cleanDN(rec.getTrunk())));
-
-                    int baseRecNo = 7;
-                    Map<String, String> attrs = rec.getAttrs();
-                    int i = 0;
-                    for (Map.Entry<String, String> entry : attrs.entrySet()) {
-                        setFieldInt(stmt, baseRecNo + i * 2, Main.getRef(ReferenceType.Misc, entry.getKey()));
-                        setFieldString(stmt, baseRecNo + i * 2 + 1, entry.getValue());
-                        if (++i >= MAX_1536_ATTRIBUTES) {
-                            Main.logger.error(rec.getM_line() + ": more attributes then max (" + MAX_1536_ATTRIBUTES + ") - "
-                                    + attrs.size() + ":" + attrs);
-                            break;
-                        }
-                    }
-
-                }
-            });
-        }
-
 
     }
 
@@ -1802,6 +1797,31 @@ public class SingleThreadParser extends Parser {
             return attrs;
         }
 
+        @Override
+        public boolean fillStat(PreparedStatement stmt) throws SQLException {
+            stmt.setTimestamp(1, new Timestamp(GetAdjustedUsecTime()));
+            stmt.setInt(2, getFileID());
+            stmt.setLong(3, getM_fileOffset());
+            stmt.setLong(4, getM_FileBytes());
+            stmt.setLong(5, getM_line());
+            setFieldInt(stmt, 6, Main.getRef(ReferenceType.SIPMETHOD, getMsg()));
+            setFieldInt(stmt, 7, getAmount());
+            stmt.setBoolean(8, isRequest());
+
+            int baseRecNo = 9;
+            Map<String, String> attrs = getAttrs();
+            int i = 0;
+            for (Map.Entry<String, String> entry : attrs.entrySet()) {
+                setFieldInt(stmt, baseRecNo + i * 2, Main.getRef(ReferenceType.Misc, entry.getKey()));
+                setFieldString(stmt, baseRecNo + i * 2 + 1, entry.getValue());
+                if (++i >= MAX_1536_ATTRIBUTES) {
+                    Main.logger.error(getM_line() + ": more attributes then max (" + MAX_1536_ATTRIBUTES + ") - "
+                            + attrs.size() + ":" + attrs);
+                    break;
+                }
+            }
+            return true;
+        }
     }
 
     public class SIP1536RequestResponseTable extends DBTable {
@@ -1842,16 +1862,20 @@ public class SingleThreadParser extends Parser {
                     + ");";
             getM_dbAccessor().runQuery(query);
 
-            buf = new StringBuilder();
+
+
+        }
+
+        @Override
+        public String getInsert() {
+            StringBuilder buf = new StringBuilder();
             for (int i = 1; i <= MAX_1536_ATTRIBUTES; i++) {
                 buf.append(",?,?");
             }
-            m_InsertStatementId = getM_dbAccessor().PrepareStatement("INSERT INTO " + getTabName() + " VALUES(NULL,?,?,?,?,?,?,?,?"
+            return "INSERT INTO " + getTabName() + " VALUES(NULL,?,?,?,?,?,?,?,?"
                     /*standard first*/
                     + buf
-                    + ");"
-            );
-
+                    + ");"            ;
         }
 
         /**
@@ -1862,37 +1886,6 @@ public class SingleThreadParser extends Parser {
             createIndexes();
         }
 
-        @Override
-        public void AddToDB(Record _rec) throws SQLException {
-            SIP1536RequestResponse rec = (SIP1536RequestResponse) _rec;
-            getM_dbAccessor().addToDB(m_InsertStatementId, new IFillStatement() {
-                @Override
-                public void fillStatement(PreparedStatement stmt) throws SQLException {
-                    stmt.setTimestamp(1, new Timestamp(rec.GetAdjustedUsecTime()));
-                    stmt.setInt(2, rec.getFileID());
-                    stmt.setLong(3, rec.getM_fileOffset());
-                    stmt.setLong(4, rec.getM_FileBytes());
-                    stmt.setLong(5, rec.getM_line());
-                    setFieldInt(stmt, 6, Main.getRef(ReferenceType.SIPMETHOD, rec.getMsg()));
-                    setFieldInt(stmt, 7, rec.getAmount());
-                    stmt.setBoolean(8, rec.isRequest());
-
-                    int baseRecNo = 9;
-                    Map<String, String> attrs = rec.getAttrs();
-                    int i = 0;
-                    for (Map.Entry<String, String> entry : attrs.entrySet()) {
-                        setFieldInt(stmt, baseRecNo + i * 2, Main.getRef(ReferenceType.Misc, entry.getKey()));
-                        setFieldString(stmt, baseRecNo + i * 2 + 1, entry.getValue());
-                        if (++i >= MAX_1536_ATTRIBUTES) {
-                            Main.logger.error(rec.getM_line() + ": more attributes then max (" + MAX_1536_ATTRIBUTES + ") - "
-                                    + attrs.size() + ":" + attrs);
-                            break;
-                        }
-                    }
-
-                }
-            });
-        }
 
 
     }
@@ -1928,6 +1921,19 @@ public class SingleThreadParser extends Parser {
             return msg;
         }
 
+        @Override
+        public boolean fillStat(PreparedStatement stmt) throws SQLException {
+            stmt.setTimestamp(1, new Timestamp(GetAdjustedUsecTime()));
+            stmt.setInt(2, getFileID());
+            stmt.setLong(3, getM_fileOffset());
+            stmt.setLong(4, getM_FileBytes());
+            stmt.setLong(5, getM_line());
+            setFieldInt(stmt, 6, Main.getRef(ReferenceType.TEvent, getMsg()));
+            setFieldInt(stmt, 7, Main.getRef(ReferenceType.ConnID, getConnID()));
+            setFieldInt(stmt, 8, Main.getRef(ReferenceType.TEventRedirectCause, getCause()));
+            return true;
+
+        }
     }
 
     public class TLibTimerRedirectTable extends DBTable {
@@ -1959,14 +1965,18 @@ public class SingleThreadParser extends Parser {
                     + ");";
             getM_dbAccessor().runQuery(query);
 
-            m_InsertStatementId = getM_dbAccessor().PrepareStatement("INSERT INTO " + getTabName() + " VALUES(NULL,?,?,?,?,?"
+
+
+        }
+
+        @Override
+        public String getInsert() {
+            return "INSERT INTO " + getTabName() + " VALUES(NULL,?,?,?,?,?"
                     /*standard first*/
                     + ",?"
                     + ",?"
                     + ",?"
-                    + ");"
-            );
-
+                    + ");"            ;
         }
 
         /**
@@ -1975,25 +1985,6 @@ public class SingleThreadParser extends Parser {
         @Override
         public void FinalizeDB() throws Exception {
             createIndexes();
-        }
-
-        @Override
-        public void AddToDB(Record _rec) throws SQLException {
-            TLibTimerRedirectMessage rec = (TLibTimerRedirectMessage) _rec;
-            getM_dbAccessor().addToDB(m_InsertStatementId, new IFillStatement() {
-                @Override
-                public void fillStatement(PreparedStatement stmt) throws SQLException {
-                    stmt.setTimestamp(1, new Timestamp(rec.GetAdjustedUsecTime()));
-                    stmt.setInt(2, rec.getFileID());
-                    stmt.setLong(3, rec.getM_fileOffset());
-                    stmt.setLong(4, rec.getM_FileBytes());
-                    stmt.setLong(5, rec.getM_line());
-                    setFieldInt(stmt, 6, Main.getRef(ReferenceType.TEvent, rec.getMsg()));
-                    setFieldInt(stmt, 7, Main.getRef(ReferenceType.ConnID, rec.getConnID()));
-                    setFieldInt(stmt, 8, Main.getRef(ReferenceType.TEventRedirectCause, rec.getCause()));
-
-                }
-            });
         }
 
 

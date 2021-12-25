@@ -63,6 +63,7 @@ public abstract class Parser {
 
     public Parser(FileInfoType type, HashMap<TableType, DBTable> tables) {
         super();
+         dbTablesFiller  = new DBTablesFiller(m_tables, Main.getMain().getM_accessor());
 
         m_MessageContents = new ArrayList<>();
         m_tables = tables;
@@ -520,16 +521,22 @@ public abstract class Parser {
         }
     }
 
-    protected void SetStdFieldsAndAdd(Record msg) {
+
+    public void addToDB(Record msg){
         try {
-            SetStdFields(msg);
             Main.logger.traceExit(msg);
-            msg.AddToDB(m_tables);
+            dbTablesFiller.addToDB(msg);
         } catch (Exception e) {
             Main.logger.error("line " + msg.getM_line() + " Not added \"" + msg.getM_type() + "\" record:" + e.getMessage(), e);
             msg.PrintMsg();
 
         }
+
+    }
+
+    public void SetStdFieldsAndAdd(Record msg) {
+            SetStdFields(msg);
+            addToDB(msg);
     }
 
     //    public DateParsed ParseDate(String s) throws Exception {
@@ -573,6 +580,8 @@ public abstract class Parser {
                 }
             }
         }
+        dbTablesFiller.DoneInserts();
+
     }
 
 
@@ -690,7 +699,7 @@ public abstract class Parser {
         cl.SetFileBytes(getEndFilePos() - getFilePos());
         cl.SetLine(m_lineStarted);
         cl.handlerID(changeValue);
-        custLineTab.AddToDB(cl);
+        dbTablesFiller.addToDB(cl);
 //        }
 //        cl.setPrinted(lastPrintedIdx);
 //        for (Pair<String, Integer> pair : value) {
@@ -701,6 +710,7 @@ public abstract class Parser {
 //        }
 
     }
+
 
     public enum DateIncluded {
         DATE_INCUDED,
@@ -826,6 +836,24 @@ public abstract class Parser {
                 s.append(getValue(i)).append(" ");
             }
             return "Custom{" + "keys=" + s + '}';
+        }
+
+        @Override
+        public boolean fillStat(PreparedStatement stmt) throws SQLException {
+            stmt.setTimestamp(1, new Timestamp(GetAdjustedUsecTime()));
+            stmt.setInt(2, getFileID());
+            stmt.setLong(3, getM_fileOffset());
+            stmt.setLong(4, getM_FileBytes());
+            stmt.setLong(5, getM_line());
+
+            setFieldInt(stmt, 6, Main.getRef(ReferenceType.CUSTCOMP, getComp()));
+            setFieldInt(stmt, 7, getHandlerID());
+
+            for (int i = 0; i < MAX_CUSTOM_FIELDS; i++) {
+                setFieldInt(stmt, BASE_CUSTOM_FIELDS + (i * 2), Main.getRef(ReferenceType.CUSTKKEY, getKey(i)));
+                setFieldInt(stmt, BASE_CUSTOM_FIELDS + (i * 2) + 1, Main.getRef(ReferenceType.CUSTVALUE, getValue(i)));
+            }
+            return true;
         }
 
         public int lastPrintedIdx(FilesParseSettings.FileParseCustomSearch fileParseCustomSearch) {
@@ -957,6 +985,8 @@ public abstract class Parser {
         }
     }
 
+    private DBTablesFiller dbTablesFiller ;
+
     private class CustomLineTable extends DBTable {
 
         private final FileInfoType type;
@@ -1002,6 +1032,13 @@ public abstract class Parser {
             query.append(");");
             getM_dbAccessor().runQuery(query.toString());
             query.setLength(0);
+
+
+        }
+
+        @Override
+        public String getInsert() {
+            StringBuilder query = new StringBuilder();
             query.append("INSERT INTO ").append(getTabName()).append(" VALUES(NULL,?,?,?,?,?"
                     + ",?"
                     + ",?"
@@ -1010,8 +1047,7 @@ public abstract class Parser {
                 query.append(",").append("?");
             }
             query.append(");");
-            m_InsertStatementId = getM_dbAccessor().PrepareStatement(query.toString());
-
+            return query.toString();
         }
 
         @Override
@@ -1019,31 +1055,7 @@ public abstract class Parser {
             createIndexes();
         }
 
-        @Override
-        public void AddToDB(Record _rec) throws Exception {
-            CustomRegexLine rec = (CustomRegexLine) _rec;
-            getM_dbAccessor().addToDB(m_InsertStatementId, new IFillStatement() {
-                @Override
-                public void fillStatement(PreparedStatement stmt) throws SQLException {
-                    stmt.setTimestamp(1, new Timestamp(rec.GetAdjustedUsecTime()));
-                    stmt.setInt(2, rec.getFileID());
-                    stmt.setLong(3, rec.getM_fileOffset());
-                    stmt.setLong(4, rec.getM_FileBytes());
-                    stmt.setLong(5, rec.getM_line());
 
-                    setFieldInt(stmt, 6, Main.getRef(ReferenceType.CUSTCOMP, rec.getComp()));
-                    setFieldInt(stmt, 7, rec.getHandlerID());
-
-                    for (int i = 0; i < MAX_CUSTOM_FIELDS; i++) {
-                        setFieldInt(stmt, BASE_CUSTOM_FIELDS + (i * 2), Main.getRef(ReferenceType.CUSTKKEY, rec.getKey(i)));
-                        setFieldInt(stmt, BASE_CUSTOM_FIELDS + (i * 2) + 1, Main.getRef(ReferenceType.CUSTVALUE, rec.getValue(i)));
-//                    stmt.setString(BASE_CUSTOM_FIELDS + (i * 2), rec.getKey(i));
-//                    stmt.setString(BASE_CUSTOM_FIELDS + (i * 2) + 1, rec.getValue(i));
-                    }
-
-                }
-            });
-        }
     }
 
     //<editor-fold defaultstate="collapsed" desc="comment">
@@ -1052,6 +1064,17 @@ public abstract class Parser {
 
         public CustomAttribute(TableType type, int fileID) {
             super(type, fileID);
+        }
+
+        @Override
+        public boolean fillStat(PreparedStatement stmt) throws SQLException {
+            //                stmt.setTimestamp(1, new Timestamp(GetAdjustedUsecTime()));
+            stmt.setInt(2, getFileID());
+            stmt.setLong(3, getM_fileOffset());
+//                stmt.setLong(4, getM_FileBytes());
+            stmt.setLong(5, getM_line());
+            return true;
+
         }
 
         private void setMatcher(Matcher m) {
@@ -1100,7 +1123,13 @@ public abstract class Parser {
                     + ",hostID int"
                     + ");";
             getM_dbAccessor().runQuery(query);
-            m_InsertStatementId = getM_dbAccessor().PrepareStatement("INSERT INTO " + getTabName() + " VALUES(NULL,?,?,?,?,?"
+
+
+        }
+
+        @Override
+        public String getInsert() {
+            return "INSERT INTO " + getTabName() + " VALUES(NULL,?,?,?,?,?"
                     /*standard first*/
                     + ",?"
                     + ",?"
@@ -1109,8 +1138,7 @@ public abstract class Parser {
                     + ",?"
                     + ",?"
                     + ",?"
-                    + ");");
-
+                    + ");";
         }
 
         @Override
@@ -1118,21 +1146,6 @@ public abstract class Parser {
             createIndexes();
         }
 
-        @Override
-        public void AddToDB(Record _rec) throws Exception {
-            CustomAttribute rec = (CustomAttribute) _rec;
-            getM_dbAccessor().addToDB(m_InsertStatementId, new IFillStatement() {
-                @Override
-                public void fillStatement(PreparedStatement stmt) throws SQLException {
-//                stmt.setTimestamp(1, new Timestamp(rec.GetAdjustedUsecTime()));
-                    stmt.setInt(2, rec.getFileID());
-                    stmt.setLong(3, rec.getM_fileOffset());
-//                stmt.setLong(4, rec.getM_FileBytes());
-                    stmt.setLong(5, rec.getM_line());
-
-                }
-            });
-        }
     }
 
 }

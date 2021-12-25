@@ -4,11 +4,20 @@
  */
 package com.myutils.logbrowser.indexer;
 
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
+
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import static com.myutils.logbrowser.indexer.MCPParser.ParserState.*;
-import java.sql.*;
-import java.util.*;
-import java.util.regex.*;
-import org.apache.commons.lang3.*;
 
 /**
  * @author ssydoruk
@@ -41,6 +50,28 @@ public class MCPParser extends Parser {
     private static final org.apache.logging.log4j.Logger logger = Main.logger;
 
     private static final HashSet<String> IGNORE_MPC = getIGNORE_MPC();
+    private final ArrayList<String> extraBuff;
+    HashMap m_BlockNamesToIgnoreHash;
+    StringBuilder sipBuf = new StringBuilder();
+    long m_CurrentFilePos;
+    long m_HeaderOffset;
+    int m_PacketLength;
+    int m_ContentLength;
+    int m_headerLine;
+    boolean m_isContentLengthUnknown;
+    private ParserState m_ParserState;
+    private boolean isInbound;
+    private String SIPMessage;
+    private String SIPURI;
+    public MCPParser(HashMap<TableType, DBTable> m_tables) {
+        super(FileInfoType.type_MCP, m_tables);
+        this.extraBuff = new ArrayList<>();
+        //m_accessor = accessor;
+        m_BlockNamesToIgnoreHash = new HashMap();
+        for (String BlockNamesToIgnoreArray1 : BlockNamesToIgnoreArray) {
+            m_BlockNamesToIgnoreHash.put(BlockNamesToIgnoreArray1, 0);
+        }
+    }
 
     private static HashSet<String> getIGNORE_MPC() {
         HashSet<String> ret = new HashSet<>();
@@ -80,30 +111,6 @@ public class MCPParser extends Parser {
         ret.add("MPCDialog::UnregisterReverseRoute,");
         ret.add("MPCDialog::~MPCDialog");
         return ret;
-    }
-
-    private final ArrayList<String> extraBuff;
-    HashMap m_BlockNamesToIgnoreHash;
-    StringBuilder sipBuf = new StringBuilder();
-    long m_CurrentFilePos;
-    long m_HeaderOffset;
-    int m_PacketLength;
-    int m_ContentLength;
-    int m_headerLine;
-    boolean m_isContentLengthUnknown;
-    private ParserState m_ParserState;
-    private boolean isInbound;
-    private String SIPMessage;
-    private String SIPURI;
-
-    public MCPParser(HashMap<TableType, DBTable> m_tables) {
-        super(FileInfoType.type_MCP, m_tables);
-        this.extraBuff = new ArrayList<>();
-        //m_accessor = accessor;
-        m_BlockNamesToIgnoreHash = new HashMap();
-        for (String BlockNamesToIgnoreArray1 : BlockNamesToIgnoreArray) {
-            m_BlockNamesToIgnoreHash.put(BlockNamesToIgnoreArray1, 0);
-        }
     }
 
     private static HashMap<String, String> getFunctionMap() {
@@ -302,7 +309,7 @@ public class MCPParser extends Parser {
                                 if (genesysMsg != null) {
                                     if (!genesysMsg.isToIgnore()) {
                                         genesysMsg.setLine(split[messageTextIdx]);
-                                        genesysMsg.AddToDB(m_tables);
+                                        addToDB(genesysMsg);
                                     }
                                     msgDone = true;
                                 }
@@ -320,7 +327,7 @@ public class MCPParser extends Parser {
                                 callMessage(split[callIDIdx], split[messageTextIdx]);
                                 if (genesysMsg != null && !genesysMsg.isToIgnore() && !isInt && !split[0].equals("DBUG") && !split[0].equals("INFO")) {
                                     genesysMsg.setLine(split[messageTextIdx]);
-                                    genesysMsg.AddToDB(m_tables);
+                                    addToDB(genesysMsg);
                                 }
                             }
                         }
@@ -416,7 +423,7 @@ public class MCPParser extends Parser {
         // Populate our class representation of the message
         SipMessage msg;
 
-        msg = new SipMessage(contents, TableType.SIPMS,  fileInfo.getRecordID());
+        msg = new SipMessage(contents, TableType.SIPMS, fileInfo.getRecordID());
 
         if (StringUtils.isNotEmpty(SIPMessage)) {
             msg.SetInbound(isInbound);
@@ -437,7 +444,7 @@ public class MCPParser extends Parser {
     }
 
     private void AddConfigMessage(ArrayList<String> m_MessageContents) {
-        ConfigUpdateRecord msg = new ConfigUpdateRecord(m_MessageContents,  fileInfo.getRecordID());
+        ConfigUpdateRecord msg = new ConfigUpdateRecord(m_MessageContents, fileInfo.getRecordID());
         try {
             Matcher m;
             if (m_MessageContents.size() > 0 && (m = regSIPServerStartDN.matcher(m_MessageContents.get(0))).find()) {
@@ -469,7 +476,7 @@ public class MCPParser extends Parser {
 
     private void callMessage(String callID, String cmd, String messageText) {
         if (!IGNORE_MPC.contains(cmd)) {
-            VXMLIntSteps steps = new VXMLIntSteps( fileInfo.getRecordID());
+            VXMLIntSteps steps = new VXMLIntSteps(fileInfo.getRecordID());
             steps.setMCPCallID(callID);
             steps.setCommand(cmd);
             //    steps.setRequestParams(messageText);
@@ -513,14 +520,14 @@ public class MCPParser extends Parser {
                         //steps.setParam1(noFile);
                     }
 
-                    VXMLIntSteps steps = new VXMLIntSteps( fileInfo.getRecordID());
+                    VXMLIntSteps steps = new VXMLIntSteps(fileInfo.getRecordID());
                     steps.setMCPCallID(callID);
                     steps.setCommand(cmd);
 
                     SetStdFieldsAndAdd(steps);
                 }
             } else { // file not specified
-                VXMLIntSteps steps = new VXMLIntSteps( fileInfo.getRecordID());
+                VXMLIntSteps steps = new VXMLIntSteps(fileInfo.getRecordID());
                 steps.setMCPCallID(callID);
                 steps.setRequestParams(messageText);
 
@@ -1095,7 +1102,7 @@ public class MCPParser extends Parser {
         private String Tenant;
         private String IVRProfile;
 
-        private VXMLIntSteps( int fileID) {
+        private VXMLIntSteps(int fileID) {
             super(TableType.VXMLIntStepsTable, fileID);
         }
 
@@ -1247,6 +1254,28 @@ public class MCPParser extends Parser {
             throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
         }
 
+        @Override
+        public boolean fillStat(PreparedStatement stmt) throws SQLException {
+            String command = getCommand();
+            if (StringUtils.isNotEmpty(command)) {
+                stmt.setTimestamp(1, new Timestamp(GetAdjustedUsecTime()));
+                stmt.setInt(2, getFileID());
+                stmt.setLong(3, getM_fileOffset());
+                stmt.setLong(4, getM_FileBytes());
+                stmt.setLong(5, getM_line());
+
+                setFieldInt(stmt, 6, Main.getRef(ReferenceType.VXMLCommand, command));
+                setFieldInt(stmt, 7, Main.getRef(ReferenceType.VXMLCommandParams, getParam1()));
+                setFieldInt(stmt, 8, Main.getRef(ReferenceType.VXMLCommandParams, getParam2()));
+                setFieldInt(stmt, 9, Main.getRef(ReferenceType.VXMLMCPCallID, getMcpCallID()));
+                setFieldInt(stmt, 10, Main.getRef(ReferenceType.SIPCALLID, getSipCallID()));
+                setFieldInt(stmt, 11, Main.getRef(ReferenceType.GVPSessionID, getGVPSession()));
+                setFieldInt(stmt, 12, Main.getRef(ReferenceType.Tenant, getTenant()));
+                setFieldInt(stmt, 13, Main.getRef(ReferenceType.GVPIVRProfile, getIVRProfile()));
+                return true;
+            }
+            return false;
+        }
     }
 
     private class VXMLIntStepTable extends DBTable {
@@ -1287,7 +1316,13 @@ public class MCPParser extends Parser {
                     + ",IVRProfileID INTEGER"
                     + ");";
             getM_dbAccessor().runQuery(query);
-            m_InsertStatementId = getM_dbAccessor().PrepareStatement("INSERT INTO " + getTabName() + " VALUES(NULL,?,?,?,?,?"
+
+
+        }
+
+        @Override
+        public String getInsert() {
+            return "INSERT INTO " + getTabName() + " VALUES(NULL,?,?,?,?,?"
                     /*standard first*/
                     + ",?"
                     + ",?"
@@ -1297,9 +1332,7 @@ public class MCPParser extends Parser {
                     + ",?"
                     + ",?"
                     + ",?"
-                    + ");"
-            );
-
+                    + ");";
         }
 
         /**
@@ -1310,32 +1343,5 @@ public class MCPParser extends Parser {
             createIndexes();
         }
 
-        @Override
-        public void AddToDB(Record _rec) throws SQLException {
-            VXMLIntSteps rec = (VXMLIntSteps) _rec;
-            String command = rec.getCommand();
-            if (StringUtils.isNotEmpty(command)) {
-                getM_dbAccessor().addToDB(m_InsertStatementId, new IFillStatement() {
-                    @Override
-                    public void fillStatement(PreparedStatement stmt) throws SQLException {
-                        stmt.setTimestamp(1, new Timestamp(rec.GetAdjustedUsecTime()));
-                        stmt.setInt(2, rec.getFileID());
-                        stmt.setLong(3, rec.getM_fileOffset());
-                        stmt.setLong(4, rec.getM_FileBytes());
-                        stmt.setLong(5, rec.getM_line());
-
-                        setFieldInt(stmt, 6, Main.getRef(ReferenceType.VXMLCommand, command));
-                        setFieldInt(stmt, 7, Main.getRef(ReferenceType.VXMLCommandParams, rec.getParam1()));
-                        setFieldInt(stmt, 8, Main.getRef(ReferenceType.VXMLCommandParams, rec.getParam2()));
-                        setFieldInt(stmt, 9, Main.getRef(ReferenceType.VXMLMCPCallID, rec.getMcpCallID()));
-                        setFieldInt(stmt, 10, Main.getRef(ReferenceType.SIPCALLID, rec.getSipCallID()));
-                        setFieldInt(stmt, 11, Main.getRef(ReferenceType.GVPSessionID, rec.getGVPSession()));
-                        setFieldInt(stmt, 12, Main.getRef(ReferenceType.Tenant, rec.getTenant()));
-                        setFieldInt(stmt, 13, Main.getRef(ReferenceType.GVPIVRProfile, rec.getIVRProfile()));
-
-                    }
-                });
-            }
-        }
     }
 }

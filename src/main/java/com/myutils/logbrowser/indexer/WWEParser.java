@@ -5,12 +5,19 @@
 package com.myutils.logbrowser.indexer;
 
 import Utils.Pair;
+
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import static com.myutils.logbrowser.indexer.Message.getRx;
-import java.io.*;
-import java.net.*;
-import java.sql.*;
-import java.util.*;
-import java.util.regex.*;
 
 /**
  * @author ssydoruk
@@ -282,7 +289,7 @@ public class WWEParser extends WebParser {
                     msg = new ExceptionMessage(
                             m_MessageContents,
                             m_msgName,
-                            m_msg1,  fileInfo.getRecordID()
+                            m_msg1, fileInfo.getRecordID()
                     );
                     m_ParserState = ParserState.STATE_EXCEPTION;
                     setSavedFilePos(getFilePos());
@@ -873,7 +880,7 @@ public class WWEParser extends WebParser {
     }
 
     private void addTLibMessage() throws Exception {
-        WWEMessage _msg = new WWEMessage(m_msgName, m_TserverSRC, m_MessageContents, isParseTimeDiff(),  fileInfo.getRecordID());
+        WWEMessage _msg = new WWEMessage(m_msgName, m_TserverSRC, m_MessageContents, isParseTimeDiff(), fileInfo.getRecordID());
         SetStdFieldsAndAdd(_msg);
     }
 
@@ -883,7 +890,7 @@ public class WWEParser extends WebParser {
         ExceptionMessage _msg = new ExceptionMessage(
                 m_MessageContents,
                 m_msgName,
-                m_msg1,  fileInfo.getRecordID()
+                m_msg1, fileInfo.getRecordID()
         );
         SetStdFieldsAndAdd(_msg);
 
@@ -972,52 +979,52 @@ public class WWEParser extends WebParser {
             rxs.add(new ReplaceRx(Pattern.compile("^(Unregistering from TServer device .+)$", Pattern.CASE_INSENSITIVE), 1, "<Unregistering from TServer device>", true));
             rxs.add(new ReplaceRx(Pattern.compile("^(Unregistering DN .+)$", Pattern.CASE_INSENSITIVE), 1, "<Unregistering DN>", true));
             rxs.add(new ReplaceRx(Pattern.compile("^Successfully saved heartbeat qualifier(.+)"), 1, "<...>", true));
-            rxs.add(new ReplaceRx(Pattern.compile("\\$Servlet3SaveToSessionRequestWrapper@(\\w+)", Pattern.CASE_INSENSITIVE),1, "<wrapperNo>"));
-            rxs.add(new ReplaceRx(Pattern.compile("last connect (\\d+) ms ago"),1, "<secs>"));
-            rxs.add(new ReplaceRx(Pattern.compile("/meta/(?:dis)?connect, id=(\\d+)"),1, "<id>"));
+            rxs.add(new ReplaceRx(Pattern.compile("\\$Servlet3SaveToSessionRequestWrapper@(\\w+)", Pattern.CASE_INSENSITIVE), 1, "<wrapperNo>"));
+            rxs.add(new ReplaceRx(Pattern.compile("last connect (\\d+) ms ago"), 1, "<secs>"));
+            rxs.add(new ReplaceRx(Pattern.compile("/meta/(?:dis)?connect, id=(\\d+)"), 1, "<id>"));
 //            rxs.add(new ReplaceRx(Pattern.compile("client ([\\w\\-]+) "),1, "<clientID>"));
 //            rxs.add(new ReplaceRx(Pattern.compile("^\\< client ([\\w\\-]+) "),1, "<clientId>"));
 //            rxs.add(new ReplaceRx(Pattern.compile("clientId=(\\w+),"),1, "<clientID>"));
 //            rxs.add(new ReplaceRx(Pattern.compile("Session \\[(\\w+)\\]"),1, "<session>"));
-            rxs.add(new ReplaceRx(Pattern.compile("contact center \\[([\\w\\-]+)\\]"),1, "<ccID>"));
-            rxs.add(new ReplaceRx(Pattern.compile("referenceId \\[([\\w\\-]+)\\]", Pattern.CASE_INSENSITIVE),1, "<refID>"));
-            rxs.add(new ReplaceRx(Pattern.compile("[\\s\\[]Number=?\\[?([\\w\\-]+)\\]?", Pattern.CASE_INSENSITIVE),1, "<number>"));
-            rxs.add(new ReplaceRx(Pattern.compile("session\\.SessionInformation@(\\w+)"),1, "<SessionInstance>"));
-            rxs.add(new ReplaceRx(Pattern.compile(" DN \\[?([\\w\\-]+)\\]?"),1, "<DN>"));
-            rxs.add(new ReplaceRx(Pattern.compile(" Employee ID: (.+)\\]"),1, "<Employee ID>"));
-            rxs.add(new ReplaceRx(Pattern.compile(" Place(?:(?: name| by name))? \\[?([^\\],]+)\\]?", Pattern.CASE_INSENSITIVE),1, "<Place>"));
-            rxs.add(new ReplaceRx(Pattern.compile(" took \\[(\\d+)ms\\]"),1, "<xx>"));
-            rxs.add(new ReplaceRx(Pattern.compile("Object \\[*(\\S+)\\]*"),1, "<obj>"));
-            rxs.add(new ReplaceRx(Pattern.compile("referenceid=(\\w+)", Pattern.CASE_INSENSITIVE),1, "<refID>"));
-            rxs.add(new ReplaceRx(Pattern.compile("userToken=\\[*(\\w+)\\]*"),1, "<userToken>"));
-            rxs.add(new ReplaceRx(Pattern.compile("destination \\[*([^\\s\\]]+)\\]*"),1, "<DN>"));
-            rxs.add(new ReplaceRx(Pattern.compile("DeviceRuntimeContext\\(dn=(\\S+)"),1, "<DN>"));
-            rxs.add(new ReplaceRx(Pattern.compile("Place name \\[*(\\S+)\\]*"),1, "<Place>"));
-            rxs.add(new ReplaceRx(Pattern.compile("[Cc]all \\[(\\S+)\\]"),1, "<ConnID>"));
-            rxs.add(new ReplaceRx(Pattern.compile("(?:with parent|relatedConnId|related connId) \\[(\\S+)\\]"),1, "<ConnID>"));
+            rxs.add(new ReplaceRx(Pattern.compile("contact center \\[([\\w\\-]+)\\]"), 1, "<ccID>"));
+            rxs.add(new ReplaceRx(Pattern.compile("referenceId \\[([\\w\\-]+)\\]", Pattern.CASE_INSENSITIVE), 1, "<refID>"));
+            rxs.add(new ReplaceRx(Pattern.compile("[\\s\\[]Number=?\\[?([\\w\\-]+)\\]?", Pattern.CASE_INSENSITIVE), 1, "<number>"));
+            rxs.add(new ReplaceRx(Pattern.compile("session\\.SessionInformation@(\\w+)"), 1, "<SessionInstance>"));
+            rxs.add(new ReplaceRx(Pattern.compile(" DN \\[?([\\w\\-]+)\\]?"), 1, "<DN>"));
+            rxs.add(new ReplaceRx(Pattern.compile(" Employee ID: (.+)\\]"), 1, "<Employee ID>"));
+            rxs.add(new ReplaceRx(Pattern.compile(" Place(?:(?: name| by name))? \\[?([^\\],]+)\\]?", Pattern.CASE_INSENSITIVE), 1, "<Place>"));
+            rxs.add(new ReplaceRx(Pattern.compile(" took \\[(\\d+)ms\\]"), 1, "<xx>"));
+            rxs.add(new ReplaceRx(Pattern.compile("Object \\[*(\\S+)\\]*"), 1, "<obj>"));
+            rxs.add(new ReplaceRx(Pattern.compile("referenceid=(\\w+)", Pattern.CASE_INSENSITIVE), 1, "<refID>"));
+            rxs.add(new ReplaceRx(Pattern.compile("userToken=\\[*(\\w+)\\]*"), 1, "<userToken>"));
+            rxs.add(new ReplaceRx(Pattern.compile("destination \\[*([^\\s\\]]+)\\]*"), 1, "<DN>"));
+            rxs.add(new ReplaceRx(Pattern.compile("DeviceRuntimeContext\\(dn=(\\S+)"), 1, "<DN>"));
+            rxs.add(new ReplaceRx(Pattern.compile("Place name \\[*(\\S+)\\]*"), 1, "<Place>"));
+            rxs.add(new ReplaceRx(Pattern.compile("[Cc]all \\[(\\S+)\\]"), 1, "<ConnID>"));
+            rxs.add(new ReplaceRx(Pattern.compile("(?:with parent|relatedConnId|related connId) \\[(\\S+)\\]"), 1, "<ConnID>"));
 
-            rxs.add(new ReplaceRx(Pattern.compile("java.lang.Object;([^,]+),"),1, "<SomeID>"));
-            rxs.add(new ReplaceRx(Pattern.compile("FirstName: (.+)"),1, "<The guy>"));
-            rxs.add(new ReplaceRx(Pattern.compile("\\[DBID=([^\\]]+)\\]"),1, "<DBID>"));
-            rxs.add(new ReplaceRx(Pattern.compile("Attempting to start contact center.+\\(([^\\)]+)\\)$"),1, "<UserName>"));
-            rxs.add(new ReplaceRx(Pattern.compile("timestampMicros=(\\d+),"),1, "<timestampMicros>"));
-            rxs.add(new ReplaceRx(Pattern.compile("^Starting registration for device \\[Id=([^,]+),"),1, "<DeviceID>"));
-            rxs.add(new ReplaceRx(Pattern.compile("AgentStateDescriptorV2\\(id=([^,\\s]+)"),1, "<AgentStateDescriptorID>"));
-            rxs.add(new ReplaceRx(Pattern.compile("contact \\[(\\w+)\\]"),1, "<contactID>"));
-            rxs.add(new ReplaceRx(Pattern.compile("contact \\[(\\w+)\\]"),1, "<contactID>"));
-            rxs.add(new ReplaceRx(Pattern.compile("with referenceId (\\d+)"),1, "<refID>"));
-            rxs.add(new ReplaceRx(Pattern.compile("found [([^\\]]+)] documents"),1, "<num>"));
-            rxs.add(new ReplaceRx(Pattern.compile("foundDocuments=([^,\\s]+),"),1, "<num>"));
-            rxs.add(new ReplaceRx(Pattern.compile("sessions for (\\w+)"),1, "<session>"));
-            rxs.add(new ReplaceRx(Pattern.compile(" client ([\\w\\-]+)"),1, "<client>"));
-            rxs.add(new ReplaceRx(Pattern.compile("userToken=(\\w+)"),1, "<userID?>"));
-            rxs.add(new ReplaceRx(Pattern.compile("referenceId (\\d+)"),1, "<refID>"));
-            rxs.add(new ReplaceRx(Pattern.compile("universalcontactserver\\.tasks\\.UpdateUcsInteractionTaskV2@(\\w+)"),1, "<instanceID>"));
-            rxs.add(new ReplaceRx(Pattern.compile(", index=(\\d+),"),1, "<ID>"));
-            rxs.add(new ReplaceRx(Pattern.compile("﻿AgentState operation name \\[([^\\]]+)\\]"),1, "<ACW>"));
-            rxs.add(new ReplaceRx(Pattern.compile("Extracted ReasonCode \\[([^\\]]+)\\]"),1, "<ACW>"));
-            rxs.add(new ReplaceRx(Pattern.compile("﻿operationName=([^\\],]+)"),1, "<ACW>"));
-            rxs.add(new ReplaceRx(Pattern.compile("Found \\[(\\d+)\\]"),1, "<NUM>"));
+            rxs.add(new ReplaceRx(Pattern.compile("java.lang.Object;([^,]+),"), 1, "<SomeID>"));
+            rxs.add(new ReplaceRx(Pattern.compile("FirstName: (.+)"), 1, "<The guy>"));
+            rxs.add(new ReplaceRx(Pattern.compile("\\[DBID=([^\\]]+)\\]"), 1, "<DBID>"));
+            rxs.add(new ReplaceRx(Pattern.compile("Attempting to start contact center.+\\(([^\\)]+)\\)$"), 1, "<UserName>"));
+            rxs.add(new ReplaceRx(Pattern.compile("timestampMicros=(\\d+),"), 1, "<timestampMicros>"));
+            rxs.add(new ReplaceRx(Pattern.compile("^Starting registration for device \\[Id=([^,]+),"), 1, "<DeviceID>"));
+            rxs.add(new ReplaceRx(Pattern.compile("AgentStateDescriptorV2\\(id=([^,\\s]+)"), 1, "<AgentStateDescriptorID>"));
+            rxs.add(new ReplaceRx(Pattern.compile("contact \\[(\\w+)\\]"), 1, "<contactID>"));
+            rxs.add(new ReplaceRx(Pattern.compile("contact \\[(\\w+)\\]"), 1, "<contactID>"));
+            rxs.add(new ReplaceRx(Pattern.compile("with referenceId (\\d+)"), 1, "<refID>"));
+            rxs.add(new ReplaceRx(Pattern.compile("found [([^\\]]+)] documents"), 1, "<num>"));
+            rxs.add(new ReplaceRx(Pattern.compile("foundDocuments=([^,\\s]+),"), 1, "<num>"));
+            rxs.add(new ReplaceRx(Pattern.compile("sessions for (\\w+)"), 1, "<session>"));
+            rxs.add(new ReplaceRx(Pattern.compile(" client ([\\w\\-]+)"), 1, "<client>"));
+            rxs.add(new ReplaceRx(Pattern.compile("userToken=(\\w+)"), 1, "<userID?>"));
+            rxs.add(new ReplaceRx(Pattern.compile("referenceId (\\d+)"), 1, "<refID>"));
+            rxs.add(new ReplaceRx(Pattern.compile("universalcontactserver\\.tasks\\.UpdateUcsInteractionTaskV2@(\\w+)"), 1, "<instanceID>"));
+            rxs.add(new ReplaceRx(Pattern.compile(", index=(\\d+),"), 1, "<ID>"));
+            rxs.add(new ReplaceRx(Pattern.compile("﻿AgentState operation name \\[([^\\]]+)\\]"), 1, "<ACW>"));
+            rxs.add(new ReplaceRx(Pattern.compile("Extracted ReasonCode \\[([^\\]]+)\\]"), 1, "<ACW>"));
+            rxs.add(new ReplaceRx(Pattern.compile("﻿operationName=([^\\],]+)"), 1, "<ACW>"));
+            rxs.add(new ReplaceRx(Pattern.compile("Found \\[(\\d+)\\]"), 1, "<NUM>"));
 
         }
 
@@ -1066,7 +1073,7 @@ public class WWEParser extends WebParser {
 
         private class ReplaceRx extends ICleanString {
 
-            private  final Pattern p;
+            private final Pattern p;
             private final int idx;
             private final String replaceString;
 
@@ -1140,7 +1147,7 @@ public class WWEParser extends WebParser {
         private String ixnID;
 
         private WWEStatServerMsg(TableType t) {
-            super(t,  fileInfo.getRecordID());
+            super(t, fileInfo.getRecordID());
         }
 
         private WWEStatServerMsg() {
@@ -1374,6 +1381,33 @@ public class WWEParser extends WebParser {
 
             this.sessionID = key;
         }
+
+        @Override
+        public boolean fillStat(PreparedStatement stmt) throws SQLException {
+            stmt.setTimestamp(1, new Timestamp(GetAdjustedUsecTime()));
+            stmt.setInt(2, getFileID());
+            stmt.setLong(3, getM_fileOffset());
+            stmt.setLong(4, getM_FileBytes());
+            stmt.setLong(5, getM_line());
+
+            setFieldInt(stmt, 6, Main.getRef(ReferenceType.IP, getIp()));
+            setFieldInt(stmt, 7, Main.getRef(ReferenceType.JSessionID, getjSessionID()));
+            setFieldInt(stmt, 8, Main.getRef(ReferenceType.HTTPURL, getUrl()));
+            setFieldInt(stmt, 9, Main.getRef(ReferenceType.MSGLEVEL, getLevel()));
+            setFieldInt(stmt, 10, Main.getRef(ReferenceType.JAVA_CLASS, getClassName()));
+            setFieldInt(stmt, 11, Main.getRef(ReferenceType.Misc, getMsgText()));
+            setFieldInt(stmt, 12, Main.getRef(ReferenceType.Agent, getUserName()));
+            setFieldInt(stmt, 13, Main.getRef(ReferenceType.MiscParam, getParam1()));
+            setFieldInt(stmt, 14, Main.getRef(ReferenceType.UUID, getUUID()));
+            setFieldInt(stmt, 15, Main.getRef(ReferenceType.IxnID, getIxnID()));
+            setFieldInt(stmt, 16, Main.getRef(ReferenceType.GWSDeviceID, getDeviceID()));
+            setFieldInt(stmt, 17, Main.getRef(ReferenceType.MiscParam, getParam2()));
+            setFieldInt(stmt, 18, Main.getRef(ReferenceType.WWEUserID, getUserID()));
+            setFieldInt(stmt, 19, Main.getRef(ReferenceType.WWEBrowserClient, getBrowserClient()));
+            setFieldInt(stmt, 20, Main.getRef(ReferenceType.WWEBrowserSession, getSessionID()));
+            return true;
+
+        }
     }
 
     private class WWEWWEStatServerMsgTable extends DBTable {
@@ -1430,7 +1464,12 @@ public class WWEParser extends WebParser {
                     + ");";
             getM_dbAccessor().runQuery(query);
 
-            m_InsertStatementId = getM_dbAccessor().PrepareStatement("INSERT INTO " + getTabName() + " VALUES(NULL,?,?,?,?,?"
+
+        }
+
+        @Override
+        public String getInsert() {
+            return "INSERT INTO " + getTabName() + " VALUES(NULL,?,?,?,?,?"
                     /*standard first*/
                     + ",?"
                     + ",?"
@@ -1447,9 +1486,7 @@ public class WWEParser extends WebParser {
                     + ",?"
                     + ",?"
                     + ",?"
-                    + ");"
-            );
-
+                    + ");";
         }
 
         /**
@@ -1460,37 +1497,6 @@ public class WWEParser extends WebParser {
             createIndexes();
         }
 
-        @Override
-            public void AddToDB(Record _rec) throws SQLException {
-            WWEStatServerMsg rec = (WWEStatServerMsg) _rec;
-            getM_dbAccessor().addToDB(m_InsertStatementId, new IFillStatement() {
-                @Override
-                public void fillStatement(PreparedStatement stmt) throws SQLException {
-                    stmt.setTimestamp(1, new Timestamp(rec.GetAdjustedUsecTime()));
-                    stmt.setInt(2, rec.getFileID());
-                    stmt.setLong(3, rec.getM_fileOffset());
-                    stmt.setLong(4, rec.getM_FileBytes());
-                    stmt.setLong(5, rec.getM_line());
-
-                    setFieldInt(stmt, 6, Main.getRef(ReferenceType.IP, rec.getIp()));
-                    setFieldInt(stmt, 7, Main.getRef(ReferenceType.JSessionID, rec.getjSessionID()));
-                    setFieldInt(stmt, 8, Main.getRef(ReferenceType.HTTPURL, rec.getUrl()));
-                    setFieldInt(stmt, 9, Main.getRef(ReferenceType.MSGLEVEL, rec.getLevel()));
-                    setFieldInt(stmt, 10, Main.getRef(ReferenceType.JAVA_CLASS, rec.getClassName()));
-                    setFieldInt(stmt, 11, Main.getRef(ReferenceType.Misc, rec.getMsgText()));
-                    setFieldInt(stmt, 12, Main.getRef(ReferenceType.Agent, rec.getUserName()));
-                    setFieldInt(stmt, 13, Main.getRef(ReferenceType.MiscParam, rec.getParam1()));
-                    setFieldInt(stmt, 14, Main.getRef(ReferenceType.UUID, rec.getUUID()));
-                    setFieldInt(stmt, 15, Main.getRef(ReferenceType.IxnID, rec.getIxnID()));
-                    setFieldInt(stmt, 16, Main.getRef(ReferenceType.GWSDeviceID, rec.getDeviceID()));
-                    setFieldInt(stmt, 17, Main.getRef(ReferenceType.MiscParam, rec.getParam2()));
-                    setFieldInt(stmt, 18, Main.getRef(ReferenceType.WWEUserID, rec.getUserID()));
-                    setFieldInt(stmt, 19, Main.getRef(ReferenceType.WWEBrowserClient, rec.getBrowserClient()));
-                    setFieldInt(stmt, 20, Main.getRef(ReferenceType.WWEBrowserSession, rec.getSessionID()));
-
-                }
-            });
-        }
     }
 //</editor-fold>
 
@@ -1517,7 +1523,7 @@ public class WWEParser extends WebParser {
         private String ixnID;
 
         private WWEDebugMsg(TableType t) {
-            super(t,  fileInfo.getRecordID());
+            super(t, fileInfo.getRecordID());
         }
 
         private WWEDebugMsg() {
@@ -1753,6 +1759,33 @@ public class WWEParser extends WebParser {
 
             this.sessionID = key;
         }
+
+        @Override
+        public boolean fillStat(PreparedStatement stmt) throws SQLException {
+            stmt.setTimestamp(1, new Timestamp(GetAdjustedUsecTime()));
+            stmt.setInt(2, getFileID());
+            stmt.setLong(3, getM_fileOffset());
+            stmt.setLong(4, getM_FileBytes());
+            stmt.setLong(5, getM_line());
+
+            setFieldInt(stmt, 6, Main.getRef(ReferenceType.IP, getIp()));
+            setFieldInt(stmt, 7, Main.getRef(ReferenceType.JSessionID, getjSessionID()));
+            setFieldInt(stmt, 8, Main.getRef(ReferenceType.HTTPURL, getUrl()));
+            setFieldInt(stmt, 9, Main.getRef(ReferenceType.MSGLEVEL, getLevel()));
+            setFieldInt(stmt, 10, Main.getRef(ReferenceType.JAVA_CLASS, getClassName()));
+            setFieldInt(stmt, 11, Main.getRef(ReferenceType.Misc, getMsgText()));
+            setFieldInt(stmt, 12, Main.getRef(ReferenceType.Agent, getUserName()));
+            setFieldInt(stmt, 13, Main.getRef(ReferenceType.MiscParam, getParam1()));
+            setFieldInt(stmt, 14, Main.getRef(ReferenceType.UUID, getUUID()));
+            setFieldInt(stmt, 15, Main.getRef(ReferenceType.IxnID, getIxnID()));
+            setFieldInt(stmt, 16, Main.getRef(ReferenceType.GWSDeviceID, getDeviceID()));
+            setFieldInt(stmt, 17, Main.getRef(ReferenceType.MiscParam, getParam2()));
+            setFieldInt(stmt, 18, Main.getRef(ReferenceType.WWEUserID, getUserID()));
+            setFieldInt(stmt, 19, Main.getRef(ReferenceType.WWEBrowserClient, getBrowserClient()));
+            setFieldInt(stmt, 20, Main.getRef(ReferenceType.WWEBrowserSession, getSessionID()));
+            return true;
+
+        }
     }
 
     private class WWEDebugMessageTable extends DBTable {
@@ -1809,7 +1842,12 @@ public class WWEParser extends WebParser {
                     + ");";
             getM_dbAccessor().runQuery(query);
 
-            m_InsertStatementId = getM_dbAccessor().PrepareStatement("INSERT INTO " + getTabName() + " VALUES(NULL,?,?,?,?,?"
+
+        }
+
+        @Override
+        public String getInsert() {
+            return "INSERT INTO " + getTabName() + " VALUES(NULL,?,?,?,?,?"
                     /*standard first*/
                     + ",?"
                     + ",?"
@@ -1826,9 +1864,7 @@ public class WWEParser extends WebParser {
                     + ",?"
                     + ",?"
                     + ",?"
-                    + ");"
-            );
-
+                    + ");";
         }
 
         /**
@@ -1839,37 +1875,7 @@ public class WWEParser extends WebParser {
             createIndexes();
         }
 
-        @Override
-            public void AddToDB(Record _rec) throws SQLException {
-            WWEDebugMsg rec = (WWEDebugMsg) _rec;
-            getM_dbAccessor().addToDB(m_InsertStatementId, new IFillStatement() {
-                @Override
-                public void fillStatement(PreparedStatement stmt) throws SQLException{
-                stmt.setTimestamp(1, new Timestamp(rec.GetAdjustedUsecTime()));
-                stmt.setInt(2, rec.getFileID());
-                stmt.setLong(3, rec.getM_fileOffset());
-                stmt.setLong(4, rec.getM_FileBytes());
-                stmt.setLong(5, rec.getM_line());
 
-                setFieldInt(stmt, 6, Main.getRef(ReferenceType.IP, rec.getIp()));
-                setFieldInt(stmt, 7, Main.getRef(ReferenceType.JSessionID, rec.getjSessionID()));
-                setFieldInt(stmt, 8, Main.getRef(ReferenceType.HTTPURL, rec.getUrl()));
-                setFieldInt(stmt, 9, Main.getRef(ReferenceType.MSGLEVEL, rec.getLevel()));
-                setFieldInt(stmt, 10, Main.getRef(ReferenceType.JAVA_CLASS, rec.getClassName()));
-                setFieldInt(stmt, 11, Main.getRef(ReferenceType.Misc, rec.getMsgText()));
-                setFieldInt(stmt, 12, Main.getRef(ReferenceType.Agent, rec.getUserName()));
-                setFieldInt(stmt, 13, Main.getRef(ReferenceType.MiscParam, rec.getParam1()));
-                setFieldInt(stmt, 14, Main.getRef(ReferenceType.UUID, rec.getUUID()));
-                setFieldInt(stmt, 15, Main.getRef(ReferenceType.IxnID, rec.getIxnID()));
-                setFieldInt(stmt, 16, Main.getRef(ReferenceType.GWSDeviceID, rec.getDeviceID()));
-                setFieldInt(stmt, 17, Main.getRef(ReferenceType.MiscParam, rec.getParam2()));
-                setFieldInt(stmt, 18, Main.getRef(ReferenceType.WWEUserID, rec.getUserID()));
-                setFieldInt(stmt, 19, Main.getRef(ReferenceType.WWEBrowserClient, rec.getBrowserClient()));
-                setFieldInt(stmt, 20, Main.getRef(ReferenceType.WWEBrowserSession, rec.getSessionID()));
-
-                }
-            });
-        }
     }
 //</editor-fold>
 
@@ -1977,6 +1983,36 @@ public class WWEParser extends WebParser {
         private void setMessageType(String rx) {
             this.msgType = rx;
         }
+
+        @Override
+        public boolean fillStat(PreparedStatement stmt) throws SQLException {
+            stmt.setTimestamp(1, new Timestamp(GetAdjustedUsecTime()));
+            stmt.setInt(2, getFileID());
+            stmt.setLong(3, getM_fileOffset());
+            stmt.setLong(4, getM_FileBytes());
+            stmt.setLong(5, getM_line());
+
+            setFieldInt(stmt, 6, Main.getRef(ReferenceType.IP, getIp()));
+            setFieldInt(stmt, 7, Main.getRef(ReferenceType.JSessionID, getjSessionID()));
+            setFieldInt(stmt, 8, Main.getRef(ReferenceType.HTTPURL, getUrl()));
+            setFieldInt(stmt, 9, Main.getRef(ReferenceType.MSGLEVEL, getLevel()));
+            setFieldInt(stmt, 10, Main.getRef(ReferenceType.JAVA_CLASS, getClassName()));
+            setFieldInt(stmt, 11, Main.getRef(ReferenceType.IxnID, getIxnID()));
+            setFieldInt(stmt, 12, Main.getRef(ReferenceType.Agent, getUserName()));
+            setFieldInt(stmt, 13, Main.getRef(ReferenceType.MiscParam, getParam1()));
+            setFieldInt(stmt, 14, Main.getRef(ReferenceType.UUID, getUUID()));
+            setFieldInt(stmt, 15, Main.getRef(ReferenceType.IxnID, getIxnID()));
+            setFieldInt(stmt, 16, Main.getRef(ReferenceType.GWSDeviceID, getDeviceID()));
+            setFieldInt(stmt, 17, Main.getRef(ReferenceType.MiscParam, getParam2()));
+            setFieldInt(stmt, 18, getBayeuxId());
+            setFieldLong(stmt, 19, getLastConnected());
+            setFieldString(stmt, 20, getAction());
+            setFieldInt(stmt, 21, Main.getRef(ReferenceType.BayeuxChannel, getChannel()));
+            setFieldInt(stmt, 22, Main.getRef(ReferenceType.BayeuxMessageType, getMsgType()));
+            setFieldInt(stmt, 23, Main.getRef(ReferenceType.WWEBrowserClient, getBrowserClient()));
+            return true;
+
+        }
     }
 
     private class WWEBayeuxSMsgTable extends DBTable {
@@ -2036,7 +2072,12 @@ public class WWEParser extends WebParser {
                     + ");";
             getM_dbAccessor().runQuery(query);
 
-            m_InsertStatementId = getM_dbAccessor().PrepareStatement("INSERT INTO " + getTabName() + " VALUES(NULL,?,?,?,?,?"
+
+        }
+
+        @Override
+        public String getInsert() {
+            return "INSERT INTO " + getTabName() + " VALUES(NULL,?,?,?,?,?"
                     /*standard first*/
                     + ",?"
                     + ",?"
@@ -2056,8 +2097,7 @@ public class WWEParser extends WebParser {
                     + ",?"
                     + ",?"
                     + ",?"
-                    + ");"
-            );
+                    + ");";
 
         }
 
@@ -2067,41 +2107,6 @@ public class WWEParser extends WebParser {
         @Override
         public void FinalizeDB() throws Exception {
             createIndexes();
-        }
-
-        @Override
-            public void AddToDB(Record _rec) throws SQLException {
-            WWEBayeuxSMsg rec = (WWEBayeuxSMsg) _rec;
-            getM_dbAccessor().addToDB(m_InsertStatementId, new IFillStatement() {
-                @Override
-                public void fillStatement(PreparedStatement stmt) throws SQLException{
-                stmt.setTimestamp(1, new Timestamp(rec.GetAdjustedUsecTime()));
-                stmt.setInt(2, rec.getFileID());
-                stmt.setLong(3, rec.getM_fileOffset());
-                stmt.setLong(4, rec.getM_FileBytes());
-                stmt.setLong(5, rec.getM_line());
-
-                setFieldInt(stmt, 6, Main.getRef(ReferenceType.IP, rec.getIp()));
-                setFieldInt(stmt, 7, Main.getRef(ReferenceType.JSessionID, rec.getjSessionID()));
-                setFieldInt(stmt, 8, Main.getRef(ReferenceType.HTTPURL, rec.getUrl()));
-                setFieldInt(stmt, 9, Main.getRef(ReferenceType.MSGLEVEL, rec.getLevel()));
-                setFieldInt(stmt, 10, Main.getRef(ReferenceType.JAVA_CLASS, rec.getClassName()));
-                setFieldInt(stmt, 11, Main.getRef(ReferenceType.IxnID, rec.getIxnID()));
-                setFieldInt(stmt, 12, Main.getRef(ReferenceType.Agent, rec.getUserName()));
-                setFieldInt(stmt, 13, Main.getRef(ReferenceType.MiscParam, rec.getParam1()));
-                setFieldInt(stmt, 14, Main.getRef(ReferenceType.UUID, rec.getUUID()));
-                setFieldInt(stmt, 15, Main.getRef(ReferenceType.IxnID, rec.getIxnID()));
-                setFieldInt(stmt, 16, Main.getRef(ReferenceType.GWSDeviceID, rec.getDeviceID()));
-                setFieldInt(stmt, 17, Main.getRef(ReferenceType.MiscParam, rec.getParam2()));
-                setFieldInt(stmt, 18, rec.getBayeuxId());
-                setFieldLong(stmt, 19, rec.getLastConnected());
-                setFieldString(stmt, 20, rec.getAction());
-                setFieldInt(stmt, 21, Main.getRef(ReferenceType.BayeuxChannel, rec.getChannel()));
-                setFieldInt(stmt, 22, Main.getRef(ReferenceType.BayeuxMessageType, rec.getMsgType()));
-                setFieldInt(stmt, 23, Main.getRef(ReferenceType.WWEBrowserClient, rec.getBrowserClient()));
-
-                }
-            });
         }
 
 
@@ -2123,6 +2128,29 @@ public class WWEParser extends WebParser {
             return msgName;
         }
 
+        @Override
+        public boolean fillStat(PreparedStatement stmt) throws SQLException {
+            stmt.setTimestamp(1, new Timestamp(GetAdjustedUsecTime()));
+            stmt.setInt(2, getFileID());
+            stmt.setLong(3, getM_fileOffset());
+            stmt.setLong(4, getM_FileBytes());
+            stmt.setLong(5, getM_line());
+
+            setFieldInt(stmt, 6, Main.getRef(ReferenceType.IP, getIp()));
+            setFieldInt(stmt, 7, Main.getRef(ReferenceType.JSessionID, getjSessionID()));
+            setFieldInt(stmt, 8, Main.getRef(ReferenceType.HTTPURL, getUrl()));
+            setFieldInt(stmt, 9, Main.getRef(ReferenceType.MSGLEVEL, getLevel()));
+            setFieldInt(stmt, 10, Main.getRef(ReferenceType.JAVA_CLASS, getClassName()));
+            setFieldInt(stmt, 11, Main.getRef(ReferenceType.Misc, getMsgText()));
+            setFieldInt(stmt, 12, Main.getRef(ReferenceType.Agent, getUserName()));
+            setFieldInt(stmt, 13, Main.getRef(ReferenceType.GWSDeviceID, getDeviceID()));
+
+            setFieldInt(stmt, 14, Main.getRef(ReferenceType.TEvent, getMsgName()));
+            setFieldInt(stmt, 15, Main.getRef(ReferenceType.UUID, getUUID()));
+            setFieldInt(stmt, 16, Main.getRef(ReferenceType.IxnID, getIxnID()));
+            return true;
+
+        }
     }
 
     private class WWEUCSTable extends DBTable {
@@ -2171,7 +2199,11 @@ public class WWEParser extends WebParser {
                     + ");";
             getM_dbAccessor().runQuery(query);
 
-            m_InsertStatementId = getM_dbAccessor().PrepareStatement("INSERT INTO " + getTabName() + " VALUES(NULL,?,?,?,?,?"
+        }
+
+        @Override
+        public String getInsert() {
+            return "INSERT INTO " + getTabName() + " VALUES(NULL,?,?,?,?,?"
                     /*standard first*/
                     + ",?"
                     + ",?"
@@ -2184,9 +2216,7 @@ public class WWEParser extends WebParser {
                     + ",?"
                     + ",?"
                     + ",?"
-                    + ");"
-            );
-
+                    + ");";
         }
 
         /**
@@ -2195,35 +2225,6 @@ public class WWEParser extends WebParser {
         @Override
         public void FinalizeDB() throws Exception {
             createIndexes();
-        }
-
-        @Override
-            public void AddToDB(Record _rec) throws SQLException {
-            WWEUCSMsg rec = (WWEUCSMsg) _rec;
-            getM_dbAccessor().addToDB(m_InsertStatementId, new IFillStatement() {
-                @Override
-                public void fillStatement(PreparedStatement stmt) throws SQLException{
-                stmt.setTimestamp(1, new Timestamp(rec.GetAdjustedUsecTime()));
-                stmt.setInt(2, rec.getFileID());
-                stmt.setLong(3, rec.getM_fileOffset());
-                stmt.setLong(4, rec.getM_FileBytes());
-                stmt.setLong(5, rec.getM_line());
-
-                setFieldInt(stmt, 6, Main.getRef(ReferenceType.IP, rec.getIp()));
-                setFieldInt(stmt, 7, Main.getRef(ReferenceType.JSessionID, rec.getjSessionID()));
-                setFieldInt(stmt, 8, Main.getRef(ReferenceType.HTTPURL, rec.getUrl()));
-                setFieldInt(stmt, 9, Main.getRef(ReferenceType.MSGLEVEL, rec.getLevel()));
-                setFieldInt(stmt, 10, Main.getRef(ReferenceType.JAVA_CLASS, rec.getClassName()));
-                setFieldInt(stmt, 11, Main.getRef(ReferenceType.Misc, rec.getMsgText()));
-                setFieldInt(stmt, 12, Main.getRef(ReferenceType.Agent, rec.getUserName()));
-                setFieldInt(stmt, 13, Main.getRef(ReferenceType.GWSDeviceID, rec.getDeviceID()));
-
-                setFieldInt(stmt, 14, Main.getRef(ReferenceType.TEvent, rec.getMsgName()));
-                setFieldInt(stmt, 15, Main.getRef(ReferenceType.UUID, rec.getUUID()));
-                setFieldInt(stmt, 16, Main.getRef(ReferenceType.IxnID, rec.getIxnID()));
-
-                }
-            });
         }
     }
 //</editor-fold>
@@ -2247,7 +2248,7 @@ public class WWEParser extends WebParser {
         private String ixnID;
 
         private WWEIxnServerMsg(String group) {
-            super(TableType.WWEIxnMessage,  fileInfo.getRecordID());
+            super(TableType.WWEIxnMessage, fileInfo.getRecordID());
             this.msgName = group;
         }
 
@@ -2402,6 +2403,18 @@ public class WWEParser extends WebParser {
         public String getMsgText() {
             return msgText;
         }
+
+        @Override
+        public boolean fillStat(PreparedStatement stmt) throws SQLException {
+            stmt.setTimestamp(1, new Timestamp(GetAdjustedUsecTime()));
+            stmt.setInt(2, getFileID());
+            stmt.setLong(3, getM_fileOffset());
+            stmt.setLong(4, getM_FileBytes());
+            stmt.setLong(5, getM_line());
+
+            setFieldInt(stmt, 6, Main.getRef(ReferenceType.TEvent, getMsgName()));
+            return true;
+        }
     }
 
     private class WWEIxnTable extends DBTable {
@@ -2430,11 +2443,14 @@ public class WWEParser extends WebParser {
                     + ");";
             getM_dbAccessor().runQuery(query);
 
-            m_InsertStatementId = getM_dbAccessor().PrepareStatement("INSERT INTO " + getTabName() + " VALUES(NULL,?,?,?,?,?"
+        }
+
+        @Override
+        public String getInsert() {
+            return "INSERT INTO " + getTabName() + " VALUES(NULL,?,?,?,?,?"
                     /*standard first*/
                     + ",?"
-                    + ");"
-            );
+                    + ");";
 
         }
 
@@ -2446,23 +2462,6 @@ public class WWEParser extends WebParser {
             createIndexes();
         }
 
-        @Override
-            public void AddToDB(Record _rec) throws SQLException {
-            WWEIxnServerMsg rec = (WWEIxnServerMsg) _rec;
-            getM_dbAccessor().addToDB(m_InsertStatementId, new IFillStatement() {
-                @Override
-                public void fillStatement(PreparedStatement stmt) throws SQLException{
-                stmt.setTimestamp(1, new Timestamp(rec.GetAdjustedUsecTime()));
-                stmt.setInt(2, rec.getFileID());
-                stmt.setLong(3, rec.getM_fileOffset());
-                stmt.setLong(4, rec.getM_FileBytes());
-                stmt.setLong(5, rec.getM_line());
-
-                setFieldInt(stmt, 6, Main.getRef(ReferenceType.TEvent, rec.getMsgName()));
-
-                }
-            });
-        }
     }
 //</editor-fold>
 //<editor-fold defaultstate="collapsed" desc="WWEUCSConfigMsg">
@@ -2485,6 +2484,26 @@ public class WWEParser extends WebParser {
             return msgName;
         }
 
+        @Override
+        public boolean fillStat(PreparedStatement stmt) throws SQLException {
+            stmt.setTimestamp(1, new Timestamp(GetAdjustedUsecTime()));
+            stmt.setInt(2, getFileID());
+            stmt.setLong(3, getM_fileOffset());
+            stmt.setLong(4, getM_FileBytes());
+            stmt.setLong(5, getM_line());
+
+            setFieldInt(stmt, 6, Main.getRef(ReferenceType.IP, getIp()));
+            setFieldInt(stmt, 7, Main.getRef(ReferenceType.JSessionID, getjSessionID()));
+            setFieldInt(stmt, 8, Main.getRef(ReferenceType.HTTPURL, getUrl()));
+            setFieldInt(stmt, 9, Main.getRef(ReferenceType.MSGLEVEL, getLevel()));
+            setFieldInt(stmt, 10, Main.getRef(ReferenceType.JAVA_CLASS, getClassName()));
+            setFieldInt(stmt, 11, Main.getRef(ReferenceType.Misc, getMsgText()));
+            setFieldInt(stmt, 12, Main.getRef(ReferenceType.Agent, getUserName()));
+
+            setFieldInt(stmt, 13, Main.getRef(ReferenceType.TEvent, getMsgName()));
+            return true;
+
+        }
     }
 
     private class WWEUCSConfigTable extends DBTable {
@@ -2527,7 +2546,12 @@ public class WWEParser extends WebParser {
                     + ");";
             getM_dbAccessor().runQuery(query);
 
-            m_InsertStatementId = getM_dbAccessor().PrepareStatement("INSERT INTO " + getTabName() + " VALUES(NULL,?,?,?,?,?"
+
+        }
+
+        @Override
+        public String getInsert() {
+            return "INSERT INTO " + getTabName() + " VALUES(NULL,?,?,?,?,?"
                     /*standard first*/
                     + ",?"
                     + ",?"
@@ -2537,8 +2561,7 @@ public class WWEParser extends WebParser {
                     + ",?"
                     + ",?"
                     + ",?"
-                    + ");"
-            );
+                    + ");";
 
         }
 
@@ -2549,33 +2572,6 @@ public class WWEParser extends WebParser {
         public void FinalizeDB() throws Exception {
             createIndexes();
         }
-
-        @Override
-            public void AddToDB(Record _rec) throws SQLException {
-            WWEUCSConfigMsg rec = (WWEUCSConfigMsg) _rec;
-            getM_dbAccessor().addToDB(m_InsertStatementId, new IFillStatement() {
-                @Override
-                public void fillStatement(PreparedStatement stmt) throws SQLException{
-                stmt.setTimestamp(1, new Timestamp(rec.GetAdjustedUsecTime()));
-                stmt.setInt(2, rec.getFileID());
-                stmt.setLong(3, rec.getM_fileOffset());
-                stmt.setLong(4, rec.getM_FileBytes());
-                stmt.setLong(5, rec.getM_line());
-
-                setFieldInt(stmt, 6, Main.getRef(ReferenceType.IP, rec.getIp()));
-                setFieldInt(stmt, 7, Main.getRef(ReferenceType.JSessionID, rec.getjSessionID()));
-                setFieldInt(stmt, 8, Main.getRef(ReferenceType.HTTPURL, rec.getUrl()));
-                setFieldInt(stmt, 9, Main.getRef(ReferenceType.MSGLEVEL, rec.getLevel()));
-                setFieldInt(stmt, 10, Main.getRef(ReferenceType.JAVA_CLASS, rec.getClassName()));
-                setFieldInt(stmt, 11, Main.getRef(ReferenceType.Misc, rec.getMsgText()));
-                setFieldInt(stmt, 12, Main.getRef(ReferenceType.Agent, rec.getUserName()));
-
-                setFieldInt(stmt, 13, Main.getRef(ReferenceType.TEvent, rec.getMsgName()));
-
-                }
-            });
-        }
-
 
     }
 //</editor-fold>

@@ -40,12 +40,17 @@ public class URSTargetSetTable extends DBTable {
                 + ",objectTypeID INTEGER"
                 + ");";
         getM_dbAccessor().runQuery(query);
-        m_InsertStatementId = getM_dbAccessor().PrepareStatement("INSERT INTO " + getTabName() + " VALUES(NULL,?,?,?,?,?"
+    }
+
+    @Override
+    public String getInsert() {
+        return "INSERT INTO " + getTabName() + " VALUES(NULL,?,?,?,?,?"
                 /*standard first*/
                 + ",?"
                 + ",?"
                 + ",?"
-                + ");");
+                + ");";
+
     }
 
     /**
@@ -54,27 +59,6 @@ public class URSTargetSetTable extends DBTable {
     @Override
     public void FinalizeDB() throws Exception {
         createIndexes();
-    }
-
-    @Override
-        public void AddToDB(Record _rec) throws SQLException {
-        URSTargetSet rec = (URSTargetSet) _rec;
-        getM_dbAccessor().addToDB(m_InsertStatementId, new IFillStatement() {
-            @Override
-            public void fillStatement(PreparedStatement stmt) throws SQLException{
-            stmt.setTimestamp(1, new Timestamp(rec.GetAdjustedUsecTime()));
-            stmt.setInt(2, rec.getFileID());
-            stmt.setLong(3, rec.getM_fileOffset());
-            stmt.setLong(4, rec.getM_FileBytes());
-            stmt.setLong(5, rec.getM_line());
-
-            setFieldInt(stmt, 6, Main.getRef(ReferenceType.URSTarget, rec.getTarget()));
-            setFieldInt(stmt, 7, Main.getRef(ReferenceType.CfgObjName, rec.getObject()));
-            setFieldInt(stmt, 8, Main.getRef(ReferenceType.CfgObjectType, rec.getObjectType()));
-//                setFieldString(stmt,11, rec.getCgMsg());
-
-            }
-        });
     }
 
 

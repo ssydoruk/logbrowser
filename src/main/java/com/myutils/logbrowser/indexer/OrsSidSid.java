@@ -6,6 +6,9 @@ package com.myutils.logbrowser.indexer;
 //import org.jdom.input.*;
 //import org.jdom.xpath.XPath;
 
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+
 /**
  * @author ssydoruk
  */
@@ -30,5 +33,14 @@ public class OrsSidSid extends Message {
 
     String getNewSID() {
         return newSID;
+    }
+
+    @Override
+    public boolean fillStat(PreparedStatement stmt) throws SQLException {
+        stmt.setInt(1, getFileID());
+
+        setFieldInt(stmt, 2, Main.getRef(ReferenceType.ORSSID, getSID()));
+        setFieldInt(stmt, 3, Main.getRef(ReferenceType.ORSSID, getNewSID()));
+        return true;
     }
 }

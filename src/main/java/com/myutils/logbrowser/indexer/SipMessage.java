@@ -6,6 +6,9 @@ package com.myutils.logbrowser.indexer;
 
 import org.apache.commons.lang3.StringUtils;
 
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -95,6 +98,89 @@ public class SipMessage extends SIPServerBaseMessage {
     @Override
     public String toString() {
         return "SipMessage{" + "m_Sendername=" + m_Sendername + ", m_Receivername=" + m_Receivername + ", m_Name=" + m_Name + ", m_isRequest=" + isInbound() + '}' + super.toString();
+    }
+
+    @Override
+    public boolean fillStat(PreparedStatement stmt) throws SQLException {
+        switch (getM_type()){
+            case SIP:
+                stmt.setInt(1, getRecordID());
+                stmt.setTimestamp(2, new Timestamp(GetAdjustedUsecTime()));
+                stmt.setBoolean(3, isInbound());
+                setFieldInt(stmt, 4, Main.getRef(ReferenceType.SIPMETHOD, GetName()));
+                setFieldInt(stmt, 5, Main.getRef(ReferenceType.SIPCALLID, GetCallId()));
+                setFieldInt(stmt, 6, Main.getRef(ReferenceType.SIPCSEQ, GetCSeq()));
+                setFieldInt(stmt, 7, Main.getRef(ReferenceType.SIPURI, GetTo()));
+                setFieldInt(stmt, 8, Main.getRef(ReferenceType.SIPURI, GetFrom()));
+                setFieldInt(stmt, 9, Main.getRef(ReferenceType.DN, transformDN(GetFrom())));
+                setFieldInt(stmt, 10, Main.getRef(ReferenceType.SIPURI, GetViaUri()));
+                setFieldInt(stmt, 11, Main.getRef(ReferenceType.SIPVIABRANCH, GetViaBranch()));
+                setFieldInt(stmt, 12, Main.getRef(ReferenceType.IP, GetPeerIp()));
+                setFieldInt(stmt, 13, GetPeerPort());
+                setFieldInt(stmt, 14, getFileID());
+                stmt.setLong(15, getM_fileOffset());
+                stmt.setLong(16, getFileBytes());
+                Main.logger.trace("m_handlerId :" +  getM_handlerId() + " m_handlerInProgress" +  isM_handlerInProgress());
+
+                setFieldInt(stmt, 17, getHandlerInProgress());
+                stmt.setBoolean(18, isCallRelated());
+                setFieldInt(stmt, 19, getM_line());
+                setFieldInt(stmt, 20, Main.getRef(ReferenceType.UUID, getUUID()));
+                setFieldInt(stmt, 21, Main.getRef(ReferenceType.DN, transformDN(SingleQuotes(getRequestURIDN()))));
+                break;
+            case SIPEP:
+                stmt.setTimestamp(1, new Timestamp(GetAdjustedUsecTime()));
+                stmt.setBoolean(2, isInbound());
+                setFieldInt(stmt, 3, Main.getRef(ReferenceType.SIPMETHOD, GetName()));
+                setFieldInt(stmt, 4, Main.getRef(ReferenceType.SIPCALLID, GetCallId()));
+                setFieldInt(stmt, 5, Main.getRef(ReferenceType.SIPCSEQ, GetCSeq()));
+                setFieldInt(stmt, 6, Main.getRef(ReferenceType.SIPURI, GetTo()));
+                setFieldInt(stmt, 7, Main.getRef(ReferenceType.SIPURI, GetFrom()));
+                setFieldInt(stmt, 8, Main.getRef(ReferenceType.DN, transformDN(SingleQuotes(GetFromUserpart()))));
+                setFieldInt(stmt, 9, Main.getRef(ReferenceType.SIPURI, GetViaUri()));
+                setFieldInt(stmt, 10, Main.getRef(ReferenceType.SIPVIABRANCH, GetViaBranch()));
+                setFieldInt(stmt, 11, Main.getRef(ReferenceType.IP, GetPeerIp()));
+                stmt.setInt(12, GetPeerPort());
+                stmt.setInt(13, getFileID());
+                stmt.setLong(14, getM_fileOffset());
+                stmt.setLong(15, getFileBytes());
+//            Main.logger.trace("m_handlerId :" + SipMessage.m_handlerId + " m_handlerInProgress" + SipMessage.m_handlerInProgress);
+
+                stmt.setBoolean(16, isCallRelated());
+                stmt.setInt(17, getM_line());
+                setFieldInt(stmt, 18, Main.getRef(ReferenceType.UUID, getUUID()));
+                setFieldInt(stmt, 19, Main.getRef(ReferenceType.DN, transformDN(SingleQuotes(getRequestURIDN()))));
+                setFieldInt(stmt, 20, Main.getRef(ReferenceType.SIPURI, getSipURI()));
+
+                break;
+
+            case SIPMS:
+                stmt.setTimestamp(1, new Timestamp(GetAdjustedUsecTime()));
+                stmt.setBoolean(2, isInbound());
+                setFieldInt(stmt, 3, Main.getRef(ReferenceType.SIPMETHOD, GetName()));
+                setFieldInt(stmt, 4, Main.getRef(ReferenceType.SIPCALLID, GetCallId()));
+                setFieldInt(stmt, 5, Main.getRef(ReferenceType.SIPCSEQ, GetCSeq()));
+                setFieldInt(stmt, 6, Main.getRef(ReferenceType.SIPURI, GetTo()));
+                setFieldInt(stmt, 7, Main.getRef(ReferenceType.SIPURI, GetFrom()));
+                setFieldInt(stmt, 8, Main.getRef(ReferenceType.DN, transformDN(SingleQuotes(GetFromUserpart()))));
+                setFieldInt(stmt, 9, Main.getRef(ReferenceType.SIPURI, GetViaUri()));
+                setFieldInt(stmt, 10, Main.getRef(ReferenceType.SIPVIABRANCH, GetViaBranch()));
+                setFieldInt(stmt, 11, Main.getRef(ReferenceType.IP, GetPeerIp()));
+                stmt.setInt(12, GetPeerPort());
+                stmt.setInt(13, getFileID());
+                stmt.setLong(14, getM_fileOffset());
+                stmt.setLong(15, getFileBytes());
+                Main.logger.trace("m_handlerId :" +  getM_handlerId()  + " m_handlerInProgress" + isM_handlerInProgress() );
+
+                stmt.setBoolean(16, isCallRelated());
+                stmt.setInt(17, getM_line());
+                setFieldInt(stmt, 18, Main.getRef(ReferenceType.UUID, getUUID()));
+                setFieldInt(stmt, 19, Main.getRef(ReferenceType.DN, transformDN(SingleQuotes(getRequestURIDN()))));
+                setFieldInt(stmt, 20, Main.getRef(ReferenceType.SIPURI, getSipURI()));
+
+                break;
+        }
+return true;
     }
 
     void SetName(String newValue) {

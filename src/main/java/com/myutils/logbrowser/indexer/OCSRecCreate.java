@@ -4,6 +4,9 @@
  */
 package com.myutils.logbrowser.indexer;
 
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -109,4 +112,23 @@ public class OCSRecCreate extends Message {
         recHandle = toInt(group, -1);
     }
 
+    @Override
+    public boolean fillStat(PreparedStatement stmt) throws SQLException {
+        stmt.setTimestamp(1, new Timestamp(GetAdjustedUsecTime()));
+        stmt.setInt(2, getFileID());
+        stmt.setLong(3, getM_fileOffset());
+        stmt.setLong(4, getM_FileBytes());
+        stmt.setLong(5, getM_line());
+
+        stmt.setInt(6, getrecHandle());
+        stmt.setInt(7, getchID());
+        stmt.setInt(8, getchNum());
+        setFieldInt(stmt, 9, Main.getRef(ReferenceType.OCSCAMPAIGN, getcamp()));
+        stmt.setInt(10, getrecType());
+        setFieldInt(stmt, 11, Main.getRef(ReferenceType.OCSCallList, getCallingList()));
+        setFieldInt(stmt, 12, Main.getRef(ReferenceType.OCSCallListTable, getTabName()));
+        setFieldInt(stmt, 13, Main.getRef(ReferenceType.DN, cleanDN(getDN())));
+        setFieldInt(stmt, 14, Main.getRef(ReferenceType.OCSRecordAction, getAction()));
+        return true;
+    }
 }

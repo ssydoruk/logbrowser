@@ -41,15 +41,20 @@ public class OCSRecTreatmentTable extends DBTable {
                 + ",recType integer"
                 + ");";
         getM_dbAccessor().runQuery(query);
-        m_InsertStatementId = getM_dbAccessor().PrepareStatement("INSERT INTO OCSTREAT VALUES(NULL,?,?,?,?,?"
+
+
+    }
+
+    @Override
+    public String getInsert() {
+        return "INSERT INTO OCSTREAT VALUES(NULL,?,?,?,?,?"
                 /*standard first*/
                 + ",?"
                 + ",?"
                 + ",?"
                 + ",?"
                 + ",?"
-                + ");");
-
+                + ");";
     }
 
     /**
@@ -63,29 +68,6 @@ public class OCSRecTreatmentTable extends DBTable {
         getM_dbAccessor().runQuery("create index if not exists campBID_OCSRECCR on OCSTREAT (campBID);");
         getM_dbAccessor().runQuery("create index if not exists campBID_unixtime on OCSTREAT (time);");
     }
-
-    @Override
-        public void AddToDB(Record _rec) throws SQLException {
-        OCSRecTreatment rec = (OCSRecTreatment) _rec;
-         getM_dbAccessor().addToDB(m_InsertStatementId, new IFillStatement() {
-                @Override
-                public void fillStatement(PreparedStatement stmt) throws SQLException{
-            stmt.setTimestamp(1, new Timestamp(rec.GetAdjustedUsecTime()));
-            stmt.setInt(2, rec.getFileID());
-            stmt.setLong(3, rec.getM_fileOffset());
-            stmt.setLong(4, rec.getM_FileBytes());
-            stmt.setLong(5, rec.getM_line());
-
-            stmt.setInt(6, rec.getrecHandle());
-            stmt.setInt(7, rec.getchID());
-            stmt.setInt(8, rec.getchNum());
-            setFieldInt(stmt, 9, Main.getRef(ReferenceType.OCSCAMPAIGN, rec.getcamp()));
-            stmt.setInt(10, rec.getrecType());
-
-                        }
-        });
-    }
-
 
 
 }

@@ -1,9 +1,5 @@
 package com.myutils.logbrowser.indexer;
 
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Timestamp;
-
 /**
  * @author akolo
  */
@@ -12,12 +8,12 @@ public class StSActionTable extends DBTable {
     String m_MessageName;
 
     public StSActionTable(SqliteAccessor dbaccessor, TableType t) {
-        super(dbaccessor, t,"STSACTION_" + dbaccessor.getM_alias());
+        super(dbaccessor, t, "STSACTION_" + dbaccessor.getM_alias());
     }
 
     @Override
     public void InitDB() {
-        
+
         addIndex("time");
         addIndex("FileId");
         addIndex("nameID");
@@ -37,30 +33,12 @@ public class StSActionTable extends DBTable {
                 + "FileBytes INT,"
                 + "line INT);";
         getM_dbAccessor().runQuery(query);
-        m_InsertStatementId = getM_dbAccessor().PrepareStatement("INSERT INTO STSACTION_" + getM_dbAccessor().getM_alias() + " VALUES(NULL,?,?,?,?,?,?,?,?,?);");
     }
 
     @Override
-        public void AddToDB(Record _rec) throws SQLException {
-
-        StSActionMessage theRec = (StSActionMessage) _rec;
-         getM_dbAccessor().addToDB(m_InsertStatementId, new IFillStatement() {
-                @Override
-                public void fillStatement(PreparedStatement stmt) throws SQLException{
-            stmt.setTimestamp(1, new Timestamp(theRec.GetAdjustedUsecTime()));
-            setFieldInt(stmt, 2, Main.getRef(ReferenceType.DN, theRec.cleanDN(theRec.GetName())));
-            setFieldInt(stmt, 3, Main.getRef(ReferenceType.DNTYPE, theRec.GetType()));
-            setFieldInt(stmt, 4, Main.getRef(ReferenceType.StatEvent, theRec.GetValue()));
-            setFieldInt(stmt, 5, Main.getRef(ReferenceType.ConnID, theRec.GetConnID()));
-            setFieldInt(stmt, 6, theRec.getFileID());
-            stmt.setLong(7, theRec.getM_fileOffset());
-            stmt.setLong(8, theRec.getFileBytes());
-            setFieldInt(stmt, 9, theRec.getM_line());
-
-                }
-         });
+    public String getInsert() {
+        return "INSERT INTO STSACTION_" + getM_dbAccessor().getM_alias() + " VALUES(NULL,?,?,?,?,?,?,?,?,?);";
     }
-
 
 
     @Override

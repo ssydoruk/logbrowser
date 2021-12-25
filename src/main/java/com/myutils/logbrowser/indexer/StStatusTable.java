@@ -48,7 +48,12 @@ public class StStatusTable extends DBTable {
                 + ",dnid integer"
                 + ");";
         getM_dbAccessor().runQuery(query);
-        m_InsertStatementId = getM_dbAccessor().PrepareStatement("INSERT INTO ststatus VALUES(NULL,?,?,?,?,?"
+
+    }
+
+    @Override
+    public String getInsert() {
+        return "INSERT INTO ststatus VALUES(NULL,?,?,?,?,?"
                 /*standard first*/
                 + ",?"
                 + ",?"
@@ -56,8 +61,7 @@ public class StStatusTable extends DBTable {
                 + ",?"
                 + ",?"
                 + ",?"
-                + ");");
-
+                + ");";
     }
 
     /**
@@ -68,28 +72,6 @@ public class StStatusTable extends DBTable {
         createIndexes();
     }
 
-    @Override
-        public void AddToDB(Record _rec) throws SQLException {
-        StStatus rec = (StStatus) _rec;
-        getM_dbAccessor().addToDB(m_InsertStatementId, new IFillStatement() {
-            @Override
-            public void fillStatement(PreparedStatement stmt) throws SQLException{
-                stmt.setTimestamp(1, new Timestamp(rec.GetAdjustedUsecTime()));
-            stmt.setInt(2, rec.getFileID());
-            stmt.setLong(3, rec.getM_fileOffset());
-            stmt.setLong(4, rec.getM_FileBytes());
-            stmt.setLong(5, rec.getM_line());
-
-            setFieldInt(stmt, 6, Main.getRef(ReferenceType.StatServerStatusType, rec.StatusType()));
-            setFieldInt(stmt, 7, Main.getRef(ReferenceType.Agent, rec.AgentName()));
-            setFieldInt(stmt, 8, Main.getRef(ReferenceType.Place, rec.PlaceName()));
-            setFieldInt(stmt, 9, Main.getRef(ReferenceType.StatType, rec.OldStatus()));
-            setFieldInt(stmt, 10, Main.getRef(ReferenceType.StatType, rec.NewStatus()));
-            setFieldInt(stmt, 11, Main.getRef(ReferenceType.DN, rec.SingleQuotes(rec.getDn())));
-
-            }
-        });
-    }
 
 
 }

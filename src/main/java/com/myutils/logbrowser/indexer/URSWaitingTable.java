@@ -42,12 +42,17 @@ public class URSWaitingTable extends DBTable {
                 + ",agentTypeID INTEGER"
                 + ");";
         getM_dbAccessor().runQuery(query);
-        m_InsertStatementId = getM_dbAccessor().PrepareStatement("INSERT INTO urswaiting VALUES(NULL,?,?,?,?,?"
+    }
+
+    @Override
+    public String getInsert() {
+        return "INSERT INTO urswaiting VALUES(NULL,?,?,?,?,?"
                 /*standard first*/
                 + ",?"
                 + ",?"
                 + ",?"
-                + ");");
+                + ");";
+
 
     }
 
@@ -57,26 +62,6 @@ public class URSWaitingTable extends DBTable {
     @Override
     public void FinalizeDB() throws Exception {
         createIndexes();
-    }
-
-    @Override
-        public void AddToDB(Record _rec) throws SQLException {
-        URSWaiting rec = (URSWaiting) _rec;
-         getM_dbAccessor().addToDB(m_InsertStatementId, new IFillStatement() {
-                @Override
-                public void fillStatement(PreparedStatement stmt) throws SQLException{
-            stmt.setTimestamp(1, new Timestamp(rec.GetAdjustedUsecTime()));
-            stmt.setInt(2, rec.getFileID());
-            stmt.setLong(3, rec.getM_fileOffset());
-            stmt.setLong(4, rec.getM_FileBytes());
-            stmt.setLong(5, rec.getM_line());
-
-            setFieldInt(stmt, 6, Main.getRef(ReferenceType.ConnID, rec.getConnID()));
-            setFieldInt(stmt, 7, Main.getRef(ReferenceType.Agent, rec.getAgent()));
-            setFieldInt(stmt, 8, Main.getRef(ReferenceType.ObjectType, rec.getTargetType()));
-
-                        }
-        });
     }
 
 

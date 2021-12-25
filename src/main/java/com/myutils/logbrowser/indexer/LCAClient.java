@@ -5,6 +5,9 @@
  */
 package com.myutils.logbrowser.indexer;
 
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -230,4 +233,21 @@ public class LCAClient extends Message {
         }
     }
 
+    @Override
+    public boolean fillStat(PreparedStatement stmt) throws SQLException {
+        stmt.setTimestamp(1, new Timestamp(GetAdjustedUsecTime()));
+        stmt.setInt(2, getFileID());
+        stmt.setLong(3, getM_fileOffset());
+        stmt.setLong(4, getM_FileBytes());
+        stmt.setLong(5, getM_line());
+
+        stmt.setInt(6, getAppDBID());
+        setFieldInt(stmt, 7, Main.getRef(ReferenceType.App, getAppName()));
+        stmt.setInt(8, getPID());
+        setFieldInt(stmt, 9, Main.getRef(ReferenceType.AppType, getAppType()));
+        setFieldInt(stmt, 10, Main.getRef(ReferenceType.IP, getIP()));
+        stmt.setInt(11, getFD());
+        stmt.setBoolean(12, isConnected());
+        return true;
+    }
 }

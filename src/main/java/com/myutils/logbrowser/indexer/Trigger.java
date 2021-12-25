@@ -4,6 +4,9 @@
  */
 package com.myutils.logbrowser.indexer;
 
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+
 /**
  * @author ssydoruk
  */
@@ -40,6 +43,23 @@ public class Trigger extends Record {
     @Override
     public String toString() {
         return "Trigger{" + "m_msgId=" + m_msgId + ", m_text=" + m_text + '}' + super.toString();
+    }
+
+    @Override
+    public boolean fillStat(PreparedStatement stmt) throws SQLException {
+        stmt.setInt(1, Main.getRef(ReferenceType.HANDLER, getM_text()));
+        Main.logger.trace("m_handlerId:"
+                + getM_handlerId() + " m_msgId:"
+                + m_msgId + " m_sipId:"
+                + getM_sipId() + " m_tlibId:" + getM_tlibId() + " m_jsonId" + getM_jsonId());
+        stmt.setInt(2, getM_handlerId());
+        stmt.setInt(3, (m_msgId == 1 ? getM_sipId() : 0));
+        stmt.setInt(4, (m_msgId == 0 ? getM_tlibId() : 0));
+        stmt.setInt(5, (m_msgId == 2 ? getM_jsonId() : 0));
+        stmt.setInt(6, getFileID());
+        stmt.setLong(7, getM_fileOffset());
+        stmt.setInt(8, getM_line());
+        return true;
     }
 
     public int getM_msgId() {

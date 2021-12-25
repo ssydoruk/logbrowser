@@ -6,6 +6,10 @@ package com.myutils.logbrowser.indexer;
 //import org.jdom.input.*;
 //import org.jdom.xpath.XPath;
 
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.Timestamp;
+
 /**
  * @author ssydoruk
  */
@@ -32,4 +36,16 @@ public class URSCONNIDIxnID extends Message {
         return IxnID;
     }
 
+    @Override
+    public boolean fillStat(PreparedStatement stmt) throws SQLException {
+        stmt.setTimestamp(1, new Timestamp(GetAdjustedUsecTime()));
+        stmt.setInt(2, getFileID());
+        stmt.setLong(3, getM_fileOffset());
+        stmt.setLong(4, getM_FileBytes());
+        stmt.setLong(5, getM_line());
+
+        setFieldInt(stmt, 6, Main.getRef(ReferenceType.ConnID, getConnID()));
+        setFieldInt(stmt, 7, Main.getRef(ReferenceType.IxnID, getIxnID()));
+        return true;
+    }
 }

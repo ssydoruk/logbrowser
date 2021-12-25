@@ -5,6 +5,9 @@
  */
 package com.myutils.logbrowser.indexer;
 
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -93,6 +96,43 @@ public class StCapacity extends Message {
         }
 
         return ret;
+    }
+
+    @Override
+    public boolean fillStat(PreparedStatement stmt) throws SQLException {
+        stmt.setTimestamp(1, new Timestamp(GetAdjustedUsecTime()));
+        stmt.setInt(2, getFileID());
+        stmt.setLong(3, getM_fileOffset());
+        stmt.setLong(4, getM_FileBytes());
+        stmt.setLong(5, getM_line());
+
+        setFieldInt(stmt, 6, Main.getRef(ReferenceType.StatServerStatusType, StatusType()));
+        setFieldInt(stmt, 7, Main.getRef(ReferenceType.Agent, AgentName()));
+        setFieldInt(stmt, 8, Main.getRef(ReferenceType.Place, PlaceName()));
+        setFieldInt(stmt, 9, Main.getRef(ReferenceType.DN, SingleQuotes(getDn())));
+        setFieldInt(stmt, 10, Main.getRef(ReferenceType.Capacity, getCapacityRule()));
+
+        int curRecNum = 11;
+
+        ArrayList<StCapacity.MediaStatuses> mediaStatuses = getMediaStatuses();
+        for (int i = 0; i < MAX_MEDIA; i++) {
+            int baseNo = curRecNum + i * 4;
+            if (i < mediaStatuses.size()) {
+                StCapacity.MediaStatuses stat = mediaStatuses.get(i);
+                Main.logger.trace("adding stat: " + stat.toString());
+                setFieldInt(stmt, baseNo, Main.getRef(ReferenceType.Media, stat.getMedia()));
+                setFieldString(stmt, baseNo + 1, stat.getRoutable());
+                setFieldInt(stmt, baseNo + 2, stat.getCurNumber());
+                setFieldInt(stmt, baseNo + 3, stat.getMaxNumber());
+
+            } else {
+                setFieldInt(stmt, baseNo, null);
+                setFieldString(stmt, baseNo + 1, null);
+                setFieldInt(stmt, baseNo + 2, null);
+                setFieldInt(stmt, baseNo + 3, null);
+            }
+        }
+        return true;
     }
 
     public static class MediaStatuses {

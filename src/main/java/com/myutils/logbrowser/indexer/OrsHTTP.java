@@ -8,6 +8,9 @@ package com.myutils.logbrowser.indexer;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -296,4 +299,26 @@ public class OrsHTTP extends Message {
         }
     }
 
+    @Override
+    public boolean fillStat(PreparedStatement stmt) throws SQLException {
+        stmt.setTimestamp(1, new Timestamp(GetAdjustedUsecTime()));
+        stmt.setInt(2, getFileID());
+        stmt.setLong(3, getM_fileOffset());
+        stmt.setLong(4, getM_FileBytes());
+        stmt.setLong(5, getM_line());
+
+        stmt.setInt(6, getSocket());
+        stmt.setInt(7, getHTTPBytes());
+        setFieldInt(stmt, 8, Main.getRef(ReferenceType.IP, GetPeerIp()));
+        setFieldInt(stmt, 9, Main.getRef(ReferenceType.ORSSID, getSID()));
+        setFieldInt(stmt, 10, Main.getRef(ReferenceType.ORSNS, getNameSpace()));
+        stmt.setBoolean(11, isInbound());
+        setFieldInt(stmt, 12, Main.getRef(ReferenceType.GMSService, getGMSService()));
+        setFieldInt(stmt, 13, Main.getRef(ReferenceType.HTTPRequest, getHTTPRequest()));
+        setFieldInt(stmt, 14, Main.getRef(ReferenceType.GMSMisc, getParam1()));
+        setFieldInt(stmt, 15, Main.getRef(ReferenceType.GMSMisc, getParam2()));
+        setFieldLong(stmt, 16, getHTTPResponseID());
+        return true;
+
+    }
 }

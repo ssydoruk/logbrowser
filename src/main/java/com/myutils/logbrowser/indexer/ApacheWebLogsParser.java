@@ -159,7 +159,7 @@ public class ApacheWebLogsParser extends WebParser {
         private String ixnID;
 
         private ApacheWebMsg() {
-            super(TableType.ApacheWeb,  fileInfo.getRecordID());
+            super(TableType.ApacheWeb, fileInfo.getRecordID());
         }
 
         /**
@@ -311,6 +311,31 @@ public class ApacheWebLogsParser extends WebParser {
         private void setUserID(String u) {
             // !!not currently put into the database
         }
+
+        @Override
+        public boolean fillStat(PreparedStatement stmt) throws SQLException {
+            stmt.setTimestamp(1, new Timestamp(GetAdjustedUsecTime()));
+            stmt.setInt(2, getFileID());
+            stmt.setLong(3, getM_fileOffset());
+            stmt.setLong(4, getM_FileBytes());
+            stmt.setLong(5, getM_line());
+
+            setFieldInt(stmt, 6, Main.getRef(ReferenceType.IP, getIp()));
+            setFieldInt(stmt, 7, Main.getRef(ReferenceType.JSessionID, getjSessionID()));
+            setFieldInt(stmt, 8, Main.getRef(ReferenceType.HTTPRESPONSE, getHttpCode()));
+            setFieldInt(stmt, 9, Main.getRef(ReferenceType.HTTPMethod, getMethod()));
+            setFieldInt(stmt, 10, Main.getRef(ReferenceType.HTTPURL, getUrl()));
+            setFieldInt(stmt, 11, Main.getRef(ReferenceType.Misc, getKey()));
+            setFieldInt(stmt, 12, Main.getRef(ReferenceType.UUID, getUUID()));
+            setFieldInt(stmt, 13, Main.getRef(ReferenceType.IxnID, getIxnID()));
+            setFieldInt(stmt, 14, Main.getRef(ReferenceType.GWSDeviceID, getDeviceID()));
+            setFieldInt(stmt, 15, Main.getRef(ReferenceType.Agent, getUserName()));
+            setFieldInt(stmt, 16, Main.getRef(ReferenceType.WWEBrowserClient, getBrowserClientID()));
+            setFieldInt(stmt, 17, getExecutionTime());
+
+            return true;
+
+        }
     }
 
     private class ApacheWebTab extends DBTable {
@@ -345,10 +370,14 @@ public class ApacheWebLogsParser extends WebParser {
                     + ",browserClientID int" + ",executionTime int" + ");";
             getM_dbAccessor().runQuery(query);
 
-            m_InsertStatementId = getM_dbAccessor()
-                    .PrepareStatement("INSERT INTO " + getTabName() + " VALUES(NULL,?,?,?,?,?"
-                            /* standard first */
-                            + ",?" + ",?" + ",?" + ",?" + ",?" + ",?" + ",?" + ",?" + ",?" + ",?" + ",?" + ",?" + ");");
+
+        }
+
+        @Override
+        public String getInsert() {
+            return "INSERT INTO " + getTabName() + " VALUES(NULL,?,?,?,?,?"
+                    /* standard first */
+                    + ",?" + ",?" + ",?" + ",?" + ",?" + ",?" + ",?" + ",?" + ",?" + ",?" + ",?" + ",?" + ");";
 
         }
 
@@ -358,35 +387,6 @@ public class ApacheWebLogsParser extends WebParser {
         @Override
         public void FinalizeDB() throws Exception {
             createIndexes();
-        }
-
-        @Override
-            public void AddToDB(Record _rec) throws SQLException {
-            ApacheWebMsg rec = (ApacheWebMsg) _rec;
-            getM_dbAccessor().addToDB(m_InsertStatementId, new IFillStatement() {
-                @Override
-                public void fillStatement(PreparedStatement stmt) throws SQLException{
-                stmt.setTimestamp(1, new Timestamp(rec.GetAdjustedUsecTime()));
-                stmt.setInt(2, rec.getFileID());
-                stmt.setLong(3, rec.getM_fileOffset());
-                stmt.setLong(4, rec.getM_FileBytes());
-                stmt.setLong(5, rec.getM_line());
-
-                setFieldInt(stmt, 6, Main.getRef(ReferenceType.IP, rec.getIp()));
-                setFieldInt(stmt, 7, Main.getRef(ReferenceType.JSessionID, rec.getjSessionID()));
-                setFieldInt(stmt, 8, Main.getRef(ReferenceType.HTTPRESPONSE, rec.getHttpCode()));
-                setFieldInt(stmt, 9, Main.getRef(ReferenceType.HTTPMethod, rec.getMethod()));
-                setFieldInt(stmt, 10, Main.getRef(ReferenceType.HTTPURL, rec.getUrl()));
-                setFieldInt(stmt, 11, Main.getRef(ReferenceType.Misc, rec.getKey()));
-                setFieldInt(stmt, 12, Main.getRef(ReferenceType.UUID, rec.getUUID()));
-                setFieldInt(stmt, 13, Main.getRef(ReferenceType.IxnID, rec.getIxnID()));
-                setFieldInt(stmt, 14, Main.getRef(ReferenceType.GWSDeviceID, rec.getDeviceID()));
-                setFieldInt(stmt, 15, Main.getRef(ReferenceType.Agent, rec.getUserName()));
-                setFieldInt(stmt, 16, Main.getRef(ReferenceType.WWEBrowserClient, rec.getBrowserClientID()));
-                setFieldInt(stmt, 17, rec.getExecutionTime());
-
-                }
-            });
         }
 
 

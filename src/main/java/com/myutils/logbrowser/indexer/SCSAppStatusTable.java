@@ -50,7 +50,13 @@ public class SCSAppStatusTable extends DBTable {
                 + ",eventID int"
                 + ");";
         getM_dbAccessor().runQuery(query);
-        m_InsertStatementId = getM_dbAccessor().PrepareStatement("INSERT INTO " + getTabName() + " VALUES(NULL,?,?,?,?,?"
+
+
+    }
+
+    @Override
+    public String getInsert() {
+        return "INSERT INTO " + getTabName() + " VALUES(NULL,?,?,?,?,?"
                 /*standard first*/
                 + ",?"
                 + ",?"
@@ -60,8 +66,7 @@ public class SCSAppStatusTable extends DBTable {
                 + ",?"
                 + ",?"
                 + ",?"
-                + ");");
-
+                + ");";
     }
 
     /**
@@ -72,30 +77,6 @@ public class SCSAppStatusTable extends DBTable {
         createIndexes();
     }
 
-    @Override
-        public void AddToDB(Record _rec) throws SQLException {
-        SCSAppStatus rec = (SCSAppStatus) _rec;
-        getM_dbAccessor().addToDB(m_InsertStatementId, new IFillStatement() {
-            @Override
-            public void fillStatement(PreparedStatement stmt) throws SQLException{
-            stmt.setTimestamp(1, new Timestamp(rec.GetAdjustedUsecTime()));
-            stmt.setInt(2, rec.getFileID());
-            stmt.setLong(3, rec.getM_fileOffset());
-            stmt.setLong(4, rec.getM_FileBytes());
-            stmt.setLong(5, rec.getM_line());
-
-            setFieldInt(stmt, 6, Main.getRef(ReferenceType.APPRunMode, rec.getNewMode()));
-            stmt.setInt(7, rec.getAppDBID());
-            setFieldInt(stmt, 8, Main.getRef(ReferenceType.App, rec.getAppName()));
-            stmt.setInt(9, rec.getPID());
-            setFieldInt(stmt, 10, Main.getRef(ReferenceType.APPRunMode, rec.getOldMode()));
-            setFieldInt(stmt, 11, Main.getRef(ReferenceType.appStatus, rec.getStatus()));
-            setFieldInt(stmt, 12, Main.getRef(ReferenceType.Host, rec.getHost()));
-            setFieldInt(stmt, 13, Main.getRef(ReferenceType.SCSEvent, rec.getEvent()));
-
-            }
-        });
-    }
 
 
 }

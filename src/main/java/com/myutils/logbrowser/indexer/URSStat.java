@@ -5,6 +5,9 @@
  */
 package com.myutils.logbrowser.indexer;
 
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -122,4 +125,29 @@ public class URSStat extends Message {
         return EmailStat;
     }
 
+    @Override
+    public boolean fillStat(PreparedStatement stmt) throws SQLException {
+        stmt.setTimestamp(1, new Timestamp(GetAdjustedUsecTime()));
+        stmt.setInt(2, getFileID());
+        stmt.setLong(3, getM_fileOffset());
+        stmt.setLong(4, getM_FileBytes());
+        stmt.setLong(5, getM_line());
+
+        stmt.setInt(6, getStatRef());
+        setFieldInt(stmt, 7, Main.getRef(ReferenceType.Agent, getAgentName()));
+        setFieldInt(stmt, 8, Main.getRef(ReferenceType.Place, getPlaceName()));
+        setFieldInt(stmt, 9, Main.getRef(ReferenceType.App, getStatSApp()));
+        setFieldInt(stmt, 10, Main.getRef(ReferenceType.StatType, getStatPrev()));
+        setFieldInt(stmt, 11, Main.getRef(ReferenceType.StatType, getStatNew()));
+
+        setFieldInt(stmt, 12, Main.getRef(ReferenceType.Switch, getVoicSwitchName()));
+        setFieldInt(stmt, 13, Main.getRef(ReferenceType.DN, SingleQuotes(getVoiceDN())));
+        setFieldInt(stmt, 14, Main.getRef(ReferenceType.StatType, getVoiceStat()));
+
+        setFieldInt(stmt, 15, Main.getRef(ReferenceType.StatType, getChatStat()));
+        setFieldInt(stmt, 16, Main.getRef(ReferenceType.StatType, getEmailStat()));
+        return true;
+
+
+    }
 }

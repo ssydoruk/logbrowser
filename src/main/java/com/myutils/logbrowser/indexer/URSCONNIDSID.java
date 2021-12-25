@@ -5,6 +5,10 @@
  */
 package com.myutils.logbrowser.indexer;
 
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.Timestamp;
+
 public class URSCONNIDSID extends Message {
 
     private final String ConnID;
@@ -24,4 +28,17 @@ public class URSCONNIDSID extends Message {
         return ConnID;
     }
 
+    @Override
+    public boolean fillStat(PreparedStatement stmt) throws SQLException {
+        stmt.setTimestamp(1, new Timestamp(GetAdjustedUsecTime()));
+        stmt.setInt(2, getFileID());
+        stmt.setLong(3, getM_fileOffset());
+        stmt.setLong(4, getM_FileBytes());
+        stmt.setLong(5, getM_line());
+
+        setFieldInt(stmt, 6, Main.getRef(ReferenceType.ConnID, GetConnID()));
+        setFieldInt(stmt, 7, Main.getRef(ReferenceType.ORSSID, GetSid()));
+        return true;
+
+    }
 }

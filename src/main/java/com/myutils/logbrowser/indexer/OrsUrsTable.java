@@ -49,7 +49,12 @@ public class OrsUrsTable extends DBTable {
                 + "methodid int"
                 + ");";
         getM_dbAccessor().runQuery(query);
-        m_InsertStatementId = getM_dbAccessor().PrepareStatement("INSERT INTO " + getTabName() + " VALUES(NULL,?,?,?,?,?"
+
+    }
+
+    @Override
+    public String getInsert() {
+        return "INSERT INTO " + getTabName() + " VALUES(NULL,?,?,?,?,?"
                 /*standard first*/
                 + ",?"
                 + ",?"
@@ -59,35 +64,10 @@ public class OrsUrsTable extends DBTable {
                 + ",?"
                 + ",?"
                 + ",?"
-                + ");");
+                + ");";
     }
 
-    @Override
-    public void AddToDB(Record aRec) throws SQLException {
-        OrsUrsMessage theRec = (OrsUrsMessage) aRec;
 
-        getM_dbAccessor().addToDB(m_InsertStatementId, new IFillStatement() {
-            @Override
-            public void fillStatement(PreparedStatement stmt) throws SQLException{
-            stmt.setTimestamp(1, new Timestamp(theRec.GetAdjustedUsecTime()));
-            stmt.setInt(2, theRec.getFileID());
-            stmt.setLong(3, theRec.getM_fileOffset());
-            stmt.setLong(4, theRec.getM_FileBytes());
-            stmt.setLong(5, theRec.getM_line());
-
-            stmt.setBoolean(6, theRec.isInbound());
-            setFieldInt(stmt, 7, Main.getRef(ReferenceType.ORSSID, theRec.GetSid()));
-            setFieldInt(stmt, 8, Main.getRef(ReferenceType.UUID, theRec.GetCall()));
-            stmt.setLong(9, theRec.GetEvent());
-            stmt.setInt(10, theRec.GetRefId());
-            stmt.setInt(11, theRec.GetReqId());
-
-            setFieldInt(stmt, 12, Main.getRef(ReferenceType.ORSMODULE, theRec.GetHeaderValue("module")));
-            setFieldInt(stmt, 13, Main.getRef(ReferenceType.ORSMETHOD, theRec.GetHeaderValue("method")));
-
-            }
-        });
-    }
 
 
     @Override

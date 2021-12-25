@@ -6,10 +6,14 @@ package com.myutils.logbrowser.indexer;
 
 import org.apache.commons.lang3.StringUtils;
 
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static Utils.Util.StripQuotes;
 import static Utils.Util.intOrDef;
 
 /**
@@ -149,4 +153,35 @@ public class ORSMessage extends Message {
 
     }
 
+    @Override
+    public boolean fillStat(PreparedStatement stmt) throws SQLException {
+        stmt.setTimestamp(1, new Timestamp(GetAdjustedUsecTime()));
+
+        setFieldInt(stmt, 2, Main.getRef(ReferenceType.TEvent, GetMessageName()));
+        setFieldInt(stmt, 3, Main.getRef(ReferenceType.DN, cleanDN(getM_ThisDN())));
+        setFieldInt(stmt, 4, Main.getRef(ReferenceType.DN, cleanDN(getAttribute("AttributeOtherDN"))));
+        setFieldInt(stmt, 5, Main.getRef(ReferenceType.Agent, getHeaderTrim("AttributeAgentID")));
+
+        setFieldInt(stmt, 6, Main.getRef(ReferenceType.ConnID, GetConnID()));
+        setFieldInt(stmt, 7, Main.getRef(ReferenceType.ConnID, getAttributeTrim("AttributeTransferConnID")));
+        setFieldInt(stmt, 8, getM_refID());
+        stmt.setBoolean(9, isInbound());
+        setFieldInt(stmt, 10, getFileID());
+        stmt.setLong(11, getM_fileOffset());
+        stmt.setLong(12, getFileBytes());
+        stmt.setInt(13, 0);
+        stmt.setInt(14, getM_line());
+        setFieldInt(stmt, 15, Main.getRef(ReferenceType.UUID, StripQuotes(getAttributeTrim("AttributeCallUUID", 32))));
+        setFieldLong(stmt, 16, getAttributeHex("AttributeEventSequenceNumber"));
+        setFieldInt(stmt, 17, Main.getRef(ReferenceType.App, getM_TserverSRC()));
+        stmt.setBoolean(18, isIsTServerReq());
+        setFieldInt(stmt, 19, Main.getRef(ReferenceType.TLIBERROR, getErrorMessage(GetMessageName())));
+        setFieldInt(stmt, 20, Main.getRef(ReferenceType.TLIBATTR1, getAttr1()));
+        setFieldInt(stmt, 21, Main.getRef(ReferenceType.TLIBATTR2, getAttr2()));
+        setFieldInt(stmt, 22, getORSCallID());
+        setFieldInt(stmt, 23, Main.getRef(ReferenceType.DN, cleanDN(getDNIS())));
+        setFieldInt(stmt, 24, Main.getRef(ReferenceType.DN, cleanDN(getANI())));
+        return true;
+
+    }
 }

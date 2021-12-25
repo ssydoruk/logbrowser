@@ -1128,17 +1128,17 @@ public abstract class Message extends Record {
         this.m_isInbound = m_isInbound;
     }
 
-    @Override
-    protected void AddToDB(HashMap<TableType, DBTable> m_tables) {
-        if (Main.IgnoreTable(this)) {
-            return;
-        }
-        try {
-            super.AddToDB(m_tables);
-        } catch (Exception exception) {
-            Main.logger.error("l:" + getM_line() + " error adding message type [" + getM_type() + "]: " + exception.getMessage() + " msg: [" + this + "]");
-        }
-    }
+//    @Override
+//    protected void AddToDB(HashMap<TableType, DBTable> m_tables) {
+//        if (Main.IgnoreTable(this)) {
+//            return;
+//        }
+//        try {
+//            super.AddToDB(m_tables);
+//        } catch (Exception exception) {
+//            Main.logger.error("l:" + getM_line() + " error adding message type [" + getM_type() + "]: " + exception.getMessage() + " msg: [" + this + "]");
+//        }
+//    }
 
     private String checkTab(String key) {
         if (key != null && key.length() > 0) {

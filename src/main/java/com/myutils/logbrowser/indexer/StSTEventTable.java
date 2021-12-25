@@ -57,42 +57,16 @@ public class StSTEventTable extends DBTable {
                 //                        ",dec_transfer_id CHAR(32)" +
                 + ");";
         getM_dbAccessor().runQuery(query);
-        m_InsertStatementId = getM_dbAccessor().PrepareStatement("INSERT INTO STSTEVENT_" + getM_dbAccessor().getM_alias() + " VALUES(NULL,?,?,?,?,?,?"
-                + ",?,?"
-                //                + ",?,?"
-                + ",?,?,?,?,?,?,?);");
     }
 
     @Override
-        public void AddToDB(Record _rec) throws SQLException {
+    public String getInsert() {
+        return "INSERT INTO STSTEVENT_" + getM_dbAccessor().getM_alias() + " VALUES(NULL,?,?,?,?,?,?"
+                + ",?,?"
+                //                + ",?,?"
+                + ",?,?,?,?,?,?,?);";
 
-        StSTEventMessage theRec = (StSTEventMessage) _rec;
-
-         getM_dbAccessor().addToDB(m_InsertStatementId, new IFillStatement() {
-                @Override
-                public void fillStatement(PreparedStatement stmt) throws SQLException{
-            stmt.setTimestamp(1, new Timestamp(theRec.GetAdjustedUsecTime()));
-            setFieldInt(stmt, 2, Main.getRef(ReferenceType.TEvent, theRec.GetMessageName()));
-            setFieldInt(stmt, 3, Main.getRef(ReferenceType.DN, theRec.SingleQuotes(theRec.getThisDN())));
-            setFieldInt(stmt, 4, Main.getRef(ReferenceType.Switch, theRec.getSwitch()));
-            setFieldInt(stmt, 5, Main.getRef(ReferenceType.App, theRec.getTServer()));
-            setFieldInt(stmt, 6, Main.getRef(ReferenceType.DN, theRec.cleanDN(theRec.getAttributeDN("AttributeOtherDN"))));
-            setFieldInt(stmt, 7, Main.getRef(ReferenceType.Agent, theRec.getAgent()));
-            setFieldInt(stmt, 8, Main.getRef(ReferenceType.ConnID, theRec.GetConnID()));
-            setFieldInt(stmt, 9, Main.getRef(ReferenceType.ConnID, theRec.getAttributeTrim("AttributeFirstTransferConnID")));
-            setFieldLong(stmt, 10, theRec.getAttributeLong("AttributeReferenceID"));
-            stmt.setInt(11, theRec.getFileID());
-            stmt.setLong(12, theRec.getM_fileOffset());
-            stmt.setLong(13, theRec.getFileBytes());
-            stmt.setInt(14, theRec.getM_line());
-            setFieldInt(stmt, 15, null);
-//            setFieldString(stmt,10,theRec.GetDecConnID());
-//            setFieldString(stmt,11,theRec.GetDecTransferConnID());
-
-                        }
-        });
     }
-
 
 
 }

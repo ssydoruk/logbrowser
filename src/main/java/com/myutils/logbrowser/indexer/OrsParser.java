@@ -23,6 +23,7 @@ import static Utils.Util.intOrDef;
 public class OrsParser extends Parser {
 
     private static final org.apache.logging.log4j.Logger logger = Main.logger;
+    public static final int MAX_ALARMS = 15;
 
     //2 types of thread messages in ORS logs
 //21:37:08.194 [T:2560] {ScxmlMetric:3} METRIC <eval_expr sid='VIKO7I50UD32135O60O7ACO4NS0083UP' expression='varConsiderConcierge = _genesys.session.getListItemValue('LIST_CHT_SCT', v_ServiceCallType, 'Concierge Considered').toUpperCase();' result='' />
@@ -480,7 +481,8 @@ public class OrsParser extends Parser {
         theMsg.SetFileBytes(getFilePos() - getSavedFilePos());
         theMsg.SetLine(m_lineStarted);
         theMsg.setM_isInbound(isInbound);
-        theMsg.AddToDB(m_tables);
+        addToDB(theMsg);
+
 
 //        prevSeqno.put(msg.getM_TserverSRC(), msg.getAttributeTrim("AttributeEventSequenceNumber"));
         m_MessageContents.clear(); // clear messages
@@ -494,7 +496,7 @@ public class OrsParser extends Parser {
         themsg.SetFileBytes(getFilePos() - getSavedFilePos());
         themsg.SetLine(m_lineStarted);
         themsg.setM_isInbound(isInbound);
-        themsg.AddToDB(m_tables);
+        addToDB(themsg);
 
         prevSeqno.put(themsg.getM_TserverSRC(), themsg.getAttributeTrim("AttributeEventSequenceNumber"));
         m_MessageContents.clear(); // clear messages
@@ -593,7 +595,8 @@ public class OrsParser extends Parser {
                     if ((m = regRelatedSession.matcher(rest)).find()) {
                         String relatedSid = m.group(1);
                         OrsSidSid sidsid = new OrsSidSid(sid, relatedSid,  fileInfo.getRecordID());
-                        sidsid.AddToDB(m_tables);
+                        addToDB(sidsid);
+
                     }
                 } else if (Method.equals("log")) {
                     if (reInside.matcher(rest).find()) {
@@ -616,7 +619,8 @@ public class OrsParser extends Parser {
         msg.SetOffset(getFilePos());
         msg.SetFileBytes(getEndFilePos() - getFilePos());
         msg.SetLine(m_lineStarted);
-        msg.AddToDB(m_tables);
+        addToDB(msg);
+
         m_MessageContents.clear(); // clear messages
     }
 
@@ -658,7 +662,7 @@ public class OrsParser extends Parser {
             themsg.SetOffset(getFilePos());
             themsg.SetFileBytes(getEndFilePos() - getFilePos());
             themsg.SetLine(m_lineStarted);
-            themsg.AddToDB(m_tables);
+            addToDB(themsg);
 
             //m_ParserState=STATE_CLUSTER;
         }
@@ -748,8 +752,8 @@ public class OrsParser extends Parser {
         themsg.SetOffset(getFilePos());
         themsg.SetFileBytes(getEndFilePos() - getFilePos());
         themsg.SetLine(m_lineStarted);
+        addToDB(themsg);
 
-        themsg.AddToDB(m_tables);
         m_MessageContents.clear(); // clear messages
     }
 
@@ -914,8 +918,7 @@ public class OrsParser extends Parser {
     }
 
     private void addCallID(String UUID, String callID) {
-        (new ORSCallID(UUID, callID,  fileInfo.getRecordID())).AddToDB(m_tables);
-
+        addToDB((new ORSCallID(UUID, callID,  fileInfo.getRecordID())));
     }
 
     enum ParserState {
@@ -1119,6 +1122,15 @@ public class OrsParser extends Parser {
             return UUID;
         }
 
+        @Override
+        public boolean fillStat(PreparedStatement stmt) throws SQLException {
+            stmt.setInt(1, getRecordID());
+            stmt.setInt(2, getFileID());
+            stmt.setInt(3, CallID());
+            setFieldInt(stmt, 4, Main.getRef(ReferenceType.UUID, getUUID()));
+            return true;
+
+        }
     }
 
     private class ORSCallIDTable extends DBTable {
@@ -1142,12 +1154,17 @@ public class OrsParser extends Parser {
                     + ",UUIDID INTEGER"
                     + ");";
             getM_dbAccessor().runQuery(query);
-            m_InsertStatementId = getM_dbAccessor().PrepareStatement("INSERT INTO " + getTabName() + " VALUES(?"
+
+        }
+
+        @Override
+        public String getInsert() {
+            return "INSERT INTO " + getTabName() + " VALUES(?"
                     /*standard first*/
                     + ",?"
                     + ",?"
                     + ",?"
-                    + ");");
+                    + ");";
 
         }
 
@@ -1159,20 +1176,6 @@ public class OrsParser extends Parser {
             createIndexes();
         }
 
-        @Override
-            public void AddToDB(Record _rec) throws SQLException {
-            ORSCallID rec = (ORSCallID) _rec;
-            getM_dbAccessor().addToDB(m_InsertStatementId, new IFillStatement() {
-                @Override
-                public void fillStatement(PreparedStatement stmt) throws SQLException{
-                 stmt.setInt(1, rec.getRecordID());
-                stmt.setInt(2, rec.getFileID());
-                stmt.setInt(3, rec.CallID());
-                setFieldInt(stmt, 4, Main.getRef(ReferenceType.UUID, rec.getUUID()));
-
-                }
-            });
-        }
 
 
     }
@@ -1192,6 +1195,37 @@ public class OrsParser extends Parser {
 
         public ArrayList<AlarmInstance> getAllAlarms() {
             return allAlarms;
+        }
+
+        @Override
+        public boolean fillStat(PreparedStatement stmt) throws SQLException {
+            stmt.setTimestamp(1, new Timestamp(GetAdjustedUsecTime()));
+            stmt.setInt(2, getFileID());
+            stmt.setLong(3, getM_fileOffset());
+            stmt.setLong(4, getM_FileBytes());
+            stmt.setLong(5, getM_line());
+
+            int baseRecNo = 6;
+            ArrayList<ORSAlarm.AlarmInstance> allAlarms = getAllAlarms();
+//                for (int i = 0; i < allAlarms.size(); i++) {
+//                    if (i >= MAX_ALARMS) {
+//                        Main.logger.error(getM_line() + ": more alarms then max (" + MAX_ALARMS + "):" + allAlarms.toString());
+//                        break;
+//                    }
+//                    setFieldInt(stmt, baseRecNo + i * 2, Main.getRef(ReferenceType.Misc, allAlarms.get(i).getName()));
+//                    setFieldInt(stmt, baseRecNo + i * 2 + 1, Main.getRef(ReferenceType.Misc, allAlarms.get(i).getRest()));
+//                }
+            for (int i = 0; i < MAX_ALARMS; i++) {
+                if (i < allAlarms.size()) {
+                    setFieldInt(stmt, baseRecNo + i * 2, Main.getRef(ReferenceType.Misc, allAlarms.get(i).getName()));
+                    setFieldInt(stmt, baseRecNo + i * 2 + 1, Main.getRef(ReferenceType.Misc, allAlarms.get(i).getRest()));
+                } else {
+                    setFieldInt(stmt, baseRecNo + i * 2, null);
+                    setFieldInt(stmt, baseRecNo + i * 2 + 1, null);
+                }
+            }
+            return true;
+
         }
 
         class AlarmInstance {
@@ -1223,8 +1257,6 @@ public class OrsParser extends Parser {
     }
 
     public class ORSAlarmTable extends DBTable {
-
-        public static final int MAX_ALARMS = 15;
 
         public ORSAlarmTable(SqliteAccessor dbaccessor, TableType t) {
             super(dbaccessor, t);
@@ -1258,15 +1290,19 @@ public class OrsParser extends Parser {
                     + ");";
             getM_dbAccessor().runQuery(query);
 
-            buf = new StringBuilder();
+
+        }
+
+        @Override
+        public String getInsert() {
+            StringBuilder buf = new StringBuilder();
             for (int i = 1; i <= MAX_ALARMS; i++) {
                 buf.append(",?,?");
             }
-            m_InsertStatementId = getM_dbAccessor().PrepareStatement("INSERT INTO " + getTabName() + " VALUES(NULL,?,?,?,?,?"
+            return "INSERT INTO " + getTabName() + " VALUES(NULL,?,?,?,?,?"
                     /*standard first*/
                     + buf
-                    + ");"
-            );
+                    + ");"            ;
 
         }
 
@@ -1276,40 +1312,6 @@ public class OrsParser extends Parser {
         @Override
         public void FinalizeDB() throws Exception {
             createIndexes();
-        }
-
-        @Override
-            public void AddToDB(Record _rec) throws SQLException {
-            ORSAlarm rec = (ORSAlarm) _rec;
-            getM_dbAccessor().addToDB(m_InsertStatementId, new IFillStatement() {
-                @Override
-                public void fillStatement(PreparedStatement stmt) throws SQLException{                stmt.setTimestamp(1, new Timestamp(rec.GetAdjustedUsecTime()));
-                stmt.setInt(2, rec.getFileID());
-                stmt.setLong(3, rec.getM_fileOffset());
-                stmt.setLong(4, rec.getM_FileBytes());
-                stmt.setLong(5, rec.getM_line());
-
-                int baseRecNo = 6;
-                ArrayList<ORSAlarm.AlarmInstance> allAlarms = rec.getAllAlarms();
-//                for (int i = 0; i < allAlarms.size(); i++) {
-//                    if (i >= MAX_ALARMS) {
-//                        Main.logger.error(rec.getM_line() + ": more alarms then max (" + MAX_ALARMS + "):" + allAlarms.toString());
-//                        break;
-//                    }
-//                    setFieldInt(stmt, baseRecNo + i * 2, Main.getRef(ReferenceType.Misc, allAlarms.get(i).getName()));
-//                    setFieldInt(stmt, baseRecNo + i * 2 + 1, Main.getRef(ReferenceType.Misc, allAlarms.get(i).getRest()));
-//                }
-                for (int i = 0; i < MAX_ALARMS; i++) {
-                    if (i < allAlarms.size()) {
-                        setFieldInt(stmt, baseRecNo + i * 2, Main.getRef(ReferenceType.Misc, allAlarms.get(i).getName()));
-                        setFieldInt(stmt, baseRecNo + i * 2 + 1, Main.getRef(ReferenceType.Misc, allAlarms.get(i).getRest()));
-                    } else {
-                        setFieldInt(stmt, baseRecNo + i * 2, null);
-                        setFieldInt(stmt, baseRecNo + i * 2 + 1, null);
-                    }
-                }
-                }
-            });
         }
 
 

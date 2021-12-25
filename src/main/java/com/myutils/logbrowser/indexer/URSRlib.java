@@ -10,6 +10,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.regex.Matcher;
@@ -172,4 +175,24 @@ public final class URSRlib extends Message {
         return FindByRx(prnParam, 1, "");
     }
 
+    @Override
+    public boolean fillStat(PreparedStatement stmt) throws SQLException {
+        stmt.setTimestamp(1, new Timestamp(GetAdjustedUsecTime()));
+        stmt.setInt(2, getFileID());
+        stmt.setLong(3, getM_fileOffset());
+        stmt.setLong(4, getM_FileBytes());
+        stmt.setInt(5, getM_line());
+
+        setFieldInt(stmt, 6, GetRefId());
+        setFieldInt(stmt, 7, GetReqId());
+        setFieldInt(stmt, 8, Main.getRef(ReferenceType.UUID, GetCall()));
+        setFieldInt(stmt, 9, Main.getRef(ReferenceType.ORSSID, GetSid()));
+//            setFieldInt(stmt,10, Main.getRef(ReferenceType.ORSMODULE, GetModule()));
+        setFieldInt(stmt, 10, Main.getRef(ReferenceType.ORSMETHOD, GetMethod()));
+        stmt.setBoolean(11, isInbound());
+        setFieldInt(stmt, 12, Main.getRef(ReferenceType.App, getSource()));
+        setFieldInt(stmt, 13, Main.getRef(ReferenceType.URSRLIBRESULT, getResult()));
+        setFieldInt(stmt, 14, Main.getRef(ReferenceType.URSRLIBPARAM, getParam()));
+        return true;
+    }
 }

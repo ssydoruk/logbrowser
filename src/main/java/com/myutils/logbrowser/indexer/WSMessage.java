@@ -4,6 +4,9 @@
  */
 package com.myutils.logbrowser.indexer;
 
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -106,4 +109,29 @@ public class WSMessage extends Message {
         }
     }
 
+    @Override
+    public boolean fillStat(PreparedStatement stmt) throws SQLException {
+        stmt.setTimestamp(1, new Timestamp(GetAdjustedUsecTime()));
+        setFieldInt(stmt, 2, Main.getRef(ReferenceType.TEvent, GetMessageName()));
+        setFieldInt(stmt, 3, Main.getRef(ReferenceType.DN, cleanDN(GetThisDN())));
+        setFieldInt(stmt, 4, Main.getRef(ReferenceType.DN, cleanDN(GetOtherDN())));
+        setFieldInt(stmt, 5, Main.getRef(ReferenceType.Agent, GetAgentID()));
+        setFieldInt(stmt, 6, Main.getRef(ReferenceType.ConnID, GetConnID()));
+        setFieldInt(stmt, 7, Main.getRef(ReferenceType.ConnID, GetTransferConnID()));
+        stmt.setInt(8, (int) getHeaderLong("AttributeReferenceID"));
+        stmt.setBoolean(9, isInbound());
+        stmt.setInt(10, getFileID());
+        stmt.setLong(11, getM_fileOffset());
+        stmt.setLong(12, getFileBytes());
+        stmt.setInt(13, 0);
+        stmt.setLong(14, getSeqNo());
+        stmt.setInt(15, getM_line());
+        setFieldInt(stmt, 16, Main.getRef(ReferenceType.UUID, GetUUID()));
+        setFieldInt(stmt, 17, Main.getRef(ReferenceType.IxnID, getIxnID()));
+        setFieldInt(stmt, 18, Main.getRef(ReferenceType.App, getServer()));
+        stmt.setInt(19, getServerHandle());
+        stmt.setInt(20, getRefID());
+        return true;
+
+    }
 }

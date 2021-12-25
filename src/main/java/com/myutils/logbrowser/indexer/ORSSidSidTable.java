@@ -32,32 +32,22 @@ public class ORSSidSidTable extends DBTable {
         getM_dbAccessor().runQuery(query);
 //        accessor.runQuery("create index if not exists ORSsess__HndId_" + m_alias +" on ORSmetr_" + m_alias + " (HandlerId);");
 
-        m_InsertStatementId = getM_dbAccessor().PrepareStatement("INSERT INTO ORSsidsid VALUES("
+
+
+    }
+
+    @Override
+    public String getInsert() {
+        return "INSERT INTO ORSsidsid VALUES("
                 + "?,"
                 + "?,"
                 + "?"
-                + ");");
-
+                + ");";
     }
 
     @Override
     public void FinalizeDB() {
         createIndexes();
-    }
-
-    @Override
-        public void AddToDB(Record _rec) throws SQLException {
-
-        OrsSidSid rec = (OrsSidSid) _rec;
-         getM_dbAccessor().addToDB(m_InsertStatementId, new IFillStatement() {
-                @Override
-                public void fillStatement(PreparedStatement stmt) throws SQLException{
-            stmt.setInt(1, rec.getFileID());
-
-            setFieldInt(stmt, 2, Main.getRef(ReferenceType.ORSSID, rec.getSID()));
-            setFieldInt(stmt, 3, Main.getRef(ReferenceType.ORSSID, rec.getNewSID()));
-                }
-         });
     }
 
 

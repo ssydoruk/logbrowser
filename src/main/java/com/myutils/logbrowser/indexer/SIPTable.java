@@ -61,46 +61,16 @@ public class SIPTable extends DBTable {
                 + "requestURIDNid"
                 + ");";
         getM_dbAccessor().runQuery(query);
-        m_InsertStatementId = getM_dbAccessor().PrepareStatement("INSERT INTO sip_" + getM_dbAccessor().getM_alias() + " VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);");
+    }
+
+    @Override
+    public String getInsert() {
+        return "INSERT INTO sip_" + getM_dbAccessor().getM_alias() + " VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);";
     }
 
     @Override
     public void FinalizeDB() {
         createIndexes();
-    }
-
-    @Override
-    public void AddToDB(Record rec) throws SQLException {
-        SipMessage theRec = (SipMessage) rec;
-        Object[] vals = new Object[21];
-        getM_dbAccessor().addToDB(m_InsertStatementId, new IFillStatement() {
-            @Override
-            public void fillStatement(PreparedStatement stmt) throws SQLException{
-                 stmt.setInt(1, rec.getRecordID());
-                stmt.setTimestamp(2, new Timestamp(theRec.GetAdjustedUsecTime()));
-                stmt.setBoolean(3, theRec.isInbound());
-                setFieldInt(stmt, 4, Main.getRef(ReferenceType.SIPMETHOD, theRec.GetName()));
-                setFieldInt(stmt, 5, Main.getRef(ReferenceType.SIPCALLID, theRec.GetCallId()));
-                setFieldInt(stmt, 6, Main.getRef(ReferenceType.SIPCSEQ, theRec.GetCSeq()));
-                setFieldInt(stmt, 7, Main.getRef(ReferenceType.SIPURI, theRec.GetTo()));
-                setFieldInt(stmt, 8, Main.getRef(ReferenceType.SIPURI, theRec.GetFrom()));
-                setFieldInt(stmt, 9, Main.getRef(ReferenceType.DN, transformDN(theRec.GetFrom())));
-                setFieldInt(stmt, 10, Main.getRef(ReferenceType.SIPURI, theRec.GetViaUri()));
-                setFieldInt(stmt, 11, Main.getRef(ReferenceType.SIPVIABRANCH, theRec.GetViaBranch()));
-                setFieldInt(stmt, 12, Main.getRef(ReferenceType.IP, theRec.GetPeerIp()));
-                setFieldInt(stmt, 13, theRec.GetPeerPort());
-                setFieldInt(stmt, 14, rec.getFileID());
-                stmt.setLong(15, theRec.getM_fileOffset());
-                stmt.setLong(16, theRec.getFileBytes());
-                Main.logger.trace("theRec.m_handlerId :" +  theRec.getM_handlerId() + " theRec.m_handlerInProgress" +  theRec.isM_handlerInProgress());
-
-                setFieldInt(stmt, 17, theRec.getHandlerInProgress());
-                stmt.setBoolean(18, theRec.isCallRelated());
-                setFieldInt(stmt, 19, theRec.getM_line());
-                setFieldInt(stmt, 20, Main.getRef(ReferenceType.UUID, theRec.getUUID()));
-                setFieldInt(stmt, 21, Main.getRef(ReferenceType.DN, transformDN(rec.SingleQuotes(theRec.getRequestURIDN()))));
-            }
-        });
     }
 
 }

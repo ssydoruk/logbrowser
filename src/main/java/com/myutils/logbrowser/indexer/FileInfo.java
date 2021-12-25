@@ -11,6 +11,9 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -245,6 +248,29 @@ public final class FileInfo extends Record {
                 + ", fileStart=" + fileStartTime
                 + ", fileEnd=" + fileEndTime
                 + '}' + super.toString();
+    }
+
+    @Override
+    public boolean fillStat(PreparedStatement stmt) throws SQLException {
+        stmt.setInt(1, getRecordID());
+
+        setFieldString(stmt, 2, getM_path());
+        stmt.setLong(3, getM_runId());
+        stmt.setInt(4, getM_componentType().ordinal());
+        setFieldString(stmt, 5, getM_nodeId());
+        FileInfoTable.incFilesAdded();
+        setFieldInt(stmt, 6, Main.getRef(ReferenceType.App, getAppName()));
+        setFieldString(stmt, 7, getHost());
+        setFieldInt(stmt, 8, Main.getRef(ReferenceType.AppType, getAppType()));
+        stmt.setInt(9, getLogFileNo());
+        setFieldString(stmt, 10, getLogFileName());
+        stmt.setTimestamp(11, new Timestamp(getStartTime()));
+        stmt.setLong(12, getSize());
+        stmt.setTimestamp(13, new Timestamp(getFileStartTimeLong()));
+        stmt.setTimestamp(14, new Timestamp(getEndTime()));
+        setFieldString(stmt, 15, getArchiveName());
+        return true;
+
     }
 
     public long getM_runId() {

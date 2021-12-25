@@ -4,6 +4,9 @@
  */
 package com.myutils.logbrowser.indexer;
 
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 
 import static Utils.Util.StripQuotes;
@@ -122,4 +125,32 @@ public class UrsMessage extends Message {
         return getAttributeDN("AttributeANI");
     }
 
+    @Override
+    public boolean fillStat(PreparedStatement stmt) throws SQLException {
+        stmt.setTimestamp(1, new Timestamp(GetAdjustedUsecTime()));
+        setFieldInt(stmt, 2, Main.getRef(ReferenceType.TEvent, GetMessageName()));
+        setFieldInt(stmt, 3, Main.getRef(ReferenceType.DN, cleanDN(getThisDN())));
+        setFieldInt(stmt, 4, Main.getRef(ReferenceType.DN, cleanDN(getOtherDN())));
+        setFieldInt(stmt, 5, Main.getRef(ReferenceType.Agent, getHeaderTrim("AttributeAgentID")));
+        setFieldInt(stmt, 6, Main.getRef(ReferenceType.ConnID, GetConnID()));
+        setFieldInt(stmt, 7, Main.getRef(ReferenceType.ConnID, GetTransferConnID()));
+        stmt.setBoolean(8, isInbound());
+        setFieldInt(stmt, 9, getFileID());
+        setFieldLong(stmt, 10, getM_fileOffset());
+        setFieldLong(stmt, 11, getFileBytes());
+        setFieldLong(stmt, 12, getAttributeHex("AttributeEventSequenceNumber"));
+        setFieldInt(stmt, 13, getM_line());
+        setFieldInt(stmt, 14, Main.getRef(ReferenceType.UUID, NoQuotes(getAttributeTrim("AttributeCallUUID", 32))));
+        setFieldInt(stmt, 15, Main.getRef(ReferenceType.IxnID, NoQuotes(getIxnID())));
+        setFieldInt(stmt, 16, Main.getRef(ReferenceType.App, getServer()));
+        setFieldInt(stmt, 17, getServerHandle());
+        setFieldInt(stmt, 18, getRefID());
+        setFieldInt(stmt, 19, Main.getRef(ReferenceType.TLIBERROR, getErrorMessage(GetMessageName())));
+        setFieldInt(stmt, 20, Main.getRef(ReferenceType.TLIBATTR1, getAttr1()));
+        setFieldInt(stmt, 21, Main.getRef(ReferenceType.TLIBATTR2, getAttr2()));
+        setFieldInt(stmt, 22, Main.getRef(ReferenceType.DN, cleanDN(getDNIS())));
+        setFieldInt(stmt, 23, Main.getRef(ReferenceType.DN, cleanDN(getANI())));
+        return true;
+
+    }
 }

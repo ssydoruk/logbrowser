@@ -5,6 +5,9 @@
  */
 package com.myutils.logbrowser.indexer;
 
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -41,4 +44,18 @@ public class OCSSCXMLTreatment extends Message {
         return FindByRx(regSessionID, rest, 1, "");
     }
 
+    @Override
+    public boolean fillStat(PreparedStatement stmt) throws SQLException {
+        stmt.setTimestamp(1, new Timestamp(GetAdjustedUsecTime()));
+        stmt.setInt(2, getFileID());
+        stmt.setLong(3, getM_fileOffset());
+        stmt.setLong(4, getM_FileBytes());
+        stmt.setLong(5, getM_line());
+
+        stmt.setInt(6, getcgdbid());
+        stmt.setInt(7, getrecHandle());
+        stmt.setInt(8, getchID());
+        setFieldInt(stmt, 9, Main.getRef(ReferenceType.OCSSCXMLSESSION, getSessID()));
+        return true;
+    }
 }

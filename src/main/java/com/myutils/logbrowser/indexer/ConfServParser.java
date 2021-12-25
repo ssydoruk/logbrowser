@@ -356,7 +356,9 @@ public class ConfServParser extends Parser {
                     msg.setClientType(m.group(4));
                     msg.setAppName(m.group(5));
                     msg.setUserName(m.group(6));
-                    SetStdFieldsAndAdd(msg);
+                    if (!msg.getOp().equals("MSGCFG_OBJECTCHANGED2")) {
+                        SetStdFieldsAndAdd(msg);
+                    }
                     m_ParserState = ParserState.STATE_COMMENTS;
                     m_MessageContents.clear();
                 } else if ((m = regChangeFinal.matcher(s)).find()) {
@@ -370,7 +372,9 @@ public class ConfServParser extends Parser {
                     msg.setClientType(m.group(5));
                     msg.setAppName(m.group(6));
                     msg.setUserName(m.group(7));
-                    SetStdFieldsAndAdd(msg);
+                    if (!msg.getOp().equals("MSGCFG_OBJECTCHANGED2")) {
+                        SetStdFieldsAndAdd(msg);
+                    }
                     m_ParserState = ParserState.STATE_COMMENTS;
                     m_MessageContents.clear();
                 } else if ((m = regChangeProxy.matcher(s)).find()) {
@@ -383,7 +387,9 @@ public class ConfServParser extends Parser {
                     msg.setOp(m.group(4));
                     msg.setClientType("server");
 
-                    SetStdFieldsAndAdd(msg);
+                    if (!msg.getOp().equals("MSGCFG_OBJECTCHANGED2")) {
+                        SetStdFieldsAndAdd(msg);
+                    }
                     m_ParserState = ParserState.STATE_COMMENTS;
                     m_MessageContents.clear();
 
@@ -391,7 +397,9 @@ public class ConfServParser extends Parser {
                         && (lastLogMsg = getLastLogMsg()) != null && regNotParseMessage.matcher(lastLogMsg.getLastGenesysMsgID()).find()) {
                     CSClientMessage msg = new CSClientMessage(m_MessageContents);
 
-                    SetStdFieldsAndAdd(msg);
+                    if (!msg.getOp().equals("MSGCFG_OBJECTCHANGED2")) {
+                        SetStdFieldsAndAdd(msg);
+                    }
                     m_ParserState = ParserState.STATE_COMMENTS;
                     m_MessageContents.clear();
                     return str;
@@ -437,15 +445,12 @@ public class ConfServParser extends Parser {
         private String objName = null;
         private Integer objNumber;
 
-        public Integer getDescriptor() {
-            return descriptor;
+        private CSObjectChange() {
+            super(TableType.CSConfigChange, fileInfo.getRecordID());
         }
 
-        private CSObjectChange(){
-            super(TableType.CSConfigChange,  fileInfo.getRecordID());
-        }
         private CSObjectChange(String req, String descr, String appType, String appName) {
-           this();
+            this();
             this.op = req;
             this.clientType = appType;
             this.appName = appName;
@@ -461,10 +466,13 @@ public class ConfServParser extends Parser {
             this.appName = appName;
         }
 
-        private CSObjectChange(ArrayList<String> m_MessageContents)
-        {
+        private CSObjectChange(ArrayList<String> m_MessageContents) {
             this();
             setMessageLines(m_MessageContents);
+        }
+
+        public Integer getDescriptor() {
+            return descriptor;
         }
 
         public String getObjType() {
@@ -553,12 +561,30 @@ public class ConfServParser extends Parser {
 
         }
 
+        public Integer getObjNumber() {
+            return objNumber;
+        }
+
         public void setObjNumber(String objNumber) {
             this.objNumber = Integer.parseInt(objNumber);
         }
 
-        public Integer getObjNumber() {
-            return objNumber;
+        @Override
+        public boolean fillStat(PreparedStatement stmt) throws SQLException {
+            stmt.setTimestamp(1, new Timestamp(GetAdjustedUsecTime()));
+            stmt.setInt(2, getFileID());
+            stmt.setLong(3, getM_fileOffset());
+            stmt.setLong(4, getM_FileBytes());
+            stmt.setLong(5, getM_line());
+
+            setFieldInt(stmt, 6, Main.getRef(ReferenceType.App, StripQuotes(getAppName())));
+            setFieldInt(stmt, 7, Main.getRef(ReferenceType.ObjectType, getObjType()));
+            setFieldInt(stmt, 8, Main.getRef(ReferenceType.AppType, getClientType()));
+            setFieldInt(stmt, 9, Main.getRef(ReferenceType.Agent, StripQuotes(getUserName())));
+            setFieldInt(stmt, 10, Main.getRef(ReferenceType.CfgOp, getOp()));
+            setFieldInt(stmt, 11, getDbid());
+            setFieldInt(stmt, 12, Main.getRef(ReferenceType.CfgObjName, getObjName()));
+            return true;
         }
     }
 
@@ -598,18 +624,23 @@ public class ConfServParser extends Parser {
                     + ",objNameID INTEGER"
                     + ");";
             getM_dbAccessor().runQuery(query);
-            m_InsertStatementId = getM_dbAccessor().PrepareStatement("INSERT INTO " + getTabName() + " VALUES(NULL,?,?,?,?,?"
-                    /*standard first*/
-                    /*standard first*/
-                    + ",?"
-                    + ",?"
-                    + ",?"
-                    + ",?"
-                    + ",?"
-                    + ",?"
-                    + ",?"
-                    + ");");
 
+
+        }
+
+        @Override
+        public String getInsert() {
+            return "INSERT INTO " + getTabName() + " VALUES(NULL,?,?,?,?,?"
+                    /*standard first*/
+                    /*standard first*/
+                    + ",?"
+                    + ",?"
+                    + ",?"
+                    + ",?"
+                    + ",?"
+                    + ",?"
+                    + ",?"
+                    + ");";
         }
 
         /**
@@ -620,31 +651,6 @@ public class ConfServParser extends Parser {
             createIndexes();
         }
 
-        @Override
-        public void AddToDB(Record _rec) throws SQLException {
-            CSObjectChange rec = (CSObjectChange) _rec;
-
-            getM_dbAccessor().addToDB(m_InsertStatementId, new IFillStatement() {
-                @Override
-                public void fillStatement(PreparedStatement stmt) throws SQLException{
-
-                    stmt.setTimestamp(1, new Timestamp(rec.GetAdjustedUsecTime()));
-                stmt.setInt(2, rec.getFileID());
-                stmt.setLong(3, rec.getM_fileOffset());
-                stmt.setLong(4, rec.getM_FileBytes());
-                stmt.setLong(5, rec.getM_line());
-
-                setFieldInt(stmt, 6, Main.getRef(ReferenceType.App, StripQuotes(rec.getAppName())));
-                setFieldInt(stmt, 7, Main.getRef(ReferenceType.ObjectType, rec.getObjType()));
-                setFieldInt(stmt, 8, Main.getRef(ReferenceType.AppType, rec.getClientType()));
-                setFieldInt(stmt, 9, Main.getRef(ReferenceType.Agent, StripQuotes(rec.getUserName())));
-                setFieldInt(stmt, 10, Main.getRef(ReferenceType.CfgOp, rec.getOp()));
-                setFieldInt(stmt, 11, rec.getDbid());
-                setFieldInt(stmt, 12, Main.getRef(ReferenceType.CfgObjName, rec.getObjName()));
-
-                }
-            });
-        }
 
     }
 
@@ -661,12 +667,8 @@ public class ConfServParser extends Parser {
         private String objName = null;
         private Integer objNumber;
 
-        public Integer getDescriptor() {
-            return descriptor;
-        }
-
         private CSClientMessage(String req, String descr, String appType, String appName) {
-            super(TableType.CSUpdate,  fileInfo.getRecordID());
+            super(TableType.CSUpdate, fileInfo.getRecordID());
             this.op = req;
             this.clientType = appType;
             this.appName = appName;
@@ -674,7 +676,7 @@ public class ConfServParser extends Parser {
 
         private CSClientMessage(String req, boolean isRequest,
                                 String descriptor, String appType, String appName) {
-            super(TableType.CSUpdate,  fileInfo.getRecordID());
+            super(TableType.CSUpdate, fileInfo.getRecordID());
             setM_isInbound(isRequest);
             this.op = req;
             this.descriptor = Integer.parseInt(descriptor);
@@ -683,7 +685,11 @@ public class ConfServParser extends Parser {
         }
 
         private CSClientMessage(ArrayList<String> m_MessageContents) {
-            super(TableType.CSUpdate, m_MessageContents,  fileInfo.getRecordID());
+            super(TableType.CSUpdate, m_MessageContents, fileInfo.getRecordID());
+        }
+
+        public Integer getDescriptor() {
+            return descriptor;
         }
 
         public String getObjType() {
@@ -772,12 +778,35 @@ public class ConfServParser extends Parser {
 
         }
 
+        public Integer getObjNumber() {
+            return objNumber;
+        }
+
         public void setObjNumber(String objNumber) {
             this.objNumber = Integer.parseInt(objNumber);
         }
 
-        public Integer getObjNumber() {
-            return objNumber;
+        @Override
+        public boolean fillStat(PreparedStatement stmt) throws SQLException {
+            stmt.setTimestamp(1, new Timestamp(GetAdjustedUsecTime()));
+            stmt.setInt(2, getFileID());
+            stmt.setLong(3, getM_fileOffset());
+            stmt.setLong(4, getM_FileBytes());
+            stmt.setLong(5, getM_line());
+
+            setFieldInt(stmt, 6, Main.getRef(ReferenceType.App, StripQuotes(getAppName())));
+            setFieldInt(stmt, 7, Main.getRef(ReferenceType.ObjectType, getObjType()));
+            setFieldInt(stmt, 8, Main.getRef(ReferenceType.AppType, getClientType()));
+            setFieldInt(stmt, 9, Main.getRef(ReferenceType.Agent, StripQuotes(getUserName())));
+            setFieldInt(stmt, 10, Main.getRef(ReferenceType.CfgOp, getOp()));
+            setFieldInt(stmt, 11, getDbid());
+            setFieldInt(stmt, 12, Main.getRef(ReferenceType.CfgObjName, getObjName()));
+            setFieldInt(stmt, 13, getRefID());
+            setFieldInt(stmt, 14, Main.getRef(ReferenceType.CfgMsg, getErrMessage()));
+            setFieldInt(stmt, 15, getDescriptor());
+            setFieldInt(stmt, 16, getObjNumber());
+            return true;
+
         }
     }
 
@@ -824,22 +853,27 @@ public class ConfServParser extends Parser {
                     + ",objNumber INTEGER"
                     + ");";
             getM_dbAccessor().runQuery(query);
-            m_InsertStatementId = getM_dbAccessor().PrepareStatement("INSERT INTO " + getTabName() + " VALUES(NULL,?,?,?,?,?"
-                    /*standard first*/
-                    /*standard first*/
-                    + ",?"
-                    + ",?"
-                    + ",?"
-                    + ",?"
-                    + ",?"
-                    + ",?"
-                    + ",?"
-                    + ",?"
-                    + ",?"
-                    + ",?"
-                    + ",?"
-                    + ");");
 
+
+        }
+
+        @Override
+        public String getInsert() {
+            return "INSERT INTO " + getTabName() + " VALUES(NULL,?,?,?,?,?"
+                    /*standard first*/
+                    /*standard first*/
+                    + ",?"
+                    + ",?"
+                    + ",?"
+                    + ",?"
+                    + ",?"
+                    + ",?"
+                    + ",?"
+                    + ",?"
+                    + ",?"
+                    + ",?"
+                    + ",?"
+                    + ");";
         }
 
         /**
@@ -848,39 +882,6 @@ public class ConfServParser extends Parser {
         @Override
         public void FinalizeDB() throws Exception {
             createIndexes();
-        }
-
-        @Override
-        public void AddToDB(Record _rec) throws SQLException {
-            CSClientMessage rec = (CSClientMessage) _rec;
-
-            if (rec.getOp().equals("MSGCFG_OBJECTCHANGED2")) {
-                return;
-            }
-
-            getM_dbAccessor().addToDB(m_InsertStatementId, new IFillStatement() {
-                @Override
-                public void fillStatement(PreparedStatement stmt) throws SQLException{
-                stmt.setTimestamp(1, new Timestamp(rec.GetAdjustedUsecTime()));
-                stmt.setInt(2, rec.getFileID());
-                stmt.setLong(3, rec.getM_fileOffset());
-                stmt.setLong(4, rec.getM_FileBytes());
-                stmt.setLong(5, rec.getM_line());
-
-                setFieldInt(stmt, 6, Main.getRef(ReferenceType.App, StripQuotes(rec.getAppName())));
-                setFieldInt(stmt, 7, Main.getRef(ReferenceType.ObjectType, rec.getObjType()));
-                setFieldInt(stmt, 8, Main.getRef(ReferenceType.AppType, rec.getClientType()));
-                setFieldInt(stmt, 9, Main.getRef(ReferenceType.Agent, StripQuotes(rec.getUserName())));
-                setFieldInt(stmt, 10, Main.getRef(ReferenceType.CfgOp, rec.getOp()));
-                setFieldInt(stmt, 11, rec.getDbid());
-                setFieldInt(stmt, 12, Main.getRef(ReferenceType.CfgObjName, rec.getObjName()));
-                setFieldInt(stmt, 13, rec.getRefID());
-                setFieldInt(stmt, 14, Main.getRef(ReferenceType.CfgMsg, rec.getErrMessage()));
-                setFieldInt(stmt, 15, rec.getDescriptor());
-                setFieldInt(stmt, 16, rec.getObjNumber());
-
-                }
-            });
         }
 
 
@@ -897,7 +898,7 @@ public class ConfServParser extends Parser {
         private Integer socket;
 
         private CSClientConnect() {
-            super(TableType.CSClientConnect,  fileInfo.getRecordID());
+            super(TableType.CSClientConnect, fileInfo.getRecordID());
         }
 
         public String getClientType() {
@@ -948,6 +949,22 @@ public class ConfServParser extends Parser {
             return socket;
         }
 
+        @Override
+        public boolean fillStat(PreparedStatement stmt) throws SQLException {
+            stmt.setTimestamp(1, new Timestamp(GetAdjustedUsecTime()));
+            stmt.setInt(2, getFileID());
+            stmt.setLong(3, getM_fileOffset());
+            stmt.setLong(4, getM_FileBytes());
+            stmt.setLong(5, getM_line());
+
+            setFieldInt(stmt, 6, Main.getRef(ReferenceType.App, getAppName()));
+            setFieldInt(stmt, 7, Main.getRef(ReferenceType.AppType, getClientType()));
+            setFieldInt(stmt, 8, getSocket());
+            setFieldInt(stmt, 9, Main.getRef(ReferenceType.Agent, StripQuotes(getUserName())));
+            setFieldInt(stmt, 10, Main.getRef(ReferenceType.Host, getClientAddr()));
+            stmt.setBoolean(11, isConnect());
+            return true;
+        }
     }
 
     private class CSClientConnectTable extends DBTable {
@@ -983,7 +1000,13 @@ public class ConfServParser extends Parser {
                     + ",isConnect bit"
                     + ");";
             getM_dbAccessor().runQuery(query);
-            m_InsertStatementId = getM_dbAccessor().PrepareStatement("INSERT INTO " + getTabName() + " VALUES(NULL,?,?,?,?,?"
+
+
+        }
+
+        @Override
+        public String getInsert() {
+            return "INSERT INTO " + getTabName() + " VALUES(NULL,?,?,?,?,?"
                     /*standard first*/
                     + ",?"
                     + ",?"
@@ -991,8 +1014,7 @@ public class ConfServParser extends Parser {
                     + ",?"
                     + ",?"
                     + ",?"
-                    + ");");
-
+                    + ");";
         }
 
         /**
@@ -1002,30 +1024,6 @@ public class ConfServParser extends Parser {
         public void FinalizeDB() throws Exception {
             createIndexes();
         }
-
-        @Override
-        public void AddToDB(Record _rec) throws SQLException {
-            CSClientConnect rec = (CSClientConnect) _rec;
-            getM_dbAccessor().addToDB(m_InsertStatementId, new IFillStatement() {
-                @Override
-                public void fillStatement(PreparedStatement stmt) throws SQLException{
-                stmt.setTimestamp(1, new Timestamp(rec.GetAdjustedUsecTime()));
-                stmt.setInt(2, rec.getFileID());
-                stmt.setLong(3, rec.getM_fileOffset());
-                stmt.setLong(4, rec.getM_FileBytes());
-                stmt.setLong(5, rec.getM_line());
-
-                setFieldInt(stmt, 6, Main.getRef(ReferenceType.App, rec.getAppName()));
-                setFieldInt(stmt, 7, Main.getRef(ReferenceType.AppType, rec.getClientType()));
-                setFieldInt(stmt, 8, rec.getSocket());
-                setFieldInt(stmt, 9, Main.getRef(ReferenceType.Agent, StripQuotes(rec.getUserName())));
-                setFieldInt(stmt, 10, Main.getRef(ReferenceType.Host, rec.getClientAddr()));
-                stmt.setBoolean(11, rec.isConnect());
-
-                }
-            });
-        }
-
 
     }
 

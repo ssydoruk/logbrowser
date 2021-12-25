@@ -5,6 +5,9 @@
  */
 package com.myutils.logbrowser.indexer;
 
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -27,6 +30,23 @@ public final class URSStrategyInit extends Message {
     @Override
     public String toString() {
         return "URSStrategy{" + "FileLine=" + FileLine + ", ConnID=" + ConnID + ", rest=" + strategyMsg + '}';
+    }
+
+    @Override
+    public boolean fillStat(PreparedStatement stmt) throws SQLException {
+        stmt.setTimestamp(1, new Timestamp(GetAdjustedUsecTime()));
+        stmt.setInt(2, getFileID());
+        stmt.setLong(3, getM_fileOffset());
+        stmt.setLong(4, getM_FileBytes());
+        stmt.setLong(5, getM_line());
+
+        setFieldInt(stmt, 6, Main.getRef(ReferenceType.ConnID, GetConnID()));
+        setFieldInt(stmt, 7, Main.getRef(ReferenceType.IxnID, getUUID()));
+        setFieldInt(stmt, 8, Main.getRef(ReferenceType.URSStrategyMsg, getStrategyMsg()));
+        setFieldInt(stmt, 9, Main.getRef(ReferenceType.URSStrategyName, getStrategyName()));
+//                setFieldString(stmt,11, getCgMsg());
+
+        return true;
     }
 
     String GetConnID() {

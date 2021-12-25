@@ -19,6 +19,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashSet;
 
+import static com.myutils.logbrowser.indexer.OrsParser.MAX_ALARMS;
 import static com.myutils.logbrowser.inquirer.DatabaseConnector.TableExist;
 import static com.myutils.logbrowser.inquirer.IQuery.getCheckedWhere;
 import static org.apache.commons.lang3.ArrayUtils.isEmpty;
@@ -734,7 +735,7 @@ final public class RoutingResults extends IQueryResults {
 
             tellProgress("Retrieving ORS self monitoring messages");
 
-            for (int i = 1; i <= com.myutils.logbrowser.indexer.OrsParser.ORSAlarmTable.MAX_ALARMS; i++) {
+            for (int i = 1; i <= MAX_ALARMS; i++) {
                 String fldName = "alarm" + i;
                 ORSAlarm.addRef(fldName + "id", fldName, ReferenceType.Misc.toString(), IQuery.FieldType.Optional);
                 fldName = "values" + i;

@@ -4,6 +4,9 @@
  */
 package com.myutils.logbrowser.indexer;
 
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 
 import static Utils.Util.intOrDef;
@@ -102,4 +105,29 @@ public class WWEMessage extends Message {
         return getIxnAttributeString("AttributeANI");
     }
 
+    @Override
+    public boolean fillStat(PreparedStatement stmt) throws SQLException {
+        stmt.setTimestamp(1, new Timestamp(GetAdjustedUsecTime()));
+        stmt.setInt(2, getFileID());
+        stmt.setLong(3, getM_fileOffset());
+        stmt.setLong(4, getM_FileBytes());
+        stmt.setLong(5, getM_line());
+
+        setFieldInt(stmt, 6, Main.getRef(ReferenceType.ConnID, getConnID()));
+        setFieldInt(stmt, 7, Main.getRef(ReferenceType.ConnID, getTransferConnID()));
+        setFieldInt(stmt, 8, Main.getRef(ReferenceType.UUID, getUUID()));
+        setFieldInt(stmt, 9, getM_refID());
+        stmt.setBoolean(10, isInbound());
+        setFieldInt(stmt, 11, Main.getRef(ReferenceType.DN, cleanDN(getThisDN())));
+        setFieldInt(stmt, 12, Main.getRef(ReferenceType.TEvent, getEventName()));
+        setFieldInt(stmt, 13, getSeqNo());
+        setFieldInt(stmt, 14, Main.getRef(ReferenceType.TEvent, getIxnID()));
+        setFieldInt(stmt, 15, Main.getRef(ReferenceType.App, getServerID()));
+        setFieldInt(stmt, 16, Main.getRef(ReferenceType.DN, cleanDN(getOtherDN())));
+        setFieldInt(stmt, 17, Main.getRef(ReferenceType.Agent, getAgentID()));
+        setFieldInt(stmt, 18, Main.getRef(ReferenceType.DN, cleanDN(getDNIS())));
+        setFieldInt(stmt, 19, Main.getRef(ReferenceType.DN, cleanDN(getANI())));
+        return true;
+
+    }
 }

@@ -5,6 +5,8 @@
  */
 package com.myutils.logbrowser.indexer;
 
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.ArrayList;
 
 public class TemplateDBRecord extends Message {
@@ -21,4 +23,8 @@ public class TemplateDBRecord extends Message {
         return GetHeaderValueNoQotes("call");
     }
 
+    @Override
+    public boolean fillStat(PreparedStatement stmt) throws SQLException {
+        return false;
+    }
 }

@@ -39,38 +39,17 @@ public class CIFaceRequestTable extends DBTable {
                 + "FileOffset bigint,"
                 + "Line INTEGER);";
         getM_dbAccessor().runQuery(query);
-        m_InsertStatementId = getM_dbAccessor().PrepareStatement("INSERT INTO cireq_" + getM_dbAccessor().getM_alias() + " VALUES(NULL,?,?,?,?,?,?,?,?);");
+    }
+
+    @Override
+    public String getInsert() {
+        return "INSERT INTO cireq_" + getM_dbAccessor().getM_alias() + " VALUES(NULL,?,?,?,?,?,?,?,?);";
     }
 
     @Override
     public void FinalizeDB() {
         createIndexes();
 
-    }
-
-    @Override
-    public void AddToDB(Record rec) throws SQLException {
-        CIFaceRequest theRec = (CIFaceRequest) rec;
-
-        if (theRec.getM_refId() == null) {
-            return;
-        }
-        getM_dbAccessor().addToDB(m_InsertStatementId, new IFillStatement() {
-            @Override
-            public void fillStatement(PreparedStatement stmt) throws SQLException{
-
-            setFieldInt(stmt, 1, Main.getRef(ReferenceType.TEvent, theRec.getM_Name()));
-            stmt.setLong(2, theRec.getM_refId());
-            setFieldInt(stmt, 3, Main.getRef(ReferenceType.DN, rec.SingleQuotes(theRec.getM_thisDN())));
-            setFieldInt(stmt, 4, Main.getRef(ReferenceType.DN, rec.SingleQuotes(theRec.getM_otherDN())));
-            stmt.setInt(5, theRec.getM_handlerId());
-            stmt.setInt(6, rec.getFileID());
-            stmt.setLong(7, theRec.getM_fileOffset());
-            stmt.setInt(8, theRec.getM_line());
-            Main.logger.trace("theRec.m_handlerId:" + theRec.getM_handlerId());
-
-            }
-        });
     }
 
 

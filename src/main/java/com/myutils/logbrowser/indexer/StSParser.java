@@ -457,7 +457,7 @@ public class StSParser extends Parser {
             }
             msg.SetLine(headerLine);
             msg.SetFileBytes((int) (m_CurrentFilePos - m_HeaderOffset));
-            msg.AddToDB(m_tables);
+            addToDB(msg);
             m_dbRecords++;
         }
 

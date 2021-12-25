@@ -5,6 +5,9 @@
  */
 package com.myutils.logbrowser.indexer;
 
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -72,4 +75,22 @@ public class OCSPAEventInfo extends Message {
         return FindByRx(regCallResult, 1, 0);
     }
 
+    @Override
+    public boolean fillStat(PreparedStatement stmt) throws SQLException {
+        stmt.setTimestamp(1, new Timestamp(GetAdjustedUsecTime()));
+        stmt.setInt(2, getFileID());
+        stmt.setLong(3, getM_fileOffset());
+        stmt.setLong(4, getM_FileBytes());
+        stmt.setLong(5, getM_line());
+
+        stmt.setInt(6, GetCGDBID());
+        stmt.setInt(7, GetPlaceDBID());
+        stmt.setInt(8, GetAgentDBID());
+        setFieldString(stmt, 9, GetAgent());
+        setFieldInt(stmt, 10, Main.getRef(ReferenceType.StatType, GetAgentStatType()));
+        setFieldInt(stmt, 11, Main.getRef(ReferenceType.AgentCallType, GetAgentCallType()));
+        stmt.setInt(12, GetRecHandle());
+        stmt.setInt(13, CallResult());
+        return true;
+    }
 }

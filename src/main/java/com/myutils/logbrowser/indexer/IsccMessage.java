@@ -4,6 +4,9 @@
  */
 package com.myutils.logbrowser.indexer;
 
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -21,7 +24,7 @@ public class IsccMessage extends SIPServerBaseMessage {
     private String connID = null;
 
     public IsccMessage(String event, ArrayList newMessageLines, boolean m_handlerInProgress, int m_handlerId, int fileID) {
-        super(TableType.ISCC,  m_handlerInProgress,  m_handlerId, fileID);
+        super(TableType.ISCC, m_handlerInProgress, m_handlerId, fileID);
         m_MessageLines = newMessageLines;
         m_MessageName = event;
         m_MessageLines.add(0, event);
@@ -30,6 +33,26 @@ public class IsccMessage extends SIPServerBaseMessage {
     @Override
     public String toString() {
         return "IsccMessage{" + "m_MessageName=" + m_MessageName + '}' + super.toString();
+    }
+
+    @Override
+    public boolean fillStat(PreparedStatement stmt) throws SQLException {
+        stmt.setTimestamp(1, new Timestamp(GetAdjustedUsecTime()));
+        setFieldInt(stmt, 2, Main.getRef(ReferenceType.ISCCEvent, GetMessageName()));
+        setFieldInt(stmt, 3, Main.getRef(ReferenceType.DN, cleanDN(getThisDN())));
+        setFieldInt(stmt, 4, Main.getRef(ReferenceType.DN, cleanDN(getOtherDN())));
+        setFieldInt(stmt, 5, Main.getRef(ReferenceType.ConnID, GetConnID()));
+        stmt.setLong(6, getRefID());
+        stmt.setBoolean(7, isInbound());
+        stmt.setInt(8, getFileID());
+        stmt.setLong(9, getM_fileOffset());
+        stmt.setLong(10, getFileBytes());
+        stmt.setInt(11, getM_handlerId());
+        stmt.setInt(12, getM_line());
+        setFieldInt(stmt, 13, Main.getRef(ReferenceType.App, GetSrcApp()));
+        setFieldInt(stmt, 14, Main.getRef(ReferenceType.Switch, GetSrcSwitch()));
+        setFieldInt(stmt, 15, Main.getRef(ReferenceType.ConnID, GetOtherConnID()));
+        return true;
     }
 
     public String GetMessageName() {
@@ -54,7 +77,7 @@ public class IsccMessage extends SIPServerBaseMessage {
     long getRefID() {
         return FindByRx(regRefID, 1, -1);
 
-//        theRec.getAttributeLong("ISCCAttributeReferenceID")
+//        getAttributeLong("ISCCAttributeReferenceID")
     }
 
     String GetSrcApp() {

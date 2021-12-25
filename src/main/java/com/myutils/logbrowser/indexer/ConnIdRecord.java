@@ -4,6 +4,10 @@
  */
 package com.myutils.logbrowser.indexer;
 
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.Timestamp;
+
 /**
  * @author ssydoruk
  */
@@ -41,6 +45,25 @@ public class ConnIdRecord extends SIPServerBaseMessage {
         return "ConnIdRecord{" + "m_connId=" + m_connId + ", m_created=" + m_created + '}' + super.toString();
     }
 
+    @Override
+    public boolean fillStat(PreparedStatement stmt) throws SQLException {
+        stmt.setTimestamp(1, new Timestamp(GetAdjustedUsecTime()));
+        stmt.setInt(2, getFileID());
+        stmt.setLong(3, getM_fileOffset());
+        stmt.setLong(4, getM_FileBytes());
+        stmt.setInt(5, getM_line());
+
+        setFieldInt(stmt, 6, Main.getRef(ReferenceType.ConnID, getM_connId()));
+        stmt.setInt(7, (isM_handlerInProgress()  ? getM_handlerId() : 0));
+        Main.logger.trace("m_handlerId :" +  getM_handlerId() + " m_handlerInProgress" + isM_handlerInProgress());
+
+        stmt.setBoolean(8, isM_created());
+        stmt.setBoolean(9, isIsTemp());
+        setFieldInt(stmt, 10, Main.getRef(ReferenceType.ConnID, getNewID()));
+        return true;
+
+    }
+
     //    public void AddToDB(DBAccessor accessor) {
 //        PreparedStatement stmt = accessor.GetStatement(m_batchId);
 //        try {
@@ -60,8 +83,8 @@ public class ConnIdRecord extends SIPServerBaseMessage {
         return m_created;
     }
 
-    void setTempConnid(boolean b) {
-        this.isTemp = b;
+    public void setTempConnid(boolean b) {
+        isTemp = b;
     }
 
 }

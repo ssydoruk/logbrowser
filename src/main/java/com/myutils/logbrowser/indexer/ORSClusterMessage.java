@@ -7,7 +7,6 @@ package com.myutils.logbrowser.indexer;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
@@ -24,6 +23,7 @@ public class ORSClusterMessage extends Message {
     private int DstNodeID;
     private boolean Direction;
     private long m_Bytes;
+
     ORSClusterMessage(String arr, int fileID) {
         super(TableType.ORSCluster, fileID);
         m_msgBody = arr.split("\r\n");
@@ -77,23 +77,23 @@ public class ORSClusterMessage extends Message {
         String sUUID = getMsgValue("e:");
 
 
-            accessor.addToDB(m_statementId, new IFillStatement() {
-                @Override
-                public void fillStatement(PreparedStatement stmt) throws SQLException{
+        accessor.addToDB(m_statementId, new IFillStatement() {
+            @Override
+            public boolean fillStatement(PreparedStatement stmt) throws SQLException {
 
-            stmt.setTimestamp(1, new Timestamp(GetAdjustedUsecTime()));
-            stmt.setInt(2, getFileID());
-            stmt.setLong(3, getM_fileOffset());
-            stmt.setLong(4, m_Bytes);
-            stmt.setInt(5, getM_line());
-            DBTable.setFieldString(stmt, 6, SrcNodeType);
-            stmt.setInt(7, SrcNodeID);
-            stmt.setInt(9, DstNodeID);
-            stmt.setBoolean(10, Direction);
-            DBTable.setFieldString(stmt, 11, sUUID);
-
-                }
-            });
+                stmt.setTimestamp(1, new Timestamp(GetAdjustedUsecTime()));
+                stmt.setInt(2, getFileID());
+                stmt.setLong(3, getM_fileOffset());
+                stmt.setLong(4, m_Bytes);
+                stmt.setInt(5, getM_line());
+                Record.setFieldString(stmt, 6, SrcNodeType);
+                stmt.setInt(7, SrcNodeID);
+                stmt.setInt(9, DstNodeID);
+                stmt.setBoolean(10, Direction);
+                Record.setFieldString(stmt, 11, sUUID);
+                return false;
+            }
+        });
     }
 
 
@@ -114,4 +114,8 @@ public class ORSClusterMessage extends Message {
         return "";
     }
 
+    @Override
+    public boolean fillStat(PreparedStatement stmt) throws SQLException {
+        return false;
+    }
 }

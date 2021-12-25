@@ -311,7 +311,7 @@ public final class SqliteAccessor implements DBAccessor {
         }
     }
 
-    private void ResetAutoCommit() {
+    public void ResetAutoCommit() {
 //        try {
 //            m_conn.setAutoCommit(false);
 //        } catch (SQLException e) {
@@ -340,6 +340,10 @@ public final class SqliteAccessor implements DBAccessor {
             logger.error("ExecuteQuery failed: " + e + " query " + query, e);
         }
         return null;
+    }
+
+    public PreparedStatement getStatement(String query) throws SQLException {
+            return m_conn.prepareStatement(query);
     }
 
     public synchronized int PrepareStatement(String query) {

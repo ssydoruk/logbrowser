@@ -59,7 +59,11 @@ public class URSRlibTable extends DBTable {
                 + ",paramid INTEGER"
                 + ");";
         getM_dbAccessor().runQuery(query);
-        m_InsertStatementId = getM_dbAccessor().PrepareStatement("INSERT INTO " + getTabName() + " VALUES(NULL,?,?,?,?,?"
+    }
+
+    @Override
+    public String getInsert() {
+        return "INSERT INTO " + getTabName() + " VALUES(NULL,?,?,?,?,?"
                 /*standard first*/
                 + ",?"
                 + ",?"
@@ -71,7 +75,7 @@ public class URSRlibTable extends DBTable {
                 + ",?"
                 + ",?"
                 + ",?"
-                + ");");
+                + ");";
 
     }
 
@@ -82,33 +86,6 @@ public class URSRlibTable extends DBTable {
     public void FinalizeDB() throws Exception {
         createIndexes();
 
-    }
-
-    @Override
-        public void AddToDB(Record _rec) throws SQLException {
-        URSRlib rec = (URSRlib) _rec;
-        getM_dbAccessor().addToDB(m_InsertStatementId, new IFillStatement() {
-            @Override
-            public void fillStatement(PreparedStatement stmt) throws SQLException{
-            stmt.setTimestamp(1, new Timestamp(rec.GetAdjustedUsecTime()));
-            stmt.setInt(2, rec.getFileID());
-            stmt.setLong(3, rec.getM_fileOffset());
-            stmt.setLong(4, rec.getM_FileBytes());
-            stmt.setInt(5, rec.getM_line());
-
-            setFieldInt(stmt, 6, rec.GetRefId());
-            setFieldInt(stmt, 7, rec.GetReqId());
-            setFieldInt(stmt, 8, Main.getRef(ReferenceType.UUID, rec.GetCall()));
-            setFieldInt(stmt, 9, Main.getRef(ReferenceType.ORSSID, rec.GetSid()));
-//            setFieldInt(stmt,10, Main.getRef(ReferenceType.ORSMODULE, rec.GetModule()));
-            setFieldInt(stmt, 10, Main.getRef(ReferenceType.ORSMETHOD, rec.GetMethod()));
-            stmt.setBoolean(11, rec.isInbound());
-            setFieldInt(stmt, 12, Main.getRef(ReferenceType.App, rec.getSource()));
-            setFieldInt(stmt, 13, Main.getRef(ReferenceType.URSRLIBRESULT, rec.getResult()));
-            setFieldInt(stmt, 14, Main.getRef(ReferenceType.URSRLIBPARAM, rec.getParam()));
-
-            }
-        });
     }
 
 

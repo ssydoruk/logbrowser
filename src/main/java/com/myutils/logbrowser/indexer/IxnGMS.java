@@ -7,6 +7,9 @@ package com.myutils.logbrowser.indexer;
 
 import Utils.Pair;
 
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -122,6 +125,31 @@ public final class IxnGMS extends Message {
         attrs.add(QueueID);
         attrs.add(mediaType);
         attrs.add(connID);
+
+    }
+
+    @Override
+    public boolean fillStat(PreparedStatement stmt) throws SQLException {
+        stmt.setTimestamp(1, new Timestamp(GetAdjustedUsecTime()));
+        stmt.setInt(2, getFileID());
+        stmt.setLong(3, getM_fileOffset());
+        stmt.setLong(4, getM_FileBytes());
+        stmt.setLong(5, getM_line());
+
+        setFieldInt(stmt, 6, Main.getRef(ReferenceType.TEvent, GetMessageName()));
+        setFieldInt(stmt, 7, Main.getRef(ReferenceType.IxnID, GetIxnID()));
+        setFieldInt(stmt, 8, Main.getRef(ReferenceType.IxnMedia, GetMedia()));
+        setFieldInt(stmt, 9, Main.getRef(ReferenceType.DN, cleanDN(GetIxnQueue())));
+        stmt.setLong(10, getM_refID());
+        setFieldInt(stmt, 11, Main.getRef(ReferenceType.ConnID, GetConnID()));
+        stmt.setBoolean(12, isInbound());
+        setFieldInt(stmt, 13, Main.getRef(ReferenceType.IxnID, GetParentIxnID()));
+        setFieldInt(stmt, 14, Main.getRef(ReferenceType.App, GetClient()));
+        setFieldInt(stmt, 15, Main.getRef(ReferenceType.Agent, GetAgent()));
+        setFieldInt(stmt, 16, Main.getRef(ReferenceType.Place, GetPlace()));
+        setFieldInt(stmt, 17, Main.getRef(ReferenceType.TLIBATTR1, getAttr1()));
+        setFieldInt(stmt, 18, Main.getRef(ReferenceType.TLIBATTR2, getAttr2()));
+        return true;
 
     }
 

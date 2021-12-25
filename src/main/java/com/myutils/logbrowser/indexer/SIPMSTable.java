@@ -61,45 +61,16 @@ public class SIPMSTable extends DBTable {
                 + "sipuriid int"
                 + ");";
         getM_dbAccessor().runQuery(query);
-        m_InsertStatementId = getM_dbAccessor().PrepareStatement("INSERT INTO sipms VALUES(NULL,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);");
+    }
+
+    @Override
+    public String getInsert() {
+        return "INSERT INTO sipms VALUES(NULL,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);";
     }
 
     @Override
     public void FinalizeDB() {
         createIndexes();
-    }
-
-    @Override
-    public void AddToDB(Record rec) throws Exception {
-        SipMessage theRec = (SipMessage) rec;
-        getM_dbAccessor().addToDB(m_InsertStatementId, new IFillStatement() {
-            @Override
-            public void fillStatement(PreparedStatement stmt) throws SQLException{
-            stmt.setTimestamp(1, new Timestamp(theRec.GetAdjustedUsecTime()));
-            stmt.setBoolean(2, theRec.isInbound());
-            setFieldInt(stmt, 3, Main.getRef(ReferenceType.SIPMETHOD, theRec.GetName()));
-            setFieldInt(stmt, 4, Main.getRef(ReferenceType.SIPCALLID, theRec.GetCallId()));
-            setFieldInt(stmt, 5, Main.getRef(ReferenceType.SIPCSEQ, theRec.GetCSeq()));
-            setFieldInt(stmt, 6, Main.getRef(ReferenceType.SIPURI, theRec.GetTo()));
-            setFieldInt(stmt, 7, Main.getRef(ReferenceType.SIPURI, theRec.GetFrom()));
-            setFieldInt(stmt, 8, Main.getRef(ReferenceType.DN, transformDN(rec.SingleQuotes(theRec.GetFromUserpart()))));
-            setFieldInt(stmt, 9, Main.getRef(ReferenceType.SIPURI, theRec.GetViaUri()));
-            setFieldInt(stmt, 10, Main.getRef(ReferenceType.SIPVIABRANCH, theRec.GetViaBranch()));
-            setFieldInt(stmt, 11, Main.getRef(ReferenceType.IP, theRec.GetPeerIp()));
-            stmt.setInt(12, theRec.GetPeerPort());
-            stmt.setInt(13, rec.getFileID());
-            stmt.setLong(14, theRec.getM_fileOffset());
-            stmt.setLong(15, theRec.getFileBytes());
-            Main.logger.trace("theRec.m_handlerId :" +  theRec.getM_handlerId()  + " theRec.m_handlerInProgress" + theRec.isM_handlerInProgress() );
-
-            stmt.setBoolean(16, theRec.isCallRelated());
-            stmt.setInt(17, theRec.getM_line());
-            setFieldInt(stmt, 18, Main.getRef(ReferenceType.UUID, theRec.getUUID()));
-            setFieldInt(stmt, 19, Main.getRef(ReferenceType.DN, transformDN(rec.SingleQuotes(theRec.getRequestURIDN()))));
-            setFieldInt(stmt, 20, Main.getRef(ReferenceType.SIPURI, theRec.getSipURI()));
-
-            }
-        });
     }
 
 

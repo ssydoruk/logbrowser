@@ -8,6 +8,9 @@ package com.myutils.logbrowser.indexer;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 
 import static Utils.Util.intOrDef;
@@ -117,4 +120,23 @@ public class OrsUrsMessage extends Message {
         return intOrDef(evt, 0);
     }
 
+    @Override
+    public boolean fillStat(PreparedStatement stmt) throws SQLException {
+        stmt.setTimestamp(1, new Timestamp(GetAdjustedUsecTime()));
+        stmt.setInt(2, getFileID());
+        stmt.setLong(3, getM_fileOffset());
+        stmt.setLong(4, getM_FileBytes());
+        stmt.setLong(5, getM_line());
+
+        stmt.setBoolean(6, isInbound());
+        setFieldInt(stmt, 7, Main.getRef(ReferenceType.ORSSID, GetSid()));
+        setFieldInt(stmt, 8, Main.getRef(ReferenceType.UUID, GetCall()));
+        stmt.setLong(9, GetEvent());
+        stmt.setInt(10, GetRefId());
+        stmt.setInt(11, GetReqId());
+
+        setFieldInt(stmt, 12, Main.getRef(ReferenceType.ORSMODULE, GetHeaderValue("module")));
+        setFieldInt(stmt, 13, Main.getRef(ReferenceType.ORSMETHOD, GetHeaderValue("method")));
+        return true;
+    }
 }

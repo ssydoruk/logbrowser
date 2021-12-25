@@ -1,5 +1,8 @@
 package com.myutils.logbrowser.indexer;
 
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -48,6 +51,20 @@ public class StSActionMessage extends Message {
 
     public String GetConnID() {
         return GetHeaderValue("ConnID");
+    }
+
+    @Override
+    public boolean fillStat(PreparedStatement stmt) throws SQLException {
+        stmt.setTimestamp(1, new Timestamp(GetAdjustedUsecTime()));
+        setFieldInt(stmt, 2, Main.getRef(ReferenceType.DN, cleanDN(GetName())));
+        setFieldInt(stmt, 3, Main.getRef(ReferenceType.DNTYPE, GetType()));
+        setFieldInt(stmt, 4, Main.getRef(ReferenceType.StatEvent, GetValue()));
+        setFieldInt(stmt, 5, Main.getRef(ReferenceType.ConnID, GetConnID()));
+        setFieldInt(stmt, 6, getFileID());
+        stmt.setLong(7, getM_fileOffset());
+        stmt.setLong(8, getFileBytes());
+        setFieldInt(stmt, 9, getM_line());
+        return true;
     }
 
 //    public static String InitDB(DBAccessor accessor, int statementId) {

@@ -7,6 +7,9 @@ package com.myutils.logbrowser.indexer;
 
 import org.apache.commons.lang3.StringUtils;
 
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -58,7 +61,7 @@ public final class GenesysMsg extends Message {
             msg.setToIgnore(true);
         }
         if (!msg.isToIgnore() && saveToDB) {
-            msg.AddToDB(p.m_tables);
+            p.addToDB(msg);
             Main.logger.traceExit("Added log message " + t + ": " + msg);
 
         }
@@ -218,6 +221,19 @@ public final class GenesysMsg extends Message {
     @Override
     public String toString() {
         return super.toString() + "level:" + level + ";msgID=" + msgID + ";msgType=" + msgType + "line:[" + line + "]}";
+    }
+
+    @Override
+    public boolean fillStat(PreparedStatement stmt) throws SQLException {
+        stmt.setTimestamp(1, new Timestamp(GetAdjustedUsecTime()));
+        stmt.setInt(2, getFileID());
+        stmt.setLong(3, getM_fileOffset());
+        stmt.setLong(4, getM_FileBytes());
+        stmt.setLong(5, getM_line());
+
+        stmt.setInt(6, getLevel());
+        stmt.setInt(7, getMsgID());
+        return true;
     }
 
     int getLevel() {

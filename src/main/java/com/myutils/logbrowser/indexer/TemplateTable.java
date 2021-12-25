@@ -41,12 +41,16 @@ public class TemplateTable extends DBTable {
                 + ",HandlerId INTEGER"
                 + ");";
         getM_dbAccessor().runQuery(query);
-        m_InsertStatementId = getM_dbAccessor().PrepareStatement("INSERT INTO " + getTabName() + " VALUES(?,?,?,?,?,?"
+
+    }
+
+    @Override
+    public String getInsert() {
+        return "INSERT INTO " + getTabName() + " VALUES(?,?,?,?,?,?"
                 /*standard first*/
                 + ",?"
                 + ",?"
-                + ");");
-
+                + ");";
     }
 
     /**
@@ -55,26 +59,6 @@ public class TemplateTable extends DBTable {
     @Override
     public void FinalizeDB() throws Exception {
         createIndexes();
-    }
-
-    @Override
-        public void AddToDB(Record _rec) throws SQLException {
-        ORSMetric rec = (ORSMetric) _rec;
-        getM_dbAccessor().addToDB(m_InsertStatementId, new IFillStatement() {
-            @Override
-            public void fillStatement(PreparedStatement stmt) throws SQLException{
-             stmt.setInt(1, rec.getRecordID());
-            stmt.setTimestamp(2, new Timestamp(rec.GetAdjustedUsecTime()));
-            stmt.setInt(3, rec.getFileID());
-            stmt.setLong(4, rec.getM_fileOffset());
-            stmt.setLong(5, rec.getM_FileBytes());
-            stmt.setLong(6, rec.getM_line());
-
-//            stmt.setInt(7, ORSMetric.m_handlerId);
-            setFieldString(stmt, 8, rec.sid);
-
-            }
-        });
     }
 
 

@@ -104,7 +104,7 @@ public class DateDiff {
             InitDB();
             dbaccessor.addToDB(m_InsertStatementId, new IFillStatement() {
                 @Override
-                public void fillStatement(PreparedStatement stmt) throws SQLException {
+                public boolean fillStatement(PreparedStatement stmt) throws SQLException {
                     stmt.setTimestamp(1, new Timestamp(time));
                     stmt.setInt(2, fileId);
                     stmt.setLong(3, filePos);
@@ -112,10 +112,10 @@ public class DateDiff {
                     stmt.setLong(5, fileLine);
 
                     stmt.setLong(6, diff);
-
+                    return true;
                 }
             });
         }
 
     }
-    }
+}

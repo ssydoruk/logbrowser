@@ -4,9 +4,14 @@
  */
 package com.myutils.logbrowser.indexer;
 
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static Utils.Util.StripQuotes;
 
 /**
  * @author terry The class Replicates TLibMessage
@@ -145,4 +150,35 @@ public class OcsMessage extends Message {
         }
     }
 
+    @Override
+    public boolean fillStat(PreparedStatement stmt) throws SQLException {
+        stmt.setTimestamp(1, new Timestamp(GetAdjustedUsecTime()));
+        stmt.setInt(2, getFileID());
+        setFieldLong(stmt, 3, getM_fileOffset());
+        setFieldLong(stmt, 4, getM_FileBytes());
+        setFieldInt(stmt, 5, getM_line());
+
+        setFieldInt(stmt, 6, Main.getRef(ReferenceType.TEvent, GetMessageName()));
+        setFieldInt(stmt, 7, Main.getRef(ReferenceType.DN, cleanDN(getM_ThisDN())));
+        setFieldInt(stmt, 8, Main.getRef(ReferenceType.DN, cleanDN(getOtherDN())));
+
+        setFieldString(stmt, 9, "");//+ "agentID char(32),"
+        setFieldInt(stmt, 10, Main.getRef(ReferenceType.ConnID, GetConnID()));
+        setFieldInt(stmt, 11, Main.getRef(ReferenceType.ConnID, GetTransferConnID()));
+        stmt.setInt(12, getM_refID());
+        stmt.setBoolean(13, isInbound());
+        setFieldInt(stmt, 14, Main.getRef(ReferenceType.UUID, StripQuotes(getAttributeTrim("AttributeCallUUID", 32))));
+        setFieldLong(stmt, 15, getAttributeHex("AttributeEventSequenceNumber"));
+        setFieldInt(stmt, 16, Main.getRef(ReferenceType.App, getM_TserverSRCp()));
+        setFieldInt(stmt, 17, Main.getRef(ReferenceType.App, getM_TserverSRCb()));
+        stmt.setBoolean(18, isIsTServerReq());
+        setFieldLong(stmt, 19, getRecordHandle());
+        setFieldLong(stmt, 20, getUData("GSW_CHAIN_ID", -1, true));
+//            Main.logger.info("CHID: "+getUData("GSW_CHAIN_ID", -1, true));
+        setFieldLong(stmt, 21, getUData("GSW_CAMPAIGN_GROUP_DBID", -1, true));
+        setFieldInt(stmt, 22, Main.getRef(ReferenceType.TLIBERROR, getErrorMessage(GetMessageName())));
+        return true;
+
+
+    }
 }

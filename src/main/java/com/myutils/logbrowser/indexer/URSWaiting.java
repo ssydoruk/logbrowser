@@ -5,6 +5,9 @@
  */
 package com.myutils.logbrowser.indexer;
 
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -38,4 +41,18 @@ public class URSWaiting extends Message {
         return targetType;
     }
 
+    @Override
+    public boolean fillStat(PreparedStatement stmt) throws SQLException {
+        stmt.setTimestamp(1, new Timestamp(GetAdjustedUsecTime()));
+        stmt.setInt(2, getFileID());
+        stmt.setLong(3, getM_fileOffset());
+        stmt.setLong(4, getM_FileBytes());
+        stmt.setLong(5, getM_line());
+
+        setFieldInt(stmt, 6, Main.getRef(ReferenceType.ConnID, getConnID()));
+        setFieldInt(stmt, 7, Main.getRef(ReferenceType.Agent, getAgent()));
+        setFieldInt(stmt, 8, Main.getRef(ReferenceType.ObjectType, getTargetType()));
+        return true;
+
+    }
 }

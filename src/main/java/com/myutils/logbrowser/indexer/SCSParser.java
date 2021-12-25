@@ -141,7 +141,7 @@ public class SCSParser extends Parser {
                     lastMSGText = m.group(2);
                     m_ParserState = ParserState.STATE_CLIENT_MESSAGE_RECEIVED;
                 } else if ((m = regAlarmCreated.matcher(s)).find()) {
-                    msg = new SCSAlarm(AlarmState.Creating,  fileInfo.getRecordID());
+                    msg = new SCSAlarm(AlarmState.Creating, fileInfo.getRecordID());
                     ((SCSAlarm) msg).setAlarmDBID(m.group(1));
                     ((SCSAlarm) msg).setAlarmName(m.group(2));
                     ((SCSAlarm) msg).setAppDBID(m.group(3));
@@ -151,7 +151,7 @@ public class SCSParser extends Parser {
                     m_ParserState = ParserState.STATE_ALARM_CREATED;
                     setSavedFilePos(getFilePos());
                 } else if ((m = regAlarmCleared.matcher(s)).find()) {
-                    msg = new SCSAlarm(AlarmState.Releasing,  fileInfo.getRecordID());
+                    msg = new SCSAlarm(AlarmState.Releasing, fileInfo.getRecordID());
                     ((SCSAlarm) msg).setHost(m.group(1));
                     ((SCSAlarm) msg).setAppName(m.group(2));
                     ((SCSAlarm) msg).setAlarmName(m.group(3));
@@ -160,7 +160,7 @@ public class SCSParser extends Parser {
                     m_ParserState = ParserState.STATE_ALARM_PARAMS_CLEARED;
                     setSavedFilePos(getFilePos());
                 } else if ((m = regAppRunModeChanged.matcher(s)).find()) {
-                    SCSAppStatus _msg = new SCSAppStatus(  fileInfo.getRecordID());
+                    SCSAppStatus _msg = new SCSAppStatus(fileInfo.getRecordID());
                     _msg.setNewMode(m.group(1));
                     _msg.setAppDBID(m.group(2));
                     _msg.setAppName(m.group(3));
@@ -170,7 +170,7 @@ public class SCSParser extends Parser {
                     _msg.setEvent("AppRunModeChanged");
                     SetStdFieldsAndAdd(_msg);
                 } else if ((m = regNotifyApp.matcher(s)).find()) {
-                    SCSAppStatus _msg = new SCSAppStatus(  fileInfo.getRecordID());
+                    SCSAppStatus _msg = new SCSAppStatus(fileInfo.getRecordID());
                     _msg.setNewMode(m.group(3));
                     _msg.setAppDBID(m.group(5));
                     _msg.setAppName(m.group(6));
@@ -181,7 +181,7 @@ public class SCSParser extends Parser {
                     SetStdFieldsAndAdd(_msg);
 
                 } else if ((m = regSCSReq.matcher(s)).find()) {
-                    SCSAppStatus _msg = new SCSAppStatus(  fileInfo.getRecordID());
+                    SCSAppStatus _msg = new SCSAppStatus(fileInfo.getRecordID());
                     _msg.setAppDBID(m.group(1));
                     _msg.setAppName(m.group(2));
                     _msg.setOldMode(m.group(3));
@@ -190,7 +190,7 @@ public class SCSParser extends Parser {
                     SetStdFieldsAndAdd(_msg);
 
                 } else if ((m = regSelfServer.matcher(s)).find()) {
-                    SCSSelfStatus _msg = new SCSSelfStatus( fileInfo.getRecordID());
+                    SCSSelfStatus _msg = new SCSSelfStatus(fileInfo.getRecordID());
                     _msg.setNewMode(m.group(2));
                     _msg.setOldMode(m.group(1));
                     SetStdFieldsAndAdd(_msg);
@@ -203,7 +203,7 @@ public class SCSParser extends Parser {
             case STATE_CLIENT_MESSAGE_RECEIVED: {
                 s = ParseGenesysSCS(str, TableType.MsgSCServer, regNotParseMessage, regLineSkip);
                 if ((m = regAlarmCreated.matcher(s)).find()) {
-                    msg = new SCSAlarm(AlarmState.Creating,  fileInfo.getRecordID());
+                    msg = new SCSAlarm(AlarmState.Creating, fileInfo.getRecordID());
                     ((SCSAlarm) msg).setMsgID(lastMSGID);
                     ((SCSAlarm) msg).setMsgText(lastMSGText);
                     lastMSGID = null;
@@ -217,7 +217,7 @@ public class SCSParser extends Parser {
                     m_ParserState = ParserState.STATE_ALARM_CREATED;
                     setSavedFilePos(getFilePos());
                 } else if ((m = regAlarmCleared.matcher(s)).find()) {
-                    msg = new SCSAlarm(AlarmState.Releasing,  fileInfo.getRecordID());
+                    msg = new SCSAlarm(AlarmState.Releasing, fileInfo.getRecordID());
                     ((SCSAlarm) msg).setMsgID(lastMSGID);
                     ((SCSAlarm) msg).setMsgText(lastMSGText);
                     lastMSGID = null;
@@ -230,7 +230,7 @@ public class SCSParser extends Parser {
                     m_ParserState = ParserState.STATE_ALARM_PARAMS_CLEARED;
                     setSavedFilePos(getFilePos());
                 } else if ((m = regAlarmActive.matcher(s)).find()) {
-                    msg = new SCSAlarm(AlarmState.ReActivate,  fileInfo.getRecordID());
+                    msg = new SCSAlarm(AlarmState.ReActivate, fileInfo.getRecordID());
                     ((SCSAlarm) msg).setMsgID(lastMSGID);
                     ((SCSAlarm) msg).setMsgText(lastMSGText);
                     lastMSGID = null;
@@ -244,7 +244,7 @@ public class SCSParser extends Parser {
                     m_MessageContents.clear();
                     m_ParserState = ParserState.STATE_COMMENTS;
                 } else {
-                    SCSClientLogMessage _msg = new SCSClientLogMessage(lastMSGID, lastMSGText,  fileInfo.getRecordID());
+                    SCSClientLogMessage _msg = new SCSClientLogMessage(lastMSGID, lastMSGText, fileInfo.getRecordID());
 
                     SetStdFieldsAndAdd(_msg);
                     m_ParserState = ParserState.STATE_COMMENTS;
@@ -321,7 +321,7 @@ public class SCSParser extends Parser {
             case STATE_APP_STATUS_CHANGED1: {
                 if ((m = regNOtificationReceived.matcher(str)).find()) {
                     m_MessageContents.add(str);
-                    SCSAppStatus _msg = new SCSAppStatus(m_MessageContents,  fileInfo.getRecordID());
+                    SCSAppStatus _msg = new SCSAppStatus(m_MessageContents, fileInfo.getRecordID());
                     _msg.setAppDBID(m.group(1));
                     _msg.setAppName(m.group(2));
                     _msg.setNewMode(m.group(3));
@@ -358,10 +358,10 @@ public class SCSParser extends Parser {
 
         if ((headerList.length == 6) && headerList[3].startsWith("Creating")) {
             String event = headerList[3];
-            _msg = new StSRequestHistoryMessage(event, contents,  fileInfo.getRecordID());
+            _msg = new StSRequestHistoryMessage(event, contents, fileInfo.getRecordID());
         } else if (headerList.length > 4) {
             String event = headerList[4].substring(1, headerList[4].length() - 1);
-            _msg = new StSRequestHistoryMessage(event, contents,  fileInfo.getRecordID());
+            _msg = new StSRequestHistoryMessage(event, contents, fileInfo.getRecordID());
         } else {
             return;
         }
@@ -384,14 +384,15 @@ public class SCSParser extends Parser {
             }
             _msg.SetLine(headerLine);
             _msg.SetFileBytes((int) (m_CurrentFilePos - m_HeaderOffset));
-            _msg.AddToDB(m_tables);
+            addToDB(_msg);
+
             m_dbRecords++;
         }
 
     }
 
     private void addRunModeChanged(String substring) {
-        ConfigUpdateRecord _msg = new ConfigUpdateRecord(substring,  fileInfo.getRecordID());
+        ConfigUpdateRecord _msg = new ConfigUpdateRecord(substring, fileInfo.getRecordID());
         try {
             Matcher m;
 //            msg.setObjName(Message.FindByRx(m_MessageContents, regCfgObjectName, 1, ""));
@@ -476,7 +477,7 @@ public class SCSParser extends Parser {
         private int msgID;
         private String msgText;
 
-        SCSClientLogMessage(TableType t,  int fileID) {
+        SCSClientLogMessage(TableType t, int fileID) {
             super(t, fileID);
         }
 
@@ -485,6 +486,19 @@ public class SCSParser extends Parser {
 
             setMsgID(msgID);
             setMsgText(msgText);
+        }
+
+        @Override
+        public boolean fillStat(PreparedStatement stmt) throws SQLException {
+            stmt.setTimestamp(1, new Timestamp(GetAdjustedUsecTime()));
+            stmt.setInt(2, getFileID());
+            stmt.setLong(3, getM_fileOffset());
+            stmt.setLong(4, getM_FileBytes());
+            stmt.setLong(5, getM_line());
+
+            setFieldInt(stmt, 6, getMsgID());
+            setFieldInt(stmt, 7, Main.getRef(ReferenceType.Misc, getMsgText()));
+            return true;
         }
 
         public int getMsgID() {
@@ -539,13 +553,16 @@ public class SCSParser extends Parser {
                     + ");";
             getM_dbAccessor().runQuery(query);
 
-            m_InsertStatementId = getM_dbAccessor().PrepareStatement("INSERT INTO " + getTabName() + " VALUES(NULL,?,?,?,?,?"
+
+        }
+
+        @Override
+        public String getInsert() {
+            return "INSERT INTO " + getTabName() + " VALUES(NULL,?,?,?,?,?"
                     /*standard first*/
                     + ",?"
                     + ",?"
-                    + ");"
-            );
-
+                    + ");";
         }
 
         /**
@@ -555,26 +572,6 @@ public class SCSParser extends Parser {
         public void FinalizeDB() throws Exception {
             createIndexes();
         }
-
-        @Override
-            public void AddToDB(Record _rec) throws SQLException {
-            SCSClientLogMessage rec = (SCSClientLogMessage) _rec;
-            getM_dbAccessor().addToDB(m_InsertStatementId, new IFillStatement() {
-                @Override
-                public void fillStatement(PreparedStatement stmt) throws SQLException{
-                stmt.setTimestamp(1, new Timestamp(rec.GetAdjustedUsecTime()));
-                stmt.setInt(2, rec.getFileID());
-                stmt.setLong(3, rec.getM_fileOffset());
-                stmt.setLong(4, rec.getM_FileBytes());
-                stmt.setLong(5, rec.getM_line());
-
-                setFieldInt(stmt, 6, rec.getMsgID());
-                setFieldInt(stmt, 7, Main.getRef(ReferenceType.Misc, rec.getMsgText()));
-
-                }
-            });
-        }
-
 
     }
 
@@ -705,7 +702,11 @@ public class SCSParser extends Parser {
                     + ");";
             getM_dbAccessor().runQuery(query);
 
-            m_InsertStatementId = getM_dbAccessor().PrepareStatement("INSERT INTO " + getTabName() + " VALUES(NULL,?,?,?,?,?"
+        }
+
+        @Override
+        public String getInsert() {
+            return "INSERT INTO " + getTabName() + " VALUES(NULL,?,?,?,?,?"
                     /*standard first*/
                     + ",?"
                     + ",?"
@@ -718,8 +719,7 @@ public class SCSParser extends Parser {
                     + ",?"
                     + ",?"
                     + ");"
-            );
-
+                    ;
         }
 
         /**
@@ -729,35 +729,6 @@ public class SCSParser extends Parser {
         public void FinalizeDB() throws Exception {
             createIndexes();
         }
-
-        @Override
-            public void AddToDB(Record _rec) throws SQLException {
-            SCSAlarm rec = (SCSAlarm) _rec;
-            getM_dbAccessor().addToDB(m_InsertStatementId, new IFillStatement() {
-                @Override
-                public void fillStatement(PreparedStatement stmt) throws SQLException{
-                stmt.setTimestamp(1, new Timestamp(rec.GetAdjustedUsecTime()));
-                stmt.setInt(2, rec.getFileID());
-                stmt.setLong(3, rec.getM_fileOffset());
-                stmt.setLong(4, rec.getM_FileBytes());
-                stmt.setLong(5, rec.getM_line());
-
-                setFieldInt(stmt, 6, Main.getRef(ReferenceType.AlarmState, rec.getAlarmState()));
-
-                setFieldInt(stmt, 7, rec.getAlarmDBID());
-                setFieldInt(stmt, 8, rec.getAppDBID());
-                setFieldInt(stmt, 9, Main.getRef(ReferenceType.Misc, rec.getAlarmName()));
-                setFieldInt(stmt, 10, Main.getRef(ReferenceType.App, rec.getAppName()));
-                setFieldInt(stmt, 11, Main.getRef(ReferenceType.Misc, rec.getReason()));
-                setFieldInt(stmt, 12, Main.getRef(ReferenceType.Misc, rec.getCategory()));
-                setFieldInt(stmt, 13, Main.getRef(ReferenceType.Misc, rec.getAlarmID()));
-                setFieldInt(stmt, 14, rec.getMsgID());
-                setFieldInt(stmt, 15, Main.getRef(ReferenceType.Misc, rec.getMsgText()));
-
-                }
-            });
-        }
-
 
     }
 

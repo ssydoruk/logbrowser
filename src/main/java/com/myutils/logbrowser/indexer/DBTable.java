@@ -20,7 +20,6 @@ public abstract class DBTable {
     private static final org.apache.logging.log4j.Logger logger = Main.logger;
     private final SqliteAccessor m_dbAccessor;
     private final ArrayList<ArrayList<String>> idxFields;
-    protected int m_InsertStatementId;
     //    protected Parser m_pParser=null;
     protected TableType m_type = TableType.UNKNOWN;
     private boolean tabCreated = false;
@@ -47,14 +46,6 @@ public abstract class DBTable {
         this(dbaccessor, TableType.UNKNOWN);
     }
     //ID
-
-    static public void setFieldString(PreparedStatement stmt, int i, String ref) throws SQLException {
-        if (ref != null) {
-            stmt.setString(i, ref);
-        } else {
-            stmt.setNull(i, java.sql.Types.CHAR);
-        }
-    }
 
     private void initID()  {
         synchronized (m_dbAccessor) {
@@ -176,9 +167,9 @@ public abstract class DBTable {
 
     public abstract void InitDB();
 
-    public abstract void FinalizeDB() throws Exception;
+    public abstract String getInsert();
 
-    public abstract void AddToDB(Record rec) throws Exception;
+    public abstract void FinalizeDB() throws Exception;
 
     public String StrOrEmpty(String param) {
         if (param == null) {
@@ -199,23 +190,6 @@ public abstract class DBTable {
                 InitDB();
                 tabCreated = true;
             }
-        }
-    }
-
-    protected void setFieldInt(PreparedStatement stmt, int i, Integer ref) throws SQLException {
-        if (ref != null) {
-            stmt.setInt(i, ref);
-        } else {
-//            stmt.setInt(i, 0);
-            stmt.setNull(i, java.sql.Types.INTEGER);
-        }
-    }
-
-    protected void setFieldLong(PreparedStatement stmt, int i, Long ref) throws SQLException {
-        if (ref != null) {
-            stmt.setLong(i, ref);
-        } else {
-            stmt.setNull(i, java.sql.Types.BIGINT);
         }
     }
 

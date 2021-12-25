@@ -1,5 +1,8 @@
 package com.myutils.logbrowser.indexer;
 
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 
 /**
@@ -35,6 +38,25 @@ public class StSRequestHistoryMessage extends Message {
 
     public String GetAssocRequestID() {
         return GetHeaderValue("'ASSOC_REQ_ID'");
+    }
+
+    @Override
+    public boolean fillStat(PreparedStatement stmt) throws SQLException {
+        setFieldString(stmt, 1, GetRequestID());
+        setFieldString(stmt, 2, GetRequestUserID());
+        setFieldString(stmt, 3, GetAssocRequestID());
+        setFieldInt(stmt, 4, Main.getRef(ReferenceType.App, GetName()));
+        setFieldString(stmt, 5, GetHeaderValue("CLUID"));
+        stmt.setTimestamp(6, new Timestamp(GetAdjustedUsecTime()));
+        setFieldInt(stmt, 7, Main.getRef(ReferenceType.StatEvent, GetMessageName()));
+        setFieldInt(stmt, 8, getFileID());
+        stmt.setLong(9, getM_fileOffset());
+        stmt.setLong(10, getFileBytes());
+        setFieldInt(stmt, 11, 0);
+        setFieldInt(stmt, 12, getM_line());
+        return true;
+
+
     }
 
 //    public static String InitDB(DBAccessor accessor, int statementId) {

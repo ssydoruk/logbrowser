@@ -5,6 +5,9 @@
  */
 package com.myutils.logbrowser.indexer;
 
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -81,4 +84,22 @@ public class OCSIxn extends Message {
         return ret;
     }
 
+    @Override
+    public boolean fillStat(PreparedStatement stmt) throws SQLException {
+        stmt.setTimestamp(1, new Timestamp(GetAdjustedUsecTime()));
+        stmt.setInt(2, getFileID());
+        stmt.setLong(3, getM_fileOffset());
+        stmt.setLong(4, getM_FileBytes());
+        stmt.setLong(5, getM_line());
+
+        setFieldInt(stmt, 6, Main.getRef(ReferenceType.TEvent, GetMessageName()));
+        setFieldInt(stmt, 7, Main.getRef(ReferenceType.IxnID, GetIxnID()));
+        setFieldInt(stmt, 8, Main.getRef(ReferenceType.IxnMedia, GetMedia()));
+        setFieldInt(stmt, 9, Main.getRef(ReferenceType.DN, cleanDN(GetIxnQueue())));
+        setFieldInt(stmt, 10, Main.getRef(ReferenceType.DN, cleanDN(GetOutPhone())));
+        stmt.setLong(11, getRecHandle());
+        stmt.setLong(12, getM_refID());
+        stmt.setLong(13, getChainID());
+        return true;
+    }
 }

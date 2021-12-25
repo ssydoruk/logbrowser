@@ -69,7 +69,12 @@ public class ORSTable extends DBTable {
                 + ",ANIID integer"
                 + ");";
         getM_dbAccessor().runQuery(query);
-        m_InsertStatementId = getM_dbAccessor().PrepareStatement("INSERT INTO " + getTabName() + " VALUES(NULL,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);");
+    }
+
+    @Override
+    public String getInsert() {
+        return "INSERT INTO " + getTabName() + " VALUES(NULL,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);";
+
     }
 
     /**
@@ -158,43 +163,6 @@ public class ORSTable extends DBTable {
 //        createIndex("ConnectionIDID");
 //        createIndex("sourceid");
 
-    }
-
-    @Override
-    public void AddToDB(Record rec) throws SQLException {
-        ORSMessage orsRec = (ORSMessage) rec;
-        getM_dbAccessor().addToDB(m_InsertStatementId, new IFillStatement() {
-            @Override
-            public void fillStatement(PreparedStatement stmt) throws SQLException{
-            stmt.setTimestamp(1, new Timestamp(orsRec.GetAdjustedUsecTime()));
-
-            setFieldInt(stmt, 2, Main.getRef(ReferenceType.TEvent, orsRec.GetMessageName()));
-            setFieldInt(stmt, 3, Main.getRef(ReferenceType.DN, rec.cleanDN(orsRec.getM_ThisDN())));
-            setFieldInt(stmt, 4, Main.getRef(ReferenceType.DN, rec.cleanDN(orsRec.getAttribute("AttributeOtherDN"))));
-            setFieldInt(stmt, 5, Main.getRef(ReferenceType.Agent, orsRec.getHeaderTrim("AttributeAgentID")));
-
-            setFieldInt(stmt, 6, Main.getRef(ReferenceType.ConnID, orsRec.GetConnID()));
-            setFieldInt(stmt, 7, Main.getRef(ReferenceType.ConnID, orsRec.getAttributeTrim("AttributeTransferConnID")));
-            setFieldInt(stmt, 8, orsRec.getM_refID());
-            stmt.setBoolean(9, orsRec.isInbound());
-            setFieldInt(stmt, 10, rec.getFileID());
-            stmt.setLong(11, orsRec.getM_fileOffset());
-            stmt.setLong(12, orsRec.getFileBytes());
-            stmt.setInt(13, 0);
-            stmt.setInt(14, orsRec.getM_line());
-            setFieldInt(stmt, 15, Main.getRef(ReferenceType.UUID, StripQuotes(orsRec.getAttributeTrim("AttributeCallUUID", 32))));
-            setFieldLong(stmt, 16, orsRec.getAttributeHex("AttributeEventSequenceNumber"));
-            setFieldInt(stmt, 17, Main.getRef(ReferenceType.App, orsRec.getM_TserverSRC()));
-            stmt.setBoolean(18, orsRec.isIsTServerReq());
-            setFieldInt(stmt, 19, Main.getRef(ReferenceType.TLIBERROR, orsRec.getErrorMessage(orsRec.GetMessageName())));
-            setFieldInt(stmt, 20, Main.getRef(ReferenceType.TLIBATTR1, orsRec.getAttr1()));
-            setFieldInt(stmt, 21, Main.getRef(ReferenceType.TLIBATTR2, orsRec.getAttr2()));
-            setFieldInt(stmt, 22, orsRec.getORSCallID());
-            setFieldInt(stmt, 23, Main.getRef(ReferenceType.DN, rec.cleanDN(orsRec.getDNIS())));
-            setFieldInt(stmt, 24, Main.getRef(ReferenceType.DN, rec.cleanDN(orsRec.getANI())));
-
-            }
-        });
     }
 
 

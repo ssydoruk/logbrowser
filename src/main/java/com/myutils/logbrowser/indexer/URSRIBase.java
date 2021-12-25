@@ -61,16 +61,16 @@ public abstract class URSRIBase extends Message {
         return buf;
     }
 
-    static void setTableValues(int baseRecNo, PreparedStatement stmt, URSRIBase rec, DBTable tab) throws SQLException {
-        ArrayList<Pair<String, String>> arr = rec.getAttrs();
+    void setTableValues(int baseRecNo, PreparedStatement stmt) throws SQLException {
+        ArrayList<Pair<String, String>> arr = getAttrs();
         for (int i = 0; i < URSRIBase.MAX_WEB_PARAMS; i++) {
             if (arr != null && i < arr.size()) {
-                tab.setFieldInt(stmt, baseRecNo + i * 2, Main.getRef(ReferenceType.Misc, arr.get(i).getKey()));
-                tab.setFieldInt(stmt, baseRecNo + i * 2 + 1, Main.getRef(ReferenceType.Misc, arr.get(i).getValue()));
+                setFieldInt(stmt, baseRecNo + i * 2, Main.getRef(ReferenceType.Misc, arr.get(i).getKey()));
+                setFieldInt(stmt, baseRecNo + i * 2 + 1, Main.getRef(ReferenceType.Misc, arr.get(i).getValue()));
 
             } else {
-                tab.setFieldInt(stmt, baseRecNo + i * 2, null);
-                tab.setFieldInt(stmt, baseRecNo + i * 2 + 1, null);
+                setFieldInt(stmt, baseRecNo + i * 2, null);
+                setFieldInt(stmt, baseRecNo + i * 2 + 1, null);
 
             }
         }

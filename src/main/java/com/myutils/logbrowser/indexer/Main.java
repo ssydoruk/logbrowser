@@ -328,7 +328,7 @@ public class Main {
                     lines = parser.ParseFrom(parsingInput, 0, 0, fileInfo);
                     parser.doneParsingFile();
                     fileInfo.setFileEndTime(parser.getLastTimeStamp());
-                    m_FileInfoTable.AddToDB(fileInfo);
+                    parser.addToDB(fileInfo);
                     Main.getMain().getProcessedFiles().put(fileInfo.getLogFileName(),
                             new ProcessedFiles(fileInfo.getLogFileName(), fileInfo.getRecordID(),
                                     fileInfo.getSize()));

@@ -405,7 +405,7 @@ public class GMSParser extends Parser {
                     GenesysMsg lastLogMsg = getLastLogMsg();
                     if (lastLogMsg != null) {
                         if (!lastLogMsg.isSavedToDB()) {
-                            lastLogMsg.AddToDB(m_tables);
+                            addToDB(lastLogMsg);
                         }
                     } else {
                         logger.info("Not parsed l:" + m_CurrentLine + " " + str);
@@ -532,8 +532,7 @@ public class GMSParser extends Parser {
             Main.logger.error("l:" + m_CurrentLine + " - " + "new ORS request [" + d.orig + "] while there is opened ORS request [" + req + "] without prior response");
             try {
                 if (req != null) {
-                    req.AddToDB(m_tables);
-
+                    addToDB(req);
                 }
             } catch (Exception ex) {
                 logger.error("fatal: ", ex);
@@ -590,9 +589,9 @@ public class GMSParser extends Parser {
 
         try {
             if (msgReq != null) {
-                msgReq.AddToDB(m_tables);
+                addToDB(msgReq);
             }
-            msgResp.AddToDB(m_tables);
+            addToDB(msgResp);
 
         } catch (Exception ex) {
             logger.error("fatal: ", ex);
@@ -707,6 +706,23 @@ public class GMSParser extends Parser {
             super(t, fileID);
         }
 
+        @Override
+        public boolean fillStat(PreparedStatement stmt) throws SQLException {
+            stmt.setTimestamp(1, new Timestamp(GetAdjustedUsecTime()));
+            stmt.setInt(2, getFileID());
+            stmt.setLong(3, getM_fileOffset());
+            stmt.setLong(4, getM_FileBytes());
+            stmt.setLong(5, getM_line());
+
+            setFieldInt(stmt, 6, Main.getRef(ReferenceType.App, getSsApp()));
+            setFieldInt(stmt, 7, Main.getRef(ReferenceType.Host, getSsHost()));
+            setFieldInt(stmt, 8, getSsPort());
+            setFieldInt(stmt, 9, Main.getRef(ReferenceType.TEvent, getSsEvent()));
+            setFieldLong(stmt, 10, getReqID());
+            setFieldString(stmt, 11, getStringValue());
+return true;
+        }
+
         private GMSStatServerMsg( int fileID) {
             this(TableType.GMSStatServerMessage, fileID);
         }
@@ -777,7 +793,11 @@ public class GMSParser extends Parser {
                     + ");";
             getM_dbAccessor().runQuery(query);
 
-            m_InsertStatementId = getM_dbAccessor().PrepareStatement("INSERT INTO " + getTabName() + " VALUES(NULL,?,?,?,?,?"
+        }
+
+        @Override
+        public String getInsert() {
+            return "INSERT INTO " + getTabName() + " VALUES(NULL,?,?,?,?,?"
                     /*standard first*/
                     + ",?"
                     + ",?"
@@ -785,8 +805,7 @@ public class GMSParser extends Parser {
                     + ",?"
                     + ",?"
                     + ",?"
-                    + ");"
-            );
+                    + ");"            ;
 
         }
 
@@ -798,29 +817,6 @@ public class GMSParser extends Parser {
             createIndexes();
         }
 
-        @Override
-        public void AddToDB(Record _rec) throws SQLException {
-            GMSStatServerMsg rec = (GMSStatServerMsg) _rec;
-            if (!rec.isCorruptMessage()) {
-                getM_dbAccessor().addToDB(m_InsertStatementId, new IFillStatement() {
-                    @Override
-                    public void fillStatement(PreparedStatement stmt) throws SQLException {
-                        stmt.setTimestamp(1, new Timestamp(rec.GetAdjustedUsecTime()));
-                        stmt.setInt(2, rec.getFileID());
-                        stmt.setLong(3, rec.getM_fileOffset());
-                        stmt.setLong(4, rec.getM_FileBytes());
-                        stmt.setLong(5, rec.getM_line());
-
-                        setFieldInt(stmt, 6, Main.getRef(ReferenceType.App, rec.getSsApp()));
-                        setFieldInt(stmt, 7, Main.getRef(ReferenceType.Host, rec.getSsHost()));
-                        setFieldInt(stmt, 8, rec.getSsPort());
-                        setFieldInt(stmt, 9, Main.getRef(ReferenceType.TEvent, rec.getSsEvent()));
-                        setFieldLong(stmt, 10, rec.getReqID());
-                        setFieldString(stmt, 11, rec.getStringValue());
-                    }
-                });
-            }
-        }
     }
 //</editor-fold> 
 
@@ -894,6 +890,44 @@ public class GMSParser extends Parser {
             }
         }
 
+        @Override
+        public boolean fillStat(PreparedStatement stmt) throws SQLException {
+            stmt.setTimestamp(1, new Timestamp(GetAdjustedUsecTime()));
+            stmt.setInt(2, getFileID());
+            stmt.setLong(3, getM_fileOffset());
+            stmt.setLong(4, getM_FileBytes());
+            stmt.setLong(5, getM_line());
+
+            setFieldInt(stmt, 6, Main.getRef(ReferenceType.HTTPURL, getURL()));
+            stmt.setBoolean(7, isResponse());
+            setFieldInt(stmt, 8, getWebReqID());
+
+            List<Pair<String, String>> allParams = getAllParams();
+            int baseRecNo = 9;
+            for (int i = 0; i < MAX_WEB_PARAMS; i++) {
+                Pair<String, String> get = null;
+                String val = null;
+                if (i < allParams.size()) {
+                    get = allParams.get(i);
+                    if (get != null) {
+                        val = Utils.Util.StripQuotes(get.getValue());
+                        if (StringUtils.equalsIgnoreCase(val, "null")) {
+                            val = null;
+                        }
+                    }
+                }
+
+                if (val != null) {
+                    setFieldInt(stmt, baseRecNo + i * 2, Main.getRef(ReferenceType.Misc, get.getKey()));
+                    setFieldInt(stmt, baseRecNo + i * 2 + 1, Main.getRef(ReferenceType.Misc, val));
+                } else {
+                    setFieldInt(stmt, baseRecNo + i * 2, null);
+                    setFieldInt(stmt, baseRecNo + i * 2 + 1, null);
+                }
+
+            }
+            return true;
+        }
     }
 
     private class GMSWebClientMsgTable extends DBTable {
@@ -937,20 +971,25 @@ public class GMSParser extends Parser {
                     + ");";
             getM_dbAccessor().runQuery(query);
 
-            buf = new StringBuilder();
+
+
+        }
+
+        @Override
+        public String getInsert() {
+            StringBuilder buf = new StringBuilder();
             for (int i = 1; i <= MAX_WEB_PARAMS; i++) {
                 buf.append(",?,?");
             }
 
-            m_InsertStatementId = getM_dbAccessor().PrepareStatement("INSERT INTO " + getTabName() + " VALUES(NULL,?,?,?,?,?"
+            return "INSERT INTO " + getTabName() + " VALUES(NULL,?,?,?,?,?"
                     /*standard first*/
                     + ",?"
                     + ",?"
                     + ",?"
                     + buf
                     + ");"
-            );
-
+            ;
         }
 
         /**
@@ -959,50 +998,6 @@ public class GMSParser extends Parser {
         @Override
         public void FinalizeDB() throws Exception {
             createIndexes();
-        }
-
-        @Override
-        public void AddToDB(Record _rec) throws SQLException {
-            GMSWebClientMsg rec = (GMSWebClientMsg) _rec;
-            getM_dbAccessor().addToDB(m_InsertStatementId, new IFillStatement() {
-                @Override
-                public void fillStatement(PreparedStatement stmt) throws SQLException {
-                    stmt.setTimestamp(1, new Timestamp(rec.GetAdjustedUsecTime()));
-                    stmt.setInt(2, rec.getFileID());
-                    stmt.setLong(3, rec.getM_fileOffset());
-                    stmt.setLong(4, rec.getM_FileBytes());
-                    stmt.setLong(5, rec.getM_line());
-
-                    setFieldInt(stmt, 6, Main.getRef(ReferenceType.HTTPURL, rec.getURL()));
-                    stmt.setBoolean(7, rec.isResponse());
-                    setFieldInt(stmt, 8, rec.getWebReqID());
-
-                    List<Pair<String, String>> allParams = rec.getAllParams();
-                    int baseRecNo = 9;
-                    for (int i = 0; i < MAX_WEB_PARAMS; i++) {
-                        Pair<String, String> get = null;
-                        String val = null;
-                        if (i < allParams.size()) {
-                            get = allParams.get(i);
-                            if (get != null) {
-                                val = Utils.Util.StripQuotes(get.getValue());
-                                if (StringUtils.equalsIgnoreCase(val, "null")) {
-                                    val = null;
-                                }
-                            }
-                        }
-
-                        if (val != null) {
-                            setFieldInt(stmt, baseRecNo + i * 2, Main.getRef(ReferenceType.Misc, get.getKey()));
-                            setFieldInt(stmt, baseRecNo + i * 2 + 1, Main.getRef(ReferenceType.Misc, val));
-                        } else {
-                            setFieldInt(stmt, baseRecNo + i * 2, null);
-                            setFieldInt(stmt, baseRecNo + i * 2 + 1, null);
-                        }
-
-                    }
-                }
-            });
         }
 
 

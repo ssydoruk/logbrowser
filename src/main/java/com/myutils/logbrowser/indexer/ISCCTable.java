@@ -50,47 +50,25 @@ public class ISCCTable extends DBTable {
                 + ",otherConnectionIDID int"
                 + ");";
         getM_dbAccessor().runQuery(query);
-        m_InsertStatementId = getM_dbAccessor().PrepareStatement("INSERT INTO " + getTabName() + " VALUES(NULL,?,?,?,?,?,?,?,?,?,?"
-                + ",?"
-                + ",?"
-                + ",?"
-                + ",?"
-                + ",?"
-                + ");");
 
+
+    }
+
+    @Override
+    public String getInsert() {
+        return "INSERT INTO " + getTabName() + " VALUES(NULL,?,?,?,?,?,?,?,?,?,?"
+                + ",?"
+                + ",?"
+                + ",?"
+                + ",?"
+                + ",?"
+                + ");";
     }
 
     @Override
     public void FinalizeDB() {
         createIndexes();
     }
-
-    @Override
-    public void AddToDB(Record rec) throws SQLException {
-        IsccMessage theRec = (IsccMessage) rec;
-         getM_dbAccessor().addToDB(m_InsertStatementId, new IFillStatement() {
-                @Override
-                public void fillStatement(PreparedStatement stmt) throws SQLException{
-            stmt.setTimestamp(1, new Timestamp(theRec.GetAdjustedUsecTime()));
-            setFieldInt(stmt, 2, Main.getRef(ReferenceType.ISCCEvent, theRec.GetMessageName()));
-            setFieldInt(stmt, 3, Main.getRef(ReferenceType.DN, rec.cleanDN(theRec.getThisDN())));
-            setFieldInt(stmt, 4, Main.getRef(ReferenceType.DN, rec.cleanDN(theRec.getOtherDN())));
-            setFieldInt(stmt, 5, Main.getRef(ReferenceType.ConnID, theRec.GetConnID()));
-            stmt.setLong(6, theRec.getRefID());
-            stmt.setBoolean(7, theRec.isInbound());
-            stmt.setInt(8, rec.getFileID());
-            stmt.setLong(9, theRec.getM_fileOffset());
-            stmt.setLong(10, theRec.getFileBytes());
-            stmt.setInt(11, theRec.getM_handlerId());
-            stmt.setInt(12, theRec.getM_line());
-            setFieldInt(stmt, 13, Main.getRef(ReferenceType.App, theRec.GetSrcApp()));
-            setFieldInt(stmt, 14, Main.getRef(ReferenceType.Switch, theRec.GetSrcSwitch()));
-            setFieldInt(stmt, 15, Main.getRef(ReferenceType.ConnID, theRec.GetOtherConnID()));
-
-                }
-         });
-    }
-
 
 
 }

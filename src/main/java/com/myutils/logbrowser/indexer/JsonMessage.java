@@ -7,6 +7,10 @@ package com.myutils.logbrowser.indexer;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.Timestamp;
+
 /**
  * @author ssydoruk
  */
@@ -22,6 +26,26 @@ public class JsonMessage extends SIPServerBaseMessage {
     @Override
     public String toString() {
         return "JsonMessage{" + "m_contents=" + m_contents + "m_jsonId=" + getRecordID() + '}' + super.toString();
+    }
+
+    @Override
+    public boolean fillStat(PreparedStatement stmt) throws SQLException {
+        stmt.setInt(1, getRecordID());
+
+        stmt.setTimestamp(2, new Timestamp(GetAdjustedUsecTime()));
+        stmt.setBoolean(3, isInbound());
+        setFieldString(stmt, 4, GetOrigUri());
+        setFieldInt(stmt, 5, Main.getRef(ReferenceType.SIPURI, GetOrigUri()));
+        setFieldInt(stmt, 6, Main.getRef(ReferenceType.SIPURI, GetDestUri()));
+        stmt.setInt(7, GetSipsId());
+        stmt.setInt(8, getFileID());
+        stmt.setLong(9, getM_fileOffset());
+        stmt.setLong(10, getFileBytes());
+        stmt.setInt(11, getRecordID());
+        stmt.setInt(12, getM_line());
+        stmt.setInt(13, getHanglerID());
+        return true;
+
     }
 
     public String GetOrigUri() {

@@ -52,7 +52,12 @@ public class OCSIxnTable extends DBTable {
                 + ",ChainID INTEGER"
                 + ");";
         getM_dbAccessor().runQuery(query);
-        m_InsertStatementId = getM_dbAccessor().PrepareStatement("INSERT INTO OCSIxn VALUES(NULL,?,?,?,?,?"
+
+    }
+
+    @Override
+    public String getInsert() {
+        return "INSERT INTO OCSIxn VALUES(NULL,?,?,?,?,?"
                 /*standard first*/
                 + ",?"
                 + ",?"
@@ -62,8 +67,7 @@ public class OCSIxnTable extends DBTable {
                 + ",?"
                 + ",?"
                 + ",?"
-                + ");");
-
+                + ");";
     }
 
     /**
@@ -81,30 +85,6 @@ public class OCSIxnTable extends DBTable {
         getM_dbAccessor().runQuery("create index if not exists OCSIxnRecHandle  on OCSIxn (RecHandle);");
         getM_dbAccessor().runQuery("create index if not exists OCSIxnRefId  on OCSIxn (RefId);");
         getM_dbAccessor().runQuery("create index if not exists OCSIxnChainID  on OCSIxn (ChainID);");
-    }
-
-    @Override
-    public void AddToDB(Record _rec) throws SQLException {
-        OCSIxn rec = (OCSIxn) _rec;
-        getM_dbAccessor().addToDB(m_InsertStatementId, new IFillStatement() {
-            @Override
-            public void fillStatement(PreparedStatement stmt) throws SQLException{
-            stmt.setTimestamp(1, new Timestamp(rec.GetAdjustedUsecTime()));
-            stmt.setInt(2, rec.getFileID());
-            stmt.setLong(3, rec.getM_fileOffset());
-            stmt.setLong(4, rec.getM_FileBytes());
-            stmt.setLong(5, rec.getM_line());
-
-            setFieldInt(stmt, 6, Main.getRef(ReferenceType.TEvent, rec.GetMessageName()));
-            setFieldInt(stmt, 7, Main.getRef(ReferenceType.IxnID, rec.GetIxnID()));
-            setFieldInt(stmt, 8, Main.getRef(ReferenceType.IxnMedia, rec.GetMedia()));
-            setFieldInt(stmt, 9, Main.getRef(ReferenceType.DN, rec.cleanDN(rec.GetIxnQueue())));
-            setFieldInt(stmt, 10, Main.getRef(ReferenceType.DN, rec.cleanDN(rec.GetOutPhone())));
-            stmt.setLong(11, rec.getRecHandle());
-            stmt.setLong(12, rec.getM_refID());
-            stmt.setLong(13, rec.getChainID());
-            }
-        });
     }
 
 

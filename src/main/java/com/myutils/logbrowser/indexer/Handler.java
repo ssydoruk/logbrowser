@@ -4,7 +4,8 @@
  */
 package com.myutils.logbrowser.indexer;
 
-import java.util.concurrent.atomic.AtomicInteger;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 
 /**
  * @author ssydoruk
@@ -21,6 +22,15 @@ public class Handler extends Record {
     @Override
     public String toString() {
         return "Handler{" + "m_text=" + m_text + "m_handlerId=" + getRecordID() + '}' + super.toString();
+    }
+
+    @Override
+    public boolean fillStat(PreparedStatement stmt) throws SQLException {
+        String m_text = getM_text();
+
+        stmt.setInt(1, Main.getRef(ReferenceType.HANDLER, m_text));
+        stmt.setInt(2, getFileID());
+        return true;
     }
 
     public String getM_text() {

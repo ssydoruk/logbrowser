@@ -60,7 +60,13 @@ public class OrsHTTPTable extends DBTable {
                 + ",httpresponse bigint"
                 + ");";
         getM_dbAccessor().runQuery(query);
-        m_InsertStatementId = getM_dbAccessor().PrepareStatement("INSERT INTO orshttp VALUES(NULL,?,?,?,?,?"
+
+
+    }
+
+    @Override
+    public String getInsert() {
+        return "INSERT INTO orshttp VALUES(NULL,?,?,?,?,?"
                 /*standard first*/
                 + ",?"
                 + ",?"
@@ -73,8 +79,7 @@ public class OrsHTTPTable extends DBTable {
                 + ",?"
                 + ",?"
                 + ",?"
-                + ");");
-
+                + ");";
     }
 
     /**
@@ -85,31 +90,7 @@ public class OrsHTTPTable extends DBTable {
         createIndexes();
     }
 
-    @Override
-        public void AddToDB(Record _rec) throws SQLException {
-        OrsHTTP rec = (OrsHTTP) _rec;
-        getM_dbAccessor().addToDB(m_InsertStatementId, new IFillStatement() {
-            @Override
-            public void fillStatement(PreparedStatement stmt) throws SQLException{            stmt.setTimestamp(1, new Timestamp(rec.GetAdjustedUsecTime()));
-            stmt.setInt(2, rec.getFileID());
-            stmt.setLong(3, rec.getM_fileOffset());
-            stmt.setLong(4, rec.getM_FileBytes());
-            stmt.setLong(5, rec.getM_line());
 
-            stmt.setInt(6, rec.getSocket());
-            stmt.setInt(7, rec.getHTTPBytes());
-            setFieldInt(stmt, 8, Main.getRef(ReferenceType.IP, rec.GetPeerIp()));
-            setFieldInt(stmt, 9, Main.getRef(ReferenceType.ORSSID, rec.getSID()));
-            setFieldInt(stmt, 10, Main.getRef(ReferenceType.ORSNS, rec.getNameSpace()));
-            stmt.setBoolean(11, rec.isInbound());
-            setFieldInt(stmt, 12, Main.getRef(ReferenceType.GMSService, rec.getGMSService()));
-            setFieldInt(stmt, 13, Main.getRef(ReferenceType.HTTPRequest, rec.getHTTPRequest()));
-            setFieldInt(stmt, 14, Main.getRef(ReferenceType.GMSMisc, rec.getParam1()));
-            setFieldInt(stmt, 15, Main.getRef(ReferenceType.GMSMisc, rec.getParam2()));
-            setFieldLong(stmt, 16, rec.getHTTPResponseID());
-            }
-        });
-    }
 
 
 }

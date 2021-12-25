@@ -42,13 +42,17 @@ public class OCSClientTable extends DBTable {
                 + ",GroupDBID INTEGER"
                 + ");";
         getM_dbAccessor().runQuery(query);
-        m_InsertStatementId = getM_dbAccessor().PrepareStatement("INSERT INTO OCSClient VALUES(NULL,?,?,?,?,?"
+
+    }
+
+    @Override
+    public String getInsert() {
+        return "INSERT INTO OCSClient VALUES(NULL,?,?,?,?,?"
                 /*standard first*/
                 + ",?"
                 + ",?"
                 + ",?"
-                + ");");
-
+                + ");";
     }
 
     /**
@@ -63,24 +67,7 @@ public class OCSClientTable extends DBTable {
         getM_dbAccessor().runQuery("create index if not exists OCSClientunixtime on  OCSClient (time);");
     }
 
-    @Override
-        public void AddToDB(Record _rec) throws SQLException {
-        OCSClient rec = (OCSClient) _rec;
-         getM_dbAccessor().addToDB(m_InsertStatementId, new IFillStatement() {
-                @Override
-                public void fillStatement(PreparedStatement stmt) throws SQLException{
-            stmt.setTimestamp(1, new Timestamp(rec.GetAdjustedUsecTime()));
-            stmt.setInt(2, rec.getFileID());
-            stmt.setLong(3, rec.getM_fileOffset());
-            stmt.setLong(4, rec.getM_FileBytes());
-            stmt.setLong(5, rec.getM_line());
 
-            setFieldInt(stmt, 6, Main.getRef(ReferenceType.OCSClientRequest, rec.GetMessageName()));
-            stmt.setInt(7, rec.GetCampaignDBID());
-            stmt.setInt(8, rec.GetGroupDBID());
-                        }
-        });
-    }
 
 
 

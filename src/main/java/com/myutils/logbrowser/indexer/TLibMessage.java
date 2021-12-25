@@ -6,6 +6,9 @@ package com.myutils.logbrowser.indexer;
 
 import org.apache.commons.lang3.StringUtils;
 
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -116,6 +119,49 @@ public class TLibMessage extends SIPServerBaseMessage {
     @Override
     public String toString() {
         return "TLibMessage{" + "m_MessageName=" + m_MessageName + ", m_source=" + m_source + '}' + super.toString();
+    }
+
+    @Override
+    public boolean fillStat(PreparedStatement stmt) throws SQLException {
+        stmt.setInt(1, getRecordID());
+        stmt.setTimestamp(2, new Timestamp(GetAdjustedUsecTime()));
+
+        String agentID = NoQuotes(getAttributeTrim("AttributeAgentID"));
+        String thisDN = cleanDN(getThisDN());
+        if (StringUtils.equals(thisDN, agentID)) {
+            agentID = null;
+        }
+
+        setFieldInt(stmt, 3, Main.getRef(ReferenceType.TEvent, GetMessageName()));
+        setFieldInt(stmt, 4, Main.getRef(ReferenceType.DN, thisDN));
+        setFieldInt(stmt, 5, Main.getRef(ReferenceType.DN, cleanDN(getAttributeDN("AttributeOtherDN"))));
+        setFieldInt(stmt, 6, Main.getRef(ReferenceType.Agent, agentID));
+        setFieldInt(stmt, 7, Main.getRef(ReferenceType.DN, cleanDN((getAttribute("AttributeANI")))));
+        setFieldInt(stmt, 8, Main.getRef(ReferenceType.ConnID, getConnID()));
+        setFieldInt(stmt, 9, Main.getRef(ReferenceType.ConnID, GetTransferConnID()));
+        setFieldLong(stmt, 10, getRefID());
+        stmt.setBoolean(11, isInbound());
+        setFieldInt(stmt, 12, Main.getRef(ReferenceType.App, getM_source()));
+        setFieldString(stmt, 13, getAttributeTrim("AttributePrivateMsgID"));
+        setFieldInt(stmt, 14, Main.getRef(ReferenceType.Switch, NoQuotes(getAttributeTrim("AttributeLocation"))));
+        setFieldInt(stmt, 15, getFileID());
+        setFieldLong(stmt, 16, getM_fileOffset());
+        setFieldLong(stmt, 17, getFileBytes());
+        setFieldInt(stmt, 18, (isM_handlerInProgress() ? getM_handlerId() : 0));
+        Main.logger.trace("m_handlerId:" + getM_handlerId() + " m_handlerInProgress :" + isM_handlerInProgress());
+
+        setFieldInt(stmt, 19, getM_line());
+        setFieldLong(stmt, 20, getSeqNo());
+        setFieldInt(stmt, 21, Main.getRef(ReferenceType.UUID, getUUID()));
+        setFieldLong(stmt, 22, getErrorCode());
+        setFieldLong(stmt, 23, getAttributeLong("AttributeCallType"));
+        setFieldInt(stmt, 24, Main.getRef(ReferenceType.TLIBERROR, getErrorMessage(GetMessageName())));
+        setFieldInt(stmt, 25, Main.getRef(ReferenceType.TLIBATTR1, getAttr1()));
+        setFieldInt(stmt, 26, Main.getRef(ReferenceType.TLIBATTR2, getAttr2()));
+        setFieldInt(stmt, 27, Main.getRef(ReferenceType.DN, cleanDN(getAttributeDN("AttributeDNIS"))));
+        setFieldInt(stmt, 28, Main.getRef(ReferenceType.Place, getAttributeDN("AttributePlace")));
+        return true;
+
     }
 
     public String getM_source() {

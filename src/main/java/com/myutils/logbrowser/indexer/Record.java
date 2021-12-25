@@ -6,6 +6,8 @@ package com.myutils.logbrowser.indexer;
 
 import org.apache.commons.lang3.StringUtils;
 
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -32,6 +34,7 @@ public abstract class Record implements Cloneable {
     //    protected Date m_Timestamp = null;
     private DateParsed m_TimestampDP = null;
     private int recordID;
+
     public Record(TableType type, int fileID) {
         this.fileID = fileID;
         m_type = type;
@@ -176,21 +179,21 @@ public abstract class Record implements Cloneable {
         m_line = line;
     }
 
-    protected void AddToDB(HashMap<TableType, DBTable> m_tables) throws Exception {
-        DBTable tab = m_tables.get(getM_type());
-        if (tab != null) {
-            tab.checkInit();
-            try {
-                Main.logger.trace("Adding to db " + this);
-                tab.AddToDB(this);
-                tab.recordAdded();
-            } catch (Exception exception) {
-                Main.logger.error("Exception in AddToDB", exception);
-            }
-        } else {
-            throw new Exception("table not found for " + getM_type().toString());
-        }
-    }
+//    protected void AddToDB(HashMap<TableType, DBTable> m_tables) throws Exception {
+//        DBTable tab = m_tables.get(getM_type());
+//        if (tab != null) {
+//            tab.checkInit();
+//            try {
+//                Main.logger.trace("Adding to db " + this);
+//                tab.AddToDB(this);
+//                tab.recordAdded();
+//            } catch (Exception exception) {
+//                Main.logger.error("Exception in AddToDB", exception);
+//            }
+//        } else {
+//            throw new Exception("table not found for " + getM_type().toString());
+//        }
+//    }
 
     /**
      * @return the m_type
@@ -233,8 +236,7 @@ public abstract class Record implements Cloneable {
 
     protected void SetStdFieldsAndAdd(Parser parser) {
         try {
-            SetStdFields(parser);
-            AddToDB(parser.m_tables);
+            parser.SetStdFieldsAndAdd(this);
         } catch (Exception e) {
             Main.logger.error("line " + parser.getLineStarted() + " Not added \"" + getM_type() + "\" record:" + e.getMessage(), e);
             PrintMsg();
@@ -242,4 +244,31 @@ public abstract class Record implements Cloneable {
         }
     }
 
+    protected void setFieldInt(PreparedStatement stmt, int i, Integer ref) throws SQLException {
+        if (ref != null) {
+            stmt.setInt(i, ref);
+        } else {
+//            stmt.setInt(i, 0);
+            stmt.setNull(i, java.sql.Types.INTEGER);
+        }
+    }
+
+    protected void setFieldLong(PreparedStatement stmt, int i, Long ref) throws SQLException {
+        if (ref != null) {
+            stmt.setLong(i, ref);
+        } else {
+            stmt.setNull(i, java.sql.Types.BIGINT);
+        }
+    }
+
+    static public void setFieldString(PreparedStatement stmt, int i, String ref) throws SQLException {
+        if (ref != null) {
+            stmt.setString(i, ref);
+        } else {
+            stmt.setNull(i, java.sql.Types.CHAR);
+        }
+    }
+
+
+    public abstract boolean fillStat(PreparedStatement stmt) throws SQLException;
 }

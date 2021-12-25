@@ -10,6 +10,9 @@ import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
 import org.apache.commons.lang3.StringUtils;
 
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -61,6 +64,25 @@ public final class URSStrategy extends Message {
     @Override
     public String toString() {
         return "URSStrategy{" + "FileLine=" + FileLine + ", ConnID=" + ConnID + ", rest=" + rest + '}';
+    }
+
+    @Override
+    public boolean fillStat(PreparedStatement stmt) throws SQLException {
+        stmt.setTimestamp(1, new Timestamp(GetAdjustedUsecTime()));
+        stmt.setInt(2, getFileID());
+        stmt.setLong(3, getM_fileOffset());
+        stmt.setLong(4, getM_FileBytes());
+        stmt.setLong(5, getM_line());
+
+        setFieldInt(stmt, 6, Main.getRef(ReferenceType.ConnID, GetConnID()));
+        setFieldInt(stmt, 7, Main.getRef(ReferenceType.IxnID, getUUID()));
+        setFieldInt(stmt, 8, Main.getRef(ReferenceType.URSStrategyMsg, getStrategyMsg()));
+        setFieldInt(stmt, 9, Main.getRef(ReferenceType.URSStrategyRef, getStrategyRef1()));
+        setFieldInt(stmt, 10, Main.getRef(ReferenceType.URSStrategyRef, getStrategyRef2()));
+//                setFieldString(stmt,11, getCgMsg());
+
+        return true;
+
     }
 
     String GetConnID() {

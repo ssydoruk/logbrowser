@@ -39,11 +39,15 @@ public class URSCONNIDIxnIDTable extends DBTable {
         getM_dbAccessor().runQuery(query);
 //        accessor.runQuery("create index if not exists ORSsess__HndId_" + m_alias +" on ORSmetr_" + m_alias + " (HandlerId);");
 
-        m_InsertStatementId = getM_dbAccessor().PrepareStatement("INSERT INTO URSConnIDIxnID VALUES(NULL,?,?,?,?,?,"
+    }
+
+    @Override
+    public String getInsert() {
+        return "INSERT INTO URSConnIDIxnID VALUES(NULL,?,?,?,?,?,"
                 /*standard first*/
                 + "?,"
                 + "?"
-                + ");");
+                + ");";
 
     }
 
@@ -51,26 +55,5 @@ public class URSCONNIDIxnIDTable extends DBTable {
     public void FinalizeDB() {
         createIndexes();
     }
-
-    @Override
-        public void AddToDB(Record _rec) throws SQLException {
-
-        URSCONNIDIxnID rec = (URSCONNIDIxnID) _rec;
-         getM_dbAccessor().addToDB(m_InsertStatementId, new IFillStatement() {
-                @Override
-                public void fillStatement(PreparedStatement stmt) throws SQLException{
-            stmt.setTimestamp(1, new Timestamp(rec.GetAdjustedUsecTime()));
-            stmt.setInt(2, rec.getFileID());
-            stmt.setLong(3, rec.getM_fileOffset());
-            stmt.setLong(4, rec.getM_FileBytes());
-            stmt.setLong(5, rec.getM_line());
-
-            setFieldInt(stmt, 6, Main.getRef(ReferenceType.ConnID, rec.getConnID()));
-            setFieldInt(stmt, 7, Main.getRef(ReferenceType.IxnID, rec.getIxnID()));
-                }
-         });
-    }
-
-
 
 }

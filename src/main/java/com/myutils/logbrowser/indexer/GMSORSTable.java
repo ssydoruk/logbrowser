@@ -42,14 +42,18 @@ public class GMSORSTable extends DBTable {
                 + ",isinbound bit"
                 + ");";
         getM_dbAccessor().runQuery(query);
-        m_InsertStatementId = getM_dbAccessor().PrepareStatement("INSERT INTO " + getTabName() + " VALUES(NULL,?,?,?,?,?"
+    }
+
+    @Override
+    public String getInsert() {
+        return "INSERT INTO " + getTabName() + " VALUES(NULL,?,?,?,?,?"
                 /*standard first*/
                 + ",?"
                 + ",?"
                 + ",?"
                 + ",?"
                 + ",?"
-                + ");");
+                + ");";
     }
 
     /**
@@ -59,31 +63,6 @@ public class GMSORSTable extends DBTable {
     public void FinalizeDB() throws Exception {
         createIndexes();
     }
-
-    @Override
-    public void AddToDB(Record rec) throws SQLException {
-        GMSORSMessage gmsRec = (GMSORSMessage) rec;
-        getM_dbAccessor().addToDB(m_InsertStatementId, new IFillStatement() {
-            @Override
-            public void fillStatement(PreparedStatement stmt) throws SQLException{
-
-            stmt.setTimestamp(1, new Timestamp(gmsRec.GetAdjustedUsecTime()));
-            stmt.setInt(2, rec.getFileID());
-            stmt.setLong(3, gmsRec.getM_fileOffset());
-            stmt.setLong(4, gmsRec.getM_FileBytes());
-            stmt.setLong(5, gmsRec.getM_line());
-
-            setFieldInt(stmt, 6, Main.getRef(ReferenceType.GMSService, gmsRec.getGMSSessionID()));
-            setFieldInt(stmt, 7, Main.getRef(ReferenceType.ORSSID, gmsRec.getORSSessionID()));
-            setFieldInt(stmt, 8, Main.getRef(ReferenceType.ConnID, gmsRec.getConnID()));
-            setFieldInt(stmt, 9, Main.getRef(ReferenceType.ORSREQ, gmsRec.getORSReq()));
-            stmt.setBoolean(10, gmsRec.isInbound());
-
-            }
-        });
-    }
-
-
 
 
 }

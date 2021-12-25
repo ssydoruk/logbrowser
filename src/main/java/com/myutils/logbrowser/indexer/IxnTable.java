@@ -60,7 +60,13 @@ public class IxnTable extends DBTable {
                 + ",attr2ID INTEGER"
                 + ");";
         getM_dbAccessor().runQuery(query);
-        m_InsertStatementId = getM_dbAccessor().PrepareStatement("INSERT INTO Ixn VALUES(NULL,?,?,?,?,?"
+
+
+    }
+
+    @Override
+    public String getInsert() {
+        return "INSERT INTO Ixn VALUES(NULL,?,?,?,?,?"
                 /*standard first*/
                 + ",?"
                 + ",?"
@@ -75,8 +81,7 @@ public class IxnTable extends DBTable {
                 + ",?"
                 + ",?"
                 + ",?"
-                + ");");
-
+                + ");";
     }
 
     /**
@@ -86,36 +91,6 @@ public class IxnTable extends DBTable {
     public void FinalizeDB() throws Exception {
         createIndexes();
     }
-
-    @Override
-        public void AddToDB(Record _rec) throws SQLException {
-        Ixn rec = (Ixn) _rec;
-         getM_dbAccessor().addToDB(m_InsertStatementId, new IFillStatement() {
-                @Override
-                public void fillStatement(PreparedStatement stmt) throws SQLException{
-            stmt.setTimestamp(1, new Timestamp(rec.GetAdjustedUsecTime()));
-            stmt.setInt(2, rec.getFileID());
-            stmt.setLong(3, rec.getM_fileOffset());
-            stmt.setLong(4, rec.getM_FileBytes());
-            stmt.setLong(5, rec.getM_line());
-
-            setFieldInt(stmt, 6, Main.getRef(ReferenceType.TEvent, rec.GetMessageName()));
-            setFieldInt(stmt, 7, Main.getRef(ReferenceType.IxnID, rec.GetIxnID()));
-            setFieldInt(stmt, 8, Main.getRef(ReferenceType.IxnMedia, rec.GetMedia()));
-            setFieldInt(stmt, 9, Main.getRef(ReferenceType.DN, rec.cleanDN(rec.GetIxnQueue())));
-            stmt.setLong(10, rec.getM_refID());
-            setFieldInt(stmt, 11, Main.getRef(ReferenceType.ConnID, rec.GetConnID()));
-            stmt.setBoolean(12, rec.isInbound());
-            setFieldInt(stmt, 13, Main.getRef(ReferenceType.IxnID, rec.GetParentIxnID()));
-            setFieldInt(stmt, 14, Main.getRef(ReferenceType.App, rec.GetClient()));
-            setFieldInt(stmt, 15, Main.getRef(ReferenceType.Agent, rec.GetAgent()));
-            setFieldInt(stmt, 16, Main.getRef(ReferenceType.Place, rec.GetPlace()));
-            setFieldInt(stmt, 17, Main.getRef(ReferenceType.TLIBATTR1, rec.getAttr1()));
-            setFieldInt(stmt, 18, Main.getRef(ReferenceType.TLIBATTR2, rec.getAttr2()));
-                        }
-        });
-    }
-
 
 
 }

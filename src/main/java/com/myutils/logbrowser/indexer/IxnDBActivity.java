@@ -5,6 +5,10 @@
  */
 package com.myutils.logbrowser.indexer;
 
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.Timestamp;
+
 public class IxnDBActivity extends Message {
 
     private final String activity;
@@ -34,4 +38,17 @@ public class IxnDBActivity extends Message {
         return ixnid;
     }
 
+    @Override
+    public boolean fillStat(PreparedStatement stmt) throws SQLException {
+        stmt.setTimestamp(1, new Timestamp(GetAdjustedUsecTime()));
+        stmt.setInt(2, getFileID());
+        stmt.setLong(3, getM_fileOffset());
+        stmt.setLong(4, getM_FileBytes());
+        stmt.setLong(5, getM_line());
+
+        setFieldInt(stmt, 6, Main.getRef(ReferenceType.DBActivity, getActivity()));
+        stmt.setInt(7, getReqid());
+        setFieldInt(stmt, 8, Main.getRef(ReferenceType.IxnID, getIxnid()));
+        return true;
+    }
 }

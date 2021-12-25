@@ -1,6 +1,9 @@
 package com.myutils.logbrowser.indexer;
 
 import java.math.BigInteger;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -132,4 +135,24 @@ public class StSTEventMessage extends Message {
         return m_agent;
     }
 
+    @Override
+    public boolean fillStat(PreparedStatement stmt) throws SQLException {
+        stmt.setTimestamp(1, new Timestamp(GetAdjustedUsecTime()));
+        setFieldInt(stmt, 2, Main.getRef(ReferenceType.TEvent, GetMessageName()));
+        setFieldInt(stmt, 3, Main.getRef(ReferenceType.DN, SingleQuotes(getThisDN())));
+        setFieldInt(stmt, 4, Main.getRef(ReferenceType.Switch, getSwitch()));
+        setFieldInt(stmt, 5, Main.getRef(ReferenceType.App, getTServer()));
+        setFieldInt(stmt, 6, Main.getRef(ReferenceType.DN, cleanDN(getAttributeDN("AttributeOtherDN"))));
+        setFieldInt(stmt, 7, Main.getRef(ReferenceType.Agent, getAgent()));
+        setFieldInt(stmt, 8, Main.getRef(ReferenceType.ConnID, GetConnID()));
+        setFieldInt(stmt, 9, Main.getRef(ReferenceType.ConnID, getAttributeTrim("AttributeFirstTransferConnID")));
+        setFieldLong(stmt, 10, getAttributeLong("AttributeReferenceID"));
+        stmt.setInt(11, getFileID());
+        stmt.setLong(12, getM_fileOffset());
+        stmt.setLong(13, getFileBytes());
+        stmt.setInt(14, getM_line());
+        setFieldInt(stmt, 15, null);
+        return true;
+
+    }
 }

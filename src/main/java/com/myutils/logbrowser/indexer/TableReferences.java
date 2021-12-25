@@ -167,9 +167,10 @@ class TableReference {
                         String finalTheKey = theKey.toString();
                         m_accessor.addToDB(m_InsertStatementId, new IFillStatement() {
                             @Override
-                            public void fillStatement(PreparedStatement stmt) throws SQLException {
+                            public boolean fillStatement(PreparedStatement stmt) throws SQLException {
                                 stmt.setInt(1, finalTheID);
-                                DBTable.setFieldString(stmt, 2, finalTheKey);
+                                Record.setFieldString(stmt, 2, finalTheKey);
+                                return true;
                             }
                         });
                         i = 1;
@@ -183,9 +184,10 @@ class TableReference {
                             Main.logger.trace("inserting [" + theID + ":" + entrySet.getKey() + "]");
                             m_accessor.addToDB(m_InsertStatementId, new IFillStatement() {
                                 @Override
-                                public void fillStatement(PreparedStatement stmt) throws SQLException {
+                                public boolean fillStatement(PreparedStatement stmt) throws SQLException {
                                     stmt.setInt(1, theID);
-                                    DBTable.setFieldString(stmt, 2, entrySet.getKey().toString());
+                                    Record.setFieldString(stmt, 2, entrySet.getKey().toString());
+                                    return true;
                                 }
                             });
                             i++;

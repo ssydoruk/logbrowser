@@ -48,7 +48,11 @@ public class GMSPostTable extends DBTable {
                 + ",sourceID int"
                 + ");";
         getM_dbAccessor().runQuery(query);
-        m_InsertStatementId = getM_dbAccessor().PrepareStatement("INSERT INTO " + getTabName() + " VALUES(NULL,?,?,?,?,?"
+    }
+
+    @Override
+    public String getInsert() {
+        return "INSERT INTO " + getTabName() + " VALUES(NULL,?,?,?,?,?"
                 /*standard first*/
                 + ",?"
                 + ",?"
@@ -58,7 +62,7 @@ public class GMSPostTable extends DBTable {
                 + ",?"
                 + ",?"
                 + ",?"
-                + ");");
+                + ");";
     }
 
     /**
@@ -69,31 +73,6 @@ public class GMSPostTable extends DBTable {
         createIndexes();
     }
 
-    @Override
-    public void AddToDB(Record rec) throws SQLException {
-        GMSPostMessage gmsRec = (GMSPostMessage) rec;
-        getM_dbAccessor().addToDB(m_InsertStatementId, new IFillStatement() {
-            @Override
-            public void fillStatement(PreparedStatement stmt) throws SQLException{
-
-            stmt.setTimestamp(1, new Timestamp(gmsRec.GetAdjustedUsecTime()));
-            stmt.setInt(2, rec.getFileID());
-            stmt.setLong(3, gmsRec.getM_fileOffset());
-            stmt.setLong(4, gmsRec.getM_FileBytes());
-            stmt.setLong(5, gmsRec.getM_line());
-
-            setFieldInt(stmt, 6, Main.getRef(ReferenceType.GMSEvent, gmsRec.getEventName()));
-            setFieldInt(stmt, 7, Main.getRef(ReferenceType.GMSCallbackType, gmsRec.CallBackType()));
-            setFieldInt(stmt, 8, Main.getRef(ReferenceType.GMSService, gmsRec.GMSService()));
-            setFieldInt(stmt, 9, Main.getRef(ReferenceType.ORSSID, gmsRec.ORSSessionID()));
-            setFieldInt(stmt, 10, Main.getRef(ReferenceType.DN, rec.cleanDN(gmsRec.getPhone())));
-            stmt.setBoolean(11, gmsRec.isInbound());
-            setFieldInt(stmt, 12, Main.getRef(ReferenceType.ORSREQ, gmsRec.ORSURI()));
-            setFieldInt(stmt, 13, Main.getRef(ReferenceType.IP, gmsRec.getSourceIP()));
-
-            }
-        });
-    }
 
 
 }

@@ -6,6 +6,9 @@ package com.myutils.logbrowser.indexer;
 
 import Utils.Pair;
 
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 
 public class GMSORSMessage extends Message {
@@ -120,4 +123,19 @@ public class GMSORSMessage extends Message {
         }
     }
 
+    @Override
+    public boolean fillStat(PreparedStatement stmt) throws SQLException {
+        stmt.setTimestamp(1, new Timestamp(GetAdjustedUsecTime()));
+        stmt.setInt(2, getFileID());
+        stmt.setLong(3, getM_fileOffset());
+        stmt.setLong(4, getM_FileBytes());
+        stmt.setLong(5, getM_line());
+
+        setFieldInt(stmt, 6, Main.getRef(ReferenceType.GMSService, getGMSSessionID()));
+        setFieldInt(stmt, 7, Main.getRef(ReferenceType.ORSSID, getORSSessionID()));
+        setFieldInt(stmt, 8, Main.getRef(ReferenceType.ConnID, getConnID()));
+        setFieldInt(stmt, 9, Main.getRef(ReferenceType.ORSREQ, getORSReq()));
+        stmt.setBoolean(10, isInbound());
+        return true;
+    }
 }

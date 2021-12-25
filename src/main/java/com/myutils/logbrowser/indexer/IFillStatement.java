@@ -4,5 +4,5 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 public interface IFillStatement {
-    void fillStatement(PreparedStatement stmt) throws SQLException;
+    boolean fillStatement(PreparedStatement stmt) throws SQLException;
 }

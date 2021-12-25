@@ -5,6 +5,9 @@
  */
 package com.myutils.logbrowser.indexer;
 
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -31,7 +34,7 @@ public class OCSDBActivity extends Message {
     private String listName;
 
     public OCSDBActivity(String listDBID, String campaignDBID, String groupDBID, String line, int fileID) {
-        super(TableType.OCSDBActivity,  fileID);
+        super(TableType.OCSDBActivity, fileID);
         this.listDBID = Long.parseLong(listDBID);
         this.campaignDBID = Long.parseLong(campaignDBID);
         this.groupDBID = Long.parseLong(groupDBID);
@@ -124,6 +127,25 @@ public class OCSDBActivity extends Message {
     String getCallingList() {
         parseDB();
         return listName;
+    }
+
+    @Override
+    public boolean fillStat(PreparedStatement stmt) throws SQLException {
+        stmt.setTimestamp(1, new Timestamp(GetAdjustedUsecTime()));
+        stmt.setInt(2, getFileID());
+        stmt.setLong(3, getM_fileOffset());
+        stmt.setLong(4, getM_FileBytes());
+        stmt.setLong(5, getM_line());
+
+        stmt.setLong(6, getListDBID());
+        stmt.setLong(7, getCampaignDBID());
+        stmt.setLong(8, getGroupDBID());
+        stmt.setLong(9, getReqID());
+        stmt.setLong(10, getChainID());
+        setFieldInt(stmt, 11, Main.getRef(ReferenceType.DBRequest, getDBReq()));
+        setFieldInt(stmt, 12, Main.getRef(ReferenceType.App, getDBServer()));
+        setFieldInt(stmt, 13, Main.getRef(ReferenceType.OCSCallList, getCallingList()));
+        return true;
     }
 
     private static class DBAction {

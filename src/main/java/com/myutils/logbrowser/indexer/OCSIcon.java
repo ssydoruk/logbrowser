@@ -5,6 +5,9 @@
  */
 package com.myutils.logbrowser.indexer;
 
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 
 import static Utils.Util.intOrDef;
@@ -114,4 +117,23 @@ public class OCSIcon extends Message {
         return intOrDef(GetHeaderValue("\t\tChID"), (Integer) null);
     }
 
+    @Override
+    public boolean fillStat(PreparedStatement stmt) throws SQLException {
+        stmt.setTimestamp(1, new Timestamp(GetAdjustedUsecTime()));
+        stmt.setInt(2, getFileID());
+        stmt.setLong(3, getM_fileOffset());
+        stmt.setLong(4, getM_FileBytes());
+        stmt.setLong(5, getM_line());
+
+        setFieldInt(stmt, 6, Main.getRef(ReferenceType.OCSIconEvent, getIconEvent()));
+        setFieldInt(stmt, 7, getSwitchDBID());
+        setFieldInt(stmt, 8, getGroupDBID());
+        setFieldInt(stmt, 9, getCampaignDBID());
+        setFieldInt(stmt, 10, getListDBID());
+        setFieldInt(stmt, 11, getChainDBID());
+        setFieldInt(stmt, 12, Main.getRef(ReferenceType.OCSIconCause, getIconCause()));
+        return true;
+
+
+    }
 }

@@ -85,24 +85,28 @@ public class IconMessage extends Message {
         String finalAni = ani;
         accessor.addToDB(m_statementId, new IFillStatement() {
             @Override
-            public void fillStatement(PreparedStatement stmt) throws SQLException{            stmt.setTimestamp(1, new Timestamp(GetAdjustedUsecTime()));
-            DBTable.setFieldString(stmt, 2, GetMessageName());
-            DBTable.setFieldString(stmt, 3, finalThisDN);
-            DBTable.setFieldString(stmt, 4, finalOtherDN);
-            DBTable.setFieldString(stmt, 5, finalAgentID);
-            DBTable.setFieldString(stmt, 6, finalAni);
-            DBTable.setFieldString(stmt, 7, GetConnID());
-            DBTable.setFieldString(stmt, 8, GetTransferConnID());
+            public boolean fillStatement(PreparedStatement stmt) throws SQLException{
+                stmt.setTimestamp(1, new Timestamp(GetAdjustedUsecTime()));
+            Record.setFieldString(stmt, 2, GetMessageName());
+            Record.setFieldString(stmt, 3, finalThisDN);
+            Record.setFieldString(stmt, 4, finalOtherDN);
+            Record.setFieldString(stmt, 5, finalAgentID);
+            Record.setFieldString(stmt, 6, finalAni);
+            Record.setFieldString(stmt, 7, GetConnID());
+            Record.setFieldString(stmt, 8, GetTransferConnID());
             stmt.setInt(9, getFileID());
             stmt.setLong(10, getM_fileOffset());
             stmt.setLong(11, getFileBytes());
             stmt.setInt(12, 0);
             stmt.setInt(13, getM_line());
-
+return false;
             }
         });
     }
 
 
-
+    @Override
+    public boolean fillStat(PreparedStatement stmt) throws SQLException {
+        return false;
+    }
 }

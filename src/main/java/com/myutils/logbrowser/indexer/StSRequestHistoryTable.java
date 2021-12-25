@@ -38,30 +38,11 @@ public class StSRequestHistoryTable extends DBTable {
                 + "HandlerId INT,"
                 + "line INT);";
         getM_dbAccessor().runQuery(query);
-        m_InsertStatementId = getM_dbAccessor().PrepareStatement("INSERT INTO STSREQHISTORY_" + getM_dbAccessor().getM_alias() + " VALUES(NULL,?,?,?,?,?,?,?,?,?,?,?,?);");
     }
 
     @Override
-    public void AddToDB(Record aRec) throws SQLException {
-        StSRequestHistoryMessage theRec = (StSRequestHistoryMessage) aRec;
-        getM_dbAccessor().addToDB(m_InsertStatementId, new IFillStatement() {
-            @Override
-            public void fillStatement(PreparedStatement stmt) throws SQLException{
-            setFieldString(stmt, 1, theRec.GetRequestID());
-            setFieldString(stmt, 2, theRec.GetRequestUserID());
-            setFieldString(stmt, 3, theRec.GetAssocRequestID());
-            setFieldInt(stmt, 4, Main.getRef(ReferenceType.App, theRec.GetName()));
-            setFieldString(stmt, 5, theRec.GetHeaderValue("CLUID"));
-            stmt.setTimestamp(6, new Timestamp(theRec.GetAdjustedUsecTime()));
-            setFieldInt(stmt, 7, Main.getRef(ReferenceType.StatEvent, theRec.GetMessageName()));
-            setFieldInt(stmt, 8, theRec.getFileID());
-            stmt.setLong(9, theRec.getM_fileOffset());
-            stmt.setLong(10, theRec.getFileBytes());
-            setFieldInt(stmt, 11, 0);
-            setFieldInt(stmt, 12, theRec.getM_line());
-
-            }
-        });
+    public String getInsert() {
+        return "INSERT INTO STSREQHISTORY_" + getM_dbAccessor().getM_alias() + " VALUES(NULL,?,?,?,?,?,?,?,?,?,?,?,?);";
     }
 
 

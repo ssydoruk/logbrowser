@@ -322,7 +322,7 @@ public class OCSParser extends Parser {
                         if ((m = regChainID.matcher(s.substring(e))).find()) {
                             msg.setChainID(m.group(1));
                         }
-                        msg.AddToDB(m_tables);
+                        addToDB(msg);
                     } catch (Exception e) {
                         Main.logger.error("Not added OCS DBServer record:" + e.getMessage(), e);
                     }
@@ -794,6 +794,22 @@ public class OCSParser extends Parser {
             return sessionID;
         }
 
+        @Override
+        public boolean fillStat(PreparedStatement stmt) throws SQLException {
+            stmt.setTimestamp(1, new Timestamp(GetAdjustedUsecTime()));
+            stmt.setInt(2, getFileID());
+            stmt.setLong(3, getM_fileOffset());
+            stmt.setLong(4, getM_FileBytes());
+            stmt.setLong(5, getM_line());
+
+            stmt.setInt(6, getSessionID());
+            stmt.setDouble(7, getDensity());
+            stmt.setDouble(8, getA());
+            stmt.setDouble(9, getPredTime());
+            stmt.setDouble(10, getReminder());
+            stmt.setDouble(11, getSentCalls());
+            return true;
+        }
     }
 
     private class OCSPredInfoTable extends DBTable {
@@ -824,7 +840,13 @@ public class OCSParser extends Parser {
                     + ",sentCalls double"
                     + ");";
             getM_dbAccessor().runQuery(query);
-            m_InsertStatementId = getM_dbAccessor().PrepareStatement("INSERT INTO " + getTabName() + " VALUES(NULL,?,?,?,?,?"
+
+
+        }
+
+        @Override
+        public String getInsert() {
+            return "INSERT INTO " + getTabName() + " VALUES(NULL,?,?,?,?,?"
                     /*standard first*/
                     + ",?"
                     + ",?"
@@ -832,8 +854,7 @@ public class OCSParser extends Parser {
                     + ",?"
                     + ",?"
                     + ",?"
-                    + ");");
-
+                    + ");";
         }
 
         /**
@@ -843,29 +864,6 @@ public class OCSParser extends Parser {
         public void FinalizeDB() throws Exception {
             createIndexes();
         }
-
-        @Override
-            public void AddToDB(Record _rec) throws SQLException {
-            OCSPredInfo rec = (OCSPredInfo) _rec;
-             getM_dbAccessor().addToDB(m_InsertStatementId, new IFillStatement() {
-                @Override
-                public void fillStatement(PreparedStatement stmt) throws SQLException{
-                stmt.setTimestamp(1, new Timestamp(rec.GetAdjustedUsecTime()));
-                stmt.setInt(2, rec.getFileID());
-                stmt.setLong(3, rec.getM_fileOffset());
-                stmt.setLong(4, rec.getM_FileBytes());
-                stmt.setLong(5, rec.getM_line());
-
-                stmt.setInt(6, rec.getSessionID());
-                stmt.setDouble(7, rec.getDensity());
-                stmt.setDouble(8, rec.getA());
-                stmt.setDouble(9, rec.getPredTime());
-                stmt.setDouble(10, rec.getReminder());
-                stmt.setDouble(11, rec.getSentCalls());
-                            }
-        });
-    }
-
 
 
     }

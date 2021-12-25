@@ -232,7 +232,7 @@ public class WWEParserTemplate extends WebParser {
             super(t, fileID);
         }
 
-        private WWEDebugMsg( int fileID) {
+        private WWEDebugMsg(int fileID) {
             this(TableType.WWEMessage, fileID);
         }
 
@@ -248,6 +248,33 @@ public class WWEParserTemplate extends WebParser {
             this.setUUID(orig.getUUID());
             this.setIxnID(orig.getIxnID());
             this.setDeviceID(orig.getDeviceID());
+        }
+
+        @Override
+        public boolean fillStat(PreparedStatement stmt) throws SQLException {
+            stmt.setTimestamp(1, new Timestamp(GetAdjustedUsecTime()));
+            stmt.setInt(2, getFileID());
+            stmt.setLong(3, getM_fileOffset());
+            stmt.setLong(4, getM_FileBytes());
+            stmt.setLong(5, getM_line());
+
+            setFieldInt(stmt, 6, Main.getRef(ReferenceType.IP, getIp()));
+            setFieldInt(stmt, 7, Main.getRef(ReferenceType.JSessionID, getjSessionID()));
+            setFieldInt(stmt, 8, Main.getRef(ReferenceType.HTTPURL, getUrl()));
+            setFieldInt(stmt, 9, Main.getRef(ReferenceType.MSGLEVEL, getLevel()));
+            setFieldInt(stmt, 10, Main.getRef(ReferenceType.JAVA_CLASS, getClassName()));
+            setFieldInt(stmt, 11, Main.getRef(ReferenceType.Misc, getMsgText()));
+            setFieldInt(stmt, 12, Main.getRef(ReferenceType.Agent, getUserName()));
+            setFieldInt(stmt, 13, Main.getRef(ReferenceType.MiscParam, getParam1()));
+            setFieldInt(stmt, 14, Main.getRef(ReferenceType.UUID, getUUID()));
+            setFieldInt(stmt, 15, Main.getRef(ReferenceType.IxnID, getIxnID()));
+            setFieldInt(stmt, 16, Main.getRef(ReferenceType.GWSDeviceID, getDeviceID()));
+            setFieldInt(stmt, 17, Main.getRef(ReferenceType.MiscParam, getParam2()));
+            setFieldInt(stmt, 18, Main.getRef(ReferenceType.WWEUserID, getUserID()));
+            setFieldInt(stmt, 19, Main.getRef(ReferenceType.WWEBrowserClient, getBrowserClient()));
+            setFieldInt(stmt, 20, Main.getRef(ReferenceType.WWEBrowserSession, getSessionID()));
+            return true;
+
         }
 
         public String getParam2() {
@@ -522,7 +549,12 @@ public class WWEParserTemplate extends WebParser {
                     + ");";
             getM_dbAccessor().runQuery(query);
 
-            m_InsertStatementId = getM_dbAccessor().PrepareStatement("INSERT INTO " + getTabName() + " VALUES(NULL,?,?,?,?,?"
+
+        }
+
+        @Override
+        public String getInsert() {
+            return "INSERT INTO " + getTabName() + " VALUES(NULL,?,?,?,?,?"
                     /*standard first*/
                     + ",?"
                     + ",?"
@@ -539,9 +571,7 @@ public class WWEParserTemplate extends WebParser {
                     + ",?"
                     + ",?"
                     + ",?"
-                    + ");"
-            );
-
+                    + ");";
         }
 
         /**
@@ -552,41 +582,10 @@ public class WWEParserTemplate extends WebParser {
             createIndexes();
         }
 
-        @Override
-            public void AddToDB(Record _rec) throws SQLException {
-            WWEDebugMsg rec = (WWEDebugMsg) _rec;
-             getM_dbAccessor().addToDB(m_InsertStatementId, new IFillStatement() {
-                @Override
-                public void fillStatement(PreparedStatement stmt) throws SQLException{
-                stmt.setTimestamp(1, new Timestamp(rec.GetAdjustedUsecTime()));
-                stmt.setInt(2, rec.getFileID());
-                stmt.setLong(3, rec.getM_fileOffset());
-                stmt.setLong(4, rec.getM_FileBytes());
-                stmt.setLong(5, rec.getM_line());
-
-                setFieldInt(stmt, 6, Main.getRef(ReferenceType.IP, rec.getIp()));
-                setFieldInt(stmt, 7, Main.getRef(ReferenceType.JSessionID, rec.getjSessionID()));
-                setFieldInt(stmt, 8, Main.getRef(ReferenceType.HTTPURL, rec.getUrl()));
-                setFieldInt(stmt, 9, Main.getRef(ReferenceType.MSGLEVEL, rec.getLevel()));
-                setFieldInt(stmt, 10, Main.getRef(ReferenceType.JAVA_CLASS, rec.getClassName()));
-                setFieldInt(stmt, 11, Main.getRef(ReferenceType.Misc, rec.getMsgText()));
-                setFieldInt(stmt, 12, Main.getRef(ReferenceType.Agent, rec.getUserName()));
-                setFieldInt(stmt, 13, Main.getRef(ReferenceType.MiscParam, rec.getParam1()));
-                setFieldInt(stmt, 14, Main.getRef(ReferenceType.UUID, rec.getUUID()));
-                setFieldInt(stmt, 15, Main.getRef(ReferenceType.IxnID, rec.getIxnID()));
-                setFieldInt(stmt, 16, Main.getRef(ReferenceType.GWSDeviceID, rec.getDeviceID()));
-                setFieldInt(stmt, 17, Main.getRef(ReferenceType.MiscParam, rec.getParam2()));
-                setFieldInt(stmt, 18, Main.getRef(ReferenceType.WWEUserID, rec.getUserID()));
-                setFieldInt(stmt, 19, Main.getRef(ReferenceType.WWEBrowserClient, rec.getBrowserClient()));
-                setFieldInt(stmt, 20, Main.getRef(ReferenceType.WWEBrowserSession, rec.getSessionID()));
-
-                            }
-        });
-    }
-
-
 
     }
-//</editor-fold>
 
 }
+//</editor-fold>
+
+

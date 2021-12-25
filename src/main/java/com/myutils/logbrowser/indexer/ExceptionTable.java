@@ -36,11 +36,15 @@ public class ExceptionTable extends DBTable {
                 + ",exceptionMsgID int"
                 + ");";
         getM_dbAccessor().runQuery(query);
-        m_InsertStatementId = getM_dbAccessor().PrepareStatement("INSERT INTO " + getTabName() + " VALUES(NULL,?,?,?,?,?"
+    }
+
+    @Override
+    public String getInsert() {
+        return "INSERT INTO " + getTabName() + " VALUES(NULL,?,?,?,?,?"
                 /*standard first*/
                 + ",?"
                 + ",?"
-                + ");");
+                + ");";
     }
 
     /**
@@ -51,27 +55,6 @@ public class ExceptionTable extends DBTable {
         createIndexes();
 
     }
-
-    @Override
-    public void AddToDB(Record rec) throws SQLException {
-        ExceptionMessage exceptionRec = (ExceptionMessage) rec;
-         getM_dbAccessor().addToDB(m_InsertStatementId, new IFillStatement() {
-                @Override
-                public void fillStatement(PreparedStatement stmt) throws SQLException{
-
-            stmt.setTimestamp(1, new Timestamp(exceptionRec.GetAdjustedUsecTime()));
-            stmt.setInt(2, rec.getFileID());
-            stmt.setLong(3, exceptionRec.getM_fileOffset());
-            stmt.setLong(4, exceptionRec.getM_FileBytes());
-            stmt.setLong(5, exceptionRec.getM_line());
-
-            setFieldInt(stmt, 6, Main.getRef(ReferenceType.Exception, exceptionRec.getException()));
-            setFieldInt(stmt, 7, Main.getRef(ReferenceType.ExceptionMessage, exceptionRec.getExceptionMessage()));
-
-                        }
-        });
-    }
-
 
 
 }

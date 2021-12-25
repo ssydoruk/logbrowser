@@ -5,6 +5,9 @@
  */
 package com.myutils.logbrowser.indexer;
 
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 
 import static Utils.Util.intOrDef;
@@ -75,4 +78,20 @@ public class ConfigUpdateRecord extends Message {
         msg = group;
     }
 
+    @Override
+    public boolean fillStat(PreparedStatement stmt) throws SQLException {
+        stmt.setInt(1, getRecordID());
+        stmt.setTimestamp(2, new Timestamp(GetAdjustedUsecTime()));
+        stmt.setInt(3, getFileID());
+        stmt.setLong(4, getM_fileOffset());
+        stmt.setLong(5, getM_FileBytes());
+        stmt.setLong(6, getM_line());
+
+        setFieldInt(stmt, 7, Main.getRef(ReferenceType.CfgOp, GetOp()));
+        setFieldInt(stmt, 8, Main.getRef(ReferenceType.CfgObjectType, GetObjType()));
+        stmt.setInt(9, GetObjDBID());
+        setFieldInt(stmt, 10, Main.getRef(ReferenceType.CfgObjName, getObjName()));
+        setFieldInt(stmt, 11, Main.getRef(ReferenceType.CfgMsg, getMsg()));
+        return true;
+    }
 }

@@ -363,6 +363,29 @@ public class WWECloudParser extends Parser {
             return getIxnAttributeString("AttributeAgentID");
         }
 
+        @Override
+        public boolean fillStat(PreparedStatement stmt) throws SQLException {
+            stmt.setTimestamp(1, new Timestamp(GetAdjustedUsecTime()));
+            stmt.setInt(2, getFileID());
+            stmt.setLong(3, getM_fileOffset());
+            stmt.setLong(4, getM_FileBytes());
+            stmt.setLong(5, getM_line());
+
+            setFieldInt(stmt, 6, Main.getRef(ReferenceType.ConnID, getConnID()));
+            setFieldInt(stmt, 7, Main.getRef(ReferenceType.ConnID, getTransferConnID()));
+            setFieldInt(stmt, 8, Main.getRef(ReferenceType.UUID, getUUID()));
+            setFieldInt(stmt, 9, getM_refID());
+            stmt.setBoolean(10, isInbound());
+            setFieldInt(stmt, 11, Main.getRef(ReferenceType.DN, cleanDN(getThisDN())));
+            setFieldInt(stmt, 12, Main.getRef(ReferenceType.TEvent, getEventName()));
+            setFieldInt(stmt, 13, getSeqNo());
+            setFieldInt(stmt, 14, Main.getRef(ReferenceType.TEvent, getIxnID()));
+            setFieldInt(stmt, 15, Main.getRef(ReferenceType.App, getServerID()));
+            setFieldInt(stmt, 16, Main.getRef(ReferenceType.DN, cleanDN(getOtherDN())));
+            setFieldInt(stmt, 17, Main.getRef(ReferenceType.Agent, getAgent()));
+            return true;
+
+        }
     }
 
     private class WWECloudTable extends DBTable {
@@ -408,7 +431,11 @@ public class WWECloudParser extends Parser {
                     + ",agentIDID INTEGER"
                     + ");";
             getM_dbAccessor().runQuery(query);
-            m_InsertStatementId = getM_dbAccessor().PrepareStatement("INSERT INTO " + getTabName() + " VALUES(NULL,?,?,?,?,?"
+        }
+
+        @Override
+        public String getInsert() {
+            return "INSERT INTO " + getTabName() + " VALUES(NULL,?,?,?,?,?"
                     /*standard first*/
                     + ",?"
                     + ",?"
@@ -422,7 +449,8 @@ public class WWECloudParser extends Parser {
                     + ",?"
                     + ",?"
                     + ",?"
-                    + ");");
+                    + ");";
+
         }
 
         /**
@@ -433,35 +461,7 @@ public class WWECloudParser extends Parser {
             createIndexes();
         }
 
-        @Override
-        public void AddToDB(Record rec) throws SQLException {
-            WWECloudMessage wweRec = (WWECloudMessage) rec;
-            getM_dbAccessor().addToDB(m_InsertStatementId, new IFillStatement() {
-                @Override
-                public void fillStatement(PreparedStatement stmt) throws SQLException {
 
-                    stmt.setTimestamp(1, new Timestamp(wweRec.GetAdjustedUsecTime()));
-                    stmt.setInt(2, rec.getFileID());
-                    stmt.setLong(3, wweRec.getM_fileOffset());
-                    stmt.setLong(4, wweRec.getM_FileBytes());
-                    stmt.setLong(5, wweRec.getM_line());
-
-                    setFieldInt(stmt, 6, Main.getRef(ReferenceType.ConnID, wweRec.getConnID()));
-                    setFieldInt(stmt, 7, Main.getRef(ReferenceType.ConnID, wweRec.getTransferConnID()));
-                    setFieldInt(stmt, 8, Main.getRef(ReferenceType.UUID, wweRec.getUUID()));
-                    setFieldInt(stmt, 9, wweRec.getM_refID());
-                    stmt.setBoolean(10, wweRec.isInbound());
-                    setFieldInt(stmt, 11, Main.getRef(ReferenceType.DN, rec.cleanDN(wweRec.getThisDN())));
-                    setFieldInt(stmt, 12, Main.getRef(ReferenceType.TEvent, wweRec.getEventName()));
-                    setFieldInt(stmt, 13, wweRec.getSeqNo());
-                    setFieldInt(stmt, 14, Main.getRef(ReferenceType.TEvent, wweRec.getIxnID()));
-                    setFieldInt(stmt, 15, Main.getRef(ReferenceType.App, wweRec.getServerID()));
-                    setFieldInt(stmt, 16, Main.getRef(ReferenceType.DN, rec.cleanDN(wweRec.getOtherDN())));
-                    setFieldInt(stmt, 17, Main.getRef(ReferenceType.Agent, wweRec.getAgent()));
-
-                }
-            });
-        }
     }
 
 
@@ -494,6 +494,20 @@ public class WWECloudParser extends Parser {
                 return getIxnAttributeString("SATRCFG_DESCRIPTION");
             }
 
+            @Override
+            public boolean fillStat(PreparedStatement stmt) throws SQLException {
+                stmt.setTimestamp(1, new Timestamp(GetAdjustedUsecTime()));
+                stmt.setInt(2, getFileID());
+                stmt.setLong(3, getM_fileOffset());
+                stmt.setLong(4, getM_FileBytes());
+                stmt.setLong(5, getM_line());
+
+                setFieldInt(stmt, 6, Main.getRef(ReferenceType.Misc, getSuccess()));
+                setFieldInt(stmt, 7, Main.getRef(ReferenceType.Agent, getAgent()));
+                setFieldInt(stmt, 8, Main.getRef(ReferenceType.ErrorDescr, getError()));
+                return true;
+
+            }
         }
 
         private class WWECloudAuthTab extends DBTable {
@@ -526,13 +540,17 @@ public class WWECloudParser extends Parser {
                         + ");";
                 getM_dbAccessor().runQuery(query);
 
-                m_InsertStatementId = getM_dbAccessor().PrepareStatement("INSERT INTO " + getTabName() + " VALUES(NULL,?,?,?,?,?"
+
+            }
+
+            @Override
+            public String getInsert() {
+                return "INSERT INTO " + getTabName() + " VALUES(NULL,?,?,?,?,?"
                         /*standard first*/
                         + ",?"
                         + ",?"
                         + ",?"
-                        + ");"
-                );
+                        + ");"                ;
 
             }
 
@@ -542,26 +560,6 @@ public class WWECloudParser extends Parser {
             @Override
             public void FinalizeDB() throws Exception {
                 createIndexes();
-            }
-
-            @Override
-            public void AddToDB(Record _rec) throws SQLException {
-                WWECloudAuthMsg rec = (WWECloudAuthMsg) _rec;
-                getM_dbAccessor().addToDB(m_InsertStatementId, new IFillStatement() {
-                    @Override
-                    public void fillStatement(PreparedStatement stmt) throws SQLException {
-                        stmt.setTimestamp(1, new Timestamp(rec.GetAdjustedUsecTime()));
-                        stmt.setInt(2, rec.getFileID());
-                        stmt.setLong(3, rec.getM_fileOffset());
-                        stmt.setLong(4, rec.getM_FileBytes());
-                        stmt.setLong(5, rec.getM_line());
-
-                        setFieldInt(stmt, 6, Main.getRef(ReferenceType.Misc, rec.getSuccess()));
-                        setFieldInt(stmt, 7, Main.getRef(ReferenceType.Agent, rec.getAgent()));
-                        setFieldInt(stmt, 8, Main.getRef(ReferenceType.ErrorDescr, rec.getError()));
-
-                    }
-                });
             }
 
 
@@ -595,6 +593,20 @@ public class WWECloudParser extends Parser {
                 return ret;
 
             }
+
+            @Override
+            public boolean fillStat(PreparedStatement stmt) throws SQLException {
+                stmt.setTimestamp(1, new Timestamp(GetAdjustedUsecTime()));
+                stmt.setInt(2, getFileID());
+                stmt.setLong(3, getM_fileOffset());
+                stmt.setLong(4, getM_FileBytes());
+                stmt.setLong(5, getM_line());
+
+                setFieldInt(stmt, 6, Main.getRef(ReferenceType.CLOUD_LOG_MESSAGE_TYPE, getMsg()));
+                setFieldInt(stmt, 7, Main.getRef(ReferenceType.CLOUD_LOG_MESSAGE, getMsgText()));
+                return true;
+
+            }
         }
 
         private class WWECloudExeptionMsg extends Message {
@@ -617,6 +629,19 @@ public class WWECloudParser extends Parser {
                 return msg;
             }
 
+            @Override
+            public boolean fillStat(PreparedStatement stmt) throws SQLException {
+                stmt.setTimestamp(1, new Timestamp(GetAdjustedUsecTime()));
+                stmt.setInt(2, getFileID());
+                stmt.setLong(3, getM_fileOffset());
+                stmt.setLong(4, getM_FileBytes());
+                stmt.setLong(5, getM_line());
+
+                setFieldInt(stmt, 6, Main.getRef(ReferenceType.Exception, getExceptionName()));
+                setFieldInt(stmt, 7, Main.getRef(ReferenceType.ExceptionMessage, getMsg()));
+                return true;
+
+            }
         }
 
         private class WWECloudExeptionTab extends DBTable {
@@ -647,12 +672,16 @@ public class WWECloudParser extends Parser {
                         + ");";
                 getM_dbAccessor().runQuery(query);
 
-                m_InsertStatementId = getM_dbAccessor().PrepareStatement("INSERT INTO " + getTabName() + " VALUES(NULL,?,?,?,?,?"
+            }
+
+            @Override
+            public String getInsert() {
+                return "INSERT INTO " + getTabName() + " VALUES(NULL,?,?,?,?,?"
                         /*standard first*/
                         + ",?"
                         + ",?"
-                        + ");"
-                );
+                        + ");"                ;
+
 
             }
 
@@ -664,24 +693,7 @@ public class WWECloudParser extends Parser {
                 createIndexes();
             }
 
-            @Override
-            public void AddToDB(Record _rec) throws SQLException {
-                WWECloudExeptionMsg rec = (WWECloudExeptionMsg) _rec;
-                getM_dbAccessor().addToDB(m_InsertStatementId, new IFillStatement() {
-                    @Override
-                    public void fillStatement(PreparedStatement stmt) throws SQLException {
-                        stmt.setTimestamp(1, new Timestamp(rec.GetAdjustedUsecTime()));
-                        stmt.setInt(2, rec.getFileID());
-                        stmt.setLong(3, rec.getM_fileOffset());
-                        stmt.setLong(4, rec.getM_FileBytes());
-                        stmt.setLong(5, rec.getM_line());
 
-                        setFieldInt(stmt, 6, Main.getRef(ReferenceType.Exception, rec.getExceptionName()));
-                        setFieldInt(stmt, 7, Main.getRef(ReferenceType.ExceptionMessage, rec.getMsg()));
-
-                    }
-                });
-            }
 
 
         }
@@ -713,12 +725,16 @@ public class WWECloudParser extends Parser {
                         + ");";
                 getM_dbAccessor().runQuery(query);
 
-                m_InsertStatementId = getM_dbAccessor().PrepareStatement("INSERT INTO " + getTabName() + " VALUES(NULL,?,?,?,?,?"
+
+            }
+
+            @Override
+            public String getInsert() {
+                return "INSERT INTO " + getTabName() + " VALUES(NULL,?,?,?,?,?"
                         /*standard first*/
                         + ",?"
                         + ",?"
-                        + ");"
-                );
+                        + ");"                ;
 
             }
 
@@ -730,24 +746,7 @@ public class WWECloudParser extends Parser {
                 createIndexes();
             }
 
-            @Override
-            public void AddToDB(Record _rec) throws SQLException {
-                WWECloudLogMsg rec = (WWECloudLogMsg) _rec;
-                getM_dbAccessor().addToDB(m_InsertStatementId, new IFillStatement() {
-                    @Override
-                    public void fillStatement(PreparedStatement stmt) throws SQLException {
-                        stmt.setTimestamp(1, new Timestamp(rec.GetAdjustedUsecTime()));
-                        stmt.setInt(2, rec.getFileID());
-                        stmt.setLong(3, rec.getM_fileOffset());
-                        stmt.setLong(4, rec.getM_FileBytes());
-                        stmt.setLong(5, rec.getM_line());
 
-                        setFieldInt(stmt, 6, Main.getRef(ReferenceType.CLOUD_LOG_MESSAGE_TYPE, rec.getMsg()));
-                        setFieldInt(stmt, 7, Main.getRef(ReferenceType.CLOUD_LOG_MESSAGE, rec.getMsgText()));
-
-                    }
-                });
-            }
         }
 //</editor-fold>
 

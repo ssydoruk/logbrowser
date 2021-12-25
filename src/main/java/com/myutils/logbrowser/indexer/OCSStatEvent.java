@@ -5,6 +5,9 @@
  */
 package com.myutils.logbrowser.indexer;
 
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -116,4 +119,22 @@ public class OCSStatEvent extends Message {
         }
     }
 
+    @Override
+    public boolean fillStat(PreparedStatement stmt) throws SQLException {
+        stmt.setTimestamp(1, new Timestamp(GetAdjustedUsecTime()));
+        stmt.setInt(2, getFileID());
+        stmt.setLong(3, getM_fileOffset());
+        stmt.setLong(4, getM_FileBytes());
+        stmt.setLong(5, getM_line());
+
+        setFieldInt(stmt, 6, Main.getRef(ReferenceType.StatEvent, getStatEvent()));
+        setFieldInt(stmt, 7, Main.getRef(ReferenceType.Agent, getAgentName()));
+        stmt.setInt(8, getAgentDBID());
+        setFieldInt(stmt, 9, Main.getRef(ReferenceType.Place, getPlaceName()));
+        stmt.setInt(10, getPlaceDBID());
+        setFieldInt(stmt, 11, Main.getRef(ReferenceType.DN, cleanDN(getDN())));
+        setFieldInt(stmt, 12, Main.getRef(ReferenceType.StatType, getStatType()));
+        return true;
+
+    }
 }

@@ -4,6 +4,9 @@
  */
 package com.myutils.logbrowser.indexer;
 
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+
 /**
  * @author ssydoruk
  */
@@ -21,6 +24,20 @@ public class CIFaceRequest extends SIPServerBaseMessage {
     @Override
     public String toString() {
         return "CIFaceRequest{" + "m_Name=" + m_Name + ", m_refId=" + m_refId + ", m_thisDN=" + m_thisDN + ", m_otherDN=" + m_otherDN + '}' + super.toString();
+    }
+
+    @Override
+    public boolean fillStat(PreparedStatement stmt) throws SQLException {
+        setFieldInt(stmt, 1, Main.getRef(ReferenceType.TEvent, getM_Name()));
+        stmt.setLong(2, getM_refId());
+        setFieldInt(stmt, 3, Main.getRef(ReferenceType.DN, SingleQuotes(getM_thisDN())));
+        setFieldInt(stmt, 4, Main.getRef(ReferenceType.DN, SingleQuotes(getM_otherDN())));
+        stmt.setInt(5, getM_handlerId());
+        stmt.setInt(6, getFileID());
+        stmt.setLong(7, getM_fileOffset());
+        stmt.setInt(8, getM_line());
+        Main.logger.trace("m_handlerId:" + getM_handlerId());
+        return true;
     }
 
     public String getM_Name() {

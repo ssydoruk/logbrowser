@@ -40,11 +40,16 @@ public class WSStatTable extends DBTable {
                 + ",HandlerId INTEGER"
                 + ");";
         getM_dbAccessor().runQuery(query);
-        m_InsertStatementId = getM_dbAccessor().PrepareStatement("INSERT INTO wsstat VALUES(NULL,?,?,?,?,?"
+
+    }
+
+    @Override
+    public String getInsert() {
+        return "INSERT INTO wsstat VALUES(NULL,?,?,?,?,?"
                 /*standard first*/
                 + ",?"
                 + ",?"
-                + ");");
+                + ");";
 
     }
 
@@ -54,24 +59,6 @@ public class WSStatTable extends DBTable {
     @Override
     public void FinalizeDB() throws Exception {
         createIndexes();
-    }
-
-    @Override
-        public void AddToDB(Record _rec) throws SQLException {
-        WSStat rec = (WSStat) _rec;
-         getM_dbAccessor().addToDB(m_InsertStatementId, new IFillStatement() {
-                @Override
-                public void fillStatement(PreparedStatement stmt) throws SQLException{
-            stmt.setTimestamp(1, new Timestamp(rec.GetAdjustedUsecTime()));
-            stmt.setInt(2, rec.getFileID());
-            stmt.setLong(3, rec.getM_fileOffset());
-            stmt.setLong(4, rec.getM_FileBytes());
-            stmt.setLong(5, rec.getM_line());
-
-            setFieldInt(stmt, 6, Main.getRef(ReferenceType.StatEvent, rec.GetMessageName()));
-
-                        }
-        });
     }
 
 

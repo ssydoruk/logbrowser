@@ -58,45 +58,18 @@ public class WSTlibTable extends DBTable {
                 + ",refID integer"
                 + ");";
         getM_dbAccessor().runQuery(query);
-        m_InsertStatementId = getM_dbAccessor().PrepareStatement("INSERT INTO WSTlib VALUES(NULL,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);");
+    }
+
+    @Override
+    public String getInsert() {
+        return "INSERT INTO WSTlib VALUES(NULL,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);";
+
     }
 
     @Override
     public void FinalizeDB() {
         createIndexes();
     }
-
-    @Override
-    public void AddToDB(Record rec) throws SQLException {
-        WSMessage theRec = (WSMessage) rec;
-         getM_dbAccessor().addToDB(m_InsertStatementId, new IFillStatement() {
-                @Override
-                public void fillStatement(PreparedStatement stmt) throws SQLException{
-            stmt.setTimestamp(1, new Timestamp(theRec.GetAdjustedUsecTime()));
-            setFieldInt(stmt, 2, Main.getRef(ReferenceType.TEvent, theRec.GetMessageName()));
-            setFieldInt(stmt, 3, Main.getRef(ReferenceType.DN, rec.cleanDN(theRec.GetThisDN())));
-            setFieldInt(stmt, 4, Main.getRef(ReferenceType.DN, rec.cleanDN(theRec.GetOtherDN())));
-            setFieldInt(stmt, 5, Main.getRef(ReferenceType.Agent, theRec.GetAgentID()));
-            setFieldInt(stmt, 6, Main.getRef(ReferenceType.ConnID, theRec.GetConnID()));
-            setFieldInt(stmt, 7, Main.getRef(ReferenceType.ConnID, theRec.GetTransferConnID()));
-            stmt.setInt(8, (int) theRec.getHeaderLong("AttributeReferenceID"));
-            stmt.setBoolean(9, theRec.isInbound());
-            stmt.setInt(10, rec.getFileID());
-            stmt.setLong(11, theRec.getM_fileOffset());
-            stmt.setLong(12, theRec.getFileBytes());
-            stmt.setInt(13, 0);
-            stmt.setLong(14, theRec.getSeqNo());
-            stmt.setInt(15, theRec.getM_line());
-            setFieldInt(stmt, 16, Main.getRef(ReferenceType.UUID, theRec.GetUUID()));
-            setFieldInt(stmt, 17, Main.getRef(ReferenceType.IxnID, theRec.getIxnID()));
-            setFieldInt(stmt, 18, Main.getRef(ReferenceType.App, theRec.getServer()));
-            stmt.setInt(19, theRec.getServerHandle());
-            stmt.setInt(20, theRec.getRefID());
-
-                        }
-        });
-    }
-
 
 
 }

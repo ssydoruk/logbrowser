@@ -5,6 +5,9 @@
  */
 package com.myutils.logbrowser.indexer;
 
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 
 import static Utils.Util.intOrDef;
@@ -86,4 +89,22 @@ public class SCSSelfStatus extends Message {
 
     }
 
+    @Override
+    public boolean fillStat(PreparedStatement stmt) throws SQLException {
+        stmt.setTimestamp(1, new Timestamp(GetAdjustedUsecTime()));
+        stmt.setInt(2, getFileID());
+        stmt.setLong(3, getM_fileOffset());
+        stmt.setLong(4, getM_FileBytes());
+        stmt.setLong(5, getM_line());
+
+        setFieldInt(stmt, 6, Main.getRef(ReferenceType.APPRunMode, getNewMode()));
+        stmt.setInt(7, getAppDBID());
+        setFieldInt(stmt, 8, Main.getRef(ReferenceType.App, getAppName()));
+        stmt.setInt(9, getPID());
+        setFieldInt(stmt, 10, Main.getRef(ReferenceType.APPRunMode, getOldMode()));
+        setFieldInt(stmt, 11, Main.getRef(ReferenceType.appStatus, getStatus()));
+        setFieldInt(stmt, 12, Main.getRef(ReferenceType.Host, getHost()));
+        return true;
+
+    }
 }
