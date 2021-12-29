@@ -148,7 +148,7 @@ public class WWEParser extends WebParser {
     private boolean skipMessage;
     private Message msg;
 
-    WWEParser(HashMap<TableType, DBTable> m_tables) {
+    WWEParser(HashMap<String, DBTable> m_tables) {
         super(FileInfoType.type_WWE, m_tables);
         m_MessageContents = new ArrayList();
         ThreadAlias.put("ORSInternal", "FMWeb");
@@ -207,10 +207,10 @@ public class WWEParser extends WebParser {
 //                m_CurrentFilePos += str.length()+input.charsSkippedOnReadLine;
             }
 //            ParseLine("", null); // to complete the parsing of the last line/last message
-        } catch (IOException e) {
+        } catch (Exception e) {
             Main.logger.error(e);
-            return m_CurrentLine - line;
         }
+
 
         return m_CurrentLine - line;
     }
@@ -897,13 +897,13 @@ public class WWEParser extends WebParser {
     }
 
     @Override
-    void init(HashMap<TableType, DBTable> m_tables) {
-        m_tables.put(TableType.WWEMessage, new WWEDebugMessageTable(Main.getInstance().getM_accessor(), TableType.WWEMessage));
-        m_tables.put(TableType.WWEUCSMessage, new WWEUCSTable(Main.getInstance().getM_accessor(), TableType.WWEUCSMessage));
-        m_tables.put(TableType.WWEUCSConfigMessage, new WWEUCSConfigTable(Main.getInstance().getM_accessor(), TableType.WWEUCSConfigMessage));
-        m_tables.put(TableType.WWEIxnMessage, new WWEIxnTable(Main.getInstance().getM_accessor(), TableType.WWEIxnMessage));
-        m_tables.put(TableType.WWEBayeuxMessage, new WWEBayeuxSMsgTable(Main.getInstance().getM_accessor(), TableType.WWEBayeuxMessage));
-        m_tables.put(TableType.WWEStatServerMessage, new WWEWWEStatServerMsgTable(Main.getInstance().getM_accessor(), TableType.WWEStatServerMessage));
+    void init(HashMap<String, DBTable> m_tables) {
+        m_tables.put(TableType.WWEMessage.toString(), new WWEDebugMessageTable(Main.getInstance().getM_accessor(), TableType.WWEMessage));
+        m_tables.put(TableType.WWEUCSMessage.toString(), new WWEUCSTable(Main.getInstance().getM_accessor(), TableType.WWEUCSMessage));
+        m_tables.put(TableType.WWEUCSConfigMessage.toString(), new WWEUCSConfigTable(Main.getInstance().getM_accessor(), TableType.WWEUCSConfigMessage));
+        m_tables.put(TableType.WWEIxnMessage.toString(), new WWEIxnTable(Main.getInstance().getM_accessor(), TableType.WWEIxnMessage));
+        m_tables.put(TableType.WWEBayeuxMessage.toString(), new WWEBayeuxSMsgTable(Main.getInstance().getM_accessor(), TableType.WWEBayeuxMessage));
+        m_tables.put(TableType.WWEStatServerMessage.toString(), new WWEWWEStatServerMsgTable(Main.getInstance().getM_accessor(), TableType.WWEStatServerMessage));
 
     }
 

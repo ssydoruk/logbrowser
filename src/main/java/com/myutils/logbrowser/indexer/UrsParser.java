@@ -100,7 +100,7 @@ public class UrsParser extends Parser {
     private Message msgTmp; // storage for message in progress
     private GenesysMsg genesysMsg;
 
-    public UrsParser(HashMap<TableType, DBTable> m_tables) {
+    public UrsParser(HashMap<String, DBTable> m_tables) {
         super(FileInfoType.type_URS, m_tables);
 
 //17:33:06.335_I_I_03350282382b556f [07:07] HERE IS TARGETS
@@ -384,8 +384,8 @@ public class UrsParser extends Parser {
             ParseLine(""); // to complete the parsing of the last line/last message
         } catch (Exception e) {
             Main.logger.error(e);
-            return m_CurrentLine - line;
         }
+
 
         return m_CurrentLine - line;
     }
@@ -976,9 +976,9 @@ public class UrsParser extends Parser {
     }
 
     @Override
-    void init(HashMap<TableType, DBTable> m_tables) {
-        m_tables.put(TableType.URSAgentGroupTable, new URSAgentGroupTable(Main.getInstance().getM_accessor(), TableType.URSAgentGroupTable));
-        m_tables.put(TableType.URSGenesysMessage, new GenesysUrsMsgTable(Main.getInstance().getM_accessor(), TableType.URSGenesysMessage));
+    void init(HashMap<String, DBTable> m_tables) {
+        m_tables.put(TableType.URSAgentGroupTable.toString(), new URSAgentGroupTable(Main.getInstance().getM_accessor(), TableType.URSAgentGroupTable));
+        m_tables.put(TableType.URSGenesysMessage.toString(), new GenesysUrsMsgTable(Main.getInstance().getM_accessor(), TableType.URSGenesysMessage));
     }
 
     // parse state contants

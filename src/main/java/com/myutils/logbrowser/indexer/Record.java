@@ -23,29 +23,33 @@ public abstract class Record implements Cloneable {
     private static final Pattern regAllQuotes = Pattern.compile("^(['\"]).+\\1$");
     private static final Pattern regNoQuotes = Pattern.compile("^(['\"])(.+)\\1$");
     private static final Pattern regDNWithHost = Pattern.compile("^(\\w+)\\.");
-    private static final ConcurrentHashMap<TableType, AtomicInteger> idStorage = new ConcurrentHashMap<>();
+    private static final ConcurrentHashMap<String, AtomicInteger> idStorage = new ConcurrentHashMap<>();
     static String m_alias;
     private static int objCreated;
     private final int fileID;
     protected long m_FileBytes;
     private long m_fileOffset;
     private int m_line;
-    private TableType m_type;
+    private String m_type;
     //    protected Date m_Timestamp = null;
     private DateParsed m_TimestampDP = null;
     private int recordID;
 
-    public Record(TableType type, int fileID) {
+    public Record(String type, int fileID) {
         this.fileID = fileID;
-        m_type = type;
         recordID = getAtomicInteger(type).incrementAndGet();
+        m_type=type;
         Main.logger.trace("Creating record type " + type);
         objCreated++;
     }
 
+    public Record(TableType type, int fileID) {
+        this(type.toString(), fileID);
+    }
+
     public static void setID(TableType file, int id) {
 //        getAtomicInteger(file).set(id);
-        getAtomicInteger(file).updateAndGet(new IntUnaryOperator() {
+        getAtomicInteger(file.toString()).updateAndGet(new IntUnaryOperator() {
             @Override
             public int applyAsInt(int operand) {
                 return (id > operand) ? id : operand;
@@ -54,12 +58,12 @@ public abstract class Record implements Cloneable {
     }
 
     public static int getID(TableType file) {
-        return getAtomicInteger(file).get();
+        return getAtomicInteger(file.toString()).get();
     }
 
-    private static AtomicInteger getAtomicInteger(TableType type) {
+    private static AtomicInteger getAtomicInteger(String type) {
         AtomicInteger atomicInteger;
-        synchronized (type) {
+        synchronized (idStorage) {
             atomicInteger = idStorage.get(type);
             if (atomicInteger == null) {
                 atomicInteger = new AtomicInteger(0);
@@ -179,7 +183,7 @@ public abstract class Record implements Cloneable {
         m_line = line;
     }
 
-//    protected void AddToDB(HashMap<TableType, DBTable> m_tables) throws Exception {
+//    protected void AddToDB(HashMap<String, DBTable> m_tables) throws Exception {
 //        DBTable tab = m_tables.get(getM_type());
 //        if (tab != null) {
 //            tab.checkInit();
@@ -198,7 +202,7 @@ public abstract class Record implements Cloneable {
     /**
      * @return the m_type
      */
-    public TableType getM_type() {
+    public String getM_type() {
         return m_type;
     }
 

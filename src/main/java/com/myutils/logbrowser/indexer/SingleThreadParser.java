@@ -144,7 +144,7 @@ public class SingleThreadParser extends Parser {
     private FileInfo.FileType fileType = FileInfo.FileType.UNKNOWN;
     private long lastSeqNo = 0;
 
-    public SingleThreadParser(HashMap<TableType, DBTable> m_tables) {
+    public SingleThreadParser(HashMap<String, DBTable> m_tables) {
         super(FileInfoType.type_SessionController, m_tables);
         Main.logger.debug("SingleThreadParser");
         this.extraBuff = new ArrayList<>();
@@ -223,8 +223,8 @@ public class SingleThreadParser extends Parser {
             ParseLine(input, ""); // to complete the parsing of the last line/last message
         } catch (Exception e) {
             Main.logger.error(e);
-            return m_CurrentLine - line;
         }
+
 
         return m_CurrentLine - line;
     }
@@ -1373,17 +1373,15 @@ public class SingleThreadParser extends Parser {
     }
 
     @Override
-    void init(HashMap<TableType, DBTable> m_tables) {
-        synchronized (m_tables) {
-            if (!m_tables.containsKey(TableType.SIP1536Other))
-                m_tables.put(TableType.SIP1536Other, new SIP1536OtherTable(Main.getInstance().getM_accessor(), TableType.SIP1536Other));
-            if (!m_tables.containsKey(TableType.SIP1536Trunk))
-                m_tables.put(TableType.SIP1536Trunk, new SIP1536TrunkTable(Main.getInstance().getM_accessor(), TableType.SIP1536Trunk));
-            if (!m_tables.containsKey(TableType.SIP1536ReqResp))
-                m_tables.put(TableType.SIP1536ReqResp, new SIP1536RequestResponseTable(Main.getInstance().getM_accessor(), TableType.SIP1536ReqResp));
-            if (!m_tables.containsKey(TableType.TLIBTimerRedirect))
-                m_tables.put(TableType.TLIBTimerRedirect, new TLibTimerRedirectTable(Main.getInstance().getM_accessor(), TableType.TLIBTimerRedirect));
-        }
+    void init(HashMap<String, DBTable> m_tables) {
+        if (!m_tables.containsKey(TableType.SIP1536Other))
+            m_tables.put(TableType.SIP1536Other.toString(), new SIP1536OtherTable(Main.getInstance().getM_accessor(), TableType.SIP1536Other));
+        if (!m_tables.containsKey(TableType.SIP1536Trunk))
+            m_tables.put(TableType.SIP1536Trunk.toString(), new SIP1536TrunkTable(Main.getInstance().getM_accessor(), TableType.SIP1536Trunk));
+        if (!m_tables.containsKey(TableType.SIP1536ReqResp))
+            m_tables.put(TableType.SIP1536ReqResp.toString(), new SIP1536RequestResponseTable(Main.getInstance().getM_accessor(), TableType.SIP1536ReqResp));
+        if (!m_tables.containsKey(TableType.TLIBTimerRedirect))
+            m_tables.put(TableType.TLIBTimerRedirect.toString(), new TLibTimerRedirectTable(Main.getInstance().getM_accessor(), TableType.TLIBTimerRedirect));
     }
 
     private String ParseLine1536(BufferedReaderCrLf input, String str) throws Exception {

@@ -46,6 +46,11 @@ public abstract class Message extends Record {
     private ArrayList<String> m_MMUserData = null;
     private ArrayList<String> m_MMEnvelope = null;
 
+    public Message(String type, int fileID) {
+        super(type, fileID);
+        m_MessageLines = new ArrayList<>(1); // by default store only one line
+
+    }
     public Message(TableType type, int fileID) {
         super(type, fileID);
         m_MessageLines = new ArrayList<>(1); // by default store only one line
@@ -1129,7 +1134,7 @@ public abstract class Message extends Record {
     }
 
 //    @Override
-//    protected void AddToDB(HashMap<TableType, DBTable> m_tables) {
+//    protected void AddToDB(HashMap<String, DBTable> m_tables) {
 //        if (Main.IgnoreTable(this)) {
 //            return;
 //        }

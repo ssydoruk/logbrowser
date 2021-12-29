@@ -78,7 +78,7 @@ public class SIPEPParser extends Parser {
     private boolean inbound;
     private DateParsed dpHeader;
 
-    public SIPEPParser(HashMap<TableType, DBTable> m_tables) {
+    public SIPEPParser(HashMap<String, DBTable> m_tables) {
         super(FileInfoType.type_SIPEP, m_tables);
         this.extraBuff = new ArrayList<>();
         //m_accessor = accessor;
@@ -153,8 +153,8 @@ public class SIPEPParser extends Parser {
             ParseLine(input, ""); // to complete the parsing of the last line/last message
         } catch (Exception e) {
             Main.logger.error(e);
-            return m_CurrentLine - line;
         }
+
 
         return m_CurrentLine - line;
     }
@@ -465,7 +465,7 @@ public class SIPEPParser extends Parser {
     }
 
     @Override
-    void init(HashMap<TableType, DBTable> m_tables) {
+    void init(HashMap<String, DBTable> m_tables) {
     }
 
     enum ParserState {

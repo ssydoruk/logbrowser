@@ -35,7 +35,6 @@ public abstract class Parser {
     private final FilesParseSettings.FileParseSettings fileParseSettings;
     private final ArrayList<CustomRegexLine> printedCustomLines = new ArrayList<>();
     //</editor-fold>
-    private final CustomAttributeTable custAttrTab = null;
     protected HashMap<TableType, DBTable> m_tables;
     protected ArrayList<String> m_MessageContents;
     protected DateParsed m_LastTimeStamp;
@@ -59,14 +58,18 @@ public abstract class Parser {
     private GenesysMsg lastLogMsg;
     private ArrayList<DateFmt> currentAppDates; //unlikely to have more than 3 date formats in single app
     private DateDiff dateDiff = null;
-    private CustomLineTable custLineTab = null;
+    private DBTablesFiller dbTablesFiller;
 
-    public Parser(FileInfoType type, HashMap<TableType, DBTable> tables) {
+    public Parser(FileInfoType type, HashMap<String, DBTable> tables) {
         super();
-         dbTablesFiller  = new DBTablesFiller(m_tables, Main.getMain().getM_accessor());
+        dbTablesFiller = new DBTablesFiller(tables, Main.getMain().getM_accessor());
+
+        String customTab = getCustomTab(type);
+        tables.put(customTab, new CustomLineTable(type));
+
+
 
         m_MessageContents = new ArrayList<>();
-        m_tables = tables;
         m_type = type;
         m_StringType = FileInfoType.getFileType(type);
 
@@ -262,7 +265,6 @@ public abstract class Parser {
         return ParseGenesys(getTServerStart(str), tabType, ptIgnore, ptSkip);
     }
 
-
     private String parserRet(String ret, Pattern ptSkip) {
         if (dp != null && ptSkip != null && ret != null) {
             Matcher m;
@@ -278,7 +280,6 @@ public abstract class Parser {
     protected String ParseGenesysSCS(String str, TableType tabType, Pattern ptIgnore, Pattern ptSkip) throws Exception {
         return parserRet(ParseGenesysSCS(str, tabType, ptIgnore), ptSkip);
     }
-
 
     protected String ParseGenesys(String str, TableType tabType, Pattern ptIgnore, Pattern ptSkip) throws Exception {
         return parserRet(ParseGenesys(str, tabType, ptIgnore), ptSkip);
@@ -339,7 +340,6 @@ public abstract class Parser {
         return (lastLogMsg != null) ? StringUtils.isNotBlank(lastLogMsg.getLastGenesysMsgLevel()) ? lastLogMsg.getLastGenesysMsgLevel() : null : null;
     }
 
-
     protected String ParseGenesysGMS(String str, TableType tabType, Pattern ptMSGsIgnore) throws Exception {
         dp = ParseTimestamp(str);
         if (dp != null) {
@@ -366,7 +366,6 @@ public abstract class Parser {
             return str;
         }
     }
-
 
     protected String ParseGenesys(String str, TableType tabType) throws Exception {
         return ParseGenesys(str, tabType, null);
@@ -521,8 +520,7 @@ public abstract class Parser {
         }
     }
 
-
-    public void addToDB(Record msg){
+    public void addToDB(Record msg) {
         try {
             Main.logger.traceExit(msg);
             dbTablesFiller.addToDB(msg);
@@ -535,8 +533,8 @@ public abstract class Parser {
     }
 
     public void SetStdFieldsAndAdd(Record msg) {
-            SetStdFields(msg);
-            addToDB(msg);
+        SetStdFields(msg);
+        addToDB(msg);
     }
 
     //    public DateParsed ParseDate(String s) throws Exception {
@@ -583,7 +581,6 @@ public abstract class Parser {
         dbTablesFiller.DoneInserts();
 
     }
-
 
     void setFileInfo(FileInfo _fileInfo) {
         this.fileInfo = _fileInfo;
@@ -663,20 +660,17 @@ public abstract class Parser {
         if (isParseTimeDiff()) {
             dateDiff.doFinalize();
         }
-        if (custAttrTab != null) {
-            custAttrTab.FinalizeDB();
-        }
-        if (custLineTab != null) {
-            custLineTab.FinalizeDB();
-        }
     }
 
-    abstract void init(HashMap<TableType, DBTable> m_tables);
+    abstract void init(HashMap<String, DBTable> m_tables);
 
-    void doneParsingFile() {
+    void doneParsingFile(FileInfo fi) {
         if (!foundBodyDates) {
             Main.logger.error("Not parsed single date; check your parser");
         }
+        fi.setFileEndTime(getLastTimeStamp());
+        addToDB(fi);
+
     }
 
     protected void pError(org.apache.logging.log4j.Logger logger, String string) {
@@ -685,11 +679,7 @@ public abstract class Parser {
 
     private void insertIntoCustom(Matcher m, String key, ArrayList<FilesParseSettings.FileParseCustomSearch.SearchComponent> value, int changeValue,
                                   FilesParseSettings.FileParseCustomSearch fileParseCustomSearch) throws Exception {
-        if (custLineTab == null) {
-            custLineTab = new CustomLineTable(m_type);
-            custLineTab.InitDB();
-        }
-        CustomRegexLine cl = new CustomRegexLine(fileInfo.getM_type(), fileInfo.getRecordID());
+        CustomRegexLine cl = new CustomRegexLine( getCustomTab(m_type) , fileInfo.getRecordID());
         cl.setParams(m, key, value);
 //        int lastPrintedIdx = cl.lastPrintedIdx(fileParseCustomSearch);
 //        Main.logger.info("insertIntoCustom custom [" + lastPrintedIdx + "]");
@@ -710,7 +700,6 @@ public abstract class Parser {
 //        }
 
     }
-
 
     public enum DateIncluded {
         DATE_INCUDED,
@@ -825,7 +814,7 @@ public abstract class Parser {
         private Integer handlerID = null;
         private ArrayList<FilesParseSettings.FileParseCustomSearch.SearchComponent> value;
 
-        public CustomRegexLine(TableType type, int fileID) {
+        public CustomRegexLine(String type, int fileID) {
             super(type, fileID);
         }
 
@@ -984,8 +973,6 @@ public abstract class Parser {
             }
         }
     }
-
-    private DBTablesFiller dbTablesFiller ;
 
     private class CustomLineTable extends DBTable {
 

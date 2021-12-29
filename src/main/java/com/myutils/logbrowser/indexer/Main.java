@@ -67,8 +67,7 @@ public class Main {
     private String alias;
     private int totalFiles = 0;
     private boolean dbExisted = false;
-    private FileInfoTable m_FileInfoTable;
-    private HashMap<TableType, DBTable> m_tables;
+    private HashMap<String, DBTable> m_tables;
     private ThreadPoolExecutor managerThreads;
     private ThreadPoolExecutor parserThreads;
     private boolean ignoreZIP = false;
@@ -326,9 +325,7 @@ public class Main {
                     BufferedReaderCrLf parsingInput = new BufferedReaderCrLf(inputStream);
 
                     lines = parser.ParseFrom(parsingInput, 0, 0, fileInfo);
-                    parser.doneParsingFile();
-                    fileInfo.setFileEndTime(parser.getLastTimeStamp());
-                    parser.addToDB(fileInfo);
+                    parser.doneParsingFile(fileInfo);
                     Main.getMain().getProcessedFiles().put(fileInfo.getLogFileName(),
                             new ProcessedFiles(fileInfo.getLogFileName(), fileInfo.getRecordID(),
                                     fileInfo.getSize()));
@@ -367,117 +364,118 @@ public class Main {
     private void InitTables() {
 
         DBTable t;
-        m_FileInfoTable = new FileInfoTable(m_accessor);
-        m_FileInfoTable.InitDB();
+//        m_FileInfoTable = new FileInfoTable(m_accessor);
+//        m_FileInfoTable.InitDB();
         m_tables = new HashMap<>();
+        m_tables.put(TableType.File.toString(), new FileInfoTable(m_accessor));
 
-        m_tables.put(TableType.ConfigUpdate, new ConfigUpdateTable(m_accessor, TableType.ConfigUpdate));
+        m_tables.put(TableType.ConfigUpdate.toString(), new ConfigUpdateTable(m_accessor, TableType.ConfigUpdate));
 
         t = new TLibTable(m_accessor, TableType.TLib);
-        m_tables.put(TableType.TLib, t);
-        m_tables.put(TableType.TLibProxied, new ProxiedTable(m_accessor, TableType.TLibProxied));
+        m_tables.put(TableType.TLib.toString(), t);
+        m_tables.put(TableType.TLibProxied.toString(), new ProxiedTable(m_accessor, TableType.TLibProxied));
 
-        m_tables.put(TableType.Handler, new HandlerTable(m_accessor, TableType.Handler));
-        m_tables.put(TableType.CIFaceRequest, new CIFaceRequestTable(m_accessor, TableType.CIFaceRequest));
-        m_tables.put(TableType.ISCC, new ISCCTable(m_accessor, TableType.ISCC));
+        m_tables.put(TableType.Handler.toString(), new HandlerTable(m_accessor, TableType.Handler));
+        m_tables.put(TableType.CIFaceRequest.toString(), new CIFaceRequestTable(m_accessor, TableType.CIFaceRequest));
+        m_tables.put(TableType.ISCC.toString(), new ISCCTable(m_accessor, TableType.ISCC));
         t = new SIPTable(m_accessor, TableType.SIP);
-        m_tables.put(TableType.SIP, t);
-        m_tables.put(TableType.ConnID, new ConnIDTable(m_accessor, TableType.ConnID));
-        m_tables.put(TableType.Trigger, new TriggerTable(m_accessor, TableType.Trigger));
+        m_tables.put(TableType.SIP.toString(), t);
+        m_tables.put(TableType.ConnID.toString(), new ConnIDTable(m_accessor, TableType.ConnID));
+        m_tables.put(TableType.Trigger.toString(), new TriggerTable(m_accessor, TableType.Trigger));
         t = new JsonTable(m_accessor, TableType.JSon);
-        m_tables.put(TableType.JSon, t);
+        m_tables.put(TableType.JSon.toString(), t);
 
-        m_tables.put(TableType.URSWaiting, new URSWaitingTable(m_accessor, TableType.URSWaiting));
+        m_tables.put(TableType.URSWaiting.toString(), new URSWaitingTable(m_accessor, TableType.URSWaiting));
 
-        m_tables.put(TableType.SIPMS, new SIPMSTable(m_accessor, TableType.SIPMS));
-        m_tables.put(TableType.SIPEP, new SIPEPTable(m_accessor, TableType.SIPEP));
-        m_tables.put(TableType.VOIPEP, new VOIPEPTable(m_accessor, TableType.VOIPEP));
+        m_tables.put(TableType.SIPMS.toString(), new SIPMSTable(m_accessor, TableType.SIPMS));
+        m_tables.put(TableType.SIPEP.toString(), new SIPEPTable(m_accessor, TableType.SIPEP));
+        m_tables.put(TableType.VOIPEP.toString(), new VOIPEPTable(m_accessor, TableType.VOIPEP));
 
-        m_tables.put(TableType.OCSTLib, new OCSTable(m_accessor, TableType.OCSTLib));
-        m_tables.put(TableType.OCSIxn, new OCSIxnTable(m_accessor, TableType.OCSIxn));
-        m_tables.put(TableType.OCSClient, new OCSClientTable(m_accessor, TableType.OCSClient));
-        m_tables.put(TableType.OCSHTTP, new OCSHTTPTable(m_accessor, TableType.OCSHTTP));
-        m_tables.put(TableType.OCSCG, new OCSCGTable(m_accessor, TableType.OCSCG));
-        m_tables.put(TableType.OCSDBActivity, new OCSDBActivityTable(m_accessor, TableType.OCSDBActivity));
-        m_tables.put(TableType.OCSPAAgentInfo, new OCSPAAgentInfoTable(m_accessor, TableType.OCSPAAgentInfo));
-        m_tables.put(TableType.OCSPASessionInfo, new OCSPASessionInfoTable(m_accessor, TableType.OCSPASessionInfo));
-        m_tables.put(TableType.OCSStatEvent, new OCSStatEventTable(m_accessor, TableType.OCSStatEvent));
-        m_tables.put(TableType.OCSPAEventInfo, new OCSPAEventInfoTable(m_accessor, TableType.OCSPAEventInfo));
-        m_tables.put(TableType.OCSAssignment, new OCSAgentAssignmentTable(m_accessor, TableType.OCSAssignment));
-        m_tables.put(TableType.OCSRecCreate, new OCSRecCreateTable(m_accessor, TableType.OCSRecCreate));
-        m_tables.put(TableType.OCSSCXMLTreatment, new OCSSCXMLTreatmentTable(m_accessor, TableType.OCSSCXMLTreatment));
-        m_tables.put(TableType.OCSSCXMLScript, new OCSSCXMLScriptTable(m_accessor, TableType.OCSSCXMLScript));
-        m_tables.put(TableType.OCSTreatment, new OCSRecTreatmentTable(m_accessor, TableType.OCSTreatment));
-        m_tables.put(TableType.OCSIcon, new OCSIconTable(m_accessor));
+        m_tables.put(TableType.OCSTLib.toString(), new OCSTable(m_accessor, TableType.OCSTLib));
+        m_tables.put(TableType.OCSIxn.toString(), new OCSIxnTable(m_accessor, TableType.OCSIxn));
+        m_tables.put(TableType.OCSClient.toString(), new OCSClientTable(m_accessor, TableType.OCSClient));
+        m_tables.put(TableType.OCSHTTP.toString(), new OCSHTTPTable(m_accessor, TableType.OCSHTTP));
+        m_tables.put(TableType.OCSCG.toString(), new OCSCGTable(m_accessor, TableType.OCSCG));
+        m_tables.put(TableType.OCSDBActivity.toString(), new OCSDBActivityTable(m_accessor, TableType.OCSDBActivity));
+        m_tables.put(TableType.OCSPAAgentInfo.toString(), new OCSPAAgentInfoTable(m_accessor, TableType.OCSPAAgentInfo));
+        m_tables.put(TableType.OCSPASessionInfo.toString(), new OCSPASessionInfoTable(m_accessor, TableType.OCSPASessionInfo));
+        m_tables.put(TableType.OCSStatEvent.toString(), new OCSStatEventTable(m_accessor, TableType.OCSStatEvent));
+        m_tables.put(TableType.OCSPAEventInfo.toString(), new OCSPAEventInfoTable(m_accessor, TableType.OCSPAEventInfo));
+        m_tables.put(TableType.OCSAssignment.toString(), new OCSAgentAssignmentTable(m_accessor, TableType.OCSAssignment));
+        m_tables.put(TableType.OCSRecCreate.toString(), new OCSRecCreateTable(m_accessor, TableType.OCSRecCreate));
+        m_tables.put(TableType.OCSSCXMLTreatment.toString(), new OCSSCXMLTreatmentTable(m_accessor, TableType.OCSSCXMLTreatment));
+        m_tables.put(TableType.OCSSCXMLScript.toString(), new OCSSCXMLScriptTable(m_accessor, TableType.OCSSCXMLScript));
+        m_tables.put(TableType.OCSTreatment.toString(), new OCSRecTreatmentTable(m_accessor, TableType.OCSTreatment));
+        m_tables.put(TableType.OCSIcon.toString(), new OCSIconTable(m_accessor));
 
-        m_tables.put(TableType.StSTEvent, new StSTEventTable(m_accessor, TableType.StSTEvent));
-        m_tables.put(TableType.StSAction, new StSActionTable(m_accessor, TableType.StSAction));
-        m_tables.put(TableType.StSRequestHistory, new StSRequestHistoryTable(m_accessor, TableType.StSRequestHistory));
-        m_tables.put(TableType.StStatus, new StStatusTable(m_accessor, TableType.StStatus));
-        m_tables.put(TableType.StCapacity, new StCapacityTable(m_accessor, TableType.StCapacity));
-        m_tables.put(TableType.IxnSS, new IxnSSTable(m_accessor, TableType.IxnSS));
+        m_tables.put(TableType.StSTEvent.toString(), new StSTEventTable(m_accessor, TableType.StSTEvent));
+        m_tables.put(TableType.StSAction.toString(), new StSActionTable(m_accessor, TableType.StSAction));
+        m_tables.put(TableType.StSRequestHistory.toString(), new StSRequestHistoryTable(m_accessor, TableType.StSRequestHistory));
+        m_tables.put(TableType.StStatus.toString(), new StStatusTable(m_accessor, TableType.StStatus));
+        m_tables.put(TableType.StCapacity.toString(), new StCapacityTable(m_accessor, TableType.StCapacity));
+        m_tables.put(TableType.IxnSS.toString(), new IxnSSTable(m_accessor, TableType.IxnSS));
 
 //        m_tables.put(new ORSEspTable(m_accessor));
 //        m_tables.put(new ORSEventTable(m_accessor));
 //        m_tables.put(new ORSLinkTable(m_accessor));
 //        m_tables.put(new ORSLogTable(m_accessor));
-        m_tables.put(TableType.ORSUrs, new OrsUrsTable(m_accessor, TableType.ORSUrs));
-        m_tables.put(TableType.ORSTlib, new ORSTable(m_accessor, TableType.ORSTlib));
-        m_tables.put(TableType.ORSSidUUID, new ORSSidUUIDTable(m_accessor, TableType.ORSSidUUID));
-        m_tables.put(TableType.ORSSidIxnID, new ORSSidIxnIDTable(m_accessor, TableType.ORSSidIxnID));
-        m_tables.put(TableType.URSCONNIDIxnID, new URSCONNIDIxnIDTable(m_accessor, TableType.URSCONNIDIxnID));
-        m_tables.put(TableType.URSRI, new URSRITable(m_accessor, TableType.URSRI));
+        m_tables.put(TableType.ORSUrs.toString(), new OrsUrsTable(m_accessor, TableType.ORSUrs));
+        m_tables.put(TableType.ORSTlib.toString(), new ORSTable(m_accessor, TableType.ORSTlib));
+        m_tables.put(TableType.ORSSidUUID.toString(), new ORSSidUUIDTable(m_accessor, TableType.ORSSidUUID));
+        m_tables.put(TableType.ORSSidIxnID.toString(), new ORSSidIxnIDTable(m_accessor, TableType.ORSSidIxnID));
+        m_tables.put(TableType.URSCONNIDIxnID.toString(), new URSCONNIDIxnIDTable(m_accessor, TableType.URSCONNIDIxnID));
+        m_tables.put(TableType.URSRI.toString(), new URSRITable(m_accessor, TableType.URSRI));
 
-        m_tables.put(TableType.ORSMetric, new ORSMetricTable(m_accessor, TableType.ORSMetric));
-        m_tables.put(TableType.ORSMetricExtension, new ORSMetricExtensionTable(m_accessor, TableType.ORSMetricExtension));
-        m_tables.put(TableType.ORSSidSid, new ORSSidSidTable(m_accessor, TableType.ORSSidSid));
+        m_tables.put(TableType.ORSMetric.toString(), new ORSMetricTable(m_accessor, TableType.ORSMetric));
+        m_tables.put(TableType.ORSMetricExtension.toString(), new ORSMetricExtensionTable(m_accessor, TableType.ORSMetricExtension));
+        m_tables.put(TableType.ORSSidSid.toString(), new ORSSidSidTable(m_accessor, TableType.ORSSidSid));
 
-        m_tables.put(TableType.ORSHTTP, new OrsHTTPTable(m_accessor));
-        m_tables.put(TableType.ORSMMessage, new ORSMMTable(m_accessor));
+        m_tables.put(TableType.ORSHTTP.toString(), new OrsHTTPTable(m_accessor));
+        m_tables.put(TableType.ORSMMessage.toString(), new ORSMMTable(m_accessor));
 
-        m_tables.put(TableType.URSStrategy, new URSStrategyTable(m_accessor, TableType.URSStrategy));
-        m_tables.put(TableType.URSStrategyInit, new URSStrategyInitTable(m_accessor, TableType.URSStrategyInit));
-        m_tables.put(TableType.URSTlib, new URSTlibTable(m_accessor, TableType.URSTlib));
-        m_tables.put(TableType.URSSTAT, new URSStatTable(m_accessor, TableType.URSSTAT));
-        m_tables.put(TableType.URSRlib, new URSRlibTable(m_accessor, TableType.URSRlib));
-        m_tables.put(TableType.URSCONNIDSID, new URSCONNIDSIDTable(m_accessor, TableType.URSCONNIDSID));
-        m_tables.put(TableType.URSVQ, new URSVQTable(m_accessor, TableType.URSVQ));
-        m_tables.put(TableType.URSTargetSet, new URSTargetSetTable(m_accessor, TableType.URSTargetSet));
+        m_tables.put(TableType.URSStrategy.toString(), new URSStrategyTable(m_accessor, TableType.URSStrategy));
+        m_tables.put(TableType.URSStrategyInit.toString(), new URSStrategyInitTable(m_accessor, TableType.URSStrategyInit));
+        m_tables.put(TableType.URSTlib.toString(), new URSTlibTable(m_accessor, TableType.URSTlib));
+        m_tables.put(TableType.URSSTAT.toString(), new URSStatTable(m_accessor, TableType.URSSTAT));
+        m_tables.put(TableType.URSRlib.toString(), new URSRlibTable(m_accessor, TableType.URSRlib));
+        m_tables.put(TableType.URSCONNIDSID.toString(), new URSCONNIDSIDTable(m_accessor, TableType.URSCONNIDSID));
+        m_tables.put(TableType.URSVQ.toString(), new URSVQTable(m_accessor, TableType.URSVQ));
+        m_tables.put(TableType.URSTargetSet.toString(), new URSTargetSetTable(m_accessor, TableType.URSTargetSet));
 
-        m_tables.put(TableType.WSTlib, new WSTlibTable(m_accessor, TableType.WSTlib));
-        m_tables.put(TableType.WSStat, new WSStatTable(m_accessor, TableType.WSStat));
-        m_tables.put(TableType.WSConf, new WSConfTable(m_accessor, TableType.WSConf));
-        m_tables.put(TableType.WSEServ, new WSEServTable(m_accessor, TableType.WSEServ));
+        m_tables.put(TableType.WSTlib.toString(), new WSTlibTable(m_accessor, TableType.WSTlib));
+        m_tables.put(TableType.WSStat.toString(), new WSStatTable(m_accessor, TableType.WSStat));
+        m_tables.put(TableType.WSConf.toString(), new WSConfTable(m_accessor, TableType.WSConf));
+        m_tables.put(TableType.WSEServ.toString(), new WSEServTable(m_accessor, TableType.WSEServ));
 
-        m_tables.put(TableType.Ixn, new IxnTable(m_accessor, TableType.Ixn));
-        m_tables.put(TableType.IxnDB, new IxnDBActivityTable(m_accessor, TableType.IxnDB));
+        m_tables.put(TableType.Ixn.toString(), new IxnTable(m_accessor, TableType.Ixn));
+        m_tables.put(TableType.IxnDB.toString(), new IxnDBActivityTable(m_accessor, TableType.IxnDB));
 
-        m_tables.put(TableType.MsgOCServer, new GenesysMsgTable(m_accessor, TableType.MsgOCServer));
-        m_tables.put(TableType.MsgIxnServer, new GenesysMsgTable(m_accessor, TableType.MsgIxnServer));
-        m_tables.put(TableType.MsgORServer, new GenesysMsgTable(m_accessor, TableType.MsgORServer));
-        m_tables.put(TableType.MsgTServer, new GenesysMsgTable(m_accessor, TableType.MsgTServer));
-        m_tables.put(TableType.MsgURServer, new GenesysMsgTable(m_accessor, TableType.MsgURServer));
-        m_tables.put(TableType.MsgStatServer, new GenesysMsgTable(m_accessor, TableType.MsgStatServer));
-        m_tables.put(TableType.MsgRM, new GenesysMsgTable(m_accessor, TableType.MsgRM));
-        m_tables.put(TableType.MsgMCP, new GenesysMsgTable(m_accessor, TableType.MsgMCP));
-        m_tables.put(TableType.MsgDBServer, new GenesysMsgTable(m_accessor, TableType.MsgDBServer));
-        m_tables.put(TableType.MsgGMS, new GenesysMsgTable(m_accessor, TableType.MsgGMS));
-        m_tables.put(TableType.MsgConfServer, new GenesysMsgTable(m_accessor, TableType.MsgConfServer));
-        m_tables.put(TableType.MsgWWE, new GenesysMsgTable(m_accessor, TableType.MsgWWE));
+        m_tables.put(TableType.MsgOCServer.toString(), new GenesysMsgTable(m_accessor, TableType.MsgOCServer));
+        m_tables.put(TableType.MsgIxnServer.toString(), new GenesysMsgTable(m_accessor, TableType.MsgIxnServer));
+        m_tables.put(TableType.MsgORServer.toString(), new GenesysMsgTable(m_accessor, TableType.MsgORServer));
+        m_tables.put(TableType.MsgTServer.toString(), new GenesysMsgTable(m_accessor, TableType.MsgTServer));
+        m_tables.put(TableType.MsgURServer.toString(), new GenesysMsgTable(m_accessor, TableType.MsgURServer));
+        m_tables.put(TableType.MsgStatServer.toString(), new GenesysMsgTable(m_accessor, TableType.MsgStatServer));
+        m_tables.put(TableType.MsgRM.toString(), new GenesysMsgTable(m_accessor, TableType.MsgRM));
+        m_tables.put(TableType.MsgMCP.toString(), new GenesysMsgTable(m_accessor, TableType.MsgMCP));
+        m_tables.put(TableType.MsgDBServer.toString(), new GenesysMsgTable(m_accessor, TableType.MsgDBServer));
+        m_tables.put(TableType.MsgGMS.toString(), new GenesysMsgTable(m_accessor, TableType.MsgGMS));
+        m_tables.put(TableType.MsgConfServer.toString(), new GenesysMsgTable(m_accessor, TableType.MsgConfServer));
+        m_tables.put(TableType.MsgWWE.toString(), new GenesysMsgTable(m_accessor, TableType.MsgWWE));
 
-        m_tables.put(TableType.MsgSCServer, new GenesysMsgTable(m_accessor, TableType.MsgSCServer));
-        m_tables.put(TableType.SCSAppStatus, new SCSAppStatusTable(m_accessor));
-        m_tables.put(TableType.SCSSelfStatus, new SCSSelfStatusTable(m_accessor));
+        m_tables.put(TableType.MsgSCServer.toString(), new GenesysMsgTable(m_accessor, TableType.MsgSCServer));
+        m_tables.put(TableType.SCSAppStatus.toString(), new SCSAppStatusTable(m_accessor));
+        m_tables.put(TableType.SCSSelfStatus.toString(), new SCSSelfStatusTable(m_accessor));
 
-        m_tables.put(TableType.MsgLCAServer, new GenesysMsgTable(m_accessor, TableType.MsgLCAServer));
-        m_tables.put(TableType.LCAAppStatus, new LCAAppStatusTable(m_accessor));
-        m_tables.put(TableType.LCAClient, new LCAClientTable(m_accessor));
+        m_tables.put(TableType.MsgLCAServer.toString(), new GenesysMsgTable(m_accessor, TableType.MsgLCAServer));
+        m_tables.put(TableType.LCAAppStatus.toString(), new LCAAppStatusTable(m_accessor));
+        m_tables.put(TableType.LCAClient.toString(), new LCAClientTable(m_accessor));
 
-        m_tables.put(TableType.WWETable, new WWETable(m_accessor, TableType.WWETable));
-        m_tables.put(TableType.WWEException, new ExceptionTable(m_accessor, TableType.WWEException));
-        m_tables.put(TableType.GMSPOST, new GMSPostTable(m_accessor, TableType.GMSPOST));
+        m_tables.put(TableType.WWETable.toString(), new WWETable(m_accessor, TableType.WWETable));
+        m_tables.put(TableType.WWEException.toString(), new ExceptionTable(m_accessor, TableType.WWEException));
+        m_tables.put(TableType.GMSPOST.toString(), new GMSPostTable(m_accessor, TableType.GMSPOST));
 
-        m_tables.put(TableType.GMSORSMessage, new GMSORSTable(m_accessor, TableType.GMSORSMessage));
+        m_tables.put(TableType.GMSORSMessage.toString(), new GMSORSTable(m_accessor, TableType.GMSORSMessage));
 
 //        for (DBTable tab : m_tables.values()) {
 //            tab.InitDB();
@@ -520,8 +518,9 @@ public class Main {
                             File fileFromQueue;
                             logger.info("queueEnd: "+queueEnd.get());
                             while (
-                                    (fileFromQueue = fileQueue.poll(100, TimeUnit.MILLISECONDS)) != null)
+                                    (fileFromQueue = fileQueue.poll(100, TimeUnit.MILLISECONDS)) != null) {
                                 parserThreads.execute(new TheParserThread(fileFromQueue));
+                            }
                         }
                         logger.info("Done kickQeueueManager");
                     } catch (InterruptedException e) {
@@ -739,9 +738,6 @@ public class Main {
     }
 
     private void finalizeWork() throws Exception {
-        m_accessor.DoneInserts();
-        m_accessor.Commit();
-        m_accessor.exit();
 //        m_accessor.join();
         GenesysMsg.updateMsg();
         tabRefs.Finalize();
@@ -751,7 +747,6 @@ public class Main {
                 logger.info("No Genesys logs found.");
             } else {
                 m_accessor.ResetAutoCommit(true);
-                m_FileInfoTable.FinalizeDB();
                 for (DBTable tab : m_tables.values()) {
                     if (tab.isTabCreated()) {
                         logger.info("Finalizing " + tab.getM_type() + " (added " + tab.getRecordsAdded() + " recs)");
@@ -761,6 +756,8 @@ public class Main {
                 FinalizeParsers();
 
             }
+            m_accessor.Commit();
+            m_accessor.DoneInserts();
             m_accessor.Commit();
             m_accessor.Close(true);
 
@@ -877,7 +874,9 @@ public class Main {
 
         }
         if (ret != null) {
-            ret.init(m_tables);
+            synchronized (m_tables) {
+                ret.init(m_tables);
+            }
         }
         return ret;
 
@@ -905,8 +904,9 @@ public class Main {
         queueEnd.set(true);
         managerThreads.shutdown();
         managerThreads.awaitTermination(5, TimeUnit.DAYS);
-//        parserThreads.shutdown();
-//        parserThreads.awaitTermination(5, TimeUnit.DAYS);
+        parserThreads.shutdown();
+        parserThreads.awaitTermination(5, TimeUnit.DAYS);
+        initExecutor(maxThreads);
         scanLogDirectory();
         finalizeWork();
         logger.info("Finish done");

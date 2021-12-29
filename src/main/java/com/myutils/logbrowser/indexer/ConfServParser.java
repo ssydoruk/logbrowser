@@ -50,7 +50,7 @@ public class ConfServParser extends Parser {
     private ParserState m_ParserState;
     private Message msgTmp;
 
-    public ConfServParser(HashMap<TableType, DBTable> m_tables) {
+    public ConfServParser(HashMap<String, DBTable> m_tables) {
         super(FileInfoType.type_ConfServer, m_tables);
 
     }
@@ -97,8 +97,8 @@ public class ConfServParser extends Parser {
 
         } catch (Exception e) {
             Main.logger.error(e);
-            return m_CurrentLine - line;
         }
+
 
         return m_CurrentLine - line;
     }
@@ -413,10 +413,10 @@ public class ConfServParser extends Parser {
     }
 
     @Override
-    void init(HashMap<TableType, DBTable> m_tables) {
-        m_tables.put(TableType.CSUpdate, new CSClientMessageTable(Main.getInstance().getM_accessor(), TableType.CSUpdate));
-        m_tables.put(TableType.CSConfigChange, new CSObjectChangeTable(Main.getInstance().getM_accessor(), TableType.CSConfigChange));
-        m_tables.put(TableType.CSClientConnect, new CSClientConnectTable(Main.getInstance().getM_accessor(), TableType.CSClientConnect));
+    void init(HashMap<String, DBTable> m_tables) {
+        m_tables.put(TableType.CSUpdate.toString(), new CSClientMessageTable(Main.getInstance().getM_accessor(), TableType.CSUpdate));
+        m_tables.put(TableType.CSConfigChange.toString(), new CSObjectChangeTable(Main.getInstance().getM_accessor(), TableType.CSConfigChange));
+        m_tables.put(TableType.CSClientConnect.toString(), new CSClientConnectTable(Main.getInstance().getM_accessor(), TableType.CSClientConnect));
 
     }
 

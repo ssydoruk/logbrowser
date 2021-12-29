@@ -14,14 +14,18 @@ import java.util.HashMap;
 class DBTablesFiller {
 
     private static final Logger logger = Main.logger;
-    private final HashMap<TableType, DBTable> dbTables;
+    private final HashMap<String, DBTable> dbTables;
     private final SqliteAccessor accessor;
-    private HashMap<TableType, StatParser> stats;
+    private HashMap<String, StatParser> stats;
 
-    DBTablesFiller(HashMap<TableType, DBTable> tables, SqliteAccessor accessor) {
+    DBTablesFiller(HashMap<String, DBTable> tables, SqliteAccessor accessor) {
         stats = new HashMap<>();
         this.dbTables = tables;
         this.accessor = accessor;
+    }
+
+    public HashMap<String, DBTable> getDbTables(){
+        return dbTables;
     }
 
 
@@ -31,10 +35,13 @@ class DBTablesFiller {
             Submit(st);
     }
 
-    private StatParser getStatement(TableType type) throws SQLException {
+    private StatParser getStatement(String type) throws SQLException {
         StatParser ret = stats.get(type);
         if (ret == null) {
-            DBTable dbTable = dbTables.get(type);
+            DBTable dbTable;
+            synchronized (dbTables) {
+                 dbTable = dbTables.get(type);
+            }
             if (dbTable == null) {
                 logger.fatal("Not found table for type [" + type + "]");
             } else {

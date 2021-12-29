@@ -65,7 +65,7 @@ public class WWECloudParser extends Parser {
     private String m_msg1;
     private Object msg;
 
-    public WWECloudParser(HashMap<TableType, DBTable> m_tables) {
+    public WWECloudParser(HashMap<String, DBTable> m_tables) {
         super(FileInfoType.type_WWECloud, m_tables);
     }
 
@@ -107,10 +107,10 @@ public class WWECloudParser extends Parser {
 
                 m_LastLine = str; // store previous line for server name
             }
-        } catch (IOException e) {
+        } catch (Exception e) {
             Main.logger.error(e);
-            return m_CurrentLine - line;
         }
+
 
         return m_CurrentLine - line;
     }
@@ -253,11 +253,11 @@ public class WWECloudParser extends Parser {
     }
 
     @Override
-    void init(HashMap<TableType, DBTable> m_tables) {
-        m_tables.put(TableType.WWECloud, new WWECloudTable(Main.getInstance().getM_accessor(), TableType.WWECloud));
-        m_tables.put(TableType.WWECloudAuth, new WWECloudAuthTab(Main.getInstance().getM_accessor(), TableType.WWECloudAuth));
-        m_tables.put(TableType.WWECloudException, new WWECloudExeptionTab(Main.getInstance().getM_accessor(), TableType.WWECloudException));
-        m_tables.put(TableType.WWECloudLog, new WWECloudLogTab(Main.getInstance().getM_accessor(), TableType.WWECloudLog));
+    void init(HashMap<String, DBTable> m_tables) {
+        m_tables.put(TableType.WWECloud.toString(), new WWECloudTable(Main.getInstance().getM_accessor(), TableType.WWECloud));
+        m_tables.put(TableType.WWECloudAuth.toString(), new WWECloudAuthTab(Main.getInstance().getM_accessor(), TableType.WWECloudAuth));
+        m_tables.put(TableType.WWECloudException.toString(), new WWECloudExeptionTab(Main.getInstance().getM_accessor(), TableType.WWECloudException));
+        m_tables.put(TableType.WWECloudLog.toString(), new WWECloudLogTab(Main.getInstance().getM_accessor(), TableType.WWECloudLog));
 
     }
 

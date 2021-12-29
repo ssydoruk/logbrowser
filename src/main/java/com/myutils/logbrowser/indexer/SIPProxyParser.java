@@ -88,7 +88,7 @@ public class SIPProxyParser extends Parser {
     private String handleAdd;
     private long lastSeqNo = 0;
 
-    public SIPProxyParser(HashMap<TableType, DBTable> m_tables) {
+    public SIPProxyParser(HashMap<String, DBTable> m_tables) {
         super(FileInfoType.type_SessionController, m_tables);
         this.extraBuff = new ArrayList<>();
         //m_accessor = accessor;
@@ -163,8 +163,8 @@ public class SIPProxyParser extends Parser {
             ParseLine(input, ""); // to complete the parsing of the last line/last message
         } catch (Exception e) {
             Main.logger.error(e);
-            return m_CurrentLine - line;
         }
+
 
         return m_CurrentLine - line;
     }
@@ -832,7 +832,7 @@ public class SIPProxyParser extends Parser {
     }
 
     @Override
-    void init(HashMap<TableType, DBTable> m_tables) {
+    void init(HashMap<String, DBTable> m_tables) {
     }
 
     enum ParserState {

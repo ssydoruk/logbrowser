@@ -63,7 +63,7 @@ public class MCPParser extends Parser {
     private boolean isInbound;
     private String SIPMessage;
     private String SIPURI;
-    public MCPParser(HashMap<TableType, DBTable> m_tables) {
+    public MCPParser(HashMap<String, DBTable> m_tables) {
         super(FileInfoType.type_MCP, m_tables);
         this.extraBuff = new ArrayList<>();
         //m_accessor = accessor;
@@ -185,8 +185,8 @@ public class MCPParser extends Parser {
             ParseLine(input, "", fi); // to complete the parsing of the last line/last message
         } catch (Exception e) {
             Main.logger.error(e);
-            return m_CurrentLine - line;
         }
+
 
         return m_CurrentLine - line;
     }
@@ -466,8 +466,8 @@ public class MCPParser extends Parser {
     }
 
     @Override
-    void init(HashMap<TableType, DBTable> m_tables) {
-        m_tables.put(TableType.VXMLIntStepsTable, new VXMLIntStepTable(Main.getInstance().getM_accessor(), TableType.VXMLIntStepsTable));
+    void init(HashMap<String, DBTable> m_tables) {
+        m_tables.put(TableType.VXMLIntStepsTable.toString(), new VXMLIntStepTable(Main.getInstance().getM_accessor(), TableType.VXMLIntStepsTable));
     }
 
     private void noCallMessage(String[] split, int initalIndex) {

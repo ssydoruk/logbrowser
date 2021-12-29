@@ -61,7 +61,7 @@ public class RMParser extends Parser {
     private boolean inbound;
     private DateParsed dpHeader;
 
-    public RMParser(HashMap<TableType, DBTable> m_tables) {
+    public RMParser(HashMap<String, DBTable> m_tables) {
         super(FileInfoType.type_RM, m_tables);
         this.extraBuff = new ArrayList<>();
         //m_accessor = accessor;
@@ -136,8 +136,8 @@ public class RMParser extends Parser {
             ParseLine(input, ""); // to complete the parsing of the last line/last message
         } catch (Exception e) {
             Main.logger.error(e);
-            return m_CurrentLine - line;
         }
+
 
         return m_CurrentLine - line;
     }
@@ -487,7 +487,7 @@ public class RMParser extends Parser {
     }
 
     @Override
-    void init(HashMap<TableType, DBTable> m_tables) {
+    void init(HashMap<String, DBTable> m_tables) {
     }
 
     enum ParserState {

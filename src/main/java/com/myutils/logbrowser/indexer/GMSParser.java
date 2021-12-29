@@ -155,7 +155,7 @@ public class GMSParser extends Parser {
     private String oldThread;
     private String savedThreadID;
 
-    GMSParser(HashMap<TableType, DBTable> m_tables) {
+    GMSParser(HashMap<String, DBTable> m_tables) {
         super(FileInfoType.type_GMS, m_tables);
         m_MessageContents = new ArrayList();
         ThreadAlias.put("ORSInternal", "FMWeb");
@@ -285,7 +285,6 @@ public class GMSParser extends Parser {
 //            ParseLine("", null); // to complete the parsing of the last line/last message
         } catch (IOException e) {
             Main.logger.error(e);
-            return m_CurrentLine - line;
         }
 
         return m_CurrentLine - line;
@@ -601,11 +600,11 @@ public class GMSParser extends Parser {
     }
 
     @Override
-    void init(HashMap<TableType, DBTable> m_tables) {
-        m_tables.put(TableType.GMSStart, new GMSStartTable(Main.getInstance().getM_accessor(), TableType.GMSStart));
-        m_tables.put(TableType.GMSStatServerMessage, new GMSStatServerMsgTable(Main.getInstance().getM_accessor(), TableType.GMSStatServerMessage));
-        m_tables.put(TableType.GMSWebClientMessage, new GMSWebClientMsgTable(Main.getInstance().getM_accessor(), TableType.GMSWebClientMessage));
-        m_tables.put(TableType.IxnGMS, new IxnGMSTable(Main.getInstance().getM_accessor(), TableType.IxnGMS));
+    void init(HashMap<String, DBTable> m_tables) {
+        m_tables.put(TableType.GMSStart.toString(), new GMSStartTable(Main.getInstance().getM_accessor(), TableType.GMSStart));
+        m_tables.put(TableType.GMSStatServerMessage.toString(), new GMSStatServerMsgTable(Main.getInstance().getM_accessor(), TableType.GMSStatServerMessage));
+        m_tables.put(TableType.GMSWebClientMessage.toString(), new GMSWebClientMsgTable(Main.getInstance().getM_accessor(), TableType.GMSWebClientMessage));
+        m_tables.put(TableType.IxnGMS.toString(), new IxnGMSTable(Main.getInstance().getM_accessor(), TableType.IxnGMS));
 
     }
 

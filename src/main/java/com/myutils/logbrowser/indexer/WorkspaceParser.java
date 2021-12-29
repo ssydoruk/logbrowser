@@ -84,7 +84,7 @@ public class WorkspaceParser extends Parser {
     private String ConnID;
     private String URSRest;
 
-    public WorkspaceParser(HashMap<TableType, DBTable> m_tables) {
+    public WorkspaceParser(HashMap<String, DBTable> m_tables) {
         super(FileInfoType.type_WorkSpace, m_tables);
 
 //17:33:06.335_I_I_03350282382b556f [07:07] HERE IS TARGETS
@@ -205,8 +205,8 @@ public class WorkspaceParser extends Parser {
             ParseLine(""); // to complete the parsing of the last line/last message
         } catch (Exception e) {
             Main.logger.error(e);
-            return m_CurrentLine - line;
         }
+
 
         return m_CurrentLine - line;
     }
@@ -472,7 +472,7 @@ public class WorkspaceParser extends Parser {
     }
 
     @Override
-    void init(HashMap<TableType, DBTable> m_tables) {
+    void init(HashMap<String, DBTable> m_tables) {
     }
 
     // parse state contants

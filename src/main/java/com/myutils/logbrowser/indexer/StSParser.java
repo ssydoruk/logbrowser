@@ -47,7 +47,7 @@ public class StSParser extends Parser {
     private String m_LastLine;
     private boolean customEvent = false;
 
-    public StSParser(HashMap<TableType, DBTable> m_tables) {
+    public StSParser(HashMap<String, DBTable> m_tables) {
         super(FileInfoType.type_StatServer, m_tables);
         m_BlockNamesToIgnoreHash = new HashMap();
 
@@ -118,8 +118,8 @@ public class StSParser extends Parser {
 
         } catch (Exception e) {
             Main.logger.error(e);
-            return m_CurrentLine - line;
         }
+
 
         return m_CurrentLine - line;
     }
@@ -499,7 +499,7 @@ public class StSParser extends Parser {
     }
 
     @Override
-    void init(HashMap<TableType, DBTable> m_tables) {
+    void init(HashMap<String, DBTable> m_tables) {
     }
 
     enum ParserState {

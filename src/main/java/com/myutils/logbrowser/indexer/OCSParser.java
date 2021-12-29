@@ -140,7 +140,7 @@ public class OCSParser extends Parser {
     private String m_LastLine = "";
     private boolean isRequest;
 
-    OCSParser(HashMap<TableType, DBTable> m_tables) {
+    OCSParser(HashMap<String, DBTable> m_tables) {
         super(FileInfoType.type_OCS, m_tables);
     }
 
@@ -273,8 +273,8 @@ public class OCSParser extends Parser {
             ParseLine("", null); // to complete the parsing of the last line/last message
         } catch (Exception e) {
             Main.logger.error(e);
-            return m_CurrentLine - line;
         }
+
 
         return m_CurrentLine - line;
     }
@@ -664,8 +664,8 @@ public class OCSParser extends Parser {
     }
 
     @Override
-    void init(HashMap<TableType, DBTable> m_tables) {
-        m_tables.put(TableType.OCSPredInfo, new OCSPredInfoTable(Main.getInstance().getM_accessor(), TableType.OCSPredInfo));
+    void init(HashMap<String, DBTable> m_tables) {
+        m_tables.put(TableType.OCSPredInfo.toString(), new OCSPredInfoTable(Main.getInstance().getM_accessor(), TableType.OCSPredInfo));
     }
 
     private void AddConfigMessage(String s) {

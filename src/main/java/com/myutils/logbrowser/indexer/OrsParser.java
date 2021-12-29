@@ -135,7 +135,7 @@ public class OrsParser extends Parser {
     private boolean isInbound = true;
     private Message msg = null; // used to store method not committed to DB yet
 
-    OrsParser(HashMap<TableType, DBTable> m_tables) {
+    OrsParser(HashMap<String, DBTable> m_tables) {
         super(FileInfoType.type_ORS, m_tables);
         ThreadAlias.put("ORSInternal", "FMWeb");
         ptpsThreadProcessor = new ParserThreadsProcessor();
@@ -247,10 +247,10 @@ public class OrsParser extends Parser {
 //                m_CurrentFilePos += str.length()+input.charsSkippedOnReadLine;
             }
 //            ParseLine("", null); // to complete the parsing of the last line/last message
-        } catch (IOException e) {
+        } catch (Exception e) {
             Main.logger.error(e);
-            return m_CurrentLine - line;
         }
+
 
         return m_CurrentLine - line;
     }
@@ -910,10 +910,10 @@ public class OrsParser extends Parser {
     }
 
     @Override
-    void init(HashMap<TableType, DBTable> m_tables) {
-        m_tables.put(TableType.ORSCallID, new ORSCallIDTable(Main.getInstance().getM_accessor(), TableType.ORSCallID));
-        m_tables.put(TableType.ORSAlarm, new ORSAlarmTable(Main.getInstance().getM_accessor(), TableType.ORSAlarm));
-        m_tables.put(TableType.ORSSessionStart, new ORSSessionStartTable(Main.getInstance().getM_accessor(), TableType.ORSSessionStart));
+    void init(HashMap<String, DBTable> m_tables) {
+        m_tables.put(TableType.ORSCallID.toString(), new ORSCallIDTable(Main.getInstance().getM_accessor(), TableType.ORSCallID));
+        m_tables.put(TableType.ORSAlarm.toString(), new ORSAlarmTable(Main.getInstance().getM_accessor(), TableType.ORSAlarm));
+        m_tables.put(TableType.ORSSessionStart.toString(), new ORSSessionStartTable(Main.getInstance().getM_accessor(), TableType.ORSSessionStart));
 
     }
 

@@ -27,7 +27,7 @@ public class ApacheWebLogsParser extends WebParser {
     int m_dbRecords = 0;
     private ParserState m_ParserState;
 
-    public ApacheWebLogsParser(HashMap<TableType, DBTable> m_tables) {
+    public ApacheWebLogsParser(HashMap<String, DBTable> m_tables) {
         super(FileInfoType.type_WWECloud, m_tables);
     }
 
@@ -73,8 +73,9 @@ public class ApacheWebLogsParser extends WebParser {
             }
         } catch (IOException e) {
             Main.logger.error(e);
-            return m_CurrentLine - line;
         }
+
+
 
         return m_CurrentLine - line;
     }
@@ -132,8 +133,8 @@ public class ApacheWebLogsParser extends WebParser {
     }
 
     @Override
-    void init(HashMap<TableType, DBTable> m_tables) {
-        m_tables.put(TableType.ApacheWeb, new ApacheWebTab(Main.getInstance().getM_accessor(), TableType.ApacheWeb));
+    void init(HashMap<String, DBTable> m_tables) {
+        m_tables.put(TableType.ApacheWeb.toString(), new ApacheWebTab(Main.getInstance().getM_accessor(), TableType.ApacheWeb));
 
     }
 

@@ -4,6 +4,7 @@
  */
 package com.myutils.logbrowser.indexer;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -23,7 +24,7 @@ public class IconParser extends Parser {
 
     int m_dbRecords = 0;
 
-    public IconParser(HashMap<TableType, DBTable> m_tables) {
+    public IconParser(HashMap<String, DBTable> m_tables) {
         super(FileInfoType.type_ICON, m_tables);
     }
 
@@ -59,7 +60,7 @@ public class IconParser extends Parser {
             }
             ParseLine(""); // to complete the parsing of the last line/last message
         } catch (Exception e) {
-            return m_CurrentLine - line;
+            Main.logger.error(e);
         }
 
         return m_CurrentLine - line;
@@ -179,6 +180,6 @@ public class IconParser extends Parser {
     }
 
     @Override
-    void init(HashMap<TableType, DBTable> m_tables) {
+    void init(HashMap<String, DBTable> m_tables) {
     }
 }

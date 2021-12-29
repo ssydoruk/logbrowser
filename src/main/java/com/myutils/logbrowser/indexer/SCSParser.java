@@ -43,7 +43,7 @@ public class SCSParser extends Parser {
     private String lastMSGID;
     private String lastMSGText;
 
-    public SCSParser(HashMap<TableType, DBTable> m_tables) {
+    public SCSParser(HashMap<String, DBTable> m_tables) {
         super(FileInfoType.type_SCS, m_tables);
     }
 
@@ -93,8 +93,8 @@ public class SCSParser extends Parser {
 
         } catch (Exception e) {
             Main.logger.error(e);
-            return m_CurrentLine - line;
         }
+
 
         return m_CurrentLine - line;
     }
@@ -410,9 +410,9 @@ public class SCSParser extends Parser {
     }
 
     @Override
-    void init(HashMap<TableType, DBTable> m_tables) {
-        m_tables.put(TableType.SCSClientLogMessage, new SCSClientLogTable(Main.getInstance().getM_accessor(), TableType.SCSClientLogMessage));
-        m_tables.put(TableType.SCSAlarm, new SCSAlarmTable(Main.getInstance().getM_accessor(), TableType.SCSAlarm));
+    void init(HashMap<String, DBTable> m_tables) {
+        m_tables.put(TableType.SCSClientLogMessage.toString(), new SCSClientLogTable(Main.getInstance().getM_accessor(), TableType.SCSClientLogMessage));
+        m_tables.put(TableType.SCSAlarm.toString(), new SCSAlarmTable(Main.getInstance().getM_accessor(), TableType.SCSAlarm));
 
     }
 

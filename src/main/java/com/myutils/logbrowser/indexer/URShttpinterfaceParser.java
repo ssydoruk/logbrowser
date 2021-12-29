@@ -73,7 +73,7 @@ public class URShttpinterfaceParser extends WebParser {
     private int m_PacketLength;
     private String thread; // current thread name as parsed fom the line
 
-    URShttpinterfaceParser(HashMap<TableType, DBTable> m_tables) {
+    URShttpinterfaceParser(HashMap<String, DBTable> m_tables) {
         super(FileInfoType.type_URSHTTP, m_tables);
         m_MessageContents = new ArrayList();
         ThreadAlias.put("ORSInternal", "FMWeb");
@@ -121,10 +121,10 @@ public class URShttpinterfaceParser extends WebParser {
 //                m_CurrentFilePos += str.length()+input.charsSkippedOnReadLine;
             }
 //            ParseLine("", null); // to complete the parsing of the last line/last message
-        } catch (IOException e) {
+        } catch (Exception e) {
             Main.logger.error(e);
-            return m_CurrentLine - line;
         }
+
 
         return m_CurrentLine - line;
     }
@@ -331,9 +331,9 @@ public class URShttpinterfaceParser extends WebParser {
     }
 
     @Override
-    void init(HashMap<TableType, DBTable> m_tables) {
-        m_tables.put(TableType.URSHTTP, new ursHTTPMsgTable(Main.getInstance().getM_accessor()));
-        m_tables.put(TableType.HTTP_TO_URS, new HTTPtoURSTable(Main.getInstance().getM_accessor()));
+    void init(HashMap<String, DBTable> m_tables) {
+        m_tables.put(TableType.URSHTTP.toString(), new ursHTTPMsgTable(Main.getInstance().getM_accessor()));
+        m_tables.put(TableType.HTTP_TO_URS.toString(), new HTTPtoURSTable(Main.getInstance().getM_accessor()));
 
     }
 

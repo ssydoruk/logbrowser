@@ -29,7 +29,7 @@ public class IxnServerParser extends Parser {
     private static final HashSet<String> nonIxnMsg = getNonIxnMsg();
     HashMap<String, String> prevSeqno = new HashMap();
     private ParserState m_ParserState;
-    IxnServerParser(HashMap<TableType, DBTable> m_tables) {
+    IxnServerParser(HashMap<String, DBTable> m_tables) {
         super(FileInfoType.type_IxnServer, m_tables);
     }
 
@@ -105,25 +105,8 @@ public class IxnServerParser extends Parser {
             ParseLine("", null); // to complete the parsing of the last line/last message
         } catch (Exception e) {
             Main.logger.error(e);
-            return m_CurrentLine - line;
         }
-//        for (Class<? extends Record> class1 : avail) {
-//            try {
-//                Integer name = (Integer) class1.getMethod("getObjCreated").invoke(null);
-//                Main.logger.info("Added " + class1.toString() + " " + name);
-//            } catch (NoSuchMethodException ex) {
-//                
-//                Main.logger.error( ex);
-//            } catch (SecurityException ex) {
-//                Main.logger.error( ex);
-//            } catch (IllegalAccessException ex) {
-//                Main.logger.error( ex);
-//            } catch (IllegalArgumentException ex) {
-//                Main.logger.error( ex);
-//            } catch (InvocationTargetException ex) {
-//                Main.logger.error( ex);
-//            }
-//        }
+
 
         return m_CurrentLine - line;
     }
@@ -381,8 +364,8 @@ public class IxnServerParser extends Parser {
     }
 
     @Override
-    void init(HashMap<TableType, DBTable> m_tables) {
-        m_tables.put(TableType.IxnNonIxn, new IxnNonIxnTable(Main.getInstance().getM_accessor(), TableType.IxnNonIxn));
+    void init(HashMap<String, DBTable> m_tables) {
+        m_tables.put(TableType.IxnNonIxn.toString(), new IxnNonIxnTable(Main.getInstance().getM_accessor(), TableType.IxnNonIxn));
 
     }
 

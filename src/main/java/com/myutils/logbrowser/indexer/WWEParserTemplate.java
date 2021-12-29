@@ -45,7 +45,7 @@ public class WWEParserTemplate extends WebParser {
     private boolean skipMessage;
     private Message msg;
 
-    WWEParserTemplate(HashMap<TableType, DBTable> m_tables) {
+    WWEParserTemplate(HashMap<String, DBTable> m_tables) {
         super(FileInfoType.type_WWE, m_tables);
         m_MessageContents = new ArrayList();
         ThreadAlias.put("ORSInternal", "FMWeb");
@@ -104,10 +104,10 @@ public class WWEParserTemplate extends WebParser {
 //                m_CurrentFilePos += str.length()+input.charsSkippedOnReadLine;
             }
 //            ParseLine("", null); // to complete the parsing of the last line/last message
-        } catch (IOException e) {
+        } catch (Exception e) {
             Main.logger.error(e);
-            return m_CurrentLine - line;
         }
+
 
         return m_CurrentLine - line;
     }
@@ -190,8 +190,8 @@ public class WWEParserTemplate extends WebParser {
     }
 
     @Override
-    void init(HashMap<TableType, DBTable> m_tables) {
-        m_tables.put(TableType.WWEMessage, new WWEDebugMessageTable(Main.getInstance().getM_accessor(), TableType.WWEMessage));
+    void init(HashMap<String, DBTable> m_tables) {
+        m_tables.put(TableType.WWEMessage.toString(), new WWEDebugMessageTable(Main.getInstance().getM_accessor(), TableType.WWEMessage));
 
     }
 
