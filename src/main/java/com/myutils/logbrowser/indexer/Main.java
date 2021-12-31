@@ -280,13 +280,13 @@ public class Main {
             if (filesInDir1.isFile()) {
                 for (int attempt = 0; attempt < MAX_OPEN_ATTEMPT; attempt++) {
                     try {
-                        LogFileWrapper logFile = LogFileWrapper.getContainer(filesInDir1);
+                        LogFileWrapper logFile = LogFileWrapper.getContainer(filesInDir1, baseDir);
                         if (logFile != null) {
                             extendFilesList(filesToAccess, logFile);
                         }
                         break;
                     } catch (java.util.zip.ZipException e) {
-                        logger.info("Exception opening ZIP file " + e.getMessage());
+                        logger.debug("Exception opening ZIP file " + e.getMessage());
                         try {
                             Thread.sleep(500);
                         } catch (InterruptedException ex) {
@@ -516,9 +516,9 @@ public class Main {
                         }
                         while (!queueEnd.get() || !fileQueue.isEmpty()) {
                             File fileFromQueue;
-                            logger.info("queueEnd: "+queueEnd.get());
+//                            logger.info("queueEnd: "+queueEnd.get());
                             while (
-                                    (fileFromQueue = fileQueue.poll(100, TimeUnit.MILLISECONDS)) != null) {
+                                    (fileFromQueue = fileQueue.poll(300, TimeUnit.MILLISECONDS)) != null) {
                                 parserThreads.execute(new TheParserThread(fileFromQueue));
                             }
                         }
@@ -568,7 +568,7 @@ public class Main {
         if (f.isDirectory()) {
             ScanDir(f, filesToAccess);
         } else {
-            LogFileWrapper log = LogFileWrapper.getContainer(f);
+            LogFileWrapper log = LogFileWrapper.getContainer(f, baseDir);
             if (log != null) {
                 extendFilesList(filesToAccess, log);
             }
@@ -1395,7 +1395,7 @@ public class Main {
         @Override
         public void run() {
 //            Thread.currentThread().setName("parser");
-            LogFileWrapper logFile = LogFileWrapper.getContainer(file);
+            LogFileWrapper logFile = LogFileWrapper.getContainer(file, baseDir);
 
             if (logFile != null)
                 for (FileInfo fi : logFile.getFileInfos()) {

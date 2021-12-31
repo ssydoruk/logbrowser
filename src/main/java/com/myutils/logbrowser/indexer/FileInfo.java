@@ -11,6 +11,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Paths;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
@@ -102,6 +103,7 @@ public final class FileInfo extends Record {
 
     FileInfo(File file, LogFileWrapper wrapper) throws IOException {
         this(file);
+        m_path = wrapper.getRelativeFile(file);
         filePath = FilenameUtils.normalize(file.getAbsolutePath());
         fileDir = new File(filePath).getParent();
         this.logFile = wrapper;
@@ -124,7 +126,7 @@ public final class FileInfo extends Record {
         Main.logger.trace(this.toString());
 
         this.logFile = aThis;
-        this.archiveName = logFile.getName();
+        this.archiveName = aThis.getRelativeFile(logFile.getFile());
     }
 
     FileInfo(File _file) throws IOException {

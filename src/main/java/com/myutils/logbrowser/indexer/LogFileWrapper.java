@@ -9,6 +9,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Set;
 
@@ -19,19 +20,30 @@ public abstract class LogFileWrapper {
 
     private final File file;
     private final HashMap<FileInfo, Object> fileInfoFileMap = new HashMap<>();
-    private boolean ignoreLog = false;
-    LogFileWrapper(File file) throws IOException {
-        this.file = file;
+
+    public String getBaseDir() {
+        return baseDir;
     }
 
-    public static LogFileWrapper getContainer(File file) {
+    public String getRelativeFile(File f) {
+        return Paths.get(getBaseDir()).relativize(Paths.get(f.getAbsolutePath())).toString();
+    }
+
+    private final String baseDir;
+    private boolean ignoreLog = false;
+    LogFileWrapper(File file, String baseDir) throws IOException {
+        this.file = file;
+        this.baseDir=baseDir;
+    }
+
+    public static LogFileWrapper getContainer(File file, String baseDir) {
         LogFileWrapper ret = null;
         try {
             if (file.getName().toLowerCase().endsWith(".log")) {
-                ret = new TextLog(file);
+                ret = new TextLog(file, baseDir);
             } else if (!Main.getMain().isIgnoreZIP()) {
                 if (file.getName().toLowerCase().endsWith(".zip")) {
-                    return new ZIPLog(file);
+                    return new ZIPLog(file, baseDir);
                 }
             }
         } catch (IOException ex) {

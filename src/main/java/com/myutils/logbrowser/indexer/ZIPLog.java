@@ -26,8 +26,8 @@ public final class ZIPLog extends LogFileWrapper {
     private int filesProcessed;
     private InputStream curStream = null;
 
-    public ZIPLog(File file) throws IOException {
-        super(file);
+    public ZIPLog(File file, String baseDir) throws IOException {
+        super(file, baseDir);
         open();
     }
 

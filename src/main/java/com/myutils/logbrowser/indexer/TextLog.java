@@ -15,8 +15,8 @@ public final class TextLog extends LogFileWrapper {
     private static final org.apache.logging.log4j.Logger logger = Main.logger;
     private FileInputStream stream = null;
 
-    public TextLog(File file) throws IOException {
-        super(file);
+    public TextLog(File file, String baseDir) throws IOException {
+        super(file, baseDir);
         FileInfo fi = new FileInfo(file, this);
         try (FileInputStream fileInputStream = new FileInputStream(file)) {
             if (fi.CheckLog(fileInputStream) == FileInfoType.type_Unknown) {

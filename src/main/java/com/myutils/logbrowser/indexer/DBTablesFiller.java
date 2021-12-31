@@ -58,10 +58,9 @@ class DBTablesFiller {
     public void Submit(StatParser st) throws SQLException {
         logger.trace("Submitting " + st);
         st.Submit();
-        if (st.cnt >= 10_000) {
+        if (st.cnt % 10_000 == 0) {
 //                Main.m_accessor.flush(st);
             st.flush();
-            st.cnt = 0;
         }
     }
 
