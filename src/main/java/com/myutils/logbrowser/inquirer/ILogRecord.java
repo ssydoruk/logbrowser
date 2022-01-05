@@ -167,6 +167,7 @@ public abstract class ILogRecord {
                     for (int i = 1; i <= meta.getColumnCount(); i++) {
                         String cName = meta.getColumnName(i).toLowerCase();
                         Object obj = rs.getObject(i);
+                        if(obj==null) obj = new String("");
                         if (cName == null) {
                             cName = "";
                         }

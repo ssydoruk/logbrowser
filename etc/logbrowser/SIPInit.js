@@ -86,7 +86,12 @@ for (var s of RECORD.getBytes().split("\n")) {
   }
 }
 if (lastLine != undefined) {
-  FIELDS.put("treatment", decodeURIComponent(lastLine).replace(/&/g, ' ').replace(/\\"/g, '"'));
+  try{
+    FIELDS.put("treatment", decodeURIComponent(lastLine).replace(/&/g, ' ').replace(/\\"/g, '"'));
+  }
+  catch(error){
+    FIELDS.put("treatment", '<UNDECODED>');
+  }
 }
 
 function setFields(key, value){

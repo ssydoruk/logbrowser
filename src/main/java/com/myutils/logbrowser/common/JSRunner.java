@@ -54,7 +54,11 @@ public class JSRunner {
         bindings.putMember("RECORD", rec);
         bindings.putMember("FIELDS", scriptFields);
         bindings.putMember("IGNORE_RECORD", false);
-        cont.eval("js", script);
+        try {
+            cont.eval("js", script);
+        } catch (Exception e) {
+            logger.error("Exception evaluating script ["+script+"]", e);
+        }
         boolean ret = bindings.getMember("IGNORE_RECORD").asBoolean();
         logger.trace("evalFields [" + scriptFields + "], ignored:[" + ret + "] - result of [" + script + "]");
         return ret;
