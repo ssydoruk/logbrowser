@@ -38,7 +38,7 @@ public class LCAParser extends Parser {
     int m_dbRecords = 0;
     private ParserState m_ParserState;
 
-    public LCAParser(HashMap<String, DBTable> m_tables) {
+    public LCAParser(DBTables  m_tables) {
         super(FileInfoType.type_LCA, m_tables);
         m_BlockNamesToIgnoreHash = new HashMap();
 
@@ -312,7 +312,7 @@ public class LCAParser extends Parser {
     }
 
     @Override
-    void init(HashMap<String, DBTable> m_tables) {
+    void init(DBTables  m_tables) {
     }
 
     enum ParserState {

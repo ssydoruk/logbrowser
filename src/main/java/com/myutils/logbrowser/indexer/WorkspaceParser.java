@@ -84,7 +84,7 @@ public class WorkspaceParser extends Parser {
     private String ConnID;
     private String URSRest;
 
-    public WorkspaceParser(HashMap<String, DBTable> m_tables) {
+    public WorkspaceParser(DBTables  m_tables) {
         super(FileInfoType.type_WorkSpace, m_tables);
 
 //17:33:06.335_I_I_03350282382b556f [07:07] HERE IS TARGETS
@@ -472,7 +472,7 @@ public class WorkspaceParser extends Parser {
     }
 
     @Override
-    void init(HashMap<String, DBTable> m_tables) {
+    void init(DBTables  m_tables) {
     }
 
     // parse state contants

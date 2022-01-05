@@ -73,7 +73,7 @@ public class URShttpinterfaceParser extends WebParser {
     private int m_PacketLength;
     private String thread; // current thread name as parsed fom the line
 
-    URShttpinterfaceParser(HashMap<String, DBTable> m_tables) {
+    URShttpinterfaceParser(DBTables  m_tables) {
         super(FileInfoType.type_URSHTTP, m_tables);
         m_MessageContents = new ArrayList();
         ThreadAlias.put("ORSInternal", "FMWeb");
@@ -331,7 +331,7 @@ public class URShttpinterfaceParser extends WebParser {
     }
 
     @Override
-    void init(HashMap<String, DBTable> m_tables) {
+    void init(DBTables  m_tables) {
         m_tables.put(TableType.URSHTTP.toString(), new ursHTTPMsgTable(Main.getInstance().getM_accessor()));
         m_tables.put(TableType.HTTP_TO_URS.toString(), new HTTPtoURSTable(Main.getInstance().getM_accessor()));
 

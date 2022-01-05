@@ -65,7 +65,7 @@ public class WWECloudParser extends Parser {
     private String m_msg1;
     private Object msg;
 
-    public WWECloudParser(HashMap<String, DBTable> m_tables) {
+    public WWECloudParser(DBTables  m_tables) {
         super(FileInfoType.type_WWECloud, m_tables);
     }
 
@@ -253,7 +253,7 @@ public class WWECloudParser extends Parser {
     }
 
     @Override
-    void init(HashMap<String, DBTable> m_tables) {
+    void init(DBTables  m_tables) {
         m_tables.put(TableType.WWECloud.toString(), new WWECloudTable(Main.getInstance().getM_accessor(), TableType.WWECloud));
         m_tables.put(TableType.WWECloudAuth.toString(), new WWECloudAuthTab(Main.getInstance().getM_accessor(), TableType.WWECloudAuth));
         m_tables.put(TableType.WWECloudException.toString(), new WWECloudExeptionTab(Main.getInstance().getM_accessor(), TableType.WWECloudException));

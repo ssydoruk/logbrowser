@@ -50,7 +50,7 @@ public class ConfServParser extends Parser {
     private ParserState m_ParserState;
     private Message msgTmp;
 
-    public ConfServParser(HashMap<String, DBTable> m_tables) {
+    public ConfServParser(DBTables  m_tables) {
         super(FileInfoType.type_ConfServer, m_tables);
 
     }
@@ -413,7 +413,7 @@ public class ConfServParser extends Parser {
     }
 
     @Override
-    void init(HashMap<String, DBTable> m_tables) {
+    void init(DBTables  m_tables) {
         m_tables.put(TableType.CSUpdate.toString(), new CSClientMessageTable(Main.getInstance().getM_accessor(), TableType.CSUpdate));
         m_tables.put(TableType.CSConfigChange.toString(), new CSObjectChangeTable(Main.getInstance().getM_accessor(), TableType.CSConfigChange));
         m_tables.put(TableType.CSClientConnect.toString(), new CSClientConnectTable(Main.getInstance().getM_accessor(), TableType.CSClientConnect));

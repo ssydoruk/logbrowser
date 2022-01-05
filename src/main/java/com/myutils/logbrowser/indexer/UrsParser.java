@@ -100,7 +100,7 @@ public class UrsParser extends Parser {
     private Message msgTmp; // storage for message in progress
     private GenesysMsg genesysMsg;
 
-    public UrsParser(HashMap<String, DBTable> m_tables) {
+    public UrsParser(DBTables  m_tables) {
         super(FileInfoType.type_URS, m_tables);
 
 //17:33:06.335_I_I_03350282382b556f [07:07] HERE IS TARGETS
@@ -976,7 +976,7 @@ public class UrsParser extends Parser {
     }
 
     @Override
-    void init(HashMap<String, DBTable> m_tables) {
+    void init(DBTables  m_tables) {
         m_tables.put(TableType.URSAgentGroupTable.toString(), new URSAgentGroupTable(Main.getInstance().getM_accessor(), TableType.URSAgentGroupTable));
         m_tables.put(TableType.URSGenesysMessage.toString(), new GenesysUrsMsgTable(Main.getInstance().getM_accessor(), TableType.URSGenesysMessage));
     }

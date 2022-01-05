@@ -26,6 +26,7 @@ import java.sql.SQLException;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -67,7 +68,7 @@ public class Main {
     private String alias;
     private int totalFiles = 0;
     private boolean dbExisted = false;
-    private HashMap<String, DBTable> m_tables;
+    private DBTables m_tables;
     private ThreadPoolExecutor managerThreads;
     private ThreadPoolExecutor parserThreads;
     private boolean ignoreZIP = false;
@@ -366,7 +367,7 @@ public class Main {
         DBTable t;
 //        m_FileInfoTable = new FileInfoTable(m_accessor);
 //        m_FileInfoTable.InitDB();
-        m_tables = new HashMap<>();
+        m_tables =  new DBTables();
         m_tables.put(TableType.File.toString(), new FileInfoTable(m_accessor));
 
         m_tables.put(TableType.ConfigUpdate.toString(), new ConfigUpdateTable(m_accessor, TableType.ConfigUpdate));
@@ -510,7 +511,7 @@ public class Main {
                 public void run() {
                     try {
                         logger.info("Starting manager thread");
-                        if( !initDB(false) ){
+                        if (!initDB(false)) {
                             logger.error("Failed to init DB; exiting");
                             return;
                         }
@@ -1423,7 +1424,7 @@ public class Main {
                 }
             }
             Parse(fi);
-            logger.info("Done "+fi.toString());
+            logger.info("Done " + fi.toString());
         }
     }
 

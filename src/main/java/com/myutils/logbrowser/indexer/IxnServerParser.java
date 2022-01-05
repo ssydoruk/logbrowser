@@ -29,7 +29,7 @@ public class IxnServerParser extends Parser {
     private static final HashSet<String> nonIxnMsg = getNonIxnMsg();
     HashMap<String, String> prevSeqno = new HashMap();
     private ParserState m_ParserState;
-    IxnServerParser(HashMap<String, DBTable> m_tables) {
+    IxnServerParser(DBTables  m_tables) {
         super(FileInfoType.type_IxnServer, m_tables);
     }
 
@@ -364,7 +364,7 @@ public class IxnServerParser extends Parser {
     }
 
     @Override
-    void init(HashMap<String, DBTable> m_tables) {
+    void init(DBTables  m_tables) {
         m_tables.put(TableType.IxnNonIxn.toString(), new IxnNonIxnTable(Main.getInstance().getM_accessor(), TableType.IxnNonIxn));
 
     }

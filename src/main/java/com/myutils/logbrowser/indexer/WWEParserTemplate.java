@@ -45,7 +45,7 @@ public class WWEParserTemplate extends WebParser {
     private boolean skipMessage;
     private Message msg;
 
-    WWEParserTemplate(HashMap<String, DBTable> m_tables) {
+    WWEParserTemplate(DBTables  m_tables) {
         super(FileInfoType.type_WWE, m_tables);
         m_MessageContents = new ArrayList();
         ThreadAlias.put("ORSInternal", "FMWeb");
@@ -190,7 +190,7 @@ public class WWEParserTemplate extends WebParser {
     }
 
     @Override
-    void init(HashMap<String, DBTable> m_tables) {
+    void init(DBTables  m_tables) {
         m_tables.put(TableType.WWEMessage.toString(), new WWEDebugMessageTable(Main.getInstance().getM_accessor(), TableType.WWEMessage));
 
     }

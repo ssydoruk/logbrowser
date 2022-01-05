@@ -63,7 +63,7 @@ public class MCPParser extends Parser {
     private boolean isInbound;
     private String SIPMessage;
     private String SIPURI;
-    public MCPParser(HashMap<String, DBTable> m_tables) {
+    public MCPParser(DBTables  m_tables) {
         super(FileInfoType.type_MCP, m_tables);
         this.extraBuff = new ArrayList<>();
         //m_accessor = accessor;
@@ -466,7 +466,7 @@ public class MCPParser extends Parser {
     }
 
     @Override
-    void init(HashMap<String, DBTable> m_tables) {
+    void init(DBTables  m_tables) {
         m_tables.put(TableType.VXMLIntStepsTable.toString(), new VXMLIntStepTable(Main.getInstance().getM_accessor(), TableType.VXMLIntStepsTable));
     }
 

@@ -155,7 +155,7 @@ public class GMSParser extends Parser {
     private String oldThread;
     private String savedThreadID;
 
-    GMSParser(HashMap<String, DBTable> m_tables) {
+    GMSParser(DBTables  m_tables) {
         super(FileInfoType.type_GMS, m_tables);
         m_MessageContents = new ArrayList();
         ThreadAlias.put("ORSInternal", "FMWeb");
@@ -600,7 +600,7 @@ public class GMSParser extends Parser {
     }
 
     @Override
-    void init(HashMap<String, DBTable> m_tables) {
+    void init(DBTables  m_tables) {
         m_tables.put(TableType.GMSStart.toString(), new GMSStartTable(Main.getInstance().getM_accessor(), TableType.GMSStart));
         m_tables.put(TableType.GMSStatServerMessage.toString(), new GMSStatServerMsgTable(Main.getInstance().getM_accessor(), TableType.GMSStatServerMessage));
         m_tables.put(TableType.GMSWebClientMessage.toString(), new GMSWebClientMsgTable(Main.getInstance().getM_accessor(), TableType.GMSWebClientMessage));

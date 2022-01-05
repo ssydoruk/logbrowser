@@ -60,14 +60,12 @@ public abstract class Parser {
     private DateDiff dateDiff = null;
     private DBTablesFiller dbTablesFiller;
 
-    public Parser(FileInfoType type, HashMap<String, DBTable> tables) {
+    public Parser(FileInfoType type, DBTables  tables) {
         super();
         dbTablesFiller = new DBTablesFiller(tables, Main.getMain().getM_accessor());
 
         String customTab = getCustomTab(type);
         tables.put(customTab, new CustomLineTable(type));
-
-
 
         m_MessageContents = new ArrayList<>();
         m_type = type;
@@ -662,7 +660,7 @@ public abstract class Parser {
         }
     }
 
-    abstract void init(HashMap<String, DBTable> m_tables);
+    abstract void init(DBTables  m_tables);
 
     void doneParsingFile(FileInfo fi) {
         if (!foundBodyDates) {

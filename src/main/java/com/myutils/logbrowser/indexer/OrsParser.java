@@ -135,7 +135,7 @@ public class OrsParser extends Parser {
     private boolean isInbound = true;
     private Message msg = null; // used to store method not committed to DB yet
 
-    OrsParser(HashMap<String, DBTable> m_tables) {
+    OrsParser(DBTables  m_tables) {
         super(FileInfoType.type_ORS, m_tables);
         ThreadAlias.put("ORSInternal", "FMWeb");
         ptpsThreadProcessor = new ParserThreadsProcessor();
@@ -910,7 +910,7 @@ public class OrsParser extends Parser {
     }
 
     @Override
-    void init(HashMap<String, DBTable> m_tables) {
+    void init(DBTables  m_tables) {
         m_tables.put(TableType.ORSCallID.toString(), new ORSCallIDTable(Main.getInstance().getM_accessor(), TableType.ORSCallID));
         m_tables.put(TableType.ORSAlarm.toString(), new ORSAlarmTable(Main.getInstance().getM_accessor(), TableType.ORSAlarm));
         m_tables.put(TableType.ORSSessionStart.toString(), new ORSSessionStartTable(Main.getInstance().getM_accessor(), TableType.ORSSessionStart));

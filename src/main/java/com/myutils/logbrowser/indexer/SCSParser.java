@@ -43,7 +43,7 @@ public class SCSParser extends Parser {
     private String lastMSGID;
     private String lastMSGText;
 
-    public SCSParser(HashMap<String, DBTable> m_tables) {
+    public SCSParser(DBTables  m_tables) {
         super(FileInfoType.type_SCS, m_tables);
     }
 
@@ -410,7 +410,7 @@ public class SCSParser extends Parser {
     }
 
     @Override
-    void init(HashMap<String, DBTable> m_tables) {
+    void init(DBTables  m_tables) {
         m_tables.put(TableType.SCSClientLogMessage.toString(), new SCSClientLogTable(Main.getInstance().getM_accessor(), TableType.SCSClientLogMessage));
         m_tables.put(TableType.SCSAlarm.toString(), new SCSAlarmTable(Main.getInstance().getM_accessor(), TableType.SCSAlarm));
 

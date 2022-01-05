@@ -37,7 +37,7 @@ abstract class WebParser extends Parser {
 
     protected static URLProcessor urlProcessor = new URLProcessor();
 
-    public WebParser(FileInfoType type, HashMap<String, DBTable> tables) {
+    public WebParser(FileInfoType type, DBTables  tables) {
         super(type, tables);
         initURLProcessor();
 

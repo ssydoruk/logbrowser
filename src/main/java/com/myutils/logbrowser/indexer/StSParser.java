@@ -47,7 +47,7 @@ public class StSParser extends Parser {
     private String m_LastLine;
     private boolean customEvent = false;
 
-    public StSParser(HashMap<String, DBTable> m_tables) {
+    public StSParser(DBTables  m_tables) {
         super(FileInfoType.type_StatServer, m_tables);
         m_BlockNamesToIgnoreHash = new HashMap();
 
@@ -499,7 +499,7 @@ public class StSParser extends Parser {
     }
 
     @Override
-    void init(HashMap<String, DBTable> m_tables) {
+    void init(DBTables  m_tables) {
     }
 
     enum ParserState {

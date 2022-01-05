@@ -19,7 +19,7 @@ public class DBServerParser extends Parser {
     String m_Header;
     int m_dbRecords = 0;
 
-    public DBServerParser(HashMap<String, DBTable> m_tables) {
+    public DBServerParser(DBTables  m_tables) {
         super(FileInfoType.type_DBServer, m_tables);
 
 //17:33:06.335_I_I_03350282382b556f [07:07] HERE IS TARGETS
@@ -112,7 +112,7 @@ public class DBServerParser extends Parser {
     }
 
     @Override
-    void init(HashMap<String, DBTable> m_tables) {
+    void init(DBTables  m_tables) {
     }
 
     // parse state contants

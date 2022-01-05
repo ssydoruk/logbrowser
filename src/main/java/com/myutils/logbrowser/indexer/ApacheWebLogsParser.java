@@ -27,7 +27,7 @@ public class ApacheWebLogsParser extends WebParser {
     int m_dbRecords = 0;
     private ParserState m_ParserState;
 
-    public ApacheWebLogsParser(HashMap<String, DBTable> m_tables) {
+    public ApacheWebLogsParser(DBTables  m_tables) {
         super(FileInfoType.type_WWECloud, m_tables);
     }
 
@@ -133,7 +133,7 @@ public class ApacheWebLogsParser extends WebParser {
     }
 
     @Override
-    void init(HashMap<String, DBTable> m_tables) {
+    void init(DBTables  m_tables) {
         m_tables.put(TableType.ApacheWeb.toString(), new ApacheWebTab(Main.getInstance().getM_accessor(), TableType.ApacheWeb));
 
     }

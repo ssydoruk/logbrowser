@@ -88,7 +88,7 @@ public class SIPProxyParser extends Parser {
     private String handleAdd;
     private long lastSeqNo = 0;
 
-    public SIPProxyParser(HashMap<String, DBTable> m_tables) {
+    public SIPProxyParser(DBTables  m_tables) {
         super(FileInfoType.type_SessionController, m_tables);
         this.extraBuff = new ArrayList<>();
         //m_accessor = accessor;
@@ -832,7 +832,7 @@ public class SIPProxyParser extends Parser {
     }
 
     @Override
-    void init(HashMap<String, DBTable> m_tables) {
+    void init(DBTables  m_tables) {
     }
 
     enum ParserState {

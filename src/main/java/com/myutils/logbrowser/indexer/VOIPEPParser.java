@@ -77,7 +77,7 @@ public class VOIPEPParser extends Parser {
     private boolean inbound;
     private DateParsed dpHeader;
 
-    public VOIPEPParser(HashMap<String, DBTable> m_tables) {
+    public VOIPEPParser(DBTables  m_tables) {
         super(FileInfoType.type_VOIPEP, m_tables);
         this.extraBuff = new ArrayList<>();
         //m_accessor = accessor;
@@ -466,7 +466,7 @@ public class VOIPEPParser extends Parser {
     }
 
     @Override
-    void init(HashMap<String, DBTable> m_tables) {
+    void init(DBTables  m_tables) {
     }
 
     enum ParserState {

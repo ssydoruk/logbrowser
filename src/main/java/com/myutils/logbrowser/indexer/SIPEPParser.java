@@ -78,7 +78,7 @@ public class SIPEPParser extends Parser {
     private boolean inbound;
     private DateParsed dpHeader;
 
-    public SIPEPParser(HashMap<String, DBTable> m_tables) {
+    public SIPEPParser(DBTables  m_tables) {
         super(FileInfoType.type_SIPEP, m_tables);
         this.extraBuff = new ArrayList<>();
         //m_accessor = accessor;
@@ -465,7 +465,7 @@ public class SIPEPParser extends Parser {
     }
 
     @Override
-    void init(HashMap<String, DBTable> m_tables) {
+    void init(DBTables  m_tables) {
     }
 
     enum ParserState {

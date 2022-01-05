@@ -183,7 +183,7 @@ public abstract class Record implements Cloneable {
         m_line = line;
     }
 
-//    protected void AddToDB(HashMap<String, DBTable> m_tables) throws Exception {
+//    protected void AddToDB(DBTables  m_tables) throws Exception {
 //        DBTable tab = m_tables.get(getM_type());
 //        if (tab != null) {
 //            tab.checkInit();

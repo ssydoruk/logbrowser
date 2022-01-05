@@ -13,7 +13,6 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -90,28 +89,6 @@ public class SingleThreadParser extends Parser {
     private static final String sipRegGenerated = "requests GENERATED_";
     private static final String sipResGenerated = "response GENERATED_";
     private static final Pattern regKeyValueLine = Pattern.compile("(\\w+)=(?:\"([^\"]+)\"|(\\w+))");
-
-    private int m_handlerId;
-    private int m_sipId;
-    private int m_tlibId;
-    private int m_jsonId;
-
-    public int getM_handlerId() {
-        return m_handlerId;
-    }
-
-    public int getM_sipId() {
-        return m_sipId;
-    }
-
-    public int getM_tlibId() {
-        return m_tlibId;
-    }
-
-    public int getM_jsonId() {
-        return m_jsonId;
-    }
-
     final int MSG_STRING_LIMIT = 200;
     private final ArrayList<String> extraBuff;
     boolean m_handlerInProgress;
@@ -130,6 +107,10 @@ public class SingleThreadParser extends Parser {
     int m_lastMsgType = -1;
     String m_lastTime;
     SIP1536OtherMessage sip1536OtherMessage = null;
+    private int m_handlerId;
+    private int m_sipId;
+    private int m_tlibId;
+    private int m_jsonId;
     private boolean ifSIPLines = false;
     // 0-tlib, 1-sip, 2-json
     private boolean ifSIPLinesForce = false;
@@ -143,8 +124,7 @@ public class SingleThreadParser extends Parser {
     private Message msgInProgress;
     private FileInfo.FileType fileType = FileInfo.FileType.UNKNOWN;
     private long lastSeqNo = 0;
-
-    public SingleThreadParser(HashMap<String, DBTable> m_tables) {
+    public SingleThreadParser(DBTables m_tables) {
         super(FileInfoType.type_SessionController, m_tables);
         Main.logger.debug("SingleThreadParser");
         this.extraBuff = new ArrayList<>();
@@ -153,6 +133,22 @@ public class SingleThreadParser extends Parser {
         m_BlockNamesToIgnoreHash.addAll(Arrays.asList(BlockNamesToIgnoreArray));
         ifSIPLinesForce = Main.ifSIPLines();
 
+    }
+
+    public int getM_handlerId() {
+        return m_handlerId;
+    }
+
+    public int getM_sipId() {
+        return m_sipId;
+    }
+
+    public int getM_tlibId() {
+        return m_tlibId;
+    }
+
+    public int getM_jsonId() {
+        return m_jsonId;
     }
 
     @Override
@@ -303,7 +299,7 @@ public class SingleThreadParser extends Parser {
                 m_lineStarted = m_CurrentLine;
 
                 if ((m = regConfigOneLineDN.matcher(str)).find()) {
-                    ConfigUpdateRecord msg = new ConfigUpdateRecord(str,  fileInfo.getRecordID());
+                    ConfigUpdateRecord msg = new ConfigUpdateRecord(str, fileInfo.getRecordID());
                     try {
                         msg.setObjectType("DN");
                         msg.setObjectDBID(m.group(1));
@@ -455,7 +451,7 @@ public class SingleThreadParser extends Parser {
                     m_HeaderOffset = m_CurrentFilePos;
                     m_headerLine = m_CurrentLine;
                     m_MessageContents.clear();
-                    msgInProgress = new TLibMessage(lastLogMsg, m_handlerInProgress,  m_handlerId, fileInfo.getRecordID());
+                    msgInProgress = new TLibMessage(lastLogMsg, m_handlerInProgress, m_handlerId, fileInfo.getRecordID());
                     m_ParserState = STATE_TLIB_MESSAGE;
                     setSavedFilePos(getFilePos());
                     break;
@@ -860,7 +856,7 @@ public class SingleThreadParser extends Parser {
 //            PrintMsg(contents);
 //            return;
 //        }
-        msg = new SipMessage(contents, TableType.SIP,  m_handlerInProgress,  m_handlerId,  fileInfo.getRecordID());
+        msg = new SipMessage(contents, TableType.SIP, m_handlerInProgress, m_handlerId, fileInfo.getRecordID());
 
         if (msg.GetFrom() == null) {
             Main.logger.error("LOG ERROR: no From in SIP message, ignore, line " + m_CurrentLine);
@@ -1084,19 +1080,19 @@ public class SingleThreadParser extends Parser {
                         msg1.setUUID(extentionCall.getUUID());
                         if (newSeqNo(msg1)) {
                             SetStdFieldsAndAdd(msg1);
-                            m_tlibId=msg1.getRecordID();
+                            m_tlibId = msg1.getRecordID();
                         }
                     }
                 }
                 if (newSeqNo(msg)) {
                     SetStdFieldsAndAdd(msg);
-                    m_tlibId=msg.getRecordID();
+                    m_tlibId = msg.getRecordID();
                 }
 
             } else {
                 if (newSeqNo(msg)) {
                     SetStdFieldsAndAdd(msg);
-                    m_tlibId=msg.getRecordID();
+                    m_tlibId = msg.getRecordID();
                 }
             }
             m_lastMsgType = 0;
@@ -1134,7 +1130,7 @@ public class SingleThreadParser extends Parser {
                 return;
             }
 
-            JsonMessage msg = new JsonMessage(obj,   m_handlerInProgress,  m_handlerId,  fileInfo.getRecordID());
+            JsonMessage msg = new JsonMessage(obj, m_handlerInProgress, m_handlerId, fileInfo.getRecordID());
             msg.setM_Timestamp((dpHeader != null) ? dpHeader : ParseFormatDate(m_lastTime));
             msg.SetInbound(header.startsWith("HTTP/1."));
 //            int headerLine = m_CurrentLine - contents.size();
@@ -1156,7 +1152,7 @@ public class SingleThreadParser extends Parser {
             }
 
             SetStdFieldsAndAdd(msg);
-            m_jsonId=msg.getRecordID();
+            m_jsonId = msg.getRecordID();
 
         } catch (Exception e) {
             Main.logger.error("l:" + m_CurrentLine + " - Could not parse JSON object: " + contents + "\n" + e);
@@ -1167,7 +1163,7 @@ public class SingleThreadParser extends Parser {
 
     protected void AddIsccMessage(ArrayList contents, String header) throws Exception {
         if (msgName != null) {
-            IsccMessage msg = new IsccMessage(msgName, contents, m_handlerInProgress,  m_handlerId, fileInfo.getRecordID());
+            IsccMessage msg = new IsccMessage(msgName, contents, m_handlerInProgress, m_handlerId, fileInfo.getRecordID());
             msg.SetInbound(inbound);
             SetStdFieldsAndAdd(msg);
         } else {
@@ -1270,7 +1266,7 @@ public class SingleThreadParser extends Parser {
 
     protected void AddCireqMessage(ArrayList contents, String header) throws Exception {
         Matcher m;
-        CIFaceRequest req = new CIFaceRequest(  m_handlerInProgress,  m_handlerId,  fileInfo.getRecordID());
+        CIFaceRequest req = new CIFaceRequest(m_handlerInProgress, m_handlerId, fileInfo.getRecordID());
 
         String[] headerList = header.split(" ");
         req.SetName(headerList[1]);
@@ -1297,10 +1293,10 @@ public class SingleThreadParser extends Parser {
         start += 14;
         connId = str.substring(start, start + 16);
         if (str.contains("{constructed}")) {
-            ConnIdRecord rec = new ConnIdRecord(connId, true,  m_handlerInProgress,  m_handlerId,   fileInfo.getRecordID());
+            ConnIdRecord rec = new ConnIdRecord(connId, true, m_handlerInProgress, m_handlerId, fileInfo.getRecordID());
             SetStdFieldsAndAdd(rec);
         } else if (str.contains("{destructed}")) {
-            ConnIdRecord rec = new ConnIdRecord(connId, false,  m_handlerInProgress,  m_handlerId,  fileInfo.getRecordID());
+            ConnIdRecord rec = new ConnIdRecord(connId, false, m_handlerInProgress, m_handlerId, fileInfo.getRecordID());
             SetStdFieldsAndAdd(rec);
         }
     }
@@ -1325,7 +1321,7 @@ public class SingleThreadParser extends Parser {
         if (oldId.isEmpty() || newId.isEmpty()) {
             return; //something's wrong
         }
-        ConnIdRecord rec = new ConnIdRecord(oldId, newId, false,  m_handlerInProgress,  m_handlerId,  fileInfo.getRecordID());
+        ConnIdRecord rec = new ConnIdRecord(oldId, newId, false, m_handlerInProgress, m_handlerId, fileInfo.getRecordID());
         rec.setTempConnid(true);
         SetStdFieldsAndAdd(rec);
 //        rec = new ConnIdRecord(newId, true);
@@ -1337,7 +1333,7 @@ public class SingleThreadParser extends Parser {
     }
 
     private void AddConfigMessage(ArrayList<String> m_MessageContents) {
-        ConfigUpdateRecord msg = new ConfigUpdateRecord(m_MessageContents,  fileInfo.getRecordID());
+        ConfigUpdateRecord msg = new ConfigUpdateRecord(m_MessageContents, fileInfo.getRecordID());
         try {
             Matcher m;
             if (m_MessageContents.size() > 0 && (m = regSIPServerStartDN.matcher(m_MessageContents.get(0))).find()) {
@@ -1373,15 +1369,11 @@ public class SingleThreadParser extends Parser {
     }
 
     @Override
-    void init(HashMap<String, DBTable> m_tables) {
-        if (!m_tables.containsKey(TableType.SIP1536Other))
-            m_tables.put(TableType.SIP1536Other.toString(), new SIP1536OtherTable(Main.getInstance().getM_accessor(), TableType.SIP1536Other));
-        if (!m_tables.containsKey(TableType.SIP1536Trunk))
-            m_tables.put(TableType.SIP1536Trunk.toString(), new SIP1536TrunkTable(Main.getInstance().getM_accessor(), TableType.SIP1536Trunk));
-        if (!m_tables.containsKey(TableType.SIP1536ReqResp))
-            m_tables.put(TableType.SIP1536ReqResp.toString(), new SIP1536RequestResponseTable(Main.getInstance().getM_accessor(), TableType.SIP1536ReqResp));
-        if (!m_tables.containsKey(TableType.TLIBTimerRedirect))
-            m_tables.put(TableType.TLIBTimerRedirect.toString(), new TLibTimerRedirectTable(Main.getInstance().getM_accessor(), TableType.TLIBTimerRedirect));
+    void init(DBTables m_tables) {
+        m_tables.put(TableType.SIP1536Other.toString(), new SIP1536OtherTable(Main.getInstance().getM_accessor(), TableType.SIP1536Other));
+        m_tables.put(TableType.SIP1536Trunk.toString(), new SIP1536TrunkTable(Main.getInstance().getM_accessor(), TableType.SIP1536Trunk));
+        m_tables.put(TableType.SIP1536ReqResp.toString(), new SIP1536RequestResponseTable(Main.getInstance().getM_accessor(), TableType.SIP1536ReqResp));
+        m_tables.put(TableType.TLIBTimerRedirect.toString(), new TLibTimerRedirectTable(Main.getInstance().getM_accessor(), TableType.TLIBTimerRedirect));
     }
 
     private String ParseLine1536(BufferedReaderCrLf input, String str) throws Exception {
@@ -1509,7 +1501,7 @@ public class SingleThreadParser extends Parser {
         private final String key;
 
         private SIP1536OtherMessage(String string) throws Exception {
-            super(TableType.SIP1536Other,  fileInfo.getRecordID());
+            super(TableType.SIP1536Other, fileInfo.getRecordID());
             if (string == null || string.isEmpty()) {
                 throw new Exception("Key cannot be empty");
             }
@@ -1607,7 +1599,6 @@ public class SingleThreadParser extends Parser {
             getM_dbAccessor().runQuery(query);
 
 
-
         }
 
         @Override
@@ -1619,7 +1610,7 @@ public class SingleThreadParser extends Parser {
             return "INSERT INTO " + getTabName() + " VALUES(NULL,?,?,?,?,?,?"
                     /*standard first*/
                     + buf
-                    + ");"            ;
+                    + ");";
         }
 
         /**
@@ -1639,7 +1630,7 @@ public class SingleThreadParser extends Parser {
         private String trunk = null;
 
         private SIP1536TrunkStatistics(String string) throws Exception {
-            super(TableType.SIP1536Trunk,  fileInfo.getRecordID());
+            super(TableType.SIP1536Trunk, fileInfo.getRecordID());
             if (string == null || string.isEmpty()) {
                 throw new Exception("Key cannot be empty");
             }
@@ -1725,7 +1716,6 @@ public class SingleThreadParser extends Parser {
             getM_dbAccessor().runQuery(query);
 
 
-
         }
 
         @Override
@@ -1737,7 +1727,7 @@ public class SingleThreadParser extends Parser {
             return "INSERT INTO " + getTabName() + " VALUES(NULL,?,?,?,?,?,?"
                     /*standard first*/
                     + buf
-                    + ");"            ;
+                    + ");";
         }
 
         /**
@@ -1758,7 +1748,7 @@ public class SingleThreadParser extends Parser {
         private String amount;
 
         private SIP1536RequestResponse(String string, boolean request) throws Exception {
-            super(TableType.SIP1536ReqResp,  fileInfo.getRecordID());
+            super(TableType.SIP1536ReqResp, fileInfo.getRecordID());
             if (string == null || string.isEmpty()) {
                 throw new Exception("Key cannot be empty");
             }
@@ -1861,7 +1851,6 @@ public class SingleThreadParser extends Parser {
             getM_dbAccessor().runQuery(query);
 
 
-
         }
 
         @Override
@@ -1873,7 +1862,7 @@ public class SingleThreadParser extends Parser {
             return "INSERT INTO " + getTabName() + " VALUES(NULL,?,?,?,?,?,?,?,?"
                     /*standard first*/
                     + buf
-                    + ");"            ;
+                    + ");";
         }
 
         /**
@@ -1885,7 +1874,6 @@ public class SingleThreadParser extends Parser {
         }
 
 
-
     }
 
     private class TLibTimerRedirectMessage extends Message {
@@ -1895,7 +1883,7 @@ public class SingleThreadParser extends Parser {
         private String connID = null;
 
         private TLibTimerRedirectMessage(String msg) throws Exception {
-            super(TableType.TLIBTimerRedirect,  fileInfo.getRecordID());
+            super(TableType.TLIBTimerRedirect, fileInfo.getRecordID());
             this.msg = msg;
         }
 
@@ -1964,7 +1952,6 @@ public class SingleThreadParser extends Parser {
             getM_dbAccessor().runQuery(query);
 
 
-
         }
 
         @Override
@@ -1974,7 +1961,7 @@ public class SingleThreadParser extends Parser {
                     + ",?"
                     + ",?"
                     + ",?"
-                    + ");"            ;
+                    + ");";
         }
 
         /**

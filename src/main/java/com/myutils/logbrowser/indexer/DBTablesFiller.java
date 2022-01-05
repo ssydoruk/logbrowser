@@ -14,17 +14,17 @@ import java.util.HashMap;
 class DBTablesFiller {
 
     private static final Logger logger = Main.logger;
-    private final HashMap<String, DBTable> dbTables;
+    private final DBTables  dbTables;
     private final SqliteAccessor accessor;
     private HashMap<String, StatParser> stats;
 
-    DBTablesFiller(HashMap<String, DBTable> tables, SqliteAccessor accessor) {
+    DBTablesFiller(DBTables  tables, SqliteAccessor accessor) {
         stats = new HashMap<>();
         this.dbTables = tables;
         this.accessor = accessor;
     }
 
-    public HashMap<String, DBTable> getDbTables(){
+    public DBTables  getDbTables(){
         return dbTables;
     }
 

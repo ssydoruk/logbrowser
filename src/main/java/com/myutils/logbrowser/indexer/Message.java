@@ -1134,7 +1134,7 @@ public abstract class Message extends Record {
     }
 
 //    @Override
-//    protected void AddToDB(HashMap<String, DBTable> m_tables) {
+//    protected void AddToDB(DBTables  m_tables) {
 //        if (Main.IgnoreTable(this)) {
 //            return;
 //        }

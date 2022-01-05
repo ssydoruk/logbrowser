@@ -140,7 +140,7 @@ public class OCSParser extends Parser {
     private String m_LastLine = "";
     private boolean isRequest;
 
-    OCSParser(HashMap<String, DBTable> m_tables) {
+    OCSParser(DBTables  m_tables) {
         super(FileInfoType.type_OCS, m_tables);
     }
 
@@ -664,7 +664,7 @@ public class OCSParser extends Parser {
     }
 
     @Override
-    void init(HashMap<String, DBTable> m_tables) {
+    void init(DBTables  m_tables) {
         m_tables.put(TableType.OCSPredInfo.toString(), new OCSPredInfoTable(Main.getInstance().getM_accessor(), TableType.OCSPredInfo));
     }
 

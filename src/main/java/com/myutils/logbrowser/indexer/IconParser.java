@@ -24,7 +24,7 @@ public class IconParser extends Parser {
 
     int m_dbRecords = 0;
 
-    public IconParser(HashMap<String, DBTable> m_tables) {
+    public IconParser(DBTables  m_tables) {
         super(FileInfoType.type_ICON, m_tables);
     }
 
@@ -180,6 +180,6 @@ public class IconParser extends Parser {
     }
 
     @Override
-    void init(HashMap<String, DBTable> m_tables) {
+    void init(DBTables  m_tables) {
     }
 }
