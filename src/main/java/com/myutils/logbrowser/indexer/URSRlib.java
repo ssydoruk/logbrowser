@@ -85,36 +85,42 @@ public final class URSRlib extends Message {
                             sid = GetCall();
                         } else if (message.equals("EventOnInvoke")) {
                             this.result = FindByRx(prnResult, 1, "");
-                            try {
-                                JSONObject _jsonBody = new JSONObject(result);
+                            if(StringUtils.isNotBlank(result)) {
+                                try {
+                                    JSONObject _jsonBody = new JSONObject(result);
 
-                                String name = jsonStringOrDef(_jsonBody, "name", null);
-                                if (name != null) {
-                                    method = name;
-                                }
-                                JSONObject obj = jsonOrDef(_jsonBody, "data");
-                                if (obj != null) {
-                                    StringBuilder dataRest = new StringBuilder();
-                                    for (Iterator<String> iterator = obj.keys(); iterator.hasNext(); ) {
-                                        String key = iterator.next();
-                                        if (key.equals("requestid")) {
-                                            reqID = obj.getInt("requestid");
-                                        } else {
-                                            if (dataRest.length() > 0) {
-                                                dataRest.append(", ");
+                                    String name = jsonStringOrDef(_jsonBody, "name", null);
+                                    if (name != null) {
+                                        method = name;
+                                    }
+                                    JSONObject obj = jsonOrDef(_jsonBody, "data");
+                                    if (obj != null) {
+                                        StringBuilder dataRest = new StringBuilder();
+                                        for (Iterator<String> iterator = obj.keys(); iterator.hasNext(); ) {
+                                            String key = iterator.next();
+                                            if (key.equals("requestid")) {
+                                                reqID = obj.getInt("requestid");
+                                            } else {
+                                                if (dataRest.length() > 0) {
+                                                    dataRest.append(", ");
+                                                }
+                                                dataRest.append(key).append(":").append(obj.get(key));
                                             }
-                                            dataRest.append(key).append(":").append(obj.get(key));
+                                        }
+                                        if (dataRest.length() > 0) {
+                                            result = dataRest.toString();
+                                        } else {
+                                            result = "";
                                         }
                                     }
-                                    if (dataRest.length() > 0) {
-                                        result = dataRest.toString();
-                                    } else {
-                                        result = "";
-                                    }
-                                }
 
-                            } catch (JSONException ex) {
-                                Main.logger.info("Not JSON: [" + result + "]", ex);
+                                } catch (JSONException ex) {
+                                    Main.logger.info("Not JSON: [" + result + "]", ex);
+                                }
+                            }
+                            else {
+                                method="(UNKNOWN)";
+                                reqID=-1;
                             }
                         }
                     }
