@@ -9,57 +9,24 @@ import com.myutils.logbrowser.common.ExecutionEnvironment;
 import org.apache.commons.cli.*;
 import org.apache.commons.lang3.StringUtils;
 
-import java.nio.file.Paths;
-
 /**
  * @author stepan_sydoruk
  */
 public class EnvIndexer extends ExecutionEnvironment {
     protected final Options options;
     protected final CommandLineParser parser;
-    private  Option optMaxThreads;
     protected CommandLine cmd;
-
-    private  Option optXMLCfg;
-    private  Option optAlias;
-    private  Option optDBName;
-    private  Option optLogsBaseDir;
-    private  Option optIgnoreZIP;
-    private  Option optTDiffParse;
-    private  Option optLogBrowserDir;
-    private  Option optSQLPragma;
     Option optHelp;
+    private Option optMaxThreads;
+    private Option optXMLCfg;
+    private Option optAlias;
+    private Option optDBName;
+    private Option optLogsBaseDir;
+    private Option optIgnoreZIP;
+    private Option optTDiffParse;
+    private Option optLogBrowserDir;
+    private Option optSQLPragma;
 
-
-    protected String getStringOrDef(Option opt, String def) {
-        String ret = null;
-        try {
-            if (StringUtils.isNotEmpty(opt.getLongOpt())) {
-                ret = (String) cmd.getParsedOptionValue(opt.getLongOpt());
-            }
-            if (StringUtils.isEmpty(ret) && StringUtils.isNotEmpty(opt.getOpt())) {
-                ret = (String) cmd.getParsedOptionValue(opt.getOpt());
-            }
-        } catch (ParseException ex) {
-            System.out.println(ex);
-        }
-        return (StringUtils.isNotBlank(ret)) ? ret : def;
-    }
-
-    protected int getIntOrDef(Option opt, int def) {
-        Integer ret = null;
-        if (StringUtils.isNotEmpty(opt.getLongOpt())) {
-            String s =cmd.getOptionValue(opt.getLongOpt());
-            if(StringUtils.isNotEmpty(s))
-            ret = Integer.parseInt(s);
-        }
-        if (ret==null && StringUtils.isNotEmpty(opt.getOpt())) {
-            String s =cmd.getOptionValue(opt.getOpt());
-            if(StringUtils.isNotEmpty(s))
-                ret = Integer.parseInt(s);
-        }
-        return (ret!=null) ? ret : def;
-    }
 
     EnvIndexer() {
         super();
@@ -147,6 +114,35 @@ public class EnvIndexer extends ExecutionEnvironment {
 
     }
 
+    protected String getStringOrDef(Option opt, String def) {
+        String ret = null;
+        try {
+            if (StringUtils.isNotEmpty(opt.getLongOpt())) {
+                ret = (String) cmd.getParsedOptionValue(opt.getLongOpt());
+            }
+            if (StringUtils.isEmpty(ret) && StringUtils.isNotEmpty(opt.getOpt())) {
+                ret = (String) cmd.getParsedOptionValue(opt.getOpt());
+            }
+        } catch (ParseException ex) {
+            System.out.println(ex);
+        }
+        return (StringUtils.isNotBlank(ret)) ? ret : def;
+    }
+
+    protected int getIntOrDef(Option opt, int def) {
+        Integer ret = null;
+        if (StringUtils.isNotEmpty(opt.getLongOpt())) {
+            String s = cmd.getOptionValue(opt.getLongOpt());
+            if (StringUtils.isNotEmpty(s))
+                ret = Integer.parseInt(s);
+        }
+        if (ret == null && StringUtils.isNotEmpty(opt.getOpt())) {
+            String s = cmd.getOptionValue(opt.getOpt());
+            if (StringUtils.isNotEmpty(s))
+                ret = Integer.parseInt(s);
+        }
+        return (ret != null) ? ret : def;
+    }
 
     public void printHelp() {
         HelpFormatter hf = new HelpFormatter();
@@ -177,7 +173,7 @@ public class EnvIndexer extends ExecutionEnvironment {
         return getStringOrDef(optLogsBaseDir, null);
     }
 
-     public void parserCommandLine(String[] args) {
+    public void parserCommandLine(String[] args) {
         try {
             cmd = parser.parse(options, args, true);
         } catch (ParseException e) {
@@ -189,25 +185,30 @@ public class EnvIndexer extends ExecutionEnvironment {
             showHelpExit(options);
         }
 
-        setAlias( getOptionAlias());
+        setAlias(getOptionAlias());
         setDbname(getOptValueDBName());
 
         setIgnoreZIP(getOptIsIgnoreZIP());
 
         setMaxThreads(getOptMaxThreads());
 
-        setXmlCFG( getOptValueXMLCfg());
+        setXmlCFG(getOptValueXMLCfg());
         setBaseDir(getOptBaseDir());
 
-        setParseTDiff( getOptValueParseTDiff());
-        setLogbrowserDir( getOptLogBrowserDir());
+        setParseTDiff(getOptValueParseTDiff());
+        setLogbrowserDir(getOptLogBrowserDir());
 
         setSqlPragma(getOptSQLPragma());
     }
 
     private Integer getOptMaxThreads() {
-        Integer ret = getIntOrDef(optMaxThreads, 2);
+        Integer ret = getIntOrDef(optMaxThreads, defProcessingThreads());
         return ret;
+    }
+
+    private int defProcessingThreads() {
+        int processors = Runtime.getRuntime().availableProcessors();
+        return (processors > 1) ? processors / 2 : 1;
     }
 
 

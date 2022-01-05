@@ -17,7 +17,7 @@ import java.nio.file.Paths;
 public class ExecutionEnvironment {
     private Boolean parseTDiff = "true".equalsIgnoreCase(System.getProperty("timediff.parse"));
     private boolean ignoreZIP = false;
-    private int maxThreads = 2;
+    private int maxThreads = 1;
 
     public int getMaxThreads() {
         return maxThreads;
