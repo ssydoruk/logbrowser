@@ -6,6 +6,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.HashMap;
+import java.util.Map;
 
 
 /**
@@ -71,6 +72,17 @@ class DBTablesFiller {
             } catch (SQLException e) {
                 logger.error("Error finalizing batch: " + e, e);
             }
+        }
+    }
+
+    public void updateRecCounters() {
+        synchronized (dbTables){
+            for (Map.Entry<String, StatParser> stat : stats.entrySet()) {
+                if(dbTables.containsKey(stat.getKey())){
+                    dbTables.get(stat.getKey()).addCnt(stat.getValue().cnt);
+                }
+            }
+
         }
     }
 

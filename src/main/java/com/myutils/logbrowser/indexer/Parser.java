@@ -668,7 +668,7 @@ public abstract class Parser {
         }
         fi.setFileEndTime(getLastTimeStamp());
         addToDB(fi);
-
+        dbTablesFiller.updateRecCounters();
     }
 
     protected void pError(org.apache.logging.log4j.Logger logger, String string) {

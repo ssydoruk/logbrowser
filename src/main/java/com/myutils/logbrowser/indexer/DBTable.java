@@ -196,4 +196,8 @@ public abstract class DBTable {
     void recordAdded() {
         recordsAdded++;
     }
+
+    public void addCnt(int cnt) {
+        recordsAdded+=cnt;
+    }
 }
