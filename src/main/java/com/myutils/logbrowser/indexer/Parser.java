@@ -87,7 +87,7 @@ public abstract class Parser {
                 }
             }
         } else {
-            Main.logger.error("Parser constructor not found file settings for : " + type);
+            Main.logger.debug("Parser constructor not found file settings for : " + type);
         }
         if (isParseTimeDiff()) {
             dateDiff = new DateDiff(type);
