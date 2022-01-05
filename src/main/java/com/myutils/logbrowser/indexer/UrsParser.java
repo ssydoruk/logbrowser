@@ -710,7 +710,23 @@ public class UrsParser extends Parser {
                     SetStdFieldsAndAdd(msg);
                     m_ParserState = ParserState.STATE_COMMENTS;
                 } else {
-                    Main.logger.error("Unexpected line: [" + str + "] after\n" + m_MessageContents.get(0));
+                    if (!m_MessageContents.isEmpty()) {
+                        URSRI msg = new URSRI(fileInfo.getRecordID());
+                        msg.SetInbound(true);
+                        if ((m = regRIRequestStart.matcher(m_MessageContents.get(0))).find()) {
+                            String reqURI = m.group(2);
+                            msg.setORSSID(getQueryKey(splitQuery(reqURI), "ORS_SESSION_ID"));
+                        } else if ((m = regRIRequestShort1.matcher(m_MessageContents.get(0))).find()) {
+                            String reqURI = m.group(1);
+                            msg.setSubFunc(reqURI);
+                        } else {
+                            Main.logger.error("l:" + m_CurrentLine + "- Expected first line: [" + m_MessageContents.get(0) + "] not parsed");
+                        }
+                        SetStdFieldsAndAdd(msg);
+                    }
+                    else {
+                        Main.logger.error("Unexpected line: [" + str + "] after\n" + m_MessageContents.get(0));
+                    }
                 }
                 m_ParserState = ParserState.STATE_COMMENTS;
             }
