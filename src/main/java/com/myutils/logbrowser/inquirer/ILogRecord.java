@@ -465,9 +465,14 @@ public abstract class ILogRecord {
             return 0;
         } else if (val instanceof Long) {
             return (int) val;
-        } else {
-            return (int) val;
-        }
+        } else if (val instanceof String) {
+            try {
+                return (((String) val).isEmpty() ? 0 : Integer.parseInt((String) val));
+            } catch (NumberFormatException e) {
+                return 0;
+            }
+        } else
+            return (Integer) val;
     }
 
     protected boolean setBoolean(Object val) {
