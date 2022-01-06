@@ -10,8 +10,6 @@ import org.apache.commons.lang3.StringUtils;
 import java.sql.SQLException;
 import java.util.HashMap;
 
-import static com.myutils.logbrowser.inquirer.DatabaseConnector.TableExist;
-
 /**
  * @author ssydoruk
  */
@@ -49,13 +47,8 @@ public class SipMSQuery extends IQuery {
         this.node = reportSettings;
         this.cidFinder = cidFinder;
 
-        if (isChecked(reportSettings) && TableExist("SIPMS")) {
+        setCommonParams(qr, dlg);
 
-            if (((dlg.getSelectionType() == SelectionType.NO_SELECTION) ? true : cidFinder.getIDs(IDType.MCPCallID)) != null || cidFinder.getIDs(IDType.PEERIP) != null) {
-                setCommonParams(qr, dlg);
-                shouldRun = true;
-            }
-        }
     }
 
     public String getTabAlias() {

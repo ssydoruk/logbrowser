@@ -241,10 +241,13 @@ public class MediaServerResults extends IQueryResults {
     }
 
     private void RetrieveSIP(QueryDialog dlg, DynamicTreeNode<OptionNode> reportSettings, IDsFinder cidFinder) throws SQLException {
-        SipMSQuery sipMsgsByCallid = new SipMSQuery(reportSettings, cidFinder, dlg, this);
-        if (sipMsgsByCallid.isShouldRun()) {
-            inquirer.logger.debug("SIP report");
-            getRecords(sipMsgsByCallid);
+        if (isChecked(reportSettings) && TableExist("SIPMS")) {
+            if (dlg.getSelectionType() == SelectionType.NO_SELECTION
+                    || cidFinder.getIDs(IDType.SIPCallID) != null || cidFinder.getIDs(IDType.PEERIP) != null) {
+                SipMSQuery sipMsgsByCallid = new SipMSQuery(reportSettings, cidFinder, dlg, this);
+                inquirer.logger.debug("SIP report");
+                getRecords(sipMsgsByCallid);
+            }
         }
     }
 

@@ -115,9 +115,9 @@ public class WindowsSystemUtility {
                         File f = new File(com.jacob.com.LibraryLoader.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath().substring(1));
                         String absolutePath = f.getAbsolutePath();
                         String property = System.getProperty("sun.arch.data.model");
-                        String jacobDll = "jacob-1.18-x64.dll";
+                        String jacobDll = "jacob-1.20-x64.dll";
                         if (property.equals("32")) {
-                            jacobDll = "jacob-1.18-x86.dll";
+                            jacobDll = "jacob-1.20-x86.dll";
                         }
                         dll = absolutePath.substring(0, absolutePath.lastIndexOf(File.separator)) + File.separator + jacobDll;
                     } catch (URISyntaxException ex) {
