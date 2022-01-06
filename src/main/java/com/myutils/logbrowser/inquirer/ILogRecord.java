@@ -167,7 +167,7 @@ public abstract class ILogRecord {
                     for (int i = 1; i <= meta.getColumnCount(); i++) {
                         String cName = meta.getColumnName(i).toLowerCase();
                         Object obj = rs.getObject(i);
-                        if(obj==null) obj = new String("");
+                        if (obj == null) obj = new String("");
                         if (cName == null) {
                             cName = "";
                         }
@@ -450,9 +450,14 @@ public abstract class ILogRecord {
             return 0;
         } else if (val instanceof Integer) {
             return new Long((Integer) val);
-        } else {
-            return (long) val;
-        }
+        } else if (val instanceof String) {
+            try {
+                return (((String) val).isEmpty() ? 0 : Long.parseLong((String) val));
+            } catch (NumberFormatException e) {
+                return 0;
+            }
+        } else
+            return (Long) val;
     }
 
     protected int setInt(Object val) {
