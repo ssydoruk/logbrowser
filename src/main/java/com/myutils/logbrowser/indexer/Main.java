@@ -250,7 +250,7 @@ public class Main {
         parserThreads = (ThreadPoolExecutor) Executors.newFixedThreadPool(maxThreads,
                 new BasicThreadFactory.Builder().priority(Thread.MAX_PRIORITY).namingPattern("parser-%d").build());
         parserThreadsAdded = (ThreadPoolExecutor) Executors.newFixedThreadPool(maxThreads,
-                new BasicThreadFactory.Builder().priority(Thread.MAX_PRIORITY).namingPattern("parser-%d").build());
+                new BasicThreadFactory.Builder().priority(Thread.MAX_PRIORITY).namingPattern("parserAdded-%d").build());
     }
 
     public ExecutionEnvironment getEe() {
