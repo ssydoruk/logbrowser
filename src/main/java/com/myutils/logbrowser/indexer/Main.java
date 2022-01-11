@@ -26,7 +26,6 @@ import java.sql.SQLException;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -71,6 +70,7 @@ public class Main {
     private DBTables m_tables;
     private ThreadPoolExecutor managerThreads;
     private ThreadPoolExecutor parserThreads;
+    private ThreadPoolExecutor parserThreadsAdded;
     private boolean ignoreZIP = false;
     private int maxThreads = 1;
 
@@ -248,6 +248,8 @@ public class Main {
         managerThreads.setMaximumPoolSize(1);
 
         parserThreads = (ThreadPoolExecutor) Executors.newFixedThreadPool(maxThreads,
+                new BasicThreadFactory.Builder().priority(Thread.MAX_PRIORITY).namingPattern("parser-%d").build());
+        parserThreadsAdded = (ThreadPoolExecutor) Executors.newFixedThreadPool(maxThreads,
                 new BasicThreadFactory.Builder().priority(Thread.MAX_PRIORITY).namingPattern("parser-%d").build());
     }
 
@@ -500,40 +502,59 @@ public class Main {
     }
 
     synchronized public void processAddedFile(File newFile) {
-        kickQeueueManager();
         logger.info("queueing " + newFile);
         fileQueue.add(newFile);
     }
 
-    public void kickQeueueManager() {
-        if (initialRun.get() == false) {
-            managerThreads.execute(new Runnable() {
+    public boolean kickQueueManager() throws Exception {
+        if (!initDB(false)) {
+            logger.error("Failed to init DB; exiting");
+            return false;
+        }
+
+        ArrayList<Callable<Integer>> parserTasks = new ArrayList<>(maxThreads);
+        for (int i = 0; i < maxThreads; i++) {
+            parserTasks.add(new Callable() {
                 @Override
-                public void run() {
-                    try {
-                        logger.info("Starting manager thread");
-                        if (!initDB(false)) {
-                            logger.error("Failed to init DB; exiting");
-                            return;
-                        }
-                        while (!queueEnd.get() || !fileQueue.isEmpty()) {
-                            File fileFromQueue;
-//                            logger.info("queueEnd: "+queueEnd.get());
-                            while (
-                                    (fileFromQueue = fileQueue.poll(300, TimeUnit.MILLISECONDS)) != null) {
-                                parserThreads.execute(new TheParserThread(fileFromQueue));
+                public Object call() throws Exception {
+                    Main.logger.info("Starting added processing thread " + Thread.currentThread().getName());
+                    while (!queueEnd.get() || !fileQueue.isEmpty()) {
+                        File fileFromQueue;
+                        while (
+                                (fileFromQueue = fileQueue.poll(300, TimeUnit.MILLISECONDS)) != null) {
+                                LogFileWrapper logFile = LogFileWrapper.getContainer(fileFromQueue, baseDir);
+                                if (logFile != null) {
+                                    for (FileInfo fi : logFile.getFileInfos()) {
+                                        logger.info("Processing added file: [" + fi.getM_path() + "] log name [" + fi.getLogFileName() + "]");
+
+                                        ProcessedFiles processedFiles = Main.getInstance().getProcessedFiles().get(fi.getLogFileName());
+                                        if (processedFiles != null) {
+                                            if (processedFiles.getSize() < fi.getSize()) {
+                                                logger.info(fi.getLogFileName()
+                                                        + " id(" + processedFiles.getId() + ")"
+                                                        + ": size[" + fi.getSize()
+                                                        + "] size in DB[" + processedFiles.getSize() + "]; file data to be removed");
+                                                m_accessor.addFileToDelete(processedFiles.getId());
+                                            } else {
+                                                logger.info(fi.getLogFileName()
+                                                        + " id(" + processedFiles.getId() + ")"
+                                                        + ": size[" + fi.getSize()
+                                                        + "] size in DB[" + processedFiles.getSize() + "]; new file ignored");
+                                                continue;
+                                            }
+                                        }
+                                        Parse(fi);
+                                        logger.info("Done " + fi.toString());
+                                    }
                             }
                         }
-                        logger.info("Done kickQeueueManager");
-                    } catch (InterruptedException e) {
-                        logger.info("queue manager interrupted");
-                    } catch (Exception e) {
-                        e.printStackTrace();
                     }
+                    return 0;
                 }
             });
-            initialRun.set(true);
         }
+        parserThreadsAdded.invokeAll(parserTasks);
+        return true;
     }
 
     public void processAddedFile(Path newFile) {
@@ -717,15 +738,7 @@ public class Main {
     }
 
 
-    private void ParseThread(FileInfo newFile) {
-        parserThreads.execute(new Runnable() {
-            @Override
-            public void run() {
-                Main.logger.info("processing file2 : " + newFile.getM_path() + ((newFile.getArchiveName() == null) ? "" : ", archive: " + newFile.getArchiveName()));
-                Parse(newFile);
-            }
-        });
-    }
+
 
     @SuppressWarnings("UseOfSystemOutOrSystemErr")
     private void parseAll() throws Exception {
@@ -742,6 +755,8 @@ public class Main {
         managerThreads.awaitTermination(5, TimeUnit.DAYS);
         parserThreads.shutdown();
         parserThreads.awaitTermination(5, TimeUnit.DAYS);
+        parserThreadsAdded.shutdown();
+        parserThreadsAdded.awaitTermination(5, TimeUnit.DAYS);
 
     }
 
@@ -912,6 +927,8 @@ public class Main {
         queueEnd.set(true);
         managerThreads.shutdown();
         managerThreads.awaitTermination(5, TimeUnit.DAYS);
+        parserThreadsAdded.shutdown();
+        parserThreadsAdded.awaitTermination(5, TimeUnit.DAYS);
         parserThreads.shutdown();
         parserThreads.awaitTermination(5, TimeUnit.DAYS);
         initExecutor(maxThreads);
@@ -1389,49 +1406,6 @@ public class Main {
                             (size == null) ? 0 : Long.valueOf(size.toString())));
                 }
             }
-        }
-    }
-
-    class TheParserThread implements Runnable {
-
-        private final File file;
-
-        public TheParserThread(File file) {
-            this.file = file;
-        }
-
-        @Override
-        public void run() {
-//            Thread.currentThread().setName("parser");
-            LogFileWrapper logFile = LogFileWrapper.getContainer(file, baseDir);
-
-            if (logFile != null)
-                for (FileInfo fi : logFile.getFileInfos()) {
-                    parseFile(fi);
-                }
-        }
-
-        private void parseFile(FileInfo fi) {
-            logger.info("Processing added file: [" + fi.getM_path() + "] log name [" + fi.getLogFileName() + "]");
-
-            ProcessedFiles processedFiles = Main.getInstance().getProcessedFiles().get(fi.getLogFileName());
-            if (processedFiles != null) {
-                if (processedFiles.getSize() < fi.getSize()) {
-                    logger.info(fi.getLogFileName()
-                            + " id(" + processedFiles.getId() + ")"
-                            + ": size[" + fi.getSize()
-                            + "] size in DB[" + processedFiles.getSize() + "]; file data to be removed");
-                    m_accessor.addFileToDelete(processedFiles.getId());
-                } else {
-                    logger.info(fi.getLogFileName()
-                            + " id(" + processedFiles.getId() + ")"
-                            + ": size[" + fi.getSize()
-                            + "] size in DB[" + processedFiles.getSize() + "]; new file ignored");
-                    return;
-                }
-            }
-            Parse(fi);
-            logger.info("Done " + fi.toString());
         }
     }
 
