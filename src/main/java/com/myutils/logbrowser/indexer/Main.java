@@ -303,6 +303,7 @@ public class Main {
     }
 
     private void Parse(FileInfo fileInfo) {
+        logger.info("Parsing "+fileInfo.getLogFileName());
         Instant fileStart = Instant.now();
         Parser parser;
         DBTable tab = null;
@@ -341,7 +342,7 @@ public class Main {
 
             totalBytes += fileInfo.getSize();
             totalFiles++;
-            logger.info("\tParsed " + lines + " lines, " + formatSize(fileInfo.getSize()) + ". Took "
+            logger.info(fileInfo.getLogFileName()+": parsed " + lines + " lines, " + formatSize(fileInfo.getSize()) + ". Took "
                     + pDuration(Duration.between(fileStart, Instant.now()).toMillis())
             );
         } else {
@@ -575,7 +576,9 @@ public class Main {
             }
         }
 
-        ArrayList<FileInfo> filesToProcess = new ArrayList();
+//        ArrayList<FileInfo> filesToProcess = new ArrayList();
+        BlockingQueue<FileInfo> filesToProcess = new LinkedBlockingDeque<>();
+
         ArrayList<Long> filesToDelete = new ArrayList<>();
 
         try {
@@ -616,17 +619,21 @@ public class Main {
         FileInfo dirInfo = new FileInfo();
         dirInfo.m_path = dirName;
 
-        ArrayList<Callable<Integer>> parserTasks = new ArrayList<>();
-        for (int i = 0; i < filesToProcess.size(); i++) {
-            FileInfo newFile = filesToProcess.get(i);
+        ArrayList<Callable<Integer>> parserTasks = new ArrayList<>(maxThreads);
+        for (int i = 0; i < maxThreads; i++) {
             parserTasks.add(new Callable() {
                 @Override
                 public Object call() throws Exception {
-                    Main.logger.info("processing file1 : " + newFile.getM_path() + ((newFile.getArchiveName() == null) ? "" : ", archive: " + newFile.getArchiveName()));
-                    Parse(newFile);
+                    Main.logger.info("Starting processing thread " + Thread.currentThread().getName());
+                    FileInfo fileInfo;
+                    while(( fileInfo = filesToProcess.poll())!=null){
+                        Parse(fileInfo);
+                    }
+                    Main.logger.info("Done parsing thread " + Thread.currentThread().getName());
                     return 0;
                 }
             });
+
         }
         parserThreads.invokeAll(parserTasks);
         logger.info("Done parsing");
