@@ -17,23 +17,13 @@ import java.nio.file.Paths;
 public class ExecutionEnvironment {
     private Boolean parseTDiff = "true".equalsIgnoreCase(System.getProperty("timediff.parse"));
     private boolean ignoreZIP = false;
-    private int maxThreads = 1;
-
-    public int getMaxThreads() {
-        return maxThreads;
-    }
-
-    public void setMaxThreads(int maxThreads) {
-        this.maxThreads = maxThreads;
-    }
-
+    private int maxThreads;
     private String baseDir = Paths.get(".").toAbsolutePath().normalize().toString();
     private String xmlCFG = ".";
     private String alias = "logbr";
     private String dbname = "logbr";
     private String logbrowserDir;
     private boolean sqlPragma;
-
     public ExecutionEnvironment() {
         String _dir = System.getProperty("logbr.dir");
         if (StringUtils.isEmpty(_dir)) {
@@ -41,6 +31,15 @@ public class ExecutionEnvironment {
         }
 
         logbrowserDir = Paths.get(_dir).toAbsolutePath().normalize().toString();
+        maxThreads = defProcessingThreads();
+    }
+
+    public int getMaxThreads() {
+        return maxThreads;
+    }
+
+    public void setMaxThreads(int maxThreads) {
+        this.maxThreads = maxThreads;
     }
 
     public boolean isParseTDiff() {
@@ -108,6 +107,12 @@ public class ExecutionEnvironment {
     public void setSqlPragma(boolean sqlPragma) {
         this.sqlPragma = sqlPragma;
     }
+
+    protected int defProcessingThreads() {
+        int processors = Runtime.getRuntime().availableProcessors();
+        return (processors > 1) ? processors / 2 : 1;
+    }
+
 
     @Override
     public String toString() {

@@ -58,7 +58,7 @@ public class Main {
     AtomicBoolean initialRun = new AtomicBoolean(false);
     boolean initFailed = false;
     BlockingQueue<File> fileQueue = new LinkedBlockingDeque<>();
-    AtomicBoolean queueEnd = new AtomicBoolean(false);
+    AtomicBoolean queueEnd ;
     ProcessedFilesSet processedFiles = new ProcessedFilesSet();
     private String dbName;
     private SqliteAccessor m_accessor;
@@ -68,7 +68,6 @@ public class Main {
     private int totalFiles = 0;
     private boolean dbExisted = false;
     private DBTables m_tables;
-    private ThreadPoolExecutor managerThreads;
     private ThreadPoolExecutor parserThreads;
     private ThreadPoolExecutor parserThreadsAdded;
     private boolean ignoreZIP = false;
@@ -238,15 +237,6 @@ public class Main {
 
 
     private void initExecutor(int maxThreads) {
-        if (managerThreads != null)
-            managerThreads.purge();
-
-        managerThreads = (ThreadPoolExecutor) Executors.newCachedThreadPool(
-                new BasicThreadFactory.Builder().namingPattern("indexer-%d").build()
-        );
-        managerThreads.setCorePoolSize(1);
-        managerThreads.setMaximumPoolSize(1);
-
         parserThreads = (ThreadPoolExecutor) Executors.newFixedThreadPool(maxThreads,
                 new BasicThreadFactory.Builder().priority(Thread.MAX_PRIORITY).namingPattern("parser-%d").build());
         parserThreadsAdded = (ThreadPoolExecutor) Executors.newFixedThreadPool(maxThreads,
@@ -305,7 +295,7 @@ public class Main {
     }
 
     private void Parse(FileInfo fileInfo) {
-        logger.info("Parsing "+fileInfo.getLogFileName());
+        logger.info("Parsing " + fileInfo.getLogFileName());
         Instant fileStart = Instant.now();
         Parser parser;
         DBTable tab = null;
@@ -344,7 +334,7 @@ public class Main {
 
             totalBytes += fileInfo.getSize();
             totalFiles++;
-            logger.info(fileInfo.getLogFileName()+": parsed " + lines + " lines, " + formatSize(fileInfo.getSize()) + ". Took "
+            logger.info(fileInfo.getLogFileName() + ": parsed " + lines + " lines, " + formatSize(fileInfo.getSize()) + ". Took "
                     + pDuration(Duration.between(fileStart, Instant.now()).toMillis())
             );
         } else {
@@ -370,7 +360,7 @@ public class Main {
         DBTable t;
 //        m_FileInfoTable = new FileInfoTable(m_accessor);
 //        m_FileInfoTable.InitDB();
-        m_tables =  new DBTables();
+        m_tables = new DBTables();
         m_tables.put(TableType.File.toString(), new FileInfoTable(m_accessor));
 
         m_tables.put(TableType.ConfigUpdate.toString(), new ConfigUpdateTable(m_accessor, TableType.ConfigUpdate));
@@ -511,49 +501,61 @@ public class Main {
             logger.error("Failed to init DB; exiting");
             return false;
         }
+        queueEnd = new AtomicBoolean(false);
 
-        ArrayList<Callable<Integer>> parserTasks = new ArrayList<>(maxThreads);
-        for (int i = 0; i < maxThreads; i++) {
-            parserTasks.add(new Callable() {
-                @Override
-                public Object call() throws Exception {
-                    Main.logger.info("Starting added processing thread " + Thread.currentThread().getName());
-                    while (!queueEnd.get() || !fileQueue.isEmpty()) {
-                        File fileFromQueue;
-                        while (
-                                (fileFromQueue = fileQueue.poll(300, TimeUnit.MILLISECONDS)) != null) {
-                                LogFileWrapper logFile = LogFileWrapper.getContainer(fileFromQueue, baseDir);
-                                if (logFile != null) {
-                                    for (FileInfo fi : logFile.getFileInfos()) {
-                                        logger.info("Processing added file: [" + fi.getM_path() + "] log name [" + fi.getLogFileName() + "]");
+        new Thread(
+                new Runnable() {
+                    @Override
+                    public void run() {
+                        ArrayList<Callable<Integer>> parserTasks = new ArrayList<>(maxThreads);
+                        for (int i = 0; i < maxThreads; i++) {
+                            parserTasks.add(new Callable() {
+                                @Override
+                                public Object call() throws Exception {
+                                    Main.logger.info("Starting added processing thread " + Thread.currentThread().getName());
+                                    while (!queueEnd.get() || !fileQueue.isEmpty()) {
+                                        File fileFromQueue;
+                                        while (
+                                                (fileFromQueue = fileQueue.poll(300, TimeUnit.MILLISECONDS)) != null) {
+                                            LogFileWrapper logFile = LogFileWrapper.getContainer(fileFromQueue, baseDir);
+                                            if (logFile != null) {
+                                                for (FileInfo fi : logFile.getFileInfos()) {
+                                                    logger.info("Processing added file: [" + fi.getM_path() + "] log name [" + fi.getLogFileName() + "]");
 
-                                        ProcessedFiles processedFiles = Main.getInstance().getProcessedFiles().get(fi.getLogFileName());
-                                        if (processedFiles != null) {
-                                            if (processedFiles.getSize() < fi.getSize()) {
-                                                logger.info(fi.getLogFileName()
-                                                        + " id(" + processedFiles.getId() + ")"
-                                                        + ": size[" + fi.getSize()
-                                                        + "] size in DB[" + processedFiles.getSize() + "]; file data to be removed");
-                                                m_accessor.addFileToDelete(processedFiles.getId());
-                                            } else {
-                                                logger.info(fi.getLogFileName()
-                                                        + " id(" + processedFiles.getId() + ")"
-                                                        + ": size[" + fi.getSize()
-                                                        + "] size in DB[" + processedFiles.getSize() + "]; new file ignored");
-                                                continue;
+                                                    ProcessedFiles processedFiles = Main.getInstance().getProcessedFiles().get(fi.getLogFileName());
+                                                    if (processedFiles != null) {
+                                                        if (processedFiles.getSize() < fi.getSize()) {
+                                                            logger.info(fi.getLogFileName()
+                                                                    + " id(" + processedFiles.getId() + ")"
+                                                                    + ": size[" + fi.getSize()
+                                                                    + "] size in DB[" + processedFiles.getSize() + "]; file data to be removed");
+                                                            m_accessor.addFileToDelete(processedFiles.getId());
+                                                        } else {
+                                                            logger.info(fi.getLogFileName()
+                                                                    + " id(" + processedFiles.getId() + ")"
+                                                                    + ": size[" + fi.getSize()
+                                                                    + "] size in DB[" + processedFiles.getSize() + "]; new file ignored");
+                                                            continue;
+                                                        }
+                                                    }
+                                                    Parse(fi);
+                                                    logger.info("Done " + fi.toString());
+                                                }
                                             }
                                         }
-                                        Parse(fi);
-                                        logger.info("Done " + fi.toString());
                                     }
-                            }
+                                    return 0;
+                                }
+                            });
+                        }
+                        try {
+                            parserThreadsAdded.invokeAll(parserTasks);
+                        } catch (InterruptedException e) {
+                            logger.info("Interrupted manager thread", e);
                         }
                     }
-                    return 0;
-                }
-            });
-        }
-        parserThreadsAdded.invokeAll(parserTasks);
+                }).start();
+
         return true;
     }
 
@@ -647,7 +649,7 @@ public class Main {
                 public Object call() throws Exception {
                     Main.logger.info("Starting processing thread " + Thread.currentThread().getName());
                     FileInfo fileInfo;
-                    while(( fileInfo = filesToProcess.poll())!=null){
+                    while ((fileInfo = filesToProcess.poll()) != null) {
                         Parse(fileInfo);
                     }
                     Main.logger.info("Done parsing thread " + Thread.currentThread().getName());
@@ -738,8 +740,6 @@ public class Main {
     }
 
 
-
-
     @SuppressWarnings("UseOfSystemOutOrSystemErr")
     private void parseAll() throws Exception {
         Instant start = Instant.now();
@@ -751,8 +751,6 @@ public class Main {
             finalizeWork();
         }
         logger.info("All done. Completed in " + pDuration(Duration.between(start, Instant.now()).toMillis()) + "; processed " + totalFiles + " files (" + formatSize(totalBytes) + ")");
-        managerThreads.shutdown();
-        managerThreads.awaitTermination(5, TimeUnit.DAYS);
         parserThreads.shutdown();
         parserThreads.awaitTermination(5, TimeUnit.DAYS);
         parserThreadsAdded.shutdown();
@@ -925,8 +923,6 @@ public class Main {
     public void finishParsing() throws Exception {
         logger.info("Finish parsing");
         queueEnd.set(true);
-        managerThreads.shutdown();
-        managerThreads.awaitTermination(5, TimeUnit.DAYS);
         parserThreadsAdded.shutdown();
         parserThreadsAdded.awaitTermination(5, TimeUnit.DAYS);
         parserThreads.shutdown();

@@ -206,10 +206,6 @@ public class EnvIndexer extends ExecutionEnvironment {
         return ret;
     }
 
-    private int defProcessingThreads() {
-        int processors = Runtime.getRuntime().availableProcessors();
-        return (processors > 1) ? processors / 2 : 1;
-    }
 
 
     private boolean getOptValueParseTDiff() {
