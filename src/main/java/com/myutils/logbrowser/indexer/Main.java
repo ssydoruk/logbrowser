@@ -77,6 +77,10 @@ public class Main {
         return MainHolder.INSTANCE;
     }
 
+    public static Main getNewInstance() {
+        return MainHolder.newInstance();
+    }
+
     static String lookupConstant(GenesysConstants constName, Integer intOrDef) {
         if (intOrDef != null) {
             HashMap<Integer, String> get = constants.get(constName);
@@ -939,7 +943,12 @@ public class Main {
 
     private static class MainHolder {
 
-        private static final Main INSTANCE = new Main();
+        private static  Main INSTANCE = new Main();
+
+        public static Main newInstance(){
+            INSTANCE = new Main();
+            return INSTANCE;
+        }
     }
 
     static class Constants extends HashMap<GenesysConstants, HashMap<Integer, String>> {
