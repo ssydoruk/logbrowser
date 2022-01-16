@@ -682,7 +682,7 @@ public class Main {
         }
         String startDir = baseDir;
 
-        m_accessor = SqliteAccessor.getInstance();
+        m_accessor = new SqliteAccessor();
 
         if (!forceNew) {
             try {

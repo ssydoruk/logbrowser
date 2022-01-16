@@ -24,26 +24,22 @@ import static Utils.Util.pDuration;
 public final class SqliteAccessor implements DBAccessor {
 
     private static final Logger logger = Main.logger;
+    String m_alias;
+    Connection m_conn;
+    //    ArrayList<PreparedStatement> m_statements;
+//    ArrayList<Integer> m_queueLength;
+    boolean m_exit;
+    Stats stats;
     /**
      * @param dbname database file name
      * @param alias postfix for table names
      */
-    private static final HashMap<String, Boolean> tabExists = new HashMap<String, Boolean>();
-    private static SqliteAccessor INSTANCE = new SqliteAccessor();
-    String m_alias;
-    Connection m_conn;
-//    ArrayList<PreparedStatement> m_statements;
-//    ArrayList<Integer> m_queueLength;
-    boolean m_exit;
-    Stats stats;
+    private HashMap<String, Boolean> tabExists = new HashMap<String, Boolean>();
     private List<Long> filesToDelete;
 
-    private SqliteAccessor() {
+    public SqliteAccessor() {
     }
 
-    public static SqliteAccessor getInstance() {
-        return INSTANCE;
-    }
 
     public void init(String dbname, String alias) throws Exception {
         m_alias = alias;
@@ -343,7 +339,7 @@ public final class SqliteAccessor implements DBAccessor {
     }
 
     public PreparedStatement getStatement(String query) throws SQLException {
-            return m_conn.prepareStatement(query);
+        return m_conn.prepareStatement(query);
     }
 
     public synchronized int PrepareStatement(String query) {
@@ -588,7 +584,7 @@ public final class SqliteAccessor implements DBAccessor {
 
         private void flush() throws SQLException {
             int[] ret = stat.executeBatch();
-            logger.trace("flashing "+stat+" ret: "+ret.length);
+            logger.trace("flashing " + stat + " ret: " + ret.length);
             if (ret.length > 0) {
                 for (int i = 0; i < ret.length; i++) {
                     if (ret[i] < 0) {
@@ -599,10 +595,9 @@ public final class SqliteAccessor implements DBAccessor {
                 Main.logger.trace("flushed " + ret.length + " records");
                 try {
                     m_conn.commit();
-                }
-                catch(SQLException e){
+                } catch (SQLException e) {
                     Main.logger.error("Exception while commit", e);
-                    }
+                }
                 ResetAutoCommit();
             }
         }
@@ -630,7 +625,7 @@ public final class SqliteAccessor implements DBAccessor {
         }
 
         synchronized public void Submit(Stat st) throws SQLException {
-            logger.trace("Submitting "+st);
+            logger.trace("Submitting " + st);
             st.Submit();
             if (st.cnt >= 10_000) {
 //                Main.m_accessor.flush(st);
