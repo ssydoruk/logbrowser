@@ -496,7 +496,7 @@ public class Main {
     }
 
     synchronized public void processAddedFile(File newFile) {
-        logger.info("queueing " + newFile);
+        logger.debug("queueing " + newFile);
         fileQueue.add(newFile);
     }
 
@@ -524,7 +524,7 @@ public class Main {
                                             LogFileWrapper logFile = LogFileWrapper.getContainer(fileFromQueue, baseDir);
                                             if (logFile != null) {
                                                 for (FileInfo fi : logFile.getFileInfos()) {
-                                                    logger.info("Processing added file: [" + fi.getM_path() + "] log name [" + fi.getLogFileName() + "]");
+                                                    logger.debug("Processing added file: [" + fi.getM_path() + "] log name [" + fi.getLogFileName() + "]");
 
                                                     ProcessedFiles processedFiles = Main.getInstance().getProcessedFiles().get(fi.getLogFileName());
                                                     if (processedFiles != null) {
@@ -543,7 +543,7 @@ public class Main {
                                                         }
                                                     }
                                                     Parse(fi);
-                                                    logger.info("Done " + fi.toString());
+                                                    logger.debug("Done " + fi.toString());
                                                 }
                                             }
                                         }
