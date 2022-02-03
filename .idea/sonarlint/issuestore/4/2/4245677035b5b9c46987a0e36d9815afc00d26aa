@@ -1,83 +1,0 @@
-
-R
-java:S3740î"/Provide the parametrized type for this generic.(êÁìúÿÿÿÿ8Õ®Õªª/
-y
-java:S1192"]Define a constant instead of duplicating this literal "Search in the table (Ctrl-F)" 3 times.(Éàÿ¸úÿÿÿÿ
-l
-java:S1192ß"PDefine a constant instead of duplicating this literal "Find and select" 3 times.(æ¹šŸşÿÿÿÿ
-F
-java:S1066Š"/Merge this if statement with the enclosing one.(Ü¤Óæ
-K
-java:S1066‹"/Merge this if statement with the enclosing one.(€½ùıÿÿÿÿ
-g	java:S117¸"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(õŒ§
-l	java:S117Î"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(¢¤©šúÿÿÿÿ
-D
-java:S1604œ"(Make this anonymous inner class a lambda(­µåŸüÿÿÿÿ
-?
-java:S1604¥"(Make this anonymous inner class a lambda(Ğ™±Í
-[
-java:S59936"9Change the visibility of this constructor to "protected".(¹µÃîüÿÿÿÿ8ßİûè§/
-R
-java:S1948,"5Make "savedHeaderRenderer" transient or serializable.(¶ ŞÒ8¦Üˆµ¨/
-G
-java:S1948."%Make "tca" transient or serializable.(×İÚ¢øÿÿÿÿ8’°Õªª/
-E
-java:S19481"(Make "sorter" transient or serializable.(¤Óßä8¨Üˆµ¨/
-^
-java:S3457}"AFormat specifiers should be used instead of string concatenation.(Ñ‹Ã…8ØÜˆµ¨/
-S
-java:S1854£"7Remove this useless assignment to local variable "sel".(¶ÀÔîÿÿÿÿÿ
-n
-java:S3776Ï"RRefactor this method to reduce its Cognitive Complexity from 23 to the 15 allowed.(ÃÄÆäøÿÿÿÿ
-J
-java:S1172œ"3Remove this unused method parameter "jTableCommon".(Àõİ×
-Q
-java:S1117º"5Rename "c" which hides the field declared at line 51.(º³»Êşÿÿÿÿ
-i
-java:S3776ğ"RRefactor this method to reduce its Cognitive Complexity from 18 to the 15 allowed.(£›á
-K
-java:S1117ñ"5Rename "c" which hides the field declared at line 51.(»úÁ
-_
-java:S3457¬"AFormat specifiers should be used instead of string concatenation.(¥Ã§Ø8¾İˆµ¨/
-
-java:S1186´"€Add a nested comment explaining why this method is empty, throw an UnsupportedOperationException or complete the implementation.(Ù¹Àùÿÿÿÿ
-˜
-java:S1186¹"€Add a nested comment explaining why this method is empty, throw an UnsupportedOperationException or complete the implementation.(¤›úä
-X
-java:S1854":Remove this useless assignment to local variable "selRow".(õï”ë8ŞŞûè§/
-?
-java:S1172¼"(Remove this unused method parameter "f".(®Ñ†
-K
-java:S1117û"5Rename "c" which hides the field declared at line 51.(»úÁ
-K
-java:S1117"5Rename "c" which hides the field declared at line 51.(»úÁ
-K
-java:S1117¥"5Rename "c" which hides the field declared at line 51.(»úÁ
-K
-java:S1117¹"5Rename "c" which hides the field declared at line 51.(»úÁ
-K
-java:S1117Í"5Rename "c" which hides the field declared at line 51.(»úÁ
-K
-java:S1117Õ"5Rename "c" which hides the field declared at line 51.(»úÁ
-K
-java:S1117ç"5Rename "c" which hides the field declared at line 51.(»úÁ
-K
-java:S1117ï"5Rename "c" which hides the field declared at line 51.(»úÁ
-K
-java:S1117"5Rename "c" which hides the field declared at line 51.(»úÁ
-K
-java:S1117‰"5Rename "c" which hides the field declared at line 51.(»úÁ
-K
-java:S1117¶"5Rename "c" which hides the field declared at line 51.(»úÁ
-d
-java:S3457â"AFormat specifiers should be used instead of string concatenation.(ƒ½ÚŞÿÿÿÿÿ8ÆŞˆµ¨/
-[
-java:S1144Î"?Remove this unused private "DirectionalFilterMenu" constructor.(¢¤©šúÿÿÿÿ
-M
-java:S1144Ô"1Remove this unused private "getTheParent" method.(Èç’­ıÿÿÿÿ
-M
-java:S1144î"1Remove this unused private "getTheParent" method.(Èç’­ıÿÿÿÿ
-M
-java:S1144ˆ"1Remove this unused private "getTheParent" method.(Èç’­ıÿÿÿÿ
-G
-java:S1144¼"+Remove this unused private "doShow" method.(íõîúÿÿÿÿ
