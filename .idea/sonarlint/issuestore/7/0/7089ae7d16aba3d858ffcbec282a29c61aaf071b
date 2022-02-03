@@ -1,0 +1,196 @@
+
+b
+java:S1301È"KReplace this "switch" statement by "if" statements to increase readability.(ßèğ×
+D
+java:S3740F"/Provide the parametrized type for this generic.(‚²ô2
+K
+java:S3740‰"/Provide the parametrized type for this generic.(ıˆîÉşÿÿÿÿ
+d
+java:S1192é"MDefine a constant instead of duplicating this literal "start time: " 3 times.(¸”Áã
+_
+java:S1192ã"HDefine a constant instead of duplicating this literal "fatal: " 7 times.(„¤—
+X
+java:S2184’"ACast one of the operands of this division operation to a "float".(Çğ˜
+?
+java:S2629s"$Invoke method(s) only conditionally.(ÎÕÅ€úÿÿÿÿ
+?
+java:S2629"$Invoke method(s) only conditionally.(ÎÕÅ€úÿÿÿÿ
+S
+java:S2629û"7Use the built-in formatting to construct this argument.(·ı˜±üÿÿÿÿ
+M
+java:S2629"7Use the built-in formatting to construct this argument.(œ¸ë
+N
+java:S2629à"7Use the built-in formatting to construct this argument.(³ûĞ
+N
+java:S2629é"7Use the built-in formatting to construct this argument.(¸”Áã
+N
+java:S2629ö"7Use the built-in formatting to construct this argument.(¸”Áã
+N
+java:S2629€"7Use the built-in formatting to construct this argument.(¸”Áã
+N
+java:S2629–"7Use the built-in formatting to construct this argument.(ú¯²¼
+^
+java:S3824ÿ"HReplace this "Map.containsKey()" with a call to "Map.computeIfAbsent()".(¿Èb
+8
+java:S1643‹"Use a StringBuilder instead.(´Ø™éøÿÿÿÿ
+Q
+java:S1141Ş"5Extract this nested try block into a separate method.(¡»¢üùÿÿÿÿ
+Q
+java:S1141ç"5Extract this nested try block into a separate method.(¡»¢üùÿÿÿÿ
+Q
+java:S1141ğ"5Extract this nested try block into a separate method.(¡»¢üùÿÿÿÿ
+Q
+java:S1141ı"5Extract this nested try block into a separate method.(¡»¢üùÿÿÿÿ
+Q
+java:S1141‰"5Extract this nested try block into a separate method.(¡»¢üùÿÿÿÿ
+Q
+java:S1141¡"5Extract this nested try block into a separate method.(¡»¢üùÿÿÿÿ
+Q
+java:S1141Å"5Extract this nested try block into a separate method.(¡»¢üùÿÿÿÿ
+k	java:S117y"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(¾§İúÿÿÿÿ
+g	java:S117•"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(”ÛØÇ
+q
+java:S1104J"[Make m_componentType a static final constant or non-public and provide accessors if needed.(ÎâÆ—
+n
+java:S1104L"SMake m_runId a static final constant or non-public and provide accessors if needed.(”‰¼—ÿÿÿÿÿ
+o
+java:S1104M"TMake m_nodeId a static final constant or non-public and provide accessors if needed.(‚Ìçèúÿÿÿÿ
+h
+java:S1104N"RMake m_path a static final constant or non-public and provide accessors if needed.(üÅ˜¼
+m
+java:S1104O"RMake m_name a static final constant or non-public and provide accessors if needed.(†ó×¹ûÿÿÿÿ
+J
+java:S1121Í".Extract the assignment out of this expression.(÷½­±şÿÿÿÿ
+E
+java:S1121™".Extract the assignment out of this expression.(¶ÕÛô
+J
+java:S1121Í".Extract the assignment out of this expression.(Ø€§Âüÿÿÿÿ
+D
+java:S1121Ğ".Extract the assignment out of this expression.(²óì$
+D
+java:S1121Ó".Extract the assignment out of this expression.(ÓÇ5
+J
+java:S1121Ö".Extract the assignment out of this expression.(à…ØÙıÿÿÿÿ
+E
+java:S1121Ù".Extract the assignment out of this expression.(à×˜é
+J
+java:S1121Ü".Extract the assignment out of this expression.(öñ’üÿÿÿÿ
+E
+java:S1121î".Extract the assignment out of this expression.(¦ù‡
+E
+java:S1121û".Extract the assignment out of this expression.(½ıÌ¬
+J
+java:S1121…".Extract the assignment out of this expression.(âùÒüÿÿÿÿ
+J
+java:S1121".Extract the assignment out of this expression.(üîæİùÿÿÿÿ
+J
+java:S1121”".Extract the assignment out of this expression.(©é«ºıÿÿÿÿ
+E
+java:S1121".Extract the assignment out of this expression.(ÌŸä
+J
+java:S1121 ".Extract the assignment out of this expression.(ó¹îáıÿÿÿÿ
+E
+java:S1121»".Extract the assignment out of this expression.(Ş¤½Ş
+h
+java:S3008F"SRename this field "m_runIds" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(‚²ô2
+o	java:S116J"ZRename this field "m_componentType" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ÎâÆ—
+l	java:S116L"RRename this field "m_runId" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(”‰¼—ÿÿÿÿÿ
+m	java:S116M"SRename this field "m_nodeId" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(‚Ìçèúÿÿÿÿ
+f	java:S116N"QRename this field "m_path" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(üÅ˜¼
+k	java:S116O"QRename this field "m_name" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(†ó×¹ûÿÿÿÿ
+n	java:S116P"YRename this field "m_fileFilterId" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(„¼
+y	java:S116Q"_Rename this field "m_ServerStartTimeSet" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ë€åáÿÿÿÿÿ
+j	java:S116V"PRename this field "m_app" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(´”ûûÿÿÿÿ
+f	java:S116W"QRename this field "m_host" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(–Åø
+{	java:S116a"aRename this field "m_componentTypeSuspect" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(òúÎ©şÿÿÿÿ
+<
+java:S1170H"!Make this final field static too.(„úöŠÿÿÿÿÿ
+7
+java:S1170I"!Make this final field static too.(›ÛÆ’
+Q	java:S125)"<This block of commented-out lines of code should be removed.(·›³Ñ
+`
+java:S1124E"EReorder the modifiers to comply with the Java Language Specification.(´Îì©úÿÿÿÿ
+L
+java:S1172k"1Remove this unused method parameter "logArchive".(Õ©ÏÈûÿÿÿÿ
+Œ
+java:S1130k"qRemove the declaration of thrown exception 'java.io.IOException', as it cannot be thrown from constructor's body.(Õ©ÏÈûÿÿÿÿ
+Œ
+java:S1130y"qRemove the declaration of thrown exception 'java.io.IOException', as it cannot be thrown from constructor's body.(¾§İúÿÿÿÿ
+A
+java:S3010‰"%Remove this assignment of "m_runIds".(ıˆîÉşÿÿÿÿ
+n
+java:S3776¦"RRefactor this method to reduce its Cognitive Complexity from 19 to the 15 allowed.(Àšòóÿÿÿÿÿ
+C
+java:S1125·"'Remove the unnecessary boolean literal.(è¤¿Ñıÿÿÿÿ
+[
+java:S1854Ô"?Remove this useless assignment to local variable "inputStream".(Ï•Éøÿÿÿÿÿ
+i	java:S100ô"NRename this method name to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(¤µ‰¯úÿÿÿÿ
+c	java:S100‰"NRename this method name to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(àşÁL
+i	java:S100"NRename this method name to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(Òå¤äøÿÿÿÿ
+d	java:S100‘"NRename this method name to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(“ÖĞ„
+i	java:S100•"NRename this method name to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(»Ôàüÿÿÿÿ
+o	java:S131›"YComplete cases by adding the missing enum constants or add a default case to this switch.(ßèğ×
+i	java:S100²"NRename this method name to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(›Ë‘Ÿüÿÿÿÿ
+o	java:S131È"YComplete cases by adding the missing enum constants or add a default case to this switch.(ßèğ×
+i	java:S100ï"NRename this method name to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(”çÀóüÿÿÿÿ
+Y
+java:S1854«"=Remove this useless assignment to local variable "isTserver".(€»ñÍùÿÿÿÿ
+o
+java:S3776ï"SRefactor this method to reduce its Cognitive Complexity from 153 to the 15 allowed.(”çÀóüÿÿÿÿ
+M
+java:S2696ğ"6Make the enclosing method "static" or remove this set.(›ˆı
+]
+java:S3457û"AFormat specifiers should be used instead of string concatenation.(·ı˜±üÿÿÿÿ
+W
+java:S3457"AFormat specifiers should be used instead of string concatenation.(œ¸ë
+W	java:S125"<This block of commented-out lines of code should be removed.(Áª®üúÿÿÿÿ
+c
+java:S1871Ğ"MThis branch's code block is the same as the block for the branch on line 461.(²óì$
+d
+java:S1871Ù"MThis branch's code block is the same as the block for the branch on line 467.(à×˜é
+i
+java:S1871Ö"MThis branch's code block is the same as the block for the branch on line 467.(à…ØÙıÿÿÿÿ
+R	java:S125­"<This block of commented-out lines of code should be removed.(ÃÇ³Ù
+X
+java:S3457à"AFormat specifiers should be used instead of string concatenation.(³ûĞ
+X
+java:S3457é"AFormat specifiers should be used instead of string concatenation.(¸”Áã
+X
+java:S3457ö"AFormat specifiers should be used instead of string concatenation.(¸”Áã
+X
+java:S3457€"AFormat specifiers should be used instead of string concatenation.(¸”Áã
+W	java:S125‡"<This block of commented-out lines of code should be removed.(ï’­âùÿÿÿÿ
+X
+java:S3457Œ"AFormat specifiers should be used instead of string concatenation.(íèõ‡
+W	java:S125™"<This block of commented-out lines of code should be removed.(¶èó¬şÿÿÿÿ
+W	java:S125›"<This block of commented-out lines of code should be removed.(éØ»Úûÿÿÿÿ
+X
+java:S3457ô"AFormat specifiers should be used instead of string concatenation.(«‹æˆ
+c	java:S100ˆ"NRename this method name to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ïºˆH
+d	java:S100•"NRename this method name to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(¦Ê¤³
+X
+java:S3457–"AFormat specifiers should be used instead of string concatenation.(ú¯²¼
+i	java:S100Ê"NRename this method name to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(Ñ›ñ¹úÿÿÿÿ
+R	java:S125¸"<This block of commented-out lines of code should be removed.(Ğ²ãè
+M
+java:S2696Ë"6Make the enclosing method "static" or remove this set.(ıöˆ
+I
+java:S1172Î"-Remove this unused method parameter "length".(Øğ÷¥ùÿÿÿÿ
+d	java:S100á"NRename this method name to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(äíãü
+R	java:S125ü"<This block of commented-out lines of code should be removed.(†Œù¬
+=
+java:S2185’"&Remove this silly call to "Math.round"(Çğ˜
+W	java:S125“"<This block of commented-out lines of code should be removed.(ë¸Æ¹ÿÿÿÿÿ
+C
+java:S1172³",Remove this unused method parameter "input".(Æ¢à
+W	java:S125Æ"<This block of commented-out lines of code should be removed.(¸ã„‹ûÿÿÿÿ
+L
+java:S1481Ô"0Remove this unused "inputStream" local variable.(Ï•Éøÿÿÿÿÿ
+E
+java:S1481õ".Remove this unused "isTserver" local variable.(¸öÂß
+W
+java:S10688"<Remove this unused "startTimePatternFinalDot" private field.(õˆÁşøÿÿÿÿ
+B
+java:S1068H"'Remove this unused "buf" private field.(„úöŠÿÿÿÿÿ
+A
+java:S1068I"+Remove this unused "bufRead" private field.(›ÛÆ’

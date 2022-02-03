@@ -1,0 +1,48 @@
+
+”
+java:S1319z"yThe type of the "shortFileNames" object should be an interface such as "List" rather than the implementation "ArrayList".(Æ»¢¶úÿÿÿÿ
+L
+java:S2629*"7Use the built-in formatting to construct this argument.(Ñ›Q
+M
+java:S2629Y"7Use the built-in formatting to construct this argument.(Á°Ï
+R
+java:S2629_"7Use the built-in formatting to construct this argument.(ŠëöËøÿÿÿÿ
+x
+java:S2629“"\Invoke method(s) only conditionally. Use the built-in formatting to construct this argument.(¤á“’şÿÿÿÿ
+s
+java:S2629—"\Invoke method(s) only conditionally. Use the built-in formatting to construct this argument.(Ëï§±
+/
+java:S1700"Rename field "excel"(†õøùøÿÿÿÿ
+t	java:S115"ZRename this constant name to match the regular expression '^[A-Z][A-Z0-9]*(_[A-Z0-9]+)*$'.(‡ÿ‚Âÿÿÿÿÿ
+t	java:S115"ZRename this constant name to match the regular expression '^[A-Z][A-Z0-9]*(_[A-Z0-9]+)*$'.(•©òşÿÿÿÿ
+t	java:S115"ZRename this constant name to match the regular expression '^[A-Z][A-Z0-9]*(_[A-Z0-9]+)*$'.(‹Šù™ÿÿÿÿÿ
+V
+java:S3457*"AFormat specifiers should be used instead of string concatenation.(Ñ›Q
+Q	java:S1259"<This block of commented-out lines of code should be removed.(¼É†î
+Q	java:S125>"<This block of commented-out lines of code should be removed.(ğ ó
+Q
+java:S1854M"6Remove this useless assignment to local variable "r1".(î·³şÿÿÿÿ
+K
+java:S1854J"5Remove this useless assignment to local variable "r".(–òÇ‰
+Q	java:S125P"<This block of commented-out lines of code should be removed.(á‘ãå
+W
+java:S3457Y"AFormat specifiers should be used instead of string concatenation.(Á°Ï
+1
+java:S3878^"Remove this array creation.(ĞˆÑï
+\
+java:S3457_"AFormat specifiers should be used instead of string concatenation.(ŠëöËøÿÿÿÿ
+Q	java:S125i"<This block of commented-out lines of code should be removed.(¨¿Ò¯
+R
+java:S1854ˆ"6Remove this useless assignment to local variable "r1".(î·³şÿÿÿÿ
+R	java:S125Œ"<This block of commented-out lines of code should be removed.(á‘ãå
+\
+java:S1124š"EReorder the modifiers to comply with the Java Language Specification.(¶ªê¼
+d	java:S100¡"NRename this method name to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(Œ´ñ¸
+<
+java:S1481J"&Remove this unused "r" local variable.(–òÇ‰
+B
+java:S1481M"'Remove this unused "r1" local variable.(î·³şÿÿÿÿ
+C
+java:S1481ˆ"'Remove this unused "r1" local variable.(î·³şÿÿÿÿ
+E
+java:S1068"*Remove this unused "logger" private field.(áœ˜Ûıÿÿÿÿ

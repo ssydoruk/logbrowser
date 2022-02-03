@@ -1,0 +1,66 @@
+
+C
+java:S3740"/Provide the parametrized type for this generic.(ãÐ…æ
+C
+java:S3740"/Provide the parametrized type for this generic.(ãÐ…æ
+f
+java:S1192"RDefine a constant instead of duplicating this literal "create index idx_" 5 times.(Þâ‰¶
+l
+java:S1192"SDefine a constant instead of duplicating this literal "Not supported yet." 4 times.(¦’ëªùÿÿÿÿ
+Z
+java:S1192"FDefine a constant instead of duplicating this literal "sipep" 5 times.(×Ûýš
+[
+java:S1192"GDefine a constant instead of duplicating this literal "nameid" 4 times.(ç„¶²
+[
+java:S1192"GDefine a constant instead of duplicating this literal "wstlib" 8 times.(œÌôÁ
+C
+java:S1066"/Merge this if statement with the enclosing one.(òÈ¸Ê
+i	java:S117"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ƒ‘¯‚ýÿÿÿÿ
+i	java:S117"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(Ìá“‘øÿÿÿÿ
+i	java:S117"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ã®§Åùÿÿÿÿ
+c	java:S117"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(º¶µ\
+i	java:S117"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(Ð„ËÑÿÿÿÿÿ
+u
+java:S1488"aImmediately return this expression instead of assigning it to the temporary variable "currTable".(¡øÖ…
+o	java:S116"\Rename this field "m_componentFilter" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ª•¾Õ
+4
+java:S1170"!Make this final field static too.(óþã1
+T	java:S125"<This block of commented-out lines of code should be removed.(žÁ–Æøÿÿÿÿ
+T	java:S125"<This block of commented-out lines of code should be removed.(‘¯­«úÿÿÿÿ
+N	java:S125"<This block of commented-out lines of code should be removed.(ï¸¡1
+f	java:S100"NRename this method name to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(åÞ›Ýøÿÿÿÿ
+O	java:S125"<This block of commented-out lines of code should be removed.(ºÆâ“
+T	java:S125"<This block of commented-out lines of code should be removed.(Š»Íûÿÿÿÿ
+f	java:S100"NRename this method name to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(¼õ†Ìùÿÿÿÿ
+O	java:S125"<This block of commented-out lines of code should be removed.(»—Áå
+/
+java:S3626"Remove this redundant jump.(ûÁÝ…
+?
+java:S1172"&Remove these unused method parameters.(òöÌ»üÿÿÿÿ
+N
+java:S6213":Rename this variable to not match a restricted identifier.(ÜÖËê
+V
+java:S1117"=Rename "cidFinder" which hides the field declared at line 28.(ÜÇ„—úÿÿÿÿ
+a	java:S100"NRename this method name to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(’úù¸
+O	java:S125"<This block of commented-out lines of code should be removed.(óÊ—˜
+f	java:S100"NRename this method name to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(›Ö¥…øÿÿÿÿ
+T	java:S125"<This block of commented-out lines of code should be removed.(°êëØûÿÿÿÿ
+f	java:S100"NRename this method name to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ÏÝÄ‚ùÿÿÿÿ
+f
+java:S3776"RRefactor this method to reduce its Cognitive Complexity from 27 to the 15 allowed.(ñÉËç
+Z
+java:S3457"AFormat specifiers should be used instead of string concatenation.(âñÜøÿÿÿÿÿ
+T	java:S125"<This block of commented-out lines of code should be removed.(±ï£Þüÿÿÿÿ
+T	java:S125"<This block of commented-out lines of code should be removed.(âˆ»‡ûÿÿÿÿ
+U
+java:S3457"AFormat specifiers should be used instead of string concatenation.(‚¸à»
+?
+java:S1481"+Remove this unused "record" local variable.(ÜÖËê
+I
+java:S1481"0Remove this unused "connIDFound" local variable.(îëŠºüÿÿÿÿ
+@
+java:S1068"-Remove this unused "timeRange" private field.(óþã1
+V
+java:S1144"=Remove this unused private "addLogMessagesReportType" method.(¾‡öÏúÿÿÿÿ
+H
+java:S1144"/Remove this unused private "doRetrieve" method.(òöÌ»üÿÿÿÿ

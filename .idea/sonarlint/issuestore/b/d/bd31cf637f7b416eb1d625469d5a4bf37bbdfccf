@@ -1,0 +1,58 @@
+
+K
+java:S1191"5Use classes from the Java API instead of Sun classes.(÷ñ ‡
+e
+java:S1192f"JDefine a constant instead of duplicating this literal "SendKeys" 22 times.(ÆçÀ‚øÿÿÿÿ
+^
+java:S1192r"HDefine a constant instead of duplicating this literal "<Enter>" 4 times.(ûÊ¯ª
+R
+java:S2629/"7Use the built-in formatting to construct this argument.(òÒóÎøÿÿÿÿ
+R
+java:S2629:"7Use the built-in formatting to construct this argument.(í½Ì‡ıÿÿÿÿ
+R
+java:S2629Z"7Use the built-in formatting to construct this argument.(ï•Åúÿÿÿÿ
+R
+java:S2629}"7Use the built-in formatting to construct this argument.(ü˜¼‰ûÿÿÿÿ
+S
+java:S2629‚"7Use the built-in formatting to construct this argument.(™Ö¥ëşÿÿÿÿ
+N
+java:S2629"7Use the built-in formatting to construct this argument.(£Å°¢
+N
+java:S2629’"7Use the built-in formatting to construct this argument.(ˆ‹ÿÊ
+N
+java:S2629´"7Use the built-in formatting to construct this argument.(Õõ«Ó
+S
+java:S2629¿"7Use the built-in formatting to construct this argument.(íøÊøÿÿÿÿ
+\
+java:S3457+"AFormat specifiers should be used instead of string concatenation.(Ê‡»—ùÿÿÿÿ
+\
+java:S3457/"AFormat specifiers should be used instead of string concatenation.(òÒóÎøÿÿÿÿ
+T
+java:S1854;">Remove this useless assignment to local variable "windowText".(›¦Š¯
+\
+java:S3457:"AFormat specifiers should be used instead of string concatenation.(í½Ì‡ıÿÿÿÿ
+c	java:S100V"NRename this method name to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(³Ë§…
+\
+java:S3457Z"AFormat specifiers should be used instead of string concatenation.(ï•Åúÿÿÿÿ
+c	java:S100_"NRename this method name to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ÎüÃ
+Y
+java:S1854†"=Remove this useless assignment to local variable "docClosed".(Æ©‡ışÿÿÿÿ
+\
+java:S3457}"AFormat specifiers should be used instead of string concatenation.(ü˜¼‰ûÿÿÿÿ
+]
+java:S3457‚"AFormat specifiers should be used instead of string concatenation.(™Ö¥ëşÿÿÿÿ
+X
+java:S3457"AFormat specifiers should be used instead of string concatenation.(£Å°¢
+X
+java:S3457’"AFormat specifiers should be used instead of string concatenation.(ˆ‹ÿÊ
+z
+java:S2142²"^Either re-interrupt this method or rethrow the "InterruptedException" that can be caught here.(è®ã¶øÿÿÿÿ
+D	java:S108²")Either remove or fill this block of code.(è®ã¶øÿÿÿÿ
+X
+java:S3457´"AFormat specifiers should be used instead of string concatenation.(Õõ«Ó
+]
+java:S3457¿"AFormat specifiers should be used instead of string concatenation.(íøÊøÿÿÿÿ
+E
+java:S1481;"/Remove this unused "windowText" local variable.(›¦Š¯
+I
+java:S1481{".Remove this unused "docClosed" local variable.(õ—Ÿóüÿÿÿÿ

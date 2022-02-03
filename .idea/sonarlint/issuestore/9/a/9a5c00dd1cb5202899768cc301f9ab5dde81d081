@@ -1,0 +1,190 @@
+
+
+java:S1319"sThe type of the "sip_records" object should be an interface such as "Map" rather than the implementation "HashMap".(óÿ·ûÿÿÿÿ
+
+java:S1319"tThe type of the "tlib_records" object should be an interface such as "Map" rather than the implementation "HashMap".(óÿ·ûÿÿÿÿ
+‹
+java:S1319ñ"oThe type of the "list" object should be an interface such as "List" rather than the implementation "ArrayList".(±³„Üûÿÿÿÿ
+J
+java:S3740"/Provide the parametrized type for this generic.(Ä÷ŸÔøÿÿÿÿ
+D
+java:S3740"/Provide the parametrized type for this generic.(šÂõ>
+J
+java:S3740	"/Provide the parametrized type for this generic.(Ş‘Ç¶üÿÿÿÿ
+J
+java:S3740
+"/Provide the parametrized type for this generic.(ô±Ÿûÿÿÿÿ
+E
+java:S3740"/Provide the parametrized type for this generic.(³»”Û
+J
+java:S3740"/Provide the parametrized type for this generic.(¶¢…‡ÿÿÿÿÿ
+J
+java:S3740"/Provide the parametrized type for this generic.(óÿ·ûÿÿÿÿ
+J
+java:S3740"/Provide the parametrized type for this generic.(óÿ·ûÿÿÿÿ
+J
+java:S3740*"/Provide the parametrized type for this generic.(Ä€‰ÿÿÿÿÿ
+E
+java:S3740,"/Provide the parametrized type for this generic.(«áé
+J
+java:S37405"/Provide the parametrized type for this generic.(ú„³‹üÿÿÿÿ
+E
+java:S37407"/Provide the parametrized type for this generic.(üòùÓ
+D
+java:S3740<"/Provide the parametrized type for this generic.(Ÿ÷œP
+D
+java:S3740="/Provide the parametrized type for this generic.(ÀÅ®@
+J
+java:S3740?"/Provide the parametrized type for this generic.(„àûÿÿÿÿ
+J
+java:S3740E"/Provide the parametrized type for this generic.(Ô¶ÇŒúÿÿÿÿ
+E
+java:S3740G"/Provide the parametrized type for this generic.(Ù¯æ
+F
+java:S3740ä"/Provide the parametrized type for this generic.(ëüÉ¿
+K
+java:S3740å"/Provide the parametrized type for this generic.(¢•’ÿúÿÿÿÿ
+F
+java:S3740ç"/Provide the parametrized type for this generic.(òş•š
+K
+java:S3740è"/Provide the parametrized type for this generic.(ôôØ‰øÿÿÿÿ
+K
+java:S3740Ç"/Provide the parametrized type for this generic.(«áÙÚüÿÿÿÿ
+F
+java:S3740È"/Provide the parametrized type for this generic.(ûã¢Ö
+F
+java:S3740Ê"/Provide the parametrized type for this generic.(òş•š
+K
+java:S3740Ë"/Provide the parametrized type for this generic.(ôôØ‰øÿÿÿÿ
+F
+java:S3740–"/Provide the parametrized type for this generic.(‹„
+K
+java:S3740©"/Provide the parametrized type for this generic.(üçÚÙøÿÿÿÿ
+K
+java:S3740©"/Provide the parametrized type for this generic.(üçÚÙøÿÿÿÿ
+K
+java:S3740ï"/Provide the parametrized type for this generic.(«Í×ûÿÿÿÿ
+K
+java:S3740‚"/Provide the parametrized type for this generic.(œ’ĞŸúÿÿÿÿ
+F
+java:S3740ƒ"/Provide the parametrized type for this generic.(Šè×¸
+F
+java:S3740‡"/Provide the parametrized type for this generic.(•³­³
+K
+java:S3740²"/Provide the parametrized type for this generic.(‹º„üûÿÿÿÿ
+K
+java:S3740Å"/Provide the parametrized type for this generic.(‹º„üûÿÿÿÿ
+K
+java:S3740ñ"/Provide the parametrized type for this generic.(±³„Üûÿÿÿÿ
+`
+java:S1192°"IDefine a constant instead of duplicating this literal "trigline" 3 times.(«İ³
+c
+java:S1192"GDefine a constant instead of duplicating this literal "source" 5 times.(“¥×½øÿÿÿÿ
+a
+java:S1192m"FDefine a constant instead of duplicating this literal "issip" 3 times.(÷Ş¼Êşÿÿÿÿ
+^
+java:S1192Û"HDefine a constant instead of duplicating this literal "Request" 5 times.(£¢ó'
+c
+java:S1192n"HDefine a constant instead of duplicating this literal "ownerid" 3 times.(ïø›‡úÿÿÿÿ
+b
+java:S1192¶"FDefine a constant instead of duplicating this literal "sipid" 3 times.(©ÊÎîüÿÿÿÿ
+a
+java:S1192®"JDefine a constant instead of duplicating this literal "component" 3 times.(ÿˆğ©
+b
+java:S1192Ü"FDefine a constant instead of duplicating this literal "Event" 4 times.(Î›Ã†üÿÿÿÿ
+E
+java:S1066K"/Merge this if statement with the enclosing one.(¦¼¯Ú
+E
+java:S1066^"/Merge this if statement with the enclosing one.(°Ç¾ã
+K
+java:S1066¯"/Merge this if statement with the enclosing one.(èÔÚ›úÿÿÿÿ
+N
+java:S2629ö"7Use the built-in formatting to construct this argument.(ÆÓÛÁ
+M
+java:S2629µ"7Use the built-in formatting to construct this argument.(÷ƒ—*
+S
+java:S2629¶"7Use the built-in formatting to construct this argument.(‚êºñıÿÿÿÿ
+x
+java:S2629¹"\Invoke method(s) only conditionally. Use the built-in formatting to construct this argument.(¶Ã®úÿÿÿÿ
+S
+java:S2629Ê"7Use the built-in formatting to construct this argument.(×íÈèøÿÿÿÿ
+s
+java:S2629Ó"\Invoke method(s) only conditionally. Use the built-in formatting to construct this argument.(ŸÊßì
+[	java:S112f"FDefine and throw a dedicated exception instead of using a generic one.(–Ëµª
+a	java:S112Ò"FDefine and throw a dedicated exception instead of using a generic one.(×¦óúÿÿÿÿ
+\	java:S112–"FDefine and throw a dedicated exception instead of using a generic one.(‹„
+a	java:S112ï"FDefine and throw a dedicated exception instead of using a generic one.(«Í×ûÿÿÿÿ
+k	java:S117"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(óÿ·ûÿÿÿÿ
+k	java:S117"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(óÿ·ûÿÿÿÿ
+l	java:S117‹"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ªÎòŠúÿÿÿÿ
+f	java:S117¬"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ëĞ¦M
+f	java:S117¬"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ëĞ¦M
+g	java:S117¾"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(‰×ºÔ
+g	java:S117¾"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(‰×ºÔ
+g	java:S117¾"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(‰×ºÔ
+g	java:S117¾"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(‰×ºÔ
+—
+java:S1186S"€Add a nested comment explaining why this method is empty, throw an UnsupportedOperationException or complete the implementation.(¡æËê
+k	java:S116"WRename this field "m_sipRecords" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(šÂõ>
+r	java:S116	"XRename this field "m_tlibRecords" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(Ş‘Ç¶üÿÿÿÿ
+n	java:S116
+"TRename this field "m_anchors" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ô±Ÿûÿÿÿÿ
+l	java:S116"WRename this field "m_sipAnchors" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(³»”Û
+q	java:S116"WRename this field "m_sipMasters" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(¶¢…‡ÿÿÿÿÿ
+m
+java:S3776"RRefactor this method to reduce its Cognitive Complexity from 24 to the 15 allowed.(óÿ·ûÿÿÿÿ
+c	java:S100S"NRename this method name to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(¡æËê
+c	java:S100V"NRename this method name to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(Áÿµİ
+h	java:S100e"NRename this method name to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(Á‰ÕĞúÿÿÿÿ
+m
+java:S3776e"RRefactor this method to reduce its Cognitive Complexity from 20 to the 15 allowed.(Á‰ÕĞúÿÿÿÿ
+W	java:S125ˆ"<This block of commented-out lines of code should be removed.(ï§¼¼ûÿÿÿÿ
+]
+java:S3457“"AFormat specifiers should be used instead of string concatenation.(İûİ£şÿÿÿÿ
+i	java:S100¦"NRename this method name to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(€ıçøÿÿÿÿ
+~
+java:S2234«"bParameters to CompareXsRecords have the same names but not the same order as the method arguments.(­ı»øÿÿÿÿ
+c	java:S100Ê"NRename this method name to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(•—öa
+i	java:S100Ò"NRename this method name to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(×¦óúÿÿÿÿ
+ˆ
+java:S1130Ò"lRemove the declaration of thrown exception 'java.lang.Exception', as it cannot be thrown from method's body.(×¦óúÿÿÿÿ
+d	java:S100ú"NRename this method name to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(êãÅ¬
+i
+java:S3776ú"RRefactor this method to reduce its Cognitive Complexity from 61 to the 15 allowed.(êãÅ¬
+I
+java:S1135…"2Complete the task associated to this TODO comment.(º•
+d	java:S100é"NRename this method name to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ÔÂ·Æ
+i
+java:S3776é"RRefactor this method to reduce its Cognitive Complexity from 19 to the 15 allowed.(ÔÂ·Æ
+s
+java:S2234í"\Parameters to CmpSipTlib have the same names but not the same order as the method arguments.(¢Ó¢ñ
+X
+java:S3457ö"AFormat specifiers should be used instead of string concatenation.(ÆÓÛÁ
+n
+java:S3776ª"RRefactor this method to reduce its Cognitive Complexity from 37 to the 15 allowed.(Õ†›èùÿÿÿÿ
+W
+java:S3457µ"AFormat specifiers should be used instead of string concatenation.(÷ƒ—*
+]
+java:S3457¶"AFormat specifiers should be used instead of string concatenation.(‚êºñıÿÿÿÿ
+]
+java:S3457¹"AFormat specifiers should be used instead of string concatenation.(¶Ã®úÿÿÿÿ
+]
+java:S3457Ê"AFormat specifiers should be used instead of string concatenation.(×íÈèøÿÿÿÿ
+X
+java:S3457Ó"AFormat specifiers should be used instead of string concatenation.(ŸÊßì
+R	java:S125î"<This block of commented-out lines of code should be removed.(×Š¼Á
+W	java:S125‰"<This block of commented-out lines of code should be removed.(¼¥Œúıÿÿÿÿ
+d	java:S100–"NRename this method name to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(‹„
+i
+java:S3776–"RRefactor this method to reduce its Cognitive Complexity from 48 to the 15 allowed.(‹„
+i	java:S100ï"NRename this method name to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(«Í×ûÿÿÿÿ
+n
+java:S3776ï"RRefactor this method to reduce its Cognitive Complexity from 75 to the 15 allowed.(«Í×ûÿÿÿÿ
+i	java:S100ñ"NRename this method name to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(±³„Üûÿÿÿÿ
+i	java:S100‰"NRename this method name to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(´üşßşÿÿÿÿ
+n
+java:S3776‰"RRefactor this method to reduce its Cognitive Complexity from 24 to the 15 allowed.(´üşßşÿÿÿÿ
+c	java:S100¬"NRename this method name to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ëĞ¦M
+d	java:S100¾"NRename this method name to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(‰×ºÔ
+F
+java:S1144Ê"0Remove this unused private "EqCondition" method.(•—öa

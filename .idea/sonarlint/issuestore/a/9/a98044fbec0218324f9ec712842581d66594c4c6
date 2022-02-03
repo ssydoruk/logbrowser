@@ -1,0 +1,405 @@
+
+K
+java:S3740™"/Provide the parametrized type for this generic.(òºßÈøÿÿÿÿ
+F
+java:S3740€"/Provide the parametrized type for this generic.(ÑšÇ·
+c
+java:S1192ˆ"LDefine a constant instead of duplicating this literal ",nameID int" 3 times.(š©ï‹
+f
+java:S1192ß
+"JDefine a constant instead of duplicating this literal "sessionID" 4 times.(Ã¸‡íüÿÿÿÿ
+_
+java:S1192÷
+"HDefine a constant instead of duplicating this literal "LevelID" 5 times.(»¨„î
+c
+java:S1192‘"GDefine a constant instead of duplicating this literal "<UUID>" 3 times.(™ğš“úÿÿÿÿ
+i
+java:S1192"RDefine a constant instead of duplicating this literal ",JSessionIDID int" 5 times.(ÃŸĞº
+a
+java:S1192"JDefine a constant instead of duplicating this literal ",IPID int" 5 times.(©«âÄ
+l
+java:S1192"PDefine a constant instead of duplicating this literal "browserClientID" 3 times.(îûèıÿÿÿÿ
+i
+java:S1192"MDefine a constant instead of duplicating this literal ",LevelID int" 5 times.(æç­£øÿÿÿÿ
+d
+java:S1192ş
+"HDefine a constant instead of duplicating this literal "IxnIDID" 4 times.(ù°ŠËşÿÿÿÿ
+b
+java:S1192ö
+"FDefine a constant instead of duplicating this literal "urlID" 5 times.(Ëº°¼şÿÿÿÿ
+_
+java:S1192µ"HDefine a constant instead of duplicating this literal "<refID>" 4 times.(›ú©™
+e
+java:S1192û
+"IDefine a constant instead of duplicating this literal "param1ID" 3 times.(Íù©Óûÿÿÿÿ
+f
+java:S1192’"ODefine a constant instead of duplicating this literal ",msgTextID int" 5 times.(ÔÂ„œ
+e
+java:S1192˜"NDefine a constant instead of duplicating this literal ",param2ID int" 3 times.(âäıÊ
+y
+java:S1192†"]Define a constant instead of duplicating this literal " (id INTEGER PRIMARY KEY ASC" 6 times.(ï¿íüÿÿÿÿ
+f
+java:S1192Š"ODefine a constant instead of duplicating this literal ",FileBytes int" 6 times.(õëÅô
+]
+java:S1192ò
+"GDefine a constant instead of duplicating this literal "FileId" 6 times.(šİ w
+b
+java:S1192—"KDefine a constant instead of duplicating this literal "<UserName>" 3 times.(à×Ç»
+i
+java:S1192–"MDefine a constant instead of duplicating this literal ",IxnIDID int" 4 times.(«Í¦âşÿÿÿÿ
+`
+java:S1192ú
+"JDefine a constant instead of duplicating this literal "msgTextID" 5 times.(˜„
+e
+java:S1192ü
+"IDefine a constant instead of duplicating this literal "param2ID" 3 times.(¾‚ù˜ûÿÿÿÿ
+e
+java:S1192”"NDefine a constant instead of duplicating this literal ",param1ID int" 3 times.(œŒñ¯
+i
+java:S1192õ
+"MDefine a constant instead of duplicating this literal "JSessionIDID" 5 times.(Š“¢şÿÿÿÿ
+x
+java:S1192†"\Define a constant instead of duplicating this literal "create table if not exists " 6 times.(ï¿íüÿÿÿÿ
+e
+java:S1192Ú"IDefine a constant instead of duplicating this literal "<userID>" 6 times.(œ‚€Ôúÿÿÿÿ
+d
+java:S1192Õ"HDefine a constant instead of duplicating this literal "<IxnID>" 7 times.(«é‘øùÿÿÿÿ
+c
+java:S1192•"LDefine a constant instead of duplicating this literal ",UUIDID int" 4 times.(ºæí¿
+`
+java:S1192"KDefine a constant instead of duplicating this literal ",urlID int" 5 times.(üØ/
+l
+java:S1192“"PDefine a constant instead of duplicating this literal ",userNameID int" 5 times.(™Ÿôûÿÿÿÿ
+f
+java:S1192‹"JDefine a constant instead of duplicating this literal ",line int" 6 times.(Ğãõıûÿÿÿÿ
+n
+java:S1192Ÿ"WDefine a constant instead of duplicating this literal " VALUES(NULL,?,?,?,?,?" 6 times.(ÆÌóÿ
+d
+java:S1192Ÿ"MDefine a constant instead of duplicating this literal "INSERT INTO " 6 times.(ÆÌóÿ
+l
+java:S1192ˆ"PDefine a constant instead of duplicating this literal ",FileId INTEGER" 6 times.(ËÚÃİşÿÿÿÿ
+b
+java:S1192·"KDefine a constant instead of duplicating this literal "<clientID>" 3 times.(­‡¬œ
+b
+java:S1192Œ
+"FDefine a constant instead of duplicating this literal "UTF-8" 3 times.(éŒÙÁÿÿÿÿÿ
+b
+java:S1192ÿ
+"KDefine a constant instead of duplicating this literal "DeviceIDID" 4 times.(¼„…
+h
+java:S1192‘"QDefine a constant instead of duplicating this literal ",classNameID int" 5 times.(°ëÁ‘
+b
+java:S1192±"KDefine a constant instead of duplicating this literal "<DeviceID>" 3 times.(µ¶Îê
+g
+java:S1192—"PDefine a constant instead of duplicating this literal ",DeviceIDID int" 4 times.(˜éõé
+`
+java:S1192"IDefine a constant instead of duplicating this literal "<UserID>" 4 times.(š¥™Â
+b
+java:S1192×"FDefine a constant instead of duplicating this literal "<ACW>" 3 times.(Ë£Ù†şÿÿÿÿ
+^
+java:S1192ı
+"GDefine a constant instead of duplicating this literal "UUIDID" 4 times.(„‹…Á
+c
+java:S1192ó"GDefine a constant instead of duplicating this literal "nameID" 3 times.(ÏÎ°Ÿøÿÿÿÿ
+b
+java:S1192ø
+"KDefine a constant instead of duplicating this literal "userNameID" 5 times.(Ô°Öõ
+q
+java:S1192Ü"[Define a constant instead of duplicating this literal "Could not add record type " 6 times.(Œœç^
+g
+java:S1192‡"PDefine a constant instead of duplicating this literal ",time timestamp" 6 times.(„Ÿáü
+c
+java:S1192ù
+"LDefine a constant instead of duplicating this literal "classNameID" 5 times.(ºŞòÙ
+o
+java:S1192‰"SDefine a constant instead of duplicating this literal ",FileOffset bigint" 6 times.(‡Ãè‰üÿÿÿÿ
+q
+java:S1192š"UDefine a constant instead of duplicating this literal ",browserClientID int" 3 times.(è¿”ßıÿÿÿÿ
+K
+java:S1066è"/Merge this if statement with the enclosing one.(ËÓ•Ñÿÿÿÿÿ
+K
+java:S1066û"/Merge this if statement with the enclosing one.(Ïùàùÿÿÿÿ
+N
+java:S2629¼"7Use the built-in formatting to construct this argument.(•îÈŒ
+S
+java:S2629ª"7Use the built-in formatting to construct this argument.(›¨äåıÿÿÿÿ
+S
+java:S2629ı"7Use the built-in formatting to construct this argument.(ÓşÂ¯ıÿÿÿÿ
+x
+java:S2629©"\Invoke method(s) only conditionally. Use the built-in formatting to construct this argument.(Â¢ğüıÿÿÿÿ
+N
+java:S2629Å"7Use the built-in formatting to construct this argument.(Øô
+S
+java:S2629ç"7Use the built-in formatting to construct this argument.(ÓşÂ¯ıÿÿÿÿ
+\	java:S112Ÿ"FDefine and throw a dedicated exception instead of using a generic one.(­ÚÍŸ
+\	java:S112"FDefine and throw a dedicated exception instead of using a generic one.(ì€‘ö
+a	java:S112ñ"FDefine and throw a dedicated exception instead of using a generic one.(’¢Óşşÿÿÿÿ
+Q
+java:S1141¾"5Extract this nested try block into a separate method.(¡»¢üùÿÿÿÿ
+g	java:S117—"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(âºÈ
+l	java:S117ğ"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(Šë•úÿÿÿÿ
+l	java:S117ò"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(°¾÷µıÿÿÿÿ
+g	java:S117ù"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(è¯³•
+l	java:S117ƒ"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(½İòåÿÿÿÿÿ
+g	java:S117·	"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ë‡„Ë
+l	java:S117¿"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(·Òûÿÿÿÿ
+g	java:S117´"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ª½‡¯
+l	java:S117¾"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(·Òûÿÿÿÿ
+g	java:S117“"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(Âª¶Ø
+l	java:S117¨"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(·Òûÿÿÿÿ
+l	java:S117ª"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(·Òûÿÿÿÿ
+g	java:S117ƒ"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ë‡„Ë
+l	java:S117¨"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(·Òûÿÿÿÿ
+l	java:S117”"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(·Òûÿÿÿÿ
+J
+java:S1121".Extract the assignment out of this expression.(ç¾¡®úÿÿÿÿ
+J
+java:S1121".Extract the assignment out of this expression.(ç¾¡®úÿÿÿÿ
+J
+java:S1121–".Extract the assignment out of this expression.(‡•®Èüÿÿÿÿ
+J
+java:S1121–".Extract the assignment out of this expression.(‡•®Èüÿÿÿÿ
+J
+java:S1121œ".Extract the assignment out of this expression.(´ªñ·şÿÿÿÿ
+J
+java:S1121¨".Extract the assignment out of this expression.(ßø­üûÿÿÿÿ
+E
+java:S1121¯".Extract the assignment out of this expression.(íåµ¡
+E
+java:S1121½".Extract the assignment out of this expression.(æßÉ
+E
+java:S1121â".Extract the assignment out of this expression.(öÜ˜à
+E
+java:S1121¨".Extract the assignment out of this expression.(¶œûÜ
+J
+java:S1121°".Extract the assignment out of this expression.(œ§Àûûÿÿÿÿ
+J
+java:S1121°".Extract the assignment out of this expression.(œ§Àûûÿÿÿÿ
+J
+java:S1121·".Extract the assignment out of this expression.(Õ‘âôùÿÿÿÿ
+J
+java:S1121¾".Extract the assignment out of this expression.(®üóÏÿÿÿÿÿ
+J
+java:S1121Å".Extract the assignment out of this expression.(‰Í–Ğüÿÿÿÿ
+E
+java:S1121å".Extract the assignment out of this expression.(ŒñÆÒ
+E
+java:S1121ã".Extract the assignment out of this expression.(ÉÕõù
+i	java:S116~"TRename this field "m_msgName" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ñ”õ˜
+q	java:S116"WRename this field "m_TserverSRC" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ı·úôúÿÿÿÿ
+n	java:S116€"XRename this field "m_ParserState" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ÇĞÚ¿
+q	java:S116‚"VRename this field "MessageType" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ªç“÷ûÿÿÿÿ
+q	java:S116"VRename this field "ThreadAlias" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(Ä·¡ÿûÿÿÿÿ
+d	java:S116"NRename this field "URL" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(İ÷Š–
+l	java:S116’"QRename this field "m_msg1" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(–ÙáÀøÿÿÿÿ
+F
+java:S6035"0Replace this alternation with a character class.(¶Ÿ¦
+V	java:S125!"<This block of commented-out lines of code should be removed.(Â¯Ôºüÿÿÿÿ
+Q	java:S125%"<This block of commented-out lines of code should be removed.(¦ÛÔ¯
+Q	java:S125)"<This block of commented-out lines of code should be removed.(´Ä³´
+K
+java:S6035."0Replace this alternation with a character class.(€¾Éñùÿÿÿÿ
+Q	java:S1252"<This block of commented-out lines of code should be removed.(””Ãá
+V	java:S125U"<This block of commented-out lines of code should be removed.(Ë·›ªüÿÿÿÿ
+V	java:S125c"<This block of commented-out lines of code should be removed.(‰È’ûÿÿÿÿ
+V	java:S125n"<This block of commented-out lines of code should be removed.(ÍÑÈ úÿÿÿÿ
+U
+java:S2479r":Remove the non-escaped \uFEFF character from this literal.(ÊÂÀÁÿÿÿÿÿ
+V	java:S125w"<This block of commented-out lines of code should be removed.(ï¤ß•şÿÿÿÿ
+V	java:S125|"<This block of commented-out lines of code should be removed.(ëûÖ ÿÿÿÿÿ
+R	java:S125ƒ"<This block of commented-out lines of code should be removed.(¹¤Ğ
+W	java:S125ˆ"<This block of commented-out lines of code should be removed.(Ğ˜ÛŞùÿÿÿÿ
+d	java:S100"NRename this method name to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ì€‘ö
+X
+java:S3457¼"AFormat specifiers should be used instead of string concatenation.(•îÈŒ
+W	java:S125À"<This block of commented-out lines of code should be removed.(»ƒ¨ ÿÿÿÿÿ
+]
+java:S3457Ê"AFormat specifiers should be used instead of string concatenation.(¿Êùıÿÿÿÿ
+W	java:S125Î"<This block of commented-out lines of code should be removed.(ğ€…ûÿÿÿÿ
+c	java:S100Ù"NRename this method name to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(ØÆÀS
+?
+java:S1172Ù")Remove this unused method parameter "in".(ØÆÀS
+M
+java:S1854½"6Remove this useless assignment to local variable "m1".(æßÉ
+M
+java:S1854â"6Remove this useless assignment to local variable "m3".(öÜ˜à
+i
+java:S3776Ù"SRefactor this method to reduce its Cognitive Complexity from 302 to the 15 allowed.(ØÆÀS
+b	java:S128"LEnd this switch case with an unconditional break, return or throw statement.(®µÓ
+t	java:S131ò"YComplete cases by adding the missing enum constants or add a default case to this switch.(¨—ÄÏøÿÿÿÿ
+i
+java:S1871–"MThis branch's code block is the same as the block for the branch on line 272.(‡•®Èüÿÿÿÿ
+W	java:S125Š"<This block of commented-out lines of code should be removed.(Ö´šùûÿÿÿÿ
+]
+java:S3457ª"AFormat specifiers should be used instead of string concatenation.(›¨äåıÿÿÿÿ
+W	java:S125®"<This block of commented-out lines of code should be removed.(†â¸ëøÿÿÿÿ
+R	java:S125Î"<This block of commented-out lines of code should be removed.(¯Ğ¢
+d
+java:S1871ò"MThis branch's code block is the same as the block for the branch on line 367.(¶äËÔ
+Q	java:S125…"<This block of commented-out lines of code should be removed.(¥Åo
+g
+java:S1764¸"KCorrect one of the identical sub-expressions on both sides of operator "||"(Ö”Ì‰úÿÿÿÿ
+W	java:S125Ó"<This block of commented-out lines of code should be removed.(¦Ñá´şÿÿÿÿ
+W	java:S125š"<This block of commented-out lines of code should be removed.(ıÕ±„üÿÿÿÿ
+R	java:S125Ì"<This block of commented-out lines of code should be removed.(¶—­Â
+W	java:S125ö"<This block of commented-out lines of code should be removed.(‘å—òüÿÿÿÿ
+]
+java:S3457ı"AFormat specifiers should be used instead of string concatenation.(ÓşÂ¯ıÿÿÿÿ
+]
+java:S3457©"AFormat specifiers should be used instead of string concatenation.(Â¢ğüıÿÿÿÿ
+W	java:S125²"<This block of commented-out lines of code should be removed.(£à¥Ÿşÿÿÿÿ
+X
+java:S3457Å"AFormat specifiers should be used instead of string concatenation.(Øô
+]
+java:S3457ç"AFormat specifiers should be used instead of string concatenation.(ÓşÂ¯ıÿÿÿÿ
+ˆ
+java:S1130ñ"lRemove the declaration of thrown exception 'java.lang.Exception', as it cannot be thrown from method's body.(’¢Óşşÿÿÿÿ
+7
+java:S3010’" Remove this assignment of "rxs".(¢„«á
+W	java:S125“"<This block of commented-out lines of code should be removed.(¦…®îşÿÿÿÿ
+V
+java:S2479–":Remove the non-escaped \uFEFF character from this literal.(€È×¯úÿÿÿÿ
+V
+java:S2479–":Remove the non-escaped \uFEFF character from this literal.(€È×¯úÿÿÿÿ
+Q
+java:S2479—":Remove the non-escaped \uFEFF character from this literal.(© Š²
+R	java:S125˜"<This block of commented-out lines of code should be removed.(İ¯ŠÕ
+Q
+java:S2479":Remove the non-escaped \uFEFF character from this literal.(Ô§–Æ
+V
+java:S2479":Remove the non-escaped \uFEFF character from this literal.(·’”øÿÿÿÿ
+W	java:S125°"<This block of commented-out lines of code should be removed.(°ßñúüÿÿÿÿ
+A
+java:S5869Ï"*Remove duplicates in this character class.(†¯
+V
+java:S2479×":Remove the non-escaped \uFEFF character from this literal.(Ë£Ù†şÿÿÿÿ
+V
+java:S2479Ù":Remove the non-escaped \uFEFF character from this literal.(Êªışüÿÿÿÿ
+\
+java:S1124´"EReorder the modifiers to comply with the Java Language Specification.(ËÀÅ²
+u	java:S115Ë"ZRename this constant name to match the regular expression '^[A-Z][A-Z0-9]*(_[A-Z0-9]+)*$'.(†ûŸøÿÿÿÿ
+o
+java:S1450ë"SRemove the "date" field and declare it as a local variable in the relevant methods.(°‡è›üÿÿÿÿ
+e	java:S116ù"ORename this field "UUID" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(…Ö‚
+e
+java:S3252Å"OUse static access with "com.myutils.logbrowser.indexer.Record" for "getFileId".(¿ï²]
+W
+java:S3457Ü"AFormat specifiers should be used instead of string concatenation.(Œœç^
+o
+java:S1450è"SRemove the "date" field and declare it as a local variable in the relevant methods.(°‡è›üÿÿÿÿ
+e	java:S116ö"ORename this field "UUID" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(…Ö‚
+a
+java:S1124¡"EReorder the modifiers to comply with the Java Language Specification.(ƒŞ‚Šùÿÿÿÿ
+\
+java:S1124´"EReorder the modifiers to comply with the Java Language Specification.(ª½‡¯
+\
+java:S1124È"EReorder the modifiers to comply with the Java Language Specification.(—Ä«‘
+k
+java:S3252Ä"OUse static access with "com.myutils.logbrowser.indexer.Record" for "getFileId".(÷¡ÅÓüÿÿÿÿ
+W
+java:S3457Û"AFormat specifiers should be used instead of string concatenation.(Œœç^
+8
+java:S1170ä"!Make this final field static too.(˜´î¬
+X
+java:S3457"AFormat specifiers should be used instead of string concatenation.(«´ªå
+]
+java:S3457‹"AFormat specifiers should be used instead of string concatenation.(ïÓøÿÿÿÿ
+O
+java:S1172“"8Remove this unused method parameter "m_MessageContents".(Âª¶Ø
+D
+java:S1185˜"(Remove this method to simply inherit it.(ãŠ›âıÿÿÿÿ
+W	java:S125™"<This block of commented-out lines of code should be removed.(¥œïµûÿÿÿÿ
+R	java:S125"<This block of commented-out lines of code should be removed.(¢î²Ì
+k
+java:S3252®"OUse static access with "com.myutils.logbrowser.indexer.Record" for "getFileId".(á Í›úÿÿÿÿ
+W
+java:S3457È"AFormat specifiers should be used instead of string concatenation.(Œœç^
+k
+java:S3252°"OUse static access with "com.myutils.logbrowser.indexer.Record" for "getFileId".(‹¤ûÎúÿÿÿÿ
+W
+java:S3457Ä"AFormat specifiers should be used instead of string concatenation.(Œœç^
+o
+java:S1450Ğ"SRemove the "date" field and declare it as a local variable in the relevant methods.(°‡è›üÿÿÿÿ
+e	java:S116Û"ORename this field "UUID" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(…Ö‚
+f
+java:S3252®"OUse static access with "com.myutils.logbrowser.indexer.Record" for "getFileId".(öëØÒ
+W
+java:S3457·"AFormat specifiers should be used instead of string concatenation.(Œœç^
+C
+java:S1172È",Remove this unused method parameter "entry".(ìµºÉ
+f
+java:S3252š"OUse static access with "com.myutils.logbrowser.indexer.Record" for "getFileId".(õ¶ûò
+W
+java:S3457«"AFormat specifiers should be used instead of string concatenation.(Œœç^
+<
+java:S1481÷"&Remove this unused "m" local variable.(ƒœÜ>
+D
+java:S1068ë"(Remove this unused "date" private field.(°‡è›üÿÿÿÿ
+D
+java:S1068è"(Remove this unused "date" private field.(°‡è›üÿÿÿÿ
+D
+java:S1068ä"-Remove this unused "msgParsed" private field.(˜´î¬
+D
+java:S1068Ğ"(Remove this unused "date" private field.(°‡è›üÿÿÿÿ
+P
+java:S1144"9Remove this unused private "SetParserThreadState" method.(ì€‘ö
+M
+java:S1144ö"1Remove this unused private "addException" method.(ƒÎë‰ÿÿÿÿÿ
+L
+java:S1144 "0Remove this unused private "cleanString" method.(Áìø…ıÿÿÿÿ
+J
+java:S1144Ú	".Remove this unused private "setMethod" method.(ˆÅÑ¥ùÿÿÿÿ
+L
+java:S1144Ş	"0Remove this unused private "setHttpCode" method.(Äûö‡ûÿÿÿÿ
+H
+java:S1144â	",Remove this unused private "setDate" method.(³øØöıÿÿÿÿ
+F
+java:S1144ş	"/Remove this unused private "setUserKey" method.(ñËÔ
+G
+java:S1144Å
+"0Remove this unused private "setURIParam" method.(ÃĞä©
+D
+java:S1144Í
+".Remove this unused private "setUserID" method.(û²¿S
+L
+java:S1144Ö
+"0Remove this unused private "setClientID" method.(óâçøøÿÿÿÿ
+H
+java:S1144Ş
+"1Remove this unused private "setSessionID" method.(×Ü­¨
+J
+java:S1144×".Remove this unused private "setMethod" method.(ˆÅÑ¥ùÿÿÿÿ
+L
+java:S1144Û"0Remove this unused private "setHttpCode" method.(Äûö‡ûÿÿÿÿ
+H
+java:S1144ß",Remove this unused private "setDate" method.(³øØöıÿÿÿÿ
+F
+java:S1144ı"/Remove this unused private "setUserKey" method.(ñËÔ
+H
+java:S1144İ"1Remove this unused private "setSessionID" method.(×Ü­¨
+J
+java:S1144¢".Remove this unused private "setMethod" method.(ˆÅÑ¥ùÿÿÿÿ
+L
+java:S1144¦"0Remove this unused private "setHttpCode" method.(Äûö‡ûÿÿÿÿ
+H
+java:S1144ª",Remove this unused private "setDate" method.(³øØöıÿÿÿÿ
+A
+java:S1144®"*Remove this unused private "setIP" method.(ååšš
+F
+java:S1144Æ"/Remove this unused private "setUserKey" method.(ñËÔ
+I
+java:S1144Ê"2Remove this unused private "setJSessionID" method.(ÁÆÑ
+G
+java:S1144Î"+Remove this unused private "setURL" method.(Êşñÿıÿÿÿÿ
+L
+java:S1144Ù"0Remove this unused private "setUserName" method.(·°øÒøÿÿÿÿ
+D
+java:S1144İ"-Remove this unused private "setLevel" method.(ÀµûÕ
+H
+java:S1144â"1Remove this unused private "setClassName" method.(Å…–¹
+J
+java:S1144ç"3Remove this unused private "setMessageText" method.(ìù­Ä
+P
+java:S1144Ã"9Remove this unused private "WWEUCSConfigMsg" constructor.(áåëœ
+o
+java:S58430"TSimplify this regular expression to reduce its complexity from 33 to the 20 allowed.(ÕÌáíúÿÿÿÿ

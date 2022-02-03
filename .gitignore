@@ -42,7 +42,6 @@ upload.sh
 airbnbutils/
 ToTestConvert/
 *.wav
-.idea
 airlib.iml
 .settings
 node_modules

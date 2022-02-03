@@ -1,0 +1,33 @@
+
+
+java:S1319"yThe type of the "shortFileNames" object should be an interface such as "List" rather than the implementation "ArrayList".(‚ı§š
+i
+java:S1192H"SDefine a constant instead of duplicating this literal "cannot run notepad" 3 times.(‡ÑÂü
+^
+java:S1192G"HDefine a constant instead of duplicating this literal "fatal: " 3 times.(„¤—
+M
+java:S2629x"7Use the built-in formatting to construct this argument.(Ë¨èô
+[
+java:S1124"EReorder the modifiers to comply with the Java Language Specification.(İ¡‚à
+Y
+java:S2147%"DCombine this catch with the one at line 35, which has the same body.(û¬“4
+[
+java:S1124+"EReorder the modifiers to comply with the Java Language Specification.(Æó£¶
+[
+java:S1124/"EReorder the modifiers to comply with the Java Language Specification.(è…ª»
+[
+java:S1124="EReorder the modifiers to comply with the Java Language Specification.(°ÆêÆ
+`
+java:S1124L"EReorder the modifiers to comply with the Java Language Specification.(¦ÃŞÙúÿÿÿÿ
+W
+java:S3457V"AFormat specifiers should be used instead of string concatenation.(üêÂ„
+`
+java:S1124`"EReorder the modifiers to comply with the Java Language Specification.(ŸÎé™ûÿÿÿÿ
+W
+java:S3457x"AFormat specifiers should be used instead of string concatenation.(Ë¨èô
+a
+java:S2147‡"ECombine this catch with the one at line 132, which has the same body.(±Ÿ—±ÿÿÿÿÿ
+]
+java:S3457”"AFormat specifiers should be used instead of string concatenation.(Çãş’ÿÿÿÿÿ
+@
+java:S1068"*Remove this unused "regNum" private field.(İ¡‚à
