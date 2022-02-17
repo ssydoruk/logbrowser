@@ -62,7 +62,6 @@ public final class SqliteAccessor implements DBAccessor {
 
             String s = "PRAGMA page_size = 32768;\n"
                     + "PRAGMA cache_size=10000;\n"
-                    + "PRAGMA locking_mode=EXCLUSIVE;\n"
                     + "pragma temp_store = memory;\n"
                     + "pragma mmap_size = 30000000000;\n"
                     + "PRAGMA synchronous=OFF;\n"
