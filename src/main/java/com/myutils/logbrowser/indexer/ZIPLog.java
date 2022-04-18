@@ -6,6 +6,7 @@
 package com.myutils.logbrowser.indexer;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -69,8 +70,10 @@ public final class ZIPLog extends LogFileWrapper {
 
     @Override
     InputStream getInputStream(FileInfo aThis) throws FileNotFoundException {
-        ZipEntry entry = logArchive.getEntry(aThis.getM_name());
-        if (entry == null) {
+        ZipEntry entry;
+        if (aThis == null
+                || StringUtils.isBlank(aThis.getM_name())
+                || (entry = logArchive.getEntry(aThis.getM_name())) == null) {
             throw new FileNotFoundException("No file: " + aThis.getM_name());
         }
 
