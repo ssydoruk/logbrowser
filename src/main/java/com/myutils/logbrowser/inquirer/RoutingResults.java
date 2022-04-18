@@ -1156,7 +1156,7 @@ final public class RoutingResults extends IQueryResults {
 //                    TableType.URSGenesysMessage.toString(), "msgid");
 //        }
 
-        if (isChecked(FindNode(ursReportSettings, DialogItem.URS_GENMESSAGE, null, null))
+        if (false && isChecked(FindNode(ursReportSettings, DialogItem.URS_GENMESSAGE, null, null))
                 && TableExist(TableType.URSGenesysMessage.toString())) {
             tellProgress("Retrieving URS genesys messages");
             TableQuery URS_GENMSG = new TableQuery(MsgType.GENESYS_URS_MSG, TableType.URSGenesysMessage.toString());
