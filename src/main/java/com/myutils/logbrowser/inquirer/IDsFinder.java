@@ -28,6 +28,11 @@ public final class IDsFinder extends QueryTools {
     ArrayList<Integer> searchApps = null;
     UTCTimeRange timeRange = null;
     private Integer[] refIDs;
+
+    public int getQueryLevel() {
+        return queryLevel;
+    }
+
     private int queryLevel;
     private boolean maxLevelSet = false;
     private String selection;
