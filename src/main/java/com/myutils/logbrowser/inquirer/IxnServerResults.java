@@ -226,7 +226,7 @@ public class IxnServerResults extends IQueryResults {
             ixnQuery.setCommonParams(this, dlg);
             getRecords(ixnQuery);
 
-            if (cidFinder.getQueryLevel()>1 &&
+            if ((cidFinder==null || cidFinder.getQueryLevel()>1) &&
                     ixnQuery.isCollectingID(IxnServerQuery.FIELD_REFID) && !ixnQuery.getCollectID(IxnServerQuery.FIELD_REFID).isEmpty()) {
 //                HashSet<Long> refIDs = ixnQuery.getCollectID("refid");
 
