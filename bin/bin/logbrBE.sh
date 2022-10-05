@@ -2,10 +2,9 @@
 
 #set -x
 
-BASEDIR=/Users/stepan_sydoruk/GCTI
-LIBDIR=$BASEDIR/lib
+BASEDIR=/home/stepan_sydoruk/IdeaProjects/install
 
-LOGDIR=$(pwd)/tmp
+LOGDIR=$BASEDIR/tmp
 VARDIR=$BASEDIR/var
 ETCDIR=$BASEDIR/etc/logbrowser
 
@@ -18,7 +17,7 @@ LOGBR_TMP_OPT=-Dlogbr.dir=${LOGBR_TMP}
 
 #DBG="-Xdebug -Xrunjdwp:transport=dt_socket,address=8000,server=y,suspend=y"
 
-LOG_OPTS="-Dlog4j.configurationFile=$ETCDIR/logbr.log4j2.indexer.xml -Dlog4j.logPath=$LOGDIR"
+LOG_OPTS="-Dlog4j.configurationFile=$ETCDIR/logbr.log4j2.indexer.xml -DlogPath=$LOGDIR"
 MISC_OPTIONS="-Dsun.java2d.d3d=false -Dall=1 -Xms8000m -Xmx8000m"
 SQLITE_PRAGMAS="-Dsqlite.pragma=true"
 
@@ -31,8 +30,6 @@ export JAVA_HOME PATH
 JAVA_OPTS="$DBG $LOGBR_TMP_OPT $LOG_OPTS $MISC_OPTIONS $SQLITE_PRAGMAS $NO_TLIB_REQUESTS $TIMEDIFF"
 export JAVA_OPTS
 
-SS3=/Users/stepan_sydoruk/GCTI/bin/logbrowser
-
 if [ -z $1 ]; then
 	RUN_DIR=$(pwd)
 else
@@ -43,7 +40,7 @@ cd ${RUN_DIR}
 
 if [ ${machine=x} = "Win" ]; then
 	DB=$(cygpath -pw ${RUN_DIR}/${LOGBRDB})
-	CFG=$(cygpath -pw ${SS3}/backend.xml)
+	CFG=$(cygpath -pw ${ETCDIR}/backend.xml)
 else
 	DB=${RUN_DIR}/${LOGBRDB}
 	CFG=${ETCDIR}/backend.xml
@@ -60,7 +57,7 @@ clean_up() {
 trap clean_up SIGHUP SIGINT SIGTERM
 
 cd ${RUN_DIR}
-(${BASEDIR}/lib/logbrowser/bin/indexer --dbname=${DB} --basedir=${RUN_DIR} --cfgxml ${CFG}) &
+(${BASEDIR}/bin/indexer --dbname=${DB} --basedir=${RUN_DIR} --cfgxml ${CFG}) &
 PID=$!
 
 wait $PID

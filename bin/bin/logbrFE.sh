@@ -2,12 +2,14 @@
 
 #set -x
 
-BASEDIR=/Users/stepan_sydoruk/GCTI
+
+BASEDIR=/home/stepan_sydoruk/IdeaProjects/install
+
 #JAVA_HOME=/Library/Java/JavaVirtualMachines/jdk1.8.0_201.jdk/Contents/Home
 #PATH=$JAVA_HOME/bin:$PATH
 export JAVA_HOME PATH
 
-LOGDIR=$(pwd)/tmp
+LOGDIR=$BASEDIR/tmp
 VARDIR=$BASEDIR/var
 ETCDIR=$BASEDIR/etc/logbrowser
 LOGBRDB=logbr #default name of the database
@@ -15,7 +17,7 @@ LOGBR_DIR=".tmp"
 LOGBR_DIR_OPT=-Dlogbr.dir=${LOGBR_DIR}
 
 #DBG="-Xdebug -Xrunjdwp:transport=dt_socket,address=8000,server=y,suspend=y"
-LOG_OPTS="-Dlog4j.configurationFile=$ETCDIR/logbr.log4j2.inquirer.xml -Dlog4j.logPath=$LOGDIR"
+LOG_OPTS="-Dlog4j.configurationFile=$ETCDIR/logbr.log4j2.inquirer.xml -DlogPath=$LOGDIR"
 MISC_OPTIONS="-Dsun.java2d.d3d=false -Dall=1 -Xms8000m -Xmx8000m"
 SQLITE_PRAGMAS="-Dsqlite.pragma=true"
 
@@ -51,5 +53,5 @@ fi
 # uncomment below if database is too large
 #REFERENCE=--no-ref-sync
 
-nohup $BASEDIR/lib/logbrowser/bin/inquirer $REFERENCE \
+nohup $BASEDIR/bin/inquirer $REFERENCE \
 --dbname=${DB} --config=${CFG} --basedir=${RUN_DIR} --outputspec=${OUTSPEC} 2>&1 >/dev/null &

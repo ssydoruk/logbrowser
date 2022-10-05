@@ -6,8 +6,7 @@
     <version>1.0</version>
     <packaging>jar</packaging>
     <properties>
-	    <!--installdir>c:\gcti\lib</installdir-->
-       <installdir>/mnt/GCTI/lib</installdir>
+        <installdir>../install</installdir>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
@@ -154,8 +153,13 @@
                 <artifactId>appassembler-maven-plugin</artifactId>
                 <version>2.1.0</version>
                 <configuration>
+                    <showConsoleWindow>true</showConsoleWindow>
                     <assembleDirectory>${installdir}</assembleDirectory>
-                    <showConsoleWindow>true</showConsoleWindow>				
+                    <useWildcardClassPath>true</useWildcardClassPath>
+                    <repositoryLayout>flat</repositoryLayout>
+                    <repositoryName>lib</repositoryName>
+                    <tempDirectory>tmp</tempDirectory>
+                    <preAssembleDirectory>bin</preAssembleDirectory>
                     <programs>
                         <program>
                             <mainClass>com.myutils.logbrowser.indexer.Main</mainClass>

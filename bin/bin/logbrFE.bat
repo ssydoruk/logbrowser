@@ -1,8 +1,6 @@
 @echo on
 
-set BASEDIR=C:\gcti
-
-set LIBDIR=%BASEDIR%\lib
+set BASEDIR="C:\Users\ssydoruk\IdeaProjects\install"
 
 if [%1]==[] (
 set RUN_DIR=%CD%
@@ -13,15 +11,14 @@ set RUN_DIR=%1
 cd %RUN_DIR%
 
 
-set LOGDIR=%RUN_DIR%\.tmp
+set LOGDIR=%BASEDIR%\tmp
 
 set VARDIR=%BASEDIR%\var
 
 set ETCDIR=%BASEDIR%\etc\logbrowser
 
-set JAVA_HOME=C:\Tools\graalvm-ce-java8-21.1.0
-
-set PATH=%JAVA_HOME%\bin;%PATH%
+rem set JAVA_HOME=C:\Tools\graalvm-ce-java8-21.1.0
+rem set PATH=%JAVA_HOME%\bin;%PATH%
 
 rem default name of the database
 
@@ -47,9 +44,7 @@ set JAVA_OPTS=%DBG% %LOGBR_TMP_OPT% %LOG_OPTS% %MISC_OPTIONS% %SQLITE_PRAGMAS% %
 
 set DB=%RUN_DIR%\logbr
 
-set CFG=%ETCDIR%\backend.xml
+rem uncomment below if database is too large
+set REFERENCE=--no-ref-sync
 
-# uncomment below if database is too large
-rem set REFERENCE=--no-ref-sync
-
-%LIBDIR%\bin\inquirer.bat %REFERENCE% --dbname=%DB% --config=%ETCDIR%\inquirer.cfg.json --basedir=%RUN_DIR% --outputspec=%ETCDIR%\outputspec3.xml
+%BASEDIR%\bin\inquirer.bat %REFERENCE% --dbname=%DB% --config=%ETCDIR%\inquirer.cfg.json --basedir=%RUN_DIR% --outputspec=%ETCDIR%\outputspec3.xml

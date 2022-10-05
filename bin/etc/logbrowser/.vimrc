@@ -28,10 +28,3 @@ set statusline+=\
 command! -nargs=1 S let @/ = escape('<args>', '\')
 nmap <Leader>S :execute(":S " . input('Regex-off: /'))<CR>
 
-source $VIMRUNTIME/mswin.vim
-behave mswin
-
-if has('win32')
-  " Avoid mswin.vim making Ctrl-v act as paste
-  noremap <C-V> <C-V>
-endif
