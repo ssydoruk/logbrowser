@@ -39,7 +39,6 @@ config_mac.properties
 assemble.sh
 makeUpload.sh
 upload.sh
-airbnbutils/
 ToTestConvert/
 *.wav
 .idea
