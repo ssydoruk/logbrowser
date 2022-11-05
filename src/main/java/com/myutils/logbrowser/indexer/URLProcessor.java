@@ -7,10 +7,7 @@ package com.myutils.logbrowser.indexer;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -22,7 +19,7 @@ import static com.myutils.logbrowser.indexer.Parser.splitQuery;
  */
 public class URLProcessor {
 
-    private final ArrayList<Pair<String, Pattern>> pathProcessing = new ArrayList<>();
+    private final List<Pair<String, Pattern>> pathProcessing = Collections.synchronizedList(new ArrayList<Pair<String, Pattern>>());
 
     // in URL query, keyword:replaceWord
     private final HashMap<String, String> queryProcessing = new HashMap<>();
@@ -31,7 +28,8 @@ public class URLProcessor {
      * This array is filled once URI is processed
      */
     private final HashMap<String, String> queryValues = new HashMap<>();
-    private final HashMap<String, String> pathValues = new HashMap<>();
+    private final Map<String, String> pathValues =
+            Collections.synchronizedMap(new HashMap<String, String>());
 
     public String getpathValues(String key) {
         return pathValues.get(key);
@@ -41,7 +39,7 @@ public class URLProcessor {
         return queryValues.get(key);
     }
 
-    public String processURL(String u) {
+    public  String processURL(String u) {
         try {
 
             queryValues.clear();

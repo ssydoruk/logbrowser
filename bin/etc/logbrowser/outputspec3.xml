@@ -7,8 +7,9 @@
 		<spec MsgType="Sip" format="filelink timestamp">
 			<initScript src="./SIPInit.js" />
 
-			<param8 type="script" name="direction"> RECORD.getField('inbound')==1?'&lt;-':'-&gt;'
-			</param8>
+			<param8 type="script" name="direction">
+			RECORD.getField('inbound')==1?'&lt;-':'-&gt;'
+		  </param8>
 
 			<param1 type="embedded" id="filelink" name="filename">
 				<pattern match="(log)" group="1" />
@@ -48,8 +49,9 @@
 
 			<param type="database" id="app" name="app" />
 
-			<param8 type="script" name="direction"> RECORD.getField('inbound')==1?'&lt;-':'-&gt;'
-			</param8>
+			<param8 type="script" name="direction">
+		RECORD.getField('inbound')==1?'&lt;-':'-&gt;'
+	  </param8>
 
 			<param type="database" id="name" format=" %7s" name="name">
 				<pattern match="^(\w{1,7})" ignorecase="true" groups="1" />
@@ -100,8 +102,9 @@
 			</param1>
 			<param2 type="embedded" id="timestamp" />
 
-			<param8 type="script" name="direction"> RECORD.getField('inbound')==1?'&lt;-':'-&gt;'
-			</param8>
+			<param8 type="script" name="direction">
+		RECORD.getField('inbound')==1?'&lt;-':'-&gt;'
+	  </param8>
 
 			<param3 type="database" id="name" format=" %8s" />
 
@@ -168,8 +171,9 @@
 
 			<param type="database" id="app" name="app" />
 
-			<param8 type="script" name="direction"> RECORD.getField('inbound')==1?'&lt;-':'-&gt;'
-			</param8>
+			<param8 type="script" name="direction">
+		RECORD.getField('inbound')==1?'&lt;-':'-&gt;'
+	  </param8>
 
 			<param3 type="database" id="name" name="name" />
 
@@ -205,7 +209,7 @@
 		else {
 			'';
 		}
-			</param8>
+	  </param8>
 
 			<param8 type="database" id="referenceid" format="|refID:%s" name="refid" hidden='true'>
 				<pattern match="([1-9]\d*)$" group="1" ignorecase="true" />
@@ -235,8 +239,9 @@
 
 			<param type="database" id="app" name="app" />
 
-			<param8 type="script" name="direction"> RECORD.getField('inbound')==1?'&lt;-':'-&gt;'
-			</param8>
+			<param8 type="script" name="direction">
+		RECORD.getField('inbound')==1?'&lt;-':'-&gt;'
+	  </param8>
 
 			<param3 type="database" id="name" format=" %s" name="name" />
 
@@ -331,10 +336,11 @@
 
 			<param type="database" id="app" name="app" />
 
-			<param8 type="script" name="direction"> RECORD.getField('inbound')==1?'&lt;-':'-&gt;'
-			</param8>
+			<param8 type="script" name="direction">
+		RECORD.getField('inbound')==1?'&lt;-':'-&gt;'
+	  </param8>
 
-			<!--param3 type="database" id="name" format="%s ">
+			<!--param3 type="database" id="name" format="%s " >
 	   <pattern match="(Event.+|Request.+)" group="1" ignorecase="true" />
 	  </param3-->
 
@@ -483,7 +489,7 @@
 			</param1>
 			<param2 type="embedded" id="timestamp" name="timestamp" />
 			<param type="database" id="app" name="app" />
-			<!--param4 type="database" id="cgdbid">
+			<!--param4 type="database" id="cgdbid" >
 	  </param4-->
 
 			<param4 type="database" id="campaignGroup" format="|cg: %s" name="campaignGroup" />
@@ -636,8 +642,9 @@
 			<param2 type="embedded" id="timestamp" name="timestamp" />
 			<param type="database" id="app" name="app" />
 
-			<param8 type="script" name="direction"> RECORD.getField('isinbound')==1?'&lt;-':'-&gt;'
-			</param8>
+			<param8 type="script" name="direction">
+		RECORD.getField('isinbound')==1?'&lt;-':'-&gt;'
+	  </param8>
 
 			<param6 type="database" id="reqname" format="|req: %s"></param6>
 			<param6 type="database" id="rechandle" format="|rech: %s" name="handle"></param6>
@@ -887,8 +894,9 @@
 				<pattern match="(log)" group="1" />
 			</param1>
 
-			<param8 type="script" name="direction"> RECORD.getField('inbound')==1?'&lt;-':'-&gt;'
-			</param8>
+			<param8 type="script" name="direction">
+		RECORD.getField('inbound')==1?'&lt;-':'-&gt;'
+	  </param8>
 
 			<param2 type="embedded" id="timestamp" name="timestamp" />
 
@@ -910,7 +918,7 @@
 
 			<param6 type="database" id="refid" format="|ref %s" name="refid"></param6>
 
-			<!--param6 type="file" format="|fm %s">
+			<!--param6 type="file" format="|fm %s" >
 		<pattern match="fm\(.+'([^']+)'$" ignorecase="true" groups="1" />
 	  </param6>
 
@@ -932,8 +940,9 @@
 			<param2 type="embedded" id="timestamp" name="timestamp" />
 			<param type="database" id="app" name="app" />
 
-			<param8 type="script" name="direction"> RECORD.getField('inbound')==1?'&lt;-':'-&gt;'
-			</param8>
+			<param8 type="script" name="direction">
+		RECORD.getField('inbound')==1?'&lt;-':'-&gt;'
+	  </param8>
 
 			<param6 type="database" id="connid" format="|%s" name="connid"></param6>
 
@@ -954,7 +963,7 @@
 			<param6 type="database" id="attr5" format="%s" name="f5" />
 			<param6 type="database" id="value5" format="%s" name="f5" />
 
-			<!--param6 type="file" format="|req: %s">
+			<!--param6 type="file" format="|req: %s" >
 		<pattern match="(urs\/call.+)" ignorecase="true" groups="1" />
 	  </param6-->
 
@@ -975,8 +984,9 @@
 			</param3>
 
 
-			<param8 type="script" name="direction"> RECORD.getField('inbound')==1?'&lt;-':'-&gt;'
-			</param8>
+			<param8 type="script" name="direction">
+		RECORD.getField('inbound')==1?'&lt;-':'-&gt;'
+	  </param8>
 
 			<param type="database" id="socket" format=" soc %s"></param>
 
@@ -1055,7 +1065,7 @@
 				<!--filter match="(eval_expr|state_exit|log|eval_condition|event_queued|event_processed)" ignorecase="true" /-->
 				<!--pattern match="^(?!state_enter|extension$)(.*)" group="1" /-->
 			</param4>
-			<!--param4 type="database" id="metric">
+			<!--param4 type="database" id="metric" >
       		<pattern match="(log)" filematch="log .+ expr='(.+)' label" retgroup="1" />
       		<pattern match="(eval_condition)" filematch="((?:condition|result)='.+') " retgroup="1" />
 	  </param4-->
@@ -1128,8 +1138,9 @@
 
 			<param3 type="database" id="sid" format="|%s" name="sid"></param3>
 
-			<param8 type="script" name="direction"> RECORD.getField('inbound')==1?'&lt;-':'-&gt;'
-			</param8>
+			<param8 type="script" name="direction">
+		RECORD.getField('inbound')==1?'&lt;-':'-&gt;'
+	  </param8>
 
 			<param3 type="database" id="module" format="mod %s" hidden="true"></param3>
 
@@ -1165,8 +1176,9 @@
 
 			<param type="database" id="app" name="app" />
 
-			<param8 type="script" name="direction"> RECORD.getField('inbound')==1?'&lt;-':'-&gt;'
-			</param8>
+			<param8 type="script" name="direction">
+		RECORD.getField('inbound')==1?'&lt;-':'-&gt;'
+	  </param8>
 
 			<param6 type="database" id="name" format="|%s"></param6>
 
@@ -1221,8 +1233,9 @@
 
 			<param type="database" id="app" name="app" />
 
-			<param8 type="script" name="direction"> RECORD.getField('inbound')==1?'&lt;-':'-&gt;'
-			</param8>
+			<param8 type="script" name="direction">
+		RECORD.getField('inbound')==1?'&lt;-':'-&gt;'
+	  </param8>
 
 			<param6 type="database" id="name" format="|%s"></param6>
 
@@ -1431,8 +1444,9 @@
 			</param1>
 			<param2 type="embedded" id="timestamp" name="timestamp" />
 			<param type="database" id="app" name="app" />
-			<param8 type="script" name="direction"> RECORD.getField('inbound')==1?'&lt;-':'-&gt;'
-			</param8>
+			<param8 type="script" name="direction">
+		RECORD.getField('inbound')==1?'&lt;-':'-&gt;'
+	  </param8>
 			<param type="database" id="origUri" format="from: %s" />
 			<param type="database" id="destUri" format="dest: %s" />
 			<param type="database" id="SipsReqId" format="req: %s" />
@@ -1613,12 +1627,12 @@
 
 		<!-- Genesys messages for vxmlstrategy >>>> -->
 		<spec MsgType="vxmlstrategy" format="filelink timestamp">
-			<initScript src="./vxmlstrategy.js" />
+			<initScript src="./vxmlstrategy.js" />			
 			<param1 type="embedded" id="filelink" name="filename">
 				<pattern match="(log)" group="1" />
 			</param1>
 			<param2 type="embedded" id="timestamp" name="timestamp" />
-			<param type="database" id="app" name="app" />
+			<param type="database" id="app" name="app" hidden="true" />
 			<!-- <param6 type="database" id="command" format="%s" name="name" /> -->
 			<!-- <param6 type="database" id="param1" format="%s" name="name" />
 			<param6 type="database" id="param2" format="%s" hidden="true" /> -->
@@ -1630,7 +1644,7 @@
 			<param8 type="database" id="sipcall" format="call-id:%s" name="callid" />
 			<param8 type="database" id="gvpsession" format="gvpsess%s" />
 			<param8 type="database" id="tenant" format="%s" />
-			<param8 type="database" id="mcpCall" format="mcpsess:%s" />
+			<param8 type="database" id="mcpCall" format="mcpsess:%s" hidden="true"/>
 		</spec>
 
 		<!-- Genesys messages for EXCEPTIONS >>>> -->
@@ -1654,8 +1668,9 @@
 			<param2 type="embedded" id="timestamp" name="timestamp" />
 			<param type="database" id="app" name="app" />
 
-			<param8 type="script" name="direction"> RECORD.getField('isinbound')==1?'&lt;-':'-&gt;'
-			</param8>
+			<param8 type="script" name="direction">
+		RECORD.getField('isinbound')==1?'&lt;-':'-&gt;'
+	  </param8>
 
 			<param6 type="database" id="GMSService" format="%s" name="gmsservice" />
 			<param6 type="database" id="ORSSession" format="%s" name="sid" />
@@ -1699,8 +1714,9 @@
 			</param1>
 			<param2 type="embedded" id="timestamp" name="timestamp" />
 			<param type="database" id="app" name="app" />
-			<param8 type="script" name="direction"> RECORD.getField('inbound')==1?'&lt;-':'-&gt;'
-			</param8>
+			<param8 type="script" name="direction">
+		RECORD.getField('inbound')==1?'&lt;-':'-&gt;'
+	  </param8>
 
 			<param6 type="database" id="EventName" format="%s" />
 			<param6 type="database" id="CallBackType" format="%s" />
@@ -1755,29 +1771,10 @@
 			<param6 type="database" id="username" format="user:%s" />
 			<param6 type="database" id="clienttype" format="%s" name="client" />
 			<param6 type="database" id="appname" format="%s" name="client" />
-			<param6 type="database" id="descr" format="socket:%s" name="socket" />
 			<param6 type="database" id="message" format="%s" name="" />
-			<param6 type="database" id="objNumber" format="objects:%s" name="objects" />
 
 		</spec>
 		<!-- <<<< Genesys messages for cs_updates -->
-
-		<!-- Genesys messages for CS_CONFIG_CHANGE >>>> -->
-		<spec MsgType="CS_CONFIG_CHANGE" format="filelink timestamp">
-			<param1 type="embedded" id="filelink" name="filename">
-				<pattern match="(log)" group="1" />
-			</param1>
-			<param2 type="embedded" id="timestamp" name="timestamp" />
-			<param type="database" id="app" name="app" />
-			<param6 type="database" id="op" format="%s" />
-			<param6 type="database" id="objtype" format="%s" name="obj" />
-			<param6 type="database" id="objName" format="'%s'" name="obj" />
-			<param6 type="database" id="dbid" format="dbid:%s" />
-			<param6 type="database" id="username" format="user:%s" />
-			<param6 type="database" id="clienttype" format="%s" name="client" />
-			<param6 type="database" id="appname" format="%s" name="client" />
-		</spec>
-		<!-- <<<< Genesys messages for CS_CONFIG_CHANGE -->
 
 
 		<!-- Genesys messages for cs_connect >>>> -->
@@ -1792,10 +1789,6 @@
 
 			<param6 type="database" id="username" format="user:%s" />
 			<param6 type="database" id="hostport" format="from:%s" />
-			<param6 type="database" id="socketNo" format="socket:%s" name="socket"/>
-			<param8 type="script" name="direction"> RECORD.getField('isConnect')=='1'?'connected':'disconnected'
-			</param8>
-
 
 		</spec>
 		<!-- <<<< Genesys messages for cs_connect -->
@@ -1912,9 +1905,9 @@
 			<param6 type="database" id="param1" name="param" />
 			<param6 type="database" id="param2" name="param" />
 			<param6 type="database" id="IxnID" name="ixnid" />
-			<!-- <param6 type="database" id="bayeuxID" format="bayeuxID:%s" /> -->
-			<!-- <param6 type="database" id="lastConected" format="last %s ms" /> -->
-			<!-- <param6 type="database" id="action" format="action %s" /> -->
+			<!-- <param6 type="database" id="bayeuxID" format="bayeuxID:%s"  /> -->
+			<!-- <param6 type="database" id="lastConected" format="last %s ms"  /> -->
+			<!-- <param6 type="database" id="action" format="action %s"  /> -->
 			<param6 type="database" id="DeviceID" />
 			<param6 type="database" id="channel" format="ch:%s" />
 			<param6 type="database" id="msgType" format="type:%s" />
@@ -2072,8 +2065,9 @@
 			<param2 type="embedded" id="timestamp" name="timestamp" />
 			<param type="database" id="app" name="app" />
 
-			<param8 type="script" name="direction"> RECORD.getField('inbound')==1?'&lt;-':'-&gt;'
-			</param8>
+			<param8 type="script" name="direction">
+		RECORD.getField('inbound')==1?'&lt;-':'-&gt;'
+	  </param8>
 
 			<param type="database" id="refID" name="refid" />
 

@@ -46,7 +46,7 @@ final class DateParsers {
         AddFormat("^\\w{3} \\d{2} \\w{3} \\d{4} \\d{2}:\\d{2}:\\d{2} \\w{2} \\w{3}\\.\\d{3}", "EEE d MMM yyyy HH:mm:ss a zzz.SSS", Parser.DateIncluded.DATE_INCUDED);
 
 //        Start time: [Wed Jan 17 08:37:07 CST 2018]
-        AddFormat("^\\w{3} \\w{3} \\d{2} \\d{2}:\\d{2}:\\d{2} \\w{3} \\d{4}", "EEE MMM y HH:mm:ss zzz yyyy", Parser.DateIncluded.DATE_INCUDED);
+        AddFormat("^\\w{3} \\w{3} \\d{2} \\d{2}:\\d{2}:\\d{2} \\w{3} \\d{4}", "EEE MMM dd HH:mm:ss zzz yyyy", Parser.DateIncluded.DATE_INCUDED);
 
     }
 

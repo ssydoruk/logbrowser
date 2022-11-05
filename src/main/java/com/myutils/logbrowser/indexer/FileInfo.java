@@ -25,10 +25,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
+
 import org.apache.commons.io.FilenameUtils;
 
 /**
- *
  * @author ssydoruk
  */
 public final class FileInfo extends Record {
@@ -112,7 +112,7 @@ public final class FileInfo extends Record {
 
 
     public String getAppID() {
-      return getAppName() + "-" + m_componentType.toString();
+        return getAppName() + "-" + m_componentType.toString();
     }
 
     FileInfo(ZipFile logArchive, ZipEntry entry, ZIPLog aThis) throws IOException {
@@ -166,9 +166,8 @@ public final class FileInfo extends Record {
                         startBuf,
                         0,
                         bytesRead);
-            }
-            else {
-                startBuf=_startBuf;
+            } else {
+                startBuf = _startBuf;
             }
         }
         return startBuf;
@@ -183,20 +182,12 @@ public final class FileInfo extends Record {
         if (getM_componentType() == FileInfoType.type_WorkSpace) {// two workspace files
             byte[] myBuf = getStartBuf();
             byte[] otherBuf = otherFile.getStartBuf();
-            int myReadBytes =myBuf.length;
+            int myReadBytes = myBuf.length;
             int otherReadBytes = otherBuf.length;
 
             return myReadBytes == otherReadBytes
                     && Arrays.equals(myBuf, otherBuf);
         } else if (getM_componentType() == FileInfoType.type_WWE) {
-            if (getStartTime() != 0) {
-                boolean ret = getStartTime() == otherFile.getStartTime();
-                if (ret == true) {
-                    return getFileLocalTime() == otherFile.getFileLocalTime();
-                } else {
-                    return false;
-                }
-            } else {
                 String myLf = getLogFileName();
                 String otherLf = otherFile.getLogFileName();
 
@@ -204,6 +195,16 @@ public final class FileInfo extends Record {
                         && otherLf != null && !otherLf.isEmpty()) {
                     return myLf.equals(otherLf);
                 }
+                else {
+                    if (getStartTime() != 0) {
+                        boolean ret = getStartTime() == otherFile.getStartTime();
+                        if (ret == true) {
+                            return getFileLocalTime() == otherFile.getFileLocalTime();
+                        } else {
+                            return false;
+                        }
+
+                    }
 
             }
         } else {
@@ -398,6 +399,20 @@ public final class FileInfo extends Record {
         ignoring = true;
     }
 
+    private void setWWEParams() {
+        appType = FileInfoType.getFileType(m_componentType);
+        (new File(FilenameUtils.normalize(this.filePath))).getParentFile().getName();
+        if (fileStartTime == null)
+            logFileName = ((new File(FilenameUtils.normalize(this.filePath))).getParentFile().getName())
+                    + File.separatorChar + m_name;
+        else
+            logFileName = ((new File(FilenameUtils.normalize(this.filePath))).getParentFile().getName())
+                    + File.separatorChar + m_name+"."+fileStartTime.fmtDate.format(DateTimeFormatter.ofPattern("yyyyddmm_kkmmss.SSS"));
+        setM_app(fileDir);
+        m_host = fileDir;
+
+    }
+
     public FileInfoType CheckLog(BufferedReaderCrLf input) {
         int num = 0;
         int numParamsToRead = 0;
@@ -513,7 +528,7 @@ public final class FileInfo extends Record {
                                 Main.logger.debug("local time: " + fileLocalTime);
 
                             } catch (Exception ex) {
-                                logger.error("fatal: ",  ex);
+                                logger.error("fatal: ", ex);
                             }
                         } else if ((startTimePatternGMS.matcher(str)).find()) {
                             numParamsToRead++;
@@ -522,7 +537,7 @@ public final class FileInfo extends Record {
                                 Main.logger.debug("start time: " + fileStartTime);
 
                             } catch (Exception ex) {
-                                logger.error("fatal: ",  ex);
+                                logger.error("fatal: ", ex);
                             }
                         } else if ((m = startTimePattern.matcher(str)).find()) {
                             numParamsToRead++;
@@ -535,7 +550,7 @@ public final class FileInfo extends Record {
                                 Main.logger.debug("start time: " + fileStartTime);
 
                             } catch (Exception ex) {
-                                logger.error("fatal: ",  ex);
+                                logger.error("fatal: ", ex);
                             }
                         } else if ((m = startTimeSIPEP.matcher(str)).find()) {
                             numParamsToRead++;
@@ -545,7 +560,7 @@ public final class FileInfo extends Record {
                                 Main.logger.debug("start time: " + fileStartTime);
 
                             } catch (Exception ex) {
-                                logger.error("fatal: ",  ex);
+                                logger.error("fatal: ", ex);
                             }
                         } else if ((m = regTimezone.matcher(str)).find()) {
                             numParamsToRead++;
@@ -572,13 +587,15 @@ public final class FileInfo extends Record {
 //                    }
                         } else if ((regGWS.matcher(str)).find()) {
                             m_componentType = FileInfoType.type_WWE;
+                            numParamsToRead++;
                         } else if ((m = regGWSPIDHost.matcher(str)).find()) {
                             m_host = m.group(2);
+                            numParamsToRead++;
                         } else if (fileStartTime == null && (m = regGWSStart.matcher(str)).find()) {
                             try {
                                 fileStartTime = dateParsers.parseFormatDate(m.group(1));
                             } catch (Exception ex) {
-                                logger.error("fatal: ",  ex);
+                                logger.error("fatal: ", ex);
                             }
                         } else if (m_componentType == FileInfoType.type_WWE) {
                             if (str.startsWith("+++++++++++++++++++++++++++++++++++++++++")) {
@@ -592,12 +609,6 @@ public final class FileInfo extends Record {
                             if (suspectedWWECloudLines > 5) {
                                 // not sure about the difference between WWE and WWECloud files. Assuming they are all WWE
                                 m_componentType = FileInfoType.type_WWE;
-                                appType = FileInfoType.getFileType(m_componentType);
-                                (new File(FilenameUtils.normalize(this.filePath))).getParentFile().getName();
-                                logFileName = ((new File(FilenameUtils.normalize(this.filePath))).getParentFile().getName())
-                                        + File.separatorChar + m_name;
-                                setM_app(fileDir);
-                                m_host = fileDir;
                                 doBreak = true;
                             } else {
                                 if (regWWECloud.matcher(str).find()) {
@@ -617,7 +628,7 @@ public final class FileInfo extends Record {
                                 doBreak = true;
                             }
                         } catch (Exception ex) {
-                            logger.error("fatal: ",  ex);
+                            logger.error("fatal: ", ex);
                             doBreak = true;
                         }
                         break;
@@ -641,6 +652,8 @@ public final class FileInfo extends Record {
 //</editor-fold>
                 }
             }
+            if (m_componentType == FileInfoType.type_WWE)
+                setWWEParams();
 
             if (m_ServerStartTimeSet) {
                 String temp = m_app + m_host + m_runId;
@@ -858,7 +871,7 @@ public final class FileInfo extends Record {
                 fileStartTime = new DateParsed(logFileName, d, "", LocalDateTime.parse(d, workSpaceDateTime));
             } catch (DateTimeParseException ex) {
                 fileStartTime = null;
-                logger.error("fatal: ",  ex);
+                logger.error("fatal: ", ex);
             }
         }
 
