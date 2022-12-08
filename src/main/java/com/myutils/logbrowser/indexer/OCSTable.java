@@ -32,6 +32,7 @@ public class OCSTable extends DBTable {
         addIndex("errMessageID");
         addIndex("chID");
         addIndex("otherDNID");
+        addIndex("agentIDID");
         addIndex("ReferenceId");
 
         dropIndexes();
@@ -46,7 +47,7 @@ public class OCSTable extends DBTable {
                 + "nameID INTEGER,"
                 + "thisDNID INTEGER,"
                 + "otherDNID INTEGER,"
-                + "agentID char(32),"
+                + "agentIDID INTEGER,"
                 + "ConnectionIDID INTEGER,"
                 + "TransferIdID INTEGER,"
                 + "ReferenceId INTEGER"

@@ -855,6 +855,11 @@ public class OrsParser extends Parser {
     }
 
     private int ParseHTTP(StringBuilder buf) {
+//        m_MessageContents.clear();
+//        m_MessageContents.addAll(Arrays.asList(StringUtils.splitPreserveAllTokens(buf.toString(), '\n')));
+//        return m_MessageContents.size();
+
+
         int linesRead = 0;
         int i = 0, start = 0, newLine;
 
@@ -870,13 +875,15 @@ public class OrsParser extends Parser {
 
             newLine = 0;
             if (i + 1 < buf.length()) { // there is room to look ahead
-                if (c == '\r' && buf.charAt(i + 1) == '\n'
-                        || c == '\n' && buf.charAt(i + 1) == '\r') {
+                if ((c == '\r' && buf.charAt(i + 1) == '\n')
+                        || (c == '\n' && buf.charAt(i + 1) == '\r')) {
                     newLine = 2;
                 }
-            } else if (c == '\r' || c == '\n') {
+            }
+            if (newLine==0 && (c == '\r' || c == '\n')) {
                 newLine = 1;
             }
+
             if (newLine == 0) {//skipping over normal characters
                 i++;
             } else { //new line detected

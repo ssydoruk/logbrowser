@@ -101,14 +101,16 @@ public class OCSDBActivity extends Message {
             Matcher m;
             String l = (m_MessageLines.size() > 0) ? m_MessageLines.get(0) : null;
             dbact = null;
-            if (l != null && (m = regDBServerReq.matcher(l)).find()) {
-                DBServer = m.group(1);
-                this.listName = m.group(2);
-                dbact = dbAction.get(l.substring(m.end()));
-            } else {
-                dbact = dbAction.get(l);
+            if (l != null) {
+                if ((m = regDBServerReq.matcher(l)).find()) {
+                    DBServer = m.group(1);
+                    this.listName = m.group(2);
+                    dbact = dbAction.get(l.substring(m.end()));
+                } else {
+                    dbact = dbAction.get(l);
+                }
+                Main.logger.trace("l:[" + l + "] dbact:[" + dbact + "]");
             }
-            Main.logger.trace("l:[" + l + "] dbact:[" + dbact + "]");
             DBParsed = true;
         }
     }
@@ -169,6 +171,9 @@ public class OCSDBActivity extends Message {
 //CM_DBCallList(311-250-5098): ExecuteRequest:0
                 addAction(": (Execute.+)", "");
 
+//15:52:15.924 CM_DBCallList(575-513-17484): Estimated Hit Ratio 0.7500; Processed Calls: 4; Answered Calls: 3
+                addAction(": (Estimated Hit Ratio)", "Campaign dial statistic");
+
 //CM_DBCallList(311-250-5098): SelectEnd:0  SelectedRecords:0 RequestID:15202300 ReadyRecords:9 SelectTime:0
 //CM_DBCallList(311-250-5098): DBServer 'ca_ocs_dbserver_pri for PM_CA_SERVICE_QUEUE_10_Calling_List (876)' SQL: select T.* from #ReadyRecord R, MSC_PM_Calling_List T where R.chain_id=T.chain_id and T.record_status = 2  and (Business_Unit = 'PMQ CA S10'  AND  Campaign_Name = '10CA AUTO INSV INC AO END')  order by Extract_Date DESC [ReqID=15202300]                
                 addAction(new String[]{"SelectEnd:", "SQL:\\s*select.+from[\\s\\#]+ReadyRecord", "SQL: TRUNCATE TABLE \\#ReadyRecord"}, "ReadyRecords table requests");
@@ -192,14 +197,20 @@ public class OCSDBActivity extends Message {
                 Matcher m;
                 Main.logger.trace("Compare DBActivity: [" + logLine + "] vs [" + key.toString() + "]");
 
-                if ((m = key.matcher(logLine)).find()) {
-                    Main.logger.trace("Compare DBActivity: [" + logLine + "] vs [" + key + "] :" + (((m.groupCount() > 0)) ? m.group(1) : ""));
-                    if (m.groupCount() > 0) {
-                        return m.group(1);
-                    } else {
-                        return value;
+                try {
+                    if ((m = key.matcher(logLine)).find()) {
+                        Main.logger.trace("Compare DBActivity: [" + logLine + "] vs [" + key + "] :" + (((m.groupCount() > 0)) ? m.group(1) : ""));
+                        if (m.groupCount() > 0) {
+                            return m.group(1);
+                        } else {
+                            return value;
+                        }
                     }
                 }
+                catch (NullPointerException e){
+                    Main.logger.error("error", e);
+                }
+
             }
             return "Misc";
         }

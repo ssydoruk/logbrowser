@@ -39,9 +39,9 @@ public class OCSByConnIdQuery extends IQuery {
         addRef("TransferIDID", "TransferID", ReferenceType.ConnID.toString(), FieldType.Optional);
         addRef("UUIDID", "UUID", ReferenceType.UUID.toString(), FieldType.Optional);
 
-        addRef("agentIDID", "agentID", ReferenceType.Agent.toString(), FieldType.Optional);
-        addRef("DNISID", "DNIS", ReferenceType.DN.toString(), FieldType.Optional);
-        addRef("ANIID", "ANI", ReferenceType.DN.toString(), FieldType.Optional);
+//        addRef("agentIDID", "agentID", ReferenceType.Agent.toString(), FieldType.Optional);
+//        addRef("DNISID", "DNIS", ReferenceType.DN.toString(), FieldType.Optional);
+//        addRef("ANIID", "ANI", ReferenceType.DN.toString(), FieldType.Optional);
 
         addNullField("ixnid");
         addNullField("typestr");
