@@ -8,7 +8,10 @@ for (var s of RECORD.getBytes().split('\n')) {
   if ((m = s.match(/AttributePrivateMsgID\s*(\d*)$/i)) != undefined) {
     FIELDS.put("PrivateMsgID", "msgid=" + m[1]);
   } else if ((m = s.match(/AttributeLocation\s(\S*)$/i)) != undefined) {
-    FIELDS.put("location", "loc=" + m[1]);
+    FIELDS.put("location", {
+      value: "loc=" + m[1],
+      hidden: true
+    });
   } else if ((m = s.match(/(from ISCC):/)) != undefined) {
     FIELDS.put("source", m[1]);
   } else if ((m = s.match(/AttributeCallState\s(\d*)$/)) != undefined) {

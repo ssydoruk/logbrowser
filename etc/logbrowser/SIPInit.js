@@ -29,6 +29,12 @@ for (var s of RECORD.getBytes().split("\n")) {
       hidden: true
     });
   }
+  if ((m = s.match(/Cisco-Gucid:\s*(.+)/)) != undefined) {
+    FIELDS.put("Cisco-Gucid", {
+      value: m[1],
+      hidden: true
+    });
+  }
   if (hasBody) {
     if (contentType != undefined) {
       if (contentType.includes('sdp')) {

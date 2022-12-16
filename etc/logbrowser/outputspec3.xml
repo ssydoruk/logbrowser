@@ -27,7 +27,7 @@
 			<param4 type="database" id="fromuri" format="|from: %4s" hidden="true" name="fromuri" />
 			<param5 type="database" id="touri" format="|to: %4s" hidden="true" />
 			<param6 type="database" id="cseq" format="|%-8s" name="seqn" />
-			<param7 type="database" id="uuid" format=" uuid=%s" hidden="true" name="uuid" />
+			<param7 type="database" id="uuid" format="uuid:%s" name="uuid" />
 			<param3 type="database" id="requestURIDN" format="|reqDN:%s" name="thisdn" hidden="true" />
 			<param3 type="database" id="FromUserpart" format="|from:%s" name="otherdn" hidden="true" />
 			<param8 type="database" id="via" format="|via:%18s" hidden="true">
@@ -56,7 +56,7 @@
 			<param type="database" id="name" format=" %7s" name="name">
 				<pattern match="^(\w{1,7})" ignorecase="true" groups="1" />
 			</param>
-			<param7 type="embedded" id="callidalias" format="|%s" name="connid" />
+			<param7 type="embedded" id="callidalias" format="|connid:%s" name="connid" />
 			<param8 type="database" id="callid" format="%s" />
 			<param4 type="database" id="fromuri" format="|F:%4s">
 				<pattern match="(\w{1,4}?)@" group="1" />
@@ -191,7 +191,7 @@
 
 			<param5 type="database" id="otherdn" format=" odn=%s" name="otherdn" />
 			<param8 type="database" id="agentid" format="|ag:%s" name="agent" />
-			<param7 type="database" id="connid" format=" connid=%s" name="connid">
+			<param7 type="database" id="connid" format="connid:%s" name="connid">
 				<pattern match="^(\d\w+)$" group="1" ignorecase="true" />
 			</param7>
 
@@ -222,7 +222,7 @@
 
 			<param8 type="database" id="attr1" format="%s" name="attr1" hidden='true' />
 
-			<param7 type="database" id="uuid" format=" uuid=%s" name="uuid" />
+			<param7 type="database" id="uuid" format="uuid:%s" name="uuid" />
 
 		</spec>
 		<!-- TLibrary events -->
@@ -249,9 +249,9 @@
 			<param4 type="database" id="thisdn" format=" dn=%s" name="thisdn" />
 
 			<param5 type="database" id="otherdn" format=" odn=%s" hidden="true" />
-			<param7 type="database" id="ConnectionID" format=" connid=%s" name="connid" />
+			<param7 type="database" id="ConnectionID" format="connid:%s" name="connid" />
 
-			<param7 type="database" id="OtherConnectionID" format=" oconnid=%s" name="otherconnid" />
+			<param7 type="database" id="OtherConnectionID" format="oconnid:%s" name="otherconnid" />
 
 			<param4 type="database" id="source" format=" |ts:%s" name="source" />
 
@@ -272,8 +272,8 @@
 			<param2 type="embedded" id="timestamp" name="timestamp" />
 			<param type="database" id="app" name="app" />
 
-			<param type="database" id="newConnID" format="newConnID: %s" name="connid" />
-			<param type="database" id="connectionID" format="connID: %s" name="connid" />
+			<param type="database" id="newConnID" format="newconnid:%s" name="connid" />
+			<param type="database" id="connectionID" format="connid:%s" name="connid" />
 			<param type="file" format="|%s" name="name">
 				<pattern match="tscp.call\s+\{([^\}]+)\}" ignorecase="true" groups="1" />
 			</param>
@@ -447,7 +447,7 @@
 				<!--pattern match="^\s*OwnerDBID: .+RecHandle: (\d+); ConnID: ([^;]*);.+Agent/Place: (\S.+)$" ignorecase="true" groups="3" /-->
 			</param6>
 
-			<param6 type="file" format="connid %s" name="connid">
+			<param6 type="file" format="connid:%s" name="connid">
 				<pattern match="^\s*OwnerDBID: .+RecHandle: (\d+); ConnID: ([^;]*);.+Agent/Place: (\S.+)$" ignorecase="true" groups="2" />
 			</param6>
 
@@ -822,7 +822,7 @@
 
 			<param type="database" id="app" name="app" />
 
-			<param6 type="database" id="connid" format="|%s" name="connid">
+			<param6 type="database" id="connid" format="|connid:%s" name="connid">
 				<!--pattern match="(.{2})$" ignorecase="true" groups="1" /-->
 			</param6>
 
@@ -857,7 +857,7 @@
 
 			<param type="database" id="app" name="app" />
 
-			<param6 type="database" id="connid" format="|%s" name="connid" />
+			<param6 type="database" id="connid" format="|connid:%s" name="connid" />
 			<param6 type="database" id="object" format="|ag:%s" name="agent" />
 			<param6 type="database" id="ObjectType" format="|type: %s" />
 
@@ -874,7 +874,7 @@
 			<param2 type="embedded" id="timestamp" name="timestamp" />
 
 			<param type="database" id="app" name="app" />
-			<param6 type="database" id="connid" format="|%s" name="connid">
+			<param6 type="database" id="connid" format="|connid:%s" name="connid">
 				<!--pattern match="(.{2})$" ignorecase="true" groups="1" /-->
 			</param6>
 			<param6 type="database" id="strategyname" format="|%s" name="strategy">
@@ -944,7 +944,7 @@
 		RECORD.getField('inbound')==1?'&lt;-':'-&gt;'
 	  </param8>
 
-			<param6 type="database" id="connid" format="|%s" name="connid"></param6>
+			<param6 type="database" id="connid" format="|connid:%s" name="connid"></param6>
 
 			<param6 type="database" id="func" format="|f %s"></param6>
 			<param6 type="database" id="subfunc" format="|- %s"></param6>
@@ -1186,7 +1186,7 @@
 
 
 			<param6 type="database" id="InteractionID" name="ixnid" format="|%s"></param6>
-			<param type="database" id="connectionid" format="|connid: %s" name="connid"></param>
+			<param type="database" id="connectionid" format="|connid:%s" name="connid"></param>
 
 			<!--param type="database" id="refid" format="|ref: %s" name="refid">
 	  	<pattern match="(^[1-9].+)" ignorecase="true" groups="1" />    
@@ -1246,7 +1246,7 @@
 			<param type="database" id="client" format="|app: %s"></param>
 
 
-			<param type="database" id="connectionid" format="|connid: %s" name="connid"></param>
+			<param type="database" id="connectionid" format="|connid:%s" name="connid"></param>
 
 			<!--param type="database" id="refid" format="|ref: %s" name="refid">
 	  	<pattern match="(^[1-9].+)" ignorecase="true" groups="1" />    
@@ -1674,7 +1674,7 @@
 
 			<param6 type="database" id="GMSService" format="%s" name="gmsservice" />
 			<param6 type="database" id="ORSSession" format="%s" name="sid" />
-			<param6 type="database" id="connID" format="%s" />
+			<param6 type="database" id="connID" format="connid:%s" />
 			<param6 type="database" id="request" format="req:%s" />
 
 			<param10 type="file" format="|ewt:%s">
