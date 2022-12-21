@@ -170,6 +170,7 @@ public class OCSParser extends Parser {
             case SEventRegistered:
             case SEventDataStreamOpeningFailure:
             case SEventError:
+            case SEventRunModeInfo:
             case SEventStatInvalid:
             case SEventCurrentTargetState_TargetRemoved:
                 return true;
@@ -723,6 +724,7 @@ public class OCSParser extends Parser {
         SEventDataStreamMessage("SEventDataStreamMessage"),
         SEventDataStreamOpened("SEventDataStreamOpened"),
         SEventCurrentTargetState_TargetRemoved("SEventCurrentTargetState_TargetRemoved"),
+        SEventRunModeInfo("SEventRunModeInfo"),
         SEventStatClosed("SEventStatClosed");
 
         private final String name;
