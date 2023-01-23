@@ -10,9 +10,12 @@
             <goal>org.codehaus.mojo:exec-maven-plugin:1.5.0:exec</goal>
         </goals>
         <properties>
-            <exec.args>-Dall=1  -Dlog4j.configurationFile=/Users/stepan_sydoruk/GCTI/etc/logbrowser/logbr.log4j2.inquirer.xml  -Dlog4j.logPath=/Users/stepan_sydoruk/GCTI/Work/Nov05_ppe_QA/.tmp -Dlogbr.dir=.tmp  -Dsqlite.pragma=true  -Dsun.java2d.d3d=false  -Dtimediff.parse=false  -Dtlib.norequest=false  -Xms8000m  -Xmx8000m -classpath %classpath com.myutils.logbrowser.inquirer.inquirer --dbname=/Users/stepan_sydoruk/GCTI/Work/Nov05_ppe_QA/logbr --basedir=/Users/stepan_sydoruk/GCTI/Work/Nov05_ppe_QA --cfgxml /Users/stepan_sydoruk/GCTI/etc/logbrowser/backend.xml</exec.args>
+            <exec.args>${exec.vmArgs} -classpath %classpath ${exec.mainClass} ${exec.appArgs}</exec.args>
             <exec.executable>java</exec.executable>
-            <exec.workingdir>/Users/stepan_sydoruk/GCTI/Work/Nov05_ppe_QA</exec.workingdir>
+            <exec.workingdir>D:\archive\uhg\ssydoruk\GCTI\work\prod.c1.1214</exec.workingdir>
+            <exec.appArgs>--no-ref-sync --dbname=D:\archive\uhg\ssydoruk\GCTI\work\prod.c1.1214\logbr --config=D:\archive\uhg\ssydoruk\GCTI\etc\logbrowser\inquirer.cfg.json --basedir=D:\archive\uhg\ssydoruk\GCTI\work\prod.c1.1214 --outputspec=I:\src\src\logbrowser\bin\etc\logbrowser\outputspec3.xml</exec.appArgs>
+            <exec.vmArgs>-Dall=1  -Dlog4j.configurationFile=D:\archive\uhg\ssydoruk\GCTI\etc\logbrowser/logbr.log4j2.inquirer.xml  -Dlog4j.logPath=.tmp -Dlogbr.dir=.tmp  -Dsqlite.pragma=true  -Dsun.java2d.d3d=false  -Dtimediff.parse=false  -Dtlib.norequest=false  -Xms8000m  -Xmx8000m -Ddebug=true</exec.vmArgs>
+            <exec.mainClass>com.myutils.logbrowser.inquirer.inquirer</exec.mainClass>
         </properties>
     </action>
     <action>
@@ -25,10 +28,13 @@
             <goal>org.codehaus.mojo:exec-maven-plugin:1.5.0:exec</goal>
         </goals>
         <properties>
-            <exec.args>-agentlib:jdwp=transport=dt_socket,server=n,address=${jpda.address} -Dall=1  -Dlog4j.configurationFile=/Users/stepan_sydoruk/GCTI/etc/logbrowser/logbr.log4j2.inquirer.xml  -Dlog4j.logPath=/Users/stepan_sydoruk/GCTI/Work/Nov05_ppe_QA/.tmp -Dlogbr.dir=.tmp  -Dsqlite.pragma=true  -Dsun.java2d.d3d=false  -Dtimediff.parse=false  -Dtlib.norequest=false  -Xms8000m  -Xmx8000m -classpath %classpath com.myutils.logbrowser.inquirer.inquirer --dbname=/Users/stepan_sydoruk/GCTI/Work/Nov05_ppe_QA/logbr --basedir=/Users/stepan_sydoruk/GCTI/Work/Nov05_ppe_QA --cfgxml /Users/stepan_sydoruk/GCTI/etc/logbrowser/backend.xml</exec.args>
+            <exec.args>${exec.vmArgs} -classpath %classpath ${exec.mainClass} ${exec.appArgs}</exec.args>
             <exec.executable>java</exec.executable>
             <jpda.listen>true</jpda.listen>
-            <exec.workingdir>/Users/stepan_sydoruk/GCTI/Work/Nov05_ppe_QA</exec.workingdir>
+            <exec.workingdir>D:\archive\uhg\ssydoruk\GCTI\work\prod.c1.1214</exec.workingdir>
+            <exec.appArgs>--no-ref-sync --dbname=D:\archive\uhg\ssydoruk\GCTI\work\prod.c1.1214\logbr --config=D:\archive\uhg\ssydoruk\GCTI\etc\logbrowser\inquirer.cfg.json --basedir=D:\archive\uhg\ssydoruk\GCTI\work\prod.c1.1214 --outputspec=I:\src\src\logbrowser\bin\etc\logbrowser\outputspec3.xml</exec.appArgs>
+            <exec.vmArgs>-Dall=1  -Dlog4j.configurationFile=D:\archive\uhg\ssydoruk\GCTI\etc\logbrowser/logbr.log4j2.inquirer.xml  -Dlog4j.logPath=.tmp -Dlogbr.dir=.tmp  -Dsqlite.pragma=true  -Dsun.java2d.d3d=false  -Dtimediff.parse=false  -Dtlib.norequest=false  -Xms8000m  -Xmx8000m -Ddebug=true -agentlib:jdwp=transport=dt_socket,server=n,address=${jpda.address}</exec.vmArgs>
+            <exec.mainClass>com.myutils.logbrowser.inquirer.inquirer</exec.mainClass>
         </properties>
     </action>
     <action>
@@ -41,9 +47,12 @@
             <goal>org.codehaus.mojo:exec-maven-plugin:1.5.0:exec</goal>
         </goals>
         <properties>
-            <exec.args>-Dall=1  -Dlog4j.configurationFile=/Users/stepan_sydoruk/GCTI/etc/logbrowser/logbr.log4j2.inquirer.xml  -Dlog4j.logPath=/Users/stepan_sydoruk/GCTI/Work/Nov05_ppe_QA/.tmp -Dlogbr.dir=.tmp  -Dsqlite.pragma=true  -Dsun.java2d.d3d=false  -Dtimediff.parse=false  -Dtlib.norequest=false  -Xms8000m  -Xmx8000m -classpath %classpath com.myutils.logbrowser.inquirer.inquirer --dbname=/Users/stepan_sydoruk/GCTI/Work/Nov05_ppe_QA/logbr --basedir=/Users/stepan_sydoruk/GCTI/Work/Nov05_ppe_QA --cfgxml /Users/stepan_sydoruk/GCTI/etc/logbrowser/backend.xml</exec.args>
+            <exec.args>${exec.vmArgs} -classpath %classpath ${exec.mainClass} ${exec.appArgs}</exec.args>
             <exec.executable>java</exec.executable>
-            <exec.workingdir>/Users/stepan_sydoruk/GCTI/Work/Nov05_ppe_QA</exec.workingdir>
+            <exec.workingdir>D:\archive\uhg\ssydoruk\GCTI\work\prod.c1.1214</exec.workingdir>
+            <exec.appArgs>--no-ref-sync --dbname=D:\archive\uhg\ssydoruk\GCTI\work\prod.c1.1214\logbr --config=D:\archive\uhg\ssydoruk\GCTI\etc\logbrowser\inquirer.cfg.json --basedir=D:\archive\uhg\ssydoruk\GCTI\work\prod.c1.1214 --outputspec=I:\src\src\logbrowser\bin\etc\logbrowser\outputspec3.xml</exec.appArgs>
+            <exec.vmArgs>-Dall=1  -Dlog4j.configurationFile=D:\archive\uhg\ssydoruk\GCTI\etc\logbrowser/logbr.log4j2.inquirer.xml  -Dlog4j.logPath=.tmp -Dlogbr.dir=.tmp  -Dsqlite.pragma=true  -Dsun.java2d.d3d=false  -Dtimediff.parse=false  -Dtlib.norequest=false  -Xms8000m  -Xmx8000m -Ddebug=true</exec.vmArgs>
+            <exec.mainClass>com.myutils.logbrowser.inquirer.inquirer</exec.mainClass>
         </properties>
     </action>
     <action>

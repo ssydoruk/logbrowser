@@ -17,6 +17,7 @@ import java.io.*;
 import java.util.HashMap;
 import java.util.logging.Handler;
 import java.util.logging.LogRecord;
+import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
 
 /**
  * @author stepan_sydoruk
@@ -63,6 +64,25 @@ public class JSRunner {
         logger.trace("evalFields [" + scriptFields + "], ignored:[" + ret + "] - result of [" + script + "]");
         return ret;
     }
+
+    
+    
+    public static RecordPrintout evalFullRecordPrintout(String script,  ILogRecord rec) {
+        RecordPrintout ret = new RecordPrintout(rec.getBytes());
+        Context cont = getInstance().getCondContext();
+        Value bindings = cont.getBindings("js");
+        bindings.putMember("RECORD", rec);
+        bindings.putMember("PRINTOUT", ret);
+
+        try {
+            cont.eval("js", script);
+        } catch (Exception e) {
+            logger.error("Exception evaluating script ["+script+"]", e);
+        }
+        return ret;
+    }
+    
+    
 
     public static String execString(String script, ILogRecord rec) {
         Context cont = getInstance().getCondContext();
@@ -125,12 +145,15 @@ public class JSRunner {
             }
         };
 
-        logHandler.setLevel(java.util.logging.Level.INFO);
+        logHandler.setLevel(java.util.logging.Level.FINEST);
         condContext = Context.newBuilder("js")
                 .allowAllAccess(true)
                 .err(stdErr)
                 .out(stdOut)
                 .logHandler(stdOut)
+//                .option("inspect", "8123")
+//                .option("inspect.WaitAttached", "true")
+//                .option("inspect.Secure", "false")
                 .build();
         stdInReader.start();
         stdErrReader.start();

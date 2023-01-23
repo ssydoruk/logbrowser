@@ -133,7 +133,12 @@
             <version>23.0.0</version>
             <scope>compile</scope>
         </dependency>
-
+        <dependency>
+            <groupId>com.fifesoft</groupId>
+            <artifactId>rsyntaxtextarea</artifactId>
+            <version>3.3.2</version>
+            <type>jar</type>
+        </dependency>
     </dependencies>
     <dependencyManagement>
         <dependencies>

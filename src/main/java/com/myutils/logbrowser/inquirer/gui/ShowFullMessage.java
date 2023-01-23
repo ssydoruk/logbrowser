@@ -6,8 +6,16 @@
 package com.myutils.logbrowser.inquirer.gui;
 
 import Utils.ScreenInfo;
+import com.myutils.logbrowser.common.JSRunner;
+import com.myutils.logbrowser.common.RecordPrintout;
+import com.myutils.logbrowser.inquirer.ILogRecord;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import javax.swing.ScrollPaneConstants;
+import org.apache.commons.lang3.StringUtils;
+import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
+import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
+import org.fife.ui.rtextarea.RTextScrollPane;
 
 /**
  *
@@ -16,12 +24,20 @@ import java.awt.event.WindowEvent;
 public class ShowFullMessage extends javax.swing.JFrame {
 
     private ReportFrameQuery parentForm;
+    RSyntaxTextArea detailedMessage;
 
     /**
      * Creates new form ShowFullMessage
      */
     public ShowFullMessage() {
         initComponents();
+        detailedMessage = new RSyntaxTextArea();
+        detailedMessage.setCodeFoldingEnabled(true);
+
+        RTextScrollPane sp = new RTextScrollPane(detailedMessage);
+        detailedMessage.setWrapStyleWord(true);
+        detailedMessage.setLineWrap(true);
+        pDetailedMessage.add(sp);
     }
 
     ShowFullMessage(ReportFrameQuery aThis) {
@@ -60,8 +76,10 @@ public class ShowFullMessage extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jScrollPane1 = new javax.swing.JScrollPane();
+        jSplitPane1 = new javax.swing.JSplitPane();
+        spFullMessage = new javax.swing.JScrollPane();
         jtaMessageText = new javax.swing.JTextArea();
+        pDetailedMessage = new javax.swing.JPanel();
 
         setAutoRequestFocus(false);
         addWindowStateListener(new java.awt.event.WindowStateListener() {
@@ -77,14 +95,23 @@ public class ShowFullMessage extends javax.swing.JFrame {
                 formWindowDeactivated(evt);
             }
         });
+        getContentPane().setLayout(new javax.swing.BoxLayout(getContentPane(), javax.swing.BoxLayout.PAGE_AXIS));
+
+        jSplitPane1.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
 
         jtaMessageText.setEditable(false);
         jtaMessageText.setColumns(20);
         jtaMessageText.setLineWrap(true);
         jtaMessageText.setRows(5);
-        jScrollPane1.setViewportView(jtaMessageText);
+        jtaMessageText.setWrapStyleWord(true);
+        spFullMessage.setViewportView(jtaMessageText);
 
-        getContentPane().add(jScrollPane1, java.awt.BorderLayout.CENTER);
+        jSplitPane1.setLeftComponent(spFullMessage);
+
+        pDetailedMessage.setLayout(new java.awt.BorderLayout());
+        jSplitPane1.setRightComponent(pDetailedMessage);
+
+        getContentPane().add(jSplitPane1);
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -103,8 +130,10 @@ public class ShowFullMessage extends javax.swing.JFrame {
     }//GEN-LAST:event_formWindowStateChanged
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JSplitPane jSplitPane1;
     private javax.swing.JTextArea jtaMessageText;
+    private javax.swing.JPanel pDetailedMessage;
+    private javax.swing.JScrollPane spFullMessage;
     // End of variables declaration//GEN-END:variables
 
     void showMessage(String GetFileBytes) {
@@ -123,5 +152,20 @@ public class ShowFullMessage extends javax.swing.JFrame {
 //        setVisible(false);
 //        setVisible(true);
 //        validate();
+    }
+
+    void showMessage(String recordDisplayScript, ILogRecord record) {
+        detailedMessage.setText("");
+        if (StringUtils.isEmpty(recordDisplayScript)) {
+            showMessage(record.getBytes());
+        } else {
+            RecordPrintout recPrintout = JSRunner.evalFullRecordPrintout(recordDisplayScript, record);
+            showMessage(recPrintout.fullMessage);
+            if(StringUtils.isNotEmpty(recPrintout.detailsMessage)){
+                detailedMessage.setText(recPrintout.detailsMessage);
+                detailedMessage.setSyntaxEditingStyle(SyntaxConstants.SYNTAX_STYLE_JSON);
+
+            }
+        }
     }
 }

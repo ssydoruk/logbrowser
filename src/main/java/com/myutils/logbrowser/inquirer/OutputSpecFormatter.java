@@ -46,8 +46,8 @@ public abstract class OutputSpecFormatter extends DefaultFormatter {
     private final HashMap<String, RecordLayout> outSpec = new HashMap<>();
 
     public OutputSpecFormatter(XmlCfg cfg,
-                               boolean isLongFileNameEnabled,
-                               HashSet<String> components) throws Exception {
+            boolean isLongFileNameEnabled,
+            HashSet<String> components) throws Exception {
         super(isLongFileNameEnabled, components);
         inquirer.logger.debug("OutputSpecFormatter " + cfg.getXmlFile());
         this.cfg = cfg;
@@ -308,14 +308,14 @@ public abstract class OutputSpecFormatter extends DefaultFormatter {
                 if (!ignorePatternForDBFields) {
                     ArrayList<Element> els = getElementsChildByName(e, "pattern");
                     if (els != null && els.size() > 0) {
-                        for (Iterator<Element> iterator = els.iterator(); iterator.hasNext(); ) {
+                        for (Iterator<Element> iterator = els.iterator(); iterator.hasNext();) {
                             Element next = iterator.next();
                             SetMatch(next);
                         }
                     }
                 }
                 for (Iterator<Element> el = getElementsChildByName(e, "filter").iterator();
-                     el != null && el.hasNext(); ) {
+                        el != null && el.hasNext();) {
                     SetFilter(el.next());
 
                 }
@@ -848,6 +848,16 @@ public abstract class OutputSpecFormatter extends DefaultFormatter {
         String formatString;
         String formatStringFromXml;
         private String initScript = null;
+        private String recordDisplayScript = null;
+
+        public String getRecordDisplayScript() {
+            return recordDisplayScript;
+        }
+
+        public void setRecordDisplayScript(String recordDisplayScript) {
+            this.recordDisplayScript = recordDisplayScript;
+        }
+
         private Utils.FileWatcher jsFileWatcher = null;
 
         private RecordLayout(org.w3c.dom.Element el, String msgType, String cfgFile) throws Exception {
@@ -872,8 +882,14 @@ public abstract class OutputSpecFormatter extends DefaultFormatter {
             for (int i = 0; i < nl.getLength(); i++) {
                 if (nl.item(i).getNodeType() == Node.ELEMENT_NODE) {
                     Element paramElement = (Element) nl.item(i);
-                    if (paramElement.getTagName().equalsIgnoreCase("initScript")) {
-                        addInitScript(paramElement);
+                    if (paramElement.getTagName().equalsIgnoreCase("recordDisplayScript")) {
+                        getInitScript(paramElement, (file) -> {
+                            setRecordDisplayScript(file);
+                        });
+                    } else if (paramElement.getTagName().equalsIgnoreCase("initScript")) {
+                        getInitScript(paramElement, (file) -> {
+                            setInitScript(file);
+                        });
                     } else {
                         Parameter parameter = null;
 
@@ -903,6 +919,10 @@ public abstract class OutputSpecFormatter extends DefaultFormatter {
                     }
                 }
             }
+        }
+
+        public void setInitScript(String initScript) {
+            this.initScript = initScript;
         }
 
         private boolean getAttribute(Element e, String key, boolean defaultValue) {
@@ -1035,7 +1055,7 @@ public abstract class OutputSpecFormatter extends DefaultFormatter {
             return "";
         }
 
-        private void addInitScript(Element paramElement) throws Exception {
+        private void getInitScript(Element paramElement, IFileChangeFun changeFun) throws Exception {
             String src = paramElement.getAttribute("src");
             if (StringUtils.isNotBlank(src)) {
 
@@ -1046,16 +1066,16 @@ public abstract class OutputSpecFormatter extends DefaultFormatter {
                     readAllLines = Files.readAllLines(cf.toPath());
                 } else {
                     Path cc = (new File(cfgFile)).toPath();
-                    readAllLines = readFile((cc.getParent() == null) ? "" : cc.getParent().toString(), src);
+                    readAllLines = readFile((cc.getParent() == null) ? "" : cc.getParent().toString(), src, changeFun);
                     if (readAllLines == null && Files.isSymbolicLink(cc)) {
                         Path symParent = Files.readSymbolicLink(cc).getParent();
-                        readAllLines = readFile((symParent == null) ? "" : symParent.toString(), src);
+                        readAllLines = readFile((symParent == null) ? "" : symParent.toString(), src, changeFun);
                     }
                 }
                 if (readAllLines == null) {
                     throw new Exception("Not able to read JS source file " + src);
                 } else {
-                    this.initScript = (StringUtils.join(readAllLines, "\n"));
+                    changeFun.fun(StringUtils.join(readAllLines, "\n"));
                 }
 
             } else {
@@ -1064,20 +1084,21 @@ public abstract class OutputSpecFormatter extends DefaultFormatter {
                     s = StringUtils.trimToNull(s);
                 }
                 if (s != null) {
-                    this.initScript = s;
+                    changeFun.fun(s);
                 } else {
                     throw new Exception("initScript specified but body is empty");
                 }
             }
+
         }
 
-        List<String> readFile(String dir, String name) {
+        List<String> readFile(String dir, String name, IFileChangeFun changeFun) {
             Path get = Paths.get(dir, name);
             logger.debug("Reading file " + get);
             if (Files.isReadable(get)) {
                 try {
                     List<String> ret = Files.readAllLines(get);
-                    setJSFile(get);
+                    setJSFile(get, changeFun);
                     return ret;
 
                 } catch (IOException ex) {
@@ -1087,7 +1108,7 @@ public abstract class OutputSpecFormatter extends DefaultFormatter {
             return null;
         }
 
-        private void setJSFile(Path get) {
+        private void setJSFile(Path get, IFileChangeFun changeFun) {
             try {
                 if (jsFileWatcher != null) {
                     jsFileWatcher.stopThread();
@@ -1099,7 +1120,7 @@ public abstract class OutputSpecFormatter extends DefaultFormatter {
                             logger.info("File changed " + f);
                             List<String> ret = Files.readAllLines(f.toPath());
                             if (ret != null) {
-                                initScript = StringUtils.join(ret, "\n");
+                                changeFun.fun(StringUtils.join(ret, "\n"));
                             }
                         } catch (IOException ex) {
                             logger.error("Error rereading file " + f);
@@ -1111,5 +1132,10 @@ public abstract class OutputSpecFormatter extends DefaultFormatter {
                 Logger.getLogger(OutputSpecFormatter.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
+    }
+
+    interface IFileChangeFun {
+
+        void fun(String file);
     }
 }
