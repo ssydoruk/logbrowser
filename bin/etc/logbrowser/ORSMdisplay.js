@@ -66,6 +66,19 @@ switch (RECORD.getField("metric")) {
         }
 
       }
+      else if ((m = PRINTOUT.fullMessage.match(/(_data.data|Segmentation Facts Rule Results[^\{]+)(\{.+\})/)) != undefined) {
+        var prefix=m[1];
+        var dt=m[2];
+        try{
+          PRINTOUT.detailsMessage=prefix+'\n'+JSON.stringify(JSON.parse(dt), undefined, 4)
+        }
+        catch (e){
+          console.log('error parsing: '+e.message);
+          PRINTOUT.detailsMessage='++>'+
+          prefix+'\n'+dt
+        }
+
+      }
 
       else {
         // PRINTOUT.detailsMessage=JSON.stringify({"cc":"bb", "key1":"val1"});
