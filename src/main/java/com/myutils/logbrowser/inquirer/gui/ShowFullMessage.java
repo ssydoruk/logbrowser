@@ -149,7 +149,7 @@ public class ShowFullMessage extends javax.swing.JFrame {
     // End of variables declaration//GEN-END:variables
 
     void showMessage(String recordDisplayScript, ILogRecord record) {
-//        detailedMessage.setText("");
+        detailedMessage.setText("");
         if (StringUtils.isEmpty(recordDisplayScript)) {
             jtaMessageText.setText(record.getBytes());
         } else {

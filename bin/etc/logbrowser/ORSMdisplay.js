@@ -66,7 +66,7 @@ switch (RECORD.getField("metric")) {
         }
 
       }
-      else if ((m = PRINTOUT.fullMessage.match(/(_data.data|Segmentation Facts Rule Results[^\{]+)(\{.+\})/)) != undefined) {
+      else if ((m = PRINTOUT.fullMessage.match(/(_data.data[^\{]*|Segmentation Facts Rule Results[^\{]+)(\{.+\})/)) != undefined) {
         var prefix=m[1];
         var dt=m[2];
         try{
