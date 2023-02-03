@@ -1,6 +1,6 @@
 @echo on
 
-set BASEDIR="C:\Users\ssydoruk\IdeaProjects\install"
+set BASEDIR="C:\Users\ssydoruk\GCTI"
 
 if [%1]==[] (
 set RUN_DIR=%CD%
@@ -28,9 +28,12 @@ set LOGBR_TMP=.tmp
 
 set LOGBR_TMP_OPT=-Dlogbr.dir=%LOGBR_TMP%
 
-rem DBG="-Xdebug -Xrunjdwp:transport=dt_socket,address=8000,server=y,suspend=y"
-set LOG_OPTS=-Dlog4j.configurationFile=%ETCDIR%\logbr.log4j2.inquirer.xml -DlogPath=%LOGDIR%
-set MISC_OPTIONS=-Dsun.java2d.d3d=false -Dall=1 -Xms4000m -Xmx4000m -Djacob.dll=C:\GCTI\bin\logbrowser\jacob-1.20-x64.dll
+rem set DBG=-Xdebug -Xrunjdwp:transport=dt_socket,address=10.29.10.129:8443,server=y,suspend=y
+rem set JAVACMD=java
+
+
+set LOG_OPTS=-Dlog4j.configurationFile=%ETCDIR%\logbr.log4j2.inquirer.xml -DlogPath=%LOGBR_TMP%
+set MISC_OPTIONS=-Dsun.java2d.d3d=false -Dall=1 -Xms3G -Xmx8G -Djacob.dll=C:\Users\ssydoruk\GCTI\bin\logbrowser\jacob-1.20-x64.dll
 
 set SQLITE_PRAGMAS=-Dsqlite.pragma=true
 

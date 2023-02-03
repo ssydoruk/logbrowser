@@ -1,5 +1,5 @@
-echo on
-set BASEDIR="C:\Users\ssydoruk\IdeaProjects\install"
+﻿echo on
+set BASEDIR="C:\Users\ssydoruk\GCTI"
 
 set LIBDIR=%BASEDIR%\lib
 
@@ -21,8 +21,8 @@ set LOGBR_TMP=.tmp
 set LOGBR_TMP_OPT=-Dlogbr.dir=%LOGBR_TMP%
 
 rem DBG="-Xdebug -Xrunjdwp:transport=dt_socket, address=8000, server=y, suspend=y"™
-set LOG_OPTS=-Dlog4j.configurationFile=%ETCDIR%\logbr.log4j2.indexer.xml -DlogPath=%LOGDIR%
-set MISC_OPTIONS=-Dsun.java2d.d3d=false -Dall=1 -Xms4G -Xmx10G
+set LOG_OPTS=-Dlog4j.configurationFile=%ETCDIR%\logbr.log4j2.indexer.xml -DlogPath=%LOGBR_TMP%
+set MISC_OPTIONS=-Dsun.java2d.d3d=false -Dall=1 -Xms3G -Xmx8G
 
 set SQLITE_PRAGMAS=-Dsqlite.pragma=true
 
@@ -30,15 +30,15 @@ set NO_TLIB_REQUESTS=-Dtlib.norequest=false
 
 set TIMEDIFF=-Dtimediff.parse=false
 
-set SIP_LINES=-DSIPLINES=1
+set SIP_LINES=-DSIPLINES=0
 
 rem ------------------ no config after this line -------------------------
 
 set JAVA_OPTS=%DBG% %LOGBR_TMP_OPT% %LOG_OPTS% %MISC_OPTIONS% %SQLITE_PRAGMAS% %NO_TLIB_REQUESTS% %TIMEDIFF% %SIP_LINES%
 if [%1]==[] (
-set RUN_DIR=%CD%
+set RUN_DIR="%CD%"
 ) else (
-set RUN_DIR=%1
+set RUN_DIR="%1"
 )
 
 cd %RUN_DIR%
@@ -46,6 +46,8 @@ cd %RUN_DIR%
 set DB=%RUN_DIR%\%LOGBRDB%
 
 set CFG=%ETCDIR%\backend.xml
+
+set JAVACMD=java
 
 %BASEDIR%\bin\indexer.bat --dbname=%DB% --basedir=%RUN_DIR% --cfgxml=%CFG% --logbr.dir=%LOGBR_TMP%
 
