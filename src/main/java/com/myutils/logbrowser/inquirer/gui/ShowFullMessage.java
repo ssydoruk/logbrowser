@@ -113,7 +113,7 @@ public class ShowFullMessage extends javax.swing.JFrame {
 
         spSplitPane.setDividerSize(2);
         spSplitPane.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
-        spSplitPane.setResizeWeight(0.5);
+        spSplitPane.setResizeWeight(0.95);
 
         pFullMessage.setLayout(new java.awt.BorderLayout());
         spSplitPane.setLeftComponent(pFullMessage);
