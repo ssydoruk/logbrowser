@@ -400,7 +400,8 @@ public class QueryDialog extends javax.swing.JFrame {
                             frm.setTitle(inquirer.getDialogTitle(theTitle));
 //                            ScreenInfo.setVisible(queryDialog, frm, true);
                             frm.setLocationRelativeTo(queryDialog);
-                            ScreenInfo.CenterWindowMaxWidth(queryDialog, frm);
+                            frm.setExtendedState(MAXIMIZED_BOTH);
+//                            ScreenInfo.CenterWindowMaxWidth(queryDialog, frm);
                             frm.setVisible(true);
                         }
                     } else {
