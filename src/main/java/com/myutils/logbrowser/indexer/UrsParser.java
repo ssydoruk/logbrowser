@@ -23,9 +23,12 @@ public class UrsParser extends Parser {
     private static final Pattern regRIRequestShort = Pattern.compile("^\\[19:10\\][^:]+: (.+), client=(\\d+)\\(([^\\)]+)\\).+ref=(\\d+)$");
     private static final Pattern regRIRequestShort1 = Pattern.compile("\\[19:10\\][^:]+: (.+), client=");
     private static final Pattern regRIResp = Pattern.compile("^\\[19:11\\].+'([\\w~]+)'.+ client (\\d+)\\(([\\w~]+)\\).+ref=(\\d+)$");
+    private static final Pattern regRIResp1 = Pattern.compile("^\\[19:11\\].+'([^']+)'.+client (\\d+)\\(([^\\)]+)\\).+ref=(\\d+)$");
     private static final Pattern regRICallStart = Pattern.compile("received: urs/call/start");
     private static final Pattern regRIConnIDGenerated = Pattern.compile("\\[19:10\\] connid ([\\w~]+).+client=(\\d+)\\(([^\\)]+)\\).+ref id=(\\d+), .+name=([\\w~]+)");
     private static final Pattern reIID = Pattern.compile("^\\s+IID:(\\w+)$");
+    private static final Pattern reRI_ConnID = Pattern.compile("^(\\w{16})$");
+    private static final Pattern reRI_UUID = Pattern.compile("^@(\\w+)$");
     //17:33:04.587_I_I_01d9027e17ef8b38 [09:05] >>>>>>>>>>>>resume interpretator(0), func:SuspendForDN
 //    _I_I_01d9027e17ef8b38 [09:04] ASSIGN: agent_target(LOCAL) <- STRING: "return:timeout"
 //    _I_I_01d9027e17ef8b38 [09:04] ASSIGN: N_attempt(LOCAL) <- INTEGER: 1
@@ -100,7 +103,7 @@ public class UrsParser extends Parser {
     private Message msgTmp; // storage for message in progress
     private GenesysMsg genesysMsg;
 
-    public UrsParser(DBTables  m_tables) {
+    public UrsParser(DBTables m_tables) {
         super(FileInfoType.type_URS, m_tables);
 
 //17:33:06.335_I_I_03350282382b556f [07:07] HERE IS TARGETS
@@ -262,6 +265,9 @@ public class UrsParser extends Parser {
         return true;
     }
 
+    protected static URLProcessor urlProcessor = new URLProcessor();
+
+
     private void ProcessRI(String s) throws Exception {
         Main.logger.trace("ProcessRI [" + s + "]");
 
@@ -277,6 +283,17 @@ public class UrsParser extends Parser {
             SetStdFieldsAndAdd(msg);
         } else if ((m = regRIResp.matcher(s)).find()) {
             Main.logger.trace("regRIResp");
+            msgTmp = new URSRI(fileInfo.getRecordID());
+            ((URSRI) msgTmp).setFunc(m.group(1));
+            ((URSRI) msgTmp).setClientID(m.group(2));
+            ((URSRI) msgTmp).setClientApp(m.group(3));
+            ((URSRI) msgTmp).setRefid(m.group(4));
+            msgTmp.SetInbound(false);
+
+            m_ParserState = ParserState.STATE_RI_RESPONSE;
+
+        } else if ((m = regRIResp1.matcher(s)).find()) {
+            Main.logger.trace("regRIResp1");
             msgTmp = new URSRI(fileInfo.getRecordID());
             ((URSRI) msgTmp).setFunc(m.group(1));
             ((URSRI) msgTmp).setClientID(m.group(2));
@@ -313,37 +330,53 @@ public class UrsParser extends Parser {
             String reqURIreq = m.group(1);
             msg.SetInbound(true);
 
+            String s1 = urlProcessor.processURL(reqURIreq);
+
             String[] split = StringUtils.split(reqURIreq, '/');
-            switch (split.length) {
-                case 4:
-                    //ConnID specified
-                    if (split[2].startsWith("@")) {
-                        msg.setUUID(split[2].substring(1));
-                    } else {
-                        msg.setConnID(split[2]);
-                    }
-                    msg.setFunc(split[3]);
-                    break;
-                case 3:
-                    msg.setFunc(split[2]);
-                    break;
-                case 5:
-                    if (split[3].equals("func") || split[3].equals("reply")) {
-                        msg.setFunc(split[4]);
-                        String id = "";
-                        if (split[2].startsWith("@")) {
-                            msg.setUUID(split[2].substring(1));
+            if (split.length > 1) {
+                if (StringUtils.compareIgnoreCase(split[0], "urs") == 0) {
+                    if (StringUtils.compareIgnoreCase(split[1], "call") == 0) {
+                        Matcher m1;
+                        if ((m1 = reRI_ConnID.matcher(split[2])).find()) {
+                            msg.setConnID(m1.group(1));
+                            msg.setFunc(((split.length > 2) ? StringUtils.joinWith("/", split[1], getFunc(split, 3)) : split[1]));
+                        } else if ((m1 = reRI_UUID.matcher(split[2])).find()) {
+                            msg.setUUID(m1.group(1));
+                            msg.setFunc(((split.length > 2) ? StringUtils.joinWith("/", split[1], getFunc(split, 3)) : split[1]));
+                        } else {
+                            msg.setFunc(((split.length > 2)
+                                    ?
+                                    ((StringUtils.compareIgnoreCase(split[2], "max") == 0)
+                                            ? StringUtils.joinWith("/", split[1], split[3])
+                                            :
+                                            StringUtils.joinWith("/", split[1], split[2])
+                                    )
+                                    : split[1]));
                         }
-                        break;
+                    } else if (StringUtils.startsWithIgnoreCase(split[1], "console")) {
+                        msg.setFunc("console");
+                    } else {
+                        msg.setFunc(((split.length > 2) ? StringUtils.joinWith("/", split[1],
+                                StringUtils.substringBefore(split[2], "?")) : split[1]));
                     }
-
-                default:
-                    Main.logger.info("Strange URI [" + reqURIreq + "] l=" + split.length + " line " + m_CurrentLine);
-                    break;
-            }
-
+                }
+            } else
+                Main.logger.info("Strange URI [" + reqURIreq + "] l=" + split.length + " line " + m_CurrentLine);
             SetStdFieldsAndAdd(msg);
         }
+    }
+
+    private String getFunc(String[] split, int startIdx) {
+        if (split.length >= startIdx) {
+            if (StringUtils.compareIgnoreCase(split[startIdx], "func") == 0) {
+                return ((split.length > startIdx) ? StringUtils.joinWith("/", split[startIdx],
+                        StringUtils.substringBefore(split[startIdx + 1], "?"))
+                        : StringUtils.substringBefore(split[startIdx], "?"));
+            }
+            else
+                return split[startIdx];
+        }
+        return "";
     }
 
     @Override
@@ -723,8 +756,7 @@ public class UrsParser extends Parser {
                             Main.logger.error("l:" + m_CurrentLine + "- Expected first line: [" + m_MessageContents.get(0) + "] not parsed");
                         }
                         SetStdFieldsAndAdd(msg);
-                    }
-                    else {
+                    } else {
                         Main.logger.error("Unexpected line: [" + str + "] after\n" + m_MessageContents.get(0));
                     }
                 }
@@ -992,7 +1024,7 @@ public class UrsParser extends Parser {
     }
 
     @Override
-    void init(DBTables  m_tables) {
+    void init(DBTables m_tables) {
         m_tables.put(TableType.URSAgentGroupTable.toString(), new URSAgentGroupTable(Main.getInstance().getM_accessor(), TableType.URSAgentGroupTable));
         m_tables.put(TableType.URSGenesysMessage.toString(), new GenesysUrsMsgTable(Main.getInstance().getM_accessor(), TableType.URSGenesysMessage));
     }

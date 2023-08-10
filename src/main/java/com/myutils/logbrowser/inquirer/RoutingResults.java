@@ -1646,6 +1646,7 @@ final public class RoutingResults extends IQueryResults {
     private TableQuery newURSRI(QueryDialog dlg) throws SQLException {
         TableQuery URSRI = new TableQuery(MsgType.URSRI, "ursri");
         URSRI.addRef("connidid", "connid", ReferenceType.ConnID.toString(), IQuery.FieldType.Optional);
+        URSRI.addRef("uuidid", "uuid", ReferenceType.UUID.toString(), IQuery.FieldType.Optional);
         URSRI.addRef("funcID", "func", ReferenceType.URSMETHOD.toString(), IQuery.FieldType.Optional);
         URSRI.addRef("subfuncID", "subfunc", ReferenceType.URSMETHOD.toString(), IQuery.FieldType.Optional);
         URSRI.addRef("clientappID", "client", ReferenceType.App.toString(), IQuery.FieldType.Optional);
