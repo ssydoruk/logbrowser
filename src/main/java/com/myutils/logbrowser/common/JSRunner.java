@@ -49,7 +49,7 @@ public class JSRunner {
      * @return true if record should be ignored (based on value of boolean
      * IGNORE_RECORD calculated by the script
      */
-    public static boolean evalFields(String script, ILogRecord rec, HashMap<String, Object> scriptFields) {
+    public static boolean evalFields(String script, ILogRecord rec, ScriptFields scriptFields) {
         Context cont = getInstance().getCondContext();
         Value bindings = cont.getBindings("js");
         bindings.putMember("RECORD", rec);

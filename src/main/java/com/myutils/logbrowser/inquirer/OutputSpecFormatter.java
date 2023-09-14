@@ -2,6 +2,7 @@ package com.myutils.logbrowser.inquirer;
 
 import Utils.FileWatcher;
 import com.myutils.logbrowser.common.JSRunner;
+import com.myutils.logbrowser.common.ScriptFields;
 import com.myutils.logbrowser.inquirer.gui.TabResultDataModel;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
@@ -842,7 +843,7 @@ public abstract class OutputSpecFormatter extends DefaultFormatter {
 
     class RecordLayout {
 
-        private final HashMap<String, Object> scriptFields = new HashMap<>();
+        private final ScriptFields scriptFields = new ScriptFields();
         private final String cfgFile;
         ArrayList<Parameter> parameters;
         String formatString;
@@ -967,7 +968,7 @@ public abstract class OutputSpecFormatter extends DefaultFormatter {
                     return "";
                 }
                 if (!scriptFields.isEmpty()) {
-                    for (Map.Entry<String, Object> entry : scriptFields.entrySet()) {
+                    for (Map.Entry<String, Object> entry : (Set<Map.Entry<String,Object>>)scriptFields.entrySet()) {
                         ps.addField(entry.getKey(), entry.getValue());
                     }
                 }
