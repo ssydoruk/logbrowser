@@ -14,7 +14,7 @@ import org.apache.logging.log4j.LogManager;
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import javax.swing.table.TableModel;
+import javax.swing.table.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
@@ -254,7 +254,8 @@ public class MyJTable extends JTableCommon {
     }
 
     void copyData(MyJTable tableView, boolean isFullClone) {
-            setModel(new TabResultDataModel(tableView, isFullClone));
+        setModel(new TabResultDataModel(tableView, isFullClone));
+        clearAllFilters();
     }
 
     public ShowFullMessage getFullMsg() {

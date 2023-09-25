@@ -140,13 +140,10 @@ abstract class JTableCommon extends JTablePopup {
         }
     }
 
-    private void doCancelFilters() {
-        int sel = popupRow;
-        if (sel >= 0) {
-            sel = convertRowIndexToModel(sel);
-        }
-        for (Integer key : columnFilters.keySet()) {
-            getColumnModel().getColumn(key).setHeaderRenderer(savedHeaderRenderer);
+    protected void clearAllFilters(){
+        TableCellRenderer defaultRenderer = getTableHeader().getDefaultRenderer();
+        for (int i = 0; i < getColumnModel().getColumnCount(); i++) {
+            getColumnModel().getColumn(i).setHeaderRenderer(defaultRenderer);
         }
 
         getTableHeader().repaint();
@@ -156,6 +153,15 @@ abstract class JTableCommon extends JTablePopup {
         tca.setResizeColumns(false);
         ((AbstractTableModel) getModel()).fireTableDataChanged();
         tca.setResizeColumns(resizeColumns);
+
+    }
+
+    private void doCancelFilters() {
+        clearAllFilters();
+        int sel = popupRow;
+        if (sel >= 0) {
+            sel = convertRowIndexToModel(sel);
+        }
         if (sel >= 0) {
             setRowSelectionInterval(sel, sel);
             scrollRectToVisible(new Rectangle(getCellRect(sel, 0, true)));

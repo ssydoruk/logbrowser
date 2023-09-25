@@ -1090,10 +1090,22 @@ public class TabResultDataModel extends AbstractTableModel {
         private int line;
         private long offset;
         private Pair<Color, Color> cellColor = null;
+
         private TableRow(TableRow tableRow) {
             this();
             for (Entry<Integer, Object> row : tableRow.rowData.entrySet()) {
-                rowData.put(row.getKey(), row.getValue());
+                Object val = row.getValue();
+                if (val != null) {
+                    if (val instanceof String) {
+                        if (StringUtils.isNotBlank((String) val))
+                            rowData.put(row.getKey(), val);
+                        else
+                            System.out.println("blank");
+                    } else
+                        rowData.put(row.getKey(), val);
+                } else {
+                    System.out.println("null");
+                }
             }
             setFileInfo(tableRow.FileName, tableRow.fileBytes, tableRow.line, tableRow.offset);
             rowType = tableRow.rowType;
@@ -1235,6 +1247,10 @@ public class TabResultDataModel extends AbstractTableModel {
                 rowData.put(columnIdx, data);
             }
         }
+
+        public void setFileInfo(TableRow tableRow) {
+            setFileInfo(tableRow.getFileName(), tableRow.getFileBytes(), tableRow.getLine(), tableRow.getOffset());
+        }
     }
 
     class FieldParams {
@@ -1242,6 +1258,7 @@ public class TabResultDataModel extends AbstractTableModel {
         private boolean hidden;
         private String title;
         private String type;
+
         public FieldParams() {
 
         }
