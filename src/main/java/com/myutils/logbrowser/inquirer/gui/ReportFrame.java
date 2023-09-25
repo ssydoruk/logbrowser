@@ -40,10 +40,14 @@ public class ReportFrame extends javax.swing.JFrame implements Cloneable {
     private static final org.apache.logging.log4j.Logger logger = LogManager.getLogger();
 
     public ReportFrame(ReportFrame theForm) throws HeadlessException {
+        this(theForm, true);
+    }
+
+    public ReportFrame(ReportFrame theForm, boolean isFullClone) throws HeadlessException {
         this();
         if (theForm != null) {
             setTitle(theForm.getTitle());
-            this.tableView.copyData(theForm.tableView);
+            this.tableView.copyData(theForm.tableView, isFullClone);
         }
     }
 
@@ -125,6 +129,9 @@ public class ReportFrame extends javax.swing.JFrame implements Cloneable {
         return toolbar.add(a);
     }
 
+    public JButton addToolbarButton(String name, String hint) {
+        return toolbar.addButton(name, hint);
+    }
     static Insets zeroInsets = new Insets(1, 1, 1, 1);
 
     public void setPrintStreams(PrintStreams ps) {

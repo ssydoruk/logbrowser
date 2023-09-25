@@ -19,9 +19,13 @@ public class ReportFrameQuery extends ReportFrame {
 
     protected ShowFullMessage fullMsg;
     private JCheckBox msgCheckBox;
+    private JPopupMenu clonePopup;
 
     public ReportFrameQuery(ReportFrameQuery frm) {
-        super(frm);
+        this(frm, true);
+    }
+    public ReportFrameQuery(ReportFrameQuery frm, boolean isFullClone) {
+        super(frm, isFullClone);
         createToolbar();
         this.fullMsg = new ShowFullMessage(this);
         tableView.setFullMsg(fullMsg);
@@ -100,22 +104,6 @@ public class ReportFrameQuery extends ReportFrame {
 
         }));
 
-//            bt = addButton("Search", "Go back to search dialog");
-//            bt.addActionListener(new ActionListener() {
-//                @Override
-//                public void actionPerformed(ActionEvent e) {
-//                    OpenSearch();
-//                }
-//
-//            });
-//            bt = addButton("Notepad++", "Go to notepad");
-//            bt.addActionListener(new ActionListener() {
-//                @Override
-//                public void actionPerformed(ActionEvent e) {
-//                    OpenNotepad();
-//                }
-//
-//            });
         addToolbarButton("Full", "Load full messages into editor", new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -123,13 +111,6 @@ public class ReportFrameQuery extends ReportFrame {
             }
 
         });
-//        addToolbarButton("Short", "Load short output messages into editor", new ActionListener() {
-//            @Override
-//            public void actionPerformed(ActionEvent e) {
-//                LoadShort();
-//            }
-//
-//        });
 
         this.msgCheckBox = new JCheckBox(new ShowMsgAction());
         addToolbarButton(msgCheckBox);
@@ -146,8 +127,37 @@ public class ReportFrameQuery extends ReportFrame {
 
         }));
 
-        addToolbarButton(new CloneAction());
+        addCloneButton();
         addToolbarButton(new InfoAction());
+
+    }
+
+    private void addCloneButton() {
+        JButton bt = addToolbarButton("Clone", "Duplicate current report window");
+
+        clonePopup = new JPopupMenu();
+        clonePopup.add(new JMenuItem(new AbstractAction("Full unfiltered") {
+            public void actionPerformed(ActionEvent e) {
+                ReportFrameQuery ch = new ReportFrameQuery((ReportFrameQuery) theForm);
+                ch.tableView.getTca().adjustColumns();
+                ch.setVisible(true);
+            }
+        }));
+        clonePopup.add(new JMenuItem(new AbstractAction("Current filtered") {
+            public void actionPerformed(ActionEvent e) {
+                ReportFrameQuery ch = new ReportFrameQuery((ReportFrameQuery) theForm, false);
+                ch.tableView.getTca().adjustColumns();
+                ch.setVisible(true);
+            }
+        }));
+
+        bt.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                clonePopup.show(e.getComponent(), e.getX(), e.getY());
+            }
+        });
+
 
     }
 
@@ -241,21 +251,6 @@ public class ReportFrameQuery extends ReportFrame {
         }
     }
 
-    private static class MyMouseAdapter extends MouseAdapter {
-
-        public MyMouseAdapter() {
-        }
-
-        @Override
-        public void mouseReleased(MouseEvent e) {
-            if (e.isPopupTrigger()) {
-                inquirer.logger.info("popup on button");
-            }
-
-        }
-
-    }
-
     class ShowMsgAction extends AbstractAction {
 
         public ShowMsgAction() {
@@ -298,26 +293,6 @@ public class ReportFrameQuery extends ReportFrame {
         }
     }
 
-    class CloneAction extends AbstractAction {
-
-        public CloneAction() {
-            super("Clone");
-            putValue(Action.SHORT_DESCRIPTION, "Duplicate current report window");
-//            putValue(Action.SELECTED_KEY, tableView.isFollowLog());
-
-            addMouseListener(new MyMouseAdapter() {
-            });
-
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            ReportFrameQuery ch = new ReportFrameQuery((ReportFrameQuery) theForm);
-            ch.tableView.getTca().adjustColumns();
-            ch.setVisible(true);
-        }
-
-    }
 
     class InfoAction extends AbstractAction {
 
@@ -326,8 +301,6 @@ public class ReportFrameQuery extends ReportFrame {
             putValue(Action.SHORT_DESCRIPTION, "Show report statistics");
 //            putValue(Action.SELECTED_KEY, tableView.isFollowLog());
 
-            addMouseListener(new MyMouseAdapter() {
-            });
 
         }
 
@@ -344,9 +317,6 @@ public class ReportFrameQuery extends ReportFrame {
             super("Copy");
             putValue(Action.SHORT_DESCRIPTION, "Copy to clipboard");
 //            putValue(Action.SELECTED_KEY, tableView.isFollowLog());
-
-            addMouseListener(new MyMouseAdapter() {
-            });
 
         }
 

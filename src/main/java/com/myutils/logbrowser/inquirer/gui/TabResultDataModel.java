@@ -59,21 +59,23 @@ public class TabResultDataModel extends AbstractTableModel {
     private ColumnParams columnParams;
     private TableRow currentRow = null;
 
-    TabResultDataModel(TabResultDataModel srcModel) {
+    TabResultDataModel(MyJTable srcTab, boolean isFullClone) {
+        super();
 //        this.columnIdxAdjusterType = new HashMap<>(srcModel.columnIdxAdjusterType);
         this.columnIdxAdjusterType = new HashMap<>();
 
-        this.columnsWithDataType = new HashMap(srcModel.columnsWithDataType);
+        this.columnsWithDataType = new HashMap(((TabResultDataModel) srcTab.getModel()).columnsWithDataType);
         this.tableData = new ArrayList<>();
-        copyData(tableData, srcModel.tableData);
+        copyData(tableData, srcTab, isFullClone);
 
-        this.columnTitle = new HashMap<>(srcModel.columnTitle);
-        columnParamsOrig = new ColumnParams(srcModel.columnParamsOrig);
+        this.columnTitle = new HashMap<>(((TabResultDataModel) srcTab.getModel()).columnTitle);
+        columnParamsOrig = new ColumnParams(((TabResultDataModel) srcTab.getModel()).columnParamsOrig);
         columnParams = new ColumnParams(columnParamsOrig);
 
     }
 
     public TabResultDataModel() {
+        super();
         this.columnIdxAdjusterType = new HashMap<>();
         this.columnsWithDataType = new HashMap();
 //        this.columnIdxAdjuster = new HashMap<>();
@@ -907,9 +909,19 @@ public class TabResultDataModel extends AbstractTableModel {
         });
     }
 
-    private void copyData(ArrayList<TableRow> dst, ArrayList<TableRow> src) {
-        for (TableRow tableRow : src) {
-            dst.add(new TableRow(tableRow));
+    private void copyData(ArrayList<TableRow> dst, MyJTable srcTab, boolean isFullClone) {
+        TabResultDataModel srcModel = (TabResultDataModel) srcTab.getModel();
+        if(isFullClone) {
+            for (TableRow tableRow : srcModel.tableData) {
+                dst.add(new TableRow(tableRow));
+            }
+        }
+        else {
+            for (int i = 0; i < srcModel.getRowCount(); i++) {
+                if(srcTab.convertRowIndexToView(i)>=0){
+                    dst.add(new TableRow(srcModel.tableData.get(i)));
+                }
+            }
         }
     }
 

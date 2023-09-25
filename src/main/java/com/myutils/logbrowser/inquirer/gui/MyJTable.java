@@ -22,7 +22,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import static javax.swing.JOptionPane.ERROR_MESSAGE;
-import org.apache.commons.lang3.StringUtils;
 
 /**
  * @author Stepan
@@ -139,12 +138,12 @@ public class MyJTable extends JTableCommon {
                     for (TabResultDataModel.FieldParams cp : hidden) {
                         menusAdded++;
                         jmAddFields.add(new AbstractAction(cp.menuName()) {
-                            @Override
-                            public void actionPerformed(ActionEvent e) {
-                                cp.setHidden(false);
-                                model.refreshTable();
-                            }
-                        }
+                                            @Override
+                                            public void actionPerformed(ActionEvent e) {
+                                                cp.setHidden(false);
+                                                model.refreshTable();
+                                            }
+                                        }
                         );
                     }
                 }
@@ -254,8 +253,8 @@ public class MyJTable extends JTableCommon {
 
     }
 
-    void copyData(MyJTable tableView) {
-        setModel(new TabResultDataModel((TabResultDataModel) tableView.getModel()));
+    void copyData(MyJTable tableView, boolean isFullClone) {
+            setModel(new TabResultDataModel(tableView, isFullClone));
     }
 
     public ShowFullMessage getFullMsg() {
@@ -287,12 +286,12 @@ public class MyJTable extends JTableCommon {
         if (regexFieldsSettings != null && !regexFieldsSettings.isEmpty()) {
             for (CustomField regexFieldsSetting : regexFieldsSettings) {
                 jmRegexFields.add(new AbstractAction(regexFieldsSetting.getName()) {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        model.addCustomColumn(regexFieldsSetting, popupRow);
+                                      @Override
+                                      public void actionPerformed(ActionEvent e) {
+                                          model.addCustomColumn(regexFieldsSetting, popupRow);
 
-                    }
-                }
+                                      }
+                                  }
                 );
             }
 
