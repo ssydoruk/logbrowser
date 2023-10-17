@@ -19,7 +19,7 @@ public class JsonMessage extends SIPServerBaseMessage {
     JSONObject m_contents;
 
     public JsonMessage(JSONObject contents, boolean m_handlerInProgress, int m_handlerId, int fileID) {
-        super(TableType.JSon,m_handlerInProgress,m_handlerId, fileID);
+        super(TableType.JSon, m_handlerInProgress, m_handlerId, fileID);
         m_contents = contents;
     }
 
@@ -81,6 +81,6 @@ public class JsonMessage extends SIPServerBaseMessage {
     }
 
     int getHanglerID() {
-        return (isM_handlerInProgress()  ? getHanglerID() : 0);
+        return (isM_handlerInProgress() ? getHanglerID() : 0);
     }
 }

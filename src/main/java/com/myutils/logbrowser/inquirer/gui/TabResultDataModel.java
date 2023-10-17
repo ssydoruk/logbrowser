@@ -911,14 +911,13 @@ public class TabResultDataModel extends AbstractTableModel {
 
     private void copyData(ArrayList<TableRow> dst, MyJTable srcTab, boolean isFullClone) {
         TabResultDataModel srcModel = (TabResultDataModel) srcTab.getModel();
-        if(isFullClone) {
+        if (isFullClone) {
             for (TableRow tableRow : srcModel.tableData) {
                 dst.add(new TableRow(tableRow));
             }
-        }
-        else {
+        } else {
             for (int i = 0; i < srcModel.getRowCount(); i++) {
-                if(srcTab.convertRowIndexToView(i)>=0){
+                if (srcTab.convertRowIndexToView(i) >= 0) {
                     dst.add(new TableRow(srcModel.tableData.get(i)));
                 }
             }

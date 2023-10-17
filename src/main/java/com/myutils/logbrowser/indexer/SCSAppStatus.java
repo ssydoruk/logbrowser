@@ -24,7 +24,7 @@ public class SCSAppStatus extends Message {
     private String status;
     private String host;
 
-    public SCSAppStatus( int fileID) {
+    public SCSAppStatus(int fileID) {
         super(TableType.SCSAppStatus, fileID);
     }
 

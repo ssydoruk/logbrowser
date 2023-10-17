@@ -4,10 +4,6 @@
  */
 package com.myutils.logbrowser.indexer;
 
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Timestamp;
-
 /**
  * @author ssydoruk
  * <p>
@@ -79,7 +75,6 @@ public class OCSStatEventTable extends DBTable {
         getM_dbAccessor().runQuery("create index if not exists OcsStatEv_DNID_" + getM_dbAccessor().getM_alias() + " on OcsStatEv_" + getM_dbAccessor().getM_alias() + " (DNID);");
         getM_dbAccessor().runQuery("create index if not exists OcsStatEv_StatTypeID_" + getM_dbAccessor().getM_alias() + " on OcsStatEv_" + getM_dbAccessor().getM_alias() + " (StatTypeID);");
     }
-
 
 
 }

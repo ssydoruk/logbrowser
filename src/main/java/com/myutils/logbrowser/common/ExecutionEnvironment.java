@@ -24,6 +24,7 @@ public class ExecutionEnvironment {
     private String dbname = "logbr";
     private String logbrowserDir;
     private boolean sqlPragma;
+
     public ExecutionEnvironment() {
         String _dir = System.getProperty("logbr.dir");
         if (StringUtils.isEmpty(_dir)) {

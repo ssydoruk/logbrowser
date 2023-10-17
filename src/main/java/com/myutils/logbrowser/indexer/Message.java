@@ -51,6 +51,7 @@ public abstract class Message extends Record {
         m_MessageLines = new ArrayList<>(1); // by default store only one line
 
     }
+
     public Message(TableType type, int fileID) {
         super(type, fileID);
         m_MessageLines = new ArrayList<>(1); // by default store only one line
@@ -782,7 +783,7 @@ public abstract class Message extends Record {
     }
 
     private String lookupAttribute(String s) {
-        if(m_MessageLines!=null)        {
+        if (m_MessageLines != null) {
             synchronized (m_MessageLines) {
                 if (s != null && s.length() > 0 && m_MessageLines != null && m_MessageLines.size() > 0) {
                     for (String m_MessageLine : m_MessageLines) {

@@ -4,10 +4,6 @@
  */
 package com.myutils.logbrowser.indexer;
 
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Timestamp;
-
 /**
  * @author ssydoruk
  * <p>
@@ -17,12 +13,12 @@ import java.sql.Timestamp;
 public class URSWaitingTable extends DBTable {
 
     public URSWaitingTable(SqliteAccessor dbaccessor, TableType t) {
-        super(dbaccessor, t,"urswaiting");
+        super(dbaccessor, t, "urswaiting");
     }
 
     @Override
     public void InitDB() {
-        
+
         addIndex("time");
         addIndex("FileId");
         addIndex("connIDID");
@@ -63,7 +59,6 @@ public class URSWaitingTable extends DBTable {
     public void FinalizeDB() throws Exception {
         createIndexes();
     }
-
 
 
 }

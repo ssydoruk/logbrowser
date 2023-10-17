@@ -9,7 +9,6 @@ import org.apache.commons.lang3.StringUtils;
 import javax.swing.*;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -80,6 +79,7 @@ public class SIPProxyParser extends Parser {
     // 0-tlib, 1-sip, 2-json
 
     String m_lastTime;
+    boolean m_handlerInProgress;
     private ParserState m_ParserState;
     private String msgName;
     private boolean inbound;
@@ -87,8 +87,9 @@ public class SIPProxyParser extends Parser {
     private boolean haMessage;
     private String handleAdd;
     private long lastSeqNo = 0;
+    private int m_handlerId;
 
-    public SIPProxyParser(DBTables  m_tables) {
+    public SIPProxyParser(DBTables m_tables) {
         super(FileInfoType.type_SessionController, m_tables);
         this.extraBuff = new ArrayList<>();
         //m_accessor = accessor;
@@ -210,14 +211,10 @@ public class SIPProxyParser extends Parser {
         }
     }
 
-    boolean m_handlerInProgress;
-    private int m_handlerId;
-
-
     String ParseLine(BufferedReaderCrLf input, String str) throws Exception {
         Matcher m;
 
-        m_handlerInProgress=false;
+        m_handlerInProgress = false;
         String s = str;
 
         Main.logger.trace("Parser state: " + m_ParserState);
@@ -245,7 +242,7 @@ public class SIPProxyParser extends Parser {
 
                 if ((m = regConfigOneLineDN.matcher(str)).find()) {
 //                    Main.logger.trace("-1-");
-                    ConfigUpdateRecord msg = new ConfigUpdateRecord(str,  fileInfo.getRecordID());
+                    ConfigUpdateRecord msg = new ConfigUpdateRecord(str, fileInfo.getRecordID());
                     try {
                         msg.setObjectType("DN");
                         msg.setObjectDBID(m.group(1));
@@ -578,7 +575,7 @@ public class SIPProxyParser extends Parser {
 //            PrintMsg(contents);
 //            return;
 //        }
-        msg = new SipMessage(contents,    TableType.SIP, m_handlerInProgress,  m_handlerId, fileInfo.getRecordID());
+        msg = new SipMessage(contents, TableType.SIP, m_handlerInProgress, m_handlerId, fileInfo.getRecordID());
 
         if (msg.GetFrom() == null) {
             Main.logger.error("LOG ERROR: no From in SIP message, ignore, line " + m_CurrentLine);
@@ -759,7 +756,7 @@ public class SIPProxyParser extends Parser {
             if (contentType != null && contentType.equals("application/x-genesys-mediaserver-status")
                     && contentEvent != null && contentEvent.equals("x-genesys-mediaserver-status")) {
                 Main.logger.debug("Cancel trigger on NOTIFY (Event=x-genesys-mediaserver-status)");
-                m_handlerInProgress=false;
+                m_handlerInProgress = false;
             }
         }
 
@@ -773,7 +770,7 @@ public class SIPProxyParser extends Parser {
 
     protected void AddCireqMessage(ArrayList contents, String header) throws Exception {
         Matcher m;
-        CIFaceRequest req = new CIFaceRequest(false, 0,  fileInfo.getRecordID());
+        CIFaceRequest req = new CIFaceRequest(false, 0, fileInfo.getRecordID());
 
         String[] headerList = header.split(" ");
         req.SetName(headerList[1]);
@@ -796,7 +793,7 @@ public class SIPProxyParser extends Parser {
     }
 
     private void AddConfigMessage(ArrayList<String> m_MessageContents) {
-        ConfigUpdateRecord msg = new ConfigUpdateRecord(m_MessageContents,  fileInfo.getRecordID());
+        ConfigUpdateRecord msg = new ConfigUpdateRecord(m_MessageContents, fileInfo.getRecordID());
         try {
             Matcher m;
             if (m_MessageContents.size() > 0 && (m = regSIPServerStartDN.matcher(m_MessageContents.get(0))).find()) {
@@ -832,7 +829,7 @@ public class SIPProxyParser extends Parser {
     }
 
     @Override
-    void init(DBTables  m_tables) {
+    void init(DBTables m_tables) {
     }
 
     enum ParserState {

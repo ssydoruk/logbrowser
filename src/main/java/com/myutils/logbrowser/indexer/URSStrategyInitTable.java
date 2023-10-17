@@ -4,22 +4,18 @@
  */
 package com.myutils.logbrowser.indexer;
 
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Timestamp;
-
 /**
  * @author ssydoruk
  */
 public class URSStrategyInitTable extends DBTable {
 
     public URSStrategyInitTable(SqliteAccessor dbaccessor, TableType t) {
-        super(dbaccessor, t,"URSSTRINIT_" + dbaccessor.getM_alias());
+        super(dbaccessor, t, "URSSTRINIT_" + dbaccessor.getM_alias());
     }
 
     @Override
     public void InitDB() {
-        
+
         addIndex("time");
         addIndex("FileId");
         addIndex("ConnIDID");

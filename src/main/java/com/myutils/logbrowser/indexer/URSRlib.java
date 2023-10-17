@@ -85,7 +85,7 @@ public final class URSRlib extends Message {
                             sid = GetCall();
                         } else if (message.equals("EventOnInvoke")) {
                             this.result = FindByRx(prnResult, 1, "");
-                            if(StringUtils.isNotBlank(result)) {
+                            if (StringUtils.isNotBlank(result)) {
                                 try {
                                     JSONObject _jsonBody = new JSONObject(result);
 
@@ -117,10 +117,9 @@ public final class URSRlib extends Message {
                                 } catch (JSONException ex) {
                                     Main.logger.info("Not JSON: [" + result + "]", ex);
                                 }
-                            }
-                            else {
-                                method="(UNKNOWN)";
-                                reqID=-1;
+                            } else {
+                                method = "(UNKNOWN)";
+                                reqID = -1;
                             }
                         }
                     }

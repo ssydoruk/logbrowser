@@ -5,22 +5,32 @@
  */
 package com.myutils.logbrowser.inquirer.gui;
 
-import static Utils.Util.pDuration;
-import java.util.List;
-import javax.swing.SwingWorker;
-import javax.swing.text.DefaultCaret;
 import org.apache.logging.log4j.LogManager;
 
+import javax.swing.*;
+import javax.swing.text.DefaultCaret;
+import java.util.List;
+
+import static Utils.Util.pDuration;
+
 /**
- *
  * @author ssydoruk
  */
 public class RequestProgress extends javax.swing.JDialog {
 
+    public static final Object dialogStarted = new Object();
     private static final org.apache.logging.log4j.Logger logger = LogManager.getLogger();
-
+    ElapsedTimer elapsedTimer = null;
     private MySwingWorker wrk;
-
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel3;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JButton jbCancel;
+    private javax.swing.JTextArea taMessages;
+    private javax.swing.JLabel tfSecondsElapsed;
     /**
      * Creates new form RequestProgress
      */
@@ -31,7 +41,6 @@ public class RequestProgress extends javax.swing.JDialog {
         DefaultCaret caret = (DefaultCaret) taMessages.getCaret();
         caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
     }
-
     public RequestProgress() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
@@ -102,8 +111,6 @@ public class RequestProgress extends javax.swing.JDialog {
 
     }//GEN-LAST:event_jbCancelActionPerformed
 
-    public static final Object dialogStarted = new Object();
-
     public void doShow() {
 
 //        synchronized (dialogStarted) {
@@ -123,6 +130,24 @@ public class RequestProgress extends javax.swing.JDialog {
 //            }
 //        }
     }
+
+    private void formWindowClosed(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosed
+//        inquirer.logger.info("Progress window closed");
+
+        if (elapsedTimer != null) {
+            elapsedTimer.cancel(true);
+            elapsedTimer = null;
+//            inquirer.logger.info("Canceling elapsed timer");
+        }
+    }//GEN-LAST:event_formWindowClosed
+
+    public void addProgress(List<String> chunks) {
+        for (String chunk : chunks) {
+            logger.trace("Displaying progress: " + chunk);
+            taMessages.append(chunk + "\n");
+        }
+    }
+    // End of variables declaration//GEN-END:variables
 
     class ElapsedTimer extends SwingWorker<Void, Integer> {
 
@@ -151,36 +176,6 @@ public class RequestProgress extends javax.swing.JDialog {
 //                    inquirer.logger.info("Elapsed timer: " + com.myutils.logbrowser.indexer.Main.pDuration(chunk.intValue() * 1000, false));
             }
             tfSecondsElapsed.repaint();
-        }
-    }
-
-    ElapsedTimer elapsedTimer = null;
-
-    private void formWindowClosed(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosed
-//        inquirer.logger.info("Progress window closed");
-
-        if (elapsedTimer != null) {
-            elapsedTimer.cancel(true);
-            elapsedTimer = null;
-//            inquirer.logger.info("Canceling elapsed timer");
-        }
-    }//GEN-LAST:event_formWindowClosed
-
-    // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel2;
-    private javax.swing.JPanel jPanel3;
-    private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JButton jbCancel;
-    private javax.swing.JTextArea taMessages;
-    private javax.swing.JLabel tfSecondsElapsed;
-    // End of variables declaration//GEN-END:variables
-
-    public void addProgress(List<String> chunks) {
-        for (String chunk : chunks) {
-            logger.trace("Displaying progress: " + chunk);
-            taMessages.append(chunk + "\n");
         }
     }
 }

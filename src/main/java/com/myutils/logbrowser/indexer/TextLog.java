@@ -49,12 +49,11 @@ public final class TextLog extends LogFileWrapper {
 
     @Override
     InputStream getInputStream(FileInfo aThis) throws FileNotFoundException {
-        if(stream==null) {
+        if (stream == null) {
             try {
                 startParsing();
-            }
-            catch (Exception e){
-                logger.error("Not able to start parsing"+e.getMessage());
+            } catch (Exception e) {
+                logger.error("Not able to start parsing" + e.getMessage());
                 throw new FileNotFoundException(e.getMessage());
             }
         }

@@ -69,16 +69,16 @@ final public class IsccQuery extends IQuery {
         StringBuilder qString = new StringBuilder();
 
         qString.append("SELECT tlib.id,"
-                + "tlib.time,"
-                + "tlib.FileId,"
-                + "tlib.FileOffset,"
-                + "tlib.FileBytes,"
-                + "tlib.line,"
-                + "tlib.Inbound,"
-                + "tlib.HandlerId,"
-                + "tlib.ReferenceId,"
-                + "tlib.thisDNID,"
-                + "tlib.otherDNID,")
+                        + "tlib.time,"
+                        + "tlib.FileId,"
+                        + "tlib.FileOffset,"
+                        + "tlib.FileBytes,"
+                        + "tlib.line,"
+                        + "tlib.Inbound,"
+                        + "tlib.HandlerId,"
+                        + "tlib.ReferenceId,"
+                        + "tlib.thisDNID,"
+                        + "tlib.otherDNID,")
                 .append(" file.name AS filename, file.arcname as arcname, file.fileno as fileno, file.appnameid as appnameid,\n")
                 .append(" 0 as anchorid,null as seqno, file.component as component, app00.name as app, file.nodeId as nodeid ")
                 .append(getRefFields())
@@ -172,12 +172,9 @@ final public class IsccQuery extends IQuery {
             }
             if (seachRef) {
                 tmpIDs = new HashSet<>();
-                setRecLoadedProc(new IQuery.IRecordLoadedProc() {
-                    @Override
-                    public void recordLoaded(ILogRecord rec) {
-                        addUnique(tmpIDs, ((TLibEvent) rec).GetReferenceId());
-                    }
-                });
+                setRecLoadedProc((ILogRecord rec) ->
+                        addUnique(tmpIDs, ((TLibEvent) rec).GetReferenceId())
+                );
             } else {
                 tmpIDs = null;
             }

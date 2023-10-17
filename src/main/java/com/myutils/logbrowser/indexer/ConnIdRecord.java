@@ -20,13 +20,13 @@ public class ConnIdRecord extends SIPServerBaseMessage {
     private String newID;
 
     ConnIdRecord(String oldId, String newId, boolean b, boolean m_handlerInProgress, int m_handlerId, int fileID) {
-        this(oldId, b,  m_handlerInProgress,  m_handlerId,  fileID);
+        this(oldId, b, m_handlerInProgress, m_handlerId, fileID);
         this.newID = newId;
 //        Main.logger.info("ConnIdRecord: ["+oldId+"] new["+newId+"]");
     }
 
     public ConnIdRecord(String connId, boolean created, boolean m_handlerInProgress, int m_handlerId, int fileID) {
-        super(TableType.ConnID,  m_handlerInProgress,  m_handlerId, fileID);
+        super(TableType.ConnID, m_handlerInProgress, m_handlerId, fileID);
         this.isTemp = false;
         m_connId = connId;
         m_created = created;
@@ -54,8 +54,8 @@ public class ConnIdRecord extends SIPServerBaseMessage {
         stmt.setInt(5, getM_line());
 
         setFieldInt(stmt, 6, Main.getRef(ReferenceType.ConnID, getM_connId()));
-        stmt.setInt(7, (isM_handlerInProgress()  ? getM_handlerId() : 0));
-        Main.logger.trace("m_handlerId :" +  getM_handlerId() + " m_handlerInProgress" + isM_handlerInProgress());
+        stmt.setInt(7, (isM_handlerInProgress() ? getM_handlerId() : 0));
+        Main.logger.trace("m_handlerId :" + getM_handlerId() + " m_handlerInProgress" + isM_handlerInProgress());
 
         stmt.setBoolean(8, isM_created());
         stmt.setBoolean(9, isIsTemp());

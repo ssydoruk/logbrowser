@@ -4,10 +4,6 @@
  */
 package com.myutils.logbrowser.indexer;
 
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Timestamp;
-
 /**
  * @author ssydoruk
  * <p>
@@ -17,12 +13,12 @@ import java.sql.Timestamp;
 public class SCSAppStatusTable extends DBTable {
 
     public SCSAppStatusTable(SqliteAccessor dbaccessor) {
-        super(dbaccessor, TableType.SCSAppStatus,"SCS_appStatus");
+        super(dbaccessor, TableType.SCSAppStatus, "SCS_appStatus");
     }
 
     @Override
     public void InitDB() {
-        
+
         addIndex("time");
         addIndex("FileId");
         addIndex("newModeID");
@@ -76,7 +72,6 @@ public class SCSAppStatusTable extends DBTable {
     public void FinalizeDB() throws Exception {
         createIndexes();
     }
-
 
 
 }

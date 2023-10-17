@@ -4,10 +4,6 @@
  */
 package com.myutils.logbrowser.indexer;
 
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Timestamp;
-
 /**
  * @author ssydoruk
  * <p>
@@ -66,8 +62,6 @@ public class GenesysMsgTable extends DBTable {
         getM_dbAccessor().runQuery("drop index if exists " + tabName() + "_levelID;");
         getM_dbAccessor().runQuery("drop index if exists " + tabName() + "_MSGID;");
     }
-
-
 
 
 }

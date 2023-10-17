@@ -4,14 +4,12 @@
  */
 package com.myutils.logbrowser.indexer;
 
-import static com.myutils.logbrowser.indexer.Main.m_component;
-import static java.lang.System.arraycopy;
+import org.apache.commons.io.FilenameUtils;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Paths;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
@@ -20,13 +18,13 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
-import org.apache.commons.io.FilenameUtils;
+import static com.myutils.logbrowser.indexer.Main.m_component;
+import static java.lang.System.arraycopy;
 
 /**
  * @author ssydoruk
@@ -100,6 +98,8 @@ public final class FileInfo extends Record {
     private DateParsed fileStartTime;
     private boolean ignoring = false;
     private FileInfoType m_componentTypeSuspect = FileInfoType.type_Unknown;
+    private byte[] startBuf = null;
+
 
     FileInfo(File file, LogFileWrapper wrapper) throws IOException {
         this(file);
@@ -108,11 +108,6 @@ public final class FileInfo extends Record {
         fileDir = new File(filePath).getParent();
         this.logFile = wrapper;
 
-    }
-
-
-    public String getAppID() {
-        return getAppName() + "-" + m_componentType.toString();
     }
 
     FileInfo(ZipFile logArchive, ZipEntry entry, ZIPLog aThis) throws IOException {
@@ -149,11 +144,13 @@ public final class FileInfo extends Record {
         dateParsers = new DateParsers();
     }
 
+    public String getAppID() {
+        return getAppName() + "-" + m_componentType.toString();
+    }
+
     public String getArchiveName() {
         return archiveName;
     }
-
-    private byte[] startBuf = null;
 
     public byte[] getStartBuf() throws IOException {
         if (startBuf == null) {
@@ -188,23 +185,22 @@ public final class FileInfo extends Record {
             return myReadBytes == otherReadBytes
                     && Arrays.equals(myBuf, otherBuf);
         } else if (getM_componentType() == FileInfoType.type_WWE) {
-                String myLf = getLogFileName();
-                String otherLf = otherFile.getLogFileName();
+            String myLf = getLogFileName();
+            String otherLf = otherFile.getLogFileName();
 
-                if (myLf != null && !myLf.isEmpty()
-                        && otherLf != null && !otherLf.isEmpty()) {
-                    return myLf.equals(otherLf);
-                }
-                else {
-                    if (getStartTime() != 0) {
-                        boolean ret = getStartTime() == otherFile.getStartTime();
-                        if (ret == true) {
-                            return getFileLocalTime() == otherFile.getFileLocalTime();
-                        } else {
-                            return false;
-                        }
-
+            if (myLf != null && !myLf.isEmpty()
+                    && otherLf != null && !otherLf.isEmpty()) {
+                return myLf.equals(otherLf);
+            } else {
+                if (getStartTime() != 0) {
+                    boolean ret = getStartTime() == otherFile.getStartTime();
+                    if (ret == true) {
+                        return getFileLocalTime() == otherFile.getFileLocalTime();
+                    } else {
+                        return false;
                     }
+
+                }
 
             }
         } else {
@@ -407,7 +403,7 @@ public final class FileInfo extends Record {
                     + File.separatorChar + m_name;
         else
             logFileName = ((new File(FilenameUtils.normalize(this.filePath))).getParentFile().getName())
-                    + File.separatorChar + m_name+"."+fileStartTime.fmtDate.format(DateTimeFormatter.ofPattern("yyyyddmm_kkmmss.SSS"));
+                    + File.separatorChar + m_name + "." + fileStartTime.fmtDate.format(DateTimeFormatter.ofPattern("yyyyddmm_kkmmss.SSS"));
         setM_app(fileDir);
         m_host = fileDir;
 

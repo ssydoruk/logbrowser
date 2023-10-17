@@ -6,8 +6,6 @@ package com.myutils.logbrowser.indexer;
 
 import org.apache.commons.lang3.StringUtils;
 
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -28,7 +26,7 @@ public abstract class DBTable {
     private String fileIDField;
 
     public DBTable(SqliteAccessor dbaccessor, TableType type, String tabName) {
-        m_dbAccessor =  dbaccessor;
+        m_dbAccessor = dbaccessor;
         m_type = type;
         setTabName(tabName);
         idxFields = new ArrayList();
@@ -36,18 +34,20 @@ public abstract class DBTable {
 
     }
 
-    public DBTable(SqliteAccessor dbaccessor, TableType type)  {
-        this(dbaccessor,type, type.toString());
+    public DBTable(SqliteAccessor dbaccessor, TableType type) {
+        this(dbaccessor, type, type.toString());
     }
-    public DBTable(SqliteAccessor dbaccessor, String tabName){
+
+    public DBTable(SqliteAccessor dbaccessor, String tabName) {
         this(dbaccessor, TableType.UNKNOWN, tabName);
     }
-    public DBTable(SqliteAccessor dbaccessor)  {
+
+    public DBTable(SqliteAccessor dbaccessor) {
         this(dbaccessor, TableType.UNKNOWN);
     }
     //ID
 
-    private void initID()  {
+    private void initID() {
         synchronized (m_dbAccessor) {
             String tabName1 = getTabName();
             try {
@@ -198,6 +198,6 @@ public abstract class DBTable {
     }
 
     public void addCnt(int cnt) {
-        recordsAdded+=cnt;
+        recordsAdded += cnt;
     }
 }

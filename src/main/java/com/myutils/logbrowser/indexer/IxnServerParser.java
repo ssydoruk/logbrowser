@@ -29,7 +29,8 @@ public class IxnServerParser extends Parser {
     private static final HashSet<String> nonIxnMsg = getNonIxnMsg();
     HashMap<String, String> prevSeqno = new HashMap();
     private ParserState m_ParserState;
-    IxnServerParser(DBTables  m_tables) {
+
+    IxnServerParser(DBTables m_tables) {
         super(FileInfoType.type_IxnServer, m_tables);
     }
 
@@ -40,9 +41,9 @@ public class IxnServerParser extends Parser {
     }
 
     private void AddIxnMessage() {
-        Ixn msg = new Ixn(m_MessageContents,  fileInfo.getRecordID());
+        Ixn msg = new Ixn(m_MessageContents, fileInfo.getRecordID());
         if (nonIxnMsg.contains(msg.GetMessageName())) {
-            IxnNonIxn nonIxn = new IxnNonIxn(TableType.IxnNonIxn, msg,  fileInfo.getRecordID());
+            IxnNonIxn nonIxn = new IxnNonIxn(TableType.IxnNonIxn, msg, fileInfo.getRecordID());
             SetStdFieldsAndAdd(nonIxn);
 
         } else {
@@ -138,7 +139,7 @@ public class IxnServerParser extends Parser {
                     m_ParserState = ParserState.STATE_TMESSAGE;
                     break;
                 } else if ((m = regDBActivity.matcher(s)).find()) {
-                    IxnDBActivity msg = new IxnDBActivity(m.group(1), m.group(2), m.group(3),  fileInfo.getRecordID());
+                    IxnDBActivity msg = new IxnDBActivity(m.group(1), m.group(2), m.group(3), fileInfo.getRecordID());
                     SetStdFieldsAndAdd(msg);
                     break;
                 }
@@ -364,7 +365,7 @@ public class IxnServerParser extends Parser {
     }
 
     @Override
-    void init(DBTables  m_tables) {
+    void init(DBTables m_tables) {
         m_tables.put(TableType.IxnNonIxn.toString(), new IxnNonIxnTable(Main.getInstance().getM_accessor(), TableType.IxnNonIxn));
 
     }

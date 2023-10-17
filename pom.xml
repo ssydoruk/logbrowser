@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.myutils</groupId>
     <artifactId>logbrowser</artifactId>
@@ -119,13 +120,13 @@
             <version>21.3.7</version>
             <type>jar</type>
         </dependency>
-	<!-- https://mvnrepository.com/artifact/org.graalvm.js/js 
-	Only used when running on traditional non-graal GVM -->
-	<dependency>
-    <groupId>org.graalvm.js</groupId>
-    <artifactId>js</artifactId>
-    <version>21.3.7</version>
-</dependency>
+        <!-- https://mvnrepository.com/artifact/org.graalvm.js/js
+        Only used when running on traditional non-graal GVM -->
+        <dependency>
+            <groupId>org.graalvm.js</groupId>
+            <artifactId>js</artifactId>
+            <version>21.3.7</version>
+        </dependency>
 
         <dependency>
             <groupId>org.jetbrains</groupId>
@@ -142,7 +143,7 @@
     </dependencies>
     <dependencyManagement>
         <dependencies>
-           <dependency>
+            <dependency>
                 <groupId>com.mycompany</groupId>
                 <artifactId>Utils</artifactId>
                 <version>1.0</version>

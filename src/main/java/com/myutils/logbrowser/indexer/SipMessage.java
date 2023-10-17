@@ -104,7 +104,7 @@ public class SipMessage extends SIPServerBaseMessage {
 
     @Override
     public boolean fillStat(PreparedStatement stmt) throws SQLException {
-        if (getM_type().equals( SIP.toString())) {
+        if (getM_type().equals(SIP.toString())) {
             stmt.setInt(1, getRecordID());
             stmt.setTimestamp(2, new Timestamp(GetAdjustedUsecTime()));
             stmt.setBoolean(3, isInbound());
@@ -128,7 +128,7 @@ public class SipMessage extends SIPServerBaseMessage {
             setFieldInt(stmt, 19, getM_line());
             setFieldInt(stmt, 20, Main.getRef(ReferenceType.UUID, getUUID()));
             setFieldInt(stmt, 21, Main.getRef(ReferenceType.DN, transformDN(SingleQuotes(getRequestURIDN()))));
-        } else if (getM_type().equals( SIPEP.toString())) {
+        } else if (getM_type().equals(SIPEP.toString())) {
             stmt.setTimestamp(1, new Timestamp(GetAdjustedUsecTime()));
             stmt.setBoolean(2, isInbound());
             setFieldInt(stmt, 3, Main.getRef(ReferenceType.SIPMETHOD, GetName()));
@@ -152,7 +152,7 @@ public class SipMessage extends SIPServerBaseMessage {
             setFieldInt(stmt, 19, Main.getRef(ReferenceType.DN, transformDN(SingleQuotes(getRequestURIDN()))));
             setFieldInt(stmt, 20, Main.getRef(ReferenceType.SIPURI, getSipURI()));
 
-        } else if (getM_type().equals( SIPMS.toString())) {
+        } else if (getM_type().equals(SIPMS.toString())) {
             stmt.setTimestamp(1, new Timestamp(GetAdjustedUsecTime()));
             stmt.setBoolean(2, isInbound());
             setFieldInt(stmt, 3, Main.getRef(ReferenceType.SIPMETHOD, GetName()));

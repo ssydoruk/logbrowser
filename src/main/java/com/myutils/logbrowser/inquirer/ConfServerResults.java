@@ -7,7 +7,6 @@ import com.myutils.logbrowser.indexer.FileInfoType;
 import com.myutils.logbrowser.indexer.ReferenceType;
 import com.myutils.logbrowser.indexer.TableType;
 import com.myutils.logbrowser.inquirer.IQuery.FieldType;
-import com.myutils.logbrowser.inquirer.IQuery.IRecordLoadedProc;
 
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
@@ -215,15 +214,11 @@ public class ConfServerResults extends IQueryResults {
                 wh.addWhere(getWhere("userNameID", iDs), "OR");
                 CSUpdates.addWhere(wh);
             }
-            CSUpdates.setRecLoadedProc(new IRecordLoadedProc() {
-                @Override
-                public void recordLoaded(ILogRecord rec) {
-                    addUnique(refIDs, Util.intOrDef(rec.GetField("refID"), (Integer) null));
-                    addUnique(appNameIDs, Util.intOrDef(rec.GetField("theAppNameID"), (Integer) null));
-                    addUnique(ids, rec.getID());
+            CSUpdates.setRecLoadedProc((ILogRecord rec) -> {
+                addUnique(refIDs, Util.intOrDef(rec.GetField("refID"), (Integer) null));
+                addUnique(appNameIDs, Util.intOrDef(rec.GetField("theAppNameID"), (Integer) null));
+                addUnique(ids, rec.getID());
 //                            addUnique(idFiles, rec.GetFileId());
-                }
-
             });
 
             CSUpdates.AddCheckedWhere(CSUpdates.getTabAlias() + ".opID",

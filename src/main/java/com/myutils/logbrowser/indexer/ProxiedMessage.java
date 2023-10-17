@@ -7,7 +7,6 @@ package com.myutils.logbrowser.indexer;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static Utils.Util.intOrDef;
@@ -24,7 +23,15 @@ public class ProxiedMessage extends Message {
     private final String event;
     private final String contents;
 
- private int m_tlibId;
+    private int m_tlibId;
+    private int m_handlerId;
+
+    public ProxiedMessage(String evName, String contents, int fileID) {
+        super(TableType.TLibProxied, contents, fileID);
+        this.event = evName;
+        this.contents = contents;
+
+    }
 
     public int getM_tlibId() {
         return m_tlibId;
@@ -40,15 +47,6 @@ public class ProxiedMessage extends Message {
 
     public void setM_handlerId(int m_handlerId) {
         this.m_handlerId = m_handlerId;
-    }
-
-    private int m_handlerId;
-
-    public ProxiedMessage(String evName, String contents, int fileID) {
-        super(TableType.TLibProxied, contents, fileID);
-        this.event = evName;
-        this.contents = contents;
-
     }
 
     public String getEvent() {
@@ -89,7 +87,7 @@ public class ProxiedMessage extends Message {
         setFieldInt(stmt, 9, Main.getRef(ReferenceType.App, getFrom()));
         setFieldInt(stmt, 10, Main.getRef(ReferenceType.DN, cleanDN(getDn())));
         stmt.setInt(11, getM_tlibId());
-        stmt.setInt(12,getM_handlerId());
+        stmt.setInt(12, getM_handlerId());
         return true;
 
     }

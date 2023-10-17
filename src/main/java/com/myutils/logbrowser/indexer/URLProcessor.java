@@ -8,7 +8,6 @@ package com.myutils.logbrowser.indexer;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.*;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static com.myutils.logbrowser.indexer.Parser.genList;
@@ -39,7 +38,7 @@ public class URLProcessor {
         return queryValues.get(key);
     }
 
-    public  String processURL(String u) {
+    public String processURL(String u) {
         try {
 
             queryValues.clear();

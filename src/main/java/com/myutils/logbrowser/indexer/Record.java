@@ -8,7 +8,6 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.IntUnaryOperator;
@@ -38,7 +37,7 @@ public abstract class Record implements Cloneable {
     public Record(String type, int fileID) {
         this.fileID = fileID;
         recordID = getAtomicInteger(type).incrementAndGet();
-        m_type=type;
+        m_type = type;
         Main.logger.trace("Creating record type " + type);
         objCreated++;
     }
@@ -102,6 +101,14 @@ public abstract class Record implements Cloneable {
         m_alias = alias;
     }
 
+    static public void setFieldString(PreparedStatement stmt, int i, String ref) throws SQLException {
+        if (ref != null) {
+            stmt.setString(i, ref);
+        } else {
+            stmt.setNull(i, java.sql.Types.CHAR);
+        }
+    }
+
     public int getFileID() {
         return fileID;
     }
@@ -132,7 +139,6 @@ public abstract class Record implements Cloneable {
 //        ret.m_FileBytes=m_FileBytes;
         return ret;
     }
-
 
     @Override
     public String toString() {
@@ -179,10 +185,6 @@ public abstract class Record implements Cloneable {
         this.m_FileBytes = m_FileBytes;
     }
 
-    public void SetLine(int line) {
-        m_line = line;
-    }
-
 //    protected void AddToDB(DBTables  m_tables) throws Exception {
 //        DBTable tab = m_tables.get(getM_type());
 //        if (tab != null) {
@@ -198,6 +200,10 @@ public abstract class Record implements Cloneable {
 //            throw new Exception("table not found for " + getM_type().toString());
 //        }
 //    }
+
+    public void SetLine(int line) {
+        m_line = line;
+    }
 
     /**
      * @return the m_type
@@ -264,15 +270,6 @@ public abstract class Record implements Cloneable {
             stmt.setNull(i, java.sql.Types.BIGINT);
         }
     }
-
-    static public void setFieldString(PreparedStatement stmt, int i, String ref) throws SQLException {
-        if (ref != null) {
-            stmt.setString(i, ref);
-        } else {
-            stmt.setNull(i, java.sql.Types.CHAR);
-        }
-    }
-
 
     public abstract boolean fillStat(PreparedStatement stmt) throws SQLException;
 }

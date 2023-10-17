@@ -5,7 +5,6 @@
  */
 package com.myutils.logbrowser.indexer;
 
-import java.util.HashMap;
 import java.util.regex.Pattern;
 
 /**
@@ -37,7 +36,7 @@ abstract class WebParser extends Parser {
 
     protected static URLProcessor urlProcessor = new URLProcessor();
 
-    public WebParser(FileInfoType type, DBTables  tables) {
+    public WebParser(FileInfoType type, DBTables tables) {
         super(type, tables);
         initURLProcessor();
 

@@ -4,10 +4,6 @@
  */
 package com.myutils.logbrowser.indexer;
 
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Timestamp;
-
 /**
  * @author ssydoruk
  * <p>
@@ -17,12 +13,12 @@ import java.sql.Timestamp;
 public class TemplateTable extends DBTable {
 
     public TemplateTable(SqliteAccessor dbaccessor, TableType t) {
-        super(dbaccessor, t,"cfg");
+        super(dbaccessor, t, "cfg");
     }
 
     @Override
     public void InitDB() {
-        
+
         addIndex("time");
         addIndex("FileId");
 

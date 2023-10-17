@@ -61,7 +61,7 @@ public class RMParser extends Parser {
     private boolean inbound;
     private DateParsed dpHeader;
 
-    public RMParser(DBTables  m_tables) {
+    public RMParser(DBTables m_tables) {
         super(FileInfoType.type_RM, m_tables);
         this.extraBuff = new ArrayList<>();
         //m_accessor = accessor;
@@ -440,7 +440,7 @@ public class RMParser extends Parser {
                 contents.add(0, SIPmsg);
             }
         }
-        msg = new SipMessage(contents, TableType.SIPMS,  fileInfo.getRecordID());
+        msg = new SipMessage(contents, TableType.SIPMS, fileInfo.getRecordID());
 
         if (msg.GetFrom() == null) {
             Main.logger.error("LOG ERROR: no From in SIP message, ignore, line " + m_CurrentLine);
@@ -465,7 +465,7 @@ public class RMParser extends Parser {
     }
 
     private void AddConfigMessage(ArrayList<String> m_MessageContents) {
-        ConfigUpdateRecord msg = new ConfigUpdateRecord(m_MessageContents,  fileInfo.getRecordID());
+        ConfigUpdateRecord msg = new ConfigUpdateRecord(m_MessageContents, fileInfo.getRecordID());
         try {
             Matcher m;
             if (m_MessageContents.size() > 0 && (m = regSIPServerStartDN.matcher(m_MessageContents.get(0))).find()) {
@@ -487,7 +487,7 @@ public class RMParser extends Parser {
     }
 
     @Override
-    void init(DBTables  m_tables) {
+    void init(DBTables m_tables) {
     }
 
     enum ParserState {

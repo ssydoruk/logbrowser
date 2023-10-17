@@ -16,15 +16,18 @@ public class Trigger extends Record {
     int m_msgId;
     private String m_text;
 
+    Trigger(int fileID, SingleThreadParser singleThreadParser) {
+        super(TableType.Trigger, fileID);
+        parser = singleThreadParser;
+    }
+
     public int getM_handlerId() {
         return parser.getM_handlerId();
     }
 
-
     public int getM_sipId() {
         return parser.getM_sipId();
     }
-
 
     public int getM_tlibId() {
         return parser.getM_tlibId();
@@ -32,12 +35,6 @@ public class Trigger extends Record {
 
     public int getM_jsonId() {
         return parser.getM_jsonId();
-    }
-
-
-    Trigger(int fileID, SingleThreadParser singleThreadParser) {
-        super(TableType.Trigger, fileID);
-        parser = singleThreadParser;
     }
 
     @Override

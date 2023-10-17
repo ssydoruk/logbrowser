@@ -78,6 +78,7 @@ public enum FileInfoType {
     }
 
     private final int value;
+
     FileInfoType(int value) {
         this.value = value;
     }

@@ -1,21 +1,17 @@
 package com.myutils.logbrowser.indexer;
 
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Timestamp;
-
 /**
  * @author akolo
  */
 public class StSRequestHistoryTable extends DBTable {
 
     public StSRequestHistoryTable(SqliteAccessor dbaccessor, TableType t) {
-        super(dbaccessor, t,"STSREQHISTORY_" + dbaccessor.getM_alias());
+        super(dbaccessor, t, "STSREQHISTORY_" + dbaccessor.getM_alias());
     }
 
     @Override
     public void InitDB() {
-        
+
         addIndex("time");
         addIndex("FileId");
         addIndex(new String[]{"clnameid", "rid"});

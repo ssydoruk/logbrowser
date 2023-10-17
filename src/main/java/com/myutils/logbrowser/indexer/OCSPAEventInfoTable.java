@@ -4,10 +4,6 @@
  */
 package com.myutils.logbrowser.indexer;
 
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Timestamp;
-
 /**
  * @author ssydoruk
  * <p>
@@ -17,12 +13,12 @@ import java.sql.Timestamp;
 public class OCSPAEventInfoTable extends DBTable {
 
     public OCSPAEventInfoTable(SqliteAccessor dbaccessor, TableType t) {
-        super(dbaccessor, t,"OCSPAEVI_" + dbaccessor.getM_alias());
+        super(dbaccessor, t, "OCSPAEVI_" + dbaccessor.getM_alias());
     }
 
     @Override
     public void InitDB() {
-        
+
         addIndex("FileId");
         addIndex("time");
         addIndex("cgDBID");

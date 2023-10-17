@@ -1,13 +1,16 @@
 {
-    "version": "2.0.0",
-    "command": "node",
-    "type": "shell",
-
-    "args": ["--jvm"],
-    "tasks": [{
-        "label": "My Task",
-        "type": "process",
-        "command": "echo Hello",
-        "problemMatcher": []
-    }]
+  "version": "2.0.0",
+  "command": "node",
+  "type": "shell",
+  "args": [
+    "--jvm"
+  ],
+  "tasks": [
+    {
+      "label": "My Task",
+      "type": "process",
+      "command": "echo Hello",
+      "problemMatcher": []
+    }
+  ]
 }

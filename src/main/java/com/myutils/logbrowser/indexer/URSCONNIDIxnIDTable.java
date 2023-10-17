@@ -4,22 +4,18 @@
  */
 package com.myutils.logbrowser.indexer;
 
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Timestamp;
-
 /**
  * @author ssydoruk
  */
 public class URSCONNIDIxnIDTable extends DBTable {
 
     public URSCONNIDIxnIDTable(SqliteAccessor dbaccessor, TableType t) {
-        super(dbaccessor, t,"URSConnIDIxnID");
+        super(dbaccessor, t, "URSConnIDIxnID");
     }
 
     @Override
     public void InitDB() {
-        
+
         addIndex("time");
         addIndex("FileId");
         addIndex("connid");

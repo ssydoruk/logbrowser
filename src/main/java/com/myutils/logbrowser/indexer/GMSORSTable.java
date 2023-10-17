@@ -4,17 +4,13 @@
  */
 package com.myutils.logbrowser.indexer;
 
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Timestamp;
-
 /**
  * @author ssydoruk
  */
 public class GMSORSTable extends DBTable {
 
     public GMSORSTable(SqliteAccessor dbaccessor, TableType t) {
-        super(dbaccessor, t,"gmsors");
+        super(dbaccessor, t, "gmsors");
     }
 
     @Override

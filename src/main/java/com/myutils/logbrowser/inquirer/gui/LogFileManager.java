@@ -25,10 +25,9 @@ import java.util.zip.ZipFile;
  */
 public class LogFileManager {
 
+    private static final org.apache.logging.log4j.Logger logger = LogManager.getLogger();
     private final HashMap<String, LogFile> logFileStore = new HashMap();
     HashSet<String> usedArchives = new HashSet<>();
-    private static final org.apache.logging.log4j.Logger logger = LogManager.getLogger();
-
 
     public static File newFile(File destinationDir, ZipEntry zipEntry) throws IOException {
         File destFile = new File(destinationDir, zipEntry.getName());
@@ -78,7 +77,7 @@ public class LogFileManager {
         logger.info("clearing out");
         for (String usedArchive : usedArchives) {
             try {
-                logger.info("Archive ["+usedArchive+"] deleting ["+new File(FilenameUtils.getFullPathNoEndSeparator(usedArchive))+"]");
+                logger.info("Archive [" + usedArchive + "] deleting [" + new File(FilenameUtils.getFullPathNoEndSeparator(usedArchive)) + "]");
                 FileUtils.deleteDirectory(new File(FilenameUtils.getFullPathNoEndSeparator(usedArchive)));
             } catch (IOException ex) {
 //                logger.error("fatal: ",  ex);

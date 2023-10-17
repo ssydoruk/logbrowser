@@ -4,8 +4,6 @@
  */
 package com.myutils.logbrowser.indexer;
 
-import java.sql.SQLException;
-
 /**
  * @author ssydoruk
  */

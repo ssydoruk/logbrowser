@@ -107,21 +107,21 @@ public final class TlibForScCmQuery extends IQuery {
 //            addTriggers = true;
 //        }
         qString.append("SELECT tlib.id,"
-                + "tlib.Inbound,"
-                + "tlib.MsgID,"
-                + "tlib.FileId,"
-                + "tlib.FileOffset,"
-                + "tlib.FileBytes,"
-                + "tlib.line,"
-                + "tlib.seqno,"
-                + "tlib.err,"
-                + "tlib.HandlerId,"
-                + "tlib.ReferenceId,"
-                + "tlib.thisDNID,"
-                + "tlib.otherDNID,"
-                + "tlib.time,"
-                + "tlib.calltype"
-        )
+                        + "tlib.Inbound,"
+                        + "tlib.MsgID,"
+                        + "tlib.FileId,"
+                        + "tlib.FileOffset,"
+                        + "tlib.FileBytes,"
+                        + "tlib.line,"
+                        + "tlib.seqno,"
+                        + "tlib.err,"
+                        + "tlib.HandlerId,"
+                        + "tlib.ReferenceId,"
+                        + "tlib.thisDNID,"
+                        + "tlib.otherDNID,"
+                        + "tlib.time,"
+                        + "tlib.calltype"
+                )
                 .append(addedFieldString(true, true))
                 .append("files.fileno as fileno, files.appnameid as appnameid, files.name as filename, files.arcname as arcname,  files.component as component, app00.name as app, files.nodeId as nodeid");
 //        if((m_componentFilter & CallFlowResults.SIP) == 0)

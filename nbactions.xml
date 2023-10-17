@@ -13,8 +13,16 @@
             <exec.args>${exec.vmArgs} -classpath %classpath ${exec.mainClass} ${exec.appArgs}</exec.args>
             <exec.executable>java</exec.executable>
             <exec.workingdir>D:\archive\uhg\ssydoruk\GCTI\work\prod.c1.1214</exec.workingdir>
-            <exec.appArgs>--no-ref-sync --dbname=D:\archive\uhg\ssydoruk\GCTI\work\prod.c1.1214\logbr --config=D:\archive\uhg\ssydoruk\GCTI\etc\logbrowser\inquirer.cfg.json --basedir=D:\archive\uhg\ssydoruk\GCTI\work\prod.c1.1214 --outputspec=I:\src\src\logbrowser\bin\etc\logbrowser\outputspec3.xml</exec.appArgs>
-            <exec.vmArgs>-Dall=1  -Dlog4j.configurationFile=D:\archive\uhg\ssydoruk\GCTI\etc\logbrowser/logbr.log4j2.inquirer.xml  -Dlog4j.logPath=.tmp -Dlogbr.dir=.tmp  -Dsqlite.pragma=true  -Dsun.java2d.d3d=false  -Dtimediff.parse=false  -Dtlib.norequest=false  -Xms8000m  -Xmx8000m -Ddebug=true</exec.vmArgs>
+            <exec.appArgs>--no-ref-sync --dbname=D:\archive\uhg\ssydoruk\GCTI\work\prod.c1.1214\logbr
+                --config=D:\archive\uhg\ssydoruk\GCTI\etc\logbrowser\inquirer.cfg.json
+                --basedir=D:\archive\uhg\ssydoruk\GCTI\work\prod.c1.1214
+                --outputspec=I:\src\src\logbrowser\bin\etc\logbrowser\outputspec3.xml
+            </exec.appArgs>
+            <exec.vmArgs>-Dall=1
+                -Dlog4j.configurationFile=D:\archive\uhg\ssydoruk\GCTI\etc\logbrowser/logbr.log4j2.inquirer.xml
+                -Dlog4j.logPath=.tmp -Dlogbr.dir=.tmp -Dsqlite.pragma=true -Dsun.java2d.d3d=false -Dtimediff.parse=false
+                -Dtlib.norequest=false -Xms8000m -Xmx8000m -Ddebug=true
+            </exec.vmArgs>
             <exec.mainClass>com.myutils.logbrowser.inquirer.inquirer</exec.mainClass>
         </properties>
     </action>
@@ -32,8 +40,17 @@
             <exec.executable>java</exec.executable>
             <jpda.listen>true</jpda.listen>
             <exec.workingdir>D:\archive\uhg\ssydoruk\GCTI\work\prod.c1.1214</exec.workingdir>
-            <exec.appArgs>--no-ref-sync --dbname=D:\archive\uhg\ssydoruk\GCTI\work\prod.c1.1214\logbr --config=D:\archive\uhg\ssydoruk\GCTI\etc\logbrowser\inquirer.cfg.json --basedir=D:\archive\uhg\ssydoruk\GCTI\work\prod.c1.1214 --outputspec=I:\src\src\logbrowser\bin\etc\logbrowser\outputspec3.xml</exec.appArgs>
-            <exec.vmArgs>-Dall=1  -Dlog4j.configurationFile=D:\archive\uhg\ssydoruk\GCTI\etc\logbrowser/logbr.log4j2.inquirer.xml  -Dlog4j.logPath=.tmp -Dlogbr.dir=.tmp  -Dsqlite.pragma=true  -Dsun.java2d.d3d=false  -Dtimediff.parse=false  -Dtlib.norequest=false  -Xms8000m  -Xmx8000m -Ddebug=true -agentlib:jdwp=transport=dt_socket,server=n,address=${jpda.address}</exec.vmArgs>
+            <exec.appArgs>--no-ref-sync --dbname=D:\archive\uhg\ssydoruk\GCTI\work\prod.c1.1214\logbr
+                --config=D:\archive\uhg\ssydoruk\GCTI\etc\logbrowser\inquirer.cfg.json
+                --basedir=D:\archive\uhg\ssydoruk\GCTI\work\prod.c1.1214
+                --outputspec=I:\src\src\logbrowser\bin\etc\logbrowser\outputspec3.xml
+            </exec.appArgs>
+            <exec.vmArgs>-Dall=1
+                -Dlog4j.configurationFile=D:\archive\uhg\ssydoruk\GCTI\etc\logbrowser/logbr.log4j2.inquirer.xml
+                -Dlog4j.logPath=.tmp -Dlogbr.dir=.tmp -Dsqlite.pragma=true -Dsun.java2d.d3d=false -Dtimediff.parse=false
+                -Dtlib.norequest=false -Xms8000m -Xmx8000m -Ddebug=true
+                -agentlib:jdwp=transport=dt_socket,server=n,address=${jpda.address}
+            </exec.vmArgs>
             <exec.mainClass>com.myutils.logbrowser.inquirer.inquirer</exec.mainClass>
         </properties>
     </action>
@@ -50,23 +67,31 @@
             <exec.args>${exec.vmArgs} -classpath %classpath ${exec.mainClass} ${exec.appArgs}</exec.args>
             <exec.executable>java</exec.executable>
             <exec.workingdir>D:\archive\uhg\ssydoruk\GCTI\work\prod.c1.1214</exec.workingdir>
-            <exec.appArgs>--no-ref-sync --dbname=D:\archive\uhg\ssydoruk\GCTI\work\prod.c1.1214\logbr --config=D:\archive\uhg\ssydoruk\GCTI\etc\logbrowser\inquirer.cfg.json --basedir=D:\archive\uhg\ssydoruk\GCTI\work\prod.c1.1214 --outputspec=I:\src\src\logbrowser\bin\etc\logbrowser\outputspec3.xml</exec.appArgs>
-            <exec.vmArgs>-Dall=1  -Dlog4j.configurationFile=D:\archive\uhg\ssydoruk\GCTI\etc\logbrowser/logbr.log4j2.inquirer.xml  -Dlog4j.logPath=.tmp -Dlogbr.dir=.tmp  -Dsqlite.pragma=true  -Dsun.java2d.d3d=false  -Dtimediff.parse=false  -Dtlib.norequest=false  -Xms8000m  -Xmx8000m -Ddebug=true</exec.vmArgs>
+            <exec.appArgs>--no-ref-sync --dbname=D:\archive\uhg\ssydoruk\GCTI\work\prod.c1.1214\logbr
+                --config=D:\archive\uhg\ssydoruk\GCTI\etc\logbrowser\inquirer.cfg.json
+                --basedir=D:\archive\uhg\ssydoruk\GCTI\work\prod.c1.1214
+                --outputspec=I:\src\src\logbrowser\bin\etc\logbrowser\outputspec3.xml
+            </exec.appArgs>
+            <exec.vmArgs>-Dall=1
+                -Dlog4j.configurationFile=D:\archive\uhg\ssydoruk\GCTI\etc\logbrowser/logbr.log4j2.inquirer.xml
+                -Dlog4j.logPath=.tmp -Dlogbr.dir=.tmp -Dsqlite.pragma=true -Dsun.java2d.d3d=false -Dtimediff.parse=false
+                -Dtlib.norequest=false -Xms8000m -Xmx8000m -Ddebug=true
+            </exec.vmArgs>
             <exec.mainClass>com.myutils.logbrowser.inquirer.inquirer</exec.mainClass>
         </properties>
     </action>
     <action>
-            <actionName>CUSTOM-Package</actionName>
-            <displayName>Package</displayName>
-            <goals>
-                <goal>package</goal>
-            </goals>
-        </action>
+        <actionName>CUSTOM-Package</actionName>
+        <displayName>Package</displayName>
+        <goals>
+            <goal>package</goal>
+        </goals>
+    </action>
     <action>
-            <actionName>CUSTOM-appassembler:assemble</actionName>
-            <displayName>appassembler:assemble</displayName>
-            <goals>
-                <goal>appassembler:assemble</goal>
-            </goals>
-        </action>
+        <actionName>CUSTOM-appassembler:assemble</actionName>
+        <displayName>appassembler:assemble</displayName>
+        <goals>
+            <goal>appassembler:assemble</goal>
+        </goals>
+    </action>
 </actions>

@@ -127,6 +127,6 @@ public class GMSPostMessage extends Message {
         stmt.setBoolean(11, isInbound());
         setFieldInt(stmt, 12, Main.getRef(ReferenceType.ORSREQ, ORSURI()));
         setFieldInt(stmt, 13, Main.getRef(ReferenceType.IP, getSourceIP()));
-return true;
+        return true;
     }
 }

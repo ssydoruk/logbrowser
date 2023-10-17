@@ -51,7 +51,7 @@ public class WindowsSystemUtility {
             // this code might be different if you customize the name of
             // the jacob dll to match some custom naming convention
             InputStream inputStream = WindowsSystemUtility.class.getResource(
-                    "/" + LibraryLoader.getPreferredDLLName() + ".dll")
+                            "/" + LibraryLoader.getPreferredDLLName() + ".dll")
                     .openStream();
             // Put the DLL somewhere we can find it with a name Jacob expects
             File temporaryDll = File.createTempFile(LibraryLoader

@@ -35,10 +35,12 @@ public class DynamicTreeNode<T> extends GenericTreeNode implements Serializable 
     private TableType tableType = null;
     private ReferenceType refType = ReferenceType.UNKNOWN;
     private ILoadChildrenProc loadChildrenProc = null;
+
     public DynamicTreeNode() {
         super();
 //        inquirer.logger.debug(" DynamicTreeNode()");
     }
+
     //    @Override
 //    public String toString() {
 //        return "DynamicTreeNode{" + "dynamicChildren=" + dynamicChildren + ", ChildrenLoaded=" + ChildrenLoaded + ", refType=" + refType + ", onlyChildrenChecked=" + onlyChildrenChecked + ", loadChildrenProc=" + loadChildrenProc + '}' + ", data: " + ((getData() != null) ? getData().toString() : "[NULL]");
@@ -60,6 +62,7 @@ public class DynamicTreeNode<T> extends GenericTreeNode implements Serializable 
             inquirer.logger.debug("Duplicating from null!!");
         }
     }
+
     public DynamicTreeNode(Object data) {
         this();
         setData((OptionNode) data);

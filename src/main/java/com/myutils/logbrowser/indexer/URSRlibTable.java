@@ -4,10 +4,6 @@
  */
 package com.myutils.logbrowser.indexer;
 
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Timestamp;
-
 /**
  * @author ssydoruk
  * <p>
@@ -21,12 +17,12 @@ public class URSRlibTable extends DBTable {
     }
 
     URSRlibTable(SqliteAccessor m_accessor, TableType tableType) {
-        super(m_accessor, tableType,"URSRLIB");
+        super(m_accessor, tableType, "URSRLIB");
     }
 
     @Override
     public void InitDB() {
-        
+
         addIndex("time");
         addIndex("FileId");
 

@@ -4,10 +4,6 @@
  */
 package com.myutils.logbrowser.indexer;
 
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Timestamp;
-
 /**
  * @author ssydoruk
  */
@@ -15,12 +11,12 @@ public class FileInfoTable extends DBTable {
 
     private static int filesAdded = 0;
 
-    static public void incFilesAdded(){
-        filesAdded++;
+    public FileInfoTable(SqliteAccessor dbaccessor) {
+        super(dbaccessor, TableType.File, "file_" + dbaccessor.getM_alias());
     }
 
-    public FileInfoTable(SqliteAccessor dbaccessor) {
-        super(dbaccessor, TableType.File,"file_" + dbaccessor.getM_alias());
+    static public void incFilesAdded() {
+        filesAdded++;
     }
 
     public static int getFilesAdded() {

@@ -4,22 +4,18 @@
  */
 package com.myutils.logbrowser.indexer;
 
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Timestamp;
-
 /**
  * @author ssydoruk
  */
 public class URSVQTable extends DBTable {
 
     public URSVQTable(SqliteAccessor dbaccessor, TableType t) {
-        super(dbaccessor, t,"ursvq");
+        super(dbaccessor, t, "ursvq");
     }
 
     @Override
     public void InitDB() {
-        
+
         addIndex("time");
         addIndex("FileId");
         addIndex("ConnIDID");
@@ -62,8 +58,6 @@ public class URSVQTable extends DBTable {
     public void FinalizeDB() throws Exception {
         createIndexes();
     }
-
-
 
 
 }

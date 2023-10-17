@@ -5,21 +5,28 @@
  */
 package com.myutils.logbrowser.inquirer;
 
-import Utils.*;
-import com.myutils.logbrowser.inquirer.ScreenInfo;
-import com.myutils.logbrowser.inquirer.gui.*;
-import java.awt.*;
-import java.awt.event.*;
-import java.util.List;
-import java.util.*;
-import javax.swing.*;
-import javax.swing.event.*;
-import org.apache.commons.lang3.*;
+import Utils.TableDialog;
+import com.myutils.logbrowser.inquirer.gui.TabResultDataModel;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.logging.log4j.*;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 /**
- *
  * @author ssydoruk
  */
 public class EditRegexFields extends javax.swing.JDialog {
@@ -32,6 +39,7 @@ public class EditRegexFields extends javax.swing.JDialog {
      * A return status code - returned if OK button has been pressed
      */
     public static final int RET_OK = 1;
+    private static final Logger logger = LogManager.getLogger(EditRegexFields.class);
     private List<RegexFieldSettings> selectedValuesList = null;
     private String savedReplace;
     private DocumentListener listener;
@@ -39,90 +47,59 @@ public class EditRegexFields extends javax.swing.JDialog {
     private TabResultDataModel.TableRow curRow;
     private String curRec;
     private TableDialog showLDAP;
-
-    public Object[] toArray() {
-        return lmSavedList.toArray();
-    }
-
-    public EditRegexFields doShow(Component _parent, boolean b, TabResultDataModel.TableRow row) {
-        this.curRow = row;
-        curRec = row.getBytes();
-
-        jlEvalText.setText(null);
-        taCurrentRecord.setText(curRec);
-        msgType = row.getRowType();
-        if (lSavedList == null) {
-            // JPanel pRefTypes = new JPanel(new BorderLayout());
-            lmSavedList = new DefaultListModel();
-            jlSearches.setModel(lmSavedList);
-        }
-        lmSavedList.clear();
-
-        ArrayList<CustomField> regexFieldsSettings = inquirer.getCr().getRegexFieldsSettings(msgType);
-        if (regexFieldsSettings != null) {
-
-            for (CustomField regexFieldsSetting : regexFieldsSettings) {
-                lmSavedList.addElement(regexFieldsSetting);
-
-            }
-        }
-        ScreenInfo.CenterWindow(this);
-        this.setVisible(true);
-
-        if (getReturnStatus() == RET_OK) {
-            return this;
-        } else {
-            return null;
-        }
-    }
-
-    private static final Logger logger = LogManager.getLogger(EditRegexFields.class);
-
-    public static EditRegexFields getInstance() {
-        return NewSingletonHolder.INSTANCE;
-    }
-
-    private boolean checkRegExSettings() {
-        if (StringUtils.isBlank(jtfRegex.getText()) || StringUtils.isBlank(jtfRetValue.getText())) {
-            JOptionPane.showMessageDialog(this, "Both \"Searched\" and \"Return value\" must be specified", "Error",
-                    JOptionPane.ERROR_MESSAGE);
-            return false;
-        }
-        return true;
-    }
-
-    private boolean checkJSSettings() {
-        if (StringUtils.isBlank(taJSScript.getText())) {
-            JOptionPane.showMessageDialog(this, "Text of javascript is empty", "Error", JOptionPane.ERROR_MESSAGE);
-            return false;
-        }
-        return true;
-
-    }
-
-    private String inputName() {
-        return inputName(null);
-    }
-
-    private String inputName(String name) {
-        String newName = JOptionPane.showInputDialog(this, "Enter search name",
-                name);
-        return (StringUtils.isBlank(newName)) ? null : newName;
-    }
-
-    private ListSelectionListener[] clearActionListeners(JList<String> jlSearches) {
-        ListSelectionListener[] actionListeners = jlSearches.getListSelectionListeners();
-        for (ListSelectionListener actionListener : actionListeners) {
-            jlSearches.removeListSelectionListener(actionListener);
-        }
-        return actionListeners;
-    }
-
-    private static class NewSingletonHolder {
-
-        private static final EditRegexFields INSTANCE = new EditRegexFields();
-    }
-
+    private String savedSearch;
+    private String editLine;
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton bAddSaved;
+    private javax.swing.ButtonGroup bgJSapplicationType;
+    private javax.swing.JButton btEval;
+    private javax.swing.JButton btRecFields;
+    private javax.swing.JButton cancelButton;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel10;
+    private javax.swing.JPanel jPanel12;
+    private javax.swing.JPanel jPanel13;
+    private javax.swing.JPanel jPanel16;
+    private javax.swing.JPanel jPanel17;
+    private javax.swing.JPanel jPanel18;
+    private javax.swing.JPanel jPanel19;
+    private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel20;
+    private javax.swing.JPanel jPanel21;
+    private javax.swing.JPanel jPanel3;
+    private javax.swing.JPanel jPanel4;
+    private javax.swing.JPanel jPanel6;
+    private javax.swing.JPanel jPanel7;
+    private javax.swing.JPanel jPanel8;
+    private javax.swing.JPanel jPanel9;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JButton jbRename;
+    private javax.swing.JButton jbSavedDelete;
+    private javax.swing.JButton jbSavedSave;
+    private javax.swing.JButton jbSavedSaveAs;
+    private javax.swing.JCheckBox jcbCaseSensitive;
+    private javax.swing.JCheckBox jcbMatchWholeWord;
+    private javax.swing.JLabel jlEvalText;
+    private javax.swing.JList<String> jlSearches;
+    private javax.swing.JTextField jtfRegex;
+    private javax.swing.JTextField jtfRetValue;
+    private javax.swing.JButton okButton;
+    private javax.swing.JPanel pJSScript;
+    private javax.swing.JPanel pRegex;
+    private javax.swing.JRadioButton rbApplyPerLine;
+    private javax.swing.JRadioButton rbApplyToText;
+    private javax.swing.JTextArea taCurrentRecord;
+    private javax.swing.JTextArea taJSScript;
+    private javax.swing.JTabbedPane tpCustomFieldType;
+    private int returnStatus = RET_CANCEL;
+    private inquirer.InfoPanel savedSelect = null;
+    private JList lSavedList = null;
+    private DefaultListModel lmSavedList = null;
+    private CustomField currentCustomField;
+    private boolean debug = false;
     /**
      * Creates new form EnterRegexDialog
      */
@@ -215,6 +192,86 @@ public class EditRegexFields extends javax.swing.JDialog {
 
         Utils.swing.Swing.restrictHeight(jtfRetValue);
     }
+    EditRegexFields() {
+        throw new UnsupportedOperationException("Not supported yet."); // To change body of generated methods, choose
+        // Tools | Templates.
+    }
+
+    public static EditRegexFields getInstance() {
+        return NewSingletonHolder.INSTANCE;
+    }
+
+    public Object[] toArray() {
+        return lmSavedList.toArray();
+    }
+
+    public EditRegexFields doShow(Component _parent, boolean b, TabResultDataModel.TableRow row) {
+        this.curRow = row;
+        curRec = row.getBytes();
+
+        jlEvalText.setText(null);
+        taCurrentRecord.setText(curRec);
+        msgType = row.getRowType();
+        if (lSavedList == null) {
+            // JPanel pRefTypes = new JPanel(new BorderLayout());
+            lmSavedList = new DefaultListModel();
+            jlSearches.setModel(lmSavedList);
+        }
+        lmSavedList.clear();
+
+        ArrayList<CustomField> regexFieldsSettings = inquirer.getCr().getRegexFieldsSettings(msgType);
+        if (regexFieldsSettings != null) {
+
+            for (CustomField regexFieldsSetting : regexFieldsSettings) {
+                lmSavedList.addElement(regexFieldsSetting);
+
+            }
+        }
+        ScreenInfo.CenterWindow(this);
+        this.setVisible(true);
+
+        if (getReturnStatus() == RET_OK) {
+            return this;
+        } else {
+            return null;
+        }
+    }
+
+    private boolean checkRegExSettings() {
+        if (StringUtils.isBlank(jtfRegex.getText()) || StringUtils.isBlank(jtfRetValue.getText())) {
+            JOptionPane.showMessageDialog(this, "Both \"Searched\" and \"Return value\" must be specified", "Error",
+                    JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
+        return true;
+    }
+
+    private boolean checkJSSettings() {
+        if (StringUtils.isBlank(taJSScript.getText())) {
+            JOptionPane.showMessageDialog(this, "Text of javascript is empty", "Error", JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
+        return true;
+
+    }
+
+    private String inputName() {
+        return inputName(null);
+    }
+
+    private String inputName(String name) {
+        String newName = JOptionPane.showInputDialog(this, "Enter search name",
+                name);
+        return (StringUtils.isBlank(newName)) ? null : newName;
+    }
+
+    private ListSelectionListener[] clearActionListeners(JList<String> jlSearches) {
+        ListSelectionListener[] actionListeners = jlSearches.getListSelectionListeners();
+        for (ListSelectionListener actionListener : actionListeners) {
+            jlSearches.removeListSelectionListener(actionListener);
+        }
+        return actionListeners;
+    }
 
     private void jlSearchesChanged(ListSelectionEvent evt) {
         JList cb = (JList) evt.getSource();
@@ -242,11 +299,6 @@ public class EditRegexFields extends javax.swing.JDialog {
         // okButton.setEnabled(!jtfRegex.getText().isEmpty());
     }
 
-    EditRegexFields() {
-        throw new UnsupportedOperationException("Not supported yet."); // To change body of generated methods, choose
-        // Tools | Templates.
-    }
-
     /**
      * @return the return status of this dialog - one of RET_OK or RET_CANCEL
      */
@@ -257,8 +309,6 @@ public class EditRegexFields extends javax.swing.JDialog {
     public boolean isMatchWholeWordSelected() {
         return jcbCaseSensitive.isSelected();
     }
-
-    private String savedSearch;
 
     // public SearchSample findRxSample(String bytes) {
     // if (searchParams != null && !searchParams.isEmpty()) {
@@ -364,8 +414,6 @@ public class EditRegexFields extends javax.swing.JDialog {
     public String getSearch() {
         return editLine;
     }
-
-    private String editLine;
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -708,6 +756,7 @@ public class EditRegexFields extends javax.swing.JDialog {
     private void jbRenameActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_jbRenameActionPerformed
         savedPressed(SaveAction.RENAME);
     }// GEN-LAST:event_jbRenameActionPerformed
+    // End of variables declaration//GEN-END:variables
 
     private void btEvalActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_btEvalActionPerformed
         evalPressed();
@@ -731,55 +780,6 @@ public class EditRegexFields extends javax.swing.JDialog {
         setVisible(false);
         dispose();
     }
-
-    // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton bAddSaved;
-    private javax.swing.ButtonGroup bgJSapplicationType;
-    private javax.swing.JButton btEval;
-    private javax.swing.JButton btRecFields;
-    private javax.swing.JButton cancelButton;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel10;
-    private javax.swing.JPanel jPanel12;
-    private javax.swing.JPanel jPanel13;
-    private javax.swing.JPanel jPanel16;
-    private javax.swing.JPanel jPanel17;
-    private javax.swing.JPanel jPanel18;
-    private javax.swing.JPanel jPanel19;
-    private javax.swing.JPanel jPanel2;
-    private javax.swing.JPanel jPanel20;
-    private javax.swing.JPanel jPanel21;
-    private javax.swing.JPanel jPanel3;
-    private javax.swing.JPanel jPanel4;
-    private javax.swing.JPanel jPanel6;
-    private javax.swing.JPanel jPanel7;
-    private javax.swing.JPanel jPanel8;
-    private javax.swing.JPanel jPanel9;
-    private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JScrollPane jScrollPane3;
-    private javax.swing.JButton jbRename;
-    private javax.swing.JButton jbSavedDelete;
-    private javax.swing.JButton jbSavedSave;
-    private javax.swing.JButton jbSavedSaveAs;
-    private javax.swing.JCheckBox jcbCaseSensitive;
-    private javax.swing.JCheckBox jcbMatchWholeWord;
-    private javax.swing.JLabel jlEvalText;
-    private javax.swing.JList<String> jlSearches;
-    private javax.swing.JTextField jtfRegex;
-    private javax.swing.JTextField jtfRetValue;
-    private javax.swing.JButton okButton;
-    private javax.swing.JPanel pJSScript;
-    private javax.swing.JPanel pRegex;
-    private javax.swing.JRadioButton rbApplyPerLine;
-    private javax.swing.JRadioButton rbApplyToText;
-    private javax.swing.JTextArea taCurrentRecord;
-    private javax.swing.JTextArea taJSScript;
-    private javax.swing.JTabbedPane tpCustomFieldType;
-    // End of variables declaration//GEN-END:variables
-
-    private int returnStatus = RET_CANCEL;
 
     private void cancelPressed() {
         doClose(RET_CANCEL);
@@ -876,12 +876,6 @@ public class EditRegexFields extends javax.swing.JDialog {
 
     }
 
-    private inquirer.InfoPanel savedSelect = null;
-    private JList lSavedList = null;
-    private DefaultListModel lmSavedList = null;
-
-    private CustomField currentCustomField;
-
     private void setCurrentField(CustomField saveRegexField) {
         currentCustomField = saveRegexField;
         selectedValuesList = null;
@@ -963,8 +957,6 @@ public class EditRegexFields extends javax.swing.JDialog {
         return selectedValuesList != null && selectedValuesList.size() > 1;
     }
 
-    private boolean debug = false;
-
     public boolean isDebug() {
         return debug;
     }
@@ -975,6 +967,13 @@ public class EditRegexFields extends javax.swing.JDialog {
 
     private enum SaveAction {
         SAVE, SAVEAS, RENAME
-    };
+    }
+
+    private static class NewSingletonHolder {
+
+        private static final EditRegexFields INSTANCE = new EditRegexFields();
+    }
+
+    ;
 
 }

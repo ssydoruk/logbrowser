@@ -207,7 +207,6 @@ public class EnvIndexer extends ExecutionEnvironment {
     }
 
 
-
     private boolean getOptValueParseTDiff() {
 
         if (StringUtils.isNotEmpty(optTDiffParse.getLongOpt())

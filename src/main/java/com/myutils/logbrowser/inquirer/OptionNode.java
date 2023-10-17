@@ -32,25 +32,30 @@ public class OptionNode implements Serializable, TClonable, Comparable {
         this(ch1.getName());
         this.id = ch1.getId();
     }
+
     public OptionNode(boolean b, DialogItem dialogItem) {
         this(b, dialogItem.toString());
         this.dialogItem = dialogItem;
     }
+
     OptionNode(boolean b, Pair pr) {
         this(b, pr.getKey().toString());
         thePr = pr;
     }
+
     OptionNode(boolean b, DialogItem dialogItem, String itemName) {
         this(b, dialogItem);
         if (itemName != null) {
             setName(itemName);
         }
     }
+
     public OptionNode(boolean checked, String name) {
         this.checked = checked;
         this.name = name;
 //        inquirer.logger.debug("OptionNode constructor item [" + name + "] checked:" + checked );
     }
+
     public OptionNode(boolean checked, boolean isEmpty, String name) {
         this.checked = checked;
         this.name = name;
@@ -250,7 +255,7 @@ public class OptionNode implements Serializable, TClonable, Comparable {
     }
 
     String getValue() {
-        return (thePr!=null && thePr.getValue()!=null) ?(String) thePr.getValue():"";
+        return (thePr != null && thePr.getValue() != null) ? (String) thePr.getValue() : "";
     }
 
     private Integer nameID() {

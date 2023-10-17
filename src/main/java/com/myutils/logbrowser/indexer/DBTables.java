@@ -1,9 +1,6 @@
 package com.myutils.logbrowser.indexer;
 
-import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
-
-import static org.apache.logging.log4j.ThreadContext.containsKey;
 
 public class DBTables extends ConcurrentHashMap<String, DBTable> {
     @Override

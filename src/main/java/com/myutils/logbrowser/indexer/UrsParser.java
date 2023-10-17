@@ -90,6 +90,7 @@ public class UrsParser extends Parser {
 //CURRENT CONTENT(32): shilpa.c@hc1_statsrvr_urs_p.A,shruthi.p@hc1_statsrvr_urs_p.A...
     private static final Pattern regline1015 = Pattern.compile("name=(.+): content");
     private static final Pattern regCheckRoutingStates = Pattern.compile("^check call routing.+(true|false)$");
+    protected static URLProcessor urlProcessor = new URLProcessor();
     final int MSG_STRING_LIMIT = 200;
     long m_CurrentFilePos;
     long m_HeaderOffset;
@@ -265,9 +266,6 @@ public class UrsParser extends Parser {
         return true;
     }
 
-    protected static URLProcessor urlProcessor = new URLProcessor();
-
-
     private void ProcessRI(String s) throws Exception {
         Main.logger.trace("ProcessRI [" + s + "]");
 
@@ -372,8 +370,7 @@ public class UrsParser extends Parser {
                 return ((split.length > startIdx) ? StringUtils.joinWith("/", split[startIdx],
                         StringUtils.substringBefore(split[startIdx + 1], "?"))
                         : StringUtils.substringBefore(split[startIdx], "?"));
-            }
-            else
+            } else
                 return split[startIdx];
         }
         return "";

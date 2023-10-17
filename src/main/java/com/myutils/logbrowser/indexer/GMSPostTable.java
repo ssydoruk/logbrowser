@@ -4,17 +4,13 @@
  */
 package com.myutils.logbrowser.indexer;
 
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Timestamp;
-
 /**
  * @author ssydoruk
  */
 public class GMSPostTable extends DBTable {
 
     public GMSPostTable(SqliteAccessor dbaccessor, TableType t) {
-        super(dbaccessor, t,"GMSPost");
+        super(dbaccessor, t, "GMSPost");
     }
 
     @Override
@@ -72,7 +68,6 @@ public class GMSPostTable extends DBTable {
     public void FinalizeDB() throws Exception {
         createIndexes();
     }
-
 
 
 }

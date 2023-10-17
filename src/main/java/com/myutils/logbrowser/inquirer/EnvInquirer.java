@@ -5,7 +5,6 @@
  */
 package com.myutils.logbrowser.inquirer;
 
-import com.myutils.logbrowser.common.ExecutionEnvironment;
 import org.apache.commons.cli.*;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -16,10 +15,7 @@ import java.nio.file.Paths;
 /**
  * @author stepan_sydoruk
  */
-public class EnvInquirer  {
-    protected  Options options;
-    protected  CommandLineParser parser;
-
+public class EnvInquirer {
     private final Option optOutSpec;
     private final Option optAlias;
     private final Option optDBName;
@@ -29,6 +25,9 @@ public class EnvInquirer  {
     private final Option optIgnoreFileAccessErrors;
     private final Option optLogBrowserDir;
     private final Option optNoTLibRequests;
+    protected Options options;
+    protected CommandLineParser parser;
+    protected CommandLine cmd;
     Option optHelp;
     private String alias;
     private String dbname;
@@ -39,7 +38,6 @@ public class EnvInquirer  {
     private boolean refSyncDisabled;
     private boolean ignoreFileAccessErrors;
     private String logBrDir;
-    protected CommandLine cmd;
 
 
     EnvInquirer() {

@@ -31,7 +31,7 @@ public class OCSRecCreate extends Message {
     private boolean isCreate = true;
 
     public OCSRecCreate(ArrayList newMessageLines, int fileID) {
-        this( fileID);
+        this(fileID);
         m_MessageLines = newMessageLines;
         Matcher m;
 //        Main.logger.info("OCSRecCreate" + ((m_MessageLines == null) ? "NULL" : m_MessageLines.toString()));
@@ -43,7 +43,7 @@ public class OCSRecCreate extends Message {
         }
     }
 
-    OCSRecCreate( int fileID) {
+    OCSRecCreate(int fileID) {
         super(TableType.OCSRecCreate, fileID);
     }
 

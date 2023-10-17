@@ -46,10 +46,10 @@ public class SipMessage extends ILogRecord {
             @Override
             public void setValue(Object val) {
                 if (val != null) {
-                    if(val instanceof String)
+                    if (val instanceof String)
                         handlerId = Utils.Util.intOrDef((String) val, 0);
-                    else if(val instanceof Number)
-                    handlerId = ((Number)val).intValue();
+                    else if (val instanceof Number)
+                        handlerId = ((Number) val).intValue();
                 }
             }
 

@@ -4,10 +4,6 @@
  */
 package com.myutils.logbrowser.indexer;
 
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Timestamp;
-
 /**
  * @author ssydoruk
  * <p>
@@ -17,12 +13,12 @@ import java.sql.Timestamp;
 public class ORSMMTable extends DBTable {
 
     public ORSMMTable(SqliteAccessor dbaccessor) {
-        super(dbaccessor, TableType.ORSMMessage,"ORSMM");
+        super(dbaccessor, TableType.ORSMMessage, "ORSMM");
     }
 
     @Override
     public void InitDB() {
-        
+
         addIndex("time");
         addIndex("FileId");
         addIndex("nameID");
@@ -69,8 +65,6 @@ public class ORSMMTable extends DBTable {
         createIndexes();
 
     }
-
-
 
 
 }

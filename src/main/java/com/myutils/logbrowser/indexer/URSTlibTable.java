@@ -4,22 +4,18 @@
  */
 package com.myutils.logbrowser.indexer;
 
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Timestamp;
-
 /**
  * @author ssydoruk
  */
 public class URSTlibTable extends DBTable {
 
     public URSTlibTable(SqliteAccessor dbaccessor, TableType t) {
-        super(dbaccessor, t,"URS_" + dbaccessor.getM_alias());
+        super(dbaccessor, t, "URS_" + dbaccessor.getM_alias());
     }
 
     @Override
     public void InitDB() {
-        
+
         addIndex("ConnectionIDID");
         addIndex("TransferIdID");
         addIndex("UUIDID");

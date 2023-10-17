@@ -6,15 +6,20 @@
 package com.myutils.logbrowser.inquirer;
 
 import Utils.Pair;
-import com.myutils.logbrowser.indexer.*;
-import static com.myutils.logbrowser.inquirer.QueryTools.getRefNames;
-import com.myutils.logbrowser.inquirer.gui.*;
-import java.io.*;
-import java.sql.*;
-import java.util.*;
-import org.apache.commons.io.*;
-import org.apache.commons.lang3.*;
+import com.myutils.logbrowser.indexer.ReferenceType;
+import com.myutils.logbrowser.indexer.TableType;
+import com.myutils.logbrowser.inquirer.gui.MyJTable;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.Serializable;
+import java.sql.SQLException;
+import java.util.*;
+
+import static com.myutils.logbrowser.inquirer.QueryTools.getRefNames;
 
 /**
  * @author ssydoruk
@@ -41,24 +46,12 @@ public class InquirerCfg implements Serializable {
     private int MaxQueryLines;
     private String titleRegex;
     private String linuxEditor;
-
-    public String getLinuxEditor() {
-        if(StringUtils.isBlank(linuxEditor)){
-            linuxEditor="gvim";
-        }
-        return linuxEditor;
-    }
-
-    public void setLinuxEditor(String linuxEditor) {
-        this.linuxEditor = linuxEditor;
-    }
     private boolean fullTimeStamp;
     private String FileNameExcel;
     private int fileSizeWarn = 5; // in mb
     private GenesysConstants1 constants;
     private boolean refsLoaded;
     private boolean newTlibSearch;
-
     private boolean saveFileShort;
     private boolean saveFileLong;
     private boolean addShortToFull;
@@ -66,7 +59,6 @@ public class InquirerCfg implements Serializable {
     private boolean addOrderBy;
     private boolean accessLogFiles;
     private boolean sorting;
-
     private boolean printLogFileName;
     private boolean ignoreFormatting;
     private String FileNameShort;
@@ -110,6 +102,17 @@ public class InquirerCfg implements Serializable {
             }
             currFileIdx++;
         }
+    }
+
+    public String getLinuxEditor() {
+        if (StringUtils.isBlank(linuxEditor)) {
+            linuxEditor = "gvim";
+        }
+        return linuxEditor;
+    }
+
+    public void setLinuxEditor(String linuxEditor) {
+        this.linuxEditor = linuxEditor;
     }
 
     private GenesysConstants1 getConsts() {

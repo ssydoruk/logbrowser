@@ -4,10 +4,6 @@
  */
 package com.myutils.logbrowser.indexer;
 
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Timestamp;
-
 /**
  * @author ssydoruk
  */
@@ -15,12 +11,12 @@ public class WSTlibTable extends DBTable {
 
     public WSTlibTable(SqliteAccessor dbaccessor, TableType t) {
 
-        super(dbaccessor, t,"WSTlib");
+        super(dbaccessor, t, "WSTlib");
     }
 
     @Override
     public void InitDB() {
-        
+
         addIndex("time");
         addIndex("FileId");
         addIndex("nameID");

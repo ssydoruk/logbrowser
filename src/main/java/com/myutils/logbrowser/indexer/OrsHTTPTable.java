@@ -4,10 +4,6 @@
  */
 package com.myutils.logbrowser.indexer;
 
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Timestamp;
-
 /**
  * @author ssydoruk
  * <p>
@@ -17,12 +13,12 @@ import java.sql.Timestamp;
 public class OrsHTTPTable extends DBTable {
 
     public OrsHTTPTable(SqliteAccessor dbaccessor) {
-        super(dbaccessor, TableType.ORSHTTP,"orshttp");
+        super(dbaccessor, TableType.ORSHTTP, "orshttp");
     }
 
     @Override
     public void InitDB() {
-        
+
 
         addIndex("time");
         addIndex("FileId");
@@ -89,8 +85,6 @@ public class OrsHTTPTable extends DBTable {
     public void FinalizeDB() throws Exception {
         createIndexes();
     }
-
-
 
 
 }

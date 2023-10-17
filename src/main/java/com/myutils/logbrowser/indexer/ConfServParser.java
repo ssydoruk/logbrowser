@@ -6,7 +6,6 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -50,7 +49,7 @@ public class ConfServParser extends Parser {
     private ParserState m_ParserState;
     private Message msgTmp;
 
-    public ConfServParser(DBTables  m_tables) {
+    public ConfServParser(DBTables m_tables) {
         super(FileInfoType.type_ConfServer, m_tables);
 
     }
@@ -413,7 +412,7 @@ public class ConfServParser extends Parser {
     }
 
     @Override
-    void init(DBTables  m_tables) {
+    void init(DBTables m_tables) {
         m_tables.put(TableType.CSUpdate.toString(), new CSClientMessageTable(Main.getInstance().getM_accessor(), TableType.CSUpdate));
         m_tables.put(TableType.CSConfigChange.toString(), new CSObjectChangeTable(Main.getInstance().getM_accessor(), TableType.CSConfigChange));
         m_tables.put(TableType.CSClientConnect.toString(), new CSClientConnectTable(Main.getInstance().getM_accessor(), TableType.CSClientConnect));

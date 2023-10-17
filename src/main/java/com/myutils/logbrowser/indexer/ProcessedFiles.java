@@ -1,10 +1,15 @@
 package com.myutils.logbrowser.indexer;
 
-import java.util.ArrayList;
-
-public class  ProcessedFiles {
+public class ProcessedFiles {
     private String fileName;
     private long id;
+    private long size;
+
+    public ProcessedFiles(String fileName, long id, long size) {
+        this.fileName = fileName;
+        this.id = id;
+        this.size = size;
+    }
 
     public String getFileName() {
         return fileName;
@@ -16,13 +21,5 @@ public class  ProcessedFiles {
 
     public long getSize() {
         return size;
-    }
-
-    private   long size;
-
-    public ProcessedFiles(String fileName, long id, long size) {
-        this.fileName = fileName;
-        this.id = id;
-        this.size = size;
     }
 }

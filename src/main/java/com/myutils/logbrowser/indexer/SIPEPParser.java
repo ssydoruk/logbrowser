@@ -78,7 +78,7 @@ public class SIPEPParser extends Parser {
     private boolean inbound;
     private DateParsed dpHeader;
 
-    public SIPEPParser(DBTables  m_tables) {
+    public SIPEPParser(DBTables m_tables) {
         super(FileInfoType.type_SIPEP, m_tables);
         this.extraBuff = new ArrayList<>();
         //m_accessor = accessor;
@@ -229,7 +229,7 @@ public class SIPEPParser extends Parser {
                 m_lineStarted = m_CurrentLine;
 
                 if ((m = regConfigOneLineDN.matcher(str)).find()) {
-                    ConfigUpdateRecord msg = new ConfigUpdateRecord(str,  fileInfo.getRecordID());
+                    ConfigUpdateRecord msg = new ConfigUpdateRecord(str, fileInfo.getRecordID());
                     try {
                         msg.setObjectType("DN");
                         msg.setObjectDBID(m.group(1));
@@ -420,7 +420,7 @@ public class SIPEPParser extends Parser {
         // Populate our class representation of the message
         SipMessage msg;
 
-        msg = new SipMessage(contents, TableType.SIPEP,  fileInfo.getRecordID());
+        msg = new SipMessage(contents, TableType.SIPEP, fileInfo.getRecordID());
 
         if ((m = regSIPReq.matcher(header)).find()) {
             if (m.group(1).startsWith("f")) {
@@ -443,7 +443,7 @@ public class SIPEPParser extends Parser {
     }
 
     private void AddConfigMessage(ArrayList<String> m_MessageContents) {
-        ConfigUpdateRecord msg = new ConfigUpdateRecord(m_MessageContents,  fileInfo.getRecordID());
+        ConfigUpdateRecord msg = new ConfigUpdateRecord(m_MessageContents, fileInfo.getRecordID());
         try {
             Matcher m;
             if (m_MessageContents.size() > 0 && (m = regSIPServerStartDN.matcher(m_MessageContents.get(0))).find()) {
@@ -465,7 +465,7 @@ public class SIPEPParser extends Parser {
     }
 
     @Override
-    void init(DBTables  m_tables) {
+    void init(DBTables m_tables) {
     }
 
     enum ParserState {

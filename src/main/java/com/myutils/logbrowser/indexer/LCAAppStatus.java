@@ -33,7 +33,7 @@ public class LCAAppStatus extends Message {
     private String status;
     private String host;
 
-    public LCAAppStatus( int fileID) {
+    public LCAAppStatus(int fileID) {
         super(TableType.LCAAppStatus, fileID);
     }
 

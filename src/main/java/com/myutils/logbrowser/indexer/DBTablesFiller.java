@@ -15,17 +15,17 @@ import java.util.Map;
 class DBTablesFiller {
 
     private static final Logger logger = Main.logger;
-    private final DBTables  dbTables;
+    private final DBTables dbTables;
     private final SqliteAccessor accessor;
     private HashMap<String, StatParser> stats;
 
-    DBTablesFiller(DBTables  tables, SqliteAccessor accessor) {
+    DBTablesFiller(DBTables tables, SqliteAccessor accessor) {
         stats = new HashMap<>();
         this.dbTables = tables;
         this.accessor = accessor;
     }
 
-    public DBTables  getDbTables(){
+    public DBTables getDbTables() {
         return dbTables;
     }
 
@@ -41,7 +41,7 @@ class DBTablesFiller {
         if (ret == null) {
             DBTable dbTable;
             synchronized (dbTables) {
-                 dbTable = dbTables.get(type);
+                dbTable = dbTables.get(type);
             }
             if (dbTable == null) {
                 logger.fatal("Not found table for type [" + type + "]");
@@ -65,7 +65,7 @@ class DBTablesFiller {
         }
     }
 
-    public void DoneInserts()  {
+    public void DoneInserts() {
         for (StatParser st : stats.values()) {
             try {
                 st.DoneInserts();
@@ -76,9 +76,9 @@ class DBTablesFiller {
     }
 
     public void updateRecCounters() {
-        synchronized (dbTables){
+        synchronized (dbTables) {
             for (Map.Entry<String, StatParser> stat : stats.entrySet()) {
-                if(dbTables.containsKey(stat.getKey())){
+                if (dbTables.containsKey(stat.getKey())) {
                     dbTables.get(stat.getKey()).addCnt(stat.getValue().cnt);
                 }
             }
@@ -107,7 +107,7 @@ class DBTablesFiller {
             cnt++;
         }
 
-         private void DoneInserts() throws SQLException {
+        private void DoneInserts() throws SQLException {
             try {
                 flush();
             } catch (SQLException sQLException) {

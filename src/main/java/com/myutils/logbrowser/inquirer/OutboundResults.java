@@ -732,20 +732,18 @@ final class OutboundResults extends IQueryResults {
                 HashSet<Long> idDNs = new HashSet<>();
 
                 OCSByConnIdQuery ocsq = new OCSByConnIdQuery();
-                ocsq.setRecLoadedProc(new IQuery.IRecordLoadedProc() {
-                    @Override
-                    public void recordLoaded(ILogRecord rec) {
-                        if (rec instanceof TLibEvent) {
-                            addUnique(refIDs, ((TLibEvent) rec).GetReferenceId());
+                ocsq.setRecLoadedProc((ILogRecord rec) -> {
+                    if (rec instanceof TLibEvent) {
+                        addUnique(refIDs, ((TLibEvent) rec).GetReferenceId());
 
-                            long id = rec.getID();
-                            if (id > 0) {
-                                ids.add(id);
-                            }
-                            addUnique(idDNs, ((TLibEvent) rec).getThisDNID(), ((TLibEvent) rec).getOtherDNID());
-
+                        long id = rec.getID();
+                        if (id > 0) {
+                            ids.add(id);
                         }
+                        addUnique(idDNs, ((TLibEvent) rec).getThisDNID(), ((TLibEvent) rec).getOtherDNID());
+
                     }
+
                 });
 
 //                ocsq.setSearchSettings(reportSettings);

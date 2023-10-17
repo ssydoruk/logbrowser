@@ -4,22 +4,18 @@
  */
 package com.myutils.logbrowser.indexer;
 
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Timestamp;
-
 /**
  * @author ssydoruk
  */
 public class OCSRecCreateTable extends DBTable {
 
     public OCSRecCreateTable(SqliteAccessor dbaccessor, TableType t) {
-        super(dbaccessor, t,"OCSRECCR");
+        super(dbaccessor, t, "OCSRECCR");
     }
 
     @Override
     public void InitDB() {
-        
+
         addIndex("recHandle");
         addIndex("chID");
         addIndex("FileId");
@@ -76,7 +72,6 @@ public class OCSRecCreateTable extends DBTable {
     public void FinalizeDB() throws Exception {
         createIndexes();
     }
-
 
 
 }

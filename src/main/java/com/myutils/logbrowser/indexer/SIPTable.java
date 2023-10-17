@@ -4,24 +4,18 @@
  */
 package com.myutils.logbrowser.indexer;
 
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Timestamp;
-
-import static com.myutils.logbrowser.indexer.Message.transformDN;
-
 /**
  * @author ssydoruk
  */
 public class SIPTable extends DBTable {
 
     public SIPTable(SqliteAccessor dbaccessor, TableType t) {
-        super(dbaccessor, t,"sip_" + dbaccessor.getM_alias());
+        super(dbaccessor, t, "sip_" + dbaccessor.getM_alias());
     }
 
     @Override
     public void InitDB() {
-        
+
         addIndex("time");
         addIndex("FileId");
         addIndex("nameID");

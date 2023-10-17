@@ -47,7 +47,7 @@ public class LCAClient extends Message {
         super(TableType.LCAClient, s, fileID);
     }
 
-    public LCAClient( int fileID) {
+    public LCAClient(int fileID) {
         super(TableType.LCAClient, fileID);
     }
 

@@ -1,6 +1,5 @@
 package com.myutils.logbrowser.indexer;
 
-import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -19,7 +18,7 @@ public class DBServerParser extends Parser {
     String m_Header;
     int m_dbRecords = 0;
 
-    public DBServerParser(DBTables  m_tables) {
+    public DBServerParser(DBTables m_tables) {
         super(FileInfoType.type_DBServer, m_tables);
 
 //17:33:06.335_I_I_03350282382b556f [07:07] HERE IS TARGETS
@@ -112,7 +111,7 @@ public class DBServerParser extends Parser {
     }
 
     @Override
-    void init(DBTables  m_tables) {
+    void init(DBTables m_tables) {
     }
 
     // parse state contants

@@ -19,6 +19,7 @@ public class LogFile {
 
     private String fileName;
     private String arcName;
+
     public LogFile(final String _fileName, final String _arcName) {
         this.fileName = _fileName;
         this.arcName = (StringUtils.isBlank(_arcName)) ? null : inquirer.getFullLogName(_arcName);

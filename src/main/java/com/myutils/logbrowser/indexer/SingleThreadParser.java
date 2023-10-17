@@ -124,6 +124,7 @@ public class SingleThreadParser extends Parser {
     private Message msgInProgress;
     private FileInfo.FileType fileType = FileInfo.FileType.UNKNOWN;
     private long lastSeqNo = 0;
+
     public SingleThreadParser(DBTables m_tables) {
         super(FileInfoType.type_SessionController, m_tables);
         Main.logger.debug("SingleThreadParser");

@@ -4,16 +4,13 @@
  */
 package com.myutils.logbrowser.indexer;
 
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-
 /**
  * @author ssydoruk
  */
 public class HandlerTable extends DBTable {
 
     public HandlerTable(SqliteAccessor dbaccessor, TableType t) {
-        super(dbaccessor, t,"handler_" + dbaccessor.getM_alias());
+        super(dbaccessor, t, "handler_" + dbaccessor.getM_alias());
     }
 
     @Override
@@ -35,7 +32,7 @@ public class HandlerTable extends DBTable {
 
     @Override
     public String getInsert() {
-return"INSERT INTO handler_" + getM_dbAccessor().getM_alias() + " VALUES(NULL,?,?"
+        return "INSERT INTO handler_" + getM_dbAccessor().getM_alias() + " VALUES(NULL,?,?"
                 //                + ",?,?"
                 + ");";
     }
@@ -45,4 +42,4 @@ return"INSERT INTO handler_" + getM_dbAccessor().getM_alias() + " VALUES(NULL,?,
         createIndexes();
     }
 
-    }
+}

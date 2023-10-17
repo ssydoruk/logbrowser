@@ -6,7 +6,6 @@ package com.myutils.logbrowser.indexer;
 
 import Utils.Pair;
 
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.sql.PreparedStatement;
@@ -148,7 +147,7 @@ public class WWEParser extends WebParser {
     private boolean skipMessage;
     private Message msg;
 
-    WWEParser(DBTables  m_tables) {
+    WWEParser(DBTables m_tables) {
         super(FileInfoType.type_WWE, m_tables);
         m_MessageContents = new ArrayList();
         ThreadAlias.put("ORSInternal", "FMWeb");
@@ -897,7 +896,7 @@ public class WWEParser extends WebParser {
     }
 
     @Override
-    void init(DBTables  m_tables) {
+    void init(DBTables m_tables) {
         m_tables.put(TableType.WWEMessage.toString(), new WWEDebugMessageTable(Main.getInstance().getM_accessor(), TableType.WWEMessage));
         m_tables.put(TableType.WWEUCSMessage.toString(), new WWEUCSTable(Main.getInstance().getM_accessor(), TableType.WWEUCSMessage));
         m_tables.put(TableType.WWEUCSConfigMessage.toString(), new WWEUCSConfigTable(Main.getInstance().getM_accessor(), TableType.WWEUCSConfigMessage));
@@ -1043,6 +1042,7 @@ public class WWEParser extends WebParser {
             return ret;
         }
 
+        @FunctionalInterface
         interface IRXFoundProc {
 
             void foundFun(String newLine, String replacedString);

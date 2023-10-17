@@ -20,11 +20,6 @@ public class IxnServerResults extends IQueryResults {
     private ArrayList<NameID> appType = null;
     private IDsFinder cidFinder = null;
 
-    @Override
-    IDsFinder.RequestLevel getDefaultQueryLevel() {
-        return IDsFinder.RequestLevel.Level1;
-    }
-
     public IxnServerResults(QueryDialogSettings qdSettings) throws SQLException {
         super(qdSettings);
         if (repComponents.isEmpty()) {
@@ -37,6 +32,11 @@ public class IxnServerResults extends IQueryResults {
         addSelectionType(SelectionType.QUEUE);
         addSelectionType(SelectionType.AGENT);
         addSelectionType(SelectionType.REFERENCEID);
+    }
+
+    @Override
+    IDsFinder.RequestLevel getDefaultQueryLevel() {
+        return IDsFinder.RequestLevel.Level1;
     }
 
     @Override
@@ -226,7 +226,7 @@ public class IxnServerResults extends IQueryResults {
             ixnQuery.setCommonParams(this, dlg);
             getRecords(ixnQuery);
 
-            if ((cidFinder==null || cidFinder.getQueryLevel()>1) &&
+            if ((cidFinder == null || cidFinder.getQueryLevel() > 1) &&
                     ixnQuery.isCollectingID(IxnServerQuery.FIELD_REFID) && !ixnQuery.getCollectID(IxnServerQuery.FIELD_REFID).isEmpty()) {
 //                HashSet<Long> refIDs = ixnQuery.getCollectID("refid");
 

@@ -1,9 +1,5 @@
 package com.myutils.logbrowser.indexer;
 
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Timestamp;
-
 /**
  * @author akolo
  */
@@ -12,7 +8,7 @@ public class StSTEventTable extends DBTable {
     String m_MessageName;
 
     public StSTEventTable(SqliteAccessor dbaccessor, TableType t) {
-        super(dbaccessor, t,"STSTEVENT_" + dbaccessor.getM_alias());
+        super(dbaccessor, t, "STSTEVENT_" + dbaccessor.getM_alias());
     }
 
     @Override
@@ -22,7 +18,7 @@ public class StSTEventTable extends DBTable {
 
     @Override
     public void InitDB() {
-        
+
         addIndex("time");
         addIndex("FileId");
         addIndex("nameID");

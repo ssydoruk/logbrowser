@@ -5,15 +5,20 @@
  */
 package com.myutils.logbrowser.inquirer.gui;
 
-import Utils.UnixProcess.*;
-import Utils.*;
-import com.myutils.logbrowser.inquirer.*;
-import java.io.*;
-import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import Utils.UnixProcess.ExtProcess;
+import Utils.Util;
+import com.myutils.logbrowser.inquirer.LogFile;
+import com.myutils.logbrowser.inquirer.inquirer;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * @author Stepan

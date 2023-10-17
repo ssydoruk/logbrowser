@@ -8,7 +8,6 @@ import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
 import org.graalvm.polyglot.HostAccess;
 
 /**
- *
  * @author ssydoruk
  */
 public class RecordPrintout {

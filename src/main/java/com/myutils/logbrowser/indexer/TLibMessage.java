@@ -20,7 +20,7 @@ public class TLibMessage extends SIPServerBaseMessage {
     private static final Pattern regTRequest = Pattern.compile("^(\\w+)");
     private static final Pattern regTRequesSource = Pattern.compile("\\s+\\(\\w+\\s+([^\\s]+)");
     private static final Pattern regTEvtPrivateI = Pattern.compile("^(\\w+)");
-    private static final Pattern  regISCCRefID = Pattern.compile("^\\s+ISCCAttributeReferenceID\\s+(\\d+)");
+    private static final Pattern regISCCRefID = Pattern.compile("^\\s+ISCCAttributeReferenceID\\s+(\\d+)");
     final private GenesysMsg lastLogMsg;
     String m_MessageName;
     private String m_source;
@@ -31,7 +31,7 @@ public class TLibMessage extends SIPServerBaseMessage {
     private Long _errorCode = null;
 
     TLibMessage(GenesysMsg lastLogMsg, boolean m_handlerInProgress, int m_handlerId, int fileID) {
-        super(TableType.TLib,m_handlerInProgress,  m_handlerId, fileID);
+        super(TableType.TLib, m_handlerInProgress, m_handlerId, fileID);
         this.lastLogMsg = lastLogMsg;
     }
 

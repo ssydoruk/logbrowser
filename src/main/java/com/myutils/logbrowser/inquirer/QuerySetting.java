@@ -5,28 +5,36 @@
  */
 package com.myutils.logbrowser.inquirer;
 
-import com.jidesoft.swing.*;
-import com.myutils.logbrowser.indexer.*;
+import com.jidesoft.swing.CheckBoxListSelectionModel;
+import com.jidesoft.swing.SearchableUtils;
+import com.myutils.logbrowser.indexer.ReferenceType;
+import com.myutils.logbrowser.indexer.TableType;
 import com.myutils.logbrowser.inquirer.InquirerCfg.GenesysConstant;
-import java.awt.*;
-import java.awt.event.*;
-import java.util.*;
-import java.util.regex.*;
+import org.apache.logging.log4j.LogManager;
+
 import javax.swing.*;
-import javax.swing.event.*;
-import javax.swing.table.*;
-import org.apache.logging.log4j.*;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import javax.swing.table.AbstractTableModel;
+import java.awt.*;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 /**
- *
  * @author ssydoruk
  */
 public final class QuerySetting extends javax.swing.JDialog {
 
     private static final org.apache.logging.log4j.Logger logger = LogManager.getLogger();
-
+    private final JList lPrintFilters;
+    Object curSelected = null;
+    TableType lastTableType;
     private JList lReferenceType;
-
     /**
      * Creates new form QuerySetting
      */
@@ -34,83 +42,103 @@ public final class QuerySetting extends javax.swing.JDialog {
     private CheckBoxListSettings clbRefValues;
     private DefaultListModel lmRefValues;
     private int closeCause;
-    private final JList lPrintFilters;
     private HashMap<String, String> printFilters;
     private CheckBoxListSettings clbLogMessages;
     private HashMap<ReferenceType, ArrayList<OptionNode>> savedRefs;
     private ReferenceType lastRefType;
-
-    private void loadReferences() {
-        lastRefType = ReferenceType.UNKNOWN;
-        lmRefValues = new DefaultListModel();
-        clbRefValues = new CheckBoxListSettings(lmRefValues, jpAllRefs);
-
-        jpAllRefs.setLayout(new BorderLayout());
-        JScrollPane jScrollPane = new JScrollPane(clbRefValues);
-        Dimension d = clbRefValues.getPreferredSize();
-        d.width = 300;
-        jScrollPane.setPreferredSize(d);
-        jpAllRefs.add(jScrollPane);
-
-        clbRefValues.getCheckBoxListSelectionModel().setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-        SearchableUtils.installSearchable(clbRefValues);
-
-        clbRefValues.getCheckBoxListSelectionModel().addListSelectionListener(new ListSelectionListener() {
-
-            @Override
-            public void valueChanged(ListSelectionEvent evt) {
-                clbValueChanged(evt);
-            }
-        });
-
-        DefaultListModel lm = new DefaultListModel();
-        pRefTypes.setLayout(new BorderLayout());
-        lReferenceType = new JList(lm);
-//        lReferenceType.setVisibleRowCount(1000);
-//        lReferenceType.setFixedCellWidth(500);
-        lReferenceType.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
-        lReferenceType.setLayoutOrientation(JList.VERTICAL);
-//        spRefTypes.setLayout(new ScrollPaneLayout());
-        jScrollPane = new JScrollPane(lReferenceType);
-        pRefTypes.add(jScrollPane);
-        ArrayList<ReferenceType> ar = new ArrayList<>(savedRefs.keySet());
-        Collections.sort(ar, (o1, o2) -> {
-            return ((ReferenceType) o1).toString().compareToIgnoreCase(((ReferenceType) o2).toString());
-        });
-
-        for (ReferenceType rt : ar) {
-            lm.addElement(rt);
-        }
-
-        lReferenceType.addListSelectionListener(new ListSelectionListener() {
-            @Override
-            public void valueChanged(ListSelectionEvent evt) {
-                lReferenceTypeChanged(evt);
-            }
-
-        });
-
-        lReferenceType.setSelectedIndex(0);
-
-    }
-
     private HashMap<TableType, ArrayList<OptionNode>> savedLogMessages;
-
-    private void retrieveLogMessages(HashMap<TableType, ArrayList<OptionNode>> msgs) {
-        if (msgs != null && msgs.size() > 0) {
-            savedLogMessages = new HashMap<>();
-            savedLogMessages.putAll(msgs);
-        }
-    }
-
-    private void retrieveRefs(HashMap<ReferenceType, ArrayList<OptionNode>> msgs) {
-        if (msgs != null && msgs.size() > 0) {
-            savedRefs = new HashMap<>();
-            savedRefs.putAll(msgs);
-        }
-
-    }
-
+    private JList lAppType;
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btCancel;
+    private javax.swing.JButton btOK;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel10;
+    private javax.swing.JLabel jLabel11;
+    private javax.swing.JLabel jLabel12;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
+    private javax.swing.JLabel jLabel7;
+    private javax.swing.JLabel jLabel8;
+    private javax.swing.JLabel jLabel9;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel10;
+    private javax.swing.JPanel jPanel11;
+    private javax.swing.JPanel jPanel12;
+    private javax.swing.JPanel jPanel13;
+    private javax.swing.JPanel jPanel14;
+    private javax.swing.JPanel jPanel15;
+    private javax.swing.JPanel jPanel16;
+    private javax.swing.JPanel jPanel17;
+    private javax.swing.JPanel jPanel18;
+    private javax.swing.JPanel jPanel19;
+    private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel20;
+    private javax.swing.JPanel jPanel21;
+    private javax.swing.JPanel jPanel22;
+    private javax.swing.JPanel jPanel23;
+    private javax.swing.JPanel jPanel24;
+    private javax.swing.JPanel jPanel25;
+    private javax.swing.JPanel jPanel26;
+    private javax.swing.JPanel jPanel27;
+    private javax.swing.JPanel jPanel28;
+    private javax.swing.JPanel jPanel29;
+    private javax.swing.JPanel jPanel3;
+    private javax.swing.JPanel jPanel30;
+    private javax.swing.JPanel jPanel31;
+    private javax.swing.JPanel jPanel32;
+    private javax.swing.JPanel jPanel34;
+    private javax.swing.JPanel jPanel35;
+    private javax.swing.JPanel jPanel4;
+    private javax.swing.JPanel jPanel5;
+    private javax.swing.JPanel jPanel6;
+    private javax.swing.JPanel jPanel7;
+    private javax.swing.JPanel jPanel8;
+    private javax.swing.JPanel jPanel9;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JTabbedPane jTabbedPane1;
+    private javax.swing.JTabbedPane jTabbedPane2;
+    private javax.swing.JButton jbConstantAdd;
+    private javax.swing.JButton jbConstantRemove;
+    private javax.swing.JButton jbConstantRename;
+    private javax.swing.JButton jbTheConstantAdd;
+    private javax.swing.JButton jbTheConstantPaste;
+    private javax.swing.JButton jbTheConstantRemove;
+    private javax.swing.JButton jbTheConstantRename;
+    private javax.swing.JCheckBox jcbAccessFiles;
+    private javax.swing.JCheckBox jcbDoSkip;
+    private javax.swing.JCheckBox jcbIncludeOrderBy;
+    private javax.swing.JCheckBox jcbLimitQueryResults;
+    private javax.swing.JCheckBox jcbNewTLibSearch;
+    private javax.swing.JCheckBox jcbPrintLogFileName;
+    private javax.swing.JCheckBox jcbShowFullDate;
+    private javax.swing.JCheckBox jcbSort;
+    private javax.swing.JCheckBox jcbignoreFormatting;
+    private javax.swing.JList<String> jlConstants;
+    private javax.swing.JPanel jpAllRefs;
+    private javax.swing.JPanel jpConstants;
+    private javax.swing.JPanel jpFileTypes;
+    private javax.swing.JPanel jpGenesysMessages;
+    private javax.swing.JPanel jpLogMessages;
+    private javax.swing.JPanel jpOutput;
+    private javax.swing.JPanel jpReferences;
+    private javax.swing.JPanel jpRegExps;
+    private javax.swing.JSpinner jsMaxQueryLines;
+    private javax.swing.JSpinner jsMaxRecords;
+    private javax.swing.JTable jtConstants;
+    private javax.swing.JFormattedTextField jtfFileSize;
+    private javax.swing.JTextField jtfLinuxEditor;
+    private javax.swing.JTextField jtfTitleRegex;
+    private javax.swing.JPanel pAppType;
+    private javax.swing.JPanel pRefTypes;
+    private javax.swing.JTextArea taRegExs;
+    private javax.swing.JTextField tfFileNameExcel;
+    private javax.swing.JTextField tfFileNameLong;
+    private javax.swing.JTextField tfFileNameShort;
     public QuerySetting(java.awt.Frame parent, boolean modal, InquirerCfg cr) {
         super(parent, modal);
         setTitle("Settings");
@@ -210,7 +238,74 @@ public final class QuerySetting extends javax.swing.JDialog {
 
     }
 
-    private JList lAppType;
+    private void loadReferences() {
+        lastRefType = ReferenceType.UNKNOWN;
+        lmRefValues = new DefaultListModel();
+        clbRefValues = new CheckBoxListSettings(lmRefValues, jpAllRefs);
+
+        jpAllRefs.setLayout(new BorderLayout());
+        JScrollPane jScrollPane = new JScrollPane(clbRefValues);
+        Dimension d = clbRefValues.getPreferredSize();
+        d.width = 300;
+        jScrollPane.setPreferredSize(d);
+        jpAllRefs.add(jScrollPane);
+
+        clbRefValues.getCheckBoxListSelectionModel().setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+        SearchableUtils.installSearchable(clbRefValues);
+
+        clbRefValues.getCheckBoxListSelectionModel().addListSelectionListener(new ListSelectionListener() {
+
+            @Override
+            public void valueChanged(ListSelectionEvent evt) {
+                clbValueChanged(evt);
+            }
+        });
+
+        DefaultListModel lm = new DefaultListModel();
+        pRefTypes.setLayout(new BorderLayout());
+        lReferenceType = new JList(lm);
+//        lReferenceType.setVisibleRowCount(1000);
+//        lReferenceType.setFixedCellWidth(500);
+        lReferenceType.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
+        lReferenceType.setLayoutOrientation(JList.VERTICAL);
+//        spRefTypes.setLayout(new ScrollPaneLayout());
+        jScrollPane = new JScrollPane(lReferenceType);
+        pRefTypes.add(jScrollPane);
+        ArrayList<ReferenceType> ar = new ArrayList<>(savedRefs.keySet());
+        Collections.sort(ar, (o1, o2) -> {
+            return ((ReferenceType) o1).toString().compareToIgnoreCase(((ReferenceType) o2).toString());
+        });
+
+        for (ReferenceType rt : ar) {
+            lm.addElement(rt);
+        }
+
+        lReferenceType.addListSelectionListener(new ListSelectionListener() {
+            @Override
+            public void valueChanged(ListSelectionEvent evt) {
+                lReferenceTypeChanged(evt);
+            }
+
+        });
+
+        lReferenceType.setSelectedIndex(0);
+
+    }
+
+    private void retrieveLogMessages(HashMap<TableType, ArrayList<OptionNode>> msgs) {
+        if (msgs != null && msgs.size() > 0) {
+            savedLogMessages = new HashMap<>();
+            savedLogMessages.putAll(msgs);
+        }
+    }
+
+    private void retrieveRefs(HashMap<ReferenceType, ArrayList<OptionNode>> msgs) {
+        if (msgs != null && msgs.size() > 0) {
+            savedRefs = new HashMap<>();
+            savedRefs.putAll(msgs);
+        }
+
+    }
 
     private void clbValueChanged(ListSelectionEvent evt) {
         if (!evt.getValueIsAdjusting()) {
@@ -271,9 +366,6 @@ public final class QuerySetting extends javax.swing.JDialog {
         lAppType.setSelectedIndex(0);
 
     }
-
-    Object curSelected = null;
-    TableType lastTableType;
 
     private void commitAppTypeChange(TableType newTableType) {
         if (newTableType != lastTableType) {
@@ -488,12 +580,12 @@ public final class QuerySetting extends javax.swing.JDialog {
         javax.swing.GroupLayout pRefTypesLayout = new javax.swing.GroupLayout(pRefTypes);
         pRefTypes.setLayout(pRefTypesLayout);
         pRefTypesLayout.setHorizontalGroup(
-            pRefTypesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 183, Short.MAX_VALUE)
+                pRefTypesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGap(0, 183, Short.MAX_VALUE)
         );
         pRefTypesLayout.setVerticalGroup(
-            pRefTypesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 491, Short.MAX_VALUE)
+                pRefTypesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGap(0, 491, Short.MAX_VALUE)
         );
 
         jPanel5.add(pRefTypes);
@@ -552,22 +644,22 @@ public final class QuerySetting extends javax.swing.JDialog {
         javax.swing.GroupLayout jPanel22Layout = new javax.swing.GroupLayout(jPanel22);
         jPanel22.setLayout(jPanel22Layout);
         jPanel22Layout.setHorizontalGroup(
-            jPanel22Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel22Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jLabel5)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(tfFileNameLong, javax.swing.GroupLayout.PREFERRED_SIZE, 438, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
+                jPanel22Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(jPanel22Layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(jLabel5)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(tfFileNameLong, javax.swing.GroupLayout.PREFERRED_SIZE, 438, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addContainerGap())
         );
         jPanel22Layout.setVerticalGroup(
-            jPanel22Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel22Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanel22Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(tfFileNameLong, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel5))
-                .addContainerGap())
+                jPanel22Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(jPanel22Layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addGroup(jPanel22Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(tfFileNameLong, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(jLabel5))
+                                .addContainerGap())
         );
 
         jPanel8.add(jPanel22);
@@ -579,12 +671,12 @@ public final class QuerySetting extends javax.swing.JDialog {
         javax.swing.GroupLayout jpFileTypesLayout = new javax.swing.GroupLayout(jpFileTypes);
         jpFileTypes.setLayout(jpFileTypesLayout);
         jpFileTypesLayout.setHorizontalGroup(
-            jpFileTypesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 171, Short.MAX_VALUE)
+                jpFileTypesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGap(0, 171, Short.MAX_VALUE)
         );
         jpFileTypesLayout.setVerticalGroup(
-            jpFileTypesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 110, Short.MAX_VALUE)
+                jpFileTypesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGap(0, 110, Short.MAX_VALUE)
         );
 
         jpRegExps.setBorder(javax.swing.BorderFactory.createTitledBorder("Regexps list"));
@@ -607,29 +699,29 @@ public final class QuerySetting extends javax.swing.JDialog {
         javax.swing.GroupLayout jPanel7Layout = new javax.swing.GroupLayout(jPanel7);
         jPanel7.setLayout(jPanel7Layout);
         jPanel7Layout.setHorizontalGroup(
-            jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel7Layout.createSequentialGroup()
-                .addGap(22, 22, 22)
-                .addComponent(jpFileTypes, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jpRegExps, javax.swing.GroupLayout.DEFAULT_SIZE, 793, Short.MAX_VALUE)
-                .addContainerGap())
-            .addGroup(jPanel7Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jcbDoSkip)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(jPanel7Layout.createSequentialGroup()
+                                .addGap(22, 22, 22)
+                                .addComponent(jpFileTypes, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(jpRegExps, javax.swing.GroupLayout.DEFAULT_SIZE, 793, Short.MAX_VALUE)
+                                .addContainerGap())
+                        .addGroup(jPanel7Layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(jcbDoSkip)
+                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel7Layout.setVerticalGroup(
-            jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel7Layout.createSequentialGroup()
-                .addComponent(jcbDoSkip)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jpRegExps, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(jPanel7Layout.createSequentialGroup()
-                        .addComponent(jpFileTypes, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 0, Short.MAX_VALUE)))
-                .addContainerGap())
+                jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel7Layout.createSequentialGroup()
+                                .addComponent(jcbDoSkip)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addComponent(jpRegExps, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                        .addGroup(jPanel7Layout.createSequentialGroup()
+                                                .addComponent(jpFileTypes, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addGap(0, 0, Short.MAX_VALUE)))
+                                .addContainerGap())
         );
 
         jPanel8.add(jPanel7);
@@ -645,22 +737,22 @@ public final class QuerySetting extends javax.swing.JDialog {
         javax.swing.GroupLayout jPanel23Layout = new javax.swing.GroupLayout(jPanel23);
         jPanel23.setLayout(jPanel23Layout);
         jPanel23Layout.setHorizontalGroup(
-            jPanel23Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel23Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jLabel7)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(tfFileNameExcel, javax.swing.GroupLayout.PREFERRED_SIZE, 432, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
+                jPanel23Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(jPanel23Layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(jLabel7)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(tfFileNameExcel, javax.swing.GroupLayout.PREFERRED_SIZE, 432, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addContainerGap())
         );
         jPanel23Layout.setVerticalGroup(
-            jPanel23Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel23Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanel23Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(tfFileNameExcel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel7))
-                .addContainerGap())
+                jPanel23Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(jPanel23Layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addGroup(jPanel23Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(tfFileNameExcel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(jLabel7))
+                                .addContainerGap())
         );
 
         jPanel8.add(jPanel23);
@@ -674,25 +766,25 @@ public final class QuerySetting extends javax.swing.JDialog {
         javax.swing.GroupLayout jPanel24Layout = new javax.swing.GroupLayout(jPanel24);
         jPanel24.setLayout(jPanel24Layout);
         jPanel24Layout.setHorizontalGroup(
-            jPanel24Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel24Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jLabel8)
-                .addGap(2, 2, 2)
-                .addComponent(jtfFileSize, javax.swing.GroupLayout.PREFERRED_SIZE, 106, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jLabel9)
-                .addContainerGap())
+                jPanel24Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(jPanel24Layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(jLabel8)
+                                .addGap(2, 2, 2)
+                                .addComponent(jtfFileSize, javax.swing.GroupLayout.PREFERRED_SIZE, 106, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jLabel9)
+                                .addContainerGap())
         );
         jPanel24Layout.setVerticalGroup(
-            jPanel24Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel24Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanel24Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel8)
-                    .addComponent(jLabel9)
-                    .addComponent(jtfFileSize, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap())
+                jPanel24Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(jPanel24Layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addGroup(jPanel24Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(jLabel8)
+                                        .addComponent(jLabel9)
+                                        .addComponent(jtfFileSize, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addContainerGap())
         );
 
         jPanel8.add(jPanel24);
@@ -713,25 +805,25 @@ public final class QuerySetting extends javax.swing.JDialog {
         javax.swing.GroupLayout jPanel11Layout = new javax.swing.GroupLayout(jPanel11);
         jPanel11.setLayout(jPanel11Layout);
         jPanel11Layout.setHorizontalGroup(
-            jPanel11Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel11Layout.createSequentialGroup()
-                .addGap(21, 21, 21)
-                .addGroup(jPanel11Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jcbShowFullDate)
-                    .addComponent(jcbignoreFormatting)
-                    .addComponent(jcbPrintLogFileName))
-                .addContainerGap(711, Short.MAX_VALUE))
+                jPanel11Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(jPanel11Layout.createSequentialGroup()
+                                .addGap(21, 21, 21)
+                                .addGroup(jPanel11Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addComponent(jcbShowFullDate)
+                                        .addComponent(jcbignoreFormatting)
+                                        .addComponent(jcbPrintLogFileName))
+                                .addContainerGap(711, Short.MAX_VALUE))
         );
         jPanel11Layout.setVerticalGroup(
-            jPanel11Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel11Layout.createSequentialGroup()
-                .addGap(19, 19, 19)
-                .addComponent(jcbPrintLogFileName)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jcbignoreFormatting)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jcbShowFullDate)
-                .addContainerGap(361, Short.MAX_VALUE))
+                jPanel11Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(jPanel11Layout.createSequentialGroup()
+                                .addGap(19, 19, 19)
+                                .addComponent(jcbPrintLogFileName)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jcbignoreFormatting)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jcbShowFullDate)
+                                .addContainerGap(361, Short.MAX_VALUE))
         );
 
         jTabbedPane2.addTab("Formated", jPanel11);
@@ -805,12 +897,12 @@ public final class QuerySetting extends javax.swing.JDialog {
         javax.swing.GroupLayout jPanel31Layout = new javax.swing.GroupLayout(jPanel31);
         jPanel31.setLayout(jPanel31Layout);
         jPanel31Layout.setHorizontalGroup(
-            jPanel31Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 1073, Short.MAX_VALUE)
+                jPanel31Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGap(0, 1073, Short.MAX_VALUE)
         );
         jPanel31Layout.setVerticalGroup(
-            jPanel31Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 100, Short.MAX_VALUE)
+                jPanel31Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGap(0, 100, Short.MAX_VALUE)
         );
 
         jpConstants.add(jPanel31, java.awt.BorderLayout.PAGE_START);
@@ -868,12 +960,12 @@ public final class QuerySetting extends javax.swing.JDialog {
         javax.swing.GroupLayout jPanel29Layout = new javax.swing.GroupLayout(jPanel29);
         jPanel29.setLayout(jPanel29Layout);
         jPanel29Layout.setHorizontalGroup(
-            jPanel29Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 578, Short.MAX_VALUE)
+                jPanel29Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGap(0, 578, Short.MAX_VALUE)
         );
         jPanel29Layout.setVerticalGroup(
-            jPanel29Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 177, Short.MAX_VALUE)
+                jPanel29Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGap(0, 177, Short.MAX_VALUE)
         );
 
         jPanel30.add(jPanel29);
@@ -889,12 +981,12 @@ public final class QuerySetting extends javax.swing.JDialog {
         jScrollPane1.setAutoscrolls(true);
 
         jtConstants.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
+                new Object[][]{
 
-            },
-            new String [] {
+                },
+                new String[]{
 
-            }
+                }
         ));
         jtConstants.setCellSelectionEnabled(true);
         jScrollPane1.setViewportView(jtConstants);
@@ -941,12 +1033,12 @@ public final class QuerySetting extends javax.swing.JDialog {
         javax.swing.GroupLayout jPanel32Layout = new javax.swing.GroupLayout(jPanel32);
         jPanel32.setLayout(jPanel32Layout);
         jPanel32Layout.setHorizontalGroup(
-            jPanel32Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 26, Short.MAX_VALUE)
+                jPanel32Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGap(0, 26, Short.MAX_VALUE)
         );
         jPanel32Layout.setVerticalGroup(
-            jPanel32Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 407, Short.MAX_VALUE)
+                jPanel32Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGap(0, 407, Short.MAX_VALUE)
         );
 
         jPanel13.add(jPanel32);
@@ -981,12 +1073,12 @@ public final class QuerySetting extends javax.swing.JDialog {
         javax.swing.GroupLayout jPanel25Layout = new javax.swing.GroupLayout(jPanel25);
         jPanel25.setLayout(jPanel25Layout);
         jPanel25Layout.setHorizontalGroup(
-            jPanel25Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 933, Short.MAX_VALUE)
+                jPanel25Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGap(0, 933, Short.MAX_VALUE)
         );
         jPanel25Layout.setVerticalGroup(
-            jPanel25Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 29, Short.MAX_VALUE)
+                jPanel25Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGap(0, 29, Short.MAX_VALUE)
         );
 
         jPanel1.add(jPanel25);
@@ -1206,141 +1298,24 @@ public final class QuerySetting extends javax.swing.JDialog {
 
 // TODO add your handling code here:
     }//GEN-LAST:event_jbConstantRemoveActionPerformed
-
-    // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton btCancel;
-    private javax.swing.JButton btOK;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel10;
-    private javax.swing.JLabel jLabel11;
-    private javax.swing.JLabel jLabel12;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel4;
-    private javax.swing.JLabel jLabel5;
-    private javax.swing.JLabel jLabel6;
-    private javax.swing.JLabel jLabel7;
-    private javax.swing.JLabel jLabel8;
-    private javax.swing.JLabel jLabel9;
-    private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel10;
-    private javax.swing.JPanel jPanel11;
-    private javax.swing.JPanel jPanel12;
-    private javax.swing.JPanel jPanel13;
-    private javax.swing.JPanel jPanel14;
-    private javax.swing.JPanel jPanel15;
-    private javax.swing.JPanel jPanel16;
-    private javax.swing.JPanel jPanel17;
-    private javax.swing.JPanel jPanel18;
-    private javax.swing.JPanel jPanel19;
-    private javax.swing.JPanel jPanel2;
-    private javax.swing.JPanel jPanel20;
-    private javax.swing.JPanel jPanel21;
-    private javax.swing.JPanel jPanel22;
-    private javax.swing.JPanel jPanel23;
-    private javax.swing.JPanel jPanel24;
-    private javax.swing.JPanel jPanel25;
-    private javax.swing.JPanel jPanel26;
-    private javax.swing.JPanel jPanel27;
-    private javax.swing.JPanel jPanel28;
-    private javax.swing.JPanel jPanel29;
-    private javax.swing.JPanel jPanel3;
-    private javax.swing.JPanel jPanel30;
-    private javax.swing.JPanel jPanel31;
-    private javax.swing.JPanel jPanel32;
-    private javax.swing.JPanel jPanel34;
-    private javax.swing.JPanel jPanel35;
-    private javax.swing.JPanel jPanel4;
-    private javax.swing.JPanel jPanel5;
-    private javax.swing.JPanel jPanel6;
-    private javax.swing.JPanel jPanel7;
-    private javax.swing.JPanel jPanel8;
-    private javax.swing.JPanel jPanel9;
-    private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JScrollPane jScrollPane3;
-    private javax.swing.JTabbedPane jTabbedPane1;
-    private javax.swing.JTabbedPane jTabbedPane2;
-    private javax.swing.JButton jbConstantAdd;
-    private javax.swing.JButton jbConstantRemove;
-    private javax.swing.JButton jbConstantRename;
-    private javax.swing.JButton jbTheConstantAdd;
-    private javax.swing.JButton jbTheConstantPaste;
-    private javax.swing.JButton jbTheConstantRemove;
-    private javax.swing.JButton jbTheConstantRename;
-    private javax.swing.JCheckBox jcbAccessFiles;
-    private javax.swing.JCheckBox jcbDoSkip;
-    private javax.swing.JCheckBox jcbIncludeOrderBy;
-    private javax.swing.JCheckBox jcbLimitQueryResults;
-    private javax.swing.JCheckBox jcbNewTLibSearch;
-    private javax.swing.JCheckBox jcbPrintLogFileName;
-    private javax.swing.JCheckBox jcbShowFullDate;
-    private javax.swing.JCheckBox jcbSort;
-    private javax.swing.JCheckBox jcbignoreFormatting;
-    private javax.swing.JList<String> jlConstants;
-    private javax.swing.JPanel jpAllRefs;
-    private javax.swing.JPanel jpConstants;
-    private javax.swing.JPanel jpFileTypes;
-    private javax.swing.JPanel jpGenesysMessages;
-    private javax.swing.JPanel jpLogMessages;
-    private javax.swing.JPanel jpOutput;
-    private javax.swing.JPanel jpReferences;
-    private javax.swing.JPanel jpRegExps;
-    private javax.swing.JSpinner jsMaxQueryLines;
-    private javax.swing.JSpinner jsMaxRecords;
-    private javax.swing.JTable jtConstants;
-    private javax.swing.JFormattedTextField jtfFileSize;
-    private javax.swing.JTextField jtfLinuxEditor;
-    private javax.swing.JTextField jtfTitleRegex;
-    private javax.swing.JPanel pAppType;
-    private javax.swing.JPanel pRefTypes;
-    private javax.swing.JTextArea taRegExs;
-    private javax.swing.JTextField tfFileNameExcel;
-    private javax.swing.JTextField tfFileNameLong;
-    private javax.swing.JTextField tfFileNameShort;
     // End of variables declaration//GEN-END:variables
-
-    private class jlConstantsSelectionListener implements ListSelectionListener {
-
-        private JTable jtConstants;
-
-        public jlConstantsSelectionListener() {
-        }
-
-        private jlConstantsSelectionListener(JTable jtConstants) {
-            this.jtConstants = jtConstants;
-        }
-
-        @Override
-        public void valueChanged(ListSelectionEvent e) {
-            JList jl = (JList) e.getSource();
-            InquirerCfg.GenesysConstant selectedValue = (InquirerCfg.GenesysConstant) jl.getSelectedValue();
-            if (selectedValue != null) {
-                ConstantsModel mod = (ConstantsModel) jtConstants.getModel();
-                mod.setTheConstant(selectedValue);
-//                tca.adjustColumns();
-                mod.fireTableDataChanged();
-//                SwingUtilities.getWindowAncestor(jtConstants).pack();
-            }
-        }
-    }
 
     private static class ConstantsModel extends AbstractTableModel {
 
-        InquirerCfg.GenesysConstant theConstant;
         private final Class[] types;
         private final String[] columnNames;
+        InquirerCfg.GenesysConstant theConstant;
 
         public ConstantsModel() {
             this.theConstant = new GenesysConstant();
 
             columnNames
                     = new String[]{
-                        "String value", "Constant ID"
-                    };
+                    "String value", "Constant ID"
+            };
 
             types = new Class[]{
-                java.lang.String.class, java.lang.Integer.class
+                    java.lang.String.class, java.lang.Integer.class
             };
 
         }
@@ -1411,6 +1386,31 @@ public final class QuerySetting extends javax.swing.JDialog {
         private void deleteRow(int selectedRow) {
             theConstant.deleteRow(selectedRow);
 
+        }
+    }
+
+    private class jlConstantsSelectionListener implements ListSelectionListener {
+
+        private JTable jtConstants;
+
+        public jlConstantsSelectionListener() {
+        }
+
+        private jlConstantsSelectionListener(JTable jtConstants) {
+            this.jtConstants = jtConstants;
+        }
+
+        @Override
+        public void valueChanged(ListSelectionEvent e) {
+            JList jl = (JList) e.getSource();
+            InquirerCfg.GenesysConstant selectedValue = (InquirerCfg.GenesysConstant) jl.getSelectedValue();
+            if (selectedValue != null) {
+                ConstantsModel mod = (ConstantsModel) jtConstants.getModel();
+                mod.setTheConstant(selectedValue);
+//                tca.adjustColumns();
+                mod.fireTableDataChanged();
+//                SwingUtilities.getWindowAncestor(jtConstants).pack();
+            }
         }
     }
 }

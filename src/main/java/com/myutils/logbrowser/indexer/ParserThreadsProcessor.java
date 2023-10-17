@@ -223,6 +223,7 @@ public class ParserThreadsProcessor {
         STATE_HTTPOUT
     }
 
+    @FunctionalInterface
     public interface StateTransition {
 
         StateTransitionResult stateTransition(ParserThreadState threadState,

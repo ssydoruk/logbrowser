@@ -4,17 +4,13 @@
  */
 package com.myutils.logbrowser.indexer;
 
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Timestamp;
-
 /**
  * @author ssydoruk
  */
 public class ISCCTable extends DBTable {
 
     public ISCCTable(SqliteAccessor dbaccessor, TableType t) {
-        super(dbaccessor, t,"ISCC_" + dbaccessor.getM_alias());
+        super(dbaccessor, t, "ISCC_" + dbaccessor.getM_alias());
     }
 
     @Override

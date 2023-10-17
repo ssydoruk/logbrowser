@@ -32,23 +32,22 @@ public final class URSTargetSet extends Message {
                     this.obj = m.group(1);
                     agentFound = true;
                 }
-            }
-            else { // default object type
+            } else { // default object type
                 String s = targetItem.trim();
-                if(StringUtils.isNotBlank(s)){
-                    this.obj=s;
-                    this.objType=UrsParser.targetCode.get("A");
+                if (StringUtils.isNotBlank(s)) {
+                    this.obj = s;
+                    this.objType = UrsParser.targetCode.get("A");
                 }
             }
         }
     }
 
     URSTargetSet(String target, int fileID) {
-        this( fileID);
+        this(fileID);
         this.target = target;
     }
 
-    public URSTargetSet( int fileID) {
+    public URSTargetSet(int fileID) {
         super(TableType.URSTargetSet, fileID);
     }
 

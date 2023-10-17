@@ -11,7 +11,6 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static Utils.Util.intOrDef;
@@ -128,6 +127,12 @@ public final class IxnGMS extends Message {
 
     }
 
+    public IxnGMS(String fromTo, String msgName, int fileID) {
+        this(TableType.IxnGMS, fileID);
+        this.messageName = msgName;
+        SetInbound(fromTo != null && fromTo.toLowerCase().startsWith("from"));
+    }
+
     @Override
     public boolean fillStat(PreparedStatement stmt) throws SQLException {
         stmt.setTimestamp(1, new Timestamp(GetAdjustedUsecTime()));
@@ -151,12 +156,6 @@ public final class IxnGMS extends Message {
         setFieldInt(stmt, 18, Main.getRef(ReferenceType.TLIBATTR2, getAttr2()));
         return true;
 
-    }
-
-    public IxnGMS(String fromTo, String msgName, int fileID) {
-        this(TableType.IxnGMS, fileID);
-        this.messageName = msgName;
-        SetInbound(fromTo != null && fromTo.toLowerCase().startsWith("from"));
     }
 
     public String GetSid() {

@@ -8,39 +8,41 @@ package com.myutils.logbrowser.inquirer.gui;
 import Utils.ScreenInfo;
 import com.myutils.logbrowser.inquirer.gui.AColumnFilter.FilterComboboxModel;
 import com.myutils.logbrowser.inquirer.gui.AColumnFilter.NumberFilter;
-import static com.myutils.logbrowser.inquirer.gui.AColumnFilter.convertDouble;
+import org.apache.logging.log4j.LogManager;
+
+import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
-import javax.swing.AbstractAction;
-import javax.swing.JComboBox;
-import javax.swing.JComponent;
-import javax.swing.JOptionPane;
-import javax.swing.KeyStroke;
-import static javax.swing.WindowConstants.DISPOSE_ON_CLOSE;
-import org.apache.logging.log4j.LogManager;
+
+import static com.myutils.logbrowser.inquirer.gui.AColumnFilter.convertDouble;
 
 /**
- *
  * @author ssydoruk
  */
 public final class jdNumberFilter extends javax.swing.JDialog {
 
-    public NumberFilter getNumberSelection() {
-        return numberSelection;
-    }
-
+    private static final org.apache.logging.log4j.Logger logger = LogManager.getLogger();
     private int closeCause = JOptionPane.CANCEL_OPTION;
-
-    public int getCloseCause() {
-        return closeCause;
-    }
     private NumberFilter numberSelection = null;
-
-    public void setCloseCause(int closeCause) {
-        this.closeCause = closeCause;
-    }
-
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel7;
+    private javax.swing.JPanel jPanel8;
+    private javax.swing.JButton jbCancel;
+    private javax.swing.JButton jbOK;
+    private javax.swing.JComboBox<String> jcbActionType;
+    private javax.swing.JLabel jlAnd;
+    private javax.swing.JPanel jpButtons;
+    private javax.swing.JPanel jpOthers;
+    private javax.swing.JPanel jpSelection;
+    private javax.swing.JPanel jpWorkArea;
+    private javax.swing.JRadioButton jrbHide;
+    private javax.swing.JRadioButton jrbShow;
+    private javax.swing.JFormattedTextField jtfFirstNumber;
+    private javax.swing.JFormattedTextField jtfSecondNumber;
     /**
      * Creates new form jdNumberFilter
      */
@@ -51,13 +53,13 @@ public final class jdNumberFilter extends javax.swing.JDialog {
         getRootPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
                 .put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "ESCAPE_KEY");
         getRootPane().getActionMap().put("ESCAPE_KEY", new AbstractAction() {
-            private static final long serialVersionUID = 1L;
+                    private static final long serialVersionUID = 1L;
 
-            @Override
-            public void actionPerformed(ActionEvent ae) {
-                dispose();
-            }
-        }
+                    @Override
+                    public void actionPerformed(ActionEvent ae) {
+                        dispose();
+                    }
+                }
         );
 
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
@@ -141,6 +143,18 @@ public final class jdNumberFilter extends javax.swing.JDialog {
             }
         });
         jcbActionType.setSelectedIndex(0);
+    }
+
+    public NumberFilter getNumberSelection() {
+        return numberSelection;
+    }
+
+    public int getCloseCause() {
+        return closeCause;
+    }
+
+    public void setCloseCause(int closeCause) {
+        this.closeCause = closeCause;
     }
 
     /**
@@ -248,16 +262,16 @@ public final class jdNumberFilter extends javax.swing.JDialog {
         javax.swing.GroupLayout jpButtonsLayout = new javax.swing.GroupLayout(jpButtons);
         jpButtons.setLayout(jpButtonsLayout);
         jpButtonsLayout.setHorizontalGroup(
-            jpButtonsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jpButtonsLayout.createSequentialGroup()
-                .addGap(0, 308, Short.MAX_VALUE)
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                jpButtonsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jpButtonsLayout.createSequentialGroup()
+                                .addGap(0, 308, Short.MAX_VALUE)
+                                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
         jpButtonsLayout.setVerticalGroup(
-            jpButtonsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jpButtonsLayout.createSequentialGroup()
-                .addGap(0, 11, Short.MAX_VALUE)
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                jpButtonsLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jpButtonsLayout.createSequentialGroup()
+                                .addGap(0, 11, Short.MAX_VALUE)
+                                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
         getContentPane().add(jpButtons);
@@ -278,6 +292,7 @@ public final class jdNumberFilter extends javax.swing.JDialog {
         dispose();
         // TODO add your handling code here:
     }//GEN-LAST:event_jbOKActionPerformed
+    // End of variables declaration//GEN-END:variables
 
     private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated
         getRootPane().setDefaultButton(jbOK);
@@ -285,26 +300,6 @@ public final class jdNumberFilter extends javax.swing.JDialog {
         pack();
 
     }//GEN-LAST:event_formWindowActivated
-
-    // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel2;
-    private javax.swing.JPanel jPanel7;
-    private javax.swing.JPanel jPanel8;
-    private javax.swing.JButton jbCancel;
-    private javax.swing.JButton jbOK;
-    private javax.swing.JComboBox<String> jcbActionType;
-    private javax.swing.JLabel jlAnd;
-    private javax.swing.JPanel jpButtons;
-    private javax.swing.JPanel jpOthers;
-    private javax.swing.JPanel jpSelection;
-    private javax.swing.JPanel jpWorkArea;
-    private javax.swing.JRadioButton jrbHide;
-    private javax.swing.JRadioButton jrbShow;
-    private javax.swing.JFormattedTextField jtfFirstNumber;
-    private javax.swing.JFormattedTextField jtfSecondNumber;
-    // End of variables declaration//GEN-END:variables
 
     void setCurrentNumber(Object valueAt) {
         if (valueAt != null) {
@@ -315,7 +310,5 @@ public final class jdNumberFilter extends javax.swing.JDialog {
             }
         }
     }
-
-    private static final org.apache.logging.log4j.Logger logger = LogManager.getLogger();
 
 }

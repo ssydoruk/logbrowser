@@ -32,7 +32,7 @@ public abstract class IQuery extends QueryTools {
     protected int recCnt;
     Wheres addWheres = new Wheres();
     private ICalculatedFields calcFields = null;
-//    void AddCheckedWhere(String[] nameIDs, ReferenceType referenceType, DynamicTreeNode<OptionNode> node, String AndOr, DialogItem di) throws Exception {
+    //    void AddCheckedWhere(String[] nameIDs, ReferenceType referenceType, DynamicTreeNode<OptionNode> node, String AndOr, DialogItem di) throws Exception {
 //        DynamicTreeNode<OptionNode> nameSettings = getChildByName(node, di);
 //        if (isChecked(nameSettings) && !OptionNode.AllChildrenChecked(nameSettings)) {
 //            
@@ -1081,6 +1081,7 @@ public abstract class IQuery extends QueryTools {
         Optional
     }
 
+    @FunctionalInterface
     public interface IRecordLoadedProc {
 
         void recordLoaded(ILogRecord rec);

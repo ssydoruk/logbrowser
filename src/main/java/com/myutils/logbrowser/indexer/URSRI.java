@@ -16,7 +16,7 @@ public class URSRI extends URSRIBase {
         super(t, messageLines, fileID);
     }
 
-    URSRI( int fileID) {
+    URSRI(int fileID) {
         super(TableType.URSRI, fileID);
     }
 

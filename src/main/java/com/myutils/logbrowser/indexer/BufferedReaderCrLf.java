@@ -42,11 +42,11 @@ import java.io.*;
  * Programs that use DataInputStreams for textual input can be localized by
  * replacing each DataInputStream with an appropriate BufferedReader.
  *
- * @version %I%, %E%
  * @author Mark Reinhold
- * @since JDK1.1
+ * @version %I%, %E%
  * @see FileReader
  * @see InputStreamReader
+ * @since JDK1.1
  */
 public class BufferedReaderCrLf {
 

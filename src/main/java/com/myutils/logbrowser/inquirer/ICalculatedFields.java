@@ -10,6 +10,7 @@ import java.util.Properties;
 /**
  * @author ssydoruk
  */
+@FunctionalInterface
 public interface ICalculatedFields {
 
     Properties calc(Properties m_fieldsAll);

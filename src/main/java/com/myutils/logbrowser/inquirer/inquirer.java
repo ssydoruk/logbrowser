@@ -85,19 +85,6 @@ public class inquirer {
         return cfg;
     }
 
-    public String getRecordDisplayScript(MsgType recType) {
-        for (ILogRecordFormatter formatter : formatters) {
-            if (formatter instanceof OutputSpecFormatter) {
-                OutputSpecFormatter.RecordLayout layout = ((OutputSpecFormatter) formatter).getLayout(recType);
-                if (layout != null) {
-                    return layout.getRecordDisplayScript();
-                }
-            }
-
-        }
-        return null;
-    }
-
     static String getDialogTitle(String title) {
         String wd = Utils.FileUtils.getCurrentDirectory();
         String prefix = "";
@@ -127,11 +114,6 @@ public class inquirer {
         } catch (NumberFormatException numberFormatException) {
             return "";
         }
-    }
-
-    @Override
-    protected void finalize() throws Throwable {
-        lfm.clear();
     }
 
     private static DateTimeFormatter getDTFormat(String dtFormat) {
@@ -175,7 +157,7 @@ public class inquirer {
     }
 
     public static int showYesNoPanel(Window p, String t, JComponent bannerPannel, Container jScrollPane,
-            int buttonOptions) {
+                                     int buttonOptions) {
         // JDialog allFiles = new JDialog(parent, title);
         InfoPanel infoDialog = new InfoPanel(p, t, bannerPannel, jScrollPane, buttonOptions);
 
@@ -680,6 +662,24 @@ public class inquirer {
         }
     }
 
+    public String getRecordDisplayScript(MsgType recType) {
+        for (ILogRecordFormatter formatter : formatters) {
+            if (formatter instanceof OutputSpecFormatter) {
+                OutputSpecFormatter.RecordLayout layout = ((OutputSpecFormatter) formatter).getLayout(recType);
+                if (layout != null) {
+                    return layout.getRecordDisplayScript();
+                }
+            }
+
+        }
+        return null;
+    }
+
+    @Override
+    protected void finalize() throws Throwable {
+        lfm.clear();
+    }
+
     public ArrayList getFormatters() throws Exception {
         for (ILogRecordFormatter formatter : formatters) {
             formatter.refreshFormatter();
@@ -747,7 +747,7 @@ public class inquirer {
             int dialogButton = JOptionPane.YES_NO_CANCEL_OPTION;
             dialogResult = inquirer.showConfirmDialog(null,
                     "Number of records seems large (" + getCr().getMaxRecords() + "/" + queryResults.m_results.size()
-                    + "). Do you want to print on screen(Yes), to files only (No), or Cancel?",
+                            + "). Do you want to print on screen(Yes), to files only (No), or Cancel?",
                     "Warning", dialogButton);
             if (dialogResult == JOptionPane.CANCEL_OPTION) {
                 doPrint = false;

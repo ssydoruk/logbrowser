@@ -4,10 +4,6 @@
  */
 package com.myutils.logbrowser.indexer;
 
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Timestamp;
-
 /**
  * @author ssydoruk
  * <p>
@@ -91,8 +87,6 @@ public class IxnGMSTable extends DBTable {
     public void FinalizeDB() throws Exception {
         createIndexes();
     }
-
-
 
 
 }

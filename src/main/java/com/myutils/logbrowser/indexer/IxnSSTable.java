@@ -4,12 +4,6 @@
  */
 package com.myutils.logbrowser.indexer;
 
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Timestamp;
-
-import static java.sql.Types.INTEGER;
-
 /**
  * @author ssydoruk
  * <p>
@@ -19,7 +13,7 @@ import static java.sql.Types.INTEGER;
 public class IxnSSTable extends DBTable {
 
     public IxnSSTable(SqliteAccessor dbaccessor, TableType t) {
-        super(dbaccessor, t,"IxnSS");
+        super(dbaccessor, t, "IxnSS");
     }
 
     @Override

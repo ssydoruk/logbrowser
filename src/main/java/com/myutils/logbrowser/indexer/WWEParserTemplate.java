@@ -4,7 +4,6 @@
  */
 package com.myutils.logbrowser.indexer;
 
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.sql.PreparedStatement;
@@ -45,7 +44,7 @@ public class WWEParserTemplate extends WebParser {
     private boolean skipMessage;
     private Message msg;
 
-    WWEParserTemplate(DBTables  m_tables) {
+    WWEParserTemplate(DBTables m_tables) {
         super(FileInfoType.type_WWE, m_tables);
         m_MessageContents = new ArrayList();
         ThreadAlias.put("ORSInternal", "FMWeb");
@@ -190,7 +189,7 @@ public class WWEParserTemplate extends WebParser {
     }
 
     @Override
-    void init(DBTables  m_tables) {
+    void init(DBTables m_tables) {
         m_tables.put(TableType.WWEMessage.toString(), new WWEDebugMessageTable(Main.getInstance().getM_accessor(), TableType.WWEMessage));
 
     }

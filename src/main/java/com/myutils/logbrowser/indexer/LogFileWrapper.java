@@ -20,20 +20,12 @@ public abstract class LogFileWrapper {
 
     private final File file;
     private final HashMap<FileInfo, Object> fileInfoFileMap = new HashMap<>();
-
-    public String getBaseDir() {
-        return baseDir;
-    }
-
-    public String getRelativeFile(File f) {
-        return Paths.get(getBaseDir()).relativize(Paths.get(f.getAbsolutePath())).toString();
-    }
-
     private final String baseDir;
     private boolean ignoreLog = false;
+
     LogFileWrapper(File file, String baseDir) throws IOException {
         this.file = file;
-        this.baseDir=baseDir;
+        this.baseDir = baseDir;
     }
 
     public static LogFileWrapper getContainer(File file, String baseDir) {
@@ -54,6 +46,14 @@ public abstract class LogFileWrapper {
         }
 
         return null;
+    }
+
+    public String getBaseDir() {
+        return baseDir;
+    }
+
+    public String getRelativeFile(File f) {
+        return Paths.get(getBaseDir()).relativize(Paths.get(f.getAbsolutePath())).toString();
     }
 
     public File getFile() {

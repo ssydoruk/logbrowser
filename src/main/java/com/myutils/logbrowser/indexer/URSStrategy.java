@@ -37,7 +37,7 @@ public final class URSStrategy extends Message {
 
     //    private static final Pattern regCampaignDBID= Pattern.compile("CampaignDBID: ([^;]+);");
     URSStrategy(ArrayList m_MessageContents, String ConnID, String FileLine,
-                String lineRest,  int fileID) {
+                String lineRest, int fileID) {
         super(TableType.URSStrategy, fileID);
         this.m_MessageLines = m_MessageContents;
         this.FileLine = FileLine;

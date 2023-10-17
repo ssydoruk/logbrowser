@@ -206,8 +206,7 @@ public class OCSDBActivity extends Message {
                             return value;
                         }
                     }
-                }
-                catch (NullPointerException e){
+                } catch (NullPointerException e) {
                     Main.logger.error("error", e);
                 }
 

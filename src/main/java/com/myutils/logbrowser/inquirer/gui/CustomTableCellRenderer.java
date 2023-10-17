@@ -26,6 +26,7 @@ class CustomTableCellRenderer extends DefaultTableCellRenderer {
     private static final int NUM_DOTS = 2;
     private static final String DOTS_STRING = StringUtils.repeat('.', NUM_DOTS);
     private final Font selectFont;
+
     CustomTableCellRenderer(Font f) {
         selectFont = f;
     }

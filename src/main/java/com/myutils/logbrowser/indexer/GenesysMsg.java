@@ -44,13 +44,12 @@ public final class GenesysMsg extends Message {
     }
 
 
-
     public static GenesysMsg postGenesysMsg(DateParsed dp, Parser p, TableType t, Pattern ignoreMSGIDs,
                                             String _lastGenesysMsgLevel, String _lastGenesysMsgID, String generatedMsgID, String generatedMsg,
                                             boolean saveToDB) {
         GenesysMsg msg;
 
-        msg = new GenesysMsg(t, _lastGenesysMsgLevel, generatedMsgID, generatedMsg, p. fileInfo.getRecordID());
+        msg = new GenesysMsg(t, _lastGenesysMsgLevel, generatedMsgID, generatedMsg, p.fileInfo.getRecordID());
 
         msg.setM_Timestamp(dp);
         msg.SetOffset(p.getFilePos());
@@ -73,7 +72,6 @@ public final class GenesysMsg extends Message {
         return postGenesysMsg(dp, p, t, ignoreMSGIDs,
                 _lastGenesysMsgLevel, _lastGenesysMsgID, generatedMsgID, generatedMsg, true);
     }
-
 
 
     public static GenesysMsg CheckGenesysMsg(DateParsed dp, Parser p, TableType t, Pattern reg, Pattern ignoreMSGIDs,

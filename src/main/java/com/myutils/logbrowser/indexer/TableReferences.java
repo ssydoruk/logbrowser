@@ -37,7 +37,7 @@ class TableReference {
                         ResultSet rs = dbAccessor.executeQuery("select name, id from " + type);
                         Main.logger.trace("Reading references from " + type);
 
-    //                    ResultSetMetaData rsmd = rs.getMetaData();
+                        //                    ResultSetMetaData rsmd = rs.getMetaData();
                         int cnt = 0;
                         while (rs.next()) {
                             String n = rs.getString(1);
@@ -165,13 +165,10 @@ class TableReference {
                     if (theID > 0) {
                         int finalTheID = theID;
                         String finalTheKey = theKey.toString();
-                        m_accessor.addToDB(m_InsertStatementId, new IFillStatement() {
-                            @Override
-                            public boolean fillStatement(PreparedStatement stmt) throws SQLException {
-                                stmt.setInt(1, finalTheID);
-                                Record.setFieldString(stmt, 2, finalTheKey);
-                                return true;
-                            }
+                        m_accessor.addToDB(m_InsertStatementId, (PreparedStatement stmt) -> {
+                            stmt.setInt(1, finalTheID);
+                            Record.setFieldString(stmt, 2, finalTheKey);
+                            return true;
                         });
                         i = 1;
                         iTotalRecs = 1;
@@ -182,13 +179,10 @@ class TableReference {
                         int theID = entrySet.getValue();
                         if (theID > initialID) {
                             Main.logger.trace("inserting [" + theID + ":" + entrySet.getKey() + "]");
-                            m_accessor.addToDB(m_InsertStatementId, new IFillStatement() {
-                                @Override
-                                public boolean fillStatement(PreparedStatement stmt) throws SQLException {
-                                    stmt.setInt(1, theID);
-                                    Record.setFieldString(stmt, 2, entrySet.getKey().toString());
-                                    return true;
-                                }
+                            m_accessor.addToDB(m_InsertStatementId, (PreparedStatement stmt) -> {
+                                stmt.setInt(1, theID);
+                                Record.setFieldString(stmt, 2, entrySet.getKey().toString());
+                                return true;
                             });
                             i++;
                         }

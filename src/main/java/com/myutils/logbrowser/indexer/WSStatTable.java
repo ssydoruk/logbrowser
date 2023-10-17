@@ -4,10 +4,6 @@
  */
 package com.myutils.logbrowser.indexer;
 
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Timestamp;
-
 /**
  * @author ssydoruk
  * <p>
@@ -17,12 +13,12 @@ import java.sql.Timestamp;
 public class WSStatTable extends DBTable {
 
     public WSStatTable(SqliteAccessor dbaccessor, TableType t) {
-        super(dbaccessor, t,"wsstat");
+        super(dbaccessor, t, "wsstat");
     }
 
     @Override
     public void InitDB() {
-        
+
         addIndex("time");
         addIndex("FileId");
         addIndex("nameID");
@@ -60,7 +56,6 @@ public class WSStatTable extends DBTable {
     public void FinalizeDB() throws Exception {
         createIndexes();
     }
-
 
 
 }

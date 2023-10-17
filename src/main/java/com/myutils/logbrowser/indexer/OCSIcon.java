@@ -22,7 +22,7 @@ public class OCSIcon extends Message {
     private String status;
     private String host;
 
-    public OCSIcon( int fileID) {
+    public OCSIcon(int fileID) {
         super(TableType.OCSIcon, fileID);
     }
 

@@ -10,7 +10,6 @@ import Utils.Util;
 import com.myutils.logbrowser.indexer.FileInfoType;
 import com.myutils.logbrowser.indexer.ReferenceType;
 import com.myutils.logbrowser.indexer.TableType;
-import com.myutils.logbrowser.inquirer.IQuery.IRecordLoadedProc;
 import org.apache.logging.log4j.LogManager;
 
 import java.awt.event.ActionEvent;
@@ -791,18 +790,15 @@ final public class RoutingResults extends IQueryResults {
                 ursByConnIdQuery.setNode(ursEventNode);
                 ursByConnIdQuery.setSearchSettings(ursEventNode);
                 ursByConnIdQuery.setCommonParams(this, dlg);
-                ursByConnIdQuery.setRecLoadedProc(new IQuery.IRecordLoadedProc() {
-                    @Override
-                    public void recordLoaded(ILogRecord rec) {
-                        if (rec instanceof TLibEvent) {
-                            addUnique(refIDs, ((TLibEvent) rec).GetReferenceId());
+                ursByConnIdQuery.setRecLoadedProc((ILogRecord rec) -> {
+                    if (rec instanceof TLibEvent) {
+                        addUnique(refIDs, ((TLibEvent) rec).GetReferenceId());
 
-                            long id = rec.getID();
-                            if (id > 0) {
-                                ids.add(id);
-                            }
-                            addUnique(idDNs, ((TLibEvent) rec).getThisDNID(), ((TLibEvent) rec).getOtherDNID());
+                        long id = rec.getID();
+                        if (id > 0) {
+                            ids.add(id);
                         }
+                        addUnique(idDNs, ((TLibEvent) rec).getThisDNID(), ((TLibEvent) rec).getOtherDNID());
                     }
                 });
                 getRecords(ursByConnIdQuery);
@@ -998,15 +994,11 @@ final public class RoutingResults extends IQueryResults {
                     whIDs.addWhere(getWhere(UrsRLib.getTabAlias() + ".sidid", SIDID, false), "OR");
                     UrsRLib.addWhere(whIDs, "AND");
 
-                    UrsRLib.setRecLoadedProc(new IRecordLoadedProc() {
-                        @Override
-                        public void recordLoaded(ILogRecord rec) {
-                            addUnique(refIDs, Util.intOrDef(rec.GetField("refid"), (Long) null));
-                            addUnique(reqIDs, Util.intOrDef(rec.GetField("reqid"), (Long) null));
-                            addUnique(iDs, rec.getID());
-                            addUnique(idFiles, new Long(rec.GetFileId()));
-                        }
-
+                    UrsRLib.setRecLoadedProc((ILogRecord rec) -> {
+                        addUnique(refIDs, Util.intOrDef(rec.GetField("refid"), (Long) null));
+                        addUnique(reqIDs, Util.intOrDef(rec.GetField("reqid"), (Long) null));
+                        addUnique(iDs, rec.getID());
+                        addUnique(idFiles, new Long(rec.GetFileId()));
                     });
                 }
                 getRecords(UrsRLib);
@@ -1020,14 +1012,10 @@ final public class RoutingResults extends IQueryResults {
                     wh1.addWhere(getWhereNot(UrsRLib.fldName("id"), iDs, false), "AND");
                     UrsRLib.addWhere(wh1, "AND");
 
-                    UrsRLib.setRecLoadedProc(new IRecordLoadedProc() {
-                        @Override
-                        public void recordLoaded(ILogRecord rec) {
-                            addUnique(reqIDs, Util.intOrDef(rec.GetField("reqid"), (Long) null));
-                            addUnique(iDs, rec.getID());
-                            addUnique(idFiles, new Long(rec.GetFileId()));
-                        }
-
+                    UrsRLib.setRecLoadedProc((ILogRecord rec) -> {
+                        addUnique(reqIDs, Util.intOrDef(rec.GetField("reqid"), (Long) null));
+                        addUnique(iDs, rec.getID());
+                        addUnique(idFiles, new Long(rec.GetFileId()));
                     });
 
                     getRecords(UrsRLib);
@@ -1097,14 +1085,10 @@ final public class RoutingResults extends IQueryResults {
                 }
                 if (whereAdded || CONNID != null || UUID != null
                         || v1added || v2added || v3added || v4added || v5added) {
-                    URSRI.setRecLoadedProc(new IRecordLoadedProc() {
-                        @Override
-                        public void recordLoaded(ILogRecord rec) {
-                            addUnique(refIDs, Util.intOrDef(rec.GetField("ref"), (Long) null));
-                            addUnique(iDs, rec.getID());
+                    URSRI.setRecLoadedProc((ILogRecord rec) -> {
+                        addUnique(refIDs, Util.intOrDef(rec.GetField("ref"), (Long) null));
+                        addUnique(iDs, rec.getID());
 //                            addUnique(idFiles, rec.GetFileId());
-                        }
-
                     });
                 }
 
@@ -1210,14 +1194,10 @@ final public class RoutingResults extends IQueryResults {
                 HashSet<Long> iDs = new HashSet<>();
                 HashSet<Long> idFiles = new HashSet<>();
                 if (addedFilter) {
-                    URSHTTP.setRecLoadedProc(new IRecordLoadedProc() {
-                        @Override
-                        public void recordLoaded(ILogRecord rec) {
-                            addUnique(httpHandlerID, Util.intOrDef(rec.GetField("httpHandlerID"), (Long) null));
-                            addUnique(iDs, rec.getID());
-                            addUnique(idFiles, new Long(rec.GetFileId()));
-                        }
-
+                    URSHTTP.setRecLoadedProc((ILogRecord rec) -> {
+                        addUnique(httpHandlerID, Util.intOrDef(rec.GetField("httpHandlerID"), (Long) null));
+                        addUnique(iDs, rec.getID());
+                        addUnique(idFiles, new Long(rec.GetFileId()));
                     });
                 }
                 getRecords(URSHTTP);
@@ -1239,12 +1219,9 @@ final public class RoutingResults extends IQueryResults {
                     httpHandlerID.clear();
                     iDs.clear();
 
-                    HTTPtoURS.setRecLoadedProc(new IRecordLoadedProc() {
-                        @Override
-                        public void recordLoaded(ILogRecord rec) {
-                            addUnique(httpHandlerID, Util.intOrDef(rec.GetField("refID"), (Long) null));
-                            addUnique(iDs, rec.getID());
-                        }
+                    HTTPtoURS.setRecLoadedProc((ILogRecord rec) -> {
+                        addUnique(httpHandlerID, Util.intOrDef(rec.GetField("refID"), (Long) null));
+                        addUnique(iDs, rec.getID());
                     });
                     getRecords(HTTPtoURS);
                     if (!httpHandlerID.isEmpty()) {
@@ -1333,19 +1310,15 @@ final public class RoutingResults extends IQueryResults {
                 HashSet<Long> idDNs = new HashSet<>();
                 tellProgress("Retrieve TLIb messages");
                 inquirer.logger.debug("TLib report");
-                orsByConnIdQuery.setRecLoadedProc(new IRecordLoadedProc() {
-                    @Override
-                    public void recordLoaded(ILogRecord rec) {
-                        if (rec instanceof TLibEvent) {
-                            addUnique(refIDs, ((TLibEvent) rec).GetReferenceId());
-                            long id = rec.getID();
-                            if (id > 0) {
-                                ids.add(id);
-                            }
-                            addUnique(idDNs, ((TLibEvent) rec).getThisDNID(), ((TLibEvent) rec).getOtherDNID());
+                orsByConnIdQuery.setRecLoadedProc((ILogRecord rec) -> {
+                    if (rec instanceof TLibEvent) {
+                        addUnique(refIDs, ((TLibEvent) rec).GetReferenceId());
+                        long id = rec.getID();
+                        if (id > 0) {
+                            ids.add(id);
                         }
+                        addUnique(idDNs, ((TLibEvent) rec).getThisDNID(), ((TLibEvent) rec).getOtherDNID());
                     }
-
                 });
                 getRecords(orsByConnIdQuery);
                 if (cidFinder != null && callRelatedSearch(cidFinder) && !refIDs.isEmpty()) {
@@ -1370,11 +1343,8 @@ final public class RoutingResults extends IQueryResults {
                     ORSMM.addWhere(getWhere("IXNIDID", IxnID, false), "AND");
                     tmpIDs = new HashSet<>();
 
-                    ORSMM.setRecLoadedProc(new IQuery.IRecordLoadedProc() {
-                        @Override
-                        public void recordLoaded(ILogRecord rec) {
-                            addUnique(tmpIDs, Util.intOrDef(rec.GetField("refid"), (Long) null));
-                        }
+                    ORSMM.setRecLoadedProc((ILogRecord rec) -> {
+                        addUnique(tmpIDs, Util.intOrDef(rec.GetField("refid"), (Long) null));
                     });
                 } else {
                     tmpIDs = null;

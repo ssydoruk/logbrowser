@@ -17,8 +17,8 @@ public class CIFaceRequest extends SIPServerBaseMessage {
     private String m_thisDN;
     private String m_otherDN;
 
-    public CIFaceRequest(boolean  m_handlerInProgress, int m_handlerId, int fileID) {
-        super(TableType.CIFaceRequest,  m_handlerInProgress,  m_handlerId, fileID);
+    public CIFaceRequest(boolean m_handlerInProgress, int m_handlerId, int fileID) {
+        super(TableType.CIFaceRequest, m_handlerInProgress, m_handlerId, fileID);
     }
 
     @Override

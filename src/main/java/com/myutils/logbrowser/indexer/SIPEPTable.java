@@ -4,12 +4,6 @@
  */
 package com.myutils.logbrowser.indexer;
 
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Timestamp;
-
-import static com.myutils.logbrowser.indexer.Message.transformDN;
-
 /**
  * @author ssydoruk
  */

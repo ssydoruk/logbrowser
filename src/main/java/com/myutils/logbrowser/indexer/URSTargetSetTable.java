@@ -4,23 +4,19 @@
  */
 package com.myutils.logbrowser.indexer;
 
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Timestamp;
-
 /**
  * @author ssydoruk
  */
 public class URSTargetSetTable extends DBTable {
 
     public URSTargetSetTable(SqliteAccessor dbaccessor, TableType t) {
-        super(dbaccessor, t,"urstargetset");
+        super(dbaccessor, t, "urstargetset");
     }
 
     @Override
     public void InitDB() {
 
-        
+
         addIndex("time");
         addIndex("FileId");
         addIndex("targetid");

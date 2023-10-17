@@ -7,14 +7,17 @@ package com.myutils.logbrowser.inquirer.gui;
 
 import com.jacob.com.ComFailException;
 import com.myutils.logbrowser.indexer.Main;
-import com.myutils.logbrowser.inquirer.*;
+import com.myutils.logbrowser.inquirer.CustomField;
+import com.myutils.logbrowser.inquirer.EditRegexFields;
+import com.myutils.logbrowser.inquirer.MsgType;
 import com.myutils.logbrowser.inquirer.gui.TabResultDataModel.FieldParams;
+import com.myutils.logbrowser.inquirer.inquirer;
 import org.apache.logging.log4j.LogManager;
 
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import javax.swing.table.*;
+import javax.swing.table.TableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;

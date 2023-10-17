@@ -441,7 +441,7 @@ public class GMSResults extends IQueryResults {
             TableQuery tab = null;
             tab = new TableQuery(MsgType.GMSPOST, "gmspost");
 
-            if (cidFinder != null && cidFinder.getSearchType()!=SelectionType.NO_SELECTION) {
+            if (cidFinder != null && cidFinder.getSearchType() != SelectionType.NO_SELECTION) {
                 Wheres wh = new Wheres();
                 Integer[] iDs;
                 if ((iDs = cidFinder.getIDs(IDType.ORSSID)) != null) {
@@ -509,7 +509,7 @@ public class GMSResults extends IQueryResults {
             TableQuery tab = null;
             tab = new TableQuery(MsgType.GMSPOST, "gmsstart");
 
-            if (cidFinder != null && cidFinder.getSearchType()!=SelectionType.NO_SELECTION) {
+            if (cidFinder != null && cidFinder.getSearchType() != SelectionType.NO_SELECTION) {
                 Wheres wh = new Wheres();
                 Integer[] iDs;
                 if ((iDs = cidFinder.getIDs(IDType.ORSSID)) != null) {
@@ -577,7 +577,7 @@ public class GMSResults extends IQueryResults {
             TableQuery tab = null;
             tab = new TableQuery(MsgType.GMSORS, "gmsors");
 
-            if (cidFinder != null && cidFinder.getSearchType()!=SelectionType.NO_SELECTION) {
+            if (cidFinder != null && cidFinder.getSearchType() != SelectionType.NO_SELECTION) {
                 Wheres wh = new Wheres();
                 Integer[] iDs;
                 if ((iDs = cidFinder.getIDs(IDType.ConnID)) != null) {

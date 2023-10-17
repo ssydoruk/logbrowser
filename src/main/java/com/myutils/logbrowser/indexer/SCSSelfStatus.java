@@ -22,7 +22,7 @@ public class SCSSelfStatus extends Message {
     private String status;
     private String host;
 
-    public SCSSelfStatus( int fileID) {
+    public SCSSelfStatus(int fileID) {
         super(TableType.SCSSelfStatus, fileID);
     }
 

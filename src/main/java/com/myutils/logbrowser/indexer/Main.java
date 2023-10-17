@@ -58,7 +58,7 @@ public class Main {
     AtomicBoolean initialRun = new AtomicBoolean(false);
     boolean initFailed = false;
     BlockingQueue<File> fileQueue = new LinkedBlockingDeque<>();
-    AtomicBoolean queueEnd ;
+    AtomicBoolean queueEnd;
     ProcessedFilesSet processedFiles = new ProcessedFilesSet();
     private String dbName;
     private SqliteAccessor m_accessor;
@@ -943,9 +943,9 @@ public class Main {
 
     private static class MainHolder {
 
-        private static  Main INSTANCE = new Main();
+        private static Main INSTANCE = new Main();
 
-        public static Main newInstance(){
+        public static Main newInstance() {
             INSTANCE = new Main();
             return INSTANCE;
         }

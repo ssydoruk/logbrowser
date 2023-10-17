@@ -4,10 +4,6 @@
  */
 package com.myutils.logbrowser.indexer;
 
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Timestamp;
-
 /**
  * @author ssydoruk
  * <p>
@@ -17,13 +13,13 @@ import java.sql.Timestamp;
 public class URSStatTable extends DBTable {
 
     public URSStatTable(SqliteAccessor dbaccessor, TableType t) {
-        super(dbaccessor, t,"URSSTAT");
+        super(dbaccessor, t, "URSSTAT");
     }
 
     @Override
     public void InitDB() {
 
-        
+
         addIndex("time");
         addIndex("FileId");
         addIndex("agentNameID");

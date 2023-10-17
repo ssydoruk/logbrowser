@@ -17,7 +17,6 @@ import java.io.*;
 import java.util.HashMap;
 import java.util.logging.Handler;
 import java.util.logging.LogRecord;
-import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
 
 /**
  * @author stepan_sydoruk
@@ -58,16 +57,15 @@ public class JSRunner {
         try {
             cont.eval("js", script);
         } catch (Exception e) {
-            logger.error("Exception evaluating script ["+script+"]", e);
+            logger.error("Exception evaluating script [" + script + "]", e);
         }
         boolean ret = bindings.getMember("IGNORE_RECORD").asBoolean();
         logger.trace("evalFields [" + scriptFields + "], ignored:[" + ret + "] - result of [" + script + "]");
         return ret;
     }
 
-    
-    
-    public static RecordPrintout evalFullRecordPrintout(String script,  ILogRecord rec) {
+
+    public static RecordPrintout evalFullRecordPrintout(String script, ILogRecord rec) {
         RecordPrintout ret = new RecordPrintout(rec.getBytes());
         Context cont = getInstance().getCondContext();
         Value bindings = cont.getBindings("js");
@@ -77,12 +75,11 @@ public class JSRunner {
         try {
             cont.eval("js", script);
         } catch (Exception e) {
-            logger.error("Exception evaluating script ["+script+"]", e);
+            logger.error("Exception evaluating script [" + script + "]", e);
         }
         return ret;
     }
-    
-    
+
 
     public static String execString(String script, ILogRecord rec) {
         Context cont = getInstance().getCondContext();

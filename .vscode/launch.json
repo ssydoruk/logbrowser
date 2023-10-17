@@ -16,22 +16,26 @@
       "type": "graalvm",
       "request": "launch",
       "name": "Launch JavaScript graal",
-      "runtimeArgs": ["--jvm"],
+      "runtimeArgs": [
+        "--jvm"
+      ],
       "runtimeExecutable": "node",
       "program": "${file}"
     },
-
     {
       "name": "Launch Program as node",
       "program": "${file}",
       "request": "launch",
       "runtimeExecutable": "/Users/stepan_sydoruk/.sdkman/candidates/java/current/bin/node",
-      "runtimeArgs": ["--jvm"],
+      "runtimeArgs": [
+        "--jvm"
+      ],
       "stopOnEntry": false,
-      "skipFiles": ["<node_internals>/**"],
+      "skipFiles": [
+        "<node_internals>/**"
+      ],
       "type": "node"
     },
-
     {
       "type": "java",
       "name": "Debug (Launch) - Current File",

@@ -77,22 +77,19 @@ public class ORSClusterMessage extends Message {
         String sUUID = getMsgValue("e:");
 
 
-        accessor.addToDB(m_statementId, new IFillStatement() {
-            @Override
-            public boolean fillStatement(PreparedStatement stmt) throws SQLException {
+        accessor.addToDB(m_statementId, (PreparedStatement stmt) -> {
 
-                stmt.setTimestamp(1, new Timestamp(GetAdjustedUsecTime()));
-                stmt.setInt(2, getFileID());
-                stmt.setLong(3, getM_fileOffset());
-                stmt.setLong(4, m_Bytes);
-                stmt.setInt(5, getM_line());
-                Record.setFieldString(stmt, 6, SrcNodeType);
-                stmt.setInt(7, SrcNodeID);
-                stmt.setInt(9, DstNodeID);
-                stmt.setBoolean(10, Direction);
-                Record.setFieldString(stmt, 11, sUUID);
-                return false;
-            }
+            stmt.setTimestamp(1, new Timestamp(GetAdjustedUsecTime()));
+            stmt.setInt(2, getFileID());
+            stmt.setLong(3, getM_fileOffset());
+            stmt.setLong(4, m_Bytes);
+            stmt.setInt(5, getM_line());
+            Record.setFieldString(stmt, 6, SrcNodeType);
+            stmt.setInt(7, SrcNodeID);
+            stmt.setInt(9, DstNodeID);
+            stmt.setBoolean(10, Direction);
+            Record.setFieldString(stmt, 11, sUUID);
+            return false;
         });
     }
 

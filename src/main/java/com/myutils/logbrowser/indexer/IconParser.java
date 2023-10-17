@@ -4,9 +4,7 @@
  */
 package com.myutils.logbrowser.indexer;
 
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 
 public class IconParser extends Parser {
 
@@ -24,7 +22,7 @@ public class IconParser extends Parser {
 
     int m_dbRecords = 0;
 
-    public IconParser(DBTables  m_tables) {
+    public IconParser(DBTables m_tables) {
         super(FileInfoType.type_ICON, m_tables);
     }
 
@@ -152,11 +150,11 @@ public class IconParser extends Parser {
         if (headerList.length >= 4) {
             if (headerList[3].equals("Message")) {
                 String event = headerList[4];
-                msg = new IconMessage(event, contents,  fileInfo.getRecordID());
+                msg = new IconMessage(event, contents, fileInfo.getRecordID());
 //              msg = new TLibMessage(event, contents);
             } else if (headerList[4].equals("message")) {
                 String event = headerList[5].substring(1, headerList[5].length() - 1);
-                msg = new IconMessage(event, contents,  fileInfo.getRecordID());
+                msg = new IconMessage(event, contents, fileInfo.getRecordID());
             }
         }
 
@@ -180,6 +178,6 @@ public class IconParser extends Parser {
     }
 
     @Override
-    void init(DBTables  m_tables) {
+    void init(DBTables m_tables) {
     }
 }

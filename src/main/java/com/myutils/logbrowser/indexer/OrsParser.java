@@ -22,9 +22,8 @@ import static Utils.Util.intOrDef;
  */
 public class OrsParser extends Parser {
 
-    private static final org.apache.logging.log4j.Logger logger = Main.logger;
     public static final int MAX_ALARMS = 15;
-
+    private static final org.apache.logging.log4j.Logger logger = Main.logger;
     //2 types of thread messages in ORS logs
 //21:37:08.194 [T:2560] {ScxmlMetric:3} METRIC <eval_expr sid='VIKO7I50UD32135O60O7ACO4NS0083UP' expression='varConsiderConcierge = _genesys.session.getListItemValue('LIST_CHT_SCT', v_ServiceCallType, 'Concierge Considered').toUpperCase();' result='' />
     private static final Pattern regWThread = Pattern.compile("^\\[([^\\]]+)");
@@ -135,7 +134,7 @@ public class OrsParser extends Parser {
     private boolean isInbound = true;
     private Message msg = null; // used to store method not committed to DB yet
 
-    OrsParser(DBTables  m_tables) {
+    OrsParser(DBTables m_tables) {
         super(FileInfoType.type_ORS, m_tables);
         ThreadAlias.put("ORSInternal", "FMWeb");
         ptpsThreadProcessor = new ParserThreadsProcessor();
@@ -308,7 +307,7 @@ public class OrsParser extends Parser {
                 } else if ((m = regNewCallID.matcher(s)).find()) {
                     addCallID(m.group(1), m.group(2));
                 } else if ((m = regConfigUpdate.matcher(s)).find()) {
-                    ConfigUpdateRecord theMsg = new ConfigUpdateRecord(m_MessageContents,  fileInfo.getRecordID());
+                    ConfigUpdateRecord theMsg = new ConfigUpdateRecord(m_MessageContents, fileInfo.getRecordID());
                     theMsg.setObjName(m.group(4));
                     theMsg.setOp(m.group(2));
                     theMsg.setObjectDBID(m.group(3));
@@ -474,7 +473,7 @@ public class OrsParser extends Parser {
     }
 
     private void AddMMMessage(String m_msgName, String m_TserverSRC, boolean isInbound) throws Exception {
-        ORSMM theMsg = new ORSMM(m_msgName, m_TserverSRC, m_MessageContents, isInbound,  fileInfo.getRecordID());
+        ORSMM theMsg = new ORSMM(m_msgName, m_TserverSRC, m_MessageContents, isInbound, fileInfo.getRecordID());
 
         theMsg.setM_Timestamp(getLastTimeStamp());
         theMsg.SetOffset(getSavedFilePos());
@@ -489,7 +488,7 @@ public class OrsParser extends Parser {
     }
 
     private void AddORSMessage(String msgName, String TServerSRC) throws Exception {
-        ORSMessage themsg = new ORSMessage(msgName, TServerSRC, m_MessageContents, false,  fileInfo.getRecordID());
+        ORSMessage themsg = new ORSMessage(msgName, TServerSRC, m_MessageContents, false, fileInfo.getRecordID());
 
         themsg.setM_Timestamp(getLastTimeStamp());
         themsg.SetOffset(getSavedFilePos());
@@ -522,7 +521,7 @@ public class OrsParser extends Parser {
             if (bytesRead != msgBytes) {
                 throw new Exception("error reading");
             }
-            ORSClusterMessage themsg = new ORSClusterMessage(new String(m_CharBuf, 0, bytesRead),  fileInfo.getRecordID());
+            ORSClusterMessage themsg = new ORSClusterMessage(new String(m_CharBuf, 0, bytesRead), fileInfo.getRecordID());
             themsg.setM_Timestamp(getLastTimeStamp());
             themsg.SetOffset(getFilePos());
             themsg.SetFileBytes(getEndFilePos() - getFilePos());
@@ -556,7 +555,7 @@ public class OrsParser extends Parser {
         }
         if (Method != null) {
             if (Method.equals("extension")) {
-                msg = new ORSMetricExtension(MetricClause, Method, sid,  fileInfo.getRecordID());
+                msg = new ORSMetricExtension(MetricClause, Method, sid, fileInfo.getRecordID());
                 ((ORSMetricExtension) msg).parseNS(rest);
 
                 if ((m = regExtentionName.matcher(rest)).find()
@@ -581,7 +580,7 @@ public class OrsParser extends Parser {
                             tps.setFilePos(getFilePos());
                             tps.addString(MetricClause);
                             tps.setHeaderOffset(m_CurrentFilePos);
-                            tps.setMsg(new ORSSessionStartMessage(  fileInfo.getRecordID()));
+                            tps.setMsg(new ORSSessionStartMessage(fileInfo.getRecordID()));
 
                             SetStdFieldsAndAdd(msg);
                             ptpsThreadProcessor.addThreadState(thread, tps);
@@ -590,11 +589,11 @@ public class OrsParser extends Parser {
                     }
                 }
             } else {
-                msg = new ORSMetric(MetricClause, Method, sid,  fileInfo.getRecordID());
+                msg = new ORSMetric(MetricClause, Method, sid, fileInfo.getRecordID());
                 if (Method.equals("event_queued")) {
                     if ((m = regRelatedSession.matcher(rest)).find()) {
                         String relatedSid = m.group(1);
-                        OrsSidSid sidsid = new OrsSidSid(sid, relatedSid,  fileInfo.getRecordID());
+                        OrsSidSid sidsid = new OrsSidSid(sid, relatedSid, fileInfo.getRecordID());
                         addToDB(sidsid);
 
                     }
@@ -612,7 +611,7 @@ public class OrsParser extends Parser {
                 }
             }
         } else {
-            msg = new ORSMetric(MetricClause,  fileInfo.getRecordID());
+            msg = new ORSMetric(MetricClause, fileInfo.getRecordID());
         }
 
         msg.setM_Timestamp(getLastTimeStamp());
@@ -628,14 +627,14 @@ public class OrsParser extends Parser {
         switch (UUID.length()) {
             case 32: {
                 //uuid
-                OrsSidUuid themsg = new OrsSidUuid(UUID, GID,  fileInfo.getRecordID());
+                OrsSidUuid themsg = new OrsSidUuid(UUID, GID, fileInfo.getRecordID());
                 themsg.setURI(URL);
                 themsg.setApp(app);
                 SetStdFieldsAndAdd(themsg);
                 break;
             }
             case 16: {
-                OrsSidIxnID themsg = new OrsSidIxnID(UUID, GID,  fileInfo.getRecordID());
+                OrsSidIxnID themsg = new OrsSidIxnID(UUID, GID, fileInfo.getRecordID());
                 themsg.setURI(URL);
                 themsg.setApp(app);
                 SetStdFieldsAndAdd(themsg);
@@ -652,7 +651,7 @@ public class OrsParser extends Parser {
         Matcher m;
         Main.logger.trace("AddORSCTIMessage [" + str + "]");
         if ((m = regCTITMReq.matcher(str)).find()) {
-            ORSMessage themsg = new ORSMessage(m.group(2), null, null, true,  fileInfo.getRecordID());
+            ORSMessage themsg = new ORSMessage(m.group(2), null, null, true, fileInfo.getRecordID());
             themsg.setM_refID(m.group(1));
             themsg.setCallID(m.group(3));
             themsg.setM_ThisDN(m.group(4));
@@ -746,7 +745,7 @@ public class OrsParser extends Parser {
     }
 
     private void AddMetricMessage() throws Exception {
-        ORSMetric themsg = new ORSMetric(m_MessageContents,  fileInfo.getRecordID());
+        ORSMetric themsg = new ORSMetric(m_MessageContents, fileInfo.getRecordID());
 
         themsg.setM_Timestamp(getLastTimeStamp());
         themsg.SetOffset(getFilePos());
@@ -762,9 +761,9 @@ public class OrsParser extends Parser {
         if (m_MessageContents.size() > 0) {
             Matcher m;
             if ((m = regORSURS.matcher(m_MessageContents.get(0))).find()) {
-                themsg = new OrsUrsMessage(m.group(1), m_MessageContents,  fileInfo.getRecordID());
+                themsg = new OrsUrsMessage(m.group(1), m_MessageContents, fileInfo.getRecordID());
             } else {
-                themsg = new OrsUrsMessage("", m_MessageContents,  fileInfo.getRecordID());
+                themsg = new OrsUrsMessage("", m_MessageContents, fileInfo.getRecordID());
             }
 
             SetStdFieldsAndAdd(themsg);
@@ -782,7 +781,7 @@ public class OrsParser extends Parser {
                 String ip = m.group(3);
                 ReadHTTP(bytes);
 
-                OrsHTTP orsHTTP = new OrsHTTP(m_MessageContents,  fileInfo.getRecordID());
+                OrsHTTP orsHTTP = new OrsHTTP(m_MessageContents, fileInfo.getRecordID());
                 orsHTTP.setIP(ip);
                 orsHTTP.setSocket(socket);
                 orsHTTP.setBytes(bytes);
@@ -824,7 +823,7 @@ public class OrsParser extends Parser {
                 int socket = Integer.parseInt(m.group(1));
                 int bytes = Integer.parseInt(m.group(2));
                 ReadHTTP(bytes);
-                OrsHTTP orsHTTP = new OrsHTTP(m_MessageContents,  fileInfo.getRecordID());
+                OrsHTTP orsHTTP = new OrsHTTP(m_MessageContents, fileInfo.getRecordID());
                 orsHTTP.setBytes(bytes);
                 orsHTTP.setSocket(socket);
                 orsHTTP.SetInbound(false);
@@ -880,7 +879,7 @@ public class OrsParser extends Parser {
                     newLine = 2;
                 }
             }
-            if (newLine==0 && (c == '\r' || c == '\n')) {
+            if (newLine == 0 && (c == '\r' || c == '\n')) {
                 newLine = 1;
             }
 
@@ -917,7 +916,7 @@ public class OrsParser extends Parser {
     }
 
     @Override
-    void init(DBTables  m_tables) {
+    void init(DBTables m_tables) {
         m_tables.put(TableType.ORSCallID.toString(), new ORSCallIDTable(Main.getInstance().getM_accessor(), TableType.ORSCallID));
         m_tables.put(TableType.ORSAlarm.toString(), new ORSAlarmTable(Main.getInstance().getM_accessor(), TableType.ORSAlarm));
         m_tables.put(TableType.ORSSessionStart.toString(), new ORSSessionStartTable(Main.getInstance().getM_accessor(), TableType.ORSSessionStart));
@@ -925,7 +924,7 @@ public class OrsParser extends Parser {
     }
 
     private void addCallID(String UUID, String callID) {
-        addToDB((new ORSCallID(UUID, callID,  fileInfo.getRecordID())));
+        addToDB((new ORSCallID(UUID, callID, fileInfo.getRecordID())));
     }
 
     enum ParserState {
@@ -1070,7 +1069,7 @@ public class OrsParser extends Parser {
 
     }
 
-    private  class TransitionHTTPOut implements ParserThreadsProcessor.StateTransition {
+    private class TransitionHTTPOut implements ParserThreadsProcessor.StateTransition {
 
         //        private static final Pattern regSessionStartParam = Pattern.compile("Session start param");
 //        private static final Pattern regSessionStartMessage = Pattern.compile("HandleDataFromThread: Starting new session. SessionID=(\\w+)$");
@@ -1184,7 +1183,6 @@ public class OrsParser extends Parser {
         }
 
 
-
     }
 
     private class ORSAlarm extends Message {
@@ -1192,7 +1190,7 @@ public class OrsParser extends Parser {
         private final ArrayList<AlarmInstance> allAlarms;
 
         private ORSAlarm() {
-            super(TableType.ORSAlarm,  fileInfo.getRecordID());
+            super(TableType.ORSAlarm, fileInfo.getRecordID());
             this.allAlarms = new ArrayList<>();
         }
 
@@ -1309,7 +1307,7 @@ public class OrsParser extends Parser {
             return "INSERT INTO " + getTabName() + " VALUES(NULL,?,?,?,?,?"
                     /*standard first*/
                     + buf
-                    + ");"            ;
+                    + ");";
 
         }
 

@@ -4,9 +4,6 @@
  */
 package com.myutils.logbrowser.indexer;
 
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-
 /**
  * @author ssydoruk
  */
@@ -33,7 +30,6 @@ public class ORSSidSidTable extends DBTable {
 //        accessor.runQuery("create index if not exists ORSsess__HndId_" + m_alias +" on ORSmetr_" + m_alias + " (HandlerId);");
 
 
-
     }
 
     @Override
@@ -49,7 +45,6 @@ public class ORSSidSidTable extends DBTable {
     public void FinalizeDB() {
         createIndexes();
     }
-
 
 
 }

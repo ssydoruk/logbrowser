@@ -6,10 +6,7 @@
 package com.myutils.logbrowser.common;
 
 import com.myutils.logbrowser.indexer.Main;
-import com.myutils.logbrowser.inquirer.inquirer;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -98,15 +95,16 @@ public class Start {
         }
         logger.info("log initialized");
     }
+
     public static void main(String[] args) throws Exception {
         Path destFile;
         File dst;
-        String outputDir= "C:\\GCTI\\work\\test1";
-        String newFilesDir = outputDir+"\\new";
+        String outputDir = "C:\\GCTI\\work\\test1";
+        String newFilesDir = outputDir + "\\new";
         Files.walk(Paths.get(newFilesDir)).forEach(path -> {
-            if(Files.isRegularFile(path)) {
-                System.out.println(path+" deleted" );
-                    FileUtils.deleteQuietly(path.toFile());
+            if (Files.isRegularFile(path)) {
+                System.out.println(path + " deleted");
+                FileUtils.deleteQuietly(path.toFile());
             }
         });
 
@@ -126,11 +124,11 @@ public class Start {
         Main.logger.error("error");
 
         Files.walk(Paths.get("C:\\GCTI\\work\\test_src")).forEach(path -> {
-            if(Files.isRegularFile(path)) {
-                Main.logger.info("starting copy "+path);
+            if (Files.isRegularFile(path)) {
+                Main.logger.info("starting copy " + path);
                 try {
                     FileUtils.copyFileToDirectory(path.toFile(), new File(newFilesDir));
-                    Main.logger.info("done copy "+path);
+                    Main.logger.info("done copy " + path);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }

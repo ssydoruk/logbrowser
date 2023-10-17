@@ -365,11 +365,11 @@ public class VOIPEPResults extends IQueryResults {
                                     + getWhere(TLibReq.getTabAlias() + ".nameid", ReferenceType.TEvent, RequestsToShow, false)
                                     + "\n and \n"
                                     + getWhere(TLibReq.getTabAlias() + ".referenceid",
-                            MakeQueryID("referenceid", "TLIB_logbr",
-                                    getWhere("connectionidid", connIDs, true)
-                                            + "\n\tand referenceid>0"
-                                            + "\n\tand "
-                                            + getWhere("nameid", ReferenceType.TEvent, EventsToShow, false)), false),
+                                    MakeQueryID("referenceid", "TLIB_logbr",
+                                            getWhere("connectionidid", connIDs, true)
+                                                    + "\n\tand referenceid>0"
+                                                    + "\n\tand "
+                                                    + getWhere("nameid", ReferenceType.TEvent, EventsToShow, false)), false),
                             "");
                     TLibReq.setCommonParams(this, dlg);
                     getRecords(TLibReq);

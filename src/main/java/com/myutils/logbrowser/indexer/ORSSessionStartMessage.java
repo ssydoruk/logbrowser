@@ -32,7 +32,7 @@ public class ORSSessionStartMessage extends Message {
         super(TableType.ORSSessionStart, m_MessageContents, fileID);
     }
 
-    ORSSessionStartMessage( int fileID) {
+    ORSSessionStartMessage(int fileID) {
         super(TableType.ORSSessionStart, fileID);
     }
 

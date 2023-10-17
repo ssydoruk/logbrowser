@@ -307,8 +307,4 @@ public class PrintStreams {
 
     }
 
-    interface PrintStorage {
-
-    }
-
 }

@@ -155,7 +155,7 @@ public class GMSParser extends Parser {
     private String oldThread;
     private String savedThreadID;
 
-    GMSParser(DBTables  m_tables) {
+    GMSParser(DBTables m_tables) {
         super(FileInfoType.type_GMS, m_tables);
         m_MessageContents = new ArrayList();
         ThreadAlias.put("ORSInternal", "FMWeb");
@@ -397,7 +397,7 @@ public class GMSParser extends Parser {
                     m_MessageContents.clear();
                     m_TotalLen = str.length() + in.charsSkippedOnReadLine;
                     m_ParserState = ParserState.STATE_IXNMESSAGE;
-                    msg = new IxnGMS(m.group(1), m.group(2),  fileInfo.getRecordID());
+                    msg = new IxnGMS(m.group(1), m.group(2), fileInfo.getRecordID());
                     setSavedFilePos(getFilePos());
 
                 } else {
@@ -504,7 +504,7 @@ public class GMSParser extends Parser {
     }
 
     private void addPostMessage() throws Exception {
-        GMSPostMessage _msg = new GMSPostMessage(m_MessageContents,  fileInfo.getRecordID());
+        GMSPostMessage _msg = new GMSPostMessage(m_MessageContents, fileInfo.getRecordID());
         SetStdFieldsAndAdd(_msg);
     }
 
@@ -514,7 +514,7 @@ public class GMSParser extends Parser {
         ExceptionMessage _msg = new ExceptionMessage(
                 m_MessageContents,
                 m_msgName,
-                m_msg1,  fileInfo.getRecordID()
+                m_msg1, fileInfo.getRecordID()
         );
         SetStdFieldsAndAdd(_msg);
 
@@ -537,14 +537,14 @@ public class GMSParser extends Parser {
                 logger.error("fatal: ", ex);
             }
         }
-        GMSORSMessage _msg = new GMSORSMessage(threadID, dp.rest,  fileInfo.getRecordID());
+        GMSORSMessage _msg = new GMSORSMessage(threadID, dp.rest, fileInfo.getRecordID());
         _msg.SetInbound(false);
         SetStdFields(_msg);
         threadReqs.put(threadID, _msg);
     }
 
     private void addORSResponseMessage(String resp) {
-        GMSORSMessage msgResp = new GMSORSMessage(newThread,  fileInfo.getRecordID());
+        GMSORSMessage msgResp = new GMSORSMessage(newThread, fileInfo.getRecordID());
         msgResp.SetInbound(true);
         SetStdFields(msgResp);
         if (isSessionID(resp)) {
@@ -557,7 +557,7 @@ public class GMSParser extends Parser {
     }
 
     private void addORSResponseMessage(boolean isException) {
-        GMSORSMessage msgResp = new GMSORSMessage(newThread, m_MessageContents,  fileInfo.getRecordID());
+        GMSORSMessage msgResp = new GMSORSMessage(newThread, m_MessageContents, fileInfo.getRecordID());
         msgResp.SetInbound(true);
         SetStdFields(msgResp);
         msgResp.setReq("OK (KVList)");
@@ -600,7 +600,7 @@ public class GMSParser extends Parser {
     }
 
     @Override
-    void init(DBTables  m_tables) {
+    void init(DBTables m_tables) {
         m_tables.put(TableType.GMSStart.toString(), new GMSStartTable(Main.getInstance().getM_accessor(), TableType.GMSStart));
         m_tables.put(TableType.GMSStatServerMessage.toString(), new GMSStatServerMsgTable(Main.getInstance().getM_accessor(), TableType.GMSStatServerMessage));
         m_tables.put(TableType.GMSWebClientMessage.toString(), new GMSWebClientMsgTable(Main.getInstance().getM_accessor(), TableType.GMSWebClientMessage));
@@ -656,7 +656,7 @@ public class GMSParser extends Parser {
                         threadState.addString(sOrig);
                         return ParserThreadsProcessor.StateTransitionResult.NON_STATE_LINE_WAITED;
                     } else {
-                        GMSStartMessage msg = new GMSStartMessage(threadState.getMsgLines(),  fileInfo.getRecordID());
+                        GMSStartMessage msg = new GMSStartMessage(threadState.getMsgLines(), fileInfo.getRecordID());
                         msg.SetStdFieldsAndAdd(parser);
                         return ParserThreadsProcessor.StateTransitionResult.FINAL_REACHED;
 
@@ -705,6 +705,10 @@ public class GMSParser extends Parser {
             super(t, fileID);
         }
 
+        private GMSStatServerMsg(int fileID) {
+            this(TableType.GMSStatServerMessage, fileID);
+        }
+
         @Override
         public boolean fillStat(PreparedStatement stmt) throws SQLException {
             stmt.setTimestamp(1, new Timestamp(GetAdjustedUsecTime()));
@@ -719,11 +723,7 @@ public class GMSParser extends Parser {
             setFieldInt(stmt, 9, Main.getRef(ReferenceType.TEvent, getSsEvent()));
             setFieldLong(stmt, 10, getReqID());
             setFieldString(stmt, 11, getStringValue());
-return true;
-        }
-
-        private GMSStatServerMsg( int fileID) {
-            this(TableType.GMSStatServerMessage, fileID);
+            return true;
         }
 
         public boolean isCorruptMessage() {
@@ -804,7 +804,7 @@ return true;
                     + ",?"
                     + ",?"
                     + ",?"
-                    + ");"            ;
+                    + ");";
 
         }
 
@@ -851,7 +851,7 @@ return true;
         }
 
         private GMSWebClientMsg() {
-            super(TableType.GMSWebClientMessage,  fileInfo.getRecordID());
+            super(TableType.GMSWebClientMessage, fileInfo.getRecordID());
         }
 
         public Integer getWebReqID() {
@@ -971,7 +971,6 @@ return true;
             getM_dbAccessor().runQuery(query);
 
 
-
         }
 
         @Override
@@ -988,7 +987,7 @@ return true;
                     + ",?"
                     + buf
                     + ");"
-            ;
+                    ;
         }
 
         /**

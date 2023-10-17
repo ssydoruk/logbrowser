@@ -140,7 +140,7 @@ abstract class JTableCommon extends JTablePopup {
         }
     }
 
-    protected void clearAllFilters(){
+    protected void clearAllFilters() {
         TableCellRenderer defaultRenderer = getTableHeader().getDefaultRenderer();
         for (int i = 0; i < getColumnModel().getColumnCount(); i++) {
             getColumnModel().getColumn(i).setHeaderRenderer(defaultRenderer);

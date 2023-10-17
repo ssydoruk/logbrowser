@@ -28,10 +28,12 @@ public abstract class URSRIBase extends Message {
     private String refid;
     private String UUID = null;
     private String uriParams;
+
     public URSRIBase(TableType t, ArrayList messageLines, int fileID) {
         this(t, fileID);
         setMessageLines(m_MessageLines);
     }
+
     URSRIBase(TableType t, int fileID) {
         super(t, fileID);
         allParams = new ArrayList<>();
@@ -61,22 +63,6 @@ public abstract class URSRIBase extends Message {
         return buf;
     }
 
-    void setTableValues(int baseRecNo, PreparedStatement stmt) throws SQLException {
-        ArrayList<Pair<String, String>> arr = getAttrs();
-        for (int i = 0; i < URSRIBase.MAX_WEB_PARAMS; i++) {
-            if (arr != null && i < arr.size()) {
-                setFieldInt(stmt, baseRecNo + i * 2, Main.getRef(ReferenceType.Misc, arr.get(i).getKey()));
-                setFieldInt(stmt, baseRecNo + i * 2 + 1, Main.getRef(ReferenceType.Misc, arr.get(i).getValue()));
-
-            } else {
-                setFieldInt(stmt, baseRecNo + i * 2, null);
-                setFieldInt(stmt, baseRecNo + i * 2 + 1, null);
-
-            }
-        }
-
-    }
-
     public static Map<String, List<String>> splitQuery(String url) throws UnsupportedEncodingException {
         if (StringUtils.isNotBlank(url)) {
             final Map<String, List<String>> query_pairs = new LinkedHashMap<>();
@@ -94,6 +80,22 @@ public abstract class URSRIBase extends Message {
         } else {
             return null;
         }
+    }
+
+    void setTableValues(int baseRecNo, PreparedStatement stmt) throws SQLException {
+        ArrayList<Pair<String, String>> arr = getAttrs();
+        for (int i = 0; i < URSRIBase.MAX_WEB_PARAMS; i++) {
+            if (arr != null && i < arr.size()) {
+                setFieldInt(stmt, baseRecNo + i * 2, Main.getRef(ReferenceType.Misc, arr.get(i).getKey()));
+                setFieldInt(stmt, baseRecNo + i * 2 + 1, Main.getRef(ReferenceType.Misc, arr.get(i).getValue()));
+
+            } else {
+                setFieldInt(stmt, baseRecNo + i * 2, null);
+                setFieldInt(stmt, baseRecNo + i * 2 + 1, null);
+
+            }
+        }
+
     }
 
     public int getRefid() {

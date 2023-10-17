@@ -4,22 +4,18 @@
  */
 package com.myutils.logbrowser.indexer;
 
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Timestamp;
-
 /**
  * @author ssydoruk
  */
 public class ORSMetricTable extends DBTable {
 
     public ORSMetricTable(SqliteAccessor dbaccessor, TableType t) {
-        super(dbaccessor, t,"ORSmetr_" + dbaccessor.getM_alias());
+        super(dbaccessor, t, "ORSmetr_" + dbaccessor.getM_alias());
     }
 
     @Override
     public void InitDB() {
-        
+
         addIndex("time");
         addIndex("FileId");
         addIndex("sidid");
@@ -59,7 +55,6 @@ public class ORSMetricTable extends DBTable {
     public void FinalizeDB() {
         createIndexes();
     }
-
 
 
 }

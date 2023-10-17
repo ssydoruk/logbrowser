@@ -6,7 +6,6 @@ import com.myutils.logbrowser.indexer.FileInfoType;
 import com.myutils.logbrowser.indexer.ReferenceType;
 import com.myutils.logbrowser.indexer.TableType;
 import com.myutils.logbrowser.inquirer.IQuery.FieldType;
-import com.myutils.logbrowser.inquirer.IQuery.IRecordLoadedProc;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -559,18 +558,16 @@ public class CallFlowResults extends IQueryResults {
             inquirer.logger.debug("TLib report");
             TlibForScCmQuery tlibQuery = new TlibForScCmQuery(eventsSettings, cidFinder, true);
             tlibQuery.setCommonParams(this, dlg);
-            tlibQuery.setRecLoadedProc(new IRecordLoadedProc() {
-                @Override
-                public void recordLoaded(ILogRecord rec) {
-                    if (rec instanceof TLibEvent) {
-                        addUnique(refIDs, ((TLibEvent) rec).GetReferenceId());
-                        long id = rec.getID();
-                        if (id > 0) {
-                            ids.add(id);
-                        }
-                        addUnique(idDNs, ((TLibEvent) rec).getThisDNID(), ((TLibEvent) rec).getOtherDNID());
+            tlibQuery.setRecLoadedProc((ILogRecord rec) -> {
+                if (rec instanceof TLibEvent) {
+                    addUnique(refIDs, ((TLibEvent) rec).GetReferenceId());
+                    long id = rec.getID();
+                    if (id > 0) {
+                        ids.add(id);
                     }
+                    addUnique(idDNs, ((TLibEvent) rec).getThisDNID(), ((TLibEvent) rec).getOtherDNID());
                 }
+
 
             });
             getRecords(tlibQuery);
@@ -583,16 +580,14 @@ public class CallFlowResults extends IQueryResults {
 
                 ArrayList<Long> idsReqs = new ArrayList<>();
 
-                tlibQuery.setRecLoadedProc(new IRecordLoadedProc() {
-                    @Override
-                    public void recordLoaded(ILogRecord rec) {
-                        if (rec instanceof TLibEvent) {
-                            long id = rec.getID();
-                            if (id > 0) {
-                                idsReqs.add(id);
-                            }
+                tlibQuery.setRecLoadedProc((ILogRecord rec) -> {
+                    if (rec instanceof TLibEvent) {
+                        long id = rec.getID();
+                        if (id > 0) {
+                            idsReqs.add(id);
                         }
                     }
+
                 });
                 getRecords(tlibQuery);
                 if (!idsReqs.isEmpty()) {

@@ -47,8 +47,8 @@ public abstract class OutputSpecFormatter extends DefaultFormatter {
     private final HashMap<String, RecordLayout> outSpec = new HashMap<>();
 
     public OutputSpecFormatter(XmlCfg cfg,
-            boolean isLongFileNameEnabled,
-            HashSet<String> components) throws Exception {
+                               boolean isLongFileNameEnabled,
+                               HashSet<String> components) throws Exception {
         super(isLongFileNameEnabled, components);
         inquirer.logger.debug("OutputSpecFormatter " + cfg.getXmlFile());
         this.cfg = cfg;
@@ -168,6 +168,11 @@ public abstract class OutputSpecFormatter extends DefaultFormatter {
         public String toString() {
             return this.name;
         }
+    }
+
+    interface IFileChangeFun {
+
+        void fun(String file);
     }
 
     public static abstract class Parameter {
@@ -309,14 +314,14 @@ public abstract class OutputSpecFormatter extends DefaultFormatter {
                 if (!ignorePatternForDBFields) {
                     ArrayList<Element> els = getElementsChildByName(e, "pattern");
                     if (els != null && els.size() > 0) {
-                        for (Iterator<Element> iterator = els.iterator(); iterator.hasNext();) {
+                        for (Iterator<Element> iterator = els.iterator(); iterator.hasNext(); ) {
                             Element next = iterator.next();
                             SetMatch(next);
                         }
                     }
                 }
                 for (Iterator<Element> el = getElementsChildByName(e, "filter").iterator();
-                        el != null && el.hasNext();) {
+                     el != null && el.hasNext(); ) {
                     SetFilter(el.next());
 
                 }
@@ -850,15 +855,6 @@ public abstract class OutputSpecFormatter extends DefaultFormatter {
         String formatStringFromXml;
         private String initScript = null;
         private String recordDisplayScript = null;
-
-        public String getRecordDisplayScript() {
-            return recordDisplayScript;
-        }
-
-        public void setRecordDisplayScript(String recordDisplayScript) {
-            this.recordDisplayScript = recordDisplayScript;
-        }
-
         private Utils.FileWatcher jsFileWatcher = null;
 
         private RecordLayout(org.w3c.dom.Element el, String msgType, String cfgFile) throws Exception {
@@ -922,6 +918,14 @@ public abstract class OutputSpecFormatter extends DefaultFormatter {
             }
         }
 
+        public String getRecordDisplayScript() {
+            return recordDisplayScript;
+        }
+
+        public void setRecordDisplayScript(String recordDisplayScript) {
+            this.recordDisplayScript = recordDisplayScript;
+        }
+
         public void setInitScript(String initScript) {
             this.initScript = initScript;
         }
@@ -968,7 +972,7 @@ public abstract class OutputSpecFormatter extends DefaultFormatter {
                     return "";
                 }
                 if (!scriptFields.isEmpty()) {
-                    for (Map.Entry<String, Object> entry : (Set<Map.Entry<String,Object>>)scriptFields.entrySet()) {
+                    for (Map.Entry<String, Object> entry : (Set<Map.Entry<String, Object>>) scriptFields.entrySet()) {
                         ps.addField(entry.getKey(), entry.getValue());
                     }
                 }
@@ -1133,10 +1137,5 @@ public abstract class OutputSpecFormatter extends DefaultFormatter {
                 Logger.getLogger(OutputSpecFormatter.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
-    }
-
-    interface IFileChangeFun {
-
-        void fun(String file);
     }
 }

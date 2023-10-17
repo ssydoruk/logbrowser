@@ -4,24 +4,18 @@
  */
 package com.myutils.logbrowser.indexer;
 
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Timestamp;
-
-import static com.myutils.logbrowser.indexer.Message.transformDN;
-
 /**
  * @author ssydoruk
  */
 public class SIPMSTable extends DBTable {
 
     public SIPMSTable(SqliteAccessor dbaccessor, TableType t) {
-        super(dbaccessor, t,"sipms");
+        super(dbaccessor, t, "sipms");
     }
 
     @Override
     public void InitDB() {
-        
+
         addIndex("time");
         addIndex("FileId");
         addIndex("nameID");

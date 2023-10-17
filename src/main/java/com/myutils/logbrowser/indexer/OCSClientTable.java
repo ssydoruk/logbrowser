@@ -4,10 +4,6 @@
  */
 package com.myutils.logbrowser.indexer;
 
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Timestamp;
-
 /**
  * @author ssydoruk
  * <p>
@@ -66,9 +62,6 @@ public class OCSClientTable extends DBTable {
         getM_dbAccessor().runQuery("create index if not exists OCSClientGroupDBID on  OCSClient (GroupDBID);");
         getM_dbAccessor().runQuery("create index if not exists OCSClientunixtime on  OCSClient (time);");
     }
-
-
-
 
 
 }

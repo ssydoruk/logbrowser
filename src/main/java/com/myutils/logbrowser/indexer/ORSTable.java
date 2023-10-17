@@ -4,24 +4,18 @@
  */
 package com.myutils.logbrowser.indexer;
 
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Timestamp;
-
-import static Utils.Util.StripQuotes;
-
 /**
  * @author ssydoruk
  */
 public class ORSTable extends DBTable {
 
     public ORSTable(SqliteAccessor dbaccessor, TableType t) {
-        super(dbaccessor, t,"ORS_" + dbaccessor.getM_alias());
+        super(dbaccessor, t, "ORS_" + dbaccessor.getM_alias());
     }
 
     @Override
     public void InitDB() {
-        
+
         addIndex("TransferIDID");
         addIndex("time");
         addIndex("uuidID");

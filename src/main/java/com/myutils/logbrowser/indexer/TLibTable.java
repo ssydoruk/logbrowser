@@ -4,24 +4,18 @@
  */
 package com.myutils.logbrowser.indexer;
 
-import org.apache.commons.lang3.StringUtils;
-
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Timestamp;
-
 /**
  * @author ssydoruk
  */
 public class TLibTable extends DBTable {
 
     public TLibTable(SqliteAccessor dbaccessor, TableType type) {
-        super(dbaccessor, type,"tlib_" + dbaccessor.getM_alias() );
+        super(dbaccessor, type, "tlib_" + dbaccessor.getM_alias());
     }
 
     @Override
     public void InitDB() {
-        
+
         addIndex("ConnectionIDID");
         addIndex("TransferIDID");
         addIndex("HandlerId");
@@ -87,6 +81,5 @@ public class TLibTable extends DBTable {
         createIndexes();
     }
 
- 
 
 }

@@ -83,10 +83,8 @@ public class IconMessage extends Message {
         String finalOtherDN = otherDN;
         String finalAgentID = agentID;
         String finalAni = ani;
-        accessor.addToDB(m_statementId, new IFillStatement() {
-            @Override
-            public boolean fillStatement(PreparedStatement stmt) throws SQLException{
-                stmt.setTimestamp(1, new Timestamp(GetAdjustedUsecTime()));
+        accessor.addToDB(m_statementId, (PreparedStatement stmt) -> {
+            stmt.setTimestamp(1, new Timestamp(GetAdjustedUsecTime()));
             Record.setFieldString(stmt, 2, GetMessageName());
             Record.setFieldString(stmt, 3, finalThisDN);
             Record.setFieldString(stmt, 4, finalOtherDN);
@@ -99,8 +97,8 @@ public class IconMessage extends Message {
             stmt.setLong(11, getFileBytes());
             stmt.setInt(12, 0);
             stmt.setInt(13, getM_line());
-return false;
-            }
+            return false;
+
         });
     }
 

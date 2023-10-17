@@ -6,7 +6,6 @@ package com.myutils.logbrowser.indexer;
 
 import Utils.Pair;
 
-import java.io.IOException;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
@@ -65,7 +64,7 @@ public class WWECloudParser extends Parser {
     private String m_msg1;
     private Object msg;
 
-    public WWECloudParser(DBTables  m_tables) {
+    public WWECloudParser(DBTables m_tables) {
         super(FileInfoType.type_WWECloud, m_tables);
     }
 
@@ -253,7 +252,7 @@ public class WWECloudParser extends Parser {
     }
 
     @Override
-    void init(DBTables  m_tables) {
+    void init(DBTables m_tables) {
         m_tables.put(TableType.WWECloud.toString(), new WWECloudTable(Main.getInstance().getM_accessor(), TableType.WWECloud));
         m_tables.put(TableType.WWECloudAuth.toString(), new WWECloudAuthTab(Main.getInstance().getM_accessor(), TableType.WWECloudAuth));
         m_tables.put(TableType.WWECloudException.toString(), new WWECloudExeptionTab(Main.getInstance().getM_accessor(), TableType.WWECloudException));
@@ -298,7 +297,7 @@ public class WWECloudParser extends Parser {
 
 
         public WWECloudMessage(String event, ArrayList newMessageLines, boolean isTServerReq) {
-            super(TableType.WWECloud,  fileInfo.getRecordID());
+            super(TableType.WWECloud, fileInfo.getRecordID());
             m_MessageLines = newMessageLines;
             m_MessageName = event;
             this.isTServerReq = isTServerReq;
@@ -468,288 +467,286 @@ public class WWECloudParser extends Parser {
 //</editor-fold>
 //<editor-fold defaultstate="collapsed" desc="CloudAuth">
 
-        private class WWECloudAuthMsg extends Message {
+    private class WWECloudAuthMsg extends Message {
 
-            private WWECloudAuthMsg(ArrayList<String> m_MessageContents) {
-                super(TableType.WWECloudAuth, m_MessageContents,  fileInfo.getRecordID());
-            }
+        private WWECloudAuthMsg(ArrayList<String> m_MessageContents) {
+            super(TableType.WWECloudAuth, m_MessageContents, fileInfo.getRecordID());
+        }
 
-            private String getSuccess() {
-                if (m_MessageLines != null && !m_MessageLines.isEmpty()) {
-                    if (m_MessageLines.get(0).contains("Authentication success")) {
-                        return "success";
-                    } else if (m_MessageLines.get(0).contains("authentication failed")) {
-                        return "authentication failed";
-                    }
+        private String getSuccess() {
+            if (m_MessageLines != null && !m_MessageLines.isEmpty()) {
+                if (m_MessageLines.get(0).contains("Authentication success")) {
+                    return "success";
+                } else if (m_MessageLines.get(0).contains("authentication failed")) {
+                    return "authentication failed";
                 }
-
-                return "(unknown)";
             }
 
-            private String getAgent() {
-                return FindByRx(regAuthUsers);
-            }
-
-            public String getError() {
-                return getIxnAttributeString("SATRCFG_DESCRIPTION");
-            }
-
-            @Override
-            public boolean fillStat(PreparedStatement stmt) throws SQLException {
-                stmt.setTimestamp(1, new Timestamp(GetAdjustedUsecTime()));
-                stmt.setInt(2, getFileID());
-                stmt.setLong(3, getM_fileOffset());
-                stmt.setLong(4, getM_FileBytes());
-                stmt.setLong(5, getM_line());
-
-                setFieldInt(stmt, 6, Main.getRef(ReferenceType.Misc, getSuccess()));
-                setFieldInt(stmt, 7, Main.getRef(ReferenceType.Agent, getAgent()));
-                setFieldInt(stmt, 8, Main.getRef(ReferenceType.ErrorDescr, getError()));
-                return true;
-
-            }
+            return "(unknown)";
         }
 
-        private class WWECloudAuthTab extends DBTable {
-
-            public WWECloudAuthTab(SqliteAccessor dbaccessor, TableType t) {
-                super(dbaccessor, t);
-            }
-
-            @Override
-            public void InitDB() {
-                StringBuilder buf = new StringBuilder();
-                addIndex("time");
-                addIndex("FileId");
-                addIndex("successID");
-                addIndex("userID");
-                addIndex("errorID");
-
-                dropIndexes();
-
-                String query = "create table if not exists " + getTabName() + " (id INTEGER PRIMARY KEY ASC"
-                        + ",time timestamp"
-                        + ",FileId INTEGER"
-                        + ",FileOffset bigint"
-                        + ",FileBytes int"
-                        + ",line int"
-                        /* standard first */
-                        + ",successID int"
-                        + ",userID int"
-                        + ",errorID int"
-                        + ");";
-                getM_dbAccessor().runQuery(query);
-
-
-            }
-
-            @Override
-            public String getInsert() {
-                return "INSERT INTO " + getTabName() + " VALUES(NULL,?,?,?,?,?"
-                        /*standard first*/
-                        + ",?"
-                        + ",?"
-                        + ",?"
-                        + ");"                ;
-
-            }
-
-            /**
-             * @throws Exception
-             */
-            @Override
-            public void FinalizeDB() throws Exception {
-                createIndexes();
-            }
-
-
-        }
-//</editor-fold>
-
-        private class WWECloudLogMsg extends Message {
-
-            private final String msg;
-            private final String msgText;
-
-            private WWECloudLogMsg(String m_msgName, String msgText) {
-                super(TableType.WWECloudLog,   fileInfo.getRecordID());
-                this.msg = m_msgName;
-                this.msgText = optimizeText(msgText);
-            }
-
-            public String getMsg() {
-                return msg;
-            }
-
-            public String getMsgText() {
-                return msgText;
-            }
-
-            private String optimizeText(String msgText) {
-                String ret = msgText;
-                for (Map.Entry<Pattern, String> entry : IGNORE_LOG_WORDS.entrySet()) {
-                    ret = entry.getKey().matcher(ret).replaceAll(entry.getValue());
-                }
-                return ret;
-
-            }
-
-            @Override
-            public boolean fillStat(PreparedStatement stmt) throws SQLException {
-                stmt.setTimestamp(1, new Timestamp(GetAdjustedUsecTime()));
-                stmt.setInt(2, getFileID());
-                stmt.setLong(3, getM_fileOffset());
-                stmt.setLong(4, getM_FileBytes());
-                stmt.setLong(5, getM_line());
-
-                setFieldInt(stmt, 6, Main.getRef(ReferenceType.CLOUD_LOG_MESSAGE_TYPE, getMsg()));
-                setFieldInt(stmt, 7, Main.getRef(ReferenceType.CLOUD_LOG_MESSAGE, getMsgText()));
-                return true;
-
-            }
+        private String getAgent() {
+            return FindByRx(regAuthUsers);
         }
 
-        private class WWECloudExeptionMsg extends Message {
-
-            private final String exceptionName;
-
-            private final String msg;
-
-            private WWECloudExeptionMsg(String exName, String msg) {
-                super(TableType.WWECloudException,  fileInfo.getRecordID());
-                this.exceptionName = exName;
-                this.msg = msg;
-            }
-
-            public String getExceptionName() {
-                return exceptionName;
-            }
-
-            public String getMsg() {
-                return msg;
-            }
-
-            @Override
-            public boolean fillStat(PreparedStatement stmt) throws SQLException {
-                stmt.setTimestamp(1, new Timestamp(GetAdjustedUsecTime()));
-                stmt.setInt(2, getFileID());
-                stmt.setLong(3, getM_fileOffset());
-                stmt.setLong(4, getM_FileBytes());
-                stmt.setLong(5, getM_line());
-
-                setFieldInt(stmt, 6, Main.getRef(ReferenceType.Exception, getExceptionName()));
-                setFieldInt(stmt, 7, Main.getRef(ReferenceType.ExceptionMessage, getMsg()));
-                return true;
-
-            }
+        public String getError() {
+            return getIxnAttributeString("SATRCFG_DESCRIPTION");
         }
 
-        private class WWECloudExeptionTab extends DBTable {
+        @Override
+        public boolean fillStat(PreparedStatement stmt) throws SQLException {
+            stmt.setTimestamp(1, new Timestamp(GetAdjustedUsecTime()));
+            stmt.setInt(2, getFileID());
+            stmt.setLong(3, getM_fileOffset());
+            stmt.setLong(4, getM_FileBytes());
+            stmt.setLong(5, getM_line());
 
-            public WWECloudExeptionTab(SqliteAccessor dbaccessor, TableType t) {
-                super(dbaccessor, t);
-            }
+            setFieldInt(stmt, 6, Main.getRef(ReferenceType.Misc, getSuccess()));
+            setFieldInt(stmt, 7, Main.getRef(ReferenceType.Agent, getAgent()));
+            setFieldInt(stmt, 8, Main.getRef(ReferenceType.ErrorDescr, getError()));
+            return true;
 
-            @Override
-            public void InitDB() {
-                StringBuilder buf = new StringBuilder();
-                addIndex("time");
-                addIndex("FileId");
-                addIndex("exNameID");
-                addIndex("msgID");
+        }
+    }
 
-                dropIndexes();
+    private class WWECloudAuthTab extends DBTable {
 
-                String query = "create table if not exists " + getTabName() + " (id INTEGER PRIMARY KEY ASC"
-                        + ",time timestamp"
-                        + ",FileId INTEGER"
-                        + ",FileOffset bigint"
-                        + ",FileBytes int"
-                        + ",line int"
-                        /* standard first */
-                        + ",exNameID int"
-                        + ",msgID int"
-                        + ");";
-                getM_dbAccessor().runQuery(query);
+        public WWECloudAuthTab(SqliteAccessor dbaccessor, TableType t) {
+            super(dbaccessor, t);
+        }
 
-            }
+        @Override
+        public void InitDB() {
+            StringBuilder buf = new StringBuilder();
+            addIndex("time");
+            addIndex("FileId");
+            addIndex("successID");
+            addIndex("userID");
+            addIndex("errorID");
 
-            @Override
-            public String getInsert() {
-                return "INSERT INTO " + getTabName() + " VALUES(NULL,?,?,?,?,?"
-                        /*standard first*/
-                        + ",?"
-                        + ",?"
-                        + ");"                ;
+            dropIndexes();
 
-
-            }
-
-            /**
-             * @throws Exception
-             */
-            @Override
-            public void FinalizeDB() throws Exception {
-                createIndexes();
-            }
-
-
+            String query = "create table if not exists " + getTabName() + " (id INTEGER PRIMARY KEY ASC"
+                    + ",time timestamp"
+                    + ",FileId INTEGER"
+                    + ",FileOffset bigint"
+                    + ",FileBytes int"
+                    + ",line int"
+                    /* standard first */
+                    + ",successID int"
+                    + ",userID int"
+                    + ",errorID int"
+                    + ");";
+            getM_dbAccessor().runQuery(query);
 
 
         }
 
-        private class WWECloudLogTab extends DBTable {
-
-            public WWECloudLogTab(SqliteAccessor dbaccessor, TableType t) {
-                super(dbaccessor, t);
-            }
-
-            @Override
-            public void InitDB() {
-                addIndex("time");
-                addIndex("FileId");
-                addIndex("msgID");
-                addIndex("msgTextID");
-
-                dropIndexes();
-
-                String query = "create table if not exists " + getTabName() + " (id INTEGER PRIMARY KEY ASC"
-                        + ",time timestamp"
-                        + ",FileId INTEGER"
-                        + ",FileOffset bigint"
-                        + ",FileBytes int"
-                        + ",line int"
-                        /* standard first */
-                        + ",msgID int"
-                        + ",msgTextID int"
-                        + ");";
-                getM_dbAccessor().runQuery(query);
-
-
-            }
-
-            @Override
-            public String getInsert() {
-                return "INSERT INTO " + getTabName() + " VALUES(NULL,?,?,?,?,?"
-                        /*standard first*/
-                        + ",?"
-                        + ",?"
-                        + ");"                ;
-
-            }
-
-            /**
-             * @throws Exception
-             */
-            @Override
-            public void FinalizeDB() throws Exception {
-                createIndexes();
-            }
-
+        @Override
+        public String getInsert() {
+            return "INSERT INTO " + getTabName() + " VALUES(NULL,?,?,?,?,?"
+                    /*standard first*/
+                    + ",?"
+                    + ",?"
+                    + ",?"
+                    + ");";
 
         }
-//</editor-fold>
+
+        /**
+         * @throws Exception
+         */
+        @Override
+        public void FinalizeDB() throws Exception {
+            createIndexes();
+        }
+
 
     }
+//</editor-fold>
+
+    private class WWECloudLogMsg extends Message {
+
+        private final String msg;
+        private final String msgText;
+
+        private WWECloudLogMsg(String m_msgName, String msgText) {
+            super(TableType.WWECloudLog, fileInfo.getRecordID());
+            this.msg = m_msgName;
+            this.msgText = optimizeText(msgText);
+        }
+
+        public String getMsg() {
+            return msg;
+        }
+
+        public String getMsgText() {
+            return msgText;
+        }
+
+        private String optimizeText(String msgText) {
+            String ret = msgText;
+            for (Map.Entry<Pattern, String> entry : IGNORE_LOG_WORDS.entrySet()) {
+                ret = entry.getKey().matcher(ret).replaceAll(entry.getValue());
+            }
+            return ret;
+
+        }
+
+        @Override
+        public boolean fillStat(PreparedStatement stmt) throws SQLException {
+            stmt.setTimestamp(1, new Timestamp(GetAdjustedUsecTime()));
+            stmt.setInt(2, getFileID());
+            stmt.setLong(3, getM_fileOffset());
+            stmt.setLong(4, getM_FileBytes());
+            stmt.setLong(5, getM_line());
+
+            setFieldInt(stmt, 6, Main.getRef(ReferenceType.CLOUD_LOG_MESSAGE_TYPE, getMsg()));
+            setFieldInt(stmt, 7, Main.getRef(ReferenceType.CLOUD_LOG_MESSAGE, getMsgText()));
+            return true;
+
+        }
+    }
+
+    private class WWECloudExeptionMsg extends Message {
+
+        private final String exceptionName;
+
+        private final String msg;
+
+        private WWECloudExeptionMsg(String exName, String msg) {
+            super(TableType.WWECloudException, fileInfo.getRecordID());
+            this.exceptionName = exName;
+            this.msg = msg;
+        }
+
+        public String getExceptionName() {
+            return exceptionName;
+        }
+
+        public String getMsg() {
+            return msg;
+        }
+
+        @Override
+        public boolean fillStat(PreparedStatement stmt) throws SQLException {
+            stmt.setTimestamp(1, new Timestamp(GetAdjustedUsecTime()));
+            stmt.setInt(2, getFileID());
+            stmt.setLong(3, getM_fileOffset());
+            stmt.setLong(4, getM_FileBytes());
+            stmt.setLong(5, getM_line());
+
+            setFieldInt(stmt, 6, Main.getRef(ReferenceType.Exception, getExceptionName()));
+            setFieldInt(stmt, 7, Main.getRef(ReferenceType.ExceptionMessage, getMsg()));
+            return true;
+
+        }
+    }
+
+    private class WWECloudExeptionTab extends DBTable {
+
+        public WWECloudExeptionTab(SqliteAccessor dbaccessor, TableType t) {
+            super(dbaccessor, t);
+        }
+
+        @Override
+        public void InitDB() {
+            StringBuilder buf = new StringBuilder();
+            addIndex("time");
+            addIndex("FileId");
+            addIndex("exNameID");
+            addIndex("msgID");
+
+            dropIndexes();
+
+            String query = "create table if not exists " + getTabName() + " (id INTEGER PRIMARY KEY ASC"
+                    + ",time timestamp"
+                    + ",FileId INTEGER"
+                    + ",FileOffset bigint"
+                    + ",FileBytes int"
+                    + ",line int"
+                    /* standard first */
+                    + ",exNameID int"
+                    + ",msgID int"
+                    + ");";
+            getM_dbAccessor().runQuery(query);
+
+        }
+
+        @Override
+        public String getInsert() {
+            return "INSERT INTO " + getTabName() + " VALUES(NULL,?,?,?,?,?"
+                    /*standard first*/
+                    + ",?"
+                    + ",?"
+                    + ");";
+
+
+        }
+
+        /**
+         * @throws Exception
+         */
+        @Override
+        public void FinalizeDB() throws Exception {
+            createIndexes();
+        }
+
+
+    }
+
+    private class WWECloudLogTab extends DBTable {
+
+        public WWECloudLogTab(SqliteAccessor dbaccessor, TableType t) {
+            super(dbaccessor, t);
+        }
+
+        @Override
+        public void InitDB() {
+            addIndex("time");
+            addIndex("FileId");
+            addIndex("msgID");
+            addIndex("msgTextID");
+
+            dropIndexes();
+
+            String query = "create table if not exists " + getTabName() + " (id INTEGER PRIMARY KEY ASC"
+                    + ",time timestamp"
+                    + ",FileId INTEGER"
+                    + ",FileOffset bigint"
+                    + ",FileBytes int"
+                    + ",line int"
+                    /* standard first */
+                    + ",msgID int"
+                    + ",msgTextID int"
+                    + ");";
+            getM_dbAccessor().runQuery(query);
+
+
+        }
+
+        @Override
+        public String getInsert() {
+            return "INSERT INTO " + getTabName() + " VALUES(NULL,?,?,?,?,?"
+                    /*standard first*/
+                    + ",?"
+                    + ",?"
+                    + ");";
+
+        }
+
+        /**
+         * @throws Exception
+         */
+        @Override
+        public void FinalizeDB() throws Exception {
+            createIndexes();
+        }
+
+
+    }
+//</editor-fold>
+
+}
 
 

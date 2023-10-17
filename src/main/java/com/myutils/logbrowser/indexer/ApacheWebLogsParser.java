@@ -10,7 +10,6 @@ import java.net.URLDecoder;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -27,7 +26,7 @@ public class ApacheWebLogsParser extends WebParser {
     int m_dbRecords = 0;
     private ParserState m_ParserState;
 
-    public ApacheWebLogsParser(DBTables  m_tables) {
+    public ApacheWebLogsParser(DBTables m_tables) {
         super(FileInfoType.type_WWECloud, m_tables);
     }
 
@@ -74,7 +73,6 @@ public class ApacheWebLogsParser extends WebParser {
         } catch (IOException e) {
             Main.logger.error(e);
         }
-
 
 
         return m_CurrentLine - line;
@@ -133,7 +131,7 @@ public class ApacheWebLogsParser extends WebParser {
     }
 
     @Override
-    void init(DBTables  m_tables) {
+    void init(DBTables m_tables) {
         m_tables.put(TableType.ApacheWeb.toString(), new ApacheWebTab(Main.getInstance().getM_accessor(), TableType.ApacheWeb));
 
     }

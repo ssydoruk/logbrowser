@@ -28,11 +28,6 @@ public final class IDsFinder extends QueryTools {
     ArrayList<Integer> searchApps = null;
     UTCTimeRange timeRange = null;
     private Integer[] refIDs;
-
-    public int getQueryLevel() {
-        return queryLevel;
-    }
-
     private int queryLevel;
     private boolean maxLevelSet = false;
     private String selection;
@@ -71,6 +66,43 @@ public final class IDsFinder extends QueryTools {
             return arr.length;
         } else {
             return 0;
+        }
+    }
+
+    public int getQueryLevel() {
+        return queryLevel;
+    }
+
+    private void setQueryLevel(RequestLevel selectedLevel) {
+        switch (selectedLevel) {
+            case Level0:
+                queryLevel = 0;
+                break;
+            case Level1:
+                queryLevel = 1;
+                break;
+            case Level2:
+                queryLevel = 2;
+                break;
+            case Level3:
+                queryLevel = 3;
+                break;
+            case Level4:
+                queryLevel = 4;
+                break;
+            case Level5:
+                queryLevel = 5;
+            case Level6:
+                queryLevel = 6;
+            case Level7:
+                queryLevel = 7;
+            case Level8:
+                queryLevel = 8;
+                break;
+            case LevelMax:
+                queryLevel = MAX_DEPTH;
+                maxLevelSet = true;
+                break;
         }
     }
 
@@ -1613,7 +1645,7 @@ public final class IDsFinder extends QueryTools {
 
 //            case ORSSID:
 //                switch (searchIDType) {
-//                    case UUID:               
+//                    case UUID:
 //                        return DatabaseConnector.getIDs("orssess_logbr", "uuidid", getWhere("sidid", searchIDs, true));
 //                }
             default: {
@@ -2000,7 +2032,7 @@ public final class IDsFinder extends QueryTools {
 
                 }
                 break;
-//</editor-fold>                
+//</editor-fold>
 
 //<editor-fold defaultstate="collapsed" desc="TLIBID">
             case TLIBID:
@@ -2226,39 +2258,6 @@ public final class IDsFinder extends QueryTools {
     boolean initWWECloud() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
 
-    }
-
-    private void setQueryLevel(RequestLevel selectedLevel) {
-        switch (selectedLevel) {
-            case Level0:
-                queryLevel = 0;
-                break;
-            case Level1:
-                queryLevel = 1;
-                break;
-            case Level2:
-                queryLevel = 2;
-                break;
-            case Level3:
-                queryLevel = 3;
-                break;
-            case Level4:
-                queryLevel = 4;
-                break;
-            case Level5:
-                queryLevel = 5;
-            case Level6:
-                queryLevel = 6;
-            case Level7:
-                queryLevel = 7;
-            case Level8:
-                queryLevel = 8;
-                break;
-            case LevelMax:
-                queryLevel = MAX_DEPTH;
-                maxLevelSet = true;
-                break;
-        }
     }
 
     boolean initRouting() throws SQLException {

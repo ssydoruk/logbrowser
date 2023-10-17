@@ -38,7 +38,7 @@ public class LCAParser extends Parser {
     int m_dbRecords = 0;
     private ParserState m_ParserState;
 
-    public LCAParser(DBTables  m_tables) {
+    public LCAParser(DBTables m_tables) {
         super(FileInfoType.type_LCA, m_tables);
         m_BlockNamesToIgnoreHash = new HashMap();
 
@@ -139,11 +139,11 @@ public class LCAParser extends Parser {
                     m_ParserState = ParserState.STATE_CLIENTCONNECT;
                     break;
                 } else if (s.endsWith("disconnected.")) {
-                    LCAClient msg = new LCAClient(s,  fileInfo.getRecordID());
+                    LCAClient msg = new LCAClient(s, fileInfo.getRecordID());
                     msg.parseDisconnect();
                     SetStdFieldsAndAdd(msg);
                 } else if ((m = reqSCSDisconnected.matcher(s)).find()) {
-                    LCAClient msg = new LCAClient(s,  fileInfo.getRecordID());
+                    LCAClient msg = new LCAClient(s, fileInfo.getRecordID());
                     msg.setAppName(m.group(1));
                     msg.setFD(m.group(2));
                     msg.setConnected(false);
@@ -162,7 +162,7 @@ public class LCAParser extends Parser {
                     m_MessageContents.add(s);
                     m_ParserState = ParserState.STATE_SCSREQUEST;
                 } else if ((m = reqNotifyStatus.matcher(s)).find()) {
-                    LCAAppStatus msg = new LCAAppStatus(  fileInfo.getRecordID());
+                    LCAAppStatus msg = new LCAAppStatus(fileInfo.getRecordID());
                     msg.setMode(m.group(5));
                     msg.setAppDBID(m.group(1));
                     msg.setAppName(m.group(2));
@@ -170,7 +170,7 @@ public class LCAParser extends Parser {
                     msg.setStatus(m.group(4));
                     SetStdFieldsAndAdd(msg);
                 } else if ((m = regNotifyRunmode.matcher(s)).find()) {
-                    LCAAppStatus msg = new LCAAppStatus(  fileInfo.getRecordID());
+                    LCAAppStatus msg = new LCAAppStatus(fileInfo.getRecordID());
                     msg.setMode(m.group(5));
                     msg.setAppDBID(m.group(1));
                     msg.setAppName(m.group(2));
@@ -185,7 +185,7 @@ public class LCAParser extends Parser {
             case STATE_SCSREQUESTSTARTAPP: {
                 if (str.contains("CREATE Application")) {
                     m_MessageContents.add(str);
-                    LCAAppStatus msg = new LCAAppStatus(m_MessageContents,  fileInfo.getRecordID());
+                    LCAAppStatus msg = new LCAAppStatus(m_MessageContents, fileInfo.getRecordID());
                     msg.parseStart();
                     SetStdFieldsAndAdd(msg);
                     m_MessageContents.clear();
@@ -198,7 +198,7 @@ public class LCAParser extends Parser {
 
             case STATE_SCSREQUESTCHANGERUNMODE: {
                 m_MessageContents.add(str);
-                LCAAppStatus msg = new LCAAppStatus(m_MessageContents,  fileInfo.getRecordID());
+                LCAAppStatus msg = new LCAAppStatus(m_MessageContents, fileInfo.getRecordID());
                 msg.parseChangeRunMode();
                 SetStdFieldsAndAdd(msg);
                 m_MessageContents.clear();
@@ -209,7 +209,7 @@ public class LCAParser extends Parser {
             case STATE_SCSREQUEST: {
                 if (!str.contains("gethostinfo")) {
                     m_MessageContents.add(str);
-                    LCAAppStatus msg = new LCAAppStatus(m_MessageContents,  fileInfo.getRecordID());
+                    LCAAppStatus msg = new LCAAppStatus(m_MessageContents, fileInfo.getRecordID());
                     msg.parseOtherRequest();
                     SetStdFieldsAndAdd(msg);
                 }
@@ -256,7 +256,7 @@ public class LCAParser extends Parser {
             case STATE_APP_STATUS_CHANGED1: {
                 if ((m = regNOtificationReceived.matcher(str)).find()) {
                     m_MessageContents.add(str);
-                    SCSAppStatus msg = new SCSAppStatus(m_MessageContents,  fileInfo.getRecordID());
+                    SCSAppStatus msg = new SCSAppStatus(m_MessageContents, fileInfo.getRecordID());
                     msg.setAppDBID(m.group(1));
                     msg.setAppName(m.group(2));
                     msg.setNewMode(m.group(3));
@@ -288,13 +288,13 @@ public class LCAParser extends Parser {
     }
 
     protected void AddClientMessage(ArrayList contents, String header) throws Exception {
-        LCAClient msg = new LCAClient(contents,  fileInfo.getRecordID());
+        LCAClient msg = new LCAClient(contents, fileInfo.getRecordID());
         msg.parseConnect();
         SetStdFieldsAndAdd(msg);
     }
 
     private void addRunModeChanged(String substring) {
-        ConfigUpdateRecord msg = new ConfigUpdateRecord(substring,  fileInfo.getRecordID());
+        ConfigUpdateRecord msg = new ConfigUpdateRecord(substring, fileInfo.getRecordID());
         try {
             Matcher m;
 //            msg.setObjName(Message.FindByRx(m_MessageContents, regCfgObjectName, 1, ""));
@@ -312,7 +312,7 @@ public class LCAParser extends Parser {
     }
 
     @Override
-    void init(DBTables  m_tables) {
+    void init(DBTables m_tables) {
     }
 
     enum ParserState {

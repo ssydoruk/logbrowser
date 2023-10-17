@@ -6,7 +6,6 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -43,7 +42,7 @@ public class SCSParser extends Parser {
     private String lastMSGID;
     private String lastMSGText;
 
-    public SCSParser(DBTables  m_tables) {
+    public SCSParser(DBTables m_tables) {
         super(FileInfoType.type_SCS, m_tables);
     }
 
@@ -410,7 +409,7 @@ public class SCSParser extends Parser {
     }
 
     @Override
-    void init(DBTables  m_tables) {
+    void init(DBTables m_tables) {
         m_tables.put(TableType.SCSClientLogMessage.toString(), new SCSClientLogTable(Main.getInstance().getM_accessor(), TableType.SCSClientLogMessage));
         m_tables.put(TableType.SCSAlarm.toString(), new SCSAlarmTable(Main.getInstance().getM_accessor(), TableType.SCSAlarm));
 

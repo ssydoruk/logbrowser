@@ -60,7 +60,7 @@ public abstract class Parser {
     private DateDiff dateDiff = null;
     private DBTablesFiller dbTablesFiller;
 
-    public Parser(FileInfoType type, DBTables  tables) {
+    public Parser(FileInfoType type, DBTables tables) {
         super();
         dbTablesFiller = new DBTablesFiller(tables, Main.getMain().getM_accessor());
 
@@ -660,7 +660,7 @@ public abstract class Parser {
         }
     }
 
-    abstract void init(DBTables  m_tables);
+    abstract void init(DBTables m_tables);
 
     void doneParsingFile(FileInfo fi) {
         if (!foundBodyDates) {
@@ -677,7 +677,7 @@ public abstract class Parser {
 
     private void insertIntoCustom(Matcher m, String key, ArrayList<FilesParseSettings.FileParseCustomSearch.SearchComponent> value, int changeValue,
                                   FilesParseSettings.FileParseCustomSearch fileParseCustomSearch) throws Exception {
-        CustomRegexLine cl = new CustomRegexLine( getCustomTab(m_type) , fileInfo.getRecordID());
+        CustomRegexLine cl = new CustomRegexLine(getCustomTab(m_type), fileInfo.getRecordID());
         cl.setParams(m, key, value);
 //        int lastPrintedIdx = cl.lastPrintedIdx(fileParseCustomSearch);
 //        Main.logger.info("insertIntoCustom custom [" + lastPrintedIdx + "]");

@@ -4,10 +4,6 @@
  */
 package com.myutils.logbrowser.indexer;
 
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Timestamp;
-
 /**
  * @author ssydoruk
  * <p>
@@ -71,7 +67,6 @@ public class OCSSCXMLTreatmentTable extends DBTable {
         getM_dbAccessor().runQuery("create index if not exists SessIDID_OCSSCXMLTr on OCSSCXMLTr (SessIDID);");
         getM_dbAccessor().runQuery("create index if not exists SessIDID_unixtime on OCSSCXMLTr (time);");
     }
-
 
 
 }

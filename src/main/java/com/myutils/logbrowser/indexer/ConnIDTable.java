@@ -4,17 +4,13 @@
  */
 package com.myutils.logbrowser.indexer;
 
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Timestamp;
-
 /**
  * @author ssydoruk
  */
 public class ConnIDTable extends DBTable {
 
     public ConnIDTable(SqliteAccessor dbaccessor, TableType t) {
-        super(dbaccessor, t,"connid_" + dbaccessor.getM_alias());
+        super(dbaccessor, t, "connid_" + dbaccessor.getM_alias());
     }
 
     @Override

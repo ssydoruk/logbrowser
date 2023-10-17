@@ -24,6 +24,7 @@ public class ReportFrameQuery extends ReportFrame {
     public ReportFrameQuery(ReportFrameQuery frm) {
         this(frm, true);
     }
+
     public ReportFrameQuery(ReportFrameQuery frm, boolean isFullClone) {
         super(frm, isFullClone);
         createToolbar();

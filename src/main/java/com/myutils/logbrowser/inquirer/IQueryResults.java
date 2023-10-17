@@ -55,6 +55,7 @@ public abstract class IQueryResults extends QueryTools
     private JTextArea taskOutput;
     private Task task;
     private boolean suppressConfirms = true;
+
     //    public void getGenesysMessages(TableType t, UTCTimeRange timeRange) throws SQLException {
 //        getGenesysMessages(t, null, timeRange, null);
 //    }
@@ -73,6 +74,7 @@ public abstract class IQueryResults extends QueryTools
             }
         }
     }
+
     public IQueryResults() {
         repComponents = new DynamicTree<>();
     }
