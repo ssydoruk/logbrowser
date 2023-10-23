@@ -487,7 +487,7 @@ abstract public class QueryTools {
     private IQueryResults.ProgressNotifications progressCallback;
     
     public static <T> ArrayList<T> sortedArray(T[] ids) {
-        return new ArrayList<>(Stream.of(ids).sorted().collect(Collectors.toList()));
+        return Stream.of(ids).sorted().collect(Collectors.toCollection(ArrayList::new));
     }
     
     public static void DebugIDs(Integer[] ids) {

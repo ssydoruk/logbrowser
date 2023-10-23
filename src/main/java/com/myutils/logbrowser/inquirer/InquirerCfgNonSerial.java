@@ -72,7 +72,7 @@ public class InquirerCfgNonSerial {
     }
 
     private void CreateRefs(ReferenceType refType, String[] refNames) {
-        refsChecked.put(refType, new ArrayList<>(Stream.of(refNames).map(ref -> new OptionNode(true, ref)).collect(Collectors.toList())));
+        refsChecked.put(refType, Stream.of(refNames).map(ref -> new OptionNode(true, ref)).collect(Collectors.toCollection(ArrayList::new)));
     }
 
     private void AddRefs(ReferenceType refType, String[] refNames, ArrayList<OptionNode> refs) {

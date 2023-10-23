@@ -331,7 +331,7 @@ public class InquirerCfg implements Serializable {
     }
 
     private void CreateRefs(ReferenceType refType, String[] refNames) {
-        refsChecked.put(refType, new ArrayList<>(Stream.of(refNames).map(ref -> new OptionNode(true, ref)).collect(Collectors.toList())));
+        refsChecked.put(refType, Stream.of(refNames).map(ref -> new OptionNode(true, ref)).collect(Collectors.toCollection(ArrayList::new)));
     }
 
     private void AddRefs(ReferenceType refType, String[] refNames, ArrayList<OptionNode> refs) {
@@ -603,7 +603,7 @@ public class InquirerCfg implements Serializable {
     }
 
     public void setRegexSearches(MsgType t, Object[] toArray) {
-        customFieldsSettings.put(t, new ArrayList<>(Stream.of(toArray).map(obj -> (CustomField) obj).collect(Collectors.toList())));
+        customFieldsSettings.put(t, Stream.of(toArray).map(obj -> (CustomField) obj).collect(Collectors.toCollection(ArrayList::new)));
     }
 
     public ArrayList<CustomField> getRegexFieldsSettings(MsgType t) {
