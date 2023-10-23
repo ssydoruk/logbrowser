@@ -8,7 +8,6 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
-
 /**
  * per parser container of prepared statements
  */
@@ -29,11 +28,11 @@ class DBTablesFiller {
         return dbTables;
     }
 
-
     public void addToDB(Record rec) throws SQLException {
         StatParser st = getStatement(rec.getM_type());
-        if (rec.fillStat(st.getStat()))
+        if (rec.fillStat(st.getStat())) {
             Submit(st);
+        }
     }
 
     private StatParser getStatement(String type) throws SQLException {
@@ -86,12 +85,10 @@ class DBTablesFiller {
         }
     }
 
-
     class StatParser {
 
         private PreparedStatement stat;
         private int cnt;
-
 
         StatParser(PreparedStatement stat) {
             this.stat = stat;

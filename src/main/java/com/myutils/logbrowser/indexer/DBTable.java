@@ -78,8 +78,7 @@ public abstract class DBTable {
     }
 
     private String idxName(String tab, ArrayList<String> fields) {
-        StringBuilder ret = new StringBuilder();
-        ret.append(tabName).append("_");
+        StringBuilder ret = new StringBuilder().append(tabName).append("_");
         for (String field : fields) {
             ret.append(field);
         }
@@ -125,9 +124,7 @@ public abstract class DBTable {
                             Main.logger.info("No fileID for table " + tabName);
                         }
                     }
-                    for (ArrayList<String> idxField : idxFields) {
-                        dropIndex(tabName, idxField);
-                    }
+                    idxFields.stream().forEach(idxField->dropIndex(tabName, idxField));
                 }
             } catch (Exception ex) {
                 logger.error("error dropping table " + tabName, ex);
@@ -140,9 +137,7 @@ public abstract class DBTable {
     }
 
     protected void createIndexes() {
-        for (ArrayList<String> idxField : idxFields) {
-            createIndex(tabName, idxField);
-        }
+        idxFields.stream().forEach(idxField->createIndex(tabName, idxField));
     }
 
     public String getTabName() {

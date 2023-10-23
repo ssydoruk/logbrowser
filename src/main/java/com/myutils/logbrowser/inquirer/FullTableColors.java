@@ -63,9 +63,7 @@ public class FullTableColors {
     }
 
     void addAll(FullTableColors currTable) {
-        for (ArrayList<Object> row : currTable.data) {
-            addRow(row);
-        }
+        currTable.data.stream().forEach(row->addRow(row));
     }
 
     public Pair<Color, Color> getRowColors(int row) {

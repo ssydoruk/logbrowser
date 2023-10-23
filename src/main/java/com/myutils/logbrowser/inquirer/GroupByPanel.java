@@ -18,7 +18,7 @@ import java.util.ArrayList;
  */
 public class GroupByPanel extends javax.swing.JPanel {
 
-    // Variables declaration - do not modify//GEN-BEGIN:variables
+    // Variables declaration - do not modify                     
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JScrollPane jScrollPane1;
@@ -31,12 +31,14 @@ public class GroupByPanel extends javax.swing.JPanel {
     private javax.swing.JButton jbUp;
     private javax.swing.JList<String> jlAvailable;
     private javax.swing.JList<String> jlInList;
+
     /**
      * Creates new form GroupByPanel
      */
     public GroupByPanel() {
         initComponents();
     }
+
     GroupByPanel(ArrayList<DBField> flds, String panelTitle) {
         this();
         ((TitledBorder) getBorder()).setTitle(panelTitle);
@@ -48,10 +50,8 @@ public class GroupByPanel extends javax.swing.JPanel {
 //            lmAvailable.addElement(new MenuItem(entry.getKey(), entry.getValue()));
 //
 //        }
-        for (DBField fld : flds) {
-            lmAvailable.addElement(new MenuItem(fld.getScreenLabel(), fld));
-
-        }
+        flds.stream().forEach(fld
+                -> lmAvailable.addElement(new MenuItem(fld.getScreenLabel(), fld)));
         jlAvailable.setModel((ListModel) lmAvailable);
 //        if (!lmAvailable.isEmpty()) {
 //            jlAvailable.setSelectedIndex(0);
@@ -314,7 +314,7 @@ public class GroupByPanel extends javax.swing.JPanel {
         }
         setUpDownButtonsState();
     }//GEN-LAST:event_jbRemoveCurrentActionPerformed
-    // End of variables declaration//GEN-END:variables
+    // End of variables declaration                   
 
     private void setMoveButtonsState() {
         jbMoveCurrent.setEnabled(jlAvailable.getSelectedIndex() >= 0);

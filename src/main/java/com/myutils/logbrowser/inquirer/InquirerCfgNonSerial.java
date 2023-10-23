@@ -13,6 +13,8 @@ import java.util.HashMap;
 import java.util.Set;
 
 import static com.myutils.logbrowser.inquirer.QueryTools.getRefNames;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @author ssydoruk
@@ -70,21 +72,11 @@ public class InquirerCfgNonSerial {
     }
 
     private void CreateRefs(ReferenceType refType, String[] refNames) {
-        ArrayList<OptionNode> refs = new ArrayList<>(refNames.length);
-
-        for (String ref : refNames) {
-            refs.add(new OptionNode(true, ref));
-        }
-        refsChecked.put(refType, refs);
+        refsChecked.put(refType, new ArrayList<>(Stream.of(refNames).map(ref -> new OptionNode(true, ref)).collect(Collectors.toList())));
     }
 
     private void AddRefs(ReferenceType refType, String[] refNames, ArrayList<OptionNode> refs) {
-        for (String ref : refNames) {
-            if (!RefExists(refs, ref)) {
-                refs.add(new OptionNode(true, ref));
-            }
-        }
-
+        Stream.of(refNames).filter(ref->!RefExists(refs, ref)).forEach(ref->refs.add(new OptionNode(true, ref)));
     }
 
     private boolean RefExists(ArrayList<OptionNode> refs, String ref) {

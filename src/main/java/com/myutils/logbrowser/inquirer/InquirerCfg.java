@@ -20,6 +20,8 @@ import java.sql.SQLException;
 import java.util.*;
 
 import static com.myutils.logbrowser.inquirer.QueryTools.getRefNames;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @author ssydoruk
@@ -329,20 +331,11 @@ public class InquirerCfg implements Serializable {
     }
 
     private void CreateRefs(ReferenceType refType, String[] refNames) {
-        ArrayList<OptionNode> refs = new ArrayList<>(refNames.length);
-
-        for (String ref : refNames) {
-            refs.add(new OptionNode(true, ref));
-        }
-        refsChecked.put(refType, refs);
+        refsChecked.put(refType, new ArrayList<>(Stream.of(refNames).map(ref -> new OptionNode(true, ref)).collect(Collectors.toList())));
     }
 
     private void AddRefs(ReferenceType refType, String[] refNames, ArrayList<OptionNode> refs) {
-        for (String ref : refNames) {
-            if (!RefExists(refs, ref)) {
-                refs.add(new OptionNode(true, ref));
-            }
-        }
+        Stream.of(refNames).filter(ref->!RefExists(refs, ref)).forEach(ref->refs.add(new OptionNode(true, ref)));
         Collections.sort(refs);
 
     }
@@ -545,15 +538,13 @@ public class InquirerCfg implements Serializable {
     }
 
     public HashMap<String, Boolean> arrToHash(ArrayList<OptionNode> refs) {
-
         if (refs != null) {
             HashMap<String, Boolean> ret = new HashMap<>(refs.size());
-            for (OptionNode ref : refs) {
-                ret.put(ref.getName(), ref.isChecked());
-            }
+            refs.stream().forEach(ref -> ret.put(ref.getName(), ref.isChecked()));
             return ret;
         }
         return null;
+
     }
 
     HashMap<String, Boolean> getLogsHash(TableType tableType) {
@@ -612,11 +603,7 @@ public class InquirerCfg implements Serializable {
     }
 
     public void setRegexSearches(MsgType t, Object[] toArray) {
-        ArrayList<CustomField> l = new ArrayList<>(toArray.length);
-        for (Object object : toArray) {
-            l.add((CustomField) object);
-        }
-        customFieldsSettings.put(t, l);
+        customFieldsSettings.put(t, new ArrayList<>(Stream.of(toArray).map(obj -> (CustomField) obj).collect(Collectors.toList())));
     }
 
     public ArrayList<CustomField> getRegexFieldsSettings(MsgType t) {
@@ -707,9 +694,7 @@ public class InquirerCfg implements Serializable {
 
         private void setHash(HashMap<Integer, String> theHash) {
             values.clear();
-            for (Map.Entry<Integer, String> entry : theHash.entrySet()) {
-                values.add(new Pair<>(entry.getValue(), entry.getKey()));
-            }
+            theHash.entrySet().stream().forEach(entry -> values.add(new Pair<>(entry.getValue(), entry.getKey())));
         }
     }
 

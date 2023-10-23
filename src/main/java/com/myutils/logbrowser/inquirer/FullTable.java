@@ -44,9 +44,7 @@ public class FullTable {
     }
 
     void addAll(FullTable currTable) {
-        for (ArrayList<Object> row : currTable.data) {
-            addRow(row);
-        }
+        currTable.data.stream().forEach(row->addRow(row));
     }
 
     public void addRow(ArrayList<Object> row) {
