@@ -57,7 +57,7 @@ public class PseudoLogFormatter implements ILogRecordFormatter {
     @Override
     public void Print(ILogRecord loggedEvent, PrintStreams ps, IQueryResults qr) {
         try {
-            String comp = loggedEvent.GetField("comp").toUpperCase();
+            String comp = loggedEvent.getFieldValue("comp").toUpperCase();
             if (!m_components.contains(comp)) {
                 return;
             }
@@ -171,29 +171,29 @@ public class PseudoLogFormatter implements ILogRecordFormatter {
         if (time.length() > 12) {
             time = time.substring(11);
         }
-        String name = record.GetField("name");
-        String dest = record.GetField("destination");
+        String name = record.getFieldValue("name");
+        String dest = record.getFieldValue("destination");
         m_fileWriter.write(time + ": Trc 04542 " + name + " sent to (" + (dest == "" ? "Unknown" : dest) + ")\n");
         m_lineCount++;
         m_fileWriter.write("message " + name + "\n");
         m_lineCount++;
 
-        if (!record.GetField("connid").isEmpty()) {
-            m_fileWriter.write("\tAttributeConnID\t" + record.GetField("connid") + "\n");
+        if (!record.getFieldValue("connid").isEmpty()) {
+            m_fileWriter.write("\tAttributeConnID\t" + record.getFieldValue("connid") + "\n");
             m_lineCount++;
         }
 
-        if (!record.GetField("refid").isEmpty()) {
-            m_fileWriter.write("\tAttributeReferenceID\t" + record.GetField("refid") + "\n");
+        if (!record.getFieldValue("refid").isEmpty()) {
+            m_fileWriter.write("\tAttributeReferenceID\t" + record.getFieldValue("refid") + "\n");
             m_lineCount++;
         }
 
-        if (!record.GetField("thisdn").isEmpty()) {
-            m_fileWriter.write("\tAttributeThisDN\t" + record.GetField("thisdn") + "\n");
+        if (!record.getFieldValue("thisdn").isEmpty()) {
+            m_fileWriter.write("\tAttributeThisDN\t" + record.getFieldValue("thisdn") + "\n");
             m_lineCount++;
         }
-        if (!record.GetField("otherdn").isEmpty()) {
-            m_fileWriter.write("\tAttributeOtherDN\t" + record.GetField("otherdn") + "\n");
+        if (!record.getFieldValue("otherdn").isEmpty()) {
+            m_fileWriter.write("\tAttributeOtherDN\t" + record.getFieldValue("otherdn") + "\n");
             m_lineCount++;
         }
 

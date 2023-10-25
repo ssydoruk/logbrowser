@@ -26,22 +26,19 @@ public final class SqliteAccessor implements DBAccessor {
     private static final Logger logger = Main.logger;
     String m_alias;
     Connection m_conn;
-    //    ArrayList<PreparedStatement> m_statements;
-//    ArrayList<Integer> m_queueLength;
+
     boolean m_exit;
     Stats stats;
-    /**
-     * @param dbname database file name
-     * @param alias postfix for table names
-     */
-    private HashMap<String, Boolean> tabExists = new HashMap<String, Boolean>();
+
+    private HashMap<String, Boolean> tabExists = new HashMap<>();
     private List<Long> filesToDelete;
 
     public SqliteAccessor() {
+        //
     }
 
 
-    public void init(String dbname, String alias) throws Exception {
+    public void init(String dbname, String alias) throws SQLException {
         m_alias = alias;
         filesToDelete = Collections.synchronizedList(new ArrayList<Long>());
 
@@ -50,14 +47,7 @@ public final class SqliteAccessor implements DBAccessor {
             String name = dbname + ".db";
             File f = new File(name);
             Path p = f.toPath();
-//            if (Files.isRegularFile(p)) {
-//                Main.logger.info("DB [" + name + "] exists; Trying to remove");
-//                try {
-//                    Files.delete(p);
-//                } catch (IOException iOException) {
-//                    throw new Exception("Cannot remove db : " + iOException.getMessage());
-//                }
-//            }
+
             m_conn = DriverManager.getConnection("jdbc:sqlite:" + name);
 
             String s = "PRAGMA page_size = 32768;\n"
@@ -81,10 +71,9 @@ public final class SqliteAccessor implements DBAccessor {
 
             stats = new Stats();
 
-            //InitRecords(alias);
         } catch (ClassNotFoundException | SQLException e) {
             logger.error("Creating accessor failed: " + e, e);
-            throw e;
+            throw new SQLException(e.getMessage());
         }
     }
 
@@ -117,16 +106,15 @@ public final class SqliteAccessor implements DBAccessor {
 
     @Override
     public void runQuery(String query) {
-        try {
-            logger.debug("[" + query + "]");
-            synchronized (m_conn) {
-                Statement statement = m_conn.createStatement();
-                statement.executeUpdate(query);
+        logger.debug("[" + query + "]");
+        synchronized (m_conn) {
+            try {
+                try (Statement statement = m_conn.createStatement()) {
+                    statement.executeUpdate(query);
+                }
+            } catch (SQLException e) {
+                logger.error("ExecuteQuery failed: " + e + " query " + query, e);
             }
-//            ResetAutoCommit();
-//            m_conn.commit();
-        } catch (SQLException e) {
-            logger.error("ExecuteQuery failed: " + e + " query " + query, e);
         }
     }
 
@@ -172,15 +160,7 @@ public final class SqliteAccessor implements DBAccessor {
                     + "WHERE NodeId=\"\";";
             runQuery(query);
 
-            /*query = "UPDATE file_" + m_alias + " "+
-                    "SET maxtimestamp= "+
-                    "( "+
-                        "SELECT MAX(time) FROM tlib_"+m_alias+" tlib "+
-                        "INNER JOIN file_"+m_alias+" AS file "+
-                        "ON tlib.fileid=file.id AND "+
-                        "file.RunId=file_"+m_alias+".RunId "+
-                    ");";
-            runQuery(query);*/
+
         } catch (Exception e) {
             logger.error("Error finalizing the connection: " + e, e);
         }
@@ -237,59 +217,50 @@ public final class SqliteAccessor implements DBAccessor {
                 + "order by time";
 
         String ORSURSUpd = "update orsurs_logbr set sidid=? where id=?";
-        PreparedStatement stmtORSURS;
         ResultSet ORSURSrecs = GetRecords(ORSURSReq);
 
-        Connection conn = getM_conn();
-        stmtORSURS = conn.prepareStatement(ORSURSUpd);
+        if (ORSURSrecs != null) {
 
-        HashMap<Integer, Integer> reqSid = new HashMap();
+            Connection conn = getM_conn();
 
-        try {
-            synchronized (conn) {
-                int updCnt = 0;
-                conn.setAutoCommit(false);
-                try {
-                    while (ORSURSrecs.next()) {
-                        if (updCnt++ >= 1_000) {
-                            Main.logger.debug("Commit1");
-                            conn.commit();
-                            updCnt = 0;
-                        }
-                        int sid = ORSURSrecs.getInt("sidid");
+            try (PreparedStatement stmtORSURS = conn.prepareStatement(ORSURSUpd)) {
 
-                        if (sid <= 0) {
-                            sid = reqSid.get(ORSURSrecs.getInt("reqid"));
-                            if (sid > 0) {
-                                stmtORSURS.setInt(1, sid);
-                                stmtORSURS.setInt(2, ORSURSrecs.getInt("id"));
-                                stmtORSURS.executeUpdate();
+                HashMap<Integer, Integer> reqSid = new HashMap<>();
+
+                synchronized (conn) {
+                    int updCnt = 0;
+                    conn.setAutoCommit(false);
+                    try {
+                        while (ORSURSrecs.next()) {
+                            if (updCnt++ >= 1_000) {
+                                Main.logger.debug("Commit1");
+                                conn.commit();
+                                updCnt = 0;
                             }
-                        } else {
-                            reqSid.put(ORSURSrecs.getInt("reqid"), sid);
-//                            if( prefSid!=null ) {
-//                                logger.error("ID: "+ORSURSrecs.getInt("reqid")+" replaced "+sid+" on "+prefSid);
-//                            }
-                        }
+                            int sid = ORSURSrecs.getInt("sidid");
 
-                        // Do whatever you want to do with these 2 values
-                    }
-                } catch (SQLException E) {
-                    logger.error("Exception finalizing: " + E.getMessage(), E);
-                    throw E;
-                } finally {
-                    Main.logger.debug("Commit2");
-                    conn.commit();
-                    if (stmtORSURS != null) {
-                        stmtORSURS.close();
+                            if (sid <= 0) {
+                                sid = reqSid.get(ORSURSrecs.getInt("reqid"));
+                                if (sid > 0) {
+                                    stmtORSURS.setInt(1, sid);
+                                    stmtORSURS.setInt(2, ORSURSrecs.getInt("id"));
+                                    stmtORSURS.executeUpdate();
+                                }
+                            } else {
+                                reqSid.put(ORSURSrecs.getInt("reqid"), sid);
+                            }
+
+                            // Do whatever you want to do with these 2 values
+                        }
+                    } catch (SQLException E) {
+                        logger.error("Exception finalizing: " + E.getMessage(), E);
+                        throw E;
+                    } finally {
+                        Main.logger.debug("Commit2");
+                        conn.commit();
                     }
                 }
             }
-        } catch (SQLException E) {
-            logger.error("Exception closing: " + E.getMessage(), E);
-            throw E;
-        } finally {
-            ORSURSrecs.close();
         }
     }
 
@@ -300,40 +271,28 @@ public final class SqliteAccessor implements DBAccessor {
                 runQuery("analyze;");
             }
             m_conn.close();
-//            interrupt();
         } catch (SQLException e) {
             logger.error("Error finalizing the connection: " + e, e);
         }
     }
 
     public void ResetAutoCommit() {
-//        try {
-//            m_conn.setAutoCommit(false);
-//        } catch (SQLException e) {
-//            logger.error("Resetting auto commit failed: " + e, e);
-//        }
-    }
-
-    private synchronized void AddStatement(String query) {
-        try {
-            PreparedStatement stmt = m_conn.prepareStatement(query);
-            stats.addStat(stmt);
-        } catch (SQLException e) {
-            logger.error("Error while registering record: " + e + " query: " + query, e);
-        }
+        //
     }
 
     public ResultSet GetRecords(String query) {
-        try {
-            synchronized (m_conn) {
-                ResultSet ret;
-                Statement statement = m_conn.createStatement();
-                ret = statement.executeQuery(query);
-                return ret;
+        synchronized (m_conn) {
+            ResultSet ret;
+            try {
+                try (Statement statement = m_conn.createStatement()) {
+                    ret = statement.executeQuery(query);
+                    return ret;
+                }
+            } catch (SQLException e) {
+                logger.error("ExecuteQuery failed: " + e + " query " + query, e);
             }
-        } catch (SQLException e) {
-            logger.error("ExecuteQuery failed: " + e + " query " + query, e);
         }
+
         return null;
     }
 
@@ -356,32 +315,6 @@ public final class SqliteAccessor implements DBAccessor {
         Main.getInstance().getM_accessor().notify();
     }
 
-//    @Override
-//    public void run() {
-//        try {
-//            while (true) {
-//                synchronized (this) {
-//                    wait();
-//                }
-//                if (m_exit) {
-////                    Close();
-//                    return;
-//                }
-////                synchronized (stToFlush) {
-////                    if (stToFlush != null) {
-////                        stToFlush.flush();
-////                    }
-////                }
-//                synchronized (m_conn) {
-//                    m_conn.commit();
-//                    ResetAutoCommit();
-//                }
-//            }
-//        } catch (InterruptedException | SQLException e) {
-//            logger.error("SubmitStatement failed: " + e, e);
-//            ResetAutoCommit();
-//        }
-//    }
 
     public void ResetAutoCommit(boolean b) {
         try {
@@ -391,7 +324,7 @@ public final class SqliteAccessor implements DBAccessor {
         }
     }
 
-    int getID(String query, int def) throws Exception {
+    int getID(String query, int def) throws SQLException {
         try {
             Integer[] iDs = getIDs(query);
             if (iDs != null && iDs.length > 0) {
@@ -416,7 +349,7 @@ public final class SqliteAccessor implements DBAccessor {
         return TableExist(tab, false);
     }
 
-    public boolean TableExist(String tab, boolean forceCheck) throws Exception {
+    public boolean TableExist(String tab, boolean forceCheck) throws SQLException {
         if (!forceCheck && tabExists.containsKey(tab)) {
             return tabExists.get(tab);
         } else {
@@ -437,62 +370,57 @@ public final class SqliteAccessor implements DBAccessor {
         return true;
     }
 
-    public ResultSet executeQuery(String query) throws Exception {
+    public ResultSet executeQuery(String query) throws SQLException {
         Instant timeStart = Instant.now();
 
-        Statement stmt = getM_conn().createStatement();
-        stmt.closeOnCompletion();
-        Main.logger.debug("About to executeQuery [" + query + "]");
+        try (
+                Statement stmt = getM_conn().createStatement()) {
+            stmt.closeOnCompletion();
+            Main.logger.debug("About to executeQuery [" + query + "]");
 
-//        if (Main.logger.isTraceEnabled()) {
-//            Explain(stmt, query);
-//        }
-        ResultSet ret = stmt.executeQuery(query);
-        Main.logger.debug("\tExecuteQuery execution took " + pDuration(Duration.between(Instant.now(), timeStart).toMillis()));
-        return ret;
-
+            ResultSet ret = stmt.executeQuery(query);
+            Main.logger.debug("\tExecuteQuery execution took " + pDuration(Duration.between(Instant.now(), timeStart).toMillis()));
+            return ret;
+        }
     }
 
-    public Integer[] getIDs(String query) throws Exception {
-        ArrayList<Integer> ret = new ArrayList();
+    public Integer[] getIDs(String query) throws SQLException {
+        ArrayList<Integer> ret = new ArrayList<>();
 
         Instant timeStart = Instant.now();
 
-        try (Statement stmt = getM_conn().createStatement()) {
-            Main.logger.debug("[" + query + "]");
+        Main.logger.debug("[" + query + "]");
+        try (Statement stmt = getM_conn().createStatement(); ResultSet rs = stmt.executeQuery(query)) {
 
-            try (ResultSet rs = stmt.executeQuery(query)) {
-                Main.logger.debug("\t Execution took " + pDuration(Duration.between(Instant.now(), timeStart).toMillis()));
+            Main.logger.debug("\t Execution took " + pDuration(Duration.between(Instant.now(), timeStart).toMillis()));
 
-                ResultSetMetaData rsmd = rs.getMetaData();
+            ResultSetMetaData rsmd = rs.getMetaData();
 
-                if (rsmd.getColumnCount() != 1) {
-                    throw new Exception("getIDs: there are " + rsmd.getColumnCount() + " output columns; has to be only 1");
-                }
-                int cnt = 0;
-                while (rs.next()) {
-                    Integer res = rs.getInt(1);
-                    if (res > 0) {
-                        ret.add(res);
-                        cnt++;
-                    }
-                }
-                Main.logger.debug("\tRetrieved " + cnt + " records");
+            if (rsmd.getColumnCount() != 1) {
+                throw new SQLException("getIDs: there are " + rsmd.getColumnCount() + " output columns; has to be only 1");
             }
+            int cnt = 0;
+            while (rs.next()) {
+                Integer res = rs.getInt(1);
+                if (res > 0) {
+                    ret.add(res);
+                    cnt++;
+                }
+            }
+            Main.logger.debug("\tRetrieved " + cnt + " records");
         }
 
         return ret.toArray(new Integer[ret.size()]);
     }
 
-    public ArrayList<ArrayList<Object>> getObjMultiple(String query, String tab) throws Exception {
+    public List<ArrayList<Object>> getObjMultiple(String query, String tab) throws Exception {
+        ArrayList<ArrayList<Object>> ret = new ArrayList<>();
         if (TableExist(tab)) {
             Statement stmt = getM_conn().createStatement();
             Main.logger.debug("[" + query + "]");
 
-            ArrayList<ArrayList<Object>> ret;
             try (ResultSet rs = stmt.executeQuery(query)) {
                 ResultSetMetaData rsmd = rs.getMetaData();
-                ret = new ArrayList<>();
                 int columnCount = rsmd.getColumnCount();
                 int cnt = 0;
                 while (rs.next()) {
@@ -506,15 +434,13 @@ public final class SqliteAccessor implements DBAccessor {
                 Main.logger.debug("\tRetrieved " + cnt + " records");
                 rs.getStatement().close();
             }
-
-            return ret;
-        } else
-            return null;
+        }
+        return ret;
 
     }
 
 
-    public ArrayList<ArrayList<Long>> getIDsMultiple(String query) throws SQLException {
+    public List<ArrayList<Long>> getIDsMultiple(String query) throws SQLException {
 
         Statement stmt = getM_conn().createStatement();
         Main.logger.debug("[" + query + "]");
@@ -547,43 +473,42 @@ public final class SqliteAccessor implements DBAccessor {
 
     public void addToDB(int m_insertStatementId, IFillStatement fillStatement) throws SQLException {
         Stat stat = stats.get(m_insertStatementId);
-        synchronized (stat.getStat()) {
-            fillStatement.fillStatement(stat.getStat());
+        synchronized (stat.getPreparedStatement()) {
+            fillStatement.fillStatement(stat.getPreparedStatement());
             stats.Submit(stat);
         }
     }
 
     class Stat {
 
-        private PreparedStatement stat;
+        private PreparedStatement preparedStatement;
         private int cnt;
 
         Stat(PreparedStatement stat) {
-            this.stat = stat;
+            this.preparedStatement = stat;
             cnt = 0;
         }
 
-        public PreparedStatement getStat() {
-            return stat;
+        public PreparedStatement getPreparedStatement() {
+            return preparedStatement;
         }
 
         public void Submit() throws SQLException {
-            stat.addBatch();
+            preparedStatement.addBatch();
             cnt++;
         }
 
-        synchronized private void DoneInserts() throws SQLException {
+        private synchronized void DoneInserts() throws SQLException {
             try {
                 flush();
             } catch (SQLException sQLException) {
-                logger.error("Exception finalizing " + stat.toString(), sQLException);
-//                throw new SQLException("Exception finalizing "+stat.toString());
+                logger.error("Exception finalizing " + preparedStatement.toString(), sQLException);
             }
         }
 
         private void flush() throws SQLException {
-            int[] ret = stat.executeBatch();
-            logger.trace("flashing " + stat + " ret: " + ret.length);
+            int[] ret = preparedStatement.executeBatch();
+            logger.trace("flashing " + preparedStatement + " ret: " + ret.length);
             if (ret.length > 0) {
                 for (int i = 0; i < ret.length; i++) {
                     if (ret[i] < 0) {
@@ -604,37 +529,36 @@ public final class SqliteAccessor implements DBAccessor {
 
     class Stats {
 
-        ArrayList<Stat> stats;
+        ArrayList<Stat> statsList;
 
         Stats() {
-            stats = new ArrayList<>();
+            statsList = new ArrayList<>();
         }
 
         public int addStat(PreparedStatement st) {
-            stats.add(new Stat(st));
-            return stats.size() - 1;
+            statsList.add(new Stat(st));
+            return statsList.size() - 1;
         }
 
         public Stat get(int statementId) {
-            return stats.get(statementId);
+            return statsList.get(statementId);
         }
 
         public void Submit(int statementId) throws SQLException {
-            Submit(stats.get(statementId));
+            Submit(statsList.get(statementId));
         }
 
-        synchronized public void Submit(Stat st) throws SQLException {
+        public synchronized void Submit(Stat st) throws SQLException {
             logger.trace("Submitting " + st);
             st.Submit();
             if (st.cnt >= 10_000) {
-//                Main.m_accessor.flush(st);
                 st.flush();
                 st.cnt = 0;
             }
         }
 
         private void DoneInserts() throws SQLException {
-            for (Stat st : stats) {
+            for (Stat st : statsList) {
                 try {
                     st.DoneInserts();
                 } catch (SQLException e) {

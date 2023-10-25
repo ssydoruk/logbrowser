@@ -95,7 +95,7 @@ public class DateDiff {
         /**
          * @throws Exception
          */
-        public void FinalizeDB() throws Exception {
+        public void FinalizeDB() throws SQLException {
 //            dbaccessor.runQuery("create index if not exists I" + tabName + "_time on " + tabName + " (time);");
 //            dbaccessor.runQuery("create index if not exists I" + tabName + "_FileId on " + tabName + " (FileId);");
         }

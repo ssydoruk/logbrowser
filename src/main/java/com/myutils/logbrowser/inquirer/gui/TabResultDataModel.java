@@ -11,6 +11,7 @@ import javax.swing.table.AbstractTableModel;
 import java.awt.*;
 import java.io.*;
 import java.util.*;
+import java.util.List;
 import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -561,7 +562,7 @@ public class TabResultDataModel extends AbstractTableModel {
             TableRow row = getRow(tab.convertRowIndexToModel(i));
             int fileID;
             int fileIDPrev = 0;
-            ArrayList<Pattern> filters = null;
+            List<Pattern> filters = null;
             if (row != null) {
                 fileID = row.getFileID();
                 if (fileID != fileIDPrev) {
@@ -595,7 +596,7 @@ public class TabResultDataModel extends AbstractTableModel {
             TableRow row = getRow(tab.convertRowIndexToModel(i));
             int fileID;
             int fileIDPrev = 0;
-            ArrayList<Pattern> filters = null;
+            List<Pattern> filters = null;
             if (row != null) {
                 fileID = row.getFileID();
                 if (fileID != fileIDPrev) {

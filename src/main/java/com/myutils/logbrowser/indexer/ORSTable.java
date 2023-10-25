@@ -4,6 +4,8 @@
  */
 package com.myutils.logbrowser.indexer;
 
+import java.sql.SQLException;
+
 /**
  * @author ssydoruk
  */
@@ -75,7 +77,7 @@ public class ORSTable extends DBTable {
      * @throws Exception
      */
     @Override
-    public void FinalizeDB() throws Exception {
+    public void FinalizeDB() throws SQLException {
 
 //        getM_dbAccessor().runQuery("create index if not exists ors_time_" + getM_dbAccessor().getM_alias() +" on ors_" + getM_dbAccessor().getM_alias() + " (time);");
         createIndexes();

@@ -115,7 +115,7 @@ public class AggrWWERequests extends IAggregateAggregate {
         if (grpBy.length > 0) {
             String[] flds = new String[grpBy.length];
             for (int i = 0; i < grpBy.length; i++) {
-                flds[i] = grpBy[i].getDbField();
+                flds[i] = grpBy[i].getFieldName();
             }
             sGrpBy = StringUtils.join(flds, ", ");
         }
@@ -136,7 +136,7 @@ public class AggrWWERequests extends IAggregateAggregate {
 
         if (grpBy.length > 0) {
             for (DBField fld : grpBy) {
-                DatabaseConnector.runQuery("create index idx_" + fld.getDbField() + " on " + tab + "(" + fld.getDbField() + ");");
+                DatabaseConnector.runQuery("create index idx_" + fld.getFieldName() + " on " + tab + "(" + fld.getFieldName() + ");");
             }
         }
         inquirer.logger.info("extracting data");
@@ -148,7 +148,7 @@ public class AggrWWERequests extends IAggregateAggregate {
 
         if (grpBy.length > 0) {
             for (DBField fld : grpBy) {
-                resultQuery.addRef(fld.getDbField(), fld.getDbOutField(), fld.getRefTable(), FieldType.Optional);
+                resultQuery.addRef(fld.getFieldName(), fld.getDbOutField(), fld.getRefTable(), FieldType.OPTIONAL);
             }
         }
 

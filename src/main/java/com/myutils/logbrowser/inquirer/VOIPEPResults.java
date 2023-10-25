@@ -116,9 +116,9 @@ public class VOIPEPResults extends IQueryResults {
             tabReport.addOutField("jduration(ended-started) duration ");
             tabReport.setAddAll(false);
 
-            tabReport.addRef("connectionidid", "connectionid", ReferenceType.ConnID.toString(), FieldType.Optional);
-            tabReport.addRef("callidid", "callid", ReferenceType.SIPCALLID.toString(), FieldType.Optional);
-            tabReport.addRef("nameid", "\"First TEvent\"", ReferenceType.TEvent.toString(), FieldType.Optional);
+            tabReport.addRef("connectionidid", "connectionid", ReferenceType.ConnID.toString(), FieldType.OPTIONAL);
+            tabReport.addRef("callidid", "callid", ReferenceType.SIPCALLID.toString(), FieldType.OPTIONAL);
+            tabReport.addRef("nameid", "\"First TEvent\"", ReferenceType.TEvent.toString(), FieldType.OPTIONAL);
             tabReport.setOrderBy(tabReport.getTabAlias() + ".started");
             FullTableColors currTable = tabReport.getFullTable();
 
@@ -298,14 +298,14 @@ public class VOIPEPResults extends IQueryResults {
 
     private TableQuery MakeTLibReq() throws SQLException {
         TableQuery TLibReq = new TableQuery(MsgType.TLIB, "tlib_logbr");
-        TLibReq.addRef("thisDNID", "thisDN", ReferenceType.DN.toString(), FieldType.Optional);
-        TLibReq.addRef("nameID", "name", ReferenceType.TEvent.toString(), FieldType.Mandatory);
-        TLibReq.addRef("otherDNID", "otherDN", ReferenceType.DN.toString(), FieldType.Optional);
-        TLibReq.addRef("sourceID", "source", ReferenceType.App.toString(), FieldType.Optional);
+        TLibReq.addRef("thisDNID", "thisDN", ReferenceType.DN.toString(), FieldType.OPTIONAL);
+        TLibReq.addRef("nameID", "name", ReferenceType.TEvent.toString(), FieldType.MANDATORY);
+        TLibReq.addRef("otherDNID", "otherDN", ReferenceType.DN.toString(), FieldType.OPTIONAL);
+        TLibReq.addRef("sourceID", "source", ReferenceType.App.toString(), FieldType.OPTIONAL);
         TLibReq.addNullField("ConnectionID");
         TLibReq.addNullField("TransferID");
         TLibReq.addNullField("SipId");
-        TLibReq.addRef("agentidid", "agentid", ReferenceType.Agent.toString(), FieldType.Optional);
+        TLibReq.addRef("agentidid", "agentid", ReferenceType.Agent.toString(), FieldType.OPTIONAL);
 //        addRef("ErrMessageID", "ErrMessage", ReferenceType.TLIBERROR.toString(), FieldType.Optional);
         TLibReq.addNullField("ErrMessageID");
         TLibReq.addNullField("ixnid");

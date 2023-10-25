@@ -17,6 +17,7 @@ import java.beans.PropertyChangeEvent;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 
 import static com.myutils.logbrowser.inquirer.DatabaseConnector.CampaignDBIDtoName;
 import static com.myutils.logbrowser.inquirer.DatabaseConnector.GroupDBIDtoName;
@@ -111,14 +112,14 @@ final class OutboundResults extends IQueryResults {
     private void getClient(Integer[] cgDBID, DynamicTreeNode<OptionNode> node, QueryDialog dlg) throws SQLException {
         if (DatabaseConnector.TableExist("OCSClient")) {
             TableQuery OCSClient = new TableQuery(MsgType.OCSClient, "OCSClient");
-            OCSClient.addRef("nameID", "name", ReferenceType.OCSClientRequest.toString(), FieldType.Optional);
+            OCSClient.addRef("nameID", "name", ReferenceType.OCSClientRequest.toString(), FieldType.OPTIONAL);
 
             if (cgDBID != null && cgDBID.length > 0) {
 //            OCSClient.setWhereType(WhereType.WhereExists);
 //            OCSClient.setExistsTable("ocspasi_logbr");
 //            OCSClient.addWhereField("CampaignDBID");
 //            OCSClient.addWhereField("GroupDBID");
-                ArrayList<ArrayList<Long>> iDsMultiple = DatabaseConnector.getIDsMultiple("select"
+                List<List<Long>> iDsMultiple = DatabaseConnector.getIDsMultiple("select"
                         + "\ndistinct o.campaigndbid, o.groupdbid"
                         + "\nfrom ocspasi_logbr o\n"
                         + getWhere("o.cgdbid", cgDBID, true));
@@ -184,7 +185,7 @@ final class OutboundResults extends IQueryResults {
             } else {
                 OCSCG = new TableQuery(MsgType.OCSCG, "ocscg_logbr", "cgDBID");
             }
-            OCSCG.addRef("cgnameID", "cgname", ReferenceType.OCSCG.toString(), FieldType.Optional);
+            OCSCG.addRef("cgnameID", "cgname", ReferenceType.OCSCG.toString(), FieldType.OPTIONAL);
             OCSCG.setSearchApps(searchApps);
             getRecords(OCSCG);
         }
@@ -209,7 +210,7 @@ final class OutboundResults extends IQueryResults {
             } else {
                 OCSAS = new TableQuery(MsgType.OCSASSIGNMENT, "ocsasgn_logbr");
             }
-            OCSAS.addRef("cgnameID", "cgname", ReferenceType.OCSCG.toString(), FieldType.Optional);
+            OCSAS.addRef("cgnameID", "cgname", ReferenceType.OCSCG.toString(), FieldType.OPTIONAL);
             OCSAS.setCommonParams(this, dlg);
             getRecords(OCSAS);
         }
@@ -366,10 +367,10 @@ final class OutboundResults extends IQueryResults {
 
         OCSUEvents.addWhere(" nameID in (select id from " + ReferenceType.TEvent + " where name in ('EventUserEvent', 'RequestDistributeUserEvent'))", "AND");
 
-        OCSUEvents.addRef("thisDNID", "thisDN", ReferenceType.DN.toString(), FieldType.Optional);
-        OCSUEvents.addRef("otherDNID", "otherDN", ReferenceType.DN.toString(), FieldType.Optional);
-        OCSUEvents.addRef("nameID", "name", ReferenceType.TEvent.toString(), FieldType.Mandatory);
-        OCSUEvents.addRef("sourceID", "source", ReferenceType.App.toString(), FieldType.Optional);
+        OCSUEvents.addRef("thisDNID", "thisDN", ReferenceType.DN.toString(), FieldType.OPTIONAL);
+        OCSUEvents.addRef("otherDNID", "otherDN", ReferenceType.DN.toString(), FieldType.OPTIONAL);
+        OCSUEvents.addRef("nameID", "name", ReferenceType.TEvent.toString(), FieldType.MANDATORY);
+        OCSUEvents.addRef("sourceID", "source", ReferenceType.App.toString(), FieldType.OPTIONAL);
         OCSUEvents.addNullField("ixnid");
         OCSUEvents.addNullField("typestr");
         OCSUEvents.addNullField("err");
@@ -401,10 +402,10 @@ final class OutboundResults extends IQueryResults {
                 + " nameID in (select id from " + ReferenceType.TEvent + " where name in ('EventUserEvent', 'RequestDistributeUserEvent'))"
                 + handleList
         );
-        OCSUEvents.addRef("thisDNID", "thisDN", ReferenceType.DN.toString(), FieldType.Optional);
-        OCSUEvents.addRef("otherDNID", "otherDN", ReferenceType.DN.toString(), FieldType.Optional);
-        OCSUEvents.addRef("nameID", "name", ReferenceType.TEvent.toString(), FieldType.Mandatory);
-        OCSUEvents.addRef("sourceID", "source", ReferenceType.App.toString(), FieldType.Optional);
+        OCSUEvents.addRef("thisDNID", "thisDN", ReferenceType.DN.toString(), FieldType.OPTIONAL);
+        OCSUEvents.addRef("otherDNID", "otherDN", ReferenceType.DN.toString(), FieldType.OPTIONAL);
+        OCSUEvents.addRef("nameID", "name", ReferenceType.TEvent.toString(), FieldType.MANDATORY);
+        OCSUEvents.addRef("sourceID", "source", ReferenceType.App.toString(), FieldType.OPTIONAL);
         OCSUEvents.setCommonParams(this, dlg);
         getRecords(OCSUEvents);
     }
@@ -712,8 +713,8 @@ final class OutboundResults extends IQueryResults {
                         node,
                         "AND",
                         DialogItem.OCS_DATABASE_DBSERVER);
-                OCSIXN.addRef("dbserverid", "dbserver", ReferenceType.App.toString(), FieldType.Optional);
-                OCSIXN.addRef("dbreqid", "dbreq", ReferenceType.DBRequest.toString(), FieldType.Optional);
+                OCSIXN.addRef("dbserverid", "dbserver", ReferenceType.App.toString(), FieldType.OPTIONAL);
+                OCSIXN.addRef("dbreqid", "dbreq", ReferenceType.DBRequest.toString(), FieldType.OPTIONAL);
 
                 OCSIXN.addOutField(DatabaseConnector.CampaignDBIDtoName + "( CampaignDBID) campaignName");
                 OCSIXN.addOutField(DatabaseConnector.GroupDBIDtoName + "( GroupDBID) groupName");
@@ -832,10 +833,10 @@ final class OutboundResults extends IQueryResults {
 
                 }
                 OCSCR.addOutField("constToStr(\"RecordType \", rectype) typestr"); // bug in SQLite lib; does not accept full word
-                OCSCR.addRef("campBID", "campaign", ReferenceType.OCSCAMPAIGN.toString(), FieldType.Optional);
-                OCSCR.addRef("listNameID", "ocsList", ReferenceType.OCSCallList.toString(), FieldType.Optional);
-                OCSCR.addRef("tableNameID", "ocsTable", ReferenceType.OCSCallListTable.toString(), FieldType.Optional);
-                OCSCR.addRef("actionID", "action", ReferenceType.OCSRecordAction.toString(), FieldType.Optional);
+                OCSCR.addRef("campBID", "campaign", ReferenceType.OCSCAMPAIGN.toString(), FieldType.OPTIONAL);
+                OCSCR.addRef("listNameID", "ocsList", ReferenceType.OCSCallList.toString(), FieldType.OPTIONAL);
+                OCSCR.addRef("tableNameID", "ocsTable", ReferenceType.OCSCallListTable.toString(), FieldType.OPTIONAL);
+                OCSCR.addRef("actionID", "action", ReferenceType.OCSRecordAction.toString(), FieldType.OPTIONAL);
 
                 OCSCR.setCommonParams(this, dlg);
                 getRecords(OCSCR);
@@ -850,7 +851,7 @@ final class OutboundResults extends IQueryResults {
                 } else {
                     OCSHTTP = new TableQuery(MsgType.OCSHTTP, "ocshttp");
                 }
-                OCSHTTP.addRef("ReqNameID", "reqname", ReferenceType.TEvent.toString(), FieldType.Optional);
+                OCSHTTP.addRef("ReqNameID", "reqname", ReferenceType.TEvent.toString(), FieldType.OPTIONAL);
 
                 OCSHTTP.AddCheckedWhere(OCSHTTP.getTabAlias() + ".ReqNameID",
                         ReferenceType.TEvent,
@@ -876,12 +877,12 @@ final class OutboundResults extends IQueryResults {
                     OCSSCXMLScript = new TableQuery(MsgType.OCSSCXMLSCRIPT, "ocssxmlscript");
                     OCSSCXMLTr = new TableQuery(MsgType.OCSSCXMLTREATMENT, "ocsscxmltr", "recHandle", getWhere("recHandle", recHandles, false));
                 }
-                OCSSCXMLScript.addRef("SessIDID", "SessID", ReferenceType.OCSSCXMLSESSION.toString(), FieldType.Mandatory);
-                OCSSCXMLScript.addRef("metricid", "metric", ReferenceType.METRIC.toString(), FieldType.Optional);
+                OCSSCXMLScript.addRef("SessIDID", "SessID", ReferenceType.OCSSCXMLSESSION.toString(), FieldType.MANDATORY);
+                OCSSCXMLScript.addRef("metricid", "metric", ReferenceType.METRIC.toString(), FieldType.OPTIONAL);
                 OCSSCXMLScript.setCommonParams(this, dlg);
                 getRecords(OCSSCXMLScript);
 
-                OCSSCXMLTr.addRef("SessIDID", "SessID", ReferenceType.OCSSCXMLSESSION.toString(), FieldType.Optional);
+                OCSSCXMLTr.addRef("SessIDID", "SessID", ReferenceType.OCSSCXMLSESSION.toString(), FieldType.OPTIONAL);
                 OCSSCXMLTr.setCommonParams(this, dlg);
                 getRecords(OCSSCXMLTr);
             }
@@ -904,10 +905,10 @@ final class OutboundResults extends IQueryResults {
                         OCSIXN.addWhere(wh);
                     }
                 }
-                OCSIXN.addRef("nameid", "name", ReferenceType.TEvent.toString(), FieldType.Optional);
-                OCSIXN.addRef("ixnid", "InteractionID", ReferenceType.IxnID.toString(), FieldType.Optional);
-                OCSIXN.addRef("ixnqueueid", "queue", ReferenceType.DN.toString(), FieldType.Optional);
-                OCSIXN.addRef("phoneid", "phone", ReferenceType.DN.toString(), FieldType.Optional);
+                OCSIXN.addRef("nameid", "name", ReferenceType.TEvent.toString(), FieldType.OPTIONAL);
+                OCSIXN.addRef("ixnid", "InteractionID", ReferenceType.IxnID.toString(), FieldType.OPTIONAL);
+                OCSIXN.addRef("ixnqueueid", "queue", ReferenceType.DN.toString(), FieldType.OPTIONAL);
+                OCSIXN.addRef("phoneid", "phone", ReferenceType.DN.toString(), FieldType.OPTIONAL);
                 OCSIXN.setCommonParams(this, dlg);
 
                 getRecords(OCSIXN);
@@ -930,8 +931,8 @@ final class OutboundResults extends IQueryResults {
                     }
                 }
 
-                OCSIcon.addRef("eventID", "event", ReferenceType.OCSIconEvent.toString(), FieldType.Optional);
-                OCSIcon.addRef("causeID", "cause", ReferenceType.OCSIconCause.toString(), FieldType.Optional);
+                OCSIcon.addRef("eventID", "event", ReferenceType.OCSIconEvent.toString(), FieldType.OPTIONAL);
+                OCSIcon.addRef("causeID", "cause", ReferenceType.OCSIconCause.toString(), FieldType.OPTIONAL);
 
                 OCSIcon.AddCheckedWhere(OCSIcon.getTabAlias() + ".eventID",
                         ReferenceType.OCSIconEvent,
@@ -1004,7 +1005,7 @@ final class OutboundResults extends IQueryResults {
                             DialogItem.OCSCG_CAMPAIGNGROUP_CGNAME);
                 }
 
-                OCSPASI.addRef("cgnameID", "cgname", ReferenceType.OCSCG.toString(), FieldType.Optional);
+                OCSPASI.addRef("cgnameID", "cgname", ReferenceType.OCSCG.toString(), FieldType.OPTIONAL);
                 OCSPASI.setCommonParams(this, dlg);
                 getRecords(OCSPASI);
 
@@ -1070,9 +1071,9 @@ final class OutboundResults extends IQueryResults {
                             DialogItem.OCSCG_CAMPAIGNGROUP_CGNAME);
                 }
 
-                OCSCG.addRef("groupnameID", "groupName", ReferenceType.AgentGroup.toString(), FieldType.Optional);
-                OCSCG.addRef("campaignnameID", "campaignName", ReferenceType.OCSCAMPAIGN.toString(), FieldType.Optional);
-                OCSCG.addRef("cgnameID", "cgname", ReferenceType.OCSCG.toString(), FieldType.Optional);
+                OCSCG.addRef("groupnameID", "groupName", ReferenceType.AgentGroup.toString(), FieldType.OPTIONAL);
+                OCSCG.addRef("campaignnameID", "campaignName", ReferenceType.OCSCAMPAIGN.toString(), FieldType.OPTIONAL);
+                OCSCG.addRef("cgnameID", "cgname", ReferenceType.OCSCG.toString(), FieldType.OPTIONAL);
                 OCSCG.setCommonParams(this, dlg);
                 getRecords(OCSCG);
             }
@@ -1110,7 +1111,7 @@ final class OutboundResults extends IQueryResults {
                             DialogItem.OCSCG_CAMPAIGNGROUP_CGNAME);
                 }
 
-                OCSAS.addRef("cgnameID", "cgname", ReferenceType.OCSCG.toString(), FieldType.Optional);
+                OCSAS.addRef("cgnameID", "cgname", ReferenceType.OCSCG.toString(), FieldType.OPTIONAL);
 
                 OCSAS.setCommonParams(this, dlg);
                 getRecords(OCSAS);
@@ -1199,9 +1200,9 @@ final class OutboundResults extends IQueryResults {
             if (isChecked(FindNode)) {
                 tellProgress("OCS PA Agent info");
                 TableQuery OCSPAAI = new TableQuery(MsgType.OCSPAAGI, "ocspaagi_logbr", "agentNameID", getWhere("agentNameID", agID, false));
-                OCSPAAI.addRef("agentNameID", "agent", ReferenceType.Agent.toString(), FieldType.Optional);
-                OCSPAAI.addRef("AgentStatTypeID", "StatType", ReferenceType.AgentStatType.toString(), FieldType.Optional);
-                OCSPAAI.addRef("AgentCallTypeID", "CallType", ReferenceType.AgentCallType.toString(), FieldType.Optional);
+                OCSPAAI.addRef("agentNameID", "agent", ReferenceType.Agent.toString(), FieldType.OPTIONAL);
+                OCSPAAI.addRef("AgentStatTypeID", "StatType", ReferenceType.AgentStatType.toString(), FieldType.OPTIONAL);
+                OCSPAAI.addRef("AgentCallTypeID", "CallType", ReferenceType.AgentCallType.toString(), FieldType.OPTIONAL);
                 OCSPAAI.setCommonParams(this, dlg);
                 OCSPAAI.AddCheckedWhere(OCSPAAI.getTabAlias() + ".agentNameID",
                         ReferenceType.Agent,
@@ -1244,11 +1245,11 @@ final class OutboundResults extends IQueryResults {
             if (isChecked(FindNode)) {
                 tellProgress("OCS Stat messages");
                 TableQuery OCSSTATEV = new TableQuery(MsgType.OCSSTATEV, "OcsStatEv_logbr", "agentNameID", getWhere("agentNameID", agID, false));
-                OCSSTATEV.addRef("StatEvNameID", "stat", ReferenceType.StatEvent.toString(), FieldType.Optional);
-                OCSSTATEV.addRef("agentNameID", "agent", ReferenceType.Agent.toString(), FieldType.Optional);
-                OCSSTATEV.addRef("placeNameID", "place", ReferenceType.Place.toString(), FieldType.Optional);
-                OCSSTATEV.addRef("DNID", "DN", ReferenceType.DN.toString(), FieldType.Optional);
-                OCSSTATEV.addRef("StatTypeID", "StatType", ReferenceType.StatType.toString(), FieldType.Optional);
+                OCSSTATEV.addRef("StatEvNameID", "stat", ReferenceType.StatEvent.toString(), FieldType.OPTIONAL);
+                OCSSTATEV.addRef("agentNameID", "agent", ReferenceType.Agent.toString(), FieldType.OPTIONAL);
+                OCSSTATEV.addRef("placeNameID", "place", ReferenceType.Place.toString(), FieldType.OPTIONAL);
+                OCSSTATEV.addRef("DNID", "DN", ReferenceType.DN.toString(), FieldType.OPTIONAL);
+                OCSSTATEV.addRef("StatTypeID", "StatType", ReferenceType.StatType.toString(), FieldType.OPTIONAL);
 
                 OCSSTATEV.AddCheckedWhere(OCSSTATEV.getTabAlias() + ".StatEvNameID",
                         ReferenceType.StatEvent,

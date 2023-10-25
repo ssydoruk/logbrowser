@@ -153,9 +153,9 @@ public class AggrOCSDBServerDelays extends IAggregateQuery {
                 node,
                 DialogItem.OCS_DATABASE_DBSERVER, true), "AND");
 
-        OCSDB.addJoin(tab2, IQuery.FieldType.Optional, "t.id=" + OCSDB.getTabAlias() + ".id", null, "t");
-        OCSDB.addRef("dbserverid", "dbserver", ReferenceType.App.toString(), IQuery.FieldType.Optional);
-        OCSDB.addRef("dbreqid", "dbreq", ReferenceType.DBRequest.toString(), IQuery.FieldType.Optional);
+        OCSDB.addJoin(tab2, IQuery.FieldType.OPTIONAL, "t.id=" + OCSDB.getTabAlias() + ".id", null, "t");
+        OCSDB.addRef("dbserverid", "dbserver", ReferenceType.App.toString(), IQuery.FieldType.OPTIONAL);
+        OCSDB.addRef("dbreqid", "dbreq", ReferenceType.DBRequest.toString(), IQuery.FieldType.OPTIONAL);
 
         OCSDB.addOutField(DatabaseConnector.CampaignDBIDtoName + "(CampaignDBID) campaignName");
         OCSDB.addOutField(DatabaseConnector.GroupDBIDtoName + "( GroupDBID) groupName");

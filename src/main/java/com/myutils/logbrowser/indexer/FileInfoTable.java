@@ -15,7 +15,7 @@ public class FileInfoTable extends DBTable {
         super(dbaccessor, TableType.File, "file_" + dbaccessor.getM_alias());
     }
 
-    static public void incFilesAdded() {
+    public static void incFilesAdded() {
         filesAdded++;
     }
 
@@ -69,7 +69,6 @@ public class FileInfoTable extends DBTable {
     public void FinalizeDB() {
         createIndexes();
 
-        ////throw new UnsupportedOperationException("Not supported yet.");
     }
 
 

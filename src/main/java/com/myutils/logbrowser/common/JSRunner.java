@@ -174,7 +174,7 @@ public class JSRunner {
         @HostAccess.Export
         public static String recordField(String fld) {
             if (curRec != null) {
-                return curRec.GetField(fld);
+                return curRec.getFieldValue(fld);
             } else {
                 return "";
             }

@@ -93,7 +93,7 @@ public class GMSResults extends IQueryResults {
             tabReport.addOutField("jduration(ended-started) duration ");
             tabReport.setAddAll(false);
 
-            tabReport.addRef("callidid", "callid", ReferenceType.SIPCALLID.toString(), FieldType.Optional);
+            tabReport.addRef("callidid", "callid", ReferenceType.SIPCALLID.toString(), FieldType.OPTIONAL);
             tabReport.setOrderBy(tabReport.getTabAlias() + ".started");
             FullTableColors currTable = tabReport.getFullTable();
 
@@ -375,14 +375,14 @@ public class GMSResults extends IQueryResults {
             TableQuery tab = null;
             tab = new TableQuery(MsgType.GMSWEBREQUESTS, TableType.GMSWebClientMessage.toString());
 
-            tab.addRef("URLID", "URL", ReferenceType.HTTPURL.toString(), FieldType.Optional);
+            tab.addRef("URLID", "URL", ReferenceType.HTTPURL.toString(), FieldType.OPTIONAL);
             Wheres wh = new Wheres();
 
             for (int i = 1; i <= com.myutils.logbrowser.indexer.GMSParser.MAX_WEB_PARAMS; i++) {
                 String fldName = "param" + i;
-                tab.addRef(fldName + "id", fldName, ReferenceType.Misc.toString(), IQuery.FieldType.Optional);
+                tab.addRef(fldName + "id", fldName, ReferenceType.Misc.toString(), IQuery.FieldType.OPTIONAL);
                 String valueFldName = "value" + i;
-                tab.addRef(valueFldName + "id", valueFldName, ReferenceType.Misc.toString(), IQuery.FieldType.Optional);
+                tab.addRef(valueFldName + "id", valueFldName, ReferenceType.Misc.toString(), IQuery.FieldType.OPTIONAL);
 
                 if (cidFinder != null) {
                     iDs = cidFinder.getIDs(IDType.ANYPARAM);
@@ -421,9 +421,9 @@ public class GMSResults extends IQueryResults {
 
                 for (int i = 1; i <= com.myutils.logbrowser.indexer.GMSParser.MAX_WEB_PARAMS; i++) {
                     String fldName = "param" + i;
-                    tabRequests.addRef(fldName + "id", fldName, ReferenceType.Misc.toString(), IQuery.FieldType.Optional);
+                    tabRequests.addRef(fldName + "id", fldName, ReferenceType.Misc.toString(), IQuery.FieldType.OPTIONAL);
                     String valueFldName = "value" + i;
-                    tabRequests.addRef(valueFldName + "id", valueFldName, ReferenceType.Misc.toString(), IQuery.FieldType.Optional);
+                    tabRequests.addRef(valueFldName + "id", valueFldName, ReferenceType.Misc.toString(), IQuery.FieldType.OPTIONAL);
 
                 }
 
@@ -488,12 +488,12 @@ public class GMSResults extends IQueryResults {
 //                        "AND",
 //                        DialogItem.URS_AGENTDN_AGENT);
 //            }
-            tab.addRef("EventNameID", "EventName", ReferenceType.GMSEvent.toString(), FieldType.Optional);
-            tab.addRef("CallBackTypeID", "CallBackType", ReferenceType.GMSCallbackType.toString(), FieldType.Optional);
-            tab.addRef("GMSServiceID", "GMSService", ReferenceType.GMSService.toString(), FieldType.Optional);
-            tab.addRef("ORSSessionID", "ORSSession", ReferenceType.ORSSID.toString(), FieldType.Optional);
-            tab.addRef("phoneID", "phone", ReferenceType.DN.toString(), FieldType.Optional);
-            tab.addRef("URIID", "URI", ReferenceType.ORSREQ.toString(), FieldType.Optional);
+            tab.addRef("EventNameID", "EventName", ReferenceType.GMSEvent.toString(), FieldType.OPTIONAL);
+            tab.addRef("CallBackTypeID", "CallBackType", ReferenceType.GMSCallbackType.toString(), FieldType.OPTIONAL);
+            tab.addRef("GMSServiceID", "GMSService", ReferenceType.GMSService.toString(), FieldType.OPTIONAL);
+            tab.addRef("ORSSessionID", "ORSSession", ReferenceType.ORSSID.toString(), FieldType.OPTIONAL);
+            tab.addRef("phoneID", "phone", ReferenceType.DN.toString(), FieldType.OPTIONAL);
+            tab.addRef("URIID", "URI", ReferenceType.ORSREQ.toString(), FieldType.OPTIONAL);
 
             tab.setCommonParams(this, dlg);
             getRecords(tab);
@@ -556,12 +556,12 @@ public class GMSResults extends IQueryResults {
 //                        "AND",
 //                        DialogItem.URS_AGENTDN_AGENT);
 //            }
-            tab.addRef("EventNameID", "EventName", ReferenceType.GMSEvent.toString(), FieldType.Optional);
-            tab.addRef("CallBackTypeID", "CallBackType", ReferenceType.GMSCallbackType.toString(), FieldType.Optional);
-            tab.addRef("GMSServiceID", "GMSService", ReferenceType.GMSService.toString(), FieldType.Optional);
-            tab.addRef("ORSSessionID", "ORSSession", ReferenceType.ORSSID.toString(), FieldType.Optional);
-            tab.addRef("phoneID", "phone", ReferenceType.DN.toString(), FieldType.Optional);
-            tab.addRef("URIID", "URI", ReferenceType.ORSREQ.toString(), FieldType.Optional);
+            tab.addRef("EventNameID", "EventName", ReferenceType.GMSEvent.toString(), FieldType.OPTIONAL);
+            tab.addRef("CallBackTypeID", "CallBackType", ReferenceType.GMSCallbackType.toString(), FieldType.OPTIONAL);
+            tab.addRef("GMSServiceID", "GMSService", ReferenceType.GMSService.toString(), FieldType.OPTIONAL);
+            tab.addRef("ORSSessionID", "ORSSession", ReferenceType.ORSSID.toString(), FieldType.OPTIONAL);
+            tab.addRef("phoneID", "phone", ReferenceType.DN.toString(), FieldType.OPTIONAL);
+            tab.addRef("URIID", "URI", ReferenceType.ORSREQ.toString(), FieldType.OPTIONAL);
 
             tab.setCommonParams(this, dlg);
             getRecords(tab);
@@ -620,10 +620,10 @@ public class GMSResults extends IQueryResults {
 //                        "AND",
 //                        DialogItem.URS_AGENTDN_AGENT);
 //            }
-            tab.addRef("GMSServiceID", "GMSService", ReferenceType.GMSService.toString(), FieldType.Optional);
-            tab.addRef("ORSSessionID", "ORSSession", ReferenceType.ORSSID.toString(), FieldType.Optional);
-            tab.addRef("connIDID", "connID", ReferenceType.ConnID.toString(), FieldType.Optional);
-            tab.addRef("reqID", "request", ReferenceType.ORSREQ.toString(), FieldType.Optional);
+            tab.addRef("GMSServiceID", "GMSService", ReferenceType.GMSService.toString(), FieldType.OPTIONAL);
+            tab.addRef("ORSSessionID", "ORSSession", ReferenceType.ORSSID.toString(), FieldType.OPTIONAL);
+            tab.addRef("connIDID", "connID", ReferenceType.ConnID.toString(), FieldType.OPTIONAL);
+            tab.addRef("reqID", "request", ReferenceType.ORSREQ.toString(), FieldType.OPTIONAL);
 
             tab.addNullField("attr1ID");
 
@@ -655,8 +655,8 @@ public class GMSResults extends IQueryResults {
 //                    "AND",
 //                    DialogItem.TLIB_CALLS_TEVENT_NAME);
 //
-            exc.addRef("exceptionid", "exception", ReferenceType.Exception.toString(), FieldType.Optional);
-            exc.addRef("exceptionMsgID", "exceptionMsg", ReferenceType.ExceptionMessage.toString(), FieldType.Optional);
+            exc.addRef("exceptionid", "exception", ReferenceType.Exception.toString(), FieldType.OPTIONAL);
+            exc.addRef("exceptionMsgID", "exceptionMsg", ReferenceType.ExceptionMessage.toString(), FieldType.OPTIONAL);
 
             exc.setCommonParams(this, dlg);
             getRecords(exc);
@@ -757,17 +757,17 @@ public class GMSResults extends IQueryResults {
 
     private TableQuery MakeTQuery(DynamicTreeNode<OptionNode> node) throws SQLException {
         TableQuery tLibReq = new TableQuery(MsgType.INTERACTION, TableType.IxnGMS.toString());
-        tLibReq.addRef("IxnQueueID", "queue", ReferenceType.DN.toString(), FieldType.Optional);
-        tLibReq.addRef("nameID", "name", ReferenceType.TEvent.toString(), FieldType.Mandatory);
-        tLibReq.addRef("ConnIDID", "ConnectionID", ReferenceType.ConnID.toString(), FieldType.Optional);
-        tLibReq.addRef("IxnID", "InteractionID", ReferenceType.IxnID.toString(), FieldType.Optional);
-        tLibReq.addRef("appid", "client", ReferenceType.App.toString(), FieldType.Optional);
+        tLibReq.addRef("IxnQueueID", "queue", ReferenceType.DN.toString(), FieldType.OPTIONAL);
+        tLibReq.addRef("nameID", "name", ReferenceType.TEvent.toString(), FieldType.MANDATORY);
+        tLibReq.addRef("ConnIDID", "ConnectionID", ReferenceType.ConnID.toString(), FieldType.OPTIONAL);
+        tLibReq.addRef("IxnID", "InteractionID", ReferenceType.IxnID.toString(), FieldType.OPTIONAL);
+        tLibReq.addRef("appid", "client", ReferenceType.App.toString(), FieldType.OPTIONAL);
 
-        tLibReq.addRef("MediaTypeID", "MediaType", ReferenceType.IxnMedia.toString(), FieldType.Optional);
-        tLibReq.addRef("AgentID", "Agent", ReferenceType.Agent.toString(), FieldType.Optional);
-        tLibReq.addRef("PlaceID", "Place", ReferenceType.Place.toString(), FieldType.Optional);
-        tLibReq.addRef("attr1ID", "attr1", ReferenceType.TLIBATTR1.toString(), FieldType.Optional);
-        tLibReq.addRef("attr2ID", "attr2", ReferenceType.TLIBATTR2.toString(), FieldType.Optional);
+        tLibReq.addRef("MediaTypeID", "MediaType", ReferenceType.IxnMedia.toString(), FieldType.OPTIONAL);
+        tLibReq.addRef("AgentID", "Agent", ReferenceType.Agent.toString(), FieldType.OPTIONAL);
+        tLibReq.addRef("PlaceID", "Place", ReferenceType.Place.toString(), FieldType.OPTIONAL);
+        tLibReq.addRef("attr1ID", "attr1", ReferenceType.TLIBATTR1.toString(), FieldType.OPTIONAL);
+        tLibReq.addRef("attr2ID", "attr2", ReferenceType.TLIBATTR2.toString(), FieldType.OPTIONAL);
 
         tLibReq.AddCheckedWhere(tLibReq.fldName("nameID"), ReferenceType.TEvent, node, "AND", DialogItem.IXN_IXN_EVENT_NAME);
 

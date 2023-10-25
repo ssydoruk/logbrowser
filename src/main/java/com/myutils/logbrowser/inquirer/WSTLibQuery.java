@@ -30,13 +30,13 @@ public class WSTLibQuery extends IQuery {
         m_componentFilter = CallFlowResults.TLIB;
         m_resultSet = null;
         m_msgFilter = "";
-        addRef("thisDNID", "thisDN", ReferenceType.DN.toString(), FieldType.Optional);
-        addRef("tlib.nameID", "name", ReferenceType.TEvent.toString(), FieldType.Optional);
-        addRef("otherDNID", "otherDN", ReferenceType.DN.toString(), FieldType.Optional);
-        addRef("ConnectionIDID", "ConnectionID", ReferenceType.ConnID.toString(), FieldType.Optional);
-        addRef("TransferIDID", "TransferID", ReferenceType.ConnID.toString(), FieldType.Optional);
-        addRef("sourceID", "source", ReferenceType.App.toString(), FieldType.Optional);
-        addRef("agentidid", "agentid", ReferenceType.Agent.toString(), FieldType.Optional);
+        addRef("thisDNID", "thisDN", ReferenceType.DN.toString(), FieldType.OPTIONAL);
+        addRef("tlib.nameID", "name", ReferenceType.TEvent.toString(), FieldType.OPTIONAL);
+        addRef("otherDNID", "otherDN", ReferenceType.DN.toString(), FieldType.OPTIONAL);
+        addRef("ConnectionIDID", "ConnectionID", ReferenceType.ConnID.toString(), FieldType.OPTIONAL);
+        addRef("TransferIDID", "TransferID", ReferenceType.ConnID.toString(), FieldType.OPTIONAL);
+        addRef("sourceID", "source", ReferenceType.App.toString(), FieldType.OPTIONAL);
+        addRef("agentidid", "agentid", ReferenceType.Agent.toString(), FieldType.OPTIONAL);
 //        addRef("ErrMessageID", "ErrMessage", ReferenceType.TLIBERROR.toString(), FieldType.Optional);
         addOutField("intToHex( seqno) seqnoHex"); // bug in SQLite lib; does not accept full word
 

@@ -4,6 +4,8 @@
  */
 package com.myutils.logbrowser.indexer;
 
+import java.sql.SQLException;
+
 /**
  * @author ssydoruk
  * <p>
@@ -59,7 +61,7 @@ public class OCSSCXMLTreatmentTable extends DBTable {
      * @throws Exception
      */
     @Override
-    public void FinalizeDB() throws Exception {
+    public void FinalizeDB() throws SQLException {
         getM_dbAccessor().runQuery("create index if not exists recHandle_OCSSCXMLTr on OCSSCXMLTr (recHandle);");
         getM_dbAccessor().runQuery("create index if not exists chID_OCSSCXMLTr on OCSSCXMLTr (chID);");
         getM_dbAccessor().runQuery("create index if not exists FileId_OCSSCXMLTr on OCSSCXMLTr (FileId);");

@@ -22,7 +22,6 @@ public class ConnIdRecord extends SIPServerBaseMessage {
     ConnIdRecord(String oldId, String newId, boolean b, boolean m_handlerInProgress, int m_handlerId, int fileID) {
         this(oldId, b, m_handlerInProgress, m_handlerId, fileID);
         this.newID = newId;
-//        Main.logger.info("ConnIdRecord: ["+oldId+"] new["+newId+"]");
     }
 
     public ConnIdRecord(String connId, boolean created, boolean m_handlerInProgress, int m_handlerId, int fileID) {
@@ -64,17 +63,7 @@ public class ConnIdRecord extends SIPServerBaseMessage {
 
     }
 
-    //    public void AddToDB(DBAccessor accessor) {
-//        PreparedStatement stmt = accessor.GetStatement(m_batchId);
-//        try {
-//            setFieldString(stmt,1, m_connId);
-//            stmt.setBoolean(2, m_created);
-//            stmt.setInt(3, m_fileId);
-//            accessor.SubmitStatement(m_batchId);
-//        } catch (Exception e) {
-//            System.out.println("Could not add ConnId manipulations record: "+e);
-//        }
-//    }
+
     public String getM_connId() {
         return m_connId;
     }

@@ -216,7 +216,6 @@ final public class RoutingResults extends IQueryResults {
                 tEventsNode.addDynamicRef(DialogItem.URS_RI_PARAM4, ReferenceType.Misc, TableType.URSHTTP.toString(), "value4id");
                 tEventsNode.addDynamicRef(DialogItem.URS_RI_PARAM5, ReferenceType.Misc, TableType.URSHTTP.toString(), "value5id");
 
-//                tEventsNode.addDynamicRef(DialogItem.URS_RI_SUBFUNCTION, ReferenceType.URSMETHOD, "ursri", "subfuncID");
             }
         } catch (SQLException ex) {
             logger.error("fatal: ", ex);
@@ -227,7 +226,6 @@ final public class RoutingResults extends IQueryResults {
 
     }
 
-    //    private static final String URS_RLIB = "RLIB";
     final public void addORSReportType(DynamicTreeNode<OptionNode> root) throws SQLException {
         DynamicTreeNode<OptionNode> Attr;
         DynamicTreeNode<OptionNode> tEventsNode;
@@ -472,7 +470,7 @@ final public class RoutingResults extends IQueryResults {
 
                 tellProgress("Finding unique voice sessions in ORS");
                 tab = "orssess_logbr";
-                getAllResults.add(new Pair("Unique voice sessions in ORS",
+                getAllResults.add(new Pair<>("Unique voice sessions in ORS",
                         DatabaseConnector.runQuery("insert into " + tmpTable + " (appid, sidid, uuidid, strnameid, urlid, started, rowtype)"
                                 + "\nselect appid, sidid, uuidid, appid, urlid, time,"
                                 + FileInfoType.type_ORS.getValue()
@@ -591,21 +589,7 @@ final public class RoutingResults extends IQueryResults {
             DatabaseConnector.runQuery("create index idx_" + tmpTable + "sourceid on " + tmpTable + "(sourceid);");
             DatabaseConnector.runQuery("create index idx_" + tmpTable + "strnameid on " + tmpTable + "(strnameid);");
             DatabaseConnector.runQuery("create index idx_" + tmpTable + "sidid on " + tmpTable + "(sidid);");
-//            FullTableColors currTable = DatabaseConnector.getFullTableColors("select "
-//                    + "REGEXP_group('([^\\\\/]+)$', intfilename, 1) infilename, "
-//                    + "hostname, "
-//                    + "app.name as name, "
-//                    + "UTCtoDateTime(starttime, \"YYYY-MM-dd HH:mm:ss.SSS\") app_starttime, "
-//                    + "UTCtoDateTime(filestarttime, \"YYYY-MM-dd HH:mm:ss.SSS\") filestarttime, "
-//                    + "UTCtoDateTime(endtime, \"YYYY-MM-dd HH:mm:ss.SSS\") endtime, "
-//                    + "jduration(endtime-filestarttime) duration, "
-//                    + "fileno, "
-//                    + "filesize(size) size"
-//                    + "\nfrom file_logbr "
-//                    + "\ninner join app on app.id=file_logbr.appnameid"
-//                    //                    + IQuery.getWhere("appnameid", new Integer[]{searchApps.get(i)}, true)
-//                    + "\norder by name, starttime, filestarttime",
-//                    "app_starttime");
+
 
             tellProgress("Extracting data");
             TableQuery tabReport = new TableQuery(tmpTable);
@@ -617,31 +601,28 @@ final public class RoutingResults extends IQueryResults {
             tabReport.addOutField("case isconsult when 1 then \"true\" when 0 then \"false\" end isconsult ");
             tabReport.addOutField("rowType");
             tabReport.setAddAll(false);
-            tabReport.addRef("thisdnid", "thisdn", ReferenceType.DN.toString(), IQuery.FieldType.Optional);
-            tabReport.addRef("otherdnid", "otherdn", ReferenceType.DN.toString(), IQuery.FieldType.Optional);
-            tabReport.addRef("connectionidid", "connectionid", ReferenceType.ConnID.toString(), IQuery.FieldType.Optional);
+            tabReport.addRef("thisdnid", "thisdn", ReferenceType.DN.toString(), IQuery.FieldType.OPTIONAL);
+            tabReport.addRef("otherdnid", "otherdn", ReferenceType.DN.toString(), IQuery.FieldType.OPTIONAL);
+            tabReport.addRef("connectionidid", "connectionid", ReferenceType.ConnID.toString(), IQuery.FieldType.OPTIONAL);
             tabReport.addOutField("intToHex( seqno) seqnoHex"); // bug in SQLite lib; does not accept full word
 
-            tabReport.addRef("uuidid", "uuid", ReferenceType.UUID.toString(), IQuery.FieldType.Optional);
-            tabReport.addRef("ixnidid", "ixnid", ReferenceType.IxnID.toString(), IQuery.FieldType.Optional);
-            tabReport.addRef("sourceid", "\"Source Server\"", ReferenceType.App.toString(), IQuery.FieldType.Optional);
-            tabReport.addRef("nameid", "\"First TEvent\"", ReferenceType.TEvent.toString(), IQuery.FieldType.Optional);
-            tabReport.addRef("strnameid", "Strategy", ReferenceType.URSStrategyName.toString(), IQuery.FieldType.Optional);
-            tabReport.addRef("appid", "application", ReferenceType.App.toString(), IQuery.FieldType.Optional);
-            tabReport.addRef("sidid", "sid", ReferenceType.ORSSID.toString(), IQuery.FieldType.Optional);
-            tabReport.addRef("urlid", "url", ReferenceType.URSStrategyName.toString(), IQuery.FieldType.Optional);
+            tabReport.addRef("uuidid", "uuid", ReferenceType.UUID.toString(), IQuery.FieldType.OPTIONAL);
+            tabReport.addRef("ixnidid", "ixnid", ReferenceType.IxnID.toString(), IQuery.FieldType.OPTIONAL);
+            tabReport.addRef("sourceid", "\"Source Server\"", ReferenceType.App.toString(), IQuery.FieldType.OPTIONAL);
+            tabReport.addRef("nameid", "\"First TEvent\"", ReferenceType.TEvent.toString(), IQuery.FieldType.OPTIONAL);
+            tabReport.addRef("strnameid", "Strategy", ReferenceType.URSStrategyName.toString(), IQuery.FieldType.OPTIONAL);
+            tabReport.addRef("appid", "application", ReferenceType.App.toString(), IQuery.FieldType.OPTIONAL);
+            tabReport.addRef("sidid", "sid", ReferenceType.ORSSID.toString(), IQuery.FieldType.OPTIONAL);
+            tabReport.addRef("urlid", "url", ReferenceType.URSStrategyName.toString(), IQuery.FieldType.OPTIONAL);
             tabReport.setOrderBy(tabReport.getTabAlias() + ".started");
             FullTableColors currTable = tabReport.getFullTable();
             currTable.setHiddenField("rowType");
 //</editor-fold>
             return currTable; //To change body of generated methods, choose Tools | Templates.
-//        } catch (Exception ex) {
-//            logger.error("fatal: ",  ex);
         } finally {
             DynamicTreeNode.setNoRefNoLoad(false);
 
         }
-//        return null;
     }
 
     @Override
@@ -736,9 +717,9 @@ final public class RoutingResults extends IQueryResults {
 
             for (int i = 1; i <= MAX_ALARMS; i++) {
                 String fldName = "alarm" + i;
-                ORSAlarm.addRef(fldName + "id", fldName, ReferenceType.Misc.toString(), IQuery.FieldType.Optional);
+                ORSAlarm.addRef(fldName + "id", fldName, ReferenceType.Misc.toString(), IQuery.FieldType.OPTIONAL);
                 fldName = "values" + i;
-                ORSAlarm.addRef(fldName + "id", fldName, ReferenceType.Misc.toString(), IQuery.FieldType.Optional);
+                ORSAlarm.addRef(fldName + "id", fldName, ReferenceType.Misc.toString(), IQuery.FieldType.OPTIONAL);
             }
 
             ORSAlarm.setCommonParams(this, dlg);
@@ -852,16 +833,16 @@ final public class RoutingResults extends IQueryResults {
                         "AND",
                         DialogItem.URS_AGENTDN_STATSWITCH);
 
-                ursAgentPlace.addRef("agentNameID", "agentName", ReferenceType.Agent.toString(), IQuery.FieldType.Optional);
-                ursAgentPlace.addRef("placeNameID", "placeName", ReferenceType.Place.toString(), IQuery.FieldType.Optional);
-                ursAgentPlace.addRef("ssNameID", "StatServer", ReferenceType.App.toString(), IQuery.FieldType.Optional);
-                ursAgentPlace.addRef("statPrevID", "statPrev", ReferenceType.StatType.toString(), IQuery.FieldType.Optional);
-                ursAgentPlace.addRef("statNewID", "statNew", ReferenceType.StatType.toString(), IQuery.FieldType.Optional);
-                ursAgentPlace.addRef("VoiceSwitchID", "VoiceSwitch", ReferenceType.Switch.toString(), IQuery.FieldType.Optional);
-                ursAgentPlace.addRef("VoiceDNID", "VoiceDN", ReferenceType.DN.toString(), IQuery.FieldType.Optional);
-                ursAgentPlace.addRef("VoiceStatID", "VoiceStat", ReferenceType.StatType.toString(), IQuery.FieldType.Optional);
-                ursAgentPlace.addRef("ChatStatID", "ChatStat", ReferenceType.StatType.toString(), IQuery.FieldType.Optional);
-                ursAgentPlace.addRef("EmailStatID", "EmailStat", ReferenceType.StatType.toString(), IQuery.FieldType.Optional);
+                ursAgentPlace.addRef("agentNameID", "agentName", ReferenceType.Agent.toString(), IQuery.FieldType.OPTIONAL);
+                ursAgentPlace.addRef("placeNameID", "placeName", ReferenceType.Place.toString(), IQuery.FieldType.OPTIONAL);
+                ursAgentPlace.addRef("ssNameID", "StatServer", ReferenceType.App.toString(), IQuery.FieldType.OPTIONAL);
+                ursAgentPlace.addRef("statPrevID", "statPrev", ReferenceType.StatType.toString(), IQuery.FieldType.OPTIONAL);
+                ursAgentPlace.addRef("statNewID", "statNew", ReferenceType.StatType.toString(), IQuery.FieldType.OPTIONAL);
+                ursAgentPlace.addRef("VoiceSwitchID", "VoiceSwitch", ReferenceType.Switch.toString(), IQuery.FieldType.OPTIONAL);
+                ursAgentPlace.addRef("VoiceDNID", "VoiceDN", ReferenceType.DN.toString(), IQuery.FieldType.OPTIONAL);
+                ursAgentPlace.addRef("VoiceStatID", "VoiceStat", ReferenceType.StatType.toString(), IQuery.FieldType.OPTIONAL);
+                ursAgentPlace.addRef("ChatStatID", "ChatStat", ReferenceType.StatType.toString(), IQuery.FieldType.OPTIONAL);
+                ursAgentPlace.addRef("EmailStatID", "EmailStat", ReferenceType.StatType.toString(), IQuery.FieldType.OPTIONAL);
 
                 ursAgentPlace.setCommonParams(this, dlg);
                 getRecords(ursAgentPlace);
@@ -894,9 +875,9 @@ final public class RoutingResults extends IQueryResults {
                     } else {
                         tellProgress("Retrieving URS strategy messages");
 
-                        UrsStrategy.addRef("connidid", "connid", ReferenceType.ConnID.toString(), IQuery.FieldType.Optional);
-                        UrsStrategy.addRef("ref1id", "ref1", ReferenceType.URSStrategyRef.toString(), IQuery.FieldType.Optional);
-                        UrsStrategy.addRef("ref2id", "ref2", ReferenceType.URSStrategyRef.toString(), IQuery.FieldType.Optional);
+                        UrsStrategy.addRef("connidid", "connid", ReferenceType.ConnID.toString(), IQuery.FieldType.OPTIONAL);
+                        UrsStrategy.addRef("ref1id", "ref1", ReferenceType.URSStrategyRef.toString(), IQuery.FieldType.OPTIONAL);
+                        UrsStrategy.addRef("ref2id", "ref2", ReferenceType.URSStrategyRef.toString(), IQuery.FieldType.OPTIONAL);
 //                UrsStrategy.setSearchApps(searchApps);
                         UrsStrategy.AddCheckedWhere(UrsStrategy.getTabAlias() + ".strategymsgid",
                                 ReferenceType.URSStrategyMsg,
@@ -927,9 +908,9 @@ final public class RoutingResults extends IQueryResults {
                     } else {
                         tellProgress("Retrieving URS strategy init messages");
 
-                        UrsStrategy.addRef("connidid", "connid", ReferenceType.ConnID.toString(), IQuery.FieldType.Optional);
-                        UrsStrategy.addRef("strategynameid", "strategyname", ReferenceType.URSStrategyName.toString(), IQuery.FieldType.Optional);
-                        UrsStrategy.addRef("strategymsgid", "strategymsg", ReferenceType.URSStrategyMsg.toString(), IQuery.FieldType.Optional);
+                        UrsStrategy.addRef("connidid", "connid", ReferenceType.ConnID.toString(), IQuery.FieldType.OPTIONAL);
+                        UrsStrategy.addRef("strategynameid", "strategyname", ReferenceType.URSStrategyName.toString(), IQuery.FieldType.OPTIONAL);
+                        UrsStrategy.addRef("strategymsgid", "strategymsg", ReferenceType.URSStrategyMsg.toString(), IQuery.FieldType.OPTIONAL);
 //                UrsStrategy.setSearchApps(searchApps);
                         UrsStrategy.AddCheckedWhere(UrsStrategy.getTabAlias() + ".strategynameid",
                                 ReferenceType.URSStrategyName,
@@ -960,9 +941,9 @@ final public class RoutingResults extends IQueryResults {
                     } else {
                         tellProgress("Retrieving URS strategy urswaiting messages");
                         UrsStrategy.addWhere(getWhere("connidid", CONNID, false), "AND");
-                        UrsStrategy.addRef("connidid", "connid", ReferenceType.ConnID.toString(), IQuery.FieldType.Optional);
-                        UrsStrategy.addRef("agentID", "object", ReferenceType.Agent.toString(), IQuery.FieldType.Optional);
-                        UrsStrategy.addRef("agentTypeID", "ObjectType", ReferenceType.ObjectType.toString(), IQuery.FieldType.Optional);
+                        UrsStrategy.addRef("connidid", "connid", ReferenceType.ConnID.toString(), IQuery.FieldType.OPTIONAL);
+                        UrsStrategy.addRef("agentID", "object", ReferenceType.Agent.toString(), IQuery.FieldType.OPTIONAL);
+                        UrsStrategy.addRef("agentTypeID", "ObjectType", ReferenceType.ObjectType.toString(), IQuery.FieldType.OPTIONAL);
 
                         UrsStrategy.setCommonParams(this, dlg);
 
@@ -995,8 +976,8 @@ final public class RoutingResults extends IQueryResults {
                     UrsRLib.addWhere(whIDs, "AND");
 
                     UrsRLib.setRecLoadedProc((ILogRecord rec) -> {
-                        addUnique(refIDs, Util.intOrDef(rec.GetField("refid"), (Long) null));
-                        addUnique(reqIDs, Util.intOrDef(rec.GetField("reqid"), (Long) null));
+                        addUnique(refIDs, Util.intOrDef(rec.getFieldValue("refid"), (Long) null));
+                        addUnique(reqIDs, Util.intOrDef(rec.getFieldValue("reqid"), (Long) null));
                         addUnique(iDs, rec.getID());
                         addUnique(idFiles, new Long(rec.GetFileId()));
                     });
@@ -1013,7 +994,7 @@ final public class RoutingResults extends IQueryResults {
                     UrsRLib.addWhere(wh1, "AND");
 
                     UrsRLib.setRecLoadedProc((ILogRecord rec) -> {
-                        addUnique(reqIDs, Util.intOrDef(rec.GetField("reqid"), (Long) null));
+                        addUnique(reqIDs, Util.intOrDef(rec.getFieldValue("reqid"), (Long) null));
                         addUnique(iDs, rec.getID());
                         addUnique(idFiles, new Long(rec.GetFileId()));
                     });
@@ -1086,7 +1067,7 @@ final public class RoutingResults extends IQueryResults {
                 if (whereAdded || CONNID != null || UUID != null
                         || v1added || v2added || v3added || v4added || v5added) {
                     URSRI.setRecLoadedProc((ILogRecord rec) -> {
-                        addUnique(refIDs, Util.intOrDef(rec.GetField("ref"), (Long) null));
+                        addUnique(refIDs, Util.intOrDef(rec.getFieldValue("ref"), (Long) null));
                         addUnique(iDs, rec.getID());
 //                            addUnique(idFiles, rec.GetFileId());
                     });
@@ -1120,10 +1101,10 @@ final public class RoutingResults extends IQueryResults {
                 }
                 if (URSVQ != null) {
                     tellProgress("Retrieving URS VQ messages");
-                    URSVQ.addRef("connidid", "connid", ReferenceType.ConnID.toString(), IQuery.FieldType.Optional);
-                    URSVQ.addRef("vqidid", "vqid", ReferenceType.VQID.toString(), IQuery.FieldType.Optional);
-                    URSVQ.addRef("vqnameid", "vqname", ReferenceType.DN.toString(), IQuery.FieldType.Optional);
-                    URSVQ.addRef("targetid", "target", ReferenceType.URSTarget.toString(), IQuery.FieldType.Optional);
+                    URSVQ.addRef("connidid", "connid", ReferenceType.ConnID.toString(), IQuery.FieldType.OPTIONAL);
+                    URSVQ.addRef("vqidid", "vqid", ReferenceType.VQID.toString(), IQuery.FieldType.OPTIONAL);
+                    URSVQ.addRef("vqnameid", "vqname", ReferenceType.DN.toString(), IQuery.FieldType.OPTIONAL);
+                    URSVQ.addRef("targetid", "target", ReferenceType.URSTarget.toString(), IQuery.FieldType.OPTIONAL);
                     URSVQ.setCommonParams(this, dlg);
                     getRecords(URSVQ);
                 }
@@ -1160,9 +1141,9 @@ final public class RoutingResults extends IQueryResults {
                     "AND",
                     DialogItem.URS_GENMESSAGE_MSG);
 
-            URS_GENMSG.addRef("connidid", "connid", ReferenceType.ConnID.toString(), IQuery.FieldType.Optional);
-            URS_GENMSG.addRef("levelid", "level", ReferenceType.MSGLEVEL.toString(), IQuery.FieldType.Optional);
-            URS_GENMSG.addRef("msgid", "msg", ReferenceType.LOGMESSAGE.toString(), IQuery.FieldType.Optional);
+            URS_GENMSG.addRef("connidid", "connid", ReferenceType.ConnID.toString(), IQuery.FieldType.OPTIONAL);
+            URS_GENMSG.addRef("levelid", "level", ReferenceType.MSGLEVEL.toString(), IQuery.FieldType.OPTIONAL);
+            URS_GENMSG.addRef("msgid", "msg", ReferenceType.LOGMESSAGE.toString(), IQuery.FieldType.OPTIONAL);
             URS_GENMSG.setCommonParams(this, dlg);
             getRecords(URS_GENMSG);
         }
@@ -1195,7 +1176,7 @@ final public class RoutingResults extends IQueryResults {
                 HashSet<Long> idFiles = new HashSet<>();
                 if (addedFilter) {
                     URSHTTP.setRecLoadedProc((ILogRecord rec) -> {
-                        addUnique(httpHandlerID, Util.intOrDef(rec.GetField("httpHandlerID"), (Long) null));
+                        addUnique(httpHandlerID, Util.intOrDef(rec.getFieldValue("httpHandlerID"), (Long) null));
                         addUnique(iDs, rec.getID());
                         addUnique(idFiles, new Long(rec.GetFileId()));
                     });
@@ -1220,7 +1201,7 @@ final public class RoutingResults extends IQueryResults {
                     iDs.clear();
 
                     HTTPtoURS.setRecLoadedProc((ILogRecord rec) -> {
-                        addUnique(httpHandlerID, Util.intOrDef(rec.GetField("refID"), (Long) null));
+                        addUnique(httpHandlerID, Util.intOrDef(rec.getFieldValue("refID"), (Long) null));
                         addUnique(iDs, rec.getID());
                     });
                     getRecords(HTTPtoURS);
@@ -1260,8 +1241,8 @@ final public class RoutingResults extends IQueryResults {
 
     private TableQuery newURSHTTP(QueryDialog dlg, DynamicTreeNode<OptionNode> ursReportSettings) throws SQLException {
         TableQuery URSHTTP = new TableQuery(MsgType.URSHTTP, TableType.URSHTTP);
-        URSHTTP.addRef("methodid", "method", ReferenceType.HTTPMethod.toString(), IQuery.FieldType.Optional);
-        URSHTTP.addRef("uriid", "uri", ReferenceType.HTTPRequest.toString(), IQuery.FieldType.Optional);
+        URSHTTP.addRef("methodid", "method", ReferenceType.HTTPMethod.toString(), IQuery.FieldType.OPTIONAL);
+        URSHTTP.addRef("uriid", "uri", ReferenceType.HTTPRequest.toString(), IQuery.FieldType.OPTIONAL);
 
 //                    URSHTTP.addRef("vqnameid", "vqname", ReferenceType.DN.toString(), IQuery.FieldType.Optional);
 //                    URSHTTP.addRef("targetid", "target", ReferenceType.URSTarget.toString(), IQuery.FieldType.Optional);
@@ -1344,7 +1325,7 @@ final public class RoutingResults extends IQueryResults {
                     tmpIDs = new HashSet<>();
 
                     ORSMM.setRecLoadedProc((ILogRecord rec) -> {
-                        addUnique(tmpIDs, Util.intOrDef(rec.GetField("refid"), (Long) null));
+                        addUnique(tmpIDs, Util.intOrDef(rec.getFieldValue("refid"), (Long) null));
                     });
                 } else {
                     tmpIDs = null;
@@ -1393,11 +1374,11 @@ final public class RoutingResults extends IQueryResults {
                 }
                 if (orsMetricExtension != null) {
                     tellProgress("Retrieving ORS metric extentions");
-                    orsMetricExtension.addRef("nsid", "ns", ReferenceType.ORSNS.toString(), IQuery.FieldType.Optional);
-                    orsMetricExtension.addRef("sidid", "sid", ReferenceType.ORSSID.toString(), IQuery.FieldType.Mandatory);
-                    orsMetricExtension.addRef("funcid", "func", ReferenceType.METRICFUNC.toString(), IQuery.FieldType.Optional);
-                    orsMetricExtension.addRef("param1id", "param1", ReferenceType.METRIC_PARAM1.toString(), IQuery.FieldType.Optional);
-                    orsMetricExtension.addRef("param2id", "param2", ReferenceType.METRIC_PARAM2.toString(), IQuery.FieldType.Optional);
+                    orsMetricExtension.addRef("nsid", "ns", ReferenceType.ORSNS.toString(), IQuery.FieldType.OPTIONAL);
+                    orsMetricExtension.addRef("sidid", "sid", ReferenceType.ORSSID.toString(), IQuery.FieldType.MANDATORY);
+                    orsMetricExtension.addRef("funcid", "func", ReferenceType.METRICFUNC.toString(), IQuery.FieldType.OPTIONAL);
+                    orsMetricExtension.addRef("param1id", "param1", ReferenceType.METRIC_PARAM1.toString(), IQuery.FieldType.OPTIONAL);
+                    orsMetricExtension.addRef("param2id", "param2", ReferenceType.METRIC_PARAM2.toString(), IQuery.FieldType.OPTIONAL);
 
 //                UrsStrategy.setSearchApps(searchApps);
                     orsMetricExtension.AddCheckedWhere(orsMetricExtension.getTabAlias() + ".funcid",
@@ -1423,10 +1404,10 @@ final public class RoutingResults extends IQueryResults {
                         OrsSess.addWhere(getWhere("sidid", SIDID, false), "AND");
                     }
 
-                    OrsSess.addRef("sidid", "sid", ReferenceType.ORSSID.toString(), IQuery.FieldType.Mandatory);
-                    OrsSess.addRef("uuidid", "uuid", ReferenceType.UUID.toString(), IQuery.FieldType.Mandatory);
-                    OrsSess.addRef("urlid", "url", ReferenceType.URSStrategyName.toString(), IQuery.FieldType.Optional);
-                    OrsSess.addRef("appid", "script", ReferenceType.URSStrategyName.toString(), IQuery.FieldType.Optional);
+                    OrsSess.addRef("sidid", "sid", ReferenceType.ORSSID.toString(), IQuery.FieldType.MANDATORY);
+                    OrsSess.addRef("uuidid", "uuid", ReferenceType.UUID.toString(), IQuery.FieldType.MANDATORY);
+                    OrsSess.addRef("urlid", "url", ReferenceType.URSStrategyName.toString(), IQuery.FieldType.OPTIONAL);
+                    OrsSess.addRef("appid", "script", ReferenceType.URSStrategyName.toString(), IQuery.FieldType.OPTIONAL);
                     OrsSess.setCommonParams(this, dlg);
 
                     getRecords(OrsSess);
@@ -1443,10 +1424,10 @@ final public class RoutingResults extends IQueryResults {
                     }
                     tellProgress("Retrieving ORS sessions");
 
-                    OrsSess.addRef("sidid", "sid", ReferenceType.ORSSID.toString(), IQuery.FieldType.Mandatory);
-                    OrsSess.addRef("ixnid", "uuid", ReferenceType.IxnID.toString(), IQuery.FieldType.Mandatory);
-                    OrsSess.addRef("urlid", "url", ReferenceType.URSStrategyName.toString(), IQuery.FieldType.Optional);
-                    OrsSess.addRef("appid", "script", ReferenceType.URSStrategyName.toString(), IQuery.FieldType.Optional);
+                    OrsSess.addRef("sidid", "sid", ReferenceType.ORSSID.toString(), IQuery.FieldType.MANDATORY);
+                    OrsSess.addRef("ixnid", "uuid", ReferenceType.IxnID.toString(), IQuery.FieldType.MANDATORY);
+                    OrsSess.addRef("urlid", "url", ReferenceType.URSStrategyName.toString(), IQuery.FieldType.OPTIONAL);
+                    OrsSess.addRef("appid", "script", ReferenceType.URSStrategyName.toString(), IQuery.FieldType.OPTIONAL);
                     OrsSess.setCommonParams(this, dlg);
 
                     getRecords(OrsSess);
@@ -1479,12 +1460,12 @@ final public class RoutingResults extends IQueryResults {
 
                     tellProgress("Retrieving ORS http");
 
-                    OrsHTTP.addRef("sidid", "sid", ReferenceType.ORSSID.toString(), IQuery.FieldType.Optional);
-                    OrsHTTP.addRef("ipid", "ip", ReferenceType.IP.toString(), IQuery.FieldType.Optional);
-                    OrsHTTP.addRef("GMSServiceid", "GMSService", ReferenceType.GMSService.toString(), IQuery.FieldType.Optional);
-                    OrsHTTP.addRef("URIID", "URI", ReferenceType.HTTPRequest.toString(), IQuery.FieldType.Optional);
-                    OrsHTTP.addRef("param1ID", "param1", ReferenceType.GMSMisc.toString(), IQuery.FieldType.Optional);
-                    OrsHTTP.addRef("param2ID", "param2", ReferenceType.GMSMisc.toString(), IQuery.FieldType.Optional);
+                    OrsHTTP.addRef("sidid", "sid", ReferenceType.ORSSID.toString(), IQuery.FieldType.OPTIONAL);
+                    OrsHTTP.addRef("ipid", "ip", ReferenceType.IP.toString(), IQuery.FieldType.OPTIONAL);
+                    OrsHTTP.addRef("GMSServiceid", "GMSService", ReferenceType.GMSService.toString(), IQuery.FieldType.OPTIONAL);
+                    OrsHTTP.addRef("URIID", "URI", ReferenceType.HTTPRequest.toString(), IQuery.FieldType.OPTIONAL);
+                    OrsHTTP.addRef("param1ID", "param1", ReferenceType.GMSMisc.toString(), IQuery.FieldType.OPTIONAL);
+                    OrsHTTP.addRef("param2ID", "param2", ReferenceType.GMSMisc.toString(), IQuery.FieldType.OPTIONAL);
                     OrsHTTP.addOutField("intToHex( httpresponse) httpResponseID"); // bug in SQLite lib; does not accept full word
 
                     OrsHTTP.setCommonParams(this, dlg);
@@ -1525,9 +1506,9 @@ final public class RoutingResults extends IQueryResults {
                     }
                     if (OrsUrs != null) {
                         tellProgress("Retrieving ORS to URS messages");
-                        OrsUrs.addRef("sidid", "sid", ReferenceType.ORSSID.toString(), IQuery.FieldType.Optional);
-                        OrsUrs.addRef("moduleid", "module", ReferenceType.ORSMODULE.toString(), IQuery.FieldType.Optional);
-                        OrsUrs.addRef("methodid", "method", ReferenceType.ORSMETHOD.toString(), IQuery.FieldType.Optional);
+                        OrsUrs.addRef("sidid", "sid", ReferenceType.ORSSID.toString(), IQuery.FieldType.OPTIONAL);
+                        OrsUrs.addRef("moduleid", "module", ReferenceType.ORSMODULE.toString(), IQuery.FieldType.OPTIONAL);
+                        OrsUrs.addRef("methodid", "method", ReferenceType.ORSMETHOD.toString(), IQuery.FieldType.OPTIONAL);
 
 //                    OrsUrs.AddCheckedWhere(OrsUrs.getTabAlias() + ".methodid",
 //                            ReferenceType.ORSMETHOD,
@@ -1607,27 +1588,27 @@ final public class RoutingResults extends IQueryResults {
                 "AND",
                 DialogItem.ORS_IXN_NAME);
 
-        ORSMM.addRef("IXNIDID", "ixnid", ReferenceType.IxnID.toString(), IQuery.FieldType.Optional);
-        ORSMM.addRef("nameid", "name", ReferenceType.TEvent.toString(), IQuery.FieldType.Mandatory);
+        ORSMM.addRef("IXNIDID", "ixnid", ReferenceType.IxnID.toString(), IQuery.FieldType.OPTIONAL);
+        ORSMM.addRef("nameid", "name", ReferenceType.TEvent.toString(), IQuery.FieldType.MANDATORY);
         ORSMM.setCommonParams(this, dlg);
         return ORSMM;
     }
 
     private TableQuery newURSRI(QueryDialog dlg) throws SQLException {
         TableQuery URSRI = new TableQuery(MsgType.URSRI, "ursri");
-        URSRI.addRef("connidid", "connid", ReferenceType.ConnID.toString(), IQuery.FieldType.Optional);
-        URSRI.addRef("uuidid", "uuid", ReferenceType.UUID.toString(), IQuery.FieldType.Optional);
-        URSRI.addRef("funcID", "func", ReferenceType.URSMETHOD.toString(), IQuery.FieldType.Optional);
-        URSRI.addRef("subfuncID", "subfunc", ReferenceType.URSMETHOD.toString(), IQuery.FieldType.Optional);
-        URSRI.addRef("clientappID", "client", ReferenceType.App.toString(), IQuery.FieldType.Optional);
-        URSRI.addRef("URLID", "URL", ReferenceType.HTTPRequest.toString(), IQuery.FieldType.Optional);
+        URSRI.addRef("connidid", "connid", ReferenceType.ConnID.toString(), IQuery.FieldType.OPTIONAL);
+        URSRI.addRef("uuidid", "uuid", ReferenceType.UUID.toString(), IQuery.FieldType.OPTIONAL);
+        URSRI.addRef("funcID", "func", ReferenceType.URSMETHOD.toString(), IQuery.FieldType.OPTIONAL);
+        URSRI.addRef("subfuncID", "subfunc", ReferenceType.URSMETHOD.toString(), IQuery.FieldType.OPTIONAL);
+        URSRI.addRef("clientappID", "client", ReferenceType.App.toString(), IQuery.FieldType.OPTIONAL);
+        URSRI.addRef("URLID", "URL", ReferenceType.HTTPRequest.toString(), IQuery.FieldType.OPTIONAL);
         URSRI.addOutFields(new String[]{"ref", "clientno"});
 
         for (int i = 1; i <= com.myutils.logbrowser.indexer.URSRI.MAX_WEB_PARAMS; i++) {
             String fldName = "attr" + i;
-            URSRI.addRef(fldName + "id", fldName, ReferenceType.Misc.toString(), IQuery.FieldType.Optional);
+            URSRI.addRef(fldName + "id", fldName, ReferenceType.Misc.toString(), IQuery.FieldType.OPTIONAL);
             String valueFldName = "value" + i;
-            URSRI.addRef(valueFldName + "id", valueFldName, ReferenceType.Misc.toString(), IQuery.FieldType.Optional);
+            URSRI.addRef(valueFldName + "id", valueFldName, ReferenceType.Misc.toString(), IQuery.FieldType.OPTIONAL);
         }
 
         URSRI.setCommonParams(this, dlg);
@@ -1636,12 +1617,12 @@ final public class RoutingResults extends IQueryResults {
 
     private TableQuery newRLib(QueryDialog dlg, DynamicTreeNode<OptionNode> ursReportSettings) throws SQLException {
         TableQuery UrsRLib = new TableQuery(MsgType.URSRLIB, "ursrlib");
-        UrsRLib.addRef("sidid", "sid", ReferenceType.ORSSID.toString(), IQuery.FieldType.Optional);
-        UrsRLib.addRef("uuidid", "uuid", ReferenceType.UUID.toString(), IQuery.FieldType.Optional);
-        UrsRLib.addRef("resultid", "result", ReferenceType.URSRLIBRESULT.toString(), IQuery.FieldType.Optional);
-        UrsRLib.addRef("paramid", "param", ReferenceType.URSRLIBPARAM.toString(), IQuery.FieldType.Optional);
-        UrsRLib.addRef("methodid", "method", ReferenceType.ORSMETHOD.toString(), IQuery.FieldType.Optional);
-        UrsRLib.addRef("sourceid", "source", ReferenceType.App.toString(), IQuery.FieldType.Optional);
+        UrsRLib.addRef("sidid", "sid", ReferenceType.ORSSID.toString(), IQuery.FieldType.OPTIONAL);
+        UrsRLib.addRef("uuidid", "uuid", ReferenceType.UUID.toString(), IQuery.FieldType.OPTIONAL);
+        UrsRLib.addRef("resultid", "result", ReferenceType.URSRLIBRESULT.toString(), IQuery.FieldType.OPTIONAL);
+        UrsRLib.addRef("paramid", "param", ReferenceType.URSRLIBPARAM.toString(), IQuery.FieldType.OPTIONAL);
+        UrsRLib.addRef("methodid", "method", ReferenceType.ORSMETHOD.toString(), IQuery.FieldType.OPTIONAL);
+        UrsRLib.addRef("sourceid", "source", ReferenceType.App.toString(), IQuery.FieldType.OPTIONAL);
 
         UrsRLib.addOutFields(new String[]{"refid", "reqid", "inbound"});
         String methodFilter = getCheckedWhere(UrsRLib.getTabAlias() + ".methodid",

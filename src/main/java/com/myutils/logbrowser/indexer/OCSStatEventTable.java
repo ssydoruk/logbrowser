@@ -4,6 +4,8 @@
  */
 package com.myutils.logbrowser.indexer;
 
+import java.sql.SQLException;
+
 /**
  * @author ssydoruk
  * <p>
@@ -66,7 +68,7 @@ public class OCSStatEventTable extends DBTable {
      * @throws Exception
      */
     @Override
-    public void FinalizeDB() throws Exception {
+    public void FinalizeDB() throws SQLException {
         getM_dbAccessor().runQuery("create index if not exists OcsStatEv_fileid_" + getM_dbAccessor().getM_alias() + " on OcsStatEv_" + getM_dbAccessor().getM_alias() + " (FileId);");
         getM_dbAccessor().runQuery("create index if not exists OcsStatEv_time_" + getM_dbAccessor().getM_alias() + " on OcsStatEv_" + getM_dbAccessor().getM_alias() + " (time);");
         getM_dbAccessor().runQuery("create index if not exists OcsStatEv_StatEvNameID_" + getM_dbAccessor().getM_alias() + " on OcsStatEv_" + getM_dbAccessor().getM_alias() + " (StatEvNameID);");

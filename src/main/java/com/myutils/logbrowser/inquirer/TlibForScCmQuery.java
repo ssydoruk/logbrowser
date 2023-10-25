@@ -31,24 +31,24 @@ public final class TlibForScCmQuery extends IQuery {
         this.handlerIDs = new HashSet();
         m_componentFilter = CallFlowResults.TLIB;
         m_msgFilter = "";
-        addRef("thisDNID", "thisDN", ReferenceType.DN.toString(), FieldType.Optional);
-        addRef("tlib.nameID", "name", ReferenceType.TEvent.toString(), FieldType.Mandatory);
-        addRef("otherDNID", "otherDN", ReferenceType.DN.toString(), FieldType.Optional);
-        addRef("ConnectionIDID", "ConnectionID", ReferenceType.ConnID.toString(), FieldType.Optional);
-        addRef("TransferIDID", "TransferID", ReferenceType.ConnID.toString(), FieldType.Optional);
-        addRef("sourceID", "source", ReferenceType.App.toString(), FieldType.Optional);
-        addRef("ErrMessageID", "ErrMessage", ReferenceType.TLIBERROR.toString(), FieldType.Optional);
-        addRef("agentIDID", "agentID", ReferenceType.Agent.toString(), FieldType.Optional);
-        addRef("UUIDID", "UUID", ReferenceType.UUID.toString(), FieldType.Optional);
-        addRef("DNISID", "DNIS", ReferenceType.DN.toString(), FieldType.Optional);
-        addRef("ANIID", "ANI", ReferenceType.DN.toString(), FieldType.Optional);
-        addRef("PlaceID", "Place", ReferenceType.Place.toString(), FieldType.Optional);
+        addRef("thisDNID", "thisDN", ReferenceType.DN.toString(), FieldType.OPTIONAL);
+        addRef("tlib.nameID", "name", ReferenceType.TEvent.toString(), FieldType.MANDATORY);
+        addRef("otherDNID", "otherDN", ReferenceType.DN.toString(), FieldType.OPTIONAL);
+        addRef("ConnectionIDID", "ConnectionID", ReferenceType.ConnID.toString(), FieldType.OPTIONAL);
+        addRef("TransferIDID", "TransferID", ReferenceType.ConnID.toString(), FieldType.OPTIONAL);
+        addRef("sourceID", "source", ReferenceType.App.toString(), FieldType.OPTIONAL);
+        addRef("ErrMessageID", "ErrMessage", ReferenceType.TLIBERROR.toString(), FieldType.OPTIONAL);
+        addRef("agentIDID", "agentID", ReferenceType.Agent.toString(), FieldType.OPTIONAL);
+        addRef("UUIDID", "UUID", ReferenceType.UUID.toString(), FieldType.OPTIONAL);
+        addRef("DNISID", "DNIS", ReferenceType.DN.toString(), FieldType.OPTIONAL);
+        addRef("ANIID", "ANI", ReferenceType.DN.toString(), FieldType.OPTIONAL);
+        addRef("PlaceID", "Place", ReferenceType.Place.toString(), FieldType.OPTIONAL);
 
         addNullField("ixnid");
 //        addOutField("constToStr(\"CallType \", calltype) typestr"); // bug in SQLite lib; does not accept full word
         addOutField("intToHex( seqno) seqnoHex"); // bug in SQLite lib; does not accept full word
-        addRef("attr1id", "attr1", ReferenceType.TLIBATTR1.toString(), FieldType.Optional);
-        addRef("attr2id", "attr2", ReferenceType.TLIBATTR2.toString(), FieldType.Optional);
+        addRef("attr1id", "attr1", ReferenceType.TLIBATTR1.toString(), FieldType.OPTIONAL);
+        addRef("attr2id", "attr2", ReferenceType.TLIBATTR2.toString(), FieldType.OPTIONAL);
 
 //        addRef("callIDID", "callID", ReferenceType.SIPCALLID.toString(), FieldType.Optional);
     }

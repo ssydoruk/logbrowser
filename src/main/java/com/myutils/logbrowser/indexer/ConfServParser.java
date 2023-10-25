@@ -646,7 +646,7 @@ public class ConfServParser extends Parser {
          * @throws Exception
          */
         @Override
-        public void FinalizeDB() throws Exception {
+        public void FinalizeDB() throws SQLException {
             createIndexes();
         }
 
@@ -879,7 +879,7 @@ public class ConfServParser extends Parser {
          * @throws Exception
          */
         @Override
-        public void FinalizeDB() throws Exception {
+        public void FinalizeDB() throws SQLException {
             createIndexes();
         }
 
@@ -1020,7 +1020,7 @@ public class ConfServParser extends Parser {
          * @throws Exception
          */
         @Override
-        public void FinalizeDB() throws Exception {
+        public void FinalizeDB() throws SQLException {
             createIndexes();
         }
 

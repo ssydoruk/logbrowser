@@ -164,12 +164,12 @@ public class LCAServerResults extends IQueryResults {
             tellProgress("LCA application statuses");
             TableQuery LCAAppStatuses = new TableQuery(MsgType.LCA_APP, TableType.LCAAppStatus.toString());
 
-            LCAAppStatuses.addRef("newModeID", "newMode", ReferenceType.APPRunMode.toString(), FieldType.Optional);
-            LCAAppStatuses.addRef("theAppNameID", "appName", ReferenceType.App.toString(), FieldType.Optional);
-            LCAAppStatuses.addRef("statusID", "status", ReferenceType.appStatus.toString(), FieldType.Optional);
-            LCAAppStatuses.addRef("eventID", "event", ReferenceType.SCSEvent.toString(), FieldType.Optional);
-            LCAAppStatuses.addRef("oldModeID", "oldmode", ReferenceType.APPRunMode.toString(), FieldType.Optional);
-            LCAAppStatuses.addRef("requestorID", "reqSCS", ReferenceType.App.toString(), FieldType.Optional);
+            LCAAppStatuses.addRef("newModeID", "newMode", ReferenceType.APPRunMode.toString(), FieldType.OPTIONAL);
+            LCAAppStatuses.addRef("theAppNameID", "appName", ReferenceType.App.toString(), FieldType.OPTIONAL);
+            LCAAppStatuses.addRef("statusID", "status", ReferenceType.appStatus.toString(), FieldType.OPTIONAL);
+            LCAAppStatuses.addRef("eventID", "event", ReferenceType.SCSEvent.toString(), FieldType.OPTIONAL);
+            LCAAppStatuses.addRef("oldModeID", "oldmode", ReferenceType.APPRunMode.toString(), FieldType.OPTIONAL);
+            LCAAppStatuses.addRef("requestorID", "reqSCS", ReferenceType.App.toString(), FieldType.OPTIONAL);
 
             LCAAppStatuses.AddCheckedWhere(LCAAppStatuses.getTabAlias() + ".theAppNameID",
                     ReferenceType.App,
@@ -188,9 +188,9 @@ public class LCAServerResults extends IQueryResults {
             tellProgress("LCA application statuses");
             TableQuery LCAAppStatuses = new TableQuery(MsgType.LCA_CLIENT, TableType.LCAClient.toString());
 
-            LCAAppStatuses.addRef("theAppNameID", "connectedApp", ReferenceType.App.toString(), FieldType.Optional);
-            LCAAppStatuses.addRef("typeID", "appType", ReferenceType.AppType.toString(), FieldType.Optional);
-            LCAAppStatuses.addRef("IPID", "IP", ReferenceType.IP.toString(), FieldType.Optional);
+            LCAAppStatuses.addRef("theAppNameID", "connectedApp", ReferenceType.App.toString(), FieldType.OPTIONAL);
+            LCAAppStatuses.addRef("typeID", "appType", ReferenceType.AppType.toString(), FieldType.OPTIONAL);
+            LCAAppStatuses.addRef("IPID", "IP", ReferenceType.IP.toString(), FieldType.OPTIONAL);
             LCAAppStatuses.addOutField("connectedName(isConnected) isConnectedName");
 
             LCAAppStatuses.AddCheckedWhere(LCAAppStatuses.getTabAlias() + ".theAppNameID",

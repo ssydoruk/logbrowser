@@ -114,7 +114,7 @@ public class CallFlowResults extends IQueryResults {
             String dnWhere = wh.makeWhere("AND", false);
             if (DatabaseConnector.TableExist("connid_logbr")) {
                 tellProgress("Getting unique calls");
-                getAllResults.add(new Pair("Unique calls in SIPServer and/or TServer", DatabaseConnector.runQuery("insert into " + tmpTable + " (connectionidid, started, ended)"
+                getAllResults.add(new Pair<>("Unique calls in SIPServer and/or TServer", DatabaseConnector.runQuery("insert into " + tmpTable + " (connectionidid, started, ended)"
                         + "\nselect distinct connectionidid, min(time), max(time) from " + tab
                         + "\nwhere connectionidid >0 and connectionidid not in (select connectionidid from connid_logbr where istemp=1)"
                         + "\n" + IQuery.getFileFilters(tab, "fileid", qd.getSearchApps(false), "AND")
@@ -261,12 +261,12 @@ public class CallFlowResults extends IQueryResults {
             tabReport.addOutField("constToStr(\"CallType \", calltype) calltype "); // bug in SQLite lib; does not accept full word
             tabReport.setAddAll(false);
 
-            tabReport.addRef("thisdnid", "thisdn", ReferenceType.DN.toString(), FieldType.Optional);
-            tabReport.addRef("otherdnid", "otherdn", ReferenceType.DN.toString(), FieldType.Optional);
-            tabReport.addRef("aniid", "ani", ReferenceType.DN.toString(), FieldType.Optional);
-            tabReport.addRef("connectionidid", "connectionid", ReferenceType.ConnID.toString(), FieldType.Optional);
-            tabReport.addRef("nameid", "\"First TEvent\"", ReferenceType.TEvent.toString(), FieldType.Optional);
-            tabReport.addRef("appid", "\"First TServer\"", ReferenceType.App.toString(), FieldType.Optional);
+            tabReport.addRef("thisdnid", "thisdn", ReferenceType.DN.toString(), FieldType.OPTIONAL);
+            tabReport.addRef("otherdnid", "otherdn", ReferenceType.DN.toString(), FieldType.OPTIONAL);
+            tabReport.addRef("aniid", "ani", ReferenceType.DN.toString(), FieldType.OPTIONAL);
+            tabReport.addRef("connectionidid", "connectionid", ReferenceType.ConnID.toString(), FieldType.OPTIONAL);
+            tabReport.addRef("nameid", "\"First TEvent\"", ReferenceType.TEvent.toString(), FieldType.OPTIONAL);
+            tabReport.addRef("appid", "\"First TServer\"", ReferenceType.App.toString(), FieldType.OPTIONAL);
             tabReport.setOrderBy(tabReport.getTabAlias() + ".started");
             tellProgress("Extracting all data");
             FullTableColors currTable = tabReport.getFullTable();
@@ -504,37 +504,17 @@ public class CallFlowResults extends IQueryResults {
 
     }
 
-    private TableQuery MakeTLibReq() throws SQLException {
-        TableQuery TLibReq = new TableQuery(MsgType.TLIB, "tlib_logbr");
-        TLibReq.setResultClass(TLibEvent.class);
-        TLibReq.addRef("thisDNID", "thisDN", ReferenceType.DN.toString(), FieldType.Optional);
-        TLibReq.addRef("nameID", "name", ReferenceType.TEvent.toString(), FieldType.Mandatory);
-        TLibReq.addRef("otherDNID", "otherDN", ReferenceType.DN.toString(), FieldType.Optional);
-        TLibReq.addRef("sourceID", "source", ReferenceType.App.toString(), FieldType.Optional);
-        TLibReq.addRef("attr1id", "attr1", ReferenceType.TLIBATTR1.toString(), FieldType.Optional);
-        TLibReq.addRef("attr2id", "attr2", ReferenceType.TLIBATTR2.toString(), FieldType.Optional);
-        TLibReq.addRef("DNISID", "DNIS", ReferenceType.DN.toString(), FieldType.Optional);
-        TLibReq.addRef("ANIID", "ANI", ReferenceType.DN.toString(), FieldType.Optional);
-
-        TLibReq.addNullField("connid");
-        TLibReq.addNullField("SipId");
-        TLibReq.addNullField("ConnectionId");
-        TLibReq.addNullField("nodeid");
-
-        return TLibReq;
-    }
 
     private void RetrieveSIP(QueryDialog dlg, DynamicTreeNode<OptionNode> reportSettings, IDsFinder cidFinder) throws SQLException {
         if (isChecked(reportSettings) && DatabaseConnector.TableExist("sip_logbr")) {
             tellProgress("Retrieving SIP messages");
             inquirer.logger.debug("SIP report");
-            if (inquirer.getCr().isNewTLibSearch()) {
-                if (cidFinder != null && cidFinder.getSearchType() != SelectionType.NO_SELECTION) {
+            if (inquirer.getCr().isNewTLibSearch() && (cidFinder != null && cidFinder.getSearchType() != SelectionType.NO_SELECTION)) {
                     Integer[] iDs = cidFinder.getIDs(IDType.SIPCallID);
                     if (iDs == null || iDs.length == 0) {
                         return;
                     }
-                }
+
             }
             SipForScCmQuery sipMsgsByCallid = new SipForScCmQuery(reportSettings, cidFinder, true);
             sipMsgsByCallid.setCommonParams(this, dlg);
@@ -641,21 +621,21 @@ public class CallFlowResults extends IQueryResults {
             connIDs = cidFinder.getIDs(IDType.ConnID);
             if (isChecked(eventsSettings) && DatabaseConnector.TableExist(TableType.TLIBTimerRedirect.toString())) {
                 TableQuery TLibTimer;
-                if (DatabaseConnector.TableExist(TableType.TLIBTimerRedirect.toString())) {
-                    if (cidFinder.getSearchType() == SelectionType.NO_SELECTION
-                            || !isEmpty(connIDs)) {
+                if (DatabaseConnector.TableExist(TableType.TLIBTimerRedirect.toString())
+                        && (cidFinder.getSearchType() == SelectionType.NO_SELECTION
+                            || !isEmpty(connIDs))) {
                         TLibTimer = new TableQuery(MsgType.TLIBTimer, TableType.TLIBTimerRedirect.toString());
                         if (connIDs != null) {
                             TLibTimer.addWhere(getWhere("connIDID", connIDs, false), "AND");
                         }
 
-                        TLibTimer.addRef("msgid", "message", ReferenceType.TEvent.toString(), IQuery.FieldType.Mandatory);
-                        TLibTimer.addRef("connIDID", "connID", ReferenceType.ConnID.toString(), IQuery.FieldType.Optional);
-                        TLibTimer.addRef("causeID", "cause", ReferenceType.TEventRedirectCause.toString(), IQuery.FieldType.Optional);
+                        TLibTimer.addRef("msgid", "message", ReferenceType.TEvent.toString(), IQuery.FieldType.MANDATORY);
+                        TLibTimer.addRef("connIDID", "connID", ReferenceType.ConnID.toString(), IQuery.FieldType.OPTIONAL);
+                        TLibTimer.addRef("causeID", "cause", ReferenceType.TEventRedirectCause.toString(), IQuery.FieldType.OPTIONAL);
                         TLibTimer.setCommonParams(this, dlg);
 
                         getRecords(TLibTimer);
-                    }
+
                 }
             }
         }
@@ -664,7 +644,6 @@ public class CallFlowResults extends IQueryResults {
     private void RetrieveCommonLib(QueryDialog dlg, DynamicTreeNode<OptionNode> eventsSettings, IDsFinder cidFinder) throws SQLException {
         if (isChecked(eventsSettings) && DatabaseConnector.TableExist("connid_logbr")) {
             TableQuery tscpCall = new TableQuery(MsgType.TSCPCALL, "connid_logbr");
-            String where = "";
             Integer[] connIDs;
             if (cidFinder != null) {
                 if (inquirer.getCr().isNewTLibSearch()) {
@@ -686,8 +665,8 @@ public class CallFlowResults extends IQueryResults {
 
             tellProgress("Retrieve commonlib");
 
-            tscpCall.addRef("ConnectionIDID", "ConnectionID", ReferenceType.ConnID.toString(), FieldType.Optional);
-            tscpCall.addRef("newConnIdID", "newConnID", ReferenceType.ConnID.toString(), FieldType.Optional);
+            tscpCall.addRef("ConnectionIDID", "ConnectionID", ReferenceType.ConnID.toString(), FieldType.OPTIONAL);
+            tscpCall.addRef("newConnIdID", "newConnID", ReferenceType.ConnID.toString(), FieldType.OPTIONAL);
             tscpCall.addNullField("SipId");
             tscpCall.setCommonParams(this, dlg);
             getRecords(tscpCall);
@@ -697,13 +676,13 @@ public class CallFlowResults extends IQueryResults {
     private void RetrieveSIPJson(QueryDialog dlg, DynamicTreeNode<OptionNode> eventsSettings, IDsFinder cidFinder) throws SQLException {
         if (isChecked(eventsSettings) && DatabaseConnector.TableExist("json_logbr")) {
             tellProgress("Retrieving JSON messages");
-            if (inquirer.getCr().isNewTLibSearch()) {
-                if (cidFinder != null && cidFinder.getSearchType() != SelectionType.NO_SELECTION) {
+            if (inquirer.getCr().isNewTLibSearch()
+                    && (cidFinder != null && cidFinder.getSearchType() != SelectionType.NO_SELECTION)) {
                     Integer[] iDs = cidFinder.getIDs(IDType.JSONID);
                     if (iDs == null || iDs.length == 0) {
                         return;
                     }
-                }
+
             }
 
             JsonQuery jq = new JsonQuery(cidFinder);
@@ -725,11 +704,11 @@ public class CallFlowResults extends IQueryResults {
 
                 for (int i = 1; i <= com.myutils.logbrowser.indexer.SingleThreadParser.MAX_1536_ATTRIBUTES; i++) {
                     String fldName = "attr" + i;
-                    sip1536Table.addRef(fldName + "id", fldName, ReferenceType.Misc.toString(), IQuery.FieldType.Optional);
+                    sip1536Table.addRef(fldName + "id", fldName, ReferenceType.Misc.toString(), IQuery.FieldType.OPTIONAL);
 //                fldName = "value" + i;
 //                ORSAlarm.addRef(fldName + "id", fldName, ReferenceType.Misc.toString(), IQuery.FieldType.Optional);
                 }
-                sip1536Table.addRef("keyid", "key", ReferenceType.Misc.toString(), IQuery.FieldType.Optional);
+                sip1536Table.addRef("keyid", "key", ReferenceType.Misc.toString(), IQuery.FieldType.OPTIONAL);
                 sip1536Table.AddCheckedWhere(sip1536Table.getTabAlias() + ".keyid",
                         ReferenceType.Misc,
                         node,
@@ -745,11 +724,11 @@ public class CallFlowResults extends IQueryResults {
 
                 for (int i = 1; i <= com.myutils.logbrowser.indexer.SingleThreadParser.MAX_1536_ATTRIBUTES; i++) {
                     String fldName = "attr" + i;
-                    sip1536Table.addRef(fldName + "id", fldName, ReferenceType.Misc.toString(), IQuery.FieldType.Optional);
+                    sip1536Table.addRef(fldName + "id", fldName, ReferenceType.Misc.toString(), IQuery.FieldType.OPTIONAL);
 //                fldName = "value" + i;
 //                ORSAlarm.addRef(fldName + "id", fldName, ReferenceType.Misc.toString(), IQuery.FieldType.Optional);
                 }
-                sip1536Table.addRef("trunkid", "DN", ReferenceType.DN.toString(), IQuery.FieldType.Optional);
+                sip1536Table.addRef("trunkid", "DN", ReferenceType.DN.toString(), IQuery.FieldType.OPTIONAL);
                 sip1536Table.AddCheckedWhere(sip1536Table.getTabAlias() + ".trunkid",
                         ReferenceType.DN,
                         node,
@@ -766,11 +745,11 @@ public class CallFlowResults extends IQueryResults {
 
                 for (int i = 1; i <= com.myutils.logbrowser.indexer.SingleThreadParser.MAX_1536_ATTRIBUTES; i++) {
                     String fldName = "attr" + i;
-                    sip1536Table.addRef(fldName + "id", fldName, ReferenceType.Misc.toString(), IQuery.FieldType.Optional);
+                    sip1536Table.addRef(fldName + "id", fldName, ReferenceType.Misc.toString(), IQuery.FieldType.OPTIONAL);
 //                fldName = "value" + i;
 //                ORSAlarm.addRef(fldName + "id", fldName, ReferenceType.Misc.toString(), IQuery.FieldType.Optional);
                 }
-                sip1536Table.addRef("msgid", "name", ReferenceType.SIPMETHOD.toString(), IQuery.FieldType.Optional);
+                sip1536Table.addRef("msgid", "name", ReferenceType.SIPMETHOD.toString(), IQuery.FieldType.OPTIONAL);
 
                 sip1536Table.AddCheckedWhere(sip1536Table.getTabAlias() + ".msgid",
                         ReferenceType.SIPMETHOD,

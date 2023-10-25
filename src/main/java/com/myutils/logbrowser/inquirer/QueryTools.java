@@ -17,11 +17,11 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static com.myutils.logbrowser.inquirer.QueryTools.getWhere;
 import static com.myutils.logbrowser.inquirer.QueryTools.uniqueInts;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 enum IDType {
     UNKNOWN,
@@ -701,7 +701,7 @@ abstract public class QueryTools {
         return ret.toString();
     }
     
-    public static String getWhere(String[] Fields, ArrayList<ArrayList<Long>> group, boolean addWhere) {
+    public static String getWhere(String[] Fields, List<List<Long>> group, boolean addWhere) {
         StringBuilder ret = new StringBuilder(256);
         
         if (group != null && group.size() > 0 && Fields != null && Fields.length > 0) {
@@ -783,7 +783,7 @@ abstract public class QueryTools {
         return "SELECT DISTINCT " + retField + " FROM " + queryTab + " " + Where;
     }
     
-    public static Integer[] getIDSubquery(Object obj, String tab, String retField, String subquery) throws SQLException {
+    public static Integer[] getIDSubquery(IQuery obj, String tab, String retField, String subquery) throws SQLException {
         return DatabaseConnector.getDatabaseConnector(obj).getIDSubquery(obj, tab, retField, subquery);
     }
     

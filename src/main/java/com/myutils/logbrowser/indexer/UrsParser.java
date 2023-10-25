@@ -1128,7 +1128,7 @@ public class UrsParser extends Parser {
          * @throws Exception
          */
         @Override
-        public void FinalizeDB() throws Exception {
+        public void FinalizeDB() throws SQLException {
             createIndexes();
         }
 
@@ -1202,7 +1202,7 @@ public class UrsParser extends Parser {
          * @throws Exception
          */
         @Override
-        public void FinalizeDB() throws Exception {
+        public void FinalizeDB() throws SQLException {
             createIndexes();
         }
 
@@ -1295,7 +1295,7 @@ public class UrsParser extends Parser {
          * @throws Exception
          */
         @Override
-        public void FinalizeDB() throws Exception {
+        public void FinalizeDB() throws SQLException {
             getM_dbAccessor().runQuery("drop index if exists " + tabName() + "_fileid;");
             getM_dbAccessor().runQuery("drop index if exists " + tabName() + "_unixtime;");
             getM_dbAccessor().runQuery("drop index if exists " + tabName() + "_levelID;");

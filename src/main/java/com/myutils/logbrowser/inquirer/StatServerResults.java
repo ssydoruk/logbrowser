@@ -281,10 +281,10 @@ public class StatServerResults extends IQueryResults {
                 wh1.addWhere(TableQuery.getCheckedWhere("agentid", ReferenceType.Agent,
                         FindNode(agentRoot, DialogItem.STATAGENTPLACE_AGENT, DialogItem.STATAGENTPLACE_AGENT_NAME, null)), "OR");
 
-                statsAgents.addRef("placeid", "place", ReferenceType.Place.toString(), FieldType.Optional);
-                statsAgents.addRef("agentid", "agent", ReferenceType.Agent.toString(), FieldType.Optional);
-                statsAgents.addRef("oldstatusid", "oldstatus", ReferenceType.StatType.toString(), FieldType.Optional);
-                statsAgents.addRef("newstatusid", "newstatus", ReferenceType.StatType.toString(), FieldType.Optional);
+                statsAgents.addRef("placeid", "place", ReferenceType.Place.toString(), FieldType.OPTIONAL);
+                statsAgents.addRef("agentid", "agent", ReferenceType.Agent.toString(), FieldType.OPTIONAL);
+                statsAgents.addRef("oldstatusid", "oldstatus", ReferenceType.StatType.toString(), FieldType.OPTIONAL);
+                statsAgents.addRef("newstatusid", "newstatus", ReferenceType.StatType.toString(), FieldType.OPTIONAL);
                 statsAgents.addWhere(wh, "AND");
                 statsAgents.addWhere(wh1, "AND");
 
@@ -302,12 +302,12 @@ public class StatServerResults extends IQueryResults {
                 wh1.addWhere(TableQuery.getCheckedWhere("agentid", ReferenceType.Agent,
                         FindNode(agentRoot, DialogItem.STATAGENTPLACE_AGENT, DialogItem.STATAGENTPLACE_AGENT_NAME, null)), "OR");
 
-                statsAgents.addRef("placeid", "place", ReferenceType.Place.toString(), FieldType.Optional);
-                statsAgents.addRef("capacityid", "capacity", ReferenceType.Capacity.toString(), FieldType.Optional);
-                statsAgents.addRef("agentid", "agent", ReferenceType.Agent.toString(), FieldType.Optional);
+                statsAgents.addRef("placeid", "place", ReferenceType.Place.toString(), FieldType.OPTIONAL);
+                statsAgents.addRef("capacityid", "capacity", ReferenceType.Capacity.toString(), FieldType.OPTIONAL);
+                statsAgents.addRef("agentid", "agent", ReferenceType.Agent.toString(), FieldType.OPTIONAL);
                 for (int i = 0; i < com.myutils.logbrowser.indexer.StCapacity.MAX_MEDIA; i++) {
                     String fldIdx = "media" + i + "name";
-                    statsAgents.addRef(fldIdx + "id", fldIdx, ReferenceType.Media.toString(), FieldType.Optional);
+                    statsAgents.addRef(fldIdx + "id", fldIdx, ReferenceType.Media.toString(), FieldType.OPTIONAL);
                 }
                 statsAgents.addWhere(wh1, "AND");
 

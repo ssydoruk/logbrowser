@@ -4,6 +4,8 @@
  */
 package com.myutils.logbrowser.indexer;
 
+import java.sql.SQLException;
+
 /**
  * @author ssydoruk
  * <p>
@@ -59,7 +61,7 @@ public class OCSPASessionInfoTable extends DBTable {
      * @throws Exception
      */
     @Override
-    public void FinalizeDB() throws Exception {
+    public void FinalizeDB() throws SQLException {
         getM_dbAccessor().runQuery("create index if not exists OcsPASI_campaignDBID_" + getM_dbAccessor().getM_alias() + " on OcsPASI_" + getM_dbAccessor().getM_alias() + " (campaignDBID);");
         getM_dbAccessor().runQuery("create index if not exists OcsPASI_time_" + getM_dbAccessor().getM_alias() + " on OcsPASI_" + getM_dbAccessor().getM_alias() + " (time);");
         getM_dbAccessor().runQuery("create index if not exists OcsPASI_groupDBID_" + getM_dbAccessor().getM_alias() + " on OcsPASI_" + getM_dbAccessor().getM_alias() + " (groupDBID);");

@@ -4,6 +4,8 @@
  */
 package com.myutils.logbrowser.indexer;
 
+import java.sql.SQLException;
+
 /**
  * @author ssydoruk
  * <p>
@@ -55,7 +57,7 @@ public class OCSClientTable extends DBTable {
      * @throws Exception
      */
     @Override
-    public void FinalizeDB() throws Exception {
+    public void FinalizeDB() throws SQLException {
         getM_dbAccessor().runQuery("create index if not exists OCSClientDBfileid on OCSClient (FileId);");
         getM_dbAccessor().runQuery("create index if not exists OCSClientnameID  on OCSClient (nameID);");
         getM_dbAccessor().runQuery("create index if not exists OCSClientCampaignDBID on OCSClient (CampaignDBID);");

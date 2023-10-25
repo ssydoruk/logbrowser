@@ -100,7 +100,7 @@ public class WWEResults extends IQueryResults {
             tabReport.addOutField("jduration(ended-started) duration ");
             tabReport.setAddAll(false);
 
-            tabReport.addRef("callidid", "callid", ReferenceType.SIPCALLID.toString(), FieldType.Optional);
+            tabReport.addRef("callidid", "callid", ReferenceType.SIPCALLID.toString(), FieldType.OPTIONAL);
             tabReport.setOrderBy(tabReport.getTabAlias() + ".started");
             FullTableColors currTable = tabReport.getFullTable();
 
@@ -461,19 +461,19 @@ public class WWEResults extends IQueryResults {
 //                        "AND",
 //                        DialogItem.URS_AGENTDN_AGENT);
 //            }
-            tlib.addRef("thisDNID", "thisDN", ReferenceType.DN.toString(), FieldType.Optional);
-            tlib.addRef("nameID", "name", ReferenceType.TEvent.toString(), FieldType.Optional);
-            tlib.addRef("otherDNID", "otherDN", ReferenceType.DN.toString(), FieldType.Optional);
-            tlib.addRef("ServerID", "Source", ReferenceType.App.toString(), FieldType.Optional);
-            tlib.addRef("ConnectionIDID", "ConnectionID", ReferenceType.ConnID.toString(), FieldType.Optional);
-            tlib.addRef("agentIDID", "agentID", ReferenceType.Agent.toString(), FieldType.Optional);
-            tlib.addRef("DNISID", "DNIS", ReferenceType.DN.toString(), FieldType.Optional);
-            tlib.addRef("ANIID", "ANI", ReferenceType.DN.toString(), FieldType.Optional);
+            tlib.addRef("thisDNID", "thisDN", ReferenceType.DN.toString(), FieldType.OPTIONAL);
+            tlib.addRef("nameID", "name", ReferenceType.TEvent.toString(), FieldType.OPTIONAL);
+            tlib.addRef("otherDNID", "otherDN", ReferenceType.DN.toString(), FieldType.OPTIONAL);
+            tlib.addRef("ServerID", "Source", ReferenceType.App.toString(), FieldType.OPTIONAL);
+            tlib.addRef("ConnectionIDID", "ConnectionID", ReferenceType.ConnID.toString(), FieldType.OPTIONAL);
+            tlib.addRef("agentIDID", "agentID", ReferenceType.Agent.toString(), FieldType.OPTIONAL);
+            tlib.addRef("DNISID", "DNIS", ReferenceType.DN.toString(), FieldType.OPTIONAL);
+            tlib.addRef("ANIID", "ANI", ReferenceType.DN.toString(), FieldType.OPTIONAL);
             tlib.addOutField("intToHex( seqno) seqnoHex"); // bug in SQLite lib; does not accept full word
 
-            tlib.addRef("TransferIDID", "TransferID", ReferenceType.ConnID.toString(), FieldType.Optional);
-            tlib.addRef("ixnIDID", "IXNID", ReferenceType.IxnID.toString(), FieldType.Optional);
-            tlib.addRef("UUIDID", "UUID", ReferenceType.UUID.toString(), FieldType.Optional);
+            tlib.addRef("TransferIDID", "TransferID", ReferenceType.ConnID.toString(), FieldType.OPTIONAL);
+            tlib.addRef("ixnIDID", "IXNID", ReferenceType.IxnID.toString(), FieldType.OPTIONAL);
+            tlib.addRef("UUIDID", "UUID", ReferenceType.UUID.toString(), FieldType.OPTIONAL);
             tlib.addNullField("attr1ID");
             tlib.addNullField("attr2");
             tlib.addNullField("attr1");
@@ -514,8 +514,8 @@ public class WWEResults extends IQueryResults {
 //                    "AND",
 //                    DialogItem.TLIB_CALLS_TEVENT_NAME);
 //
-            exc.addRef("exceptionid", "exception", ReferenceType.Exception.toString(), FieldType.Optional);
-            exc.addRef("exceptionMsgID", "exceptionMsg", ReferenceType.ExceptionMessage.toString(), FieldType.Optional);
+            exc.addRef("exceptionid", "exception", ReferenceType.Exception.toString(), FieldType.OPTIONAL);
+            exc.addRef("exceptionMsgID", "exceptionMsg", ReferenceType.ExceptionMessage.toString(), FieldType.OPTIONAL);
 
             exc.setCommonParams(this, dlg);
             getRecords(exc);
@@ -604,16 +604,16 @@ public class WWEResults extends IQueryResults {
             q.AddCheckedWhere(q.getTabAlias() + ".methodID", ReferenceType.HTTPMethod, eventsSettings, "AND", DialogItem.APACHEMSG_PARAMS_HTTPMETHOD);
             q.AddCheckedWhere(q.getTabAlias() + ".urlID", ReferenceType.HTTPURL, eventsSettings, "AND", DialogItem.APACHEMSG_PARAMS_HTTPURL);
 
-            q.addRef("httpCode", "Code", ReferenceType.HTTPRESPONSE.toString(), FieldType.Optional);
-            q.addRef("IPID", "IP", ReferenceType.IP.toString(), FieldType.Optional);
-            q.addRef("JSessionIDID", "JSessionID", ReferenceType.JSessionID.toString(), FieldType.Optional);
-            q.addRef("methodID", "method", ReferenceType.HTTPMethod.toString(), FieldType.Optional);
-            q.addRef("urlID", "url", ReferenceType.HTTPURL.toString(), FieldType.Optional);
-            q.addRef("UUIDID", "UUID", ReferenceType.UUID.toString(), FieldType.Optional);
-            q.addRef("IxnIDID", "IxnID", ReferenceType.IxnID.toString(), FieldType.Optional);
-            q.addRef("DeviceIDID", "DeviceID", ReferenceType.GWSDeviceID.toString(), FieldType.Optional);
-            q.addRef("userNameID", "userName", ReferenceType.Agent.toString(), FieldType.Optional);
-            q.addRef("browserClientID", "browserClient", ReferenceType.WWEBrowserClient.toString(), FieldType.Optional);
+            q.addRef("httpCode", "Code", ReferenceType.HTTPRESPONSE.toString(), FieldType.OPTIONAL);
+            q.addRef("IPID", "IP", ReferenceType.IP.toString(), FieldType.OPTIONAL);
+            q.addRef("JSessionIDID", "JSessionID", ReferenceType.JSessionID.toString(), FieldType.OPTIONAL);
+            q.addRef("methodID", "method", ReferenceType.HTTPMethod.toString(), FieldType.OPTIONAL);
+            q.addRef("urlID", "url", ReferenceType.HTTPURL.toString(), FieldType.OPTIONAL);
+            q.addRef("UUIDID", "UUID", ReferenceType.UUID.toString(), FieldType.OPTIONAL);
+            q.addRef("IxnIDID", "IxnID", ReferenceType.IxnID.toString(), FieldType.OPTIONAL);
+            q.addRef("DeviceIDID", "DeviceID", ReferenceType.GWSDeviceID.toString(), FieldType.OPTIONAL);
+            q.addRef("userNameID", "userName", ReferenceType.Agent.toString(), FieldType.OPTIONAL);
+            q.addRef("browserClientID", "browserClient", ReferenceType.WWEBrowserClient.toString(), FieldType.OPTIONAL);
 
             q.setCommonParams(this, dlg);
             getRecords(q);
@@ -652,20 +652,20 @@ public class WWEResults extends IQueryResults {
             q.AddCheckedWhere(q.getTabAlias() + ".msgTextID", ReferenceType.Misc, eventsSettings, "AND", DialogItem.WWEDEBUGMESSAGE_PARAMS_MESSAGE);
             q.AddCheckedWhere(q.getTabAlias() + ".userNameID", ReferenceType.Agent, eventsSettings, "AND", DialogItem.WWEDEBUGMESSAGE_PARAMS_USER);
 
-            q.addRef("IPID", "IP", ReferenceType.IP.toString(), FieldType.Optional);
-            q.addRef("JSessionIDID", "JSessionID", ReferenceType.JSessionID.toString(), FieldType.Optional);
-            q.addRef("urlID", "url", ReferenceType.HTTPURL.toString(), FieldType.Optional);
-            q.addRef("LevelID", "Level", ReferenceType.MSGLEVEL.toString(), FieldType.Optional);
-            q.addRef("classNameID", "class", ReferenceType.JAVA_CLASS.toString(), FieldType.Optional);
-            q.addRef("msgTextID", "msgText", ReferenceType.Misc.toString(), FieldType.Optional);
-            q.addRef("userNameID", "userName", ReferenceType.Agent.toString(), FieldType.Optional);
-            q.addRef("param1ID", "param1", ReferenceType.MiscParam.toString(), FieldType.Optional);
-            q.addRef("param2ID", "param2", ReferenceType.MiscParam.toString(), FieldType.Optional);
-            q.addRef("UUIDID", "UUID", ReferenceType.UUID.toString(), FieldType.Optional);
-            q.addRef("IxnIDID", "IxnID", ReferenceType.IxnID.toString(), FieldType.Optional);
-            q.addRef("DeviceIDID", "DeviceID", ReferenceType.GWSDeviceID.toString(), FieldType.Optional);
-            q.addRef("UserIDID", "UserID", ReferenceType.WWEUserID.toString(), FieldType.Optional);
-            q.addRef("browserClientID", "browserClient", ReferenceType.WWEBrowserClient.toString(), FieldType.Optional);
+            q.addRef("IPID", "IP", ReferenceType.IP.toString(), FieldType.OPTIONAL);
+            q.addRef("JSessionIDID", "JSessionID", ReferenceType.JSessionID.toString(), FieldType.OPTIONAL);
+            q.addRef("urlID", "url", ReferenceType.HTTPURL.toString(), FieldType.OPTIONAL);
+            q.addRef("LevelID", "Level", ReferenceType.MSGLEVEL.toString(), FieldType.OPTIONAL);
+            q.addRef("classNameID", "class", ReferenceType.JAVA_CLASS.toString(), FieldType.OPTIONAL);
+            q.addRef("msgTextID", "msgText", ReferenceType.Misc.toString(), FieldType.OPTIONAL);
+            q.addRef("userNameID", "userName", ReferenceType.Agent.toString(), FieldType.OPTIONAL);
+            q.addRef("param1ID", "param1", ReferenceType.MiscParam.toString(), FieldType.OPTIONAL);
+            q.addRef("param2ID", "param2", ReferenceType.MiscParam.toString(), FieldType.OPTIONAL);
+            q.addRef("UUIDID", "UUID", ReferenceType.UUID.toString(), FieldType.OPTIONAL);
+            q.addRef("IxnIDID", "IxnID", ReferenceType.IxnID.toString(), FieldType.OPTIONAL);
+            q.addRef("DeviceIDID", "DeviceID", ReferenceType.GWSDeviceID.toString(), FieldType.OPTIONAL);
+            q.addRef("UserIDID", "UserID", ReferenceType.WWEUserID.toString(), FieldType.OPTIONAL);
+            q.addRef("browserClientID", "browserClient", ReferenceType.WWEBrowserClient.toString(), FieldType.OPTIONAL);
 
             q.setCommonParams(this, dlg);
             getRecords(q);
@@ -697,19 +697,19 @@ public class WWEResults extends IQueryResults {
             q.AddCheckedWhere(q.getTabAlias() + ".msgTextID", ReferenceType.Misc, eventsSettings, "AND", DialogItem.WWEDEBUGMESSAGE_PARAMS_MESSAGE);
             q.AddCheckedWhere(q.getTabAlias() + ".UserIDID", ReferenceType.Agent, eventsSettings, "AND", DialogItem.WWEDEBUGMESSAGE_PARAMS_USER);
 
-            q.addRef("IPID", "IP", ReferenceType.IP.toString(), FieldType.Optional);
-            q.addRef("JSessionIDID", "JSessionID", ReferenceType.JSessionID.toString(), FieldType.Optional);
-            q.addRef("urlID", "url", ReferenceType.HTTPURL.toString(), FieldType.Optional);
-            q.addRef("LevelID", "Level", ReferenceType.MSGLEVEL.toString(), FieldType.Optional);
-            q.addRef("classNameID", "class", ReferenceType.JAVA_CLASS.toString(), FieldType.Optional);
-            q.addRef("msgTextID", "msgText", ReferenceType.Misc.toString(), FieldType.Optional);
-            q.addRef("userNameID", "userName", ReferenceType.Agent.toString(), FieldType.Optional);
-            q.addRef("param1ID", "param1", ReferenceType.MiscParam.toString(), FieldType.Optional);
-            q.addRef("param2ID", "param2", ReferenceType.MiscParam.toString(), FieldType.Optional);
-            q.addRef("UUIDID", "UUID", ReferenceType.UUID.toString(), FieldType.Optional);
-            q.addRef("IxnIDID", "IxnID", ReferenceType.IxnID.toString(), FieldType.Optional);
-            q.addRef("DeviceIDID", "DeviceID", ReferenceType.GWSDeviceID.toString(), FieldType.Optional);
-            q.addRef("UserIDID", "UserID", ReferenceType.WWEUserID.toString(), FieldType.Optional);
+            q.addRef("IPID", "IP", ReferenceType.IP.toString(), FieldType.OPTIONAL);
+            q.addRef("JSessionIDID", "JSessionID", ReferenceType.JSessionID.toString(), FieldType.OPTIONAL);
+            q.addRef("urlID", "url", ReferenceType.HTTPURL.toString(), FieldType.OPTIONAL);
+            q.addRef("LevelID", "Level", ReferenceType.MSGLEVEL.toString(), FieldType.OPTIONAL);
+            q.addRef("classNameID", "class", ReferenceType.JAVA_CLASS.toString(), FieldType.OPTIONAL);
+            q.addRef("msgTextID", "msgText", ReferenceType.Misc.toString(), FieldType.OPTIONAL);
+            q.addRef("userNameID", "userName", ReferenceType.Agent.toString(), FieldType.OPTIONAL);
+            q.addRef("param1ID", "param1", ReferenceType.MiscParam.toString(), FieldType.OPTIONAL);
+            q.addRef("param2ID", "param2", ReferenceType.MiscParam.toString(), FieldType.OPTIONAL);
+            q.addRef("UUIDID", "UUID", ReferenceType.UUID.toString(), FieldType.OPTIONAL);
+            q.addRef("IxnIDID", "IxnID", ReferenceType.IxnID.toString(), FieldType.OPTIONAL);
+            q.addRef("DeviceIDID", "DeviceID", ReferenceType.GWSDeviceID.toString(), FieldType.OPTIONAL);
+            q.addRef("UserIDID", "UserID", ReferenceType.WWEUserID.toString(), FieldType.OPTIONAL);
 
             q.setCommonParams(this, dlg);
             getRecords(q);
@@ -745,18 +745,18 @@ public class WWEResults extends IQueryResults {
             q.AddCheckedWhere(q.getTabAlias() + ".msgTextID", ReferenceType.Misc, commonSettings, "AND", DialogItem.WWEDEBUGMESSAGE_PARAMS_MESSAGE);
             q.AddCheckedWhere(q.getTabAlias() + ".UserNameID", ReferenceType.Agent, commonSettings, "AND", DialogItem.WWEDEBUGMESSAGE_PARAMS_USER);
 
-            q.addRef("IPID", "IP", ReferenceType.IP.toString(), FieldType.Optional);
-            q.addRef("JSessionIDID", "JSessionID", ReferenceType.JSessionID.toString(), FieldType.Optional);
-            q.addRef("urlID", "url", ReferenceType.HTTPURL.toString(), FieldType.Optional);
-            q.addRef("LevelID", "Level", ReferenceType.MSGLEVEL.toString(), FieldType.Optional);
-            q.addRef("classNameID", "class", ReferenceType.JAVA_CLASS.toString(), FieldType.Optional);
-            q.addRef("msgTextID", "msgText", ReferenceType.Misc.toString(), FieldType.Optional);
-            q.addRef("userNameID", "userName", ReferenceType.Agent.toString(), FieldType.Optional);
-            q.addRef("DeviceIDID", "DeviceID", ReferenceType.GWSDeviceID.toString(), FieldType.Optional);
+            q.addRef("IPID", "IP", ReferenceType.IP.toString(), FieldType.OPTIONAL);
+            q.addRef("JSessionIDID", "JSessionID", ReferenceType.JSessionID.toString(), FieldType.OPTIONAL);
+            q.addRef("urlID", "url", ReferenceType.HTTPURL.toString(), FieldType.OPTIONAL);
+            q.addRef("LevelID", "Level", ReferenceType.MSGLEVEL.toString(), FieldType.OPTIONAL);
+            q.addRef("classNameID", "class", ReferenceType.JAVA_CLASS.toString(), FieldType.OPTIONAL);
+            q.addRef("msgTextID", "msgText", ReferenceType.Misc.toString(), FieldType.OPTIONAL);
+            q.addRef("userNameID", "userName", ReferenceType.Agent.toString(), FieldType.OPTIONAL);
+            q.addRef("DeviceIDID", "DeviceID", ReferenceType.GWSDeviceID.toString(), FieldType.OPTIONAL);
 
-            q.addRef("nameID", "name", ReferenceType.TEvent.toString(), FieldType.Optional);
-            q.addRef("UUIDID", "UUID", ReferenceType.UUID.toString(), FieldType.Optional);
-            q.addRef("IxnIDID", "IxnID", ReferenceType.IxnID.toString(), FieldType.Optional);
+            q.addRef("nameID", "name", ReferenceType.TEvent.toString(), FieldType.OPTIONAL);
+            q.addRef("UUIDID", "UUID", ReferenceType.UUID.toString(), FieldType.OPTIONAL);
+            q.addRef("IxnIDID", "IxnID", ReferenceType.IxnID.toString(), FieldType.OPTIONAL);
 
             q.setCommonParams(this, dlg);
             getRecords(q);
@@ -791,15 +791,15 @@ public class WWEResults extends IQueryResults {
             q.AddCheckedWhere(q.getTabAlias() + ".msgTextID", ReferenceType.Misc, commonSettings, "AND", DialogItem.WWEDEBUGMESSAGE_PARAMS_MESSAGE);
             q.AddCheckedWhere(q.getTabAlias() + ".UserNameID", ReferenceType.Agent, commonSettings, "AND", DialogItem.WWEDEBUGMESSAGE_PARAMS_USER);
 
-            q.addRef("IPID", "IP", ReferenceType.IP.toString(), FieldType.Optional);
-            q.addRef("JSessionIDID", "JSessionID", ReferenceType.JSessionID.toString(), FieldType.Optional);
-            q.addRef("urlID", "url", ReferenceType.HTTPURL.toString(), FieldType.Optional);
-            q.addRef("LevelID", "Level", ReferenceType.MSGLEVEL.toString(), FieldType.Optional);
-            q.addRef("classNameID", "class", ReferenceType.JAVA_CLASS.toString(), FieldType.Optional);
-            q.addRef("msgTextID", "msgText", ReferenceType.Misc.toString(), FieldType.Optional);
-            q.addRef("userNameID", "userName", ReferenceType.Agent.toString(), FieldType.Optional);
+            q.addRef("IPID", "IP", ReferenceType.IP.toString(), FieldType.OPTIONAL);
+            q.addRef("JSessionIDID", "JSessionID", ReferenceType.JSessionID.toString(), FieldType.OPTIONAL);
+            q.addRef("urlID", "url", ReferenceType.HTTPURL.toString(), FieldType.OPTIONAL);
+            q.addRef("LevelID", "Level", ReferenceType.MSGLEVEL.toString(), FieldType.OPTIONAL);
+            q.addRef("classNameID", "class", ReferenceType.JAVA_CLASS.toString(), FieldType.OPTIONAL);
+            q.addRef("msgTextID", "msgText", ReferenceType.Misc.toString(), FieldType.OPTIONAL);
+            q.addRef("userNameID", "userName", ReferenceType.Agent.toString(), FieldType.OPTIONAL);
 
-            q.addRef("nameID", "name", ReferenceType.TEvent.toString(), FieldType.Optional);
+            q.addRef("nameID", "name", ReferenceType.TEvent.toString(), FieldType.OPTIONAL);
 
             q.setCommonParams(this, dlg);
             getRecords(q);
@@ -826,7 +826,7 @@ public class WWEResults extends IQueryResults {
 //            q.AddCheckedWhere(q.getTabAlias() + ".httpCode", ReferenceType.HTTPRESPONSE, eventsSettings, "AND", DialogItem.APACHEMSG_PARAMS_HTTPCODE);
 //            q.AddCheckedWhere(q.getTabAlias() + ".methodID", ReferenceType.HTTPMethod, eventsSettings, "AND", DialogItem.APACHEMSG_PARAMS_HTTPMETHOD);
 //            q.AddCheckedWhere(q.getTabAlias() + ".urlID", ReferenceType.HTTPURL, eventsSettings, "AND", DialogItem.APACHEMSG_PARAMS_HTTPURL);
-            q.addRef("nameID", "name", ReferenceType.TEvent.toString(), FieldType.Optional);
+            q.addRef("nameID", "name", ReferenceType.TEvent.toString(), FieldType.OPTIONAL);
 //            q.addRef("IPID", "IP", ReferenceType.IP.toString(), FieldType.Optional);
 //            q.addRef("JSessionIDID", "JSessionID", ReferenceType.JSessionID.toString(), FieldType.Optional);
 //            q.addRef("methodID", "method", ReferenceType.HTTPMethod.toString(), FieldType.Optional);
@@ -878,21 +878,21 @@ public class WWEResults extends IQueryResults {
             q.AddCheckedWhere(q.getTabAlias() + ".param2ID", ReferenceType.Misc, msgSpecific, "AND", DialogItem.WWEBAYEUXMESSAGE_PARAM2_NAME);
             q.AddCheckedWhere(q.getTabAlias() + ".UserNameID", ReferenceType.Agent, commonSettings, "AND", DialogItem.WWEDEBUGMESSAGE_PARAMS_USER);
 
-            q.addRef("IPID", "IP", ReferenceType.IP.toString(), FieldType.Optional);
-            q.addRef("JSessionIDID", "JSessionID", ReferenceType.JSessionID.toString(), FieldType.Optional);
-            q.addRef("urlID", "url", ReferenceType.HTTPURL.toString(), FieldType.Optional);
-            q.addRef("LevelID", "Level", ReferenceType.MSGLEVEL.toString(), FieldType.Optional);
-            q.addRef("classNameID", "class", ReferenceType.JAVA_CLASS.toString(), FieldType.Optional);
-            q.addRef("msgTextID", "msgText", ReferenceType.Misc.toString(), FieldType.Optional);
-            q.addRef("userNameID", "userName", ReferenceType.Agent.toString(), FieldType.Optional);
-            q.addRef("param1ID", "param1", ReferenceType.MiscParam.toString(), FieldType.Optional);
-            q.addRef("param2ID", "param2", ReferenceType.MiscParam.toString(), FieldType.Optional);
-            q.addRef("UUIDID", "UUID", ReferenceType.UUID.toString(), FieldType.Optional);
-            q.addRef("IxnIDID", "IxnID", ReferenceType.IxnID.toString(), FieldType.Optional);
-            q.addRef("DeviceIDID", "DeviceID", ReferenceType.GWSDeviceID.toString(), FieldType.Optional);
-            q.addRef("channelID", "channel", ReferenceType.BayeuxChannel.toString(), FieldType.Optional);
-            q.addRef("msgTypeID", "msgType", ReferenceType.BayeuxMessageType.toString(), FieldType.Optional);
-            q.addRef("browserClientID", "browserClient", ReferenceType.WWEBrowserClient.toString(), FieldType.Optional);
+            q.addRef("IPID", "IP", ReferenceType.IP.toString(), FieldType.OPTIONAL);
+            q.addRef("JSessionIDID", "JSessionID", ReferenceType.JSessionID.toString(), FieldType.OPTIONAL);
+            q.addRef("urlID", "url", ReferenceType.HTTPURL.toString(), FieldType.OPTIONAL);
+            q.addRef("LevelID", "Level", ReferenceType.MSGLEVEL.toString(), FieldType.OPTIONAL);
+            q.addRef("classNameID", "class", ReferenceType.JAVA_CLASS.toString(), FieldType.OPTIONAL);
+            q.addRef("msgTextID", "msgText", ReferenceType.Misc.toString(), FieldType.OPTIONAL);
+            q.addRef("userNameID", "userName", ReferenceType.Agent.toString(), FieldType.OPTIONAL);
+            q.addRef("param1ID", "param1", ReferenceType.MiscParam.toString(), FieldType.OPTIONAL);
+            q.addRef("param2ID", "param2", ReferenceType.MiscParam.toString(), FieldType.OPTIONAL);
+            q.addRef("UUIDID", "UUID", ReferenceType.UUID.toString(), FieldType.OPTIONAL);
+            q.addRef("IxnIDID", "IxnID", ReferenceType.IxnID.toString(), FieldType.OPTIONAL);
+            q.addRef("DeviceIDID", "DeviceID", ReferenceType.GWSDeviceID.toString(), FieldType.OPTIONAL);
+            q.addRef("channelID", "channel", ReferenceType.BayeuxChannel.toString(), FieldType.OPTIONAL);
+            q.addRef("msgTypeID", "msgType", ReferenceType.BayeuxMessageType.toString(), FieldType.OPTIONAL);
+            q.addRef("browserClientID", "browserClient", ReferenceType.WWEBrowserClient.toString(), FieldType.OPTIONAL);
 //            q.addRef("UserIDID", "UserID", ReferenceType.WWEUserID.toString(), FieldType.Optional);
 
             q.setCommonParams(this, dlg);

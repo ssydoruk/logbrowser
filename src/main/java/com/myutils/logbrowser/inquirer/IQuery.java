@@ -32,25 +32,7 @@ public abstract class IQuery extends QueryTools {
     protected int recCnt;
     Wheres addWheres = new Wheres();
     private ICalculatedFields calcFields = null;
-    //    void AddCheckedWhere(String[] nameIDs, ReferenceType referenceType, DynamicTreeNode<OptionNode> node, String AndOr, DialogItem di) throws Exception {
-//        DynamicTreeNode<OptionNode> nameSettings = getChildByName(node, di);
-//        if (isChecked(nameSettings) && !OptionNode.AllChildrenChecked(nameSettings)) {
-//            
-//            String ret = "";
-//            for (String nameIDs : nameIDs) {
-//                if (ret.length() > 0) {
-//                    ret += " or ";
-//                }
-//                ret += getAttrsWhere(tabColumn, "id", "name", referenceType.toString(), node);
-//            }
-//            if (ret.length() > 0) {
-//                return " ( " + ret + " ) ";
-//            }
-//            
-//            AddCheckedWhere(nameID, referenceType, nameSettings, AndOr);
-//        }
-//
-//    }
+
     private boolean limitQueryResults;
     private int maxQueryLines;
 
@@ -62,9 +44,6 @@ public abstract class IQuery extends QueryTools {
         incQueryTypes();
     }
 
-    static String theLimitClause() {
-        return getLimitClause(inquirer.getCr().isLimitQueryResults(), inquirer.getCr().getMaxQueryLines());
-    }
 
     static void reSetQueryNo() {
         queryTypes = 0;
@@ -106,10 +85,9 @@ public abstract class IQuery extends QueryTools {
     }
 
     public static String getFileFilters(String tab, String fileIDField, ArrayList<Integer> apps) {
-        if (apps != null && apps.size() > 0) {
-            StringBuilder q = new StringBuilder();
-            q.append("+(");
-            if (tab != null && tab.length() > 0) {
+        if (apps != null && !apps.isEmpty()) {
+            StringBuilder q = new StringBuilder().append("+(");
+            if (tab != null && !tab.isEmpty()) {
                 q.append(tab).append(".");
             }
 
@@ -214,8 +192,8 @@ public abstract class IQuery extends QueryTools {
     static String getCheckedWhere(String nameID, ReferenceType referenceType, DynamicTreeNode<OptionNode> nameSettings, boolean optimize) {
         if (nameSettings != null) {
             DynamicTreeNode<OptionNode> parent = (DynamicTreeNode<OptionNode>) nameSettings.getParent();
-            if (parent != null) {
-                if (parent.getData() == null || ((OptionNode) parent.getData()).isChecked() && !OptionNode.AllChildrenChecked(nameSettings)) {
+            if (parent != null
+                && (parent.getData() == null || ((OptionNode) parent.getData()).isChecked() && !OptionNode.AllChildrenChecked(nameSettings))) {
                     StringBuilder ret = new StringBuilder();
 
                     if (optimize) {
@@ -227,7 +205,6 @@ public abstract class IQuery extends QueryTools {
                     }
                     return ret.toString();
 
-                }
             }
         }
         return null;
@@ -292,7 +269,7 @@ public abstract class IQuery extends QueryTools {
     }
 
     public static String getIDsList(String Field, ArrayList<Integer> ids, boolean addWhere, boolean optimize) {
-        if (ids != null && ids.size() > 0) {
+        if (ids != null && !ids.isEmpty()) {
             if (inquirer.logger.isDebugEnabled()) {
                 Collections.sort(ids);
             }
@@ -318,7 +295,6 @@ public abstract class IQuery extends QueryTools {
 
             }
             ret.append(") ");
-//            ret.append(" or ").append(Field).append(" is null ");
             ret.append(")");
 
             return ret.toString();
@@ -430,7 +406,7 @@ public abstract class IQuery extends QueryTools {
     private static StringBuilder gatherIDs(String Field, Integer[] ids, boolean isAmong) {
         Long[] longIds = new Long[ids.length];
         for (int i = 0; i < ids.length; i++) {
-            longIds[i] = new Long(ids[i]);
+            longIds[i] = Long.valueOf(ids[i]);
 
         }
         return gatherIDs(Field, longIds, isAmong);
@@ -656,8 +632,7 @@ public abstract class IQuery extends QueryTools {
         for (refTab TabRef : TabRefs) {
             String tab = TabRef.getRefTableName();
             inquirer.logger.trace("Checking is table [" + tab + "] exists");
-            if ((ret = DatabaseConnector.TableExist(tab))
-                    == false) {
+            if (!(ret = DatabaseConnector.TableExist(tab))) {
                 break;
             }
         }
@@ -675,8 +650,6 @@ public abstract class IQuery extends QueryTools {
     void addWhere(Wheres wh) {
         addWheres.addWhere(wh);
     }
-    //    void AddCheckedWhere(String nameID, ReferenceType referenceType, DynamicTreeNode<OptionNode> node, String AndOr) throws Exception {
-//    }
 
     Where AddCheckedWhere(String nameID, ReferenceType referenceType, DynamicTreeNode<OptionNode> node, String AndOr, DialogItem di) {
         if (node != null) {
@@ -760,15 +733,9 @@ public abstract class IQuery extends QueryTools {
         DynamicTreeNode<OptionNode> parent = (DynamicTreeNode<OptionNode>) nameSettings.getParent();
         if (parent != null) {
             if (parent.getData() == null || ((OptionNode) parent.getData()).isChecked() && !OptionNode.AllChildrenChecked(nameSettings)) {
-//                String isNull = OptionNode.getEmptyClause(nameSettings);
                 String isNullClause = "";
-//                if (isNull != null) {
-//                    isNullClause = " or " + nameID + " is null ";
-//                }
                 return addWhere(
                         OptionNode.checkedChildrenList(nameID, nameSettings) + isNullClause, " " + AndOr + " ");
-//                addWhere(nameID + " in \n"
-//                        + getRefSubQuery(this, referenceType, OptionNode.getChecked(nameSettings)) + isNullClause, " " + AndOr + " ");
             }
         }
         return null;
@@ -776,10 +743,6 @@ public abstract class IQuery extends QueryTools {
 
     void AddCheckedWhere(String nameID, ReferenceType referenceType, DynamicTreeNode<OptionNode> nameSettings) throws Exception {
         AddCheckedWhere(nameID, referenceType, nameSettings, "or");
-    }
-
-    private String makeWhere(boolean WhereClause) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     void addOutFields(String[] strings) {
@@ -794,7 +757,7 @@ public abstract class IQuery extends QueryTools {
 
     public String addedFieldString(boolean startWithComa, boolean finishWithComa) {
         StringBuilder qString = new StringBuilder();
-        if (outFields != null && outFields.size() > 0) {
+        if (outFields != null && !outFields.isEmpty()) {
             if (startWithComa) {
                 qString.append(",");
             }
@@ -1077,8 +1040,8 @@ public abstract class IQuery extends QueryTools {
     }
 
     enum FieldType {
-        Mandatory,
-        Optional
+        MANDATORY,
+        OPTIONAL
     }
 
     @FunctionalInterface
@@ -1122,10 +1085,10 @@ public abstract class IQuery extends QueryTools {
             String jType = "";
 
             switch (ft) {
-                case Mandatory:
+                case MANDATORY:
                     jType = "INNER";
                     break;
-                case Optional:
+                case OPTIONAL:
                     jType = "LEFT";
                     break;
             }
@@ -1168,10 +1131,10 @@ public abstract class IQuery extends QueryTools {
             String jType = "";
 
             switch (ft) {
-                case Mandatory:
+                case MANDATORY:
                     jType = "INNER";
                     break;
-                case Optional:
+                case OPTIONAL:
                     jType = "LEFT";
                     break;
             }

@@ -6,6 +6,7 @@ package com.myutils.logbrowser.indexer;
 
 import org.apache.commons.lang3.StringUtils;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -18,31 +19,30 @@ public abstract class DBTable {
     private static final org.apache.logging.log4j.Logger logger = Main.logger;
     private final SqliteAccessor m_dbAccessor;
     private final ArrayList<ArrayList<String>> idxFields;
-    //    protected Parser m_pParser=null;
     protected TableType m_type = TableType.UNKNOWN;
     private boolean tabCreated = false;
     private String tabName;
     private int recordsAdded = 0;
     private String fileIDField;
 
-    public DBTable(SqliteAccessor dbaccessor, TableType type, String tabName) {
+    protected DBTable(SqliteAccessor dbaccessor, TableType type, String tabName) {
         m_dbAccessor = dbaccessor;
         m_type = type;
         setTabName(tabName);
-        idxFields = new ArrayList();
+        idxFields = new ArrayList<>();
         initID();
 
     }
 
-    public DBTable(SqliteAccessor dbaccessor, TableType type) {
+    protected DBTable(SqliteAccessor dbaccessor, TableType type) {
         this(dbaccessor, type, type.toString());
     }
 
-    public DBTable(SqliteAccessor dbaccessor, String tabName) {
+    protected DBTable(SqliteAccessor dbaccessor, String tabName) {
         this(dbaccessor, TableType.UNKNOWN, tabName);
     }
 
-    public DBTable(SqliteAccessor dbaccessor) {
+    protected DBTable(SqliteAccessor dbaccessor) {
         this(dbaccessor, TableType.UNKNOWN);
     }
     //ID
@@ -78,15 +78,15 @@ public abstract class DBTable {
     }
 
     private String idxName(String tab, ArrayList<String> fields) {
-        StringBuilder ret = new StringBuilder().append(tabName).append("_");
+        StringBuilder ret = new StringBuilder().append(tab).append("_");
         for (String field : fields) {
             ret.append(field);
         }
         return ret.toString();
     }
 
-    protected void dropIndex(String fld, ArrayList<String> idxField) {
-        getM_dbAccessor().runQuery("drop index if exists " + idxName(tabName, idxField) + ";");
+    protected void dropIndex(String tab, ArrayList<String> idxField) {
+        getM_dbAccessor().runQuery("drop index if exists " + idxName(tab, idxField) + ";");
     }
 
     /**
@@ -124,7 +124,7 @@ public abstract class DBTable {
                             Main.logger.info("No fileID for table " + tabName);
                         }
                     }
-                    idxFields.stream().forEach(idxField->dropIndex(tabName, idxField));
+                    idxFields.forEach(idxField -> dropIndex(tabName, idxField));
                 }
             } catch (Exception ex) {
                 logger.error("error dropping table " + tabName, ex);
@@ -137,7 +137,7 @@ public abstract class DBTable {
     }
 
     protected void createIndexes() {
-        idxFields.stream().forEach(idxField->createIndex(tabName, idxField));
+        idxFields.forEach(idxField -> createIndex(tabName, idxField));
     }
 
     public String getTabName() {
@@ -164,15 +164,7 @@ public abstract class DBTable {
 
     public abstract String getInsert();
 
-    public abstract void FinalizeDB() throws Exception;
-
-    public String StrOrEmpty(String param) {
-        if (param == null) {
-            return "";
-        } else {
-            return param;
-        }
-    }
+    public abstract void FinalizeDB() throws SQLException;
 
     public boolean isTabCreated() {
         return tabCreated;
@@ -186,10 +178,6 @@ public abstract class DBTable {
                 tabCreated = true;
             }
         }
-    }
-
-    void recordAdded() {
-        recordsAdded++;
     }
 
     public void addCnt(int cnt) {

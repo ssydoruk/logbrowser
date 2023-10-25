@@ -51,13 +51,13 @@ final public class IsccQuery extends IQuery {
     }
 
     public void defRefs() throws SQLException {
-        addRef("nameID", "name", ReferenceType.ISCCEvent.toString(), FieldType.Mandatory);
-        addRef("thisDNID", "thisDN", ReferenceType.DN.toString(), FieldType.Optional);
-        addRef("otherDNID", "otherDN", ReferenceType.DN.toString(), FieldType.Optional);
-        addRef("ConnectionIDID", "ConnectionID", ReferenceType.ConnID.toString(), FieldType.Optional);
-        addRef("otherConnectionIDID", "OtherConnectionID", ReferenceType.ConnID.toString(), FieldType.Optional);
-        addRef("srcTServerID", "source", ReferenceType.App.toString(), FieldType.Optional);
-        addRef("srcSwitchID", "sourceSwitch", ReferenceType.Switch.toString(), FieldType.Optional);
+        addRef("nameID", "name", ReferenceType.ISCCEvent.toString(), FieldType.MANDATORY);
+        addRef("thisDNID", "thisDN", ReferenceType.DN.toString(), FieldType.OPTIONAL);
+        addRef("otherDNID", "otherDN", ReferenceType.DN.toString(), FieldType.OPTIONAL);
+        addRef("ConnectionIDID", "ConnectionID", ReferenceType.ConnID.toString(), FieldType.OPTIONAL);
+        addRef("otherConnectionIDID", "OtherConnectionID", ReferenceType.ConnID.toString(), FieldType.OPTIONAL);
+        addRef("srcTServerID", "source", ReferenceType.App.toString(), FieldType.OPTIONAL);
+        addRef("srcSwitchID", "sourceSwitch", ReferenceType.Switch.toString(), FieldType.OPTIONAL);
     }
 
     @Override

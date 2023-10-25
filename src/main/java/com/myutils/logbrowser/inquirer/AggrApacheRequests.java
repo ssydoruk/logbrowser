@@ -26,7 +26,6 @@ import static com.myutils.logbrowser.inquirer.inquirer.getCr;
  */
 public class AggrApacheRequests extends IAggregateAggregate {
 
-    private boolean isTLibReport;
 
     public AggrApacheRequests() {
         setJpConfig(new AggrApacheURIPerSecondConfig());
@@ -89,7 +88,6 @@ public class AggrApacheRequests extends IAggregateAggregate {
     }
 
     private void runReport(AggrApacheURIPerSecondConfig cfg, Integer[] appIDs, String tabName) throws SQLException {
-        isTLibReport = true;
         DynamicTreeNode<OptionNode> attrRoot = cfg.getAttrRoot();
         Wheres wh = new Wheres();
 
@@ -112,7 +110,7 @@ public class AggrApacheRequests extends IAggregateAggregate {
         if (grpBy.length > 0) {
             String[] flds = new String[grpBy.length];
             for (int i = 0; i < grpBy.length; i++) {
-                flds[i] = grpBy[i].getDbField();
+                flds[i] = grpBy[i].getFieldName();
             }
             sGrpBy = StringUtils.join(flds, ", ");
         }
@@ -133,7 +131,7 @@ public class AggrApacheRequests extends IAggregateAggregate {
 
         if (grpBy.length > 0) {
             for (DBField fld : grpBy) {
-                DatabaseConnector.runQuery("create index idx_" + tab + "_" + fld.getDbField() + " on " + tab + "(" + fld.getDbField() + ");");
+                DatabaseConnector.runQuery("create index idx_" + tab + "_" + fld.getFieldName() + " on " + tab + "(" + fld.getFieldName() + ");");
             }
         }
         inquirer.logger.info("extracting data");
@@ -145,7 +143,7 @@ public class AggrApacheRequests extends IAggregateAggregate {
 
         if (grpBy.length > 0) {
             for (DBField fld : grpBy) {
-                resultQuery.addRef(fld.getDbField(), fld.getDbOutField(), fld.getRefTable(), FieldType.Optional);
+                resultQuery.addRef(fld.getFieldName(), fld.getDbOutField(), fld.getRefTable(), FieldType.OPTIONAL);
             }
         }
 
@@ -153,23 +151,18 @@ public class AggrApacheRequests extends IAggregateAggregate {
             resultQuery.Execute();
 
             if (getCr().isSaveFileShort()) {
-                PrintStream ps = null;
                 try {
                     String fileName = getCr().getFileNameShort();
                     inquirer.logger.info("Short output goes to " + fileName);
-                    ps = new PrintStream(new FileOutputStream(fileName));
-                    ps.println(StringUtils.join(resultQuery.getFieldNames(), ","));
-                    String[] GetNextStringArray;
-                    while ((GetNextStringArray = resultQuery.GetNextStringArray()) != null) {
-                        ps.println(StringUtils.join(GetNextStringArray, ","));
+                    try (PrintStream ps = new PrintStream(new FileOutputStream(fileName))) {
+                        ps.println(StringUtils.join(resultQuery.getFieldNames(), ","));
+                        String[] GetNextStringArray;
+                        while ((GetNextStringArray = resultQuery.GetNextStringArray()) != null) {
+                            ps.println(StringUtils.join(GetNextStringArray, ","));
+                        }
                     }
                 } catch (FileNotFoundException ex) {
                     inquirer.ExceptionHandler.handleException("Cannot open file ", ex);
-
-                } finally {
-                    if (ps != null) {
-                        ps.close();
-                    }
                 }
 
             }

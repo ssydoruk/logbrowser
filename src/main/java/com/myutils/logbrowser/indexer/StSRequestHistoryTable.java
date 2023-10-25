@@ -1,5 +1,7 @@
 package com.myutils.logbrowser.indexer;
 
+import java.sql.SQLException;
+
 /**
  * @author akolo
  */
@@ -43,7 +45,7 @@ public class StSRequestHistoryTable extends DBTable {
 
 
     @Override
-    public void FinalizeDB() throws Exception {
+    public void FinalizeDB() throws SQLException {
         createIndexes();
     }
 

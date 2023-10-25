@@ -1618,7 +1618,7 @@ public class SingleThreadParser extends Parser {
          * @throws Exception
          */
         @Override
-        public void FinalizeDB() throws Exception {
+        public void FinalizeDB() throws SQLException {
             createIndexes();
         }
 
@@ -1735,7 +1735,7 @@ public class SingleThreadParser extends Parser {
          * @throws Exception
          */
         @Override
-        public void FinalizeDB() throws Exception {
+        public void FinalizeDB() throws SQLException {
             createIndexes();
         }
 
@@ -1870,7 +1870,7 @@ public class SingleThreadParser extends Parser {
          * @throws Exception
          */
         @Override
-        public void FinalizeDB() throws Exception {
+        public void FinalizeDB() throws SQLException {
             createIndexes();
         }
 
@@ -1969,7 +1969,7 @@ public class SingleThreadParser extends Parser {
          * @throws Exception
          */
         @Override
-        public void FinalizeDB() throws Exception {
+        public void FinalizeDB() throws SQLException {
             createIndexes();
         }
 

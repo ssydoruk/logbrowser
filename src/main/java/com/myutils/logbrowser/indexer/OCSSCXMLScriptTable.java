@@ -4,6 +4,8 @@
  */
 package com.myutils.logbrowser.indexer;
 
+import java.sql.SQLException;
+
 /**
  * @author ssydoruk
  * <p>
@@ -53,7 +55,7 @@ public class OCSSCXMLScriptTable extends DBTable {
      * @throws Exception
      */
     @Override
-    public void FinalizeDB() throws Exception {
+    public void FinalizeDB() throws SQLException {
         getM_dbAccessor().runQuery("create index if not exists FileId_OCSSXMLScript on OCSSXMLScript (FileId);");
         getM_dbAccessor().runQuery("create index if not exists metricid_OCSSXMLScript on OCSSXMLScript (metricid);");
         getM_dbAccessor().runQuery("create index if not exists SessIDID_OCSSXMLScript on OCSSXMLScript (SessIDID);");

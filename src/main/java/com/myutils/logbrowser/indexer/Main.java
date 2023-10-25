@@ -27,6 +27,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Pattern;
@@ -568,7 +569,7 @@ public class Main {
     }
 
     private synchronized Pair<Long, Long> getDBFile(String f) throws SQLException {
-        ArrayList<ArrayList<Long>> iDs = m_accessor.getIDsMultiple(
+        List<ArrayList<Long>> iDs = m_accessor.getIDsMultiple(
                 "select id, size from file_logbr where intfilename = '"
                         + f + "'"
                         //                            + "and size=" + fi.getSize()
@@ -1400,16 +1401,14 @@ public class Main {
     class ProcessedFilesSet extends HashMap<String, ProcessedFiles> {
 
         //"select id, intfilename, size from file_logbr
-        public void loadFiles(ArrayList<ArrayList<Object>> objMultiple) {
+        public void loadFiles(List<ArrayList<Object>> objMultiple) {
             clear();
-            if (objMultiple != null) {
-                for (ArrayList<Object> row : objMultiple) {
-                    Object id = row.get(0);
-                    Object size = row.get(2);
-                    put((String) row.get(1), new ProcessedFiles(row.get(1).toString(),
-                            (id == null) ? 0 : Long.valueOf(id.toString()),
-                            (size == null) ? 0 : Long.valueOf(size.toString())));
-                }
+            for (ArrayList<Object> row : objMultiple) {
+                Object id = row.get(0);
+                Object size = row.get(2);
+                put((String) row.get(1), new ProcessedFiles(row.get(1).toString(),
+                        (id == null) ? 0 : Long.valueOf(id.toString()),
+                        (size == null) ? 0 : Long.valueOf(size.toString())));
             }
         }
     }

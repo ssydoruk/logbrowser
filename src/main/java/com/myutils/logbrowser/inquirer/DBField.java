@@ -11,13 +11,13 @@ package com.myutils.logbrowser.inquirer;
 public class DBField {
 
     private final String screenLabel;
-    private final String dbField;
+    private final String fieldName;
     private final String dbOutField;
     private final String refTable;
 
     public DBField(String screenLabel, String dbField, String dbOutField, String refTable) {
         this.screenLabel = screenLabel;
-        this.dbField = dbField;
+        this.fieldName = dbField;
         this.dbOutField = dbOutField;
         this.refTable = refTable;
     }
@@ -26,8 +26,8 @@ public class DBField {
         return screenLabel;
     }
 
-    public String getDbField() {
-        return dbField;
+    public String getFieldName() {
+        return fieldName;
     }
 
     public String getDbOutField() {

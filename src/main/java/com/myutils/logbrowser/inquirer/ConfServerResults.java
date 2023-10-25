@@ -64,25 +64,7 @@ public class ConfServerResults extends IQueryResults {
         return "ConfServer";
     }
 
-    public void AddComponent(int filter) {
-        m_componentFilter = m_componentFilter | filter;
-    }
 
-    private void addLogMessagesReportType(DynamicTreeNode<OptionNode> root, TableType tableType) {
-        DynamicTreeNode<OptionNode> nd = new DynamicTreeNode<>(new OptionNode(false, "Log messages"));
-        root.addChild(nd);
-
-        DynamicTreeNode<OptionNode> ComponentNode;
-        ComponentNode = new DynamicTreeNode<>(new OptionNode(false, "Type"));
-        nd.addChild(ComponentNode);
-
-        /**
-         * *****************
-         */
-        ComponentNode.addDynamicRef("Level", ReferenceType.MSGLEVEL);
-        ComponentNode.addDynamicRefLogMessage("Message ID", tableType);
-
-    }
 
     private void loadStdOptions() throws SQLException {
         DynamicTreeNode<OptionNode> rootA = new DynamicTreeNode<>(null);
@@ -215,8 +197,8 @@ public class ConfServerResults extends IQueryResults {
                 CSUpdates.addWhere(wh);
             }
             CSUpdates.setRecLoadedProc((ILogRecord rec) -> {
-                addUnique(refIDs, Util.intOrDef(rec.GetField("refID"), (Integer) null));
-                addUnique(appNameIDs, Util.intOrDef(rec.GetField("theAppNameID"), (Integer) null));
+                addUnique(refIDs, Util.intOrDef(rec.getFieldValue("refID"), (Integer) null));
+                addUnique(appNameIDs, Util.intOrDef(rec.getFieldValue("theAppNameID"), (Integer) null));
                 addUnique(ids, rec.getID());
 //                            addUnique(idFiles, rec.GetFileId());
             });
@@ -325,12 +307,12 @@ public class ConfServerResults extends IQueryResults {
 
         TableQuery CSConfigChange = new TableQuery(MsgType.CONFSERV_CONFIGCHANGE, TableType.CSConfigChange.toString());
 
-        CSConfigChange.addRef("theAppNameID", "appName", ReferenceType.App.toString(), FieldType.Optional);
-        CSConfigChange.addRef("objTypeID", "objType", ReferenceType.ObjectType.toString(), FieldType.Optional);
-        CSConfigChange.addRef("userNameID", "userName", ReferenceType.Agent.toString(), FieldType.Optional);
-        CSConfigChange.addRef("clientTypeID", "clientType", ReferenceType.AppType.toString(), FieldType.Optional);
-        CSConfigChange.addRef("opID", "op", ReferenceType.CfgOp.toString(), FieldType.Optional);
-        CSConfigChange.addRef("objNameID", "objName", ReferenceType.CfgObjName.toString(), FieldType.Optional);
+        CSConfigChange.addRef("theAppNameID", "appName", ReferenceType.App.toString(), FieldType.OPTIONAL);
+        CSConfigChange.addRef("objTypeID", "objType", ReferenceType.ObjectType.toString(), FieldType.OPTIONAL);
+        CSConfigChange.addRef("userNameID", "userName", ReferenceType.Agent.toString(), FieldType.OPTIONAL);
+        CSConfigChange.addRef("clientTypeID", "clientType", ReferenceType.AppType.toString(), FieldType.OPTIONAL);
+        CSConfigChange.addRef("opID", "op", ReferenceType.CfgOp.toString(), FieldType.OPTIONAL);
+        CSConfigChange.addRef("objNameID", "objName", ReferenceType.CfgObjName.toString(), FieldType.OPTIONAL);
         CSConfigChange.addOutFields(new String[]{"theappnameid", "dbid"});
         CSConfigChange.setCommonParams(this, dlg);
 
@@ -342,13 +324,13 @@ public class ConfServerResults extends IQueryResults {
 
         TableQuery CSUpdates = new TableQuery(MsgType.CONFSERV_UPDATES, TableType.CSUpdate.toString());
 
-        CSUpdates.addRef("theAppNameID", "appName", ReferenceType.App.toString(), FieldType.Optional);
-        CSUpdates.addRef("objTypeID", "objType", ReferenceType.ObjectType.toString(), FieldType.Optional);
-        CSUpdates.addRef("userNameID", "userName", ReferenceType.Agent.toString(), FieldType.Optional);
-        CSUpdates.addRef("clientTypeID", "clientType", ReferenceType.AppType.toString(), FieldType.Optional);
-        CSUpdates.addRef("opID", "op", ReferenceType.CfgOp.toString(), FieldType.Optional);
-        CSUpdates.addRef("objNameID", "objName", ReferenceType.CfgObjName.toString(), FieldType.Optional);
-        CSUpdates.addRef("msgID", "message", ReferenceType.CfgMsg.toString(), FieldType.Optional);
+        CSUpdates.addRef("theAppNameID", "appName", ReferenceType.App.toString(), FieldType.OPTIONAL);
+        CSUpdates.addRef("objTypeID", "objType", ReferenceType.ObjectType.toString(), FieldType.OPTIONAL);
+        CSUpdates.addRef("userNameID", "userName", ReferenceType.Agent.toString(), FieldType.OPTIONAL);
+        CSUpdates.addRef("clientTypeID", "clientType", ReferenceType.AppType.toString(), FieldType.OPTIONAL);
+        CSUpdates.addRef("opID", "op", ReferenceType.CfgOp.toString(), FieldType.OPTIONAL);
+        CSUpdates.addRef("objNameID", "objName", ReferenceType.CfgObjName.toString(), FieldType.OPTIONAL);
+        CSUpdates.addRef("msgID", "message", ReferenceType.CfgMsg.toString(), FieldType.OPTIONAL);
         CSUpdates.addOutFields(new String[]{"refid", "theappnameid", "dbid", "descr", "objNumber"});
         CSUpdates.setCommonParams(this, dlg);
 
@@ -370,10 +352,10 @@ public class ConfServerResults extends IQueryResults {
             CSConnect.addWhere(wh);
             CSConnect.addOutFields(new String[]{CSConnect.getTabAlias() + ".socketNo", CSConnect.getTabAlias() + ".isConnect"});
 
-            CSConnect.addRef("theAppNameID", "appName", ReferenceType.App.toString(), FieldType.Optional);
-            CSConnect.addRef("clientTypeID", "clientType", ReferenceType.AppType.toString(), FieldType.Optional);
-            CSConnect.addRef("userNameID", "userName", ReferenceType.Agent.toString(), FieldType.Optional);
-            CSConnect.addRef("hostportID", "hostport", ReferenceType.Host.toString(), FieldType.Optional);
+            CSConnect.addRef("theAppNameID", "appName", ReferenceType.App.toString(), FieldType.OPTIONAL);
+            CSConnect.addRef("clientTypeID", "clientType", ReferenceType.AppType.toString(), FieldType.OPTIONAL);
+            CSConnect.addRef("userNameID", "userName", ReferenceType.Agent.toString(), FieldType.OPTIONAL);
+            CSConnect.addRef("hostportID", "hostport", ReferenceType.Host.toString(), FieldType.OPTIONAL);
 
             CSConnect.addWhere(IQuery.getAttrsWhere("inbound", FindNode(reportSettings, DialogItem.CONFSERV_CLIENTCONN_ISCONNECT, null, null)), "AND");
             CSConnect.AddCheckedWhere(CSConnect.getTabAlias() + ".userNameID",

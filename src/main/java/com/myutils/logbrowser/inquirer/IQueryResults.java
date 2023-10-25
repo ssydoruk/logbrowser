@@ -20,6 +20,7 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.*;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -401,10 +402,9 @@ public abstract class IQueryResults extends QueryTools
 
     public abstract void Retrieve(QueryDialog qd, SelectionType key, String searchID) throws SQLException;
 
-    public void setFormatters(ArrayList formatters) {
+    public void setFormatters(List<ILogRecordFormatter> formatters) {
         for (int i = 0; i < formatters.size(); i++) {
-            AddFormatter(
-                    (ILogRecordFormatter) formatters.get(i));
+            AddFormatter(formatters.get(i));
         }
     }
 
@@ -604,10 +604,10 @@ public abstract class IQueryResults extends QueryTools
             tellProgress("Extracting Config messages");
 
             TableQuery genCfg = new TableQuery(MsgType.GENESYS_CFG, "cfg");
-            genCfg.addRef("opid", "operation", ReferenceType.CfgOp.toString(), FieldType.Optional);
-            genCfg.addRef("objtypeID", "objtype", ReferenceType.CfgObjectType.toString(), FieldType.Optional);
-            genCfg.addRef("objNameID", "objName", ReferenceType.CfgObjName.toString(), FieldType.Optional);
-            genCfg.addRef("msgID", "msg", ReferenceType.CfgMsg.toString(), FieldType.Optional);
+            genCfg.addRef("opid", "operation", ReferenceType.CfgOp.toString(), FieldType.OPTIONAL);
+            genCfg.addRef("objtypeID", "objtype", ReferenceType.CfgObjectType.toString(), FieldType.OPTIONAL);
+            genCfg.addRef("objNameID", "objName", ReferenceType.CfgObjName.toString(), FieldType.OPTIONAL);
+            genCfg.addRef("msgID", "msg", ReferenceType.CfgMsg.toString(), FieldType.OPTIONAL);
             genCfg.AddCheckedWhere(genCfg.getTabAlias() + ".objtypeID",
                     ReferenceType.CfgObjectType,
                     FindNode(cfgUpdateNode, DialogItem.CONFIGUPDATES_CONFIGUPDATES, null, null),
@@ -641,8 +641,8 @@ public abstract class IQueryResults extends QueryTools
 
                         TableQuery genMsg = new TableQuery(MsgType.GENESYS_MSG, tableType.toString());
 //        genMsg.setIdsSubQuery("fileid", "select id from file_logbr "+ getWhere("component", new Integer[] {ft.getValue()}, true));        
-                        genMsg.addRef("levelID", "level", ReferenceType.MSGLEVEL.toString(), FieldType.Mandatory);
-                        genMsg.addRef("msgID", "msg", ReferenceType.LOGMESSAGE.toString(), FieldType.Optional);
+                        genMsg.addRef("levelID", "level", ReferenceType.MSGLEVEL.toString(), FieldType.MANDATORY);
+                        genMsg.addRef("msgID", "msg", ReferenceType.LOGMESSAGE.toString(), FieldType.OPTIONAL);
                         genMsg.AddCheckedWhere(genMsg.getTabAlias() + ".levelID", ReferenceType.MSGLEVEL, logMsgType, "AND", DialogItem.APP_LOG_MESSAGES_TYPE_LEVEL);
                         genMsg.AddCheckedWhere(genMsg.getTabAlias() + ".MSGID", ReferenceType.LOGMESSAGE, logMsgType, "AND", DialogItem.APP_LOG_MESSAGES_TYPE_MESSAGE_ID);
                         genMsg.setCommonParams(qry, dlg);
@@ -859,10 +859,10 @@ public abstract class IQueryResults extends QueryTools
 
             customQuery.AddCheckedCustomWhere(customQuery.getTabAlias() + ".keyid", node, "AND");
 
-            customQuery.addRef("keyid", "keycomponent", ReferenceType.CUSTCOMP.toString(), FieldType.Optional);
+            customQuery.addRef("keyid", "keycomponent", ReferenceType.CUSTCOMP.toString(), FieldType.OPTIONAL);
             for (int i = 1; i <= Parser.MAX_CUSTOM_FIELDS; i++) {
-                customQuery.addRef(Parser.fldName(i), Parser.fldNameFull(i), ReferenceType.CUSTKKEY.toString(), FieldType.Optional);
-                customQuery.addRef(Parser.valName(i), Parser.valNameFull(i), ReferenceType.CUSTVALUE.toString(), FieldType.Optional);
+                customQuery.addRef(Parser.fldName(i), Parser.fldNameFull(i), ReferenceType.CUSTKKEY.toString(), FieldType.OPTIONAL);
+                customQuery.addRef(Parser.valName(i), Parser.valNameFull(i), ReferenceType.CUSTVALUE.toString(), FieldType.OPTIONAL);
 
             }
 

@@ -652,7 +652,7 @@ public abstract class OutputSpecFormatter extends DefaultFormatter {
                 value = record.GetTime();
 
             } else if (m_id.equals(SIPNAME)) {
-                String name = record.GetField("name");
+                String name = record.getFieldValue("name");
 //                if (m_isLongFileNameEnabled) {
                 name = (record.IsInbound() ? "<-" + name : "->" + name);
                 if (name.length() > MAX_NAME_LENGTH) {
@@ -664,7 +664,7 @@ public abstract class OutputSpecFormatter extends DefaultFormatter {
 //                    value = "";
 //                }
             } else if (m_id.equals(TLIBNAME)) {
-                String name = GetValueFilter(record.GetField("name"), record);
+                String name = GetValueFilter(record.getFieldValue("name"), record);
                 if (name != null) {
 //                    if (name.length() > MAX_NAME_LENGTH) {
 //                        String newName = name.substring(0, MAX_NAME_LENGTH - m_tlibTail);
@@ -692,12 +692,12 @@ public abstract class OutputSpecFormatter extends DefaultFormatter {
                 }
 
             } else if (m_id.equals(MSGSPECIFIC)) {
-                String name = record.GetField("name");
+                String name = record.getFieldValue("name");
                 if (name.equals("RequestPrivateService")
                         || name.equals("RequestNetworkPrivateService")
                         || name.equals("EventPrivateInfo")
                         || name.equals("EventNetworkPrivateInfo")) {
-                    String msgid = record.GetField("msgid");
+                    String msgid = record.getFieldValue("msgid");
                     value = "msgid=" + msgid;
                 } else if (name.equals("RequestRouteCall")
                         || name.equals("RequestMakeCall")
@@ -708,7 +708,7 @@ public abstract class OutputSpecFormatter extends DefaultFormatter {
                         || name.equals("RequestSingleStepConference")
                         || name.equals("RequestGetAccessNumber")
                         || name.equals("RequestQueryLocation")) {
-                    String location = record.GetField("location");
+                    String location = record.getFieldValue("location");
                     value = "loc=" + location;
                 } else {
                     value = "";
@@ -749,7 +749,7 @@ public abstract class OutputSpecFormatter extends DefaultFormatter {
 
         @Override
         public String GetValue(ILogRecord record) throws SQLException {
-            String value = record.GetField(m_id);
+            String value = record.getFieldValue(m_id);
 
             return GetValueFilter(value, record);
         }
@@ -832,7 +832,7 @@ public abstract class OutputSpecFormatter extends DefaultFormatter {
         @HostAccess.Export
         public static String recordField(String fld) {
             if (curRec != null) {
-                return curRec.GetField(fld);
+                return curRec.getFieldValue(fld);
             } else {
                 return "";
             }

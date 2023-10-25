@@ -13,8 +13,6 @@ public class SipMessage extends ILogRecord {
 
     public SipMessage(ResultSet rs) throws SQLException {
         super(rs, MsgType.SIP);
-        String s;
-
     }
 
     public int getHandlerId() {

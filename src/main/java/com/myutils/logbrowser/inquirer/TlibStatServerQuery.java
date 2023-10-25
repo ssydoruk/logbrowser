@@ -21,11 +21,11 @@ public final class TlibStatServerQuery extends IQuery {
 
     public TlibStatServerQuery() throws SQLException {
         m_resultSet = null;
-        addRef("thisDNID", "thisDN", ReferenceType.DN.toString(), FieldType.Optional);
-        addRef("nameID", "name", ReferenceType.TEvent.toString(), FieldType.Mandatory);
-        addRef("otherDNID", "otherDN", ReferenceType.DN.toString(), FieldType.Optional);
-        addRef("ConnectionIDID", "ConnectionID", ReferenceType.ConnID.toString(), FieldType.Optional);
-        addRef("tserverID", "source", ReferenceType.App.toString(), FieldType.Optional);
+        addRef("thisDNID", "thisDN", ReferenceType.DN.toString(), FieldType.OPTIONAL);
+        addRef("nameID", "name", ReferenceType.TEvent.toString(), FieldType.MANDATORY);
+        addRef("otherDNID", "otherDN", ReferenceType.DN.toString(), FieldType.OPTIONAL);
+        addRef("ConnectionIDID", "ConnectionID", ReferenceType.ConnID.toString(), FieldType.OPTIONAL);
+        addRef("tserverID", "source", ReferenceType.App.toString(), FieldType.OPTIONAL);
         addOutField("intToHex( seqno) seqnoHex"); // bug in SQLite lib; does not accept full word
 
         addNullField("ixnid");

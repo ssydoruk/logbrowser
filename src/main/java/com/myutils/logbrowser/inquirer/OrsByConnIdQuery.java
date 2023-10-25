@@ -26,16 +26,16 @@ public class OrsByConnIdQuery extends IQuery {
     private IDsFinder cif = null;
 
     public OrsByConnIdQuery() throws SQLException {
-        addRef("ors.thisDNID", "thisDN", ReferenceType.DN.toString(), FieldType.Optional);
-        addRef("ors.nameID", "name", ReferenceType.TEvent.toString(), FieldType.Mandatory);
-        addRef("ors.otherDNID", "otherDN", ReferenceType.DN.toString(), FieldType.Optional);
-        addRef("ors.sourceid", "source", ReferenceType.App.toString(), FieldType.Optional);
-        addRef("ors.ConnectionIDID", "ConnectionID", ReferenceType.ConnID.toString(), FieldType.Optional);
-        addRef("ors.UUIDID", "UUID", ReferenceType.UUID.toString(), FieldType.Optional);
-        addRef("TransferIDID", "TransferID", ReferenceType.ConnID.toString(), FieldType.Optional);
-        addRef("agentIDID", "agentID", ReferenceType.Agent.toString(), FieldType.Optional);
-        addRef("DNISID", "DNIS", ReferenceType.DN.toString(), FieldType.Optional);
-        addRef("ANIID", "ANI", ReferenceType.DN.toString(), FieldType.Optional);
+        addRef("ors.thisDNID", "thisDN", ReferenceType.DN.toString(), FieldType.OPTIONAL);
+        addRef("ors.nameID", "name", ReferenceType.TEvent.toString(), FieldType.MANDATORY);
+        addRef("ors.otherDNID", "otherDN", ReferenceType.DN.toString(), FieldType.OPTIONAL);
+        addRef("ors.sourceid", "source", ReferenceType.App.toString(), FieldType.OPTIONAL);
+        addRef("ors.ConnectionIDID", "ConnectionID", ReferenceType.ConnID.toString(), FieldType.OPTIONAL);
+        addRef("ors.UUIDID", "UUID", ReferenceType.UUID.toString(), FieldType.OPTIONAL);
+        addRef("TransferIDID", "TransferID", ReferenceType.ConnID.toString(), FieldType.OPTIONAL);
+        addRef("agentIDID", "agentID", ReferenceType.Agent.toString(), FieldType.OPTIONAL);
+        addRef("DNISID", "DNIS", ReferenceType.DN.toString(), FieldType.OPTIONAL);
+        addRef("ANIID", "ANI", ReferenceType.DN.toString(), FieldType.OPTIONAL);
 
         addOutField("intToHex( seqno) seqnoHex"); // bug in SQLite lib; does not accept full word
 

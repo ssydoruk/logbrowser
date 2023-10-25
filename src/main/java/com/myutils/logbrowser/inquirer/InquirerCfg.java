@@ -18,10 +18,10 @@ import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.*;
-
-import static com.myutils.logbrowser.inquirer.QueryTools.getRefNames;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import static com.myutils.logbrowser.inquirer.QueryTools.getRefNames;
 
 /**
  * @author ssydoruk

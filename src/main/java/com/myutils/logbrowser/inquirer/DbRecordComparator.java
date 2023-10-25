@@ -71,7 +71,7 @@ class DbRecordComparator implements Comparator {
                 HashMap current = (HashMap) m_sipAnchors.get(anchor);
                 current.put(iKey, val);
 
-                if (val.GetField("comp").equals("CM")) {
+                if (val.getFieldValue("comp").equals("CM")) {
                     if (!m_sipMasters.containsKey(anchor)) {
                         m_sipMasters.put(anchor, val);
                     }
@@ -106,12 +106,12 @@ class DbRecordComparator implements Comparator {
         if (itemType1.equals(itemType2)) {
             // both items are custom lines
             Object owner1 = GetCustomItemOwner(
-                    item1.GetField("issip").equals("1"),
-                    Integer.parseInt(item1.GetField("ownerid")));
+                    item1.getFieldValue("issip").equals("1"),
+                    Integer.parseInt(item1.getFieldValue("ownerid")));
 
             Object owner2 = GetCustomItemOwner(
-                    item2.GetField("issip").equals("1"),
-                    Integer.parseInt(item2.GetField("ownerid")));
+                    item2.getFieldValue("issip").equals("1"),
+                    Integer.parseInt(item2.getFieldValue("ownerid")));
 
             if (owner1 == null && owner2 == null) {
                 // if items are in the same file
@@ -136,7 +136,7 @@ class DbRecordComparator implements Comparator {
 //        if (itemType2 == MsgType.CUSTOM) {
 //            return -CompareCustomItems(item2, item1);
 //        }
-        String GetField = item1.GetField("ownerid");
+        String GetField = item1.getFieldValue("ownerid");
         if (GetField == null || GetField.isEmpty()) {
             return 1;
         }
@@ -147,7 +147,7 @@ class DbRecordComparator implements Comparator {
             inquirer.logger.error("Cannot parse [" + GetField + "]", numberFormatException);
             return 1;
         }
-        int issip = item1.GetField("issip").equals("1") ? 1 : 0;
+        int issip = item1.getFieldValue("issip").equals("1") ? 1 : 0;
         long item2id = item2.getID();
 
         if (ownerid == item2id && ((issip == 1 && itemType2 == MsgType.SIP)
@@ -173,14 +173,14 @@ class DbRecordComparator implements Comparator {
 
         if (item2.GetType() == MsgType.TLIB) {
             if (((TLibEvent) item2).GetTriggerFileId() == item1.GetFileId()) {
-                int trigline = Integer.parseInt(item2.GetField("trigline"));
+                int trigline = Integer.parseInt(item2.getFieldValue("trigline"));
                 int jsonline = item1.GetLine();
                 return jsonline - trigline;
             }
         }
 
         if (item1.hasField("sipid")) {
-            int sipid = Integer.parseInt(item1.GetField("sipid"));
+            int sipid = Integer.parseInt(item1.getFieldValue("sipid"));
             if (m_sipRecords != null && m_sipRecords.containsKey(sipid)) {
                 ILogRecord masterSipItem = (ILogRecord) m_sipRecords.get(sipid);
                 int sipItemDifference = this.compare(masterSipItem, item2);
@@ -296,8 +296,8 @@ class DbRecordComparator implements Comparator {
 
         if ((record1 instanceof TLibEvent)
                 && (record2 instanceof TLibEvent)) {
-            String name1 = record1.GetField("name");
-            String name2 = record1.GetField("name");
+            String name1 = record1.getFieldValue("name");
+            String name2 = record1.getFieldValue("name");
 
             if (name1.startsWith("ISCC")
                     && name1.equalsIgnoreCase(name2)
@@ -344,12 +344,12 @@ class DbRecordComparator implements Comparator {
         // hack: put request first
         if ((record1 instanceof TLibEvent)
                 && (record2 instanceof TLibEvent)) {
-            if (record1.GetField("name").startsWith("Request")
-                    && record2.GetField("name").startsWith("Event")) {
+            if (record1.getFieldValue("name").startsWith("Request")
+                    && record2.getFieldValue("name").startsWith("Event")) {
                 return -1;
             }
-            if (record2.GetField("name").startsWith("Request")
-                    && record1.GetField("name").startsWith("Event")) {
+            if (record2.getFieldValue("name").startsWith("Request")
+                    && record1.getFieldValue("name").startsWith("Event")) {
                 return 1;
             }
         }
@@ -370,18 +370,18 @@ class DbRecordComparator implements Comparator {
         }
         // OK, TLib is first one. Let's find an initiator
         inquirer.logger.trace("-00-");
-        int masterSipId = record1.GetField("sipid", 0);
+        int masterSipId = record1.getFieldValue("sipid", 0);
         inquirer.logger.trace("-0-" + masterSipId);
         if (masterSipId == 0 && record1.GetType() == MsgType.TLIB && record1 instanceof TLibEvent) {
             inquirer.logger.trace("-1-");
             if (((TLibEvent) record1).GetTriggerFileId() == record2.GetFileId()) {
                 inquirer.logger.trace("-2-");
-                int trigline = Integer.parseInt(record1.GetField("trigline"));
+                int trigline = Integer.parseInt(record1.getFieldValue("trigline"));
                 int sipline = record2.GetLine();
                 return trigline - sipline;
             }
             inquirer.logger.trace("-3-");
-            return record1.GetField("name").startsWith("Event") ? 1 : -1;
+            return record1.getFieldValue("name").startsWith("Event") ? 1 : -1;
         }
 
         long sipId = record2.getID();
@@ -397,13 +397,13 @@ class DbRecordComparator implements Comparator {
             inquirer.logger.trace("-5-");
             if (((TLibEvent) record1).GetTriggerFileId() == record2.GetFileId()) {
                 inquirer.logger.trace("-6-");
-                int trigline = Integer.parseInt(record1.GetField("trigline"));
+                int trigline = Integer.parseInt(record1.getFieldValue("trigline"));
                 int sipline = record2.GetLine();
                 inquirer.logger.trace("-7-");
                 return trigline - sipline;
             }
             inquirer.logger.trace("-8-");
-            return record1.GetField("name").startsWith("Event") ? 1 : -1;
+            return record1.getFieldValue("name").startsWith("Event") ? 1 : -1;
         }
         inquirer.logger.trace("-9-");
         ILogRecord masterSipItem = (m_sipRecords == null) ? null : (ILogRecord) m_sipRecords.get(masterSipId);
@@ -501,13 +501,13 @@ class DbRecordComparator implements Comparator {
             }
 
             if (itemType1 == MsgType.PROXY) {
-                int id = Integer.parseInt(record1.GetField("tlib_id"));
+                int id = Integer.parseInt(record1.getFieldValue("tlib_id"));
                 if (id != 0 && m_tlibRecords.containsKey(id)) {
                     record1 = (ILogRecord) m_tlibRecords.get(id);
                 }
             }
             if (itemType2 == MsgType.PROXY) {
-                int id = Integer.parseInt(record2.GetField("tlib_id"));
+                int id = Integer.parseInt(record2.getFieldValue("tlib_id"));
                 if (id != 0 && m_tlibRecords.containsKey(id)) {
                     record2 = (ILogRecord) m_tlibRecords.get(id);
                 }
@@ -555,7 +555,7 @@ class DbRecordComparator implements Comparator {
         int srv = -1;
         for (int i = start; i < end; i++) {
             ILogRecord current = (ILogRecord) list.get(i);
-            int cmp = Integer.parseInt(current.GetField("component"));
+            int cmp = Integer.parseInt(current.getFieldValue("component"));
             if (cmp == 1 || cmp == 0) {
                 srv = i;
                 break;
@@ -572,9 +572,9 @@ class DbRecordComparator implements Comparator {
             // starts with sipserver, then proxies
             result.add(rec);
             for (int i = start; i < end; i++) {
-                String via = rec.GetField("via");
+                String via = rec.getFieldValue("via");
                 ILogRecord current = (ILogRecord) list.get(i);
-                if (current.GetField("via").equals(via)
+                if (current.getFieldValue("via").equals(via)
                         && current.IsInbound()) {
                     ILogRecord next = current;
                     result.add(next);
@@ -595,9 +595,9 @@ class DbRecordComparator implements Comparator {
         } else {
             result.add(rec);
             for (int i = start; i < end; i++) {
-                String via = rec.GetField("via");
+                String via = rec.getFieldValue("via");
                 ILogRecord current = (ILogRecord) list.get(i);
-                if (current.GetField("via").equals(via)
+                if (current.getFieldValue("via").equals(via)
                         && !current.IsInbound()) {
                     ILogRecord next = current;
                     result.add(next);
@@ -648,20 +648,20 @@ class DbRecordComparator implements Comparator {
 
         // find originator
         ILogRecord orig = null;
-        if (first.GetField("name").startsWith("Request")) {
+        if (first.getFieldValue("name").startsWith("Request")) {
             for (ILogRecord rec : unused) {
-                if ((Integer.parseInt(rec.GetField("comptype")) < 5)
+                if ((Integer.parseInt(rec.getFieldValue("comptype")) < 5)
                         && rec.IsInbound()
-                        && !rec.GetField("source").contains("tController")
-                        && !rec.GetField("source").contains("sessionController")
-                        && !rec.GetField("source").contains("interactionProxy")) {
+                        && !rec.getFieldValue("source").contains("tController")
+                        && !rec.getFieldValue("source").contains("sessionController")
+                        && !rec.getFieldValue("source").contains("interactionProxy")) {
                     orig = rec;
                     break;
                 }
             }
         } else {
             for (ILogRecord rec : unused) {
-                if ((Integer.parseInt(rec.GetField("comptype")) < 5)
+                if ((Integer.parseInt(rec.getFieldValue("comptype")) < 5)
                         && !rec.IsInbound()) {
                     ILogRecord prev = null;
                     for (ILogRecord curr : unused) {
@@ -683,7 +683,7 @@ class DbRecordComparator implements Comparator {
             return end - start; // nothing to do here
         }
 
-        if (orig.GetField("name").startsWith("Request")) {
+        if (orig.getFieldValue("name").startsWith("Request")) {
             result.add(orig);
             unused.remove(orig);
             // for request, try to find its outbound
@@ -708,9 +708,9 @@ class DbRecordComparator implements Comparator {
             ILogRecord out = queue.removeFirst();
             ArrayList<ILogRecord> temp = new ArrayList();
             for (ILogRecord inb : unused) {
-                if (inb.GetField("source").equals(out.GetField("component"))
-                        || inb.GetField("source").equals("00000000 sessionController")
-                        && out.GetField("component").contains("sessionController")) {
+                if (inb.getFieldValue("source").equals(out.getFieldValue("component"))
+                        || inb.getFieldValue("source").equals("00000000 sessionController")
+                        && out.getFieldValue("component").contains("sessionController")) {
                     // this is from that outbound
                     temp.add(inb);
                     // search for outbounds
@@ -728,7 +728,7 @@ class DbRecordComparator implements Comparator {
             }
         }
 
-        if (orig.GetField("name").startsWith("Request")) {
+        if (orig.getFieldValue("name").startsWith("Request")) {
             // for requests, put unused first
             int i = start;
             for (ILogRecord rec : unused) {

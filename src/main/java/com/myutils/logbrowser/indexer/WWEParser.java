@@ -1493,7 +1493,7 @@ public class WWEParser extends WebParser {
          * @throws Exception
          */
         @Override
-        public void FinalizeDB() throws Exception {
+        public void FinalizeDB() throws SQLException {
             createIndexes();
         }
 
@@ -1871,7 +1871,7 @@ public class WWEParser extends WebParser {
          * @throws Exception
          */
         @Override
-        public void FinalizeDB() throws Exception {
+        public void FinalizeDB() throws SQLException {
             createIndexes();
         }
 
@@ -2105,7 +2105,7 @@ public class WWEParser extends WebParser {
          * @throws Exception
          */
         @Override
-        public void FinalizeDB() throws Exception {
+        public void FinalizeDB() throws SQLException {
             createIndexes();
         }
 
@@ -2223,7 +2223,7 @@ public class WWEParser extends WebParser {
          * @throws Exception
          */
         @Override
-        public void FinalizeDB() throws Exception {
+        public void FinalizeDB() throws SQLException {
             createIndexes();
         }
     }
@@ -2458,7 +2458,7 @@ public class WWEParser extends WebParser {
          * @throws Exception
          */
         @Override
-        public void FinalizeDB() throws Exception {
+        public void FinalizeDB() throws SQLException {
             createIndexes();
         }
 
@@ -2569,7 +2569,7 @@ public class WWEParser extends WebParser {
          * @throws Exception
          */
         @Override
-        public void FinalizeDB() throws Exception {
+        public void FinalizeDB() throws SQLException {
             createIndexes();
         }
 

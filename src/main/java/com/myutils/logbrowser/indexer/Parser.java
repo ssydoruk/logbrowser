@@ -1036,7 +1036,7 @@ public abstract class Parser {
         }
 
         @Override
-        public void FinalizeDB() throws Exception {
+        public void FinalizeDB() throws SQLException {
             createIndexes();
         }
 
@@ -1127,7 +1127,7 @@ public abstract class Parser {
         }
 
         @Override
-        public void FinalizeDB() throws Exception {
+        public void FinalizeDB() throws SQLException {
             createIndexes();
         }
 

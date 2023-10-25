@@ -131,7 +131,7 @@ public class AggrORSDuration extends IAggregateQuery {
             inquirer.logger.info("extracting data");
 
             TableQuery outTab = new TableQuery(MsgType.ORS_DELAYS, TMP_TABLE);
-            outTab.addRef(outTab.getTabAlias() + ".sidid", "sid", ReferenceType.ORSSID.toString(), FieldType.Mandatory);
+            outTab.addRef(outTab.getTabAlias() + ".sidid", "sid", ReferenceType.ORSSID.toString(), FieldType.MANDATORY);
             outTab.setOrderBy(outTab.getTabAlias() + ".sidid, " + outTab.getTabAlias() + ".fileid, " + outTab.getTabAlias() + ".line");
             outTab.setCalculatedFields(new ICalculatedFields() {
                 private long lastTime = 0;

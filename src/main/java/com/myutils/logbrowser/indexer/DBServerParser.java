@@ -1,6 +1,5 @@
 package com.myutils.logbrowser.indexer;
 
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
@@ -8,18 +7,13 @@ import java.util.regex.Pattern;
  */
 public class DBServerParser extends Parser {
 
-    private static final Pattern regRI = Pattern.compile("^_R_I_\\s*");
-
     private static final Pattern regCfgUpdate = Pattern.compile("^\\s+PopCfg");
-    final int MSG_STRING_LIMIT = 200;
     long m_CurrentFilePos;
-    long m_HeaderOffset;
     ParserState m_ParserState;
-    String m_Header;
     int m_dbRecords = 0;
 
-    public DBServerParser(DBTables m_tables) {
-        super(FileInfoType.type_DBServer, m_tables);
+    public DBServerParser(DBTables tables) {
+        super(FileInfoType.type_DBServer, tables);
 
 //17:33:06.335_I_I_03350282382b556f [07:07] HERE IS TARGETS
 //TARGETS: OBN_IP_Skill1_Group@OBN_StatServerRouting.GA
@@ -57,9 +51,7 @@ public class DBServerParser extends Parser {
                     Main.logger.error("Failure parsing line " + m_CurrentLine + ":"
                             + str + "\n" + e, e);
                     m_ParserState = ParserState.STATE_COMMENTS;
-//                    throw e;
                 }
-//                m_CurrentFilePos += str.length()+input.charsSkippedOnReadLine;
             }
             ParseLine(""); // to complete the parsing of the last line/last message
         } catch (Exception e) {
@@ -70,8 +62,6 @@ public class DBServerParser extends Parser {
     }
 
     private String ParseLine(String str) throws Exception {
-//        String trimmed = str.trim();
-        Matcher m;
         String s = str;
 
         Main.logger.trace("Parser state " + m_ParserState);
@@ -94,14 +84,10 @@ public class DBServerParser extends Parser {
                     Main.logger.error("Exception in state " + m_ParserState, exception);
                 }
 
-                if ((m = regCfgUpdate.matcher(s)).find()) {
+                if (regCfgUpdate.matcher(s).find()) {
                     setSavedFilePos(getFilePos());
                     m_MessageContents.add(s);
                     m_ParserState = ParserState.STATE_CONFIG;
-//                } else if ((m = regAgentStatusChanged .matcher(s)).find()) {
-//                    setSavedFilePos(getFilePos());
-//                    m_MessageContents.add(s.substring(m.end()));
-//                    m_ParserState = ParserState.STATEAGENTSTATUSNEW;
                 }
                 break;
 
@@ -111,30 +97,14 @@ public class DBServerParser extends Parser {
     }
 
     @Override
-    void init(DBTables m_tables) {
+    void init(DBTables tables) {
+        /* */
     }
 
-    // parse state contants
     enum ParserState {
 
         STATE_HEADER,
-        STATE_TLIB_MESSAGE_IN,
-        STATE_STRATEGY_MULTILINE,
-        STATE_NONSTRATEGY_MULTILINE,
-        STATE_TLIB_MESSAGE_OUT,
-        STATE_COMMENTS,
-        STATE_RLIB,
-        STATE_CONFIG,
-        STATE_RI_CALLSTART,
-        STATE_WAITINGCALLS,
-        STATEAGENTSTATUSNEW,
-        STATE_STRATEGY_TARGETS,
-        STATE_WAITINGCALLSSTART,
-        smUpdateObject,
-        STATE_STRATEGY_SCXML,
-        HTTP_BRIDGE,
-        STATE_HTTP_RESPONSE,
-        STATE_ROUTING_TARGET
+        STATE_COMMENTS, STATE_CONFIG,
     }
 
 }

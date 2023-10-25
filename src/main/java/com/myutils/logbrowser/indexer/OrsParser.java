@@ -1178,7 +1178,7 @@ public class OrsParser extends Parser {
          * @throws Exception
          */
         @Override
-        public void FinalizeDB() throws Exception {
+        public void FinalizeDB() throws SQLException {
             createIndexes();
         }
 
@@ -1315,7 +1315,7 @@ public class OrsParser extends Parser {
          * @throws Exception
          */
         @Override
-        public void FinalizeDB() throws Exception {
+        public void FinalizeDB() throws SQLException {
             createIndexes();
         }
 

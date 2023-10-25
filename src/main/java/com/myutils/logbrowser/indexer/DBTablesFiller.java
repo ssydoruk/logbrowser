@@ -30,7 +30,7 @@ class DBTablesFiller {
 
     public void addToDB(Record rec) throws SQLException {
         StatParser st = getStatement(rec.getM_type());
-        if (rec.fillStat(st.getStat())) {
+        if (st!=null && rec.fillStat(st.getStat())) {
             Submit(st);
         }
     }

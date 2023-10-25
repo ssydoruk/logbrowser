@@ -135,11 +135,9 @@ class TableReference {
         }
         try {
             if (!valRef.isEmpty()) {
-//            Main.logger.debug("Finaling table " + type.toString());
                 String query = "create table if not exists " + type.toString() + " (id INTEGER primary key,"
                         + "name char(255) collate nocase);";
 
-//                m_accessor.Commit();
                 m_accessor.ResetAutoCommit(true);
                 String idxID = type + "_id";
                 String idxName = type + "_name";
@@ -192,14 +190,9 @@ class TableReference {
                 m_accessor.Commit();
                 m_accessor.ResetAutoCommit(true);
 
-//                if (type != ReferenceType.HANDLER) {
                 m_accessor.runQuery("create unique index if not exists " + type + "_id on " + type + " (id);");
                 m_accessor.runQuery("create unique index if not exists " + type + "_name on " + type + " (name collate nocase);");
-//                } else {
-//                    Main.logger.info("No indexes for " + type.toString());
-//                }
                 Main.logger.info("Finalized ref table " + type + "; added " + i + " recs (total " + iTotalRecs + " recs)");
-//            m_accessor.Commit(stmt);
             }
         } catch (SQLException sQLException) {
             Main.logger.error("Not able to finalize " + type, sQLException);
@@ -260,7 +253,7 @@ public class TableReferences {
     SqliteAccessor m_accessor;
 
     TableReferences(SqliteAccessor m_accessor) {
-        tabRefs = new HashMap();
+        tabRefs = new HashMap<>();
         this.m_accessor = m_accessor;
         doNotSave = new HashSet<>();
 

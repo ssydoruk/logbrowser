@@ -61,7 +61,7 @@ public class DefaultFormatter implements ILogRecordFormatter {
     @Override
     public void Layout(ILogRecord loggedEvent) throws SQLException {
         if (loggedEvent.GetType() == MsgType.SIP) {
-            String callId = loggedEvent.GetField("callid");
+            String callId = loggedEvent.getFieldValue("callid");
             if (callId != null && !callId.isEmpty()
                     && !callId.equalsIgnoreCase("null")) {
                 if (!m_callIdHash.containsKey(callId)) {

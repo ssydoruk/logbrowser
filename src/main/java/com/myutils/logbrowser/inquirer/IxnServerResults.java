@@ -204,17 +204,17 @@ public class IxnServerResults extends IQueryResults {
 
     private TableQuery IxnTable(MsgType tabType, String tab) throws SQLException {
         TableQuery TLibReq = new TableQuery(tabType, tab);
-        TLibReq.addRef("IxnQueueID", "queue", ReferenceType.DN.toString(), FieldType.Optional);
-        TLibReq.addRef("nameID", "name", ReferenceType.TEvent.toString(), FieldType.Mandatory);
-        TLibReq.addRef("ConnIDID", "ConnectionID", ReferenceType.ConnID.toString(), FieldType.Optional);
-        TLibReq.addRef("IxnID", "InteractionID", ReferenceType.IxnID.toString(), FieldType.Optional);
-        TLibReq.addRef("appid", "client", ReferenceType.App.toString(), FieldType.Optional);
+        TLibReq.addRef("IxnQueueID", "queue", ReferenceType.DN.toString(), FieldType.OPTIONAL);
+        TLibReq.addRef("nameID", "name", ReferenceType.TEvent.toString(), FieldType.MANDATORY);
+        TLibReq.addRef("ConnIDID", "ConnectionID", ReferenceType.ConnID.toString(), FieldType.OPTIONAL);
+        TLibReq.addRef("IxnID", "InteractionID", ReferenceType.IxnID.toString(), FieldType.OPTIONAL);
+        TLibReq.addRef("appid", "client", ReferenceType.App.toString(), FieldType.OPTIONAL);
 
-        TLibReq.addRef("MediaTypeID", "MediaType", ReferenceType.IxnMedia.toString(), FieldType.Optional);
-        TLibReq.addRef("AgentID", "Agent", ReferenceType.Agent.toString(), FieldType.Optional);
-        TLibReq.addRef("PlaceID", "Place", ReferenceType.Place.toString(), FieldType.Optional);
-        TLibReq.addRef("attr1ID", "attr1", ReferenceType.TLIBATTR1.toString(), FieldType.Optional);
-        TLibReq.addRef("attr2ID", "attr2", ReferenceType.TLIBATTR2.toString(), FieldType.Optional);
+        TLibReq.addRef("MediaTypeID", "MediaType", ReferenceType.IxnMedia.toString(), FieldType.OPTIONAL);
+        TLibReq.addRef("AgentID", "Agent", ReferenceType.Agent.toString(), FieldType.OPTIONAL);
+        TLibReq.addRef("PlaceID", "Place", ReferenceType.Place.toString(), FieldType.OPTIONAL);
+        TLibReq.addRef("attr1ID", "attr1", ReferenceType.TLIBATTR1.toString(), FieldType.OPTIONAL);
+        TLibReq.addRef("attr2ID", "attr2", ReferenceType.TLIBATTR2.toString(), FieldType.OPTIONAL);
 
         return TLibReq;
     }
@@ -255,8 +255,8 @@ public class IxnServerResults extends IQueryResults {
 //                HashSet<Long> refIDs = ixnQuery.getCollectID("refid");
 
             TableQuery tabIxnNonIxn = IxnTable(MsgType.INTERACTION_NONIXN, TableType.IxnNonIxn.toString());
-            tabIxnNonIxn.addRef("thisDNID", "thisDN", ReferenceType.DN.toString(), FieldType.Optional);
-            tabIxnNonIxn.addRef("userEventID", "event", ReferenceType.TEvent.toString(), FieldType.Optional);
+            tabIxnNonIxn.addRef("thisDNID", "thisDN", ReferenceType.DN.toString(), FieldType.OPTIONAL);
+            tabIxnNonIxn.addRef("userEventID", "event", ReferenceType.TEvent.toString(), FieldType.OPTIONAL);
 
             tabIxnNonIxn.AddCheckedWhere(tabIxnNonIxn.getTabAlias() + ".thisDNID", ReferenceType.TEvent, eventsSettings, "AND", DialogItem.IXN_NONIXN_EVENT_DN);
             tabIxnNonIxn.AddCheckedWhere(tabIxnNonIxn.getTabAlias() + ".userEventID", ReferenceType.DN, eventsSettings, "AND", DialogItem.IXN_NONIXN_EVENT_EVENT);

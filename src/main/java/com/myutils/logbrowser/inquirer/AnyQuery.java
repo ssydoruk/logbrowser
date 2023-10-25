@@ -14,7 +14,7 @@ import java.util.ArrayList;
 
 public class AnyQuery extends IQuery {
 
-    private final ArrayList<Pair> selectFields;
+    private final ArrayList<Pair<String, String>> selectFields;
     private ResultSetMetaData rsmd;
     private String queryTable;
 
@@ -23,14 +23,6 @@ public class AnyQuery extends IQuery {
         selectFields = new ArrayList<>();
     }
 
-    public AnyQuery(String _query) {
-        this();
-        query = _query;
-    }
-
-    public ResultSetMetaData getRsmd() {
-        return rsmd;
-    }
 
     @Override
     public void Execute() throws SQLException {
@@ -42,7 +34,7 @@ public class AnyQuery extends IQuery {
         } else {
             StringBuilder q = new StringBuilder(255);
             ArrayList<String> flds = new ArrayList<>();
-            for (Pair selectField : selectFields) {
+            for (Pair<String, String> selectField : selectFields) {
                 flds.add(selectField.getKey() + " as " + selectField.getValue());
             }
             q.append(" select ").append(StringUtils.join(flds.toArray(), ", "));
@@ -57,7 +49,6 @@ public class AnyQuery extends IQuery {
     }
 
     public String[] GetNextStringArray() throws SQLException {
-        on_error:
         if (m_resultSet.next()) {
             recCnt++;
             QueryTools.DebugRec(m_resultSet);
@@ -68,7 +59,7 @@ public class AnyQuery extends IQuery {
             }
             return ret;
         }
-        inquirer.logger.debug("++ " + this.getClass().toString() + ": extracted " + recCnt + " records");
+        inquirer.logger.debug("++ " + this.getClass() + ": extracted " + recCnt + " records");
         return null;
     }
 
@@ -95,7 +86,7 @@ public class AnyQuery extends IQuery {
     }
 
     public void addOutField(String fld, String alias) {
-        selectFields.add(new Pair(fld, alias));
+        selectFields.add(new Pair<>(fld, alias));
     }
 
     public String[] getFieldNames() throws SQLException {

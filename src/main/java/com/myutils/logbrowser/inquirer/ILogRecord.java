@@ -16,12 +16,11 @@ public abstract class ILogRecord {
     };
     private static final String FILEOFFSET = "fileoffset";
     private static final String FILEBYTES = "filebytes";
-    private static final String APPNAMEID = "appnameid";
+    private static final String C_APPNAMEID = "appnameid";
     private static final String COMPONENT = "component";
-    private static final String ID = "id";
+    private static final String C_ID = "id";
     public Properties m_fieldsAll;
     protected StdFields stdFields = new StdFields();
-    private int m_appid;
     private int appnameid;
     private int id;
     private boolean m_isMarked;
@@ -33,15 +32,14 @@ public abstract class ILogRecord {
     private String m_time;
     private MsgType m_type;
     private int m_component;
-    private ICalculatedFields calcFields;
     private Date dateTime = null;
     private LogFile logFile = null;
 
-    public ILogRecord() {
+    protected  ILogRecord() {
         m_fieldsAll = new Properties();
     }
 
-    public ILogRecord(ResultSet rs, MsgType type) throws SQLException {
+    protected ILogRecord(ResultSet rs, MsgType type) throws SQLException {
         this();
         if (Thread.currentThread().isInterrupted()) {
             throw new RuntimeInterruptException();
@@ -58,20 +56,8 @@ public abstract class ILogRecord {
         return m_component;
     }
 
-    /**
-     * @param rs
-     * @throws Exception
-     */
-    public void getAllFields(ResultSet rs) throws Exception {
 
-    }
-
-    public ICalculatedFields getCalcFields() {
-        return calcFields;
-    }
-
-    final public void setCalcFields(ICalculatedFields calcFields) {
-        this.calcFields = calcFields;
+    public final void setCalcFields(ICalculatedFields calcFields) {
         m_fieldsAll.putAll(calcFields.calc(m_fieldsAll));
     }
 
@@ -79,7 +65,7 @@ public abstract class ILogRecord {
 
     abstract HashMap<String, Object> initCalculatedFields(ResultSet rs) throws SQLException;
 
-    final public void initRecord(ResultSet rs, MsgType type) throws SQLException {
+    public final void initRecord(ResultSet rs, MsgType type) throws SQLException {
         try {
             m_type = type;
 
@@ -96,7 +82,7 @@ public abstract class ILogRecord {
                     @Override
                     public void setValue(Object val) {
                         if (val instanceof Integer) {
-                            m_fileOffset = new Long((Integer) val);
+                            m_fileOffset = (Integer) val;
                         } else {
                             m_fileOffset = (long) val;
                         }
@@ -114,7 +100,7 @@ public abstract class ILogRecord {
                         m_fileBytes = (int) val;
                     }
                 });
-                stdFields.fieldInit(APPNAMEID, new IValueAssessor() {
+                stdFields.fieldInit(C_APPNAMEID, new IValueAssessor() {
                     @Override
                     public Object getValue() {
                         return appnameid;
@@ -136,7 +122,7 @@ public abstract class ILogRecord {
                         m_component = (int) val;
                     }
                 });
-                stdFields.fieldInit(ID, new IValueAssessor() {
+                stdFields.fieldInit(C_ID, new IValueAssessor() {
                     @Override
                     public Object getValue() {
                         return id;
@@ -167,10 +153,7 @@ public abstract class ILogRecord {
                     for (int i = 1; i <= meta.getColumnCount(); i++) {
                         String cName = meta.getColumnName(i).toLowerCase();
                         Object obj = rs.getObject(i);
-                        if (obj == null) obj = new String("");
-                        if (cName == null) {
-                            cName = "";
-                        }
+                        if (obj == null) obj = "";
                         String cVal;
 
                         if (!stdFields.setValue(cName, obj)) {
@@ -197,7 +180,7 @@ public abstract class ILogRecord {
             }
 
         } catch (SQLException e) {
-            inquirer.logger.error(this.getClass().toString() + " const: " + e.getMessage(), e);
+            inquirer.logger.error(this.getClass() + " const: " + e.getMessage(), e);
             throw e;
         }
     }
@@ -210,16 +193,13 @@ public abstract class ILogRecord {
         return appnameid;
     }
 
-    public int getM_appid() {
-        return m_appid;
-    }
 
     public Date getDateTime() {
         return dateTime;
     }
 
     public String getM_appName() {
-        return GetField("app", "");
+        return getFieldValue("app", "");
     }
 
     public boolean isTLibType() {
@@ -242,7 +222,7 @@ public abstract class ILogRecord {
 
     public Integer GetFileId() {
         if (m_fileId <= 0) {
-            m_fileId = GetField("fileid", 0);
+            m_fileId = getFieldValue("fileid", 0);
         }
         return m_fileId;
     }
@@ -257,14 +237,14 @@ public abstract class ILogRecord {
 
     public int GetLine() {
         if (m_line <= 0) {
-            m_line = GetField("line", 0);
+            m_line = getFieldValue("line", 0);
         }
         return m_line;
     }
 
     public LogFile GetFileName() {
         if (logFile == null) {
-            logFile = inquirer.getInq().getLfm().getLogFile(GetField("filename", ""), GetField("arcname", null));
+            logFile = inquirer.getInq().getLfm().getLogFile(getFieldValue("filename", ""), getFieldValue("arcname", null));
         }
         return logFile;
     }
@@ -281,19 +261,19 @@ public abstract class ILogRecord {
         return m_isMarked;
     }
 
-    public String GetField(String fieldName, String def) {
+    public String getFieldValue(String fieldName, String def) {
         try {
-            return GetField(fieldName);
+            return getFieldValue(fieldName);
         } catch (Exception ex) {
             inquirer.ExceptionHandler.handleException("cannot get field", ex);
             return def;
         }
     }
 
-    public int GetField(String fieldName, int def) {
+    public int getFieldValue(String fieldName, int def) {
         try {
-            String value = GetField(fieldName);
-            if (value != null && value.length() > 0) {
+            String value = getFieldValue(fieldName);
+            if (value != null && !value.isEmpty()) {
                 return Integer.parseInt(value);
             }
         } catch (NumberFormatException ex) {
@@ -303,13 +283,13 @@ public abstract class ILogRecord {
         return def;
     }
 
-    public String GetField(String fieldName) {
-        return GetField(fieldName.toLowerCase(), false);
+    public String getFieldValue(String fieldName) {
+        return getFieldValue(fieldName.toLowerCase(), false);
     }
 
     @HostAccess.Export
     public String getField(String fieldName) {
-        return GetField(fieldName.toLowerCase(), true);
+        return getFieldValue(fieldName.toLowerCase(), true);
     }
 
     @HostAccess.Export
@@ -340,7 +320,7 @@ public abstract class ILogRecord {
         return Integer.toString(val);
     }
 
-    public String GetField(String fieldName, boolean ignoreException) {
+    public String getFieldValue(String fieldName, boolean ignoreException) {
         Object ret;
         if (stdFields.containsKey(fieldName)) {
             ret = stdFields.get(fieldName).getValue();
@@ -350,11 +330,8 @@ public abstract class ILogRecord {
             if (!ignoreException) {
                 String s = "Error: \"" + fieldName + "\": no such field in " + GetType() + " message";
                 inquirer.logger.error(s);
-//                inquirer.showError(null, s, "Field not found");
-//                PrintFieldNames();
             }
             return "";
-//            throw new Exception("Cannot continue");
         }
         return ret == null ? "" : ret.toString();
     }
@@ -368,10 +345,8 @@ public abstract class ILogRecord {
         if (ret == null) {
             String s = "Error: \"" + fieldName + "\": no such field in " + GetType() + " message";
             inquirer.logger.error(s);
-//            inquirer.showError(null, s, "Field not found");
-//            PrintFieldNames();
+
             return 0;
-//            throw new Exception("Cannot continue");
         }
         return Integer.parseInt(ret.toString());
     }
@@ -384,6 +359,7 @@ public abstract class ILogRecord {
         try {
             return Integer.parseInt((String) obj) == 1;
         } catch (NumberFormatException e) {
+            //
         }
         return false;
     }
@@ -397,15 +373,6 @@ public abstract class ILogRecord {
         return false;
     }
 
-    private void PrintFieldNames() {
-        inquirer.logger.info("Fields available:");
-        StringBuilder s = new StringBuilder(255);
-        for (Object key : m_fieldsAll.keySet()) {
-            s.append(key).append(", ");
-        }
-        inquirer.logger.info(s);
-    }
-
     boolean hasField(String fldName) {
         if (stdFields.containsKey(fldName)) {
             return true;
@@ -417,11 +384,11 @@ public abstract class ILogRecord {
             if (Thread.currentThread().isInterrupted()) {
                 throw new RuntimeInterruptException();
             } else {
-                String s = this.getClass() + "| ";
+                StringBuilder s = new StringBuilder(this.getClass().toString() ).append( "| ");
                 for (Object key : m_fieldsAll.keySet()) {
-                    s += key + "[" + m_fieldsAll.getProperty((String) key) + "] ";
+                    s.append(key).append("[").append(m_fieldsAll.getProperty((String) key)).append("] ");
                 }
-                inquirer.logger.trace(s);
+                inquirer.logger.trace(s.toString());
             }
         }
     }
@@ -442,14 +409,13 @@ public abstract class ILogRecord {
     protected Integer getInt(ResultSet rs, String fld) throws SQLException {
         int aInt = rs.getInt(fld);
         return aInt;
-
     }
 
     protected long setLong(Object val) {
         if (val == null) {
             return 0;
         } else if (val instanceof Integer) {
-            return new Long((Integer) val);
+            return (Integer) val;
         } else if (val instanceof String) {
             try {
                 return (((String) val).isEmpty() ? 0 : Long.parseLong((String) val));

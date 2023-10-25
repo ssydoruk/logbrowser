@@ -254,6 +254,7 @@ public abstract class URSRIBase extends Message {
                     setConnID(split[2]);
                     break;
                 }
+                break;
 
             default:
                 throw new Exception("Strange URI [" + url + "] l=" + split.length);

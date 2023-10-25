@@ -17,10 +17,8 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.util.ArrayList;
+import java.util.*;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.IllegalFormatException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -37,21 +35,19 @@ public class DatabaseConnector {
     public static final String ListDBIDtoName = "ListDBIDtoName";
     private static final org.apache.logging.log4j.Logger logger = LogManager.getLogger();
     private static final HashMap<String, DateTimeFormatter> parsedFormats = new HashMap<>();
-    private static final HashMap<String, Boolean> tabExists = new HashMap<String, Boolean>();
+    private static final HashMap<String, Boolean> tabExists = new HashMap<>();
     static public Statement currentStatement = null;
     private static DatabaseConnector databaseConnector = null;
     static private int noAppTypes = -1;
-    private final String m_dbName;
     private final String m_dbAlias;
     private final Connection m_conn;
-    private final HashMap<ReferenceType, HashMap<Integer, String>> thePersistentRef = new HashMap<>();
+    private final Map<ReferenceType, Map<Integer, String>> thePersistentRef = new HashMap<>();
     private final IDsToName idsToName;
     HashMap m_activeStatements;
     ArrayList m_freeStatements;
     ArrayList<PreparedStatement> m_statements;
 
     protected DatabaseConnector(String dbName, String dbAlias) throws SQLException {
-        m_dbName = dbName;
         m_dbAlias = dbAlias;
 
         try {
@@ -441,8 +437,8 @@ public class DatabaseConnector {
             }
         });
 
-        m_activeStatements = new HashMap();
-        m_freeStatements = new ArrayList();
+        m_activeStatements = new HashMap<>();
+        m_freeStatements = new ArrayList<>();
         m_statements = new ArrayList<>();
     }
 
@@ -574,16 +570,15 @@ public class DatabaseConnector {
     }
 
     public static DatabaseConnector getDatabaseConnector(Object obj) throws SQLException {
-        if (databaseConnector != null) {
-            if (obj != null) {
-                Statement stmt;
-                if (!databaseConnector.m_freeStatements.isEmpty()) {
-                    stmt = (Statement) databaseConnector.m_freeStatements.remove(0);
-                } else {
-                    stmt = databaseConnector.m_conn.createStatement();
-                }
-                databaseConnector.m_activeStatements.put(obj, stmt);
+        if (databaseConnector != null && (obj != null)) {
+            Statement stmt;
+            if (!databaseConnector.m_freeStatements.isEmpty()) {
+                stmt = (Statement) databaseConnector.m_freeStatements.remove(0);
+            } else {
+                stmt = databaseConnector.m_conn.createStatement();
             }
+            databaseConnector.m_activeStatements.put(obj, stmt);
+
         }
         return databaseConnector;
     }
@@ -613,9 +608,9 @@ public class DatabaseConnector {
             }
 //        inquirer.logger.debug();
             while (rs.next()) {
-                String row = "";
+                StringBuilder row = new StringBuilder();
                 for (int i = 1; i <= columnCount; i++) {
-                    row += rs.getString(i) + ", ";
+                    row .append( rs.getString(i) ).append( ", ");
                 }
                 if (Thread.currentThread().isInterrupted()) {
                     throw new RuntimeInterruptException();
@@ -783,7 +778,7 @@ public class DatabaseConnector {
     public static boolean onlyOneApp() throws SQLException {
         if (noAppTypes < 0) {
             Integer[] iDs = getIDs("file_logbr", "apptypeid", "where apptypeid>0");
-            noAppTypes = iDs.length;
+            noAppTypes = (iDs == null) ? 0 : iDs.length;
         }
         return noAppTypes < 2;
     }
@@ -794,7 +789,7 @@ public class DatabaseConnector {
                 ? getNames(obj, "select distinct " + retField + " from " + tab + " " + where) : null;
     }
 
-    public static ArrayList<NameID> getNamesNameID(Object obj, String tab, String retField, String where) throws SQLException {
+    public static List<NameID> getNamesNameID(Object obj, String tab, String retField, String where) throws SQLException {
 //        m_connector.getIDs(this, "select sid from orssess_logbr WHERE "+getWhere("connid", m_ConnIds));
         return (TableExist(tab))
                 ? getNamesNameID(obj, "select distinct " + retField + " from " + tab + " " + where) : null;
@@ -815,14 +810,14 @@ public class DatabaseConnector {
         }
     }
 
-    public static HashMap<Integer, String> getRefs(ReferenceType refTab) throws SQLException {
+    public static Map<Integer, String> getRefs(ReferenceType refTab) throws SQLException {
         return (TableExist(refTab.toString()))
                 ? getRefs("select id, name from " + refTab)
                 : null;
     }
 
     private static HashMap<Integer, String> getRefs(String query) throws SQLException {
-        HashMap<Integer, String> ret = new HashMap();
+        HashMap<Integer, String> ret = new HashMap<>();
 
         try (ResultSet resultSet = DatabaseConnector.executeQuery(query)) {
             ResultSetMetaData rsmd = resultSet.getMetaData();
@@ -854,7 +849,7 @@ public class DatabaseConnector {
                 : null;
     }
 
-    static public Integer[] getIDs(String tab, String retField, String where) throws SQLException {
+    public static Integer[] getIDs(String tab, String retField, String where) throws SQLException {
 //        m_connector.getIDs(this, "select sid from orssess_logbr WHERE "+getWhere("connid", m_ConnIds));
         return (TableExist(tab))
                 ? getIDs("select distinct " + retField + " from " + tab + " " + where)
@@ -876,7 +871,7 @@ public class DatabaseConnector {
     }
 
     public static Integer[] getIDs(Object obj, String query) throws SQLException {
-        ArrayList<Integer> ret = new ArrayList();
+        ArrayList<Integer> ret = new ArrayList<>();
         DatabaseConnector connector = DatabaseConnector.getDatabaseConnector(obj);
 
         try (ResultSet resultSet = connector.executeQuery(obj, query)) {
@@ -901,7 +896,7 @@ public class DatabaseConnector {
     }
 
     public static String[] getNames(String query) throws SQLException {
-        ArrayList<String> ret = new ArrayList();
+        ArrayList<String> ret = new ArrayList<>();
 
         try (ResultSet resultSet = executeQuery(query)) {
             ResultSetMetaData rsmd = resultSet.getMetaData();
@@ -928,7 +923,7 @@ public class DatabaseConnector {
     }
 
     public static ArrayList<NameID> getNamesNameID(Object obj, String query) throws SQLException {
-        ArrayList<NameID> ret = new ArrayList();
+        ArrayList<NameID> ret = new ArrayList<>();
         DatabaseConnector connector = DatabaseConnector.getDatabaseConnector(obj);
 
         try (ResultSet resultSet = connector.executeQuery(obj, query)) {
@@ -1000,7 +995,7 @@ public class DatabaseConnector {
         Integer[] arrSearchApps;
         q.append("select min(filestarttime), max(endtime) from file_logbr ");
 
-        if (searchApps != null && searchApps.size() > 0) {
+        if (searchApps != null && !searchApps.isEmpty()) {
             arrSearchApps = searchApps.toArray(new Integer[searchApps.size()]);
             q.append(getWhere("id", arrSearchApps, true));
         } else {
@@ -1012,22 +1007,20 @@ public class DatabaseConnector {
             q.append(getWhere("apptypeid", ReferenceType.AppType, n, true));
         }
 
-        ArrayList<ArrayList<Long>> iDsMultiple = getIDsMultiple(q.toString());
-        if (iDsMultiple.size() > 0) {
-            ArrayList<Long> dbRet = iDsMultiple.get(0);
+        List<List<Long>> iDsMultiple = getIDsMultiple(q.toString());
+        if (!iDsMultiple.isEmpty()) {
+            List<Long> dbRet = iDsMultiple.get(0);
             Long val = dbRet.get(0);
-            if (val != null && val > 0) {
-                if (ret.getStart() == 0 || ret.getStart() > val) {
+            if (val != null && val > 0 && (ret.getStart() == 0 || ret.getStart() > val)) {
                     ret.setStart(val);
-                }
+
             }
 
             val = dbRet.get(1);
-            if (val != null && val > 0) {
-                if (ret.getEnd() == 0 || ret.getEnd() < val) {
+            if (val != null && val > 0 && (ret.getEnd() == 0 || ret.getEnd() < val)) {
                     ret.setEnd(val);
 
-                }
+
             }
         }
         return ret;
@@ -1038,7 +1031,7 @@ public class DatabaseConnector {
         UTCTimeRange ret = new UTCTimeRange(0, 0);
         StringBuilder q = new StringBuilder(256);
         Integer[] arrSearchApps = null;
-        if (searchApps != null && searchApps.size() > 0) {
+        if (searchApps != null && !searchApps.isEmpty()) {
             arrSearchApps = searchApps.toArray(new Integer[searchApps.size()]);
         }
 
@@ -1053,22 +1046,20 @@ public class DatabaseConnector {
                             .append(")");
                 }
 
-                ArrayList<ArrayList<Long>> iDsMultiple = getIDsMultiple(q.toString());
+                List<List<Long>> iDsMultiple = getIDsMultiple(q.toString());
                 if (iDsMultiple.size() > 0) {
-                    ArrayList<Long> dbRet = iDsMultiple.get(0);
+                    List<Long> dbRet = iDsMultiple.get(0);
                     Long val = dbRet.get(0);
-                    if (val != null && val > 0) {
-                        if (ret.getStart() == 0 || ret.getStart() > val) {
+                    if (val != null && val > 0 && (ret.getStart() == 0 || ret.getStart() > val)) {
                             ret.setStart(val);
-                        }
+
                     }
 
                     val = dbRet.get(1);
-                    if (val != null && val > 0) {
-                        if (ret.getEnd() == 0 || ret.getEnd() < val) {
+                    if (val != null && val > 0 && (ret.getEnd() == 0 || ret.getEnd() < val)) {
                             ret.setEnd(val);
 
-                        }
+
                     }
                 }
 
@@ -1085,9 +1076,9 @@ public class DatabaseConnector {
         return getTimeRange(new String[]{tab});
     }
 
-    public static ArrayList<ArrayList<Long>> getIDsMultiple(String query) throws SQLException {
+    public static List<List<Long>> getIDsMultiple(String query) throws SQLException {
 
-        ArrayList<ArrayList<Long>> ret;
+        List<List<Long>> ret;
         try (ResultSet rs = executeQuery(query)) {
             ResultSetMetaData rsmd = rs.getMetaData();
             ret = new ArrayList<>();
@@ -1180,16 +1171,13 @@ public class DatabaseConnector {
 
         String s = exp.replaceAll("\\$1\\b", "'" + p + "'");
 
-        Statement createStatement = databaseConnector.m_conn.createStatement();
+        try (Statement createStatement = databaseConnector.m_conn.createStatement()) {
 
-        ResultSet rs = createStatement.executeQuery(s);
+            ResultSet rs = createStatement.executeQuery(s);
 
-//        ResultSetMetaData rsmd = rs.getMetaData();
-//        if (rsmd.getColumnCount() != 1) {
-//            throw new Exception("getValue: there are " + rsmd.getColumnCount() + " output columns; has to be only 1");
-//        }
-        while (rs.next()) {
-            return rs.getString(1);
+            while (rs.next()) {
+                return rs.getString(1);
+            }
         }
         inquirer.logger.info("\tgetValue " + " nothing returned");
         return null;
@@ -1256,7 +1244,7 @@ public class DatabaseConnector {
         if (!TableExist(tab)) {
             return null;
         }
-        ArrayList<String> ret = new ArrayList();
+        ArrayList<String> ret = new ArrayList<>();
         DatabaseConnector connector = DatabaseConnector.getDatabaseConnector(obj);
 
         StringBuilder q = new StringBuilder(256);
@@ -1384,7 +1372,7 @@ public class DatabaseConnector {
     }
 
     String persistentRef(ReferenceType referenceType, Integer i) throws SQLException {
-        HashMap<Integer, String> theRef = thePersistentRef.get(referenceType);
+        Map<Integer, String> theRef = thePersistentRef.get(referenceType);
         if (theRef == null) {
             theRef = getRefs(referenceType);
             thePersistentRef.put(referenceType, theRef);
@@ -1409,27 +1397,22 @@ public class DatabaseConnector {
             inquirer.logger.debug("[" + query + "]");
 
             try {
-                Statement stat = m_conn.createStatement();
-                currentStatement = stat;
-                stat.closeOnCompletion();
-                Explain(stat, query);
-                ret = stat.executeQuery(query);
+                try (Statement stat = m_conn.createStatement() ) {
+                    currentStatement = stat;
+                    stat.closeOnCompletion();
+                    Explain(stat, query);
+                    ret = stat.executeQuery(query);
+                }
             } catch (SQLException sQLException) {
                 if (sQLException.getErrorCode() == SQLITE_INTERRUPT.code) {
                     inquirer.logger.info("Statement cancelled");
                     Thread.currentThread().interrupt();
                     return null;
-//                    throw new RuntimeInterruptException();
                 } else {
                     inquirer.ExceptionHandler.handleException("RunQuery failed: " + sQLException + " query " + query, sQLException);
                     throw sQLException;
                 }
             }
-//        finally {
-//            synchronized (currentStatement) {
-//                currentStatement = null;
-//            }
-//        }
 
             long timeEnd = new Date().getTime();
             inquirer.logger.debug("\t Execution took " + pDuration(timeEnd - timeStart));

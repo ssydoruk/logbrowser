@@ -14,9 +14,9 @@ public class ORSMetricByCallIdQuery extends IQuery {
     private DynamicTreeNode<OptionNode> orsMetrics = null;
 
     public ORSMetricByCallIdQuery() throws SQLException {
-        addRef("metricid", "metric", ReferenceType.METRIC.toString(), FieldType.Mandatory);
-        addRef("sidid", "sid", ReferenceType.ORSSID.toString(), FieldType.Mandatory);
-        addRef("param1id", "param1", ReferenceType.METRIC_PARAM1.toString(), FieldType.Optional);
+        addRef("metricid", "metric", ReferenceType.METRIC.toString(), FieldType.MANDATORY);
+        addRef("sidid", "sid", ReferenceType.ORSSID.toString(), FieldType.MANDATORY);
+        addRef("param1id", "param1", ReferenceType.METRIC_PARAM1.toString(), FieldType.OPTIONAL);
     }
 
     public ORSMetricByCallIdQuery(Integer[] SIDIDs) throws SQLException {

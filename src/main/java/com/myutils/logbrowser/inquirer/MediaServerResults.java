@@ -21,7 +21,6 @@ public class MediaServerResults extends IQueryResults {
     public static final int TC = 0x04;
     public static final int SIP = 0x08;
     public static final int PROXY = 0x10;
-    private final UTCTimeRange timeRange = null;
     ArrayList<NameID> appsType = null;
     private Object cidFinder;
 
@@ -43,11 +42,6 @@ public class MediaServerResults extends IQueryResults {
         addSelectionType(SelectionType.UUID);
     }
 
-    public MediaServerResults() throws SQLException {
-        super();
-        loadStdOptions();
-//        repComponents.getRoot().addChild(addLogMessagesReportType(TableType.MsgTServer));
-    }
 
     @Override
     public void Retrieve(QueryDialog dlg, SelectionType key, String searchID) throws SQLException {
@@ -55,6 +49,8 @@ public class MediaServerResults extends IQueryResults {
         doSort();
 
     }
+
+    private static final String C_CREATE_IDX="create index idx_";
 
     @Override
     FullTableColors getAll(QueryDialog qd) throws SQLException {
@@ -75,17 +71,10 @@ public class MediaServerResults extends IQueryResults {
                     + ")\n;"
             );
 
-//            String sWhere = StringUtils.join(new String[]{
-//                IQuery.getFileFilters(tab, "fileid", qd.getSearchApps(false)),
-//                IQuery.getDateTimeFilters(tab, "time", qd.getTimeRange()),
-//                getCheckedWhere("sip.nameID", ReferenceType.SIPMETHOD, node, "AND", DialogItem.TLIB_CALLS_SIP_NAME)
-//            },
-//                    "AND", 1, 3);
+
             Wheres wh = new Wheres();
             wh.addWhere(IQuery.getFileFilters(tab, "fileid", qd.getSearchApps(false)), "AND");
             wh.addWhere(IQuery.getDateTimeFilters(tab, "time", qd.getTimeRange()), "AND");
-//            wh.addWhere(IQuery.getCheckedWhere("sipms.nameID", ReferenceType.SIPMETHOD,
-//                    FindNode(repComponents.getRoot(), DialogItem.TLIB_CALLS, DialogItem.TLIB_CALLS_SIP, DialogItem.TLIB_CALLS_SIP_NAME)), "AND");
             wh.addWhere(getWhere("sipms.nameID", ReferenceType.SIPMETHOD, new String[]{"OPTIONS", "200 OK OPTIONS",
                     "NOTIFY", "200 OK NOTIFY", "503 Service Unavailable OPTIONS"}, false, false, true), "AND");
 
@@ -94,11 +83,10 @@ public class MediaServerResults extends IQueryResults {
                     + "\n" + wh.makeWhere(true)
                     + "\ngroup by 1;");
 
-            DatabaseConnector.runQuery("create index idx_" + tmpTable + "callidid on " + tmpTable + "(callidid);");
-            DatabaseConnector.runQuery("create index idx_" + tmpTable + "started on " + tmpTable + "(started);");
+            DatabaseConnector.runQuery(C_CREATE_IDX + tmpTable + "callidid on " + tmpTable + "(callidid);");
+            DatabaseConnector.runQuery(C_CREATE_IDX + tmpTable + "started on " + tmpTable + "(started);");
 
-            DatabaseConnector.runQuery(""
-                    + "update " + tmpTable
+            DatabaseConnector.runQuery("update " + tmpTable
                     + "\nset (ToUriID, FromUriID)  = (select "
                     + "ToUriID, FromUriID"
                     + "\nfrom sipms a "
@@ -106,8 +94,8 @@ public class MediaServerResults extends IQueryResults {
                     + "and " + tmpTable + ".started=a.time\n"
                     + ")"
                     + ";");
-            DatabaseConnector.runQuery("create index idx_" + tmpTable + "ToUriID on " + tmpTable + "(ToUriID);");
-            DatabaseConnector.runQuery("create index idx_" + tmpTable + "FromUriID on " + tmpTable + "(FromUriID);");
+            DatabaseConnector.runQuery(C_CREATE_IDX + tmpTable + "ToUriID on " + tmpTable + "(ToUriID);");
+            DatabaseConnector.runQuery(C_CREATE_IDX + tmpTable + "FromUriID on " + tmpTable + "(FromUriID);");
 
             TableQuery tabReport = new TableQuery(tmpTable);
             tabReport.addOutField("UTCtoDateTime(started, \"YYYY-MM-dd HH:mm:ss.SSS\") started");
@@ -115,15 +103,14 @@ public class MediaServerResults extends IQueryResults {
             tabReport.addOutField("jduration(ended-started) duration ");
             tabReport.setAddAll(false);
 
-            tabReport.addRef("callidid", "callid", ReferenceType.SIPCALLID.toString(), FieldType.Optional);
+            tabReport.addRef("callidid", "callid", ReferenceType.SIPCALLID.toString(), FieldType.OPTIONAL);
 
-            tabReport.addRef("ToUriID", "ToUri", ReferenceType.SIPURI.toString(), FieldType.Optional);
-            tabReport.addRef("FromUriID", "FromUri", ReferenceType.SIPURI.toString(), FieldType.Optional);
+            tabReport.addRef("ToUriID", "ToUri", ReferenceType.SIPURI.toString(), FieldType.OPTIONAL);
+            tabReport.addRef("FromUriID", "FromUri", ReferenceType.SIPURI.toString(), FieldType.OPTIONAL);
 
             tabReport.setOrderBy(tabReport.getTabAlias() + ".started");
-            FullTableColors currTable = tabReport.getFullTable();
 
-            return currTable; //To change body of generated methods, choose Tools | Templates.
+            return tabReport.getFullTable(); //To change body of generated methods, choose Tools | Templates.
         } finally {
             DynamicTreeNode.setNoRefNoLoad(false);
 
@@ -167,29 +154,13 @@ public class MediaServerResults extends IQueryResults {
         nd.addDynamicRef(DialogItem.TLIB_CALLS_SIP_ENDPOINT, ReferenceType.DN);
         nd.addDynamicRef(DialogItem.TLIB_CALLS_SIP_PEERIP, ReferenceType.IP);
         nd.addPairChildren(DialogItem.TLIB_CALLS_SIP_DIRECTION,
-                new Pair[]{new Pair("inbound", "1"), new Pair("outbound", "0")});
+                new Pair[]{new Pair<>("inbound", "1"), new Pair<>("outbound", "0")});
 
         nd = new DynamicTreeNode<>(new OptionNode(true, DialogItem.MCP_STRATEGY));
         root.addChild(nd);
         nd.addDynamicRef(DialogItem.MCP_STRATEGY_STEPS, ReferenceType.VXMLCommand);
         nd.addDynamicRef(DialogItem.MCP_STRATEGY_STEPSPARAMS1, ReferenceType.VXMLCommandParams, TableType.VXMLIntStepsTable.toString(), "param1ID");
         nd.addDynamicRef(DialogItem.MCP_STRATEGY_STEPSPARAMS2, ReferenceType.VXMLCommandParams, TableType.VXMLIntStepsTable.toString(), "param2ID");
-
-    }
-
-    private void addLogMessagesReportType(DynamicTreeNode<OptionNode> root, TableType tableType) {
-        DynamicTreeNode<OptionNode> nd = new DynamicTreeNode<>(new OptionNode(false, "Log messages"));
-        root.addChild(nd);
-
-        DynamicTreeNode<OptionNode> ComponentNode;
-        ComponentNode = new DynamicTreeNode<>(new OptionNode(false, "Type"));
-        nd.addChild(ComponentNode);
-
-        /**
-         * *****************
-         */
-        ComponentNode.addDynamicRef("Level", ReferenceType.MSGLEVEL);
-        ComponentNode.addDynamicRefLogMessage("Message ID", tableType);
 
     }
 
@@ -234,21 +205,16 @@ public class MediaServerResults extends IQueryResults {
 
         runSelectionQuery(dlg, dlg.getSelectionType(), new IDsFinder(dlg));
 
-//        getCustom(FileInfoType.type_MCP, dlg, repComponents.getRoot(), null, null);
-//        getCustom(FileInfoType.type_RM, dlg, repComponents.getRoot(), null, null);
-//        getGenesysMessages(TableType.MsgRM, repComponents.getRoot(), dlg, this);
-//        getGenesysMessages(TableType.MsgMCP, repComponents.getRoot(), dlg, this);
     }
 
     private void RetrieveSIP(QueryDialog dlg, DynamicTreeNode<OptionNode> reportSettings, IDsFinder cidFinder) throws SQLException {
-        if (isChecked(reportSettings) && TableExist("SIPMS")) {
-            if (dlg.getSelectionType() == SelectionType.NO_SELECTION
-                    || cidFinder.getIDs(IDType.SIPCallID) != null || cidFinder.getIDs(IDType.PEERIP) != null) {
+        if( (isChecked(reportSettings) && TableExist("SIPMS")) &&
+            (dlg.getSelectionType() == SelectionType.NO_SELECTION
+                    || cidFinder.getIDs(IDType.SIPCallID) != null || cidFinder.getIDs(IDType.PEERIP) != null)) {
                 SipMSQuery sipMsgsByCallid = new SipMSQuery(reportSettings, cidFinder, dlg, this);
                 inquirer.logger.debug("SIP report");
                 getRecords(sipMsgsByCallid);
             }
-        }
     }
 
     private void runSelectionQuery(QueryDialog dlg, SelectionType selectionType, IDsFinder cidFinder) throws SQLException {
@@ -303,17 +269,17 @@ public class MediaServerResults extends IQueryResults {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        /* */
     }
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        /* */
     }
 
     @Override
     protected ArrayList<IAggregateQuery> loadReportAggregates() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return null;
     }
 
     @Override
@@ -328,17 +294,16 @@ public class MediaServerResults extends IQueryResults {
             if ((dlg.getSelectionType() == SelectionType.NO_SELECTION || (mcpCallID = cidFinder.getIDs(IDType.MCPCallID)) != null)) {
                 TableQuery strategySteps = new TableQuery(MsgType.VXMLStrategySteps, TableType.VXMLIntStepsTable.toString());
                 tellProgress("Retrieving VXMLStrategy steps");
-                strategySteps.addRef("commandId", "command", ReferenceType.VXMLCommand.toString(), IQuery.FieldType.Mandatory);
-                strategySteps.addRef("param1ID", "param1", ReferenceType.VXMLCommandParams.toString(), IQuery.FieldType.Optional);
-                strategySteps.addRef("param2ID", "param2", ReferenceType.VXMLCommandParams.toString(), IQuery.FieldType.Optional);
+                strategySteps.addRef("commandId", "command", ReferenceType.VXMLCommand.toString(), FieldType.MANDATORY);
+                strategySteps.addRef("param1ID", "param1", ReferenceType.VXMLCommandParams.toString(), FieldType.OPTIONAL);
+                strategySteps.addRef("param2ID", "param2", ReferenceType.VXMLCommandParams.toString(), FieldType.OPTIONAL);
 
-                strategySteps.addRef("mcpCallIDID", "mcpCall", ReferenceType.VXMLMCPCallID.toString(), IQuery.FieldType.Optional);
-                strategySteps.addRef("SIPCallID", "SIPCall", ReferenceType.SIPCALLID.toString(), IQuery.FieldType.Optional);
-                strategySteps.addRef("GVPSessionID", "GVPSession", ReferenceType.GVPSessionID.toString(), IQuery.FieldType.Optional);
-                strategySteps.addRef("TenantID", "Tenant", ReferenceType.Tenant.toString(), IQuery.FieldType.Optional);
-                strategySteps.addRef("IVRProfileID", "IVRProfile", ReferenceType.GVPIVRProfile.toString(), IQuery.FieldType.Optional);
+                strategySteps.addRef("mcpCallIDID", "mcpCall", ReferenceType.VXMLMCPCallID.toString(), FieldType.OPTIONAL);
+                strategySteps.addRef("SIPCallID", "SIPCall", ReferenceType.SIPCALLID.toString(), FieldType.OPTIONAL);
+                strategySteps.addRef("GVPSessionID", "GVPSession", ReferenceType.GVPSessionID.toString(), FieldType.OPTIONAL);
+                strategySteps.addRef("TenantID", "Tenant", ReferenceType.Tenant.toString(), FieldType.OPTIONAL);
+                strategySteps.addRef("IVRProfileID", "IVRProfile", ReferenceType.GVPIVRProfile.toString(), FieldType.OPTIONAL);
 
-//                UrsStrategy.setSearchApps(searchApps);
                 if (mcpCallID != null) {
                     strategySteps.addWhere(getWhere("mcpCallIDID", mcpCallID, false), "AND");
                 }

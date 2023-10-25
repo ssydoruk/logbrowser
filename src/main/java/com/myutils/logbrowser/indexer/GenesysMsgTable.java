@@ -4,6 +4,8 @@
  */
 package com.myutils.logbrowser.indexer;
 
+import java.sql.SQLException;
+
 /**
  * @author ssydoruk
  * <p>
@@ -56,7 +58,7 @@ public class GenesysMsgTable extends DBTable {
      * @throws Exception
      */
     @Override
-    public void FinalizeDB() throws Exception {
+    public void FinalizeDB() throws SQLException {
         getM_dbAccessor().runQuery("drop index if exists " + tabName() + "_fileid;");
         getM_dbAccessor().runQuery("drop index if exists " + tabName() + "_unixtime;");
         getM_dbAccessor().runQuery("drop index if exists " + tabName() + "_levelID;");

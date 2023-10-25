@@ -63,21 +63,7 @@ public class DBServerResults extends IQueryResults {
         m_componentFilter = m_componentFilter | filter;
     }
 
-    private void addLogMessagesReportType(DynamicTreeNode<OptionNode> root, TableType tableType) {
-        DynamicTreeNode<OptionNode> nd = new DynamicTreeNode<>(new OptionNode(false, "Log messages"));
-        root.addChild(nd);
 
-        DynamicTreeNode<OptionNode> ComponentNode;
-        ComponentNode = new DynamicTreeNode<>(new OptionNode(false, "Type"));
-        nd.addChild(ComponentNode);
-
-        /**
-         * *****************
-         */
-        ComponentNode.addDynamicRef("Level", ReferenceType.MSGLEVEL);
-        ComponentNode.addDynamicRefLogMessage("Message ID", tableType);
-
-    }
 
     private void loadStdOptions() throws SQLException {
         DynamicTreeNode<OptionNode> rootA = new DynamicTreeNode<>(null);
@@ -164,12 +150,12 @@ public class DBServerResults extends IQueryResults {
             tellProgress("SCS application statuses");
             TableQuery SCSAppStatuses = new TableQuery(MsgType.SCS_APP, "SCS_appStatus");
 
-            SCSAppStatuses.addRef("newModeID", "newMode", ReferenceType.APPRunMode.toString(), FieldType.Optional);
-            SCSAppStatuses.addRef("theAppNameID", "appName", ReferenceType.App.toString(), FieldType.Optional);
-            SCSAppStatuses.addRef("oldModeID", "oldMode", ReferenceType.APPRunMode.toString(), FieldType.Optional);
-            SCSAppStatuses.addRef("statusID", "status", ReferenceType.appStatus.toString(), FieldType.Optional);
-            SCSAppStatuses.addRef("hostID", "host", ReferenceType.Host.toString(), FieldType.Optional);
-            SCSAppStatuses.addRef("eventID", "event", ReferenceType.SCSEvent.toString(), FieldType.Optional);
+            SCSAppStatuses.addRef("newModeID", "newMode", ReferenceType.APPRunMode.toString(), FieldType.OPTIONAL);
+            SCSAppStatuses.addRef("theAppNameID", "appName", ReferenceType.App.toString(), FieldType.OPTIONAL);
+            SCSAppStatuses.addRef("oldModeID", "oldMode", ReferenceType.APPRunMode.toString(), FieldType.OPTIONAL);
+            SCSAppStatuses.addRef("statusID", "status", ReferenceType.appStatus.toString(), FieldType.OPTIONAL);
+            SCSAppStatuses.addRef("hostID", "host", ReferenceType.Host.toString(), FieldType.OPTIONAL);
+            SCSAppStatuses.addRef("eventID", "event", ReferenceType.SCSEvent.toString(), FieldType.OPTIONAL);
 
             SCSAppStatuses.AddCheckedWhere(SCSAppStatuses.getTabAlias() + ".theAppNameID",
                     ReferenceType.App,
@@ -189,8 +175,8 @@ public class DBServerResults extends IQueryResults {
             tellProgress("SCS application actions");
             TableQuery SCSAppStatuses = new TableQuery(MsgType.SCS_SCS, "SCS_SelfStatus");
 
-            SCSAppStatuses.addRef("newModeID", "newMode", ReferenceType.APPRunMode.toString(), FieldType.Optional);
-            SCSAppStatuses.addRef("oldModeID", "oldMode", ReferenceType.APPRunMode.toString(), FieldType.Optional);
+            SCSAppStatuses.addRef("newModeID", "newMode", ReferenceType.APPRunMode.toString(), FieldType.OPTIONAL);
+            SCSAppStatuses.addRef("oldModeID", "oldMode", ReferenceType.APPRunMode.toString(), FieldType.OPTIONAL);
             SCSAppStatuses.setCommonParams(this, dlg);
             getRecords(SCSAppStatuses);
         }

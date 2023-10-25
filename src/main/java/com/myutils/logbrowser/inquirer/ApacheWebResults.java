@@ -94,7 +94,7 @@ public class ApacheWebResults extends IQueryResults {
             tabReport.addOutField("jduration(ended-started) duration ");
             tabReport.setAddAll(false);
 
-            tabReport.addRef("callidid", "callid", ReferenceType.SIPCALLID.toString(), FieldType.Optional);
+            tabReport.addRef("callidid", "callid", ReferenceType.SIPCALLID.toString(), FieldType.OPTIONAL);
             tabReport.setOrderBy(tabReport.getTabAlias() + ".started");
             FullTableColors currTable = tabReport.getFullTable();
 
@@ -241,15 +241,15 @@ public class ApacheWebResults extends IQueryResults {
             q.AddCheckedWhere(q.getTabAlias() + ".methodID", ReferenceType.HTTPMethod, eventsSettings, "AND", DialogItem.APACHEMSG_PARAMS_HTTPMETHOD);
             q.AddCheckedWhere(q.getTabAlias() + ".urlID", ReferenceType.HTTPURL, eventsSettings, "AND", DialogItem.APACHEMSG_PARAMS_HTTPURL);
 
-            q.addRef("httpCode", "Code", ReferenceType.HTTPRESPONSE.toString(), FieldType.Optional);
-            q.addRef("IPID", "IP", ReferenceType.IP.toString(), FieldType.Optional);
-            q.addRef("JSessionIDID", "JSessionID", ReferenceType.JSessionID.toString(), FieldType.Optional);
-            q.addRef("methodID", "method", ReferenceType.HTTPMethod.toString(), FieldType.Optional);
-            q.addRef("urlID", "url", ReferenceType.HTTPURL.toString(), FieldType.Optional);
-            q.addRef("UUIDID", "UUID", ReferenceType.UUID.toString(), FieldType.Optional);
-            q.addRef("IxnIDID", "IxnID", ReferenceType.IxnID.toString(), FieldType.Optional);
-            q.addRef("DeviceIDID", "DeviceID", ReferenceType.GWSDeviceID.toString(), FieldType.Optional);
-            q.addRef("userNameID", "userName", ReferenceType.Agent.toString(), FieldType.Optional);
+            q.addRef("httpCode", "Code", ReferenceType.HTTPRESPONSE.toString(), FieldType.OPTIONAL);
+            q.addRef("IPID", "IP", ReferenceType.IP.toString(), FieldType.OPTIONAL);
+            q.addRef("JSessionIDID", "JSessionID", ReferenceType.JSessionID.toString(), FieldType.OPTIONAL);
+            q.addRef("methodID", "method", ReferenceType.HTTPMethod.toString(), FieldType.OPTIONAL);
+            q.addRef("urlID", "url", ReferenceType.HTTPURL.toString(), FieldType.OPTIONAL);
+            q.addRef("UUIDID", "UUID", ReferenceType.UUID.toString(), FieldType.OPTIONAL);
+            q.addRef("IxnIDID", "IxnID", ReferenceType.IxnID.toString(), FieldType.OPTIONAL);
+            q.addRef("DeviceIDID", "DeviceID", ReferenceType.GWSDeviceID.toString(), FieldType.OPTIONAL);
+            q.addRef("userNameID", "userName", ReferenceType.Agent.toString(), FieldType.OPTIONAL);
 
             q.setCommonParams(this, dlg);
             getRecords(q);

@@ -31,13 +31,13 @@ public class OCSByConnIdQuery extends IQuery {
     }
 
     public OCSByConnIdQuery() throws SQLException {
-        addRef("thisDNID", "thisDN", ReferenceType.DN.toString(), FieldType.Optional);
-        addRef("otherDNID", "otherDN", ReferenceType.DN.toString(), FieldType.Optional);
-        addRef("ConnectionIDID", "ConnectionID", ReferenceType.ConnID.toString(), FieldType.Optional);
-        addRef("nameID", "name", ReferenceType.TEvent.toString(), FieldType.Optional);
-        addRef("sourceID", "source", ReferenceType.App.toString(), FieldType.Optional);
-        addRef("TransferIDID", "TransferID", ReferenceType.ConnID.toString(), FieldType.Optional);
-        addRef("UUIDID", "UUID", ReferenceType.UUID.toString(), FieldType.Optional);
+        addRef("thisDNID", "thisDN", ReferenceType.DN.toString(), FieldType.OPTIONAL);
+        addRef("otherDNID", "otherDN", ReferenceType.DN.toString(), FieldType.OPTIONAL);
+        addRef("ConnectionIDID", "ConnectionID", ReferenceType.ConnID.toString(), FieldType.OPTIONAL);
+        addRef("nameID", "name", ReferenceType.TEvent.toString(), FieldType.OPTIONAL);
+        addRef("sourceID", "source", ReferenceType.App.toString(), FieldType.OPTIONAL);
+        addRef("TransferIDID", "TransferID", ReferenceType.ConnID.toString(), FieldType.OPTIONAL);
+        addRef("UUIDID", "UUID", ReferenceType.UUID.toString(), FieldType.OPTIONAL);
 
 //        addRef("agentIDID", "agentID", ReferenceType.Agent.toString(), FieldType.Optional);
 //        addRef("DNISID", "DNIS", ReferenceType.DN.toString(), FieldType.Optional);

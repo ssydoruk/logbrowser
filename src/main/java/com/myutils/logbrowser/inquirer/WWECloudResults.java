@@ -97,7 +97,7 @@ public class WWECloudResults extends IQueryResults {
             tabReport.addOutField("jduration(ended-started) duration ");
             tabReport.setAddAll(false);
 
-            tabReport.addRef("callidid", "callid", ReferenceType.SIPCALLID.toString(), FieldType.Optional);
+            tabReport.addRef("callidid", "callid", ReferenceType.SIPCALLID.toString(), FieldType.OPTIONAL);
             tabReport.setOrderBy(tabReport.getTabAlias() + ".started");
             FullTableColors currTable = tabReport.getFullTable();
 
@@ -290,10 +290,10 @@ public class WWECloudResults extends IQueryResults {
 
     private TableQuery MakeTLibReq() throws Exception {
         TableQuery TLibReq = new TableQuery(MsgType.TLIB, "tlib_logbr");
-        TLibReq.addRef("thisDNID", "thisDN", ReferenceType.DN.toString(), FieldType.Optional);
-        TLibReq.addRef("nameID", "name", ReferenceType.TEvent.toString(), FieldType.Mandatory);
-        TLibReq.addRef("otherDNID", "otherDN", ReferenceType.DN.toString(), FieldType.Optional);
-        TLibReq.addRef("sourceID", "source", ReferenceType.App.toString(), FieldType.Optional);
+        TLibReq.addRef("thisDNID", "thisDN", ReferenceType.DN.toString(), FieldType.OPTIONAL);
+        TLibReq.addRef("nameID", "name", ReferenceType.TEvent.toString(), FieldType.MANDATORY);
+        TLibReq.addRef("otherDNID", "otherDN", ReferenceType.DN.toString(), FieldType.OPTIONAL);
+        TLibReq.addRef("sourceID", "source", ReferenceType.App.toString(), FieldType.OPTIONAL);
         TLibReq.addNullField("connid");
         TLibReq.addNullField("SipId");
 
@@ -385,17 +385,17 @@ public class WWECloudResults extends IQueryResults {
 //                        "AND",
 //                        DialogItem.URS_AGENTDN_AGENT);
 //            }
-            tlib.addRef("thisDNID", "thisDN", ReferenceType.DN.toString(), FieldType.Optional);
-            tlib.addRef("nameID", "name", ReferenceType.TEvent.toString(), FieldType.Optional);
-            tlib.addRef("otherDNID", "otherDN", ReferenceType.DN.toString(), FieldType.Optional);
-            tlib.addRef("ServerID", "Source", ReferenceType.App.toString(), FieldType.Optional);
-            tlib.addRef("ConnectionIDID", "ConnectionID", ReferenceType.ConnID.toString(), FieldType.Optional);
+            tlib.addRef("thisDNID", "thisDN", ReferenceType.DN.toString(), FieldType.OPTIONAL);
+            tlib.addRef("nameID", "name", ReferenceType.TEvent.toString(), FieldType.OPTIONAL);
+            tlib.addRef("otherDNID", "otherDN", ReferenceType.DN.toString(), FieldType.OPTIONAL);
+            tlib.addRef("ServerID", "Source", ReferenceType.App.toString(), FieldType.OPTIONAL);
+            tlib.addRef("ConnectionIDID", "ConnectionID", ReferenceType.ConnID.toString(), FieldType.OPTIONAL);
             tlib.addOutField("intToHex( seqno) seqnoHex"); // bug in SQLite lib; does not accept full word
 
-            tlib.addRef("TransferIDID", "TransferID", ReferenceType.ConnID.toString(), FieldType.Optional);
-            tlib.addRef("ixnIDID", "IXNID", ReferenceType.IxnID.toString(), FieldType.Optional);
-            tlib.addRef("agentidid", "agentid", ReferenceType.Agent.toString(), FieldType.Optional);
-            tlib.addRef("uuidid", "uuid", ReferenceType.UUID.toString(), FieldType.Optional);
+            tlib.addRef("TransferIDID", "TransferID", ReferenceType.ConnID.toString(), FieldType.OPTIONAL);
+            tlib.addRef("ixnIDID", "IXNID", ReferenceType.IxnID.toString(), FieldType.OPTIONAL);
+            tlib.addRef("agentidid", "agentid", ReferenceType.Agent.toString(), FieldType.OPTIONAL);
+            tlib.addRef("uuidid", "uuid", ReferenceType.UUID.toString(), FieldType.OPTIONAL);
             tlib.addNullField("attr1ID");
             tlib.addNullField("attr2");
             tlib.addNullField("attr1");
@@ -429,8 +429,8 @@ public class WWECloudResults extends IQueryResults {
                     "AND",
                     DialogItem.WWELOGMESSAGE_MSG_TEXT);
 
-            tab.addRef("msgID", "level", ReferenceType.CLOUD_LOG_MESSAGE_TYPE.toString(), FieldType.Optional);
-            tab.addRef("msgTextID", "text", ReferenceType.CLOUD_LOG_MESSAGE.toString(), FieldType.Optional);
+            tab.addRef("msgID", "level", ReferenceType.CLOUD_LOG_MESSAGE_TYPE.toString(), FieldType.OPTIONAL);
+            tab.addRef("msgTextID", "text", ReferenceType.CLOUD_LOG_MESSAGE.toString(), FieldType.OPTIONAL);
 
             tab.setCommonParams(this, dlg);
             getRecords(tab);
@@ -453,9 +453,9 @@ public class WWECloudResults extends IQueryResults {
 //                    eventsSettings,
 //                    "AND",
 //                    DialogItem.TLIB_CALLS_TEVENT_NAME);
-            tlib.addRef("successID", "result", ReferenceType.Misc.toString(), FieldType.Optional);
-            tlib.addRef("userID", "agent", ReferenceType.Agent.toString(), FieldType.Optional);
-            tlib.addRef("errorID", "error", ReferenceType.ErrorDescr.toString(), FieldType.Optional);
+            tlib.addRef("successID", "result", ReferenceType.Misc.toString(), FieldType.OPTIONAL);
+            tlib.addRef("userID", "agent", ReferenceType.Agent.toString(), FieldType.OPTIONAL);
+            tlib.addRef("errorID", "error", ReferenceType.ErrorDescr.toString(), FieldType.OPTIONAL);
 
             tlib.setCommonParams(this, dlg);
             getRecords(tlib);
@@ -492,8 +492,8 @@ public class WWECloudResults extends IQueryResults {
                     "AND",
                     DialogItem.WWEEXCEPTIONS_EX_MSG);
 
-            exc.addRef("exNameid", "exception", ReferenceType.Exception.toString(), FieldType.Optional);
-            exc.addRef("MsgID", "exceptionMsg", ReferenceType.ExceptionMessage.toString(), FieldType.Optional);
+            exc.addRef("exNameid", "exception", ReferenceType.Exception.toString(), FieldType.OPTIONAL);
+            exc.addRef("MsgID", "exceptionMsg", ReferenceType.ExceptionMessage.toString(), FieldType.OPTIONAL);
 
             exc.setCommonParams(this, dlg);
             getRecords(exc);

@@ -21,9 +21,9 @@ public class JsonQuery extends IQuery {
     private IDsFinder cid;
 
     public JsonQuery() throws SQLException {
-        addJoin("sip_logbr", FieldType.Optional, "sip_logbr.id=json.sipid", "");
-        addRef("origUriID", "origUri", ReferenceType.SIPURI.toString(), FieldType.Optional);
-        addRef("destUriID", "destUri", ReferenceType.SIPURI.toString(), FieldType.Optional);
+        addJoin("sip_logbr", FieldType.OPTIONAL, "sip_logbr.id=json.sipid", "");
+        addRef("origUriID", "origUri", ReferenceType.SIPURI.toString(), FieldType.OPTIONAL);
+        addRef("destUriID", "destUri", ReferenceType.SIPURI.toString(), FieldType.OPTIONAL);
 
     }
 

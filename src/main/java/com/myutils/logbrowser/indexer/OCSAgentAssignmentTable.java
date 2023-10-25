@@ -4,6 +4,8 @@
  */
 package com.myutils.logbrowser.indexer;
 
+import java.sql.SQLException;
+
 /**
  * @author ssydoruk
  * <p>
@@ -55,7 +57,7 @@ public class OCSAgentAssignmentTable extends DBTable {
      * @throws Exception
      */
     @Override
-    public void FinalizeDB() throws Exception {
+    public void FinalizeDB() throws SQLException {
         getM_dbAccessor().runQuery("create index if not exists OCSASGN_fileid_" + getM_dbAccessor().getM_alias() + " on OCSASGN_" + getM_dbAccessor().getM_alias() + " (FileId);");
         getM_dbAccessor().runQuery("create index if not exists OCSASGN_cgnameID_" + getM_dbAccessor().getM_alias() + " on OCSASGN_" + getM_dbAccessor().getM_alias() + " (cgnameID);");
         getM_dbAccessor().runQuery("create index if not exists OCSASGN_time_" + getM_dbAccessor().getM_alias() + " on OCSASGN_" + getM_dbAccessor().getM_alias() + " (time);");

@@ -213,12 +213,12 @@ public class SCServerResults extends IQueryResults {
             tellProgress("SCS application statuses");
             TableQuery SCSAppStatuses = new TableQuery(MsgType.SCS_APP, "SCS_appStatus");
 
-            SCSAppStatuses.addRef("newModeID", "newMode", ReferenceType.APPRunMode.toString(), FieldType.Optional);
-            SCSAppStatuses.addRef("theAppNameID", "appName", ReferenceType.App.toString(), FieldType.Optional);
-            SCSAppStatuses.addRef("oldModeID", "oldMode", ReferenceType.APPRunMode.toString(), FieldType.Optional);
-            SCSAppStatuses.addRef("statusID", "status", ReferenceType.appStatus.toString(), FieldType.Optional);
-            SCSAppStatuses.addRef("hostID", "host", ReferenceType.Host.toString(), FieldType.Optional);
-            SCSAppStatuses.addRef("eventID", "event", ReferenceType.SCSEvent.toString(), FieldType.Optional);
+            SCSAppStatuses.addRef("newModeID", "newMode", ReferenceType.APPRunMode.toString(), FieldType.OPTIONAL);
+            SCSAppStatuses.addRef("theAppNameID", "appName", ReferenceType.App.toString(), FieldType.OPTIONAL);
+            SCSAppStatuses.addRef("oldModeID", "oldMode", ReferenceType.APPRunMode.toString(), FieldType.OPTIONAL);
+            SCSAppStatuses.addRef("statusID", "status", ReferenceType.appStatus.toString(), FieldType.OPTIONAL);
+            SCSAppStatuses.addRef("hostID", "host", ReferenceType.Host.toString(), FieldType.OPTIONAL);
+            SCSAppStatuses.addRef("eventID", "event", ReferenceType.SCSEvent.toString(), FieldType.OPTIONAL);
 
             SCSAppStatuses.AddCheckedWhere(SCSAppStatuses.getTabAlias() + ".theAppNameID",
                     ReferenceType.App,
@@ -238,7 +238,7 @@ public class SCServerResults extends IQueryResults {
             tellProgress("SCS application actions");
             TableQuery scsClientLogs = new TableQuery(MsgType.SCS_CLIENT_LOG, TableType.SCSClientLogMessage.toString());
 
-            scsClientLogs.addRef("messageTextID", "messageText", ReferenceType.Misc.toString(), FieldType.Optional);
+            scsClientLogs.addRef("messageTextID", "messageText", ReferenceType.Misc.toString(), FieldType.OPTIONAL);
 
             scsClientLogs.setCommonParams(this, dlg);
             getRecords(scsClientLogs);
@@ -251,13 +251,13 @@ public class SCServerResults extends IQueryResults {
             tellProgress("SCS alarms");
             TableQuery scsAlarms = new TableQuery(MsgType.SCS_ALARMS, TableType.SCSAlarm.toString());
 
-            scsAlarms.addRef("alarmNameID", "alarmName", ReferenceType.Misc.toString(), FieldType.Optional);
-            scsAlarms.addRef("logAppNameID", "logAppName", ReferenceType.App.toString(), FieldType.Optional);
-            scsAlarms.addRef("reasonID", "reason", ReferenceType.Misc.toString(), FieldType.Optional);
-            scsAlarms.addRef("categoryID", "category", ReferenceType.Misc.toString(), FieldType.Optional);
-            scsAlarms.addRef("alarmIDID", "alarmID", ReferenceType.Misc.toString(), FieldType.Optional);
-            scsAlarms.addRef("msgTextID", "msgText", ReferenceType.Misc.toString(), FieldType.Optional);
-            scsAlarms.addRef("alarmStateID", "alarmState", ReferenceType.AlarmState.toString(), FieldType.Optional);
+            scsAlarms.addRef("alarmNameID", "alarmName", ReferenceType.Misc.toString(), FieldType.OPTIONAL);
+            scsAlarms.addRef("logAppNameID", "logAppName", ReferenceType.App.toString(), FieldType.OPTIONAL);
+            scsAlarms.addRef("reasonID", "reason", ReferenceType.Misc.toString(), FieldType.OPTIONAL);
+            scsAlarms.addRef("categoryID", "category", ReferenceType.Misc.toString(), FieldType.OPTIONAL);
+            scsAlarms.addRef("alarmIDID", "alarmID", ReferenceType.Misc.toString(), FieldType.OPTIONAL);
+            scsAlarms.addRef("msgTextID", "msgText", ReferenceType.Misc.toString(), FieldType.OPTIONAL);
+            scsAlarms.addRef("alarmStateID", "alarmState", ReferenceType.AlarmState.toString(), FieldType.OPTIONAL);
 
             scsAlarms.AddCheckedWhere(scsAlarms.getTabAlias() + ".alarmNameID",
                     ReferenceType.Misc,
@@ -291,8 +291,8 @@ public class SCServerResults extends IQueryResults {
             tellProgress("SCS application actions");
             TableQuery SCSAppStatuses = new TableQuery(MsgType.SCS_SCS, "SCS_SelfStatus");
 
-            SCSAppStatuses.addRef("newModeID", "newMode", ReferenceType.APPRunMode.toString(), FieldType.Optional);
-            SCSAppStatuses.addRef("oldModeID", "oldMode", ReferenceType.APPRunMode.toString(), FieldType.Optional);
+            SCSAppStatuses.addRef("newModeID", "newMode", ReferenceType.APPRunMode.toString(), FieldType.OPTIONAL);
+            SCSAppStatuses.addRef("oldModeID", "oldMode", ReferenceType.APPRunMode.toString(), FieldType.OPTIONAL);
 
             SCSAppStatuses.setCommonParams(this, dlg);
             getRecords(SCSAppStatuses);

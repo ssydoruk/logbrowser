@@ -21,21 +21,21 @@ public final class UrsByConnIdQuery extends IQuery {
     private IDsFinder cif = null;
 
     public UrsByConnIdQuery() throws SQLException {
-        addRef("thisDNID", "thisDN", ReferenceType.DN.toString(), FieldType.Optional);
-        addRef("nameID", "name", ReferenceType.TEvent.toString(), FieldType.Optional);
-        addRef("otherDNID", "otherDN", ReferenceType.DN.toString(), FieldType.Optional);
-        addRef("SourceID", "Source", ReferenceType.App.toString(), FieldType.Optional);
-        addRef("ConnectionIDID", "ConnectionID", ReferenceType.ConnID.toString(), FieldType.Optional);
-        addRef("TransferIDID", "TransferID", ReferenceType.ConnID.toString(), FieldType.Optional);
-        addRef("ixnIDID", "IXNID", ReferenceType.IxnID.toString(), FieldType.Optional);
-        addRef("attr1ID", "attr1", ReferenceType.TLIBATTR1.toString(), FieldType.Optional);
-        addRef("UUIDID", "UUID", ReferenceType.UUID.toString(), FieldType.Optional);
-        addRef("errMessageID", "errmessage", ReferenceType.TLIBERROR.toString(), FieldType.Optional);
+        addRef("thisDNID", "thisDN", ReferenceType.DN.toString(), FieldType.OPTIONAL);
+        addRef("nameID", "name", ReferenceType.TEvent.toString(), FieldType.OPTIONAL);
+        addRef("otherDNID", "otherDN", ReferenceType.DN.toString(), FieldType.OPTIONAL);
+        addRef("SourceID", "Source", ReferenceType.App.toString(), FieldType.OPTIONAL);
+        addRef("ConnectionIDID", "ConnectionID", ReferenceType.ConnID.toString(), FieldType.OPTIONAL);
+        addRef("TransferIDID", "TransferID", ReferenceType.ConnID.toString(), FieldType.OPTIONAL);
+        addRef("ixnIDID", "IXNID", ReferenceType.IxnID.toString(), FieldType.OPTIONAL);
+        addRef("attr1ID", "attr1", ReferenceType.TLIBATTR1.toString(), FieldType.OPTIONAL);
+        addRef("UUIDID", "UUID", ReferenceType.UUID.toString(), FieldType.OPTIONAL);
+        addRef("errMessageID", "errmessage", ReferenceType.TLIBERROR.toString(), FieldType.OPTIONAL);
         addOutField("intToHex( seqno) seqnoHex"); // bug in SQLite lib; does not accept full word
 //        addRef("agentIDID", "agentID", ReferenceType.Agent.toString(), FieldType.Optional);
         addNullField("agentID");
-        addRef("DNISID", "DNIS", ReferenceType.DN.toString(), FieldType.Optional);
-        addRef("ANIID", "ANI", ReferenceType.DN.toString(), FieldType.Optional);
+        addRef("DNISID", "DNIS", ReferenceType.DN.toString(), FieldType.OPTIONAL);
+        addRef("ANIID", "ANI", ReferenceType.DN.toString(), FieldType.OPTIONAL);
 
         addNullField("attr2");
         addNullField("err");

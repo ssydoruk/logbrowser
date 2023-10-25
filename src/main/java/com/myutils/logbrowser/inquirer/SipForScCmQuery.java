@@ -31,17 +31,17 @@ public class SipForScCmQuery extends IQuery {
     private IDsFinder cidFinder;
 
     public SipForScCmQuery() throws SQLException {
-        addRef("ToUriID", "ToUri", ReferenceType.SIPURI.toString(), FieldType.Optional);
-        addRef("FromUriID", "FromUri", ReferenceType.SIPURI.toString(), FieldType.Optional);
-        addRef("ViaUriID", "ViaUri", ReferenceType.SIPURI.toString(), FieldType.Optional);
-        addRef("callIDID", "callID", ReferenceType.SIPCALLID.toString(), FieldType.Optional);
-        addRef("nameID", "name", ReferenceType.SIPMETHOD.toString(), FieldType.Optional);
-        addRef("CSeqID", "CSeq", ReferenceType.SIPCSEQ.toString(), FieldType.Optional);
-        addRef("FromUserpartID", "FromUserpart", ReferenceType.DN.toString(), FieldType.Optional);
-        addRef("requestURIDNid", "requestURIDN", ReferenceType.DN.toString(), FieldType.Optional);
-        addRef("ViaBranchID", "ViaBranch", ReferenceType.SIPVIABRANCH.toString(), FieldType.Optional);
-        addRef("PeerIpID", "PeerIp", ReferenceType.IP.toString(), FieldType.Optional);
-        addRef("uuidid", "uuid", ReferenceType.UUID.toString(), FieldType.Optional);
+        addRef("ToUriID", "ToUri", ReferenceType.SIPURI.toString(), FieldType.OPTIONAL);
+        addRef("FromUriID", "FromUri", ReferenceType.SIPURI.toString(), FieldType.OPTIONAL);
+        addRef("ViaUriID", "ViaUri", ReferenceType.SIPURI.toString(), FieldType.OPTIONAL);
+        addRef("callIDID", "callID", ReferenceType.SIPCALLID.toString(), FieldType.OPTIONAL);
+        addRef("nameID", "name", ReferenceType.SIPMETHOD.toString(), FieldType.OPTIONAL);
+        addRef("CSeqID", "CSeq", ReferenceType.SIPCSEQ.toString(), FieldType.OPTIONAL);
+        addRef("FromUserpartID", "FromUserpart", ReferenceType.DN.toString(), FieldType.OPTIONAL);
+        addRef("requestURIDNid", "requestURIDN", ReferenceType.DN.toString(), FieldType.OPTIONAL);
+        addRef("ViaBranchID", "ViaBranch", ReferenceType.SIPVIABRANCH.toString(), FieldType.OPTIONAL);
+        addRef("PeerIpID", "PeerIp", ReferenceType.IP.toString(), FieldType.OPTIONAL);
+        addRef("uuidid", "uuid", ReferenceType.UUID.toString(), FieldType.OPTIONAL);
         addNullField("sipid");
 
         setOrderBy(new String[]{"time"});

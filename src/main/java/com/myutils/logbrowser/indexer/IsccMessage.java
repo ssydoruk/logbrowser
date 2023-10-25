@@ -60,16 +60,16 @@ public class IsccMessage extends SIPServerBaseMessage {
     }
 
     public String getThisDN() {
-        return GetAttribute(new String[]{"ISCCAttributeOriginationDN", "SDAttributeOriginationDN"});
+        return getAttribute(new String[]{"ISCCAttributeOriginationDN", "SDAttributeOriginationDN"});
     }
 
     public String getOtherDN() {
-        return GetAttribute(new String[]{"ISCCAttributeDestinationDN", "SDAttributeDestinationDN", "ISCCAttributeCallDataXferResource"});
+        return getAttribute(new String[]{"ISCCAttributeDestinationDN", "SDAttributeDestinationDN", "ISCCAttributeCallDataXferResource"});
     }
 
     public String GetConnID() {
         if (connID == null) {
-            connID = GetAttribute(new String[]{"ISCCAttributeConnID", "SDAttributeConnID"});
+            connID = getAttribute(new String[]{"ISCCAttributeConnID", "SDAttributeConnID"});
         }
         return connID;
     }

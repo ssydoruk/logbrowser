@@ -21,16 +21,16 @@ public class IxnSSQuery extends IQuery {
 
     public IxnSSQuery() throws SQLException {
         m_resultSet = null;
-        addRef("IxnQueueID", "queue", ReferenceType.DN.toString(), FieldType.Optional);
-        addRef("nameID", "name", ReferenceType.TEvent.toString(), FieldType.Mandatory);
-        addRef("ConnIDID", "ConnectionID", ReferenceType.ConnID.toString(), FieldType.Optional);
-        addRef("IxnID", "InteractionID", ReferenceType.IxnID.toString(), FieldType.Optional);
-        addRef("MediaTypeID", "MediaType", ReferenceType.IxnMedia.toString(), FieldType.Optional);
-        addRef("RouterID", "client", ReferenceType.App.toString(), FieldType.Optional);
-        addRef("AgentID", "Agent", ReferenceType.Agent.toString(), FieldType.Optional);
-        addRef("PlaceID", "Place", ReferenceType.Place.toString(), FieldType.Optional);
-        addRef("ServiceID", "Service", ReferenceType.IxnService.toString(), FieldType.Optional);
-        addRef("MethodID", "Method", ReferenceType.IxnMethod.toString(), FieldType.Optional);
+        addRef("IxnQueueID", "queue", ReferenceType.DN.toString(), FieldType.OPTIONAL);
+        addRef("nameID", "name", ReferenceType.TEvent.toString(), FieldType.MANDATORY);
+        addRef("ConnIDID", "ConnectionID", ReferenceType.ConnID.toString(), FieldType.OPTIONAL);
+        addRef("IxnID", "InteractionID", ReferenceType.IxnID.toString(), FieldType.OPTIONAL);
+        addRef("MediaTypeID", "MediaType", ReferenceType.IxnMedia.toString(), FieldType.OPTIONAL);
+        addRef("RouterID", "client", ReferenceType.App.toString(), FieldType.OPTIONAL);
+        addRef("AgentID", "Agent", ReferenceType.Agent.toString(), FieldType.OPTIONAL);
+        addRef("PlaceID", "Place", ReferenceType.Place.toString(), FieldType.OPTIONAL);
+        addRef("ServiceID", "Service", ReferenceType.IxnService.toString(), FieldType.OPTIONAL);
+        addRef("MethodID", "Method", ReferenceType.IxnMethod.toString(), FieldType.OPTIONAL);
 
     }
 
