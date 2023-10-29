@@ -122,7 +122,7 @@ public class SingleThreadParser extends Parser {
     private boolean haMessage;
     private String handleAdd;
     private Message msgInProgress;
-    private FileInfo.FileType fileType = FileInfo.FileType.UNKNOWN;
+    private final FileInfo.FileType fileType = FileInfo.FileType.UNKNOWN;
     private long lastSeqNo = 0;
 
     public SingleThreadParser(DBTables m_tables) {

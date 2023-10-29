@@ -1,6 +1,7 @@
 package com.myutils.logbrowser.indexer;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 public class Pair<K, V> implements Serializable {
 
@@ -96,7 +97,7 @@ public class Pair<K, V> implements Serializable {
 
         Pair pair = (Pair) o;
 
-        return key != null ? key.equals(pair.key) : pair.key == null;
+        return Objects.equals(key, pair.key);
     }
 
     @Override

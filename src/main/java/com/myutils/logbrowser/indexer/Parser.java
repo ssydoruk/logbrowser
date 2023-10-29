@@ -58,7 +58,7 @@ public abstract class Parser {
     private GenesysMsg lastLogMsg;
     private ArrayList<DateFmt> currentAppDates; //unlikely to have more than 3 date formats in single app
     private DateDiff dateDiff = null;
-    private DBTablesFiller dbTablesFiller;
+    private final DBTablesFiller dbTablesFiller;
 
     public Parser(FileInfoType type, DBTables tables) {
         super();

@@ -278,7 +278,7 @@ public class ConfServParser extends Parser {
 
                 }
 
-                GenesysMsg.CheckGenesysMsg(dp, this, TableType.MsgConfServer, (Pattern) null);
+                GenesysMsg.CheckGenesysMsg(dp, this, TableType.MsgConfServer, null);
 
                 break;
 //</editor-fold>
@@ -429,7 +429,6 @@ public class ConfServParser extends Parser {
         STATE_CLIENT_REQUEST,
         STATE_CLIENT_RESPONSE,
         STATE_IGNORE_MESSAGE,
-        ;
     }
 
     private class CSObjectChange extends Message {

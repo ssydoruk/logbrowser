@@ -32,7 +32,7 @@ public class ReportFrame extends javax.swing.JFrame implements Cloneable {
     TableSorter sorter;
     // Tool Bar
     private ToggleButtonToolBar toolbar = null;
-    private ButtonGroup toolbarGroup = new ButtonGroup();
+    private final ButtonGroup toolbarGroup = new ButtonGroup();
     public ReportFrame(ReportFrame theForm) throws HeadlessException {
         this(theForm, true);
     }

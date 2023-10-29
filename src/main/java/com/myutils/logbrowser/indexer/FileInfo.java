@@ -194,7 +194,7 @@ public final class FileInfo extends Record {
             } else {
                 if (getStartTime() != 0) {
                     boolean ret = getStartTime() == otherFile.getStartTime();
-                    if (ret == true) {
+                    if (ret) {
                         return getFileLocalTime() == otherFile.getFileLocalTime();
                     } else {
                         return false;
@@ -224,15 +224,15 @@ public final class FileInfo extends Record {
         return read;
     }
 
-    protected DateParsed getFileEndTime() {
+    private DateParsed getFileEndTime() {
         return fileEndTime;
     }
 
-    protected void setFileEndTime(DateParsed fileEndTime) {
+    void setFileEndTime(DateParsed fileEndTime) {
         this.fileEndTime = fileEndTime;
     }
 
-    protected DateParsed getFileLocalTime() {
+    DateParsed getFileLocalTime() {
         return fileLocalTime;
     }
 

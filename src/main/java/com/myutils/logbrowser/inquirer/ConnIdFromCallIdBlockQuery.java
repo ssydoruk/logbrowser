@@ -19,7 +19,7 @@ public class ConnIdFromCallIdBlockQuery {
     }
 
     public void Execute() throws SQLException {
-        inquirer.logger.debug("**Execute in  " + this.getClass().toString());
+        inquirer.logger.debug("**Execute in  " + this.getClass());
         m_connector = DatabaseConnector.getDatabaseConnector(this);
         String alias = m_connector.getAlias();
 
@@ -126,7 +126,7 @@ public class ConnIdFromCallIdBlockQuery {
                 }
             }
         }
-        inquirer.logger.debug("++ " + this.getClass().toString() + ": extracted " + recCnt + " records");
+        inquirer.logger.debug("++ " + this.getClass() + ": extracted " + recCnt + " records");
         return null;
     }
 

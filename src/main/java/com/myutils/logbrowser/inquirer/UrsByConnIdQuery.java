@@ -75,26 +75,25 @@ public final class UrsByConnIdQuery extends IQuery {
         m_connector = DatabaseConnector.getDatabaseConnector(this);
         String alias = m_connector.getAlias();
         String myWhere = getMyWhere();
-        StringBuilder qString = new StringBuilder(512);
 
-        qString.append("SELECT urs.*,null as SipId,null as CallId,files.fileno as fileno, ")
-                .append("files.appnameid as appnameid, files.name as filename, files.arcname as arcname,  ")
-                .append("files.component as component, files.nodeId as nodeid, ")
-                .append("app00.name as app, null as anchorId \n")
-                .append(getRefFields())
-                .append(getNullFields())
-                .append(addedFieldString(true, false))
-                .append("\nFROM URS_logbr AS urs INNER JOIN FILE_logbr AS files ")
-                .append("ON urs.fileId=files.id \ninner join app as app00 on files.appnameid=app00.id\n")
-                .append(getRefs())
-                .append("\n")
-                .append(myWhere)
-                .append((inquirer.getCr().isAddOrderBy()) ? " ORDER BY urs.time " : " ")
-                .append("\n")
-                .append(getLimitClause())
-                .append(";");
+        String qString = "SELECT urs.*,null as SipId,null as CallId,files.fileno as fileno, " +
+                "files.appnameid as appnameid, files.name as filename, files.arcname as arcname,  " +
+                "files.component as component, files.nodeId as nodeid, " +
+                "app00.name as app, null as anchorId \n" +
+                getRefFields() +
+                getNullFields() +
+                addedFieldString(true, false) +
+                "\nFROM URS_logbr AS urs INNER JOIN FILE_logbr AS files " +
+                "ON urs.fileId=files.id \ninner join app as app00 on files.appnameid=app00.id\n" +
+                getRefs() +
+                "\n" +
+                myWhere +
+                ((inquirer.getCr().isAddOrderBy()) ? " ORDER BY urs.time " : " ") +
+                "\n" +
+                getLimitClause() +
+                ";";
 
-        m_resultSet = m_connector.executeQuery(this, qString.toString());
+        m_resultSet = m_connector.executeQuery(this, qString);
         recCnt = 0;
     }
 

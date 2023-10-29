@@ -161,7 +161,7 @@ public abstract class OutputSpecFormatter extends DefaultFormatter {
         }
 
         public boolean equalsName(String otherName) {
-            return otherName != null && name.equals(otherName);
+            return name.equals(otherName);
         }
 
         @Override
@@ -405,7 +405,7 @@ public abstract class OutputSpecFormatter extends DefaultFormatter {
         private String evalValue(ILogRecord record) throws Exception {
             if (cond != null) {
                 try {
-                    if (JSRunner.execBoolean(cond, record) == false) {
+                    if (!JSRunner.execBoolean(cond, record)) {
                         return "";
                     }
                 } catch (Exception e) {

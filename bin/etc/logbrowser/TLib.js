@@ -6,15 +6,9 @@ for (var s of RECORD.getBytes().split('\n')) {
   if ((m = s.match(/AttributePrivateMsgID\s*(\d*)$/i)) != undefined) {
     FIELDS.put("PrivateMsgID", "msgid=" + m[1]);
   } else if ((m = s.match(/AttributeLocation\s(\S*)$/i)) != undefined) {
-    FIELDS.put("location", {
-      value: "loc=" + m[1],
-      hidden: true
-    });
-
+    FIELDS.put("location", "loc=" + m[1]);
   } else if ((m = s.match(/Session'\s'(\S*)'/i)) != undefined) {
     FIELDS.put("sid", "sid=" + m[1]);
-  } else if ((m = s.match(/ENT_VQ'\s'(\S*)'/i)) != undefined) {
-    FIELDS.put("VQ", "VQ=" + m[1]);
   } else if ((m = s.match(/(from ISCC):/)) != undefined) {
     FIELDS.put("source", m[1]);
   } else if ((m = s.match(/AttributeCallState\s(\d*)$/)) != undefined) {

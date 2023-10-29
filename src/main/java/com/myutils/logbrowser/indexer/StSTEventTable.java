@@ -32,6 +32,8 @@ public class StSTEventTable extends DBTable {
         addIndex("errMessageID");
         dropIndexes();
 
+        //                        ",dec_conn_id CHAR(32)" +
+        //                        ",dec_transfer_id CHAR(32)" +
         String query = "create table if not exists STSTEVENT_" + getM_dbAccessor().getM_alias() + " (id INTEGER PRIMARY KEY ASC,"
                 + "time timestamp,"
                 + "nameID INTEGER,"
@@ -48,9 +50,6 @@ public class StSTEventTable extends DBTable {
                 + "FileBytes INT,"
                 + "line INT,"
                 + "errMessageID integer"
-                + ""
-                //                        ",dec_conn_id CHAR(32)" +
-                //                        ",dec_transfer_id CHAR(32)" +
                 + ");";
         getM_dbAccessor().runQuery(query);
     }

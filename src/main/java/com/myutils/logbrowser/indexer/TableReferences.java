@@ -34,26 +34,25 @@ class TableReference {
             synchronized (dbAccessor) {
                 try {
                     if (dbAccessor.TableExist(type.toString())) {
-                        ResultSet rs = dbAccessor.executeQuery("select name, id from " + type);
-                        Main.logger.trace("Reading references from " + type);
+                        try (ResultSet rs = dbAccessor.executeQuery("select name, id from " + type)) {
+                            Main.logger.trace("Reading references from " + type);
 
-                        //                    ResultSetMetaData rsmd = rs.getMetaData();
-                        int cnt = 0;
-                        while (rs.next()) {
-                            String n = rs.getString(1);
-                            if (n != null && !n.isEmpty()) {
-                                int aInt = rs.getInt(2);
-                                if (aInt > maxID) {
-                                    maxID = aInt;
+                            //                    ResultSetMetaData rsmd = rs.getMetaData();
+                            int cnt = 0;
+                            while (rs.next()) {
+                                String n = rs.getString(1);
+                                if (n != null && !n.isEmpty()) {
+                                    int aInt = rs.getInt(2);
+                                    if (aInt > maxID) {
+                                        maxID = aInt;
+                                    }
+                                    Main.logger.trace("Added name/key: [" + rs.getString(1) + "] / " + aInt);
+                                    valRef.put(new CIString(rs.getString(1)), aInt);
+                                    cnt++;
                                 }
-                                Main.logger.trace("Added name/key: [" + rs.getString(1) + "] / " + aInt);
-                                valRef.put(new CIString(rs.getString(1)), aInt);
-                                cnt++;
                             }
+                            Main.logger.debug("\tRetrieved " + cnt + " records");
                         }
-                        Main.logger.debug("\tRetrieved " + cnt + " records");
-                        rs.close();
-                        rs.getStatement().close();
                         this.initialID = maxID;
                     }
                 } catch (Exception ex) {
@@ -275,7 +274,7 @@ public class TableReferences {
     }
 
     public Integer getRef(ReferenceType type, String key) {
-        if (key == null || key.length() == 0) {
+        if (key == null || key.isEmpty()) {
             return null;
         }
         TableReference tr;
@@ -291,8 +290,8 @@ public class TableReferences {
 
     }
 
-    synchronized public Integer getRef(ReferenceType type, String key, int wordsToCompare) {
-        if (key == null || key.length() == 0) {
+    public synchronized Integer getRef(ReferenceType type, String key, int wordsToCompare) {
+        if (key == null || key.isEmpty()) {
             return null;
         }
         TableReference tr = tabRefs.get(type);

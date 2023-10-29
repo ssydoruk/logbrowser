@@ -71,7 +71,7 @@ public class SipForScCmQuery extends IQuery {
 
     @Override
     public void Execute() throws SQLException {
-        inquirer.logger.debug("**Execute in  " + this.getClass().toString());
+        inquirer.logger.debug("**Execute in  " + this.getClass());
         m_connector = DatabaseConnector.getDatabaseConnector(this);
         String alias = m_connector.getAlias();
 
@@ -86,7 +86,6 @@ public class SipForScCmQuery extends IQuery {
                 + "sip.HandlerId,"
                 + "sip.callRelated,"
                 + "sip.FileId,"
-                + ""
                 + "files.id as files_id,files.fileno as fileno, files.appnameid as appnameid, files.name as filename, files.arcname as arcname,  app00.name as app, "
                 + "files.component as component \n"
                 + getRefFields()

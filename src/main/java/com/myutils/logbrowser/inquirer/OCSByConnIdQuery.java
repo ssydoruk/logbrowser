@@ -67,7 +67,7 @@ public class OCSByConnIdQuery extends IQuery {
 
     @Override
     public void Execute() throws SQLException {
-        inquirer.logger.debug("**Execute in  " + this.getClass().toString());
+        inquirer.logger.debug("**Execute in  " + this.getClass());
         m_connector = DatabaseConnector.getDatabaseConnector(this);
         String alias = m_connector.getAlias();
 
@@ -98,7 +98,7 @@ public class OCSByConnIdQuery extends IQuery {
             recLoaded(rec);
             return rec;
         }
-        inquirer.logger.debug("++ " + this.getClass().toString() + ": extracted " + recCnt + " records");
+        inquirer.logger.debug("++ " + this.getClass() + ": extracted " + recCnt + " records");
         return null;
     }
 

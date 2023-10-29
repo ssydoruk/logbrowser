@@ -1,0 +1,69 @@
+{
+  // Use IntelliSense to learn about possible attributes.
+  // Hover to view descriptions of existing attributes.
+  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "bashdb",
+      "request": "launch",
+      "name": "Bash-Debug (hardcoded script name)",
+      "cwd": "${workspaceFolder}",
+      "program": "/Users/stepan_sydoruk/src/logbrowser/bin/logbrowser/aa.sh",
+      "args": []
+    },
+    {
+      "type": "graalvm",
+      "request": "launch",
+      "name": "Launch JavaScript graal",
+      "runtimeArgs": [
+        "--jvm"
+      ],
+      "runtimeExecutable": "node",
+      "program": "${file}"
+    },
+    {
+      "name": "Launch Program as node",
+      "program": "${file}",
+      "request": "launch",
+      "runtimeExecutable": "/Users/stepan_sydoruk/.sdkman/candidates/java/current/bin/node",
+      "runtimeArgs": [
+        "--jvm"
+      ],
+      "stopOnEntry": false,
+      "skipFiles": [
+        "<node_internals>/**"
+      ],
+      "type": "node"
+    },
+    {
+      "type": "java",
+      "name": "Debug (Launch) - Current File",
+      "request": "launch",
+      "mainClass": "${file}"
+    },
+    {
+      "type": "java",
+      "name": "Debug (Launch)-Main<logbrowser>",
+      "request": "launch",
+      "mainClass": "com.myutils.logbrowser.indexer.Main",
+      "projectName": "logbrowser"
+    },
+    {
+      "type": "java",
+      "name": "Debug (Launch)-Parser<logbrowser>",
+      "request": "launch",
+      "mainClass": "com.myutils.logbrowser.indexer.Parser",
+      "projectName": "logbrowser"
+    },
+    {
+      "type": "java",
+      "name": "Debug (Launch)-inquirer<logbrowser>",
+      "request": "launch",
+      "mainClass": "com.myutils.logbrowser.inquirer.inquirer",
+      "projectName": "logbrowser",
+      "vmArgs": "-Dlogbr.dir=.tmp -Dlog4j.configurationFile=/Users/stepan_sydoruk/GCTI/etc/logbrowser/logbr.log4j2.inquirer.xml -Dlog4j.logPath=/Users/stepan_sydoruk/GCTI/Work/Nov20_ppe/tmp -Dsun.java2d.d3d=false -Dall=1 -Xms8000m -Xmx8000m -Dsqlite.pragma=true -Dtlib.norequest=false -Dtimediff.parse=false",
+      "args": "--dbname=/Users/stepan_sydoruk/GCTI/Work/Nov20_ppe/logbr --config=/Users/stepan_sydoruk/GCTI/etc/logbrowser/inquirer.cfg.json --basedir=/Users/stepan_sydoruk/GCTI/Work/Nov20_ppe --outputspec=/Users/stepan_sydoruk/GCTI/etc/logbrowser/outputspec3.xml"
+    }
+  ]
+}

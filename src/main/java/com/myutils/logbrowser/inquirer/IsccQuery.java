@@ -66,34 +66,32 @@ final public class IsccQuery extends IQuery {
         m_connector = DatabaseConnector.getDatabaseConnector(this);
         String alias = m_connector.getAlias();
 
-        StringBuilder qString = new StringBuilder();
+        String qString = "SELECT tlib.id,"
+                + "tlib.time,"
+                + "tlib.FileId,"
+                + "tlib.FileOffset,"
+                + "tlib.FileBytes,"
+                + "tlib.line,"
+                + "tlib.Inbound,"
+                + "tlib.HandlerId,"
+                + "tlib.ReferenceId,"
+                + "tlib.thisDNID,"
+                + "tlib.otherDNID," +
+                " file.name AS filename, file.arcname as arcname, file.fileno as fileno, file.appnameid as appnameid,\n" +
+                " 0 as anchorid,null as seqno, file.component as component, app00.name as app, file.nodeId as nodeid " +
+                getRefFields() +
+                getNullFields() +
+                "\nFROM iscc_" + alias + " AS tlib\n" +
+                getRefs() +
+                "\nINNER JOIN file_" + alias + " AS file ON file.id=tlib.fileId\n" +
+                "inner join app as app00 on file.appnameid=app00.id\n" +
+                getMyWhere("tlib") +
+                ((inquirer.getCr().isAddOrderBy()) ? " ORDER BY tlib.time" : "") +
+                "\n" +
+                getLimitClause() +
+                ";";
 
-        qString.append("SELECT tlib.id,"
-                        + "tlib.time,"
-                        + "tlib.FileId,"
-                        + "tlib.FileOffset,"
-                        + "tlib.FileBytes,"
-                        + "tlib.line,"
-                        + "tlib.Inbound,"
-                        + "tlib.HandlerId,"
-                        + "tlib.ReferenceId,"
-                        + "tlib.thisDNID,"
-                        + "tlib.otherDNID,")
-                .append(" file.name AS filename, file.arcname as arcname, file.fileno as fileno, file.appnameid as appnameid,\n")
-                .append(" 0 as anchorid,null as seqno, file.component as component, app00.name as app, file.nodeId as nodeid ")
-                .append(getRefFields())
-                .append(getNullFields())
-                .append("\nFROM iscc_").append(alias).append(" AS tlib\n")
-                .append(getRefs())
-                .append("\nINNER JOIN file_").append(alias).append(" AS file ON file.id=tlib.fileId\n")
-                .append("inner join app as app00 on file.appnameid=app00.id\n")
-                .append(getMyWhere("tlib"))
-                .append((inquirer.getCr().isAddOrderBy()) ? " ORDER BY tlib.time" : "")
-                .append("\n")
-                .append(getLimitClause())
-                .append(";");
-
-        m_resultSet = m_connector.executeQuery(this, qString.toString());
+        m_resultSet = m_connector.executeQuery(this, qString);
         recCnt = 0;
 
     }

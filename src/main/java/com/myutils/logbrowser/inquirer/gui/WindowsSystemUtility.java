@@ -78,7 +78,7 @@ public class WindowsSystemUtility {
 
 
     static void InitDLLActiveX() throws IOException {
-        if (libraryLoaded == false) {
+        if (!libraryLoaded) {
             /**
              * `System.getProperty("os.arch")` It'll tell us on which platform
              * Java Program is executing. Based on that we'll load respective

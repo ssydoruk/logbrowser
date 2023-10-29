@@ -37,24 +37,24 @@ public class RequestParams extends javax.swing.JPanel {
     static private final int CHILD_LISTBOX = 2;
     private final QueryDialog qd;
     ArrayList<ChangeListItem> CRIs;
-    private HashMap<CheckBoxList, String> lastRegExp = new HashMap<>(4);
-    private MyCheckBoxList cblReportType;
-    private DefaultListModel lmReportType;
-    private MyCheckBoxList cblReportComp;
-    private DefaultListModel lmReportComp;
-    private IQueryResults qry;
-    private MyCheckBoxList cblApps;
-    private DefaultListModel lmApps;
-    private DefaultListModel lmAttr;
-    private MyCheckBoxList cblAttr;
-    private DefaultListModel lmAttrValues;
-    private MyCheckBoxList cblAttrValues;
-    private TDateRange timeRange;
-    private CheckBoxList _listComps = null;
-    private DefaultListModel _modelComps = null;
-    private HashMap<Integer, int[]> compChecked = new HashMap<>();
-    private int rptSelected = -1;
-    private HashMap<CheckBoxList, ChangeListItem> changeList = new HashMap<>();
+    private final HashMap<CheckBoxList, String> lastRegExp = new HashMap<>(4);
+    private final MyCheckBoxList cblReportType;
+    private final DefaultListModel lmReportType;
+    private final MyCheckBoxList cblReportComp;
+    private final DefaultListModel lmReportComp;
+    private final IQueryResults qry;
+    private final MyCheckBoxList cblApps;
+    private final DefaultListModel lmApps;
+    private final DefaultListModel lmAttr;
+    private final MyCheckBoxList cblAttr;
+    private final DefaultListModel lmAttrValues;
+    private final MyCheckBoxList cblAttrValues;
+    private final TDateRange timeRange;
+    private final CheckBoxList _listComps = null;
+    private final DefaultListModel _modelComps = null;
+    private final HashMap<Integer, int[]> compChecked = new HashMap<>();
+    private final int rptSelected = -1;
+    private final HashMap<CheckBoxList, ChangeListItem> changeList = new HashMap<>();
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JComboBox<String> cbSearchLevel;
     private javax.swing.JLabel jLabel1;
@@ -113,7 +113,7 @@ public class RequestParams extends javax.swing.JPanel {
         InitCB(cblAttrValues, null, rptAttrValues, 4);
 
         cblReportType.setValueIsAdjusting(true);
-        FillElements(cblReportType, (DynamicTreeNode<OptionNode>) qry.getReportItems().getRoot(), true);
+        FillElements(cblReportType, qry.getReportItems().getRoot(), true);
 
 //        cblReportType.setCheckBoxListSelectedIndex(0);
 //        for (int i = 0; i < lmReportType.size(); i++) {

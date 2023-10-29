@@ -413,7 +413,7 @@ public class IxnServerParser extends Parser {
         }
 
         public boolean equalsName(String otherName) {
-            return otherName != null && name.equals(otherName);
+            return name.equals(otherName);
         }
 
         @Override

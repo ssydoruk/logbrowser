@@ -17,15 +17,15 @@ public class EnvIndexer extends ExecutionEnvironment {
     protected final CommandLineParser parser;
     protected CommandLine cmd;
     Option optHelp;
-    private Option optMaxThreads;
-    private Option optXMLCfg;
-    private Option optAlias;
-    private Option optDBName;
-    private Option optLogsBaseDir;
-    private Option optIgnoreZIP;
-    private Option optTDiffParse;
-    private Option optLogBrowserDir;
-    private Option optSQLPragma;
+    private final Option optMaxThreads;
+    private final Option optXMLCfg;
+    private final Option optAlias;
+    private final Option optDBName;
+    private final Option optLogsBaseDir;
+    private final Option optIgnoreZIP;
+    private final Option optTDiffParse;
+    private final Option optLogBrowserDir;
+    private final Option optSQLPragma;
 
 
     EnvIndexer() {

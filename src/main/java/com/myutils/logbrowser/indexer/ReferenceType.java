@@ -128,7 +128,7 @@ public enum ReferenceType {
     }
 
     public boolean equalsName(String otherName) {
-        return otherName != null && name.equals(otherName);
+        return name.equals(otherName);
     }
 
     @Override

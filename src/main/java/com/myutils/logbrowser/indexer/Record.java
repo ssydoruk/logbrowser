@@ -29,10 +29,10 @@ public abstract class Record implements Cloneable {
     protected long m_FileBytes;
     private long m_fileOffset;
     private int m_line;
-    private String m_type;
+    private final String m_type;
     //    protected Date m_Timestamp = null;
     private DateParsed m_TimestampDP = null;
-    private int recordID;
+    private final int recordID;
 
     public Record(String type, int fileID) {
         this.fileID = fileID;

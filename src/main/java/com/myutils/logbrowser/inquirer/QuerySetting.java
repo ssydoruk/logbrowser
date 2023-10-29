@@ -38,11 +38,11 @@ public final class QuerySetting extends javax.swing.JDialog {
     /**
      * Creates new form QuerySetting
      */
-    private InquirerCfg cr;
+    private final InquirerCfg cr;
     private CheckBoxListSettings clbRefValues;
     private DefaultListModel lmRefValues;
     private int closeCause;
-    private HashMap<String, String> printFilters;
+    private final HashMap<String, String> printFilters;
     private CheckBoxListSettings clbLogMessages;
     private HashMap<ReferenceType, ArrayList<OptionNode>> savedRefs;
     private ReferenceType lastRefType;
@@ -149,7 +149,7 @@ public final class QuerySetting extends javax.swing.JDialog {
         tfFileNameLong.setText(cr.getFileNameLongBase());
         tfFileNameShort.setText(cr.getFileNameShortBase());
         tfFileNameExcel.setText(cr.getFileNameExcelBase());
-        jtfFileSize.setText(new Integer(cr.getFileSizeWarn()).toString());
+        jtfFileSize.setText(Integer.toString(cr.getFileSizeWarn()));
         jsMaxRecords.getModel().setValue(cr.getMaxRecords());
         retrieveLogMessages(cr.retrieveLogMessages());
         retrieveRefs(cr.retrieveRefs());
@@ -273,7 +273,7 @@ public final class QuerySetting extends javax.swing.JDialog {
         pRefTypes.add(jScrollPane);
         ArrayList<ReferenceType> ar = new ArrayList<>(savedRefs.keySet());
         Collections.sort(ar, (o1, o2) -> {
-            return ((ReferenceType) o1).toString().compareToIgnoreCase(((ReferenceType) o2).toString());
+            return o1.toString().compareToIgnoreCase(o2.toString());
         });
 
         for (ReferenceType rt : ar) {
@@ -1288,7 +1288,7 @@ public final class QuerySetting extends javax.swing.JDialog {
         Object selectedValue = jlConstants.getSelectedValue();
         int selectedIndex = jlConstants.getSelectedIndex();
         if (selectedValue != null) {
-            int ret = inquirer.showConfirmDialog(this, "Really want to delete [" + selectedValue.toString() + "]?", "Confirm", JOptionPane.YES_NO_OPTION);
+            int ret = inquirer.showConfirmDialog(this, "Really want to delete [" + selectedValue + "]?", "Confirm", JOptionPane.YES_NO_OPTION);
             if (ret == JOptionPane.YES_OPTION) {
                 DefaultListModel model = (DefaultListModel) jlConstants.getModel();
                 model.remove(selectedIndex);

@@ -237,7 +237,7 @@ public enum DialogItem {
 //        
 //    }
     public boolean equalsName(String otherName) {
-        return otherName != null && name.equalsIgnoreCase(otherName);
+        return name.equalsIgnoreCase(otherName);
     }
 
     @Override

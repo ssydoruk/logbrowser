@@ -88,23 +88,22 @@ public class OrsByConnIdQuery extends IQuery {
 //            connIdCondition += " OR ors.ConnectionId=\"" + m_ConnIds[i] + "\"";
 //        }
 //        connIdCondition += ")";
-        StringBuilder qString = new StringBuilder(512);
-        qString.append("SELECT ")
-                .append(stdFields("ors"))
-                .append(",ors.Inbound,ors.seqno,ors.HandlerId,ors.ReferenceId,ors.thisDNID,ors.otherDNID,files.fileno as fileno, files.appnameid as appnameid, files.name as filename, files.arcname as arcname,  \n")
-                .append("files.component as component, app00.name as app, files.nodeId as nodeid, null as anchorId \n")
-                .append(getRefFields())
-                .append(getNullFields())
-                .append(addedFieldString(true, false))
-                .append("\nFROM ORS_logbr AS ors INNER JOIN FILE_logbr AS files ON ors.fileId=files.id \n")
-                .append("inner join app as app00 on files.appnameid=app00.id\n")
-                .append(getRefs())
-                .append("\n")
-                .append(getMyWhere())
-                .append((inquirer.getCr().isAddOrderBy()) ? " ORDER BY ors.time " : " ")
-                .append("\n")
-                .append(getLimitClause())
-                .append(";\n ");
+        String qString = "SELECT " +
+                stdFields("ors") +
+                ",ors.Inbound,ors.seqno,ors.HandlerId,ors.ReferenceId,ors.thisDNID,ors.otherDNID,files.fileno as fileno, files.appnameid as appnameid, files.name as filename, files.arcname as arcname,  \n" +
+                "files.component as component, app00.name as app, files.nodeId as nodeid, null as anchorId \n" +
+                getRefFields() +
+                getNullFields() +
+                addedFieldString(true, false) +
+                "\nFROM ORS_logbr AS ors INNER JOIN FILE_logbr AS files ON ors.fileId=files.id \n" +
+                "inner join app as app00 on files.appnameid=app00.id\n" +
+                getRefs() +
+                "\n" +
+                getMyWhere() +
+                ((inquirer.getCr().isAddOrderBy()) ? " ORDER BY ors.time " : " ") +
+                "\n" +
+                getLimitClause() +
+                ";\n ";
 
 //         query = "SELECT ors.*,0 as SipId,null as CallId,files.fileno as fileno, files.appnameid as appnameid, files.name as filename, files.arcname as arcname,  \n"+
 //                 "null as source,\n"+
@@ -139,7 +138,7 @@ public class OrsByConnIdQuery extends IQuery {
 ////                "AND sip.handlerid IS NOT NULL AND sip.handlerid!=0 and sip.inbound=1 \n"+
 //                " WHERE " + connIdCondition + 
 //                 " ORDER BY ors.time;"; 
-        m_resultSet = m_connector.executeQuery(this, qString.toString());
+        m_resultSet = m_connector.executeQuery(this, qString);
         recCnt = 0;
     }
 

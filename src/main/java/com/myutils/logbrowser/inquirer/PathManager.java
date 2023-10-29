@@ -35,12 +35,12 @@ public class PathManager {
         // using dbPath as owner, it's temporary anyway
         DatabaseConnector dbConnector = DatabaseConnector.getDatabaseConnector(dbPath);
         String query = "SELECT name FROM file_" + alias + " WHERE id=1;";
-        ResultSet rs = dbConnector.executeQuery(dbPath, query);
-        if (rs.next()) {
-            String pathname = rs.getString("name");
-            m_origPath = Paths.get(pathname);
+        try (ResultSet rs = dbConnector.executeQuery(dbPath, query) ) {
+            if (rs.next()) {
+                String pathname = rs.getString("name");
+                m_origPath = Paths.get(pathname);
+            }
         }
-        rs.close();
         dbConnector.releaseConnector(dbPath);
 
         Integer[] iDs = DatabaseConnector.getIDs("select count(*) from file_" + alias + " WHERE apptypeid>0;");

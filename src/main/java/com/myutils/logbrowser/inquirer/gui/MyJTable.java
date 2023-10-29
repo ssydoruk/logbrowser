@@ -674,7 +674,7 @@ public class MyJTable extends JTableCommon {
         public void valueChanged(ListSelectionEvent e) {
             if (!e.getValueIsAdjusting()) {
                 DefaultListSelectionModel sm = (DefaultListSelectionModel) e.getSource();
-                inquirer.logger.trace("Selection Changed" + sm.toString() + "");
+                inquirer.logger.trace("Selection Changed" + sm.toString());
                 int row = sm.getMinSelectionIndex();
                 if (row >= 0) {
                     MyJTable table = MyJTable.this;

@@ -21,7 +21,7 @@ public class SipMSQuery extends IQuery {
     private Integer[] m_CallIds;
     private DynamicTreeNode<OptionNode> node = null;
     private IDsFinder cidFinder;
-    private boolean shouldRun = false;
+    private final boolean shouldRun = false;
 
     public SipMSQuery() throws SQLException {
         addRef("ToUriID", "ToUri", ReferenceType.SIPURI.toString(), FieldType.OPTIONAL);
@@ -65,7 +65,7 @@ public class SipMSQuery extends IQuery {
 
     @Override
     public void Execute() throws SQLException {
-        inquirer.logger.debug("**Execute in  " + this.getClass().toString());
+        inquirer.logger.debug("**Execute in  " + this.getClass());
         m_connector = DatabaseConnector.getDatabaseConnector(this);
         String alias = m_connector.getAlias();
 
@@ -95,7 +95,6 @@ public class SipMSQuery extends IQuery {
 
     @Override
     public ILogRecord GetNext() throws SQLException {
-        on_error:
         if (m_resultSet.next()) {
             recCnt++;
             QueryTools.DebugRec(m_resultSet);

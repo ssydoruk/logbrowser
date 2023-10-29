@@ -10,6 +10,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.concurrent.BasicThreadFactory;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.immutables.value.Value;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -40,6 +41,12 @@ import static Utils.Util.pDuration;
  * @author ssydoruk
  */
 public class Main {
+    @Value.Style(
+            typeAbstract = {"Abstract*"}, // 'Abstract' prefix will be detected and trimmed
+            typeImmutable = "C*", // No prefix or suffix for generated immutable type
+            visibility = Value.Style.ImplementationVisibility.PUBLIC, // Generated class will be always public
+            defaults = @Value.Immutable(copy = false, builder = false, singleton = true)) // Disable copy methods by default
+    public @interface MySingleton {}
 
     private static final Constants constants = new Constants();
     private static final Pattern regFilesNotGood = Pattern.compile("(^\\.logbr|logbr.db)");
@@ -48,7 +55,6 @@ public class Main {
     static String m_component = "all";
     static String m_executableName = "indexer.jar";
     static long totalBytes = 0;
-    ;
     private final ArrayList<File> m_files = new ArrayList();
     public XmlCfg xmlCfg = null;
     HashMap<FileInfoType, Parser> m_parsers = new HashMap<>();
@@ -544,7 +550,7 @@ public class Main {
                                                         }
                                                     }
                                                     Parse(fi);
-                                                    logger.debug("Done " + fi.toString());
+                                                    logger.debug("Done " + fi);
                                                 }
                                             }
                                         }
@@ -1281,13 +1287,13 @@ public class Main {
 
         private boolean CheckIgnore(Message msg) {
             if (tablesCfg != null && msg != null) {
-                ArrayList<Pattern> pIgnore = tablesCfg.get(msg.getM_type().toString());
+                ArrayList<Pattern> pIgnore = tablesCfg.get(msg.getM_type());
 
                 if (pIgnore != null && msg.m_MessageLines != null) {
                     for (String s : msg.m_MessageLines) {
                         for (Pattern pIgn : pIgnore) {
                             if (pIgn.matcher(s).find()) {
-                                Main.logger.trace("Ignoring message type " + msg.getM_type().toString() + " msg:" + msg);
+                                Main.logger.trace("Ignoring message type " + msg.getM_type() + " msg:" + msg);
                                 return true;
                             }
                         }

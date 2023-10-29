@@ -336,7 +336,6 @@ public class WorkspaceResults extends IQueryResults {
             cidFinder = new IDsFinder();
             if (!cidFinder.initSearch()) {
                 inquirer.logger.info("No call ID found; returning");
-                return;
             }
         }
     }

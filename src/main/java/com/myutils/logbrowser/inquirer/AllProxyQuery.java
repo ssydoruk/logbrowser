@@ -40,7 +40,7 @@ public class AllProxyQuery extends IQuery {
             return rec;
         }
 
-        inquirer.logger.debug("++ " + this.getClass().toString() + ": extracted " + recCnt + " records");
+        inquirer.logger.debug("++ " + this.getClass() + ": extracted " + recCnt + " records");
 
         return null;
     }

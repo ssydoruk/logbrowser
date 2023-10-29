@@ -55,10 +55,10 @@ public class QueryDialog extends javax.swing.JFrame {
     AggregateDialog aggregateDialog = null;
     CancelRunDialog fileSaveSettings = null;
     private int closeCause = 0;
-    private boolean aggregateInitiated = false;
+    private final boolean aggregateInitiated = false;
     private FileOutSettings fileOutSetting;
     private JPanel aggregatePanel;
-    private ArrayList<ReportFrame> reps = new ArrayList<>();
+    private final ArrayList<ReportFrame> reps = new ArrayList<>();
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btAllCalls;
     private javax.swing.JButton btOK;
@@ -67,8 +67,7 @@ public class QueryDialog extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel5;
 
-    ;
-//</editor-fold>
+    //</editor-fold>
     private javax.swing.JButton jbAggregate;
     private javax.swing.JButton jbCancel;
     private javax.swing.JButton jbReset;
@@ -441,8 +440,7 @@ public class QueryDialog extends javax.swing.JFrame {
                     }
 
                 }
-                ;
-//</editor-fold>
+                //</editor-fold>
                 QueryTools.queryMessagesClear();
                 QueryAllTask tsk = new QueryAllTask(this, qry);
                 RequestProgress rp = new RequestProgress(this, true, tsk);
@@ -842,7 +840,7 @@ public class QueryDialog extends javax.swing.JFrame {
         ReportFrame frm = null;
         private String outFile;
         private boolean displayForm;
-        private QueryDialog queryDialog;
+        private final QueryDialog queryDialog;
         private RequestProgress rp = null;
 
         private QueryTask(QueryDialog frm, IAggregateQuery selected) {

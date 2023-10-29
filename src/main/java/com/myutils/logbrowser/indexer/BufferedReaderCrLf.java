@@ -324,7 +324,6 @@ public class BufferedReaderCrLf {
             ensureOpen();
             boolean omitLF = ignoreLF || skipLF;
 
-            bufferLoop:
             for (; ; ) {
 
                 if (nextChar >= nChars) {
@@ -354,7 +353,6 @@ public class BufferedReaderCrLf {
                 skipLF = false;
                 omitLF = false;
 
-                charLoop:
                 for (i = nextChar; i < nChars; i++) {
                     c = cb[i];
                     if ((c == '\n') || (c == '\r')) {
@@ -411,7 +409,6 @@ public class BufferedReaderCrLf {
         synchronized (lock) {
             ensureOpen();
 
-            bufferLoop:
             for (; ; ) {
 
                 if (nextChar >= nChars) {
@@ -434,7 +431,6 @@ public class BufferedReaderCrLf {
                 byte c = 0;
                 int i;
 
-                charLoop:
                 for (i = nextChar; i < nChars && cnt > 0; i++, cnt--) {
 //		    c = cb[i];
 //		    if ((c == '\n') || (c == '\r')) {

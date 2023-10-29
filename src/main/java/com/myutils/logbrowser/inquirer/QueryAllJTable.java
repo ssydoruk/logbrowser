@@ -145,7 +145,7 @@ public final class QueryAllJTable extends QueryJTable {
         public void valueChanged(ListSelectionEvent e) {
             if (!e.getValueIsAdjusting()) {
                 DefaultListSelectionModel sm = (DefaultListSelectionModel) e.getSource();
-                inquirer.logger.trace("Selection Changed" + sm.toString() + "");
+                inquirer.logger.trace("Selection Changed" + sm.toString());
                 theTable.showCall(sm.getMinSelectionIndex(), false, false);
             }
         }

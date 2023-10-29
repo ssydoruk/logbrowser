@@ -712,7 +712,7 @@ public class TabResultDataModel extends AbstractTableModel {
                 }
             }
             if (tabDelimiter) {
-                out.write("" + colName + "\t");
+                out.write(colName + "\t");
             }
 
             out.write("\"" + colName + "\",");
@@ -722,7 +722,7 @@ public class TabResultDataModel extends AbstractTableModel {
         for (int i = 0; i < tab.getRowCount(); i++) {
             for (int j = 0; j < tab.getColumnCount(); j++) {
                 if (tabDelimiter) {
-                    out.write("" + getValueAt(tab.convertRowIndexToModel(i), tab.convertColumnIndexToModel(j)) + "\t");
+                    out.write(getValueAt(tab.convertRowIndexToModel(i), tab.convertColumnIndexToModel(j)) + "\t");
                 } else {
                     out.write("\"" + getValueAt(tab.convertRowIndexToModel(i), j) + "\",");
                 }
@@ -963,7 +963,7 @@ public class TabResultDataModel extends AbstractTableModel {
     private Integer getTitleIdx(String title) {
         Integer ret = columnTitle.get(title);
         if (ret == null) {
-            if (!title.startsWith(TableRow.colPrefix) && false) {
+            if (false) {
                 int maxNamed = 0;
                 for (Map.Entry<String, Integer> entry : columnTitle.entrySet()) {
                     if (!entry.getKey().startsWith(TableRow.colPrefix)) {

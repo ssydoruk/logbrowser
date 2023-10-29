@@ -5,7 +5,16 @@
  */
 package com.myutils.logbrowser.common;
 
-import com.myutils.logbrowser.inquirer.ILogRecord;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PipedInputStream;
+import java.io.PipedOutputStream;
+import java.util.HashMap;
+import java.util.logging.Handler;
+import java.util.logging.LogRecord;
+
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.graalvm.polyglot.Context;
@@ -13,20 +22,20 @@ import org.graalvm.polyglot.HostAccess;
 import org.graalvm.polyglot.Source;
 import org.graalvm.polyglot.Value;
 
-import java.io.*;
-import java.util.HashMap;
-import java.util.logging.Handler;
-import java.util.logging.LogRecord;
+import com.myutils.logbrowser.inquirer.ILogRecord;
+
 
 /**
  * @author stepan_sydoruk
  */
+
+
 public class JSRunner {
 
     static final public String LogBrowser_CLASS = LogBrowser.class.getName();
     static final boolean isDebug = System.getProperties().containsKey("debug");
     private static final org.apache.logging.log4j.Logger logger = LogManager.getLogger();
-    private static final HashMap<String, Source> sourceFiles = new HashMap();
+	private static final HashMap<String, Source> sourceFiles = new HashMap<>();
     private Context condContext = null;
 
     private JSRunner() {

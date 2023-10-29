@@ -31,8 +31,8 @@ public class jdDateTimeFilter extends javax.swing.JDialog {
     private UTCTimeRange timeRange;
     private DateFilter dateFilter;
     private int closeCause = JOptionPane.CANCEL_OPTION;
-    private DateTimePicker dtFrom;
-    private DateTimePicker dtTo;
+    private final DateTimePicker dtFrom;
+    private final DateTimePicker dtTo;
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btEarlyFirst;
     private javax.swing.JButton btEarlySecond;

@@ -12,7 +12,7 @@ import java.awt.event.MouseEvent;
 @SuppressWarnings("serial")
 public final class JCheckBoxList extends JList<JCheckBox> {
 
-    protected static Border noFocusBorder = new EmptyBorder(1, 1, 1, 1);
+    private static Border noFocusBorder = new EmptyBorder(1, 1, 1, 1);
 
     public JCheckBoxList() {
         setCellRenderer(new CellRenderer());

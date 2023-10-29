@@ -127,10 +127,8 @@ public class AggrORSPerSecond extends IAggregateAggregate {
                 + ";"
         );
 
-        if (grpBy.length > 0) {
-            for (DBField fld : grpBy) {
-                DatabaseConnector.runQuery("create index idx_" + fld.getFieldName() + " on " + TMP_TABLE + "(" + fld.getFieldName() + ");");
-            }
+        for (DBField fld : grpBy) {
+            DatabaseConnector.runQuery("create index idx_" + fld.getFieldName() + " on " + TMP_TABLE + "(" + fld.getFieldName() + ");");
         }
         inquirer.logger.info("extracting data");
         resultQuery = new AnyQuery();
@@ -139,13 +137,11 @@ public class AggrORSPerSecond extends IAggregateAggregate {
         resultQuery.addOutField(resultQuery.getTable() + ".ts", "ts");
         resultQuery.addOutField(resultQuery.getTable() + ".cnt", "cnt");
 
-        if (grpBy.length > 0) {
-            for (DBField fld : grpBy) {
-                if (fld.getFieldName().equals("inbound")) {
-                    resultQuery.addOutField("(case (" + resultQuery.getTable() + ".inbound) when 1 then 'inbound' else 'outbound' end)", "direction");
-                } else {
-                    resultQuery.addRef(fld.getFieldName(), fld.getDbOutField(), fld.getRefTable(), FieldType.MANDATORY);
-                }
+        for (DBField fld : grpBy) {
+            if (fld.getFieldName().equals("inbound")) {
+                resultQuery.addOutField("(case (" + resultQuery.getTable() + ".inbound) when 1 then 'inbound' else 'outbound' end)", "direction");
+            } else {
+                resultQuery.addRef(fld.getFieldName(), fld.getDbOutField(), fld.getRefTable(), FieldType.MANDATORY);
             }
         }
 
@@ -202,10 +198,8 @@ public class AggrORSPerSecond extends IAggregateAggregate {
                 + ";"
         );
 
-        if (grpBy.length > 0) {
-            for (DBField fld : grpBy) {
-                DatabaseConnector.runQuery("create index idx_" + fld.getFieldName() + " on " + TMP_TABLE + "(" + fld.getFieldName() + ");");
-            }
+        for (DBField fld : grpBy) {
+            DatabaseConnector.runQuery("create index idx_" + fld.getFieldName() + " on " + TMP_TABLE + "(" + fld.getFieldName() + ");");
         }
         inquirer.logger.info("extracting data");
         resultQuery = new AnyQuery();
@@ -214,13 +208,11 @@ public class AggrORSPerSecond extends IAggregateAggregate {
         resultQuery.addOutField(resultQuery.getTable() + ".ts", "ts");
         resultQuery.addOutField(resultQuery.getTable() + ".cnt", "cnt");
 
-        if (grpBy.length > 0) {
-            for (DBField fld : grpBy) {
-                if (fld.getFieldName().equals("inbound")) {
-                    resultQuery.addOutField("(case (" + resultQuery.getTable() + ".inbound) when 1 then 'inbound' else 'outbound' end)", "direction");
-                } else {
-                    resultQuery.addRef(fld.getFieldName(), fld.getDbOutField(), fld.getRefTable(), FieldType.MANDATORY);
-                }
+        for (DBField fld : grpBy) {
+            if (fld.getFieldName().equals("inbound")) {
+                resultQuery.addOutField("(case (" + resultQuery.getTable() + ".inbound) when 1 then 'inbound' else 'outbound' end)", "direction");
+            } else {
+                resultQuery.addRef(fld.getFieldName(), fld.getDbOutField(), fld.getRefTable(), FieldType.MANDATORY);
             }
         }
 

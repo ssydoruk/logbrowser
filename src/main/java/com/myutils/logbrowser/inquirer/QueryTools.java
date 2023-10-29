@@ -120,7 +120,6 @@ class SearchIDs {
                 + getWhere(search, ids, true)))) {
             getRelatedConnIDs(tab, search, ret, tmpConnIDs.keySet().toArray(new Integer[tmpConnIDs.size()]), depth++);
         }
-        return;
     }
     
     private static IDFound getRoutingIdType(String[] sIDs) throws SQLException {
@@ -756,9 +755,7 @@ abstract public class QueryTools {
     }
     
     public static String appEqualWhere(String trigger_logbr, String handler_logbr) {
-        StringBuilder s = new StringBuilder();
-        s.append(trigger_logbr).append(".");
-        return s.toString();
+        return trigger_logbr + ".";
     }
     
     public static String getWhere(String Field, Integer[] ids, String addCond, boolean addWhere) {

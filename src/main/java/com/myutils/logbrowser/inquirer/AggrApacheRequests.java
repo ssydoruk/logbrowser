@@ -129,10 +129,8 @@ public class AggrApacheRequests extends IAggregateAggregate {
                 + ";"
         );
 
-        if (grpBy.length > 0) {
-            for (DBField fld : grpBy) {
-                DatabaseConnector.runQuery("create index idx_" + tab + "_" + fld.getFieldName() + " on " + tab + "(" + fld.getFieldName() + ");");
-            }
+        for (DBField fld : grpBy) {
+            DatabaseConnector.runQuery("create index idx_" + tab + "_" + fld.getFieldName() + " on " + tab + "(" + fld.getFieldName() + ");");
         }
         inquirer.logger.info("extracting data");
         resultQuery = new AnyQuery();
@@ -141,10 +139,8 @@ public class AggrApacheRequests extends IAggregateAggregate {
         resultQuery.addOutField(resultQuery.getTable() + ".ts", "ts");
         resultQuery.addOutField(resultQuery.getTable() + ".cnt", "cnt");
 
-        if (grpBy.length > 0) {
-            for (DBField fld : grpBy) {
-                resultQuery.addRef(fld.getFieldName(), fld.getDbOutField(), fld.getRefTable(), FieldType.OPTIONAL);
-            }
+        for (DBField fld : grpBy) {
+            resultQuery.addRef(fld.getFieldName(), fld.getDbOutField(), fld.getRefTable(), FieldType.OPTIONAL);
         }
 
         try {

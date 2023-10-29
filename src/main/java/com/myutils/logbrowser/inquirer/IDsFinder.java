@@ -7,10 +7,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -2325,7 +2322,7 @@ public final class IDsFinder extends QueryTools {
             }
 //            queriesRun = true;
             if (!inquirer.getCr().isNewTLibSearch()) {
-                if (idsFound == true) {
+                if (idsFound) {
                     FindRelated();
                 }
             }
@@ -2478,9 +2475,7 @@ public final class IDsFinder extends QueryTools {
         if (selectionType == SelectionType.CONNID || selectionType == SelectionType.GUESS_SELECTION) {
             ConnIDs = getRefIDs(ReferenceType.ConnID, new String[]{selection}, regex);
             if (ConnIDs != null && ConnIDs.length > 0) {
-                for (Integer ConnID : ConnIDs) {
-                    m_connIdHash.add(ConnID);
-                }
+                Collections.addAll(m_connIdHash, ConnIDs);
                 AddIDs(IDType.ConnID, ConnIDs);
                 return true;
             } else if (selectionType == SelectionType.CONNID) {
@@ -2495,9 +2490,7 @@ public final class IDsFinder extends QueryTools {
                 AddIDs(IDType.UUID, UUIDs);
                 ConnIDs = DatabaseConnector.getDatabaseConnector(this).getIDs(this, "tlib_logbr", "ConnectionIDID", IQuery.getWhere("uuidID", UUIDs, true));
                 if (ConnIDs != null && ConnIDs.length > 0) { // parameter is a ConnID
-                    for (Integer ConnID : ConnIDs) {
-                        m_connIdHash.add(ConnID);
-                    }
+                    Collections.addAll(m_connIdHash, ConnIDs);
                     return true;
                 }
             } else if (selectionType == SelectionType.UUID) {
@@ -2512,9 +2505,7 @@ public final class IDsFinder extends QueryTools {
             }
             if (ConnIDs != null && _CallIDs.length > 0) {
                 AddIDs(IDType.SIPCallID, _CallIDs);
-                for (Integer CallID : _CallIDs) {
-                    m_callIdHash.add(CallID);
-                }
+                Collections.addAll(m_callIdHash, _CallIDs);
                 return true;
             } else if (selectionType == SelectionType.CALLID) {
                 return false;
@@ -2564,9 +2555,9 @@ public final class IDsFinder extends QueryTools {
 
     }
 
-    protected void Loop(ArrayList<Integer> newConnIds,
-                        ArrayList<Integer> newCallIds,
-                        LoopState state) throws SQLException {
+    private void Loop(ArrayList<Integer> newConnIds,
+                      ArrayList<Integer> newCallIds,
+                      LoopState state) throws SQLException {
         boolean newCallIdsFromConnIds = true;
         boolean newCallIdsFromBlocks = true;
         boolean newConnIdsFound = true;
@@ -2681,7 +2672,7 @@ public final class IDsFinder extends QueryTools {
                             if (q.allTabsExist()) {
                                 Integer[] callids = DatabaseConnector.getIDs(q.getReq());
                                 DebugIDs(callids);
-                                if (callids != null && callids.length > 0) {
+                                if (callids != null) {
                                     for (Integer callid : callids) {
                                         if (callid > 0 && !m_callIdHash.contains(callid)) {
                                             int val = callid;
@@ -2856,7 +2847,7 @@ public final class IDsFinder extends QueryTools {
         }
     }
 
-    protected boolean RetrieveParentTransfers(Integer connId, int depth) throws SQLException {
+    private boolean RetrieveParentTransfers(Integer connId, int depth) throws SQLException {
         boolean ret = false;
         if (depth < MAX_DEPTH) {
 
@@ -2894,7 +2885,7 @@ public final class IDsFinder extends QueryTools {
         return ret;
     }
 
-    protected boolean RetrieveChildTransfers(Integer connId, int depth) throws SQLException {
+    private boolean RetrieveChildTransfers(Integer connId, int depth) throws SQLException {
         boolean ret = false;
         if (depth < MAX_DEPTH) {
             ChildTransferQuery query = new ChildTransferQuery(connId);
@@ -2966,7 +2957,7 @@ public final class IDsFinder extends QueryTools {
         }
 
         public boolean equalsName(String otherName) {
-            return otherName != null && name.equals(otherName);
+            return name.equals(otherName);
         }
 
         @Override

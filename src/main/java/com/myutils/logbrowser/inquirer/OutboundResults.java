@@ -261,7 +261,7 @@ final class OutboundResults extends IQueryResults {
                 sendRequest = false;
             }
         }
-        if (sendRequest && false) {
+        if (false) {
             TableQuery OCSPAEVI = null;
             if (cgDBID > 0) {
                 OCSPAEVI = new TableQuery(MsgType.OCSPAEVI, "ocspaevi_logbr", "cgDBID", getWhere("cgDBID", new Integer[]{cgDBID}, false));

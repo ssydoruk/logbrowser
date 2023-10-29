@@ -392,7 +392,7 @@ public abstract class Message extends Record {
 
     protected void checkDiffer(String oldS, String newS, String prop, int line) {
         if ((oldS == null || oldS.isEmpty())
-                || (oldS != null && newS != null && oldS.equals(newS))) {
+                || (oldS != null && oldS.equals(newS))) {
             return;
         }
 

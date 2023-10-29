@@ -48,7 +48,7 @@ public class SQLQuery extends IQuery {
                 break on_error;
             }
         }
-        inquirer.logger.debug("++ " + this.getClass().toString() + ": extracted " + recCnt + " records");
+        inquirer.logger.debug("++ " + this.getClass() + ": extracted " + recCnt + " records");
         return null;
     }
 

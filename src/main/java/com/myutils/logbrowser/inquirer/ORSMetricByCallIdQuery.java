@@ -73,7 +73,6 @@ public class ORSMetricByCallIdQuery extends IQuery {
 
     @Override
     public ILogRecord GetNext() throws SQLException {
-        on_error:
         if (m_resultSet.next()) {
             recCnt++;
             QueryTools.DebugRec(m_resultSet);

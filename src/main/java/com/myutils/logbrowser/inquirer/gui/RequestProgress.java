@@ -21,7 +21,7 @@ public class RequestProgress extends javax.swing.JDialog {
     public static final Object dialogStarted = new Object();
     private static final org.apache.logging.log4j.Logger logger = LogManager.getLogger();
     ElapsedTimer elapsedTimer = null;
-    private MySwingWorker wrk;
+    private final MySwingWorker wrk;
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
@@ -171,7 +171,7 @@ public class RequestProgress extends javax.swing.JDialog {
         protected void process(List<Integer> chunks) {
             for (Integer chunk : chunks) {
 //                    tfSecondsElapsed.t
-                tfSecondsElapsed.setText(pDuration(chunk.intValue() * 1000, false));
+                tfSecondsElapsed.setText(pDuration(chunk.intValue() * 1000L, false));
                 tfSecondsElapsed.invalidate();
 //                    inquirer.logger.info("Elapsed timer: " + com.myutils.logbrowser.indexer.Main.pDuration(chunk.intValue() * 1000, false));
             }

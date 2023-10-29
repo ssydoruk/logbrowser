@@ -6,8 +6,6 @@ package com.myutils.logbrowser.indexer;
 
 import org.apache.logging.log4j.Logger;
 
-import java.io.File;
-import java.nio.file.Path;
 import java.sql.*;
 import java.time.Duration;
 import java.time.Instant;
@@ -30,7 +28,7 @@ public final class SqliteAccessor implements DBAccessor {
     boolean m_exit;
     Stats stats;
 
-    private HashMap<String, Boolean> tabExists = new HashMap<>();
+    private final HashMap<String, Boolean> tabExists = new HashMap<>();
     private List<Long> filesToDelete;
 
     public SqliteAccessor() {
@@ -40,13 +38,11 @@ public final class SqliteAccessor implements DBAccessor {
 
     public void init(String dbname, String alias) throws SQLException {
         m_alias = alias;
-        filesToDelete = Collections.synchronizedList(new ArrayList<Long>());
+        filesToDelete = Collections.synchronizedList(new ArrayList<>());
 
         try {
             Class.forName("org.sqlite.JDBC");
             String name = dbname + ".db";
-            File f = new File(name);
-            Path p = f.toPath();
 
             m_conn = DriverManager.getConnection("jdbc:sqlite:" + name);
 
@@ -187,8 +183,7 @@ public final class SqliteAccessor implements DBAccessor {
         runQuery("Alter table orssess_logbr add connidid INTEGER;\n"
                 + "update orssess_logbr\n"
                 + "set connidid=(select distinct connectionidid from ors_logbr t\n"
-                + "where t.uuidid=orssess_logbr.uuidid);\n"
-                + "");
+                + "where t.uuidid=orssess_logbr.uuidid);\n");
         runQuery("create index if not exists orssess_connid_" + getM_alias() + " on orssess_" + getM_alias() + " (connidid);");
 
         runQuery("update ORSURS_logbr set sidid =\n"
@@ -196,18 +191,15 @@ public final class SqliteAccessor implements DBAccessor {
                 + "ORSURS_logbr.refid=or1.refid and or1.refid>0 and or1.sidid>0  \n"
                 + "and ORSURS_logbr.fileid in (select id from file_logbr where name in (select name from file_logbr where id=or1.fileid))),\n"
                 + "inbound=1\n"
-                + "where sidid <=0 \n"
-                + "");
+                + "where sidid <=0 \n");
         sidForORSURS();
 
-        runQuery(""
-                //                    + "PRAGMA main.page_size = 4096;\n"
-                //                    + "PRAGMA main.cache_size=10000;\n"
-                + "PRAGMA main.locking_mode=NORMAL;\n"
-                + "PRAGMA optimize;\n"
-                //                    + "PRAGMA main.journal_mode=WAL;\n"
+        //                    + "PRAGMA main.page_size = 4096;\n"
+        //                    + "PRAGMA main.cache_size=10000;\n"
+        runQuery("PRAGMA main.locking_mode=NORMAL;\n"
+                + //                    + "PRAGMA main.journal_mode=WAL;\n"
                 //                    + "PRAGMA main.cache_size=5000;\n"
-                + "");
+                "PRAGMA optimize;\n");
 
     }
 
@@ -217,47 +209,48 @@ public final class SqliteAccessor implements DBAccessor {
                 + "order by time";
 
         String ORSURSUpd = "update orsurs_logbr set sidid=? where id=?";
-        ResultSet ORSURSrecs = GetRecords(ORSURSReq);
+        try (ResultSet ORSURSrecs = GetRecords(ORSURSReq)) {
 
-        if (ORSURSrecs != null) {
+            if (ORSURSrecs != null) {
 
-            Connection conn = getM_conn();
+                Connection conn = getM_conn();
 
-            try (PreparedStatement stmtORSURS = conn.prepareStatement(ORSURSUpd)) {
+                try (PreparedStatement stmtORSURS = conn.prepareStatement(ORSURSUpd)) {
 
-                HashMap<Integer, Integer> reqSid = new HashMap<>();
+                    HashMap<Integer, Integer> reqSid = new HashMap<>();
 
-                synchronized (conn) {
-                    int updCnt = 0;
-                    conn.setAutoCommit(false);
-                    try {
-                        while (ORSURSrecs.next()) {
-                            if (updCnt++ >= 1_000) {
-                                Main.logger.debug("Commit1");
-                                conn.commit();
-                                updCnt = 0;
-                            }
-                            int sid = ORSURSrecs.getInt("sidid");
-
-                            if (sid <= 0) {
-                                sid = reqSid.get(ORSURSrecs.getInt("reqid"));
-                                if (sid > 0) {
-                                    stmtORSURS.setInt(1, sid);
-                                    stmtORSURS.setInt(2, ORSURSrecs.getInt("id"));
-                                    stmtORSURS.executeUpdate();
+                    synchronized (conn) {
+                        int updCnt = 0;
+                        conn.setAutoCommit(false);
+                        try {
+                            while (ORSURSrecs.next()) {
+                                if (updCnt++ >= 1_000) {
+                                    Main.logger.debug("Commit1");
+                                    conn.commit();
+                                    updCnt = 0;
                                 }
-                            } else {
-                                reqSid.put(ORSURSrecs.getInt("reqid"), sid);
-                            }
+                                int sid = ORSURSrecs.getInt("sidid");
 
-                            // Do whatever you want to do with these 2 values
+                                if (sid <= 0) {
+                                    sid = reqSid.get(ORSURSrecs.getInt("reqid"));
+                                    if (sid > 0) {
+                                        stmtORSURS.setInt(1, sid);
+                                        stmtORSURS.setInt(2, ORSURSrecs.getInt("id"));
+                                        stmtORSURS.executeUpdate();
+                                    }
+                                } else {
+                                    reqSid.put(ORSURSrecs.getInt("reqid"), sid);
+                                }
+
+                                // Do whatever you want to do with these 2 values
+                            }
+                        } catch (SQLException E) {
+                            logger.error("Exception finalizing: " + E.getMessage(), E);
+                            throw E;
+                        } finally {
+                            Main.logger.debug("Commit2");
+                            conn.commit();
                         }
-                    } catch (SQLException E) {
-                        logger.error("Exception finalizing: " + E.getMessage(), E);
-                        throw E;
-                    } finally {
-                        Main.logger.debug("Commit2");
-                        conn.commit();
                     }
                 }
             }
@@ -337,7 +330,7 @@ public final class SqliteAccessor implements DBAccessor {
         return def;
     }
 
-    int getID(String query, String tab, int def) throws Exception {
+    int getID(String query, String tab, int def) throws SQLException {
         if (TableExist(tab)) {
             return getID(query, def);
         }
@@ -345,7 +338,7 @@ public final class SqliteAccessor implements DBAccessor {
         return def;
     }
 
-    public boolean TableExist(String tab) throws Exception {
+    public boolean TableExist(String tab) throws SQLException {
         return TableExist(tab, false);
     }
 
@@ -481,7 +474,7 @@ public final class SqliteAccessor implements DBAccessor {
 
     class Stat {
 
-        private PreparedStatement preparedStatement;
+        private final PreparedStatement preparedStatement;
         private int cnt;
 
         Stat(PreparedStatement stat) {

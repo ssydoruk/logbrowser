@@ -731,8 +731,8 @@ public class inquirer {
     public static class InfoPanel extends StandardDialog {
 
         private final int buttonOptions;
-        private Container mainPanel;
-        private JComponent bannerPannel = null;
+        private final Container mainPanel;
+        private final JComponent bannerPannel = null;
 
         public InfoPanel(Window parent, String title, Container jScrollPane, int buttonOptions)
                 throws HeadlessException {

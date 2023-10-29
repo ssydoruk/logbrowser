@@ -184,8 +184,7 @@ public class CallFlowResults extends IQueryResults {
             DatabaseConnector.runQuery("create index idx_" + tmpTable1 + "tlibid on " + tmpTable1 + "(tlibid);");
 //            DatabaseConnector.runQuery("alter table " + tmpTable1 + "tlibid on " + tmpTable1 + "(tlibid);");
             tellProgress("Updating call parameters");
-            DatabaseConnector.runQuery(""
-                    + "WITH a AS\n"
+            DatabaseConnector.runQuery("WITH a AS\n"
                     + "(\n"
                     + "    SELECT\n"
                     + "        " + tab + ".connectionIDid,\n"

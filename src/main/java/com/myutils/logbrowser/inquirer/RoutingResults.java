@@ -133,7 +133,7 @@ final public class RoutingResults extends IQueryResults {
         return IDsFinder.RequestLevel.Level2;
     }
 
-    final public void addURSReportType(DynamicTreeNode<OptionNode> root) {
+    public void addURSReportType(DynamicTreeNode<OptionNode> root) {
         DynamicTreeNode<OptionNode> reportTypeURSStrategy = new DynamicTreeNode<>(new OptionNode(true, DialogItem.URS));
         root.addChild(reportTypeURSStrategy);
 
@@ -226,7 +226,7 @@ final public class RoutingResults extends IQueryResults {
 
     }
 
-    final public void addORSReportType(DynamicTreeNode<OptionNode> root) throws SQLException {
+    public void addORSReportType(DynamicTreeNode<OptionNode> root) throws SQLException {
         DynamicTreeNode<OptionNode> Attr;
         DynamicTreeNode<OptionNode> tEventsNode;
 
@@ -335,8 +335,7 @@ final public class RoutingResults extends IQueryResults {
                 DatabaseConnector.runQuery("create index idx_" + tmpTable + "started on " + tmpTable + "(started);");
 
                 tellProgress("Updating parameters of URS calls");
-                DatabaseConnector.runQuery(""
-                        + "update " + tmpTable
+                DatabaseConnector.runQuery("update " + tmpTable
                         + "\nset ("
                         + "nameid"
                         + ", thisdnid"
@@ -382,8 +381,7 @@ final public class RoutingResults extends IQueryResults {
             if (DatabaseConnector.TableExist(tab)) {
                 String tmpTable1 = tmpTable + "1";
                 DatabaseConnector.dropTable(tmpTable1);
-                DatabaseConnector.runQuery(""
-                        + "create temp table "
+                DatabaseConnector.runQuery("create temp table "
                         + tmpTable1
                         + " as  SELECT\n"
                         + "connidid\n"
@@ -394,12 +392,10 @@ final public class RoutingResults extends IQueryResults {
                         + "\n" + IQuery.getFileFilters(tab, "fileid", qd.getSearchApps(false), "AND")
                         + "\n" + IQuery.getDateTimeFilters(tab, "time", qd.getTimeRange(), "AND")
                         + "\ngroup by 1\n"
-                        + IQuery.getLimitClause(isLimitQueryResults(), getMaxQueryLines())
-                        + "");
+                        + IQuery.getLimitClause(isLimitQueryResults(), getMaxQueryLines()));
                 DatabaseConnector.runQuery("create index idx_" + tmpTable1 + "connID on " + tmpTable1 + "(connidid);");
 
-                DatabaseConnector.runQuery(""
-                        + "update " + tmpTable
+                DatabaseConnector.runQuery("update " + tmpTable
                         + "\nset ("
                         + "strended"
                         + ") = "
@@ -412,8 +408,7 @@ final public class RoutingResults extends IQueryResults {
                         + ";");
 
                 DatabaseConnector.dropTable(tmpTable1);
-                DatabaseConnector.runQuery(""
-                        + "create temp table "
+                DatabaseConnector.runQuery("create temp table "
                         + tmpTable1
                         + " as  SELECT\n"
                         + "connidid\n"
@@ -424,13 +419,11 @@ final public class RoutingResults extends IQueryResults {
                         + "\n" + IQuery.getFileFilters(tab, "fileid", qd.getSearchApps(false), "AND")
                         + "\n" + IQuery.getDateTimeFilters(tab, "time", qd.getTimeRange(), "AND")
                         + "\ngroup by 1\n"
-                        + IQuery.getLimitClause(isLimitQueryResults(), getMaxQueryLines())
-                        + "");
+                        + IQuery.getLimitClause(isLimitQueryResults(), getMaxQueryLines()));
                 DatabaseConnector.runQuery("create index idx_" + tmpTable1 + "connID on " + tmpTable1 + "(connidid);");
                 DatabaseConnector.runQuery("create index idx_" + tmpTable1 + "strstarted on " + tmpTable1 + "(strstarted);");
 
-                DatabaseConnector.runQuery(""
-                        + "update " + tmpTable
+                DatabaseConnector.runQuery("update " + tmpTable
                         + "\nset ("
                         + "strstarted"
                         + ") = "
@@ -442,8 +435,7 @@ final public class RoutingResults extends IQueryResults {
                         + ")"
                         + ";");
 
-                DatabaseConnector.runQuery(""
-                        + "update " + tmpTable
+                DatabaseConnector.runQuery("update " + tmpTable
                         + "\nset ("
                         + "strnameid"
                         + ") = "
@@ -542,8 +534,7 @@ final public class RoutingResults extends IQueryResults {
                 tellProgress("Updating ORS sessions parameters");
                 tab = "orsmetr_logbr";
                 if (DatabaseConnector.TableExist(ReferenceType.METRIC.toString())) {
-                    DatabaseConnector.runQuery(""
-                            + "update " + tmpTable
+                    DatabaseConnector.runQuery("update " + tmpTable
                             + "\nset ("
                             + "strstarted"
                             + ") = "
@@ -559,8 +550,7 @@ final public class RoutingResults extends IQueryResults {
                             + ")"
                             + ";");
 
-                    DatabaseConnector.runQuery(""
-                            + "update " + tmpTable
+                    DatabaseConnector.runQuery("update " + tmpTable
                             + "\nset ("
                             + "strended"
                             + ") = "
@@ -1121,8 +1111,7 @@ final public class RoutingResults extends IQueryResults {
 //                    TableType.URSGenesysMessage.toString(), "msgid");
 //        }
 
-        if (false && isChecked(FindNode(ursReportSettings, DialogItem.URS_GENMESSAGE, null, null))
-                && TableExist(TableType.URSGenesysMessage.toString())) {
+        if (false) {
             tellProgress("Retrieving URS genesys messages");
             TableQuery URS_GENMSG = new TableQuery(MsgType.GENESYS_URS_MSG, TableType.URSGenesysMessage.toString());
             if (cidFinder != null && cidFinder.getSearchType() != SelectionType.NO_SELECTION

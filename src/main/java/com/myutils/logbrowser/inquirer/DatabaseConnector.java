@@ -43,8 +43,8 @@ public class DatabaseConnector {
     private final Connection m_conn;
     private final Map<ReferenceType, Map<Integer, String>> thePersistentRef = new HashMap<>();
     private final IDsToName idsToName;
-    HashMap m_activeStatements;
-    ArrayList m_freeStatements;
+    HashMap<Object, Statement> m_activeStatements;
+    ArrayList<Statement> m_freeStatements;
     ArrayList<PreparedStatement> m_statements;
 
     protected DatabaseConnector(String dbName, String dbAlias) throws SQLException {
@@ -89,7 +89,7 @@ public class DatabaseConnector {
                 try {
                     String sizeText = value_text(0);
 //                    inquirer.logger.info("sizeText: [" + value_text(0) + "]");
-                    Long sizeL = Long.parseLong(sizeText);
+                    long sizeL = Long.parseLong(sizeText);
 //                    inquirer.logger.info("parsed: [" + sizeL + "]");
                     result(Main.formatSize(sizeL));
                 } catch (IllegalFormatException | NumberFormatException e) {
@@ -107,9 +107,9 @@ public class DatabaseConnector {
                 try {
                     String sizeText = value_text(0);
 //                    inquirer.logger.info("sizeText: [" + value_text(0) + "]");
-                    Integer val = Integer.parseInt(sizeText);
+                    int val = Integer.parseInt(sizeText);
 //                    inquirer.logger.info("parsed: [" + sizeL + "]");
-                    if (val != null && val.intValue() == 1) {
+                    if (val == 1) {
                         result("connected");
                     } else {
                         result("disconnected");
@@ -142,7 +142,7 @@ public class DatabaseConnector {
                     String sizeText = value_text(0);
                     if (sizeText != null && !sizeText.isEmpty()) {
 //                    inquirer.logger.info("sizeText: [" + value_text(0) + "]");
-                        Long sizeL = Long.parseLong(sizeText);
+                        long sizeL = Long.parseLong(sizeText);
 //                    inquirer.logger.info("parsed: [" + sizeL + "]");
                         result(Utils.Util.pDuration(sizeL));
                     } else {
@@ -381,7 +381,7 @@ public class DatabaseConnector {
             protected void xFunc() throws SQLException {
                 String regex = value_text(0);
                 String compareString = value_text(1);
-                Integer grpIdx;
+                int grpIdx;
                 String grpIdxS;
                 if (compareString == null) {
                     compareString = "";
@@ -496,15 +496,10 @@ public class DatabaseConnector {
     }
 
     private static long parseTime(String dateString, String dateFormat) {
-//    DateTimeFormatter formatter =
-//                      DateTimeFormatter.ofPattern("MMM d yyyy");
-//    LocalDate date = LocalDate.parse(input, formatter);
-//    System.out.printf("%s%n", date);
 
         DateTimeFormatter fmt = parsedFormats.get(dateFormat);
         if (fmt == null) {
             fmt = DateTimeFormatter.ofPattern(dateFormat);
-//            fmt.setLenient(false); // Don't automatically convert invalid date.
             parsedFormats.put(dateFormat, fmt);
         }
 
@@ -536,12 +531,6 @@ public class DatabaseConnector {
         return 0;
     }
 
-    static CallableStatement prepareStatement(String expr) throws SQLException {
-//        PreparedStatement ret = null;
-
-        return databaseConnector.m_conn.prepareCall(expr);
-
-    }
 
     private static boolean textColumn(int columnType) {
         return columnType == java.sql.Types.CHAR
@@ -573,7 +562,7 @@ public class DatabaseConnector {
         if (databaseConnector != null && (obj != null)) {
             Statement stmt;
             if (!databaseConnector.m_freeStatements.isEmpty()) {
-                stmt = (Statement) databaseConnector.m_freeStatements.remove(0);
+                stmt = databaseConnector.m_freeStatements.remove(0);
             } else {
                 stmt = databaseConnector.m_conn.createStatement();
             }
@@ -610,7 +599,7 @@ public class DatabaseConnector {
             while (rs.next()) {
                 StringBuilder row = new StringBuilder();
                 for (int i = 1; i <= columnCount; i++) {
-                    row .append( rs.getString(i) ).append( ", ");
+                    row.append(rs.getString(i)).append(", ");
                 }
                 if (Thread.currentThread().isInterrupted()) {
                     throw new RuntimeInterruptException();
@@ -828,7 +817,7 @@ public class DatabaseConnector {
             while (resultSet.next()) {
                 Integer id = resultSet.getInt(1);
                 String name = resultSet.getString(2);
-                if (name != null && name.length() > 0 && id != null) {
+                if (name != null && !name.isEmpty() && id != null) {
                     ret.put(id, name);
                     QueryTools.DebugRec(resultSet);
                     cnt++;
@@ -874,24 +863,25 @@ public class DatabaseConnector {
         ArrayList<Integer> ret = new ArrayList<>();
         DatabaseConnector connector = DatabaseConnector.getDatabaseConnector(obj);
 
-        try (ResultSet resultSet = connector.executeQuery(obj, query)) {
-            ResultSetMetaData rsmd = resultSet.getMetaData();
+        if (connector != null) {
+            try (ResultSet resultSet = connector.executeQuery(obj, query)) {
+                ResultSetMetaData rsmd = resultSet.getMetaData();
 
-            if (rsmd.getColumnCount() != 1) {
-                throw new SQLException("getIDs: there are " + rsmd.getColumnCount() + " output columns; has to be only 1");
-            }
-            int cnt = 0;
-            while (resultSet.next()) {
-                Integer res = resultSet.getInt(1);
-                if (res > 0) {
-                    ret.add(res);
-                    QueryTools.DebugRec(resultSet);
-                    cnt++;
+                if (rsmd.getColumnCount() != 1) {
+                    throw new SQLException("getIDs: there are " + rsmd.getColumnCount() + " output columns; has to be only 1");
                 }
+                int cnt = 0;
+                while (resultSet.next()) {
+                    Integer res = resultSet.getInt(1);
+                    if (res > 0) {
+                        ret.add(res);
+                        QueryTools.DebugRec(resultSet);
+                        cnt++;
+                    }
+                }
+                inquirer.logger.debug("\tRetrieved " + cnt + " records");
             }
-            inquirer.logger.debug("\tRetrieved " + cnt + " records");
         }
-
         return ret.toArray(new Integer[ret.size()]);
     }
 
@@ -907,7 +897,7 @@ public class DatabaseConnector {
             int cnt = 0;
             while (resultSet.next()) {
                 String res = resultSet.getString(1);
-                if (res != null && res.length() > 0) {
+                if (res != null && !res.isEmpty()) {
                     ret.add(res);
                     QueryTools.DebugRec(resultSet);
                     cnt++;
@@ -922,65 +912,67 @@ public class DatabaseConnector {
 
     }
 
-    public static ArrayList<NameID> getNamesNameID(Object obj, String query) throws SQLException {
+    public static List<NameID> getNamesNameID(Object obj, String query) throws SQLException {
         ArrayList<NameID> ret = new ArrayList<>();
         DatabaseConnector connector = DatabaseConnector.getDatabaseConnector(obj);
 
-        try (ResultSet resultSet = connector.executeQuery(obj, query)) {
-            ResultSetMetaData rsmd = resultSet.getMetaData();
-            boolean noID = rsmd.getColumnCount() == 1;
-            if (rsmd.getColumnCount() != 2 && !noID) {
-                throw new SQLException("getNamesPair: there are " + rsmd.getColumnCount() + " output columns; has to be only 2");
-            }
-            if (!noID && (!textColumn(rsmd.getColumnType(2))
-                    || !numColumn(rsmd.getColumnType(1)))) {
-                throw new SQLException("getNamesPair: col[1] is " + rsmd.getColumnType(1) + " expected int;"
-                        + "col[2] is " + rsmd.getColumnType(2) + " expected text;");
-            }
-            int cnt = 0;
-            while (resultSet.next()) {
-                String res;
-                int aInt = 0;
-                if (noID) {
-                    res = resultSet.getString(1);
-                } else {
-                    res = resultSet.getString(2);
-                    aInt = resultSet.getInt(1);
+        if (connector != null)
+            try (ResultSet resultSet = connector.executeQuery(obj, query)) {
+                ResultSetMetaData rsmd = resultSet.getMetaData();
+                boolean noID = rsmd.getColumnCount() == 1;
+                if (rsmd.getColumnCount() != 2 && !noID) {
+                    throw new SQLException("getNamesPair: there are " + rsmd.getColumnCount() + " output columns; has to be only 2");
                 }
-                if (res != null && res.length() > 0) {
-                    ret.add(new NameID(res, aInt));
-                    QueryTools.DebugRec(resultSet);
-                    cnt++;
+                if (!noID && (!textColumn(rsmd.getColumnType(2))
+                        || !numColumn(rsmd.getColumnType(1)))) {
+                    throw new SQLException("getNamesPair: col[1] is " + rsmd.getColumnType(1) + " expected int;"
+                            + "col[2] is " + rsmd.getColumnType(2) + " expected text;");
                 }
+                int cnt = 0;
+                while (resultSet.next()) {
+                    String res;
+                    int aInt = 0;
+                    if (noID) {
+                        res = resultSet.getString(1);
+                    } else {
+                        res = resultSet.getString(2);
+                        aInt = resultSet.getInt(1);
+                    }
+                    if (res != null && !res.isEmpty()) {
+                        ret.add(new NameID(res, aInt));
+                        QueryTools.DebugRec(resultSet);
+                        cnt++;
+                    }
+                }
+                inquirer.logger.debug("\tRetrieved " + cnt + " records");
+                //        resultSet.getStatement().close();
             }
-            inquirer.logger.debug("\tRetrieved " + cnt + " records");
-            //        resultSet.getStatement().close();
-        }
 
         return ret;
     }
 
     public static String[] getNames(Object obj, String query) throws SQLException {
-        ArrayList<String> ret = new ArrayList();
+        ArrayList<String> ret = new ArrayList<>();
         DatabaseConnector connector = DatabaseConnector.getDatabaseConnector(obj);
 
-        try (ResultSet resultSet = connector.executeQuery(obj, query)) {
-            ResultSetMetaData rsmd = resultSet.getMetaData();
-            if (rsmd.getColumnCount() != 1) {
-                throw new SQLException("getIDs: there are " + rsmd.getColumnCount() + " output columns; has to be only 1");
-            }
-            int cnt = 0;
-            while (resultSet.next()) {
-                String res = resultSet.getString(1);
-                if (res != null && res.length() > 0) {
-                    ret.add(res);
-                    QueryTools.DebugRec(resultSet);
-                    cnt++;
+        if (connector != null)
+            try (ResultSet resultSet = connector.executeQuery(obj, query)) {
+                ResultSetMetaData rsmd = resultSet.getMetaData();
+                if (rsmd.getColumnCount() != 1) {
+                    throw new SQLException("getIDs: there are " + rsmd.getColumnCount() + " output columns; has to be only 1");
                 }
+                int cnt = 0;
+                while (resultSet.next()) {
+                    String res = resultSet.getString(1);
+                    if (res != null && !res.isEmpty()) {
+                        ret.add(res);
+                        QueryTools.DebugRec(resultSet);
+                        cnt++;
+                    }
+                }
+                inquirer.logger.debug("\tRetrieved " + cnt + " records");
+                //        resultSet.getStatement().close();
             }
-            inquirer.logger.debug("\tRetrieved " + cnt + " records");
-            //        resultSet.getStatement().close();
-        }
 
         return ret.toArray(new String[ret.size()]);
     }
@@ -1012,13 +1004,13 @@ public class DatabaseConnector {
             List<Long> dbRet = iDsMultiple.get(0);
             Long val = dbRet.get(0);
             if (val != null && val > 0 && (ret.getStart() == 0 || ret.getStart() > val)) {
-                    ret.setStart(val);
+                ret.setStart(val);
 
             }
 
             val = dbRet.get(1);
             if (val != null && val > 0 && (ret.getEnd() == 0 || ret.getEnd() < val)) {
-                    ret.setEnd(val);
+                ret.setEnd(val);
 
 
             }
@@ -1042,22 +1034,22 @@ public class DatabaseConnector {
                 q.append("select min(time), max(time) from ").append(tab);
                 if (arrSearchApps != null) {
                     q.append(" where fileid in (select id from file_logbr ")
-                            .append(getWhere("appnameid", arrSearchApps, true))
-                            .append(")");
+                     .append(getWhere("appnameid", arrSearchApps, true))
+                     .append(")");
                 }
 
                 List<List<Long>> iDsMultiple = getIDsMultiple(q.toString());
-                if (iDsMultiple.size() > 0) {
+                if (!iDsMultiple.isEmpty()) {
                     List<Long> dbRet = iDsMultiple.get(0);
                     Long val = dbRet.get(0);
                     if (val != null && val > 0 && (ret.getStart() == 0 || ret.getStart() > val)) {
-                            ret.setStart(val);
+                        ret.setStart(val);
 
                     }
 
                     val = dbRet.get(1);
                     if (val != null && val > 0 && (ret.getEnd() == 0 || ret.getEnd() < val)) {
-                            ret.setEnd(val);
+                        ret.setEnd(val);
 
 
                     }
@@ -1184,7 +1176,7 @@ public class DatabaseConnector {
     }
 
     public static Integer[] getIDs(String query) throws SQLException {
-        ArrayList<Integer> ret = new ArrayList();
+        ArrayList<Integer> ret = new ArrayList<>();
 
         Integer[] ids;
         try (ResultSet rs = executeQuery(query)) {
@@ -1201,7 +1193,7 @@ public class DatabaseConnector {
                 }
             }
             inquirer.logger.debug("\tRetrieved " + cnt + " records");
-            ids = ret.toArray(new Integer[ret.size()]);
+            ids = ret.toArray(new Integer[0]);
             QueryTools.DebugIDs(ids);
             rs.getStatement().close();
         }
@@ -1211,13 +1203,13 @@ public class DatabaseConnector {
     public static void GracefulClose() {
         try {
             if (databaseConnector != null) {
-                for (Object m_activeStatement : databaseConnector.m_activeStatements.values()) {
-                    ((Statement) m_activeStatement).close();
+                for (Statement m_activeStatement : databaseConnector.m_activeStatements.values()) {
+                    m_activeStatement.close();
                 }
                 databaseConnector.m_activeStatements.clear();
 
                 for (int i = 0; i < databaseConnector.m_freeStatements.size(); i++) {
-                    Statement stmt = (Statement) databaseConnector.m_freeStatements.get(i);
+                    Statement stmt = databaseConnector.m_freeStatements.get(i);
                     stmt.close();
                 }
                 databaseConnector.m_freeStatements.clear();
@@ -1247,34 +1239,36 @@ public class DatabaseConnector {
         ArrayList<String> ret = new ArrayList<>();
         DatabaseConnector connector = DatabaseConnector.getDatabaseConnector(obj);
 
-        StringBuilder q = new StringBuilder(256);
-        q.append("select name from ").append(tab);//remove 'distinct' from here. Uniquness of names is ensured by parser,
-        //so no need to sort again
-        if (CheckTab != null && CheckIDField != null) {
-            q.append(" where id in (select distinct ").append(CheckIDField).append(" from ").append(CheckTab);
-            if (CheckIDField1 != null) {
-                q.append("\nunion\nselect distinct ").append(CheckIDField1).append(" from ").append(CheckTab);
-            }
-
-            q.append("\n)");
-        }
-        q.append("\norder by name");
-        try (ResultSet resultSet = connector.executeQuery(obj, q.toString())) {
-            ResultSetMetaData rsmd = resultSet.getMetaData();
-
-            if (rsmd.getColumnCount() != 1) {
-                throw new SQLException("getRefNames: there are " + rsmd.getColumnCount() + " output columns; has to be only 1");
-            }
-            int cnt = 0;
-            while (resultSet.next()) {
-                String res = resultSet.getString(1);
-                if (res != null && res.length() > 0) {
-                    ret.add(res);
-                    QueryTools.DebugRec(resultSet);
-                    cnt++;
+        if (connector != null) {
+            StringBuilder q = new StringBuilder(256).
+                    append("select name from ").append(tab);//remove 'distinct' from here. Uniquness of names is ensured by parser,
+            //so no need to sort again
+            if (CheckTab != null && CheckIDField != null) {
+                q.append(" where id in (select distinct ").append(CheckIDField).append(" from ").append(CheckTab);
+                if (CheckIDField1 != null) {
+                    q.append("\nunion\nselect distinct ").append(CheckIDField1).append(" from ").append(CheckTab);
                 }
+
+                q.append("\n)");
             }
-            inquirer.logger.debug("\tRetrieved " + cnt + " records");
+            q.append("\norder by name");
+            try (ResultSet resultSet = connector.executeQuery(obj, q.toString())) {
+                ResultSetMetaData rsmd = resultSet.getMetaData();
+
+                if (rsmd.getColumnCount() != 1) {
+                    throw new SQLException("getRefNames: there are " + rsmd.getColumnCount() + " output columns; has to be only 1");
+                }
+                int cnt = 0;
+                while (resultSet.next()) {
+                    String res = resultSet.getString(1);
+                    if (res != null && !res.isEmpty()) {
+                        ret.add(res);
+                        QueryTools.DebugRec(resultSet);
+                        cnt++;
+                    }
+                }
+                inquirer.logger.debug("\tRetrieved " + cnt + " records");
+            }
         }
 
         return ret.toArray(new String[ret.size()]);
@@ -1285,7 +1279,7 @@ public class DatabaseConnector {
         if (!TableExist(tab) || (CheckTab != null && !TableExist(CheckTab))) {
             return null;
         }
-        ArrayList<NameID> ret = new ArrayList();
+        ArrayList<NameID> ret = new ArrayList<>();
         DatabaseConnector connector = DatabaseConnector.getDatabaseConnector(obj);
 
         StringBuilder q = new StringBuilder(256);
@@ -1319,7 +1313,7 @@ public class DatabaseConnector {
             while (resultSet.next()) {
                 String res = resultSet.getString(2);
                 int aInt = resultSet.getInt(1);
-                if (res != null && res.length() > 0) {
+                if (res != null && !res.isEmpty()) {
                     ret.add(new NameID(res, aInt));
                     QueryTools.DebugRec(resultSet);
                     cnt++;
@@ -1339,7 +1333,7 @@ public class DatabaseConnector {
         if (!TableExist(tab)) {
             return null;
         }
-        ArrayList<NameID> ret = new ArrayList();
+        ArrayList<NameID> ret = new ArrayList<>();
         StringBuilder query = new StringBuilder("select id, name from ");
         query.append(tab);
         if (subQuery != null) {
@@ -1382,7 +1376,7 @@ public class DatabaseConnector {
 
     public void releaseConnector(Object owner) {
         if (m_activeStatements.containsKey(owner)) {
-            Statement stmt = (Statement) m_activeStatements.get(owner);
+            Statement stmt = m_activeStatements.get(owner);
             m_activeStatements.remove(owner);
             m_freeStatements.add(stmt);
         }
@@ -1397,12 +1391,12 @@ public class DatabaseConnector {
             inquirer.logger.debug("[" + query + "]");
 
             try {
-                try (Statement stat = m_conn.createStatement() ) {
-                    currentStatement = stat;
-                    stat.closeOnCompletion();
-                    Explain(stat, query);
-                    ret = stat.executeQuery(query);
-                }
+                Statement stat = m_conn.createStatement();
+                currentStatement = stat;
+                stat.closeOnCompletion();
+                Explain(stat, query);
+                ret = stat.executeQuery(query);
+
             } catch (SQLException sQLException) {
                 if (sQLException.getErrorCode() == SQLITE_INTERRUPT.code) {
                     inquirer.logger.info("Statement cancelled");
@@ -1468,19 +1462,19 @@ public class DatabaseConnector {
 
     class IDsToName {
 
-        private final HashMap<String, IDToName> idsToName;
+        private final HashMap<String, IDToName> nameHashMap;
 
         public IDsToName() {
-            this.idsToName = new HashMap<>();
+            this.nameHashMap = new HashMap<>();
         }
 
         public void addFun(String funName, ILoadFun fun) throws SQLException {
-            idsToName.put(funName, new IDToName(fun));
+            nameHashMap.put(funName, new IDToName(fun));
         }
 
         public String getNames(String fName, String id) throws SQLException {
             if (fName != null && id != null) {
-                IDToName idn = idsToName.get(fName);
+                IDToName idn = nameHashMap.get(fName);
                 if (idn != null) {
                     String[] refNames = idn.getNames(id);
                     if (refNames != null && refNames.length > 0) {
@@ -1505,22 +1499,22 @@ public class DatabaseConnector {
         class IDToName {
 
             private final ILoadFun fun;
-            private final HashMap<String, String[]> idToName;
+            private final HashMap<String, String[]> stringHashMap;
 
             public IDToName(ILoadFun fun) {
                 this.fun = fun;
-                idToName = new HashMap<>();
+                stringHashMap = new HashMap<>();
             }
 
             public String[] getNames(String id) throws SQLException {
-                if (idToName.containsKey(id)) {
-                    return idToName.get(id);
+                if (stringHashMap.containsKey(id)) {
+                    return stringHashMap.get(id);
                 } else {
                     String[] names = fun.getNames(id);
                     if (names != null && names.length == 0) {
                         names = null;
                     }
-                    idToName.put(id, names);
+                    stringHashMap.put(id, names);
                     return names;
                 }
             }

@@ -1,9 +1,9 @@
 package com.myutils.logbrowser.indexer;
 
 public class ProcessedFiles {
-    private String fileName;
-    private long id;
-    private long size;
+    private final String fileName;
+    private final long id;
+    private final long size;
 
     public ProcessedFiles(String fileName, long id, long size) {
         this.fileName = fileName;

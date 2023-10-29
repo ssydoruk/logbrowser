@@ -47,7 +47,7 @@ public class ChildTransferQuery {
             QueryTools.DebugRec(m_resultSet);
             return m_resultSet.getInt("connid");
         }
-        inquirer.logger.debug("++ " + this.getClass().toString() + ": extracted " + recCnt + " records");
+        inquirer.logger.debug("++ " + this.getClass() + ": extracted " + recCnt + " records");
         return null;
     }
 

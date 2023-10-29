@@ -16,7 +16,7 @@ class DBTablesFiller {
     private static final Logger logger = Main.logger;
     private final DBTables dbTables;
     private final SqliteAccessor accessor;
-    private HashMap<String, StatParser> stats;
+    private final HashMap<String, StatParser> stats;
 
     DBTablesFiller(DBTables tables, SqliteAccessor accessor) {
         stats = new HashMap<>();
@@ -87,7 +87,7 @@ class DBTablesFiller {
 
     class StatParser {
 
-        private PreparedStatement stat;
+        private final PreparedStatement stat;
         private int cnt;
 
         StatParser(PreparedStatement stat) {

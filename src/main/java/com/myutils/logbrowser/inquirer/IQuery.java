@@ -746,9 +746,7 @@ public abstract class IQuery extends QueryTools {
     }
 
     void addOutFields(String[] strings) {
-        for (String string : strings) {
-            this.outFields.add(string);
-        }
+        Collections.addAll(this.outFields, strings);
     }
 
     final void addOutField(String fld) {
@@ -1029,7 +1027,7 @@ public abstract class IQuery extends QueryTools {
 //
 //    }
         public boolean equalsName(String otherName) {
-            return otherName != null && name.equalsIgnoreCase(otherName);
+            return name.equalsIgnoreCase(otherName);
         }
 
         @Override
@@ -1138,13 +1136,15 @@ public abstract class IQuery extends QueryTools {
                     jType = "LEFT";
                     break;
             }
-            StringBuilder ret = new StringBuilder();
 
-            ret.append(jType).append(" JOIN ").append(joinTable).append(" AS ").append(tabAlias).append(" on ").append(JoinExpr).append("\n");
+            //            if (JoinWhere != null) {
+//                ret.append(" where " + JoinWhere);
+//            }
+            return jType + " JOIN " + joinTable + " AS " + tabAlias + " on " + JoinExpr + "\n"
 //            if (JoinWhere != null) {
 //                ret.append(" where " + JoinWhere);
 //            }
-            return ret.toString();
+                    ;
         }
 
         private String getJoinField() {

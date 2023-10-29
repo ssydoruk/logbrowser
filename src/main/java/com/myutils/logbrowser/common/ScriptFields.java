@@ -1,11 +1,16 @@
 package com.myutils.logbrowser.common;
 
-import org.apache.commons.lang3.StringUtils;
-
 import java.util.HashMap;
 
+import org.apache.commons.lang3.StringUtils;
+
 public class ScriptFields<K, V> extends HashMap<K, V> {
-    public V appendValue(K key, V value, V separator) {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 5944406558664155223L;
+
+	public V appendValue(K key, V value, V separator) {
         V oldValue = get(key);
         if (oldValue == null) {
             return put(key, value);

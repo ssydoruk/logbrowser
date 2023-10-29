@@ -10,7 +10,7 @@
         <Appender type="Console" name="CONSOLE">
             <!--Layout type="PatternLayout" pattern="%m%n"/-->
             <Layout type="PatternLayout" pattern="%d %5.5p %m%n"/>
-            <ThresholdFilter level="debug"/>
+            <ThresholdFilter level="info"/>
         </Appender>
         <RollingFile name="FileIndexer" fileName="${IndexerFilename}.log"
                      filePattern="${IndexerFilename}-%d{yyyyMMdd-HHmmss_SSS}.log"
@@ -28,12 +28,12 @@
 
     <Loggers>
 
-        <Logger name="indexer" level="debug" additivity="false">
+        <Logger name="indexer" level="info" additivity="false">
             <AppenderRef ref="FileIndexer"/>
             <AppenderRef ref="CONSOLE"/>
         </Logger>
 
-        <Root level="debug">
+        <Root level="info">
             <AppenderRef ref="FileIndexer"/>
             <AppenderRef ref="CONSOLE"/>
         </Root>

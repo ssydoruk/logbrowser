@@ -75,8 +75,8 @@ public class AggrSIPRetransmits extends IAggregateQuery {
 
         inquirer.logger.info("extracting data");
         SipForScCmQuery sipMsgsByCallid = new SipForScCmQuery(attrRoot);
-        sipMsgsByCallid.addJoin(tab, IQuery.FieldType.MANDATORY, "" + tab + ".ni =" + sipMsgsByCallid.getTabAlias() + ".nameID and " + tab + ".vb=" + sipMsgsByCallid.getTabAlias() + ".viabranchid",
-                sipMsgsByCallid.getTabAlias() + ".rowid <> " + "" + tab + ".mrowid");
+        sipMsgsByCallid.addJoin(tab, IQuery.FieldType.MANDATORY, tab + ".ni =" + sipMsgsByCallid.getTabAlias() + ".nameID and " + tab + ".vb=" + sipMsgsByCallid.getTabAlias() + ".viabranchid",
+                sipMsgsByCallid.getTabAlias() + ".rowid <> " + tab + ".mrowid");
         sipMsgsByCallid.setOrderBy(cfg.getOrderBy());
         getRecords(sipMsgsByCallid);
         checkIntr();
