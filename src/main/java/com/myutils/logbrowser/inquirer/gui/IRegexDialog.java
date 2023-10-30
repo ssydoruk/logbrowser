@@ -7,8 +7,8 @@ import org.immutables.value.Value;
 @Value.Immutable(singleton = true, builder = false)
 @Main.MySingleton
 public interface IRegexDialog {
-    @Value.Default
-    default EnterRegexDialog findDlg () {
+    @Value.Lazy
+    default EnterRegexDialog findDlg() {
         return new EnterRegexDialog(null, true);
     }
 }

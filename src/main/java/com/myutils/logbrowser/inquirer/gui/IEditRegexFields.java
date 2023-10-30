@@ -7,8 +7,8 @@ import org.immutables.value.Value;
 @Value.Immutable(singleton = true, builder = false)
 @Main.MySingleton
 public interface IEditRegexFields {
-    @Value.Default
-    default EditRegexFields searchExtract () {
+    @Value.Lazy
+    default EditRegexFields dlg() {
         return new EditRegexFields(null, true);
     }
 }

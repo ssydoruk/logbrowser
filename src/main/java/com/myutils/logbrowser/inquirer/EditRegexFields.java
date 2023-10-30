@@ -197,9 +197,6 @@ public class EditRegexFields extends javax.swing.JDialog {
         // Tools | Templates.
     }
 
-    public static EditRegexFields getInstance() {
-        return NewSingletonHolder.INSTANCE;
-    }
 
     public Object[] toArray() {
         return lmSavedList.toArray();
@@ -967,11 +964,6 @@ public class EditRegexFields extends javax.swing.JDialog {
 
     private enum SaveAction {
         SAVE, SAVEAS, RENAME
-    }
-
-    private static class NewSingletonHolder {
-
-        private static final EditRegexFields INSTANCE = new EditRegexFields();
     }
 
 }

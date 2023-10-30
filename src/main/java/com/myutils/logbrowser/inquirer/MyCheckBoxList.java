@@ -9,6 +9,7 @@ import Utils.ScreenInfo;
 import com.jidesoft.swing.CheckBoxList;
 import com.jidesoft.swing.CheckBoxListSelectionModel;
 import com.myutils.logbrowser.inquirer.gui.CIRegexDialog;
+import com.myutils.logbrowser.inquirer.gui.IRegexDialog;
 
 import javax.swing.*;
 import javax.swing.event.ListSelectionListener;
@@ -133,9 +134,11 @@ public class MyCheckBoxList extends CheckBoxList {
         }
     }
 
+    private final IRegexDialog regexDialog = CIRegexDialog.of();
+
     private void doSearch(boolean initialRun, boolean searchForward) {
         Window windowAncestor = SwingUtilities.getWindowAncestor(this);
-        EnterRegexDialog dlg = CIRegexDialog.of().findDlg();
+        EnterRegexDialog dlg = regexDialog.findDlg();
         boolean runSearch = true;
         boolean isForward = searchForward;
         if (initialRun || lastIdx < 0) {
@@ -386,8 +389,10 @@ public class MyCheckBoxList extends CheckBoxList {
             inquirer.showInfoPanel(SwingUtilities.windowForComponent(jpo), "Statistic", jp, true);
         }
 
+        private final IRegexDialog regexDialog = CIRegexDialog.of();
+
         private HashMap<Integer, String> getMatchedItems() {
-            EnterRegexDialog dlg = CIRegexDialog.of().findDlg();
+            EnterRegexDialog dlg = regexDialog.findDlg();
             dlg.setRegex(inquirer.geLocaltQuerySettings().getSavedFilters());
             dlg.setShowUps(false);
             ScreenInfo.setVisible(SwingUtilities.getWindowAncestor(this), dlg, true);

@@ -7,7 +7,6 @@ package com.myutils.logbrowser.inquirer.gui;
 
 import Utils.Pair;
 import Utils.ScreenInfo;
-import com.myutils.logbrowser.indexer.Main;
 import com.myutils.logbrowser.inquirer.EditRegexFields;
 import com.myutils.logbrowser.inquirer.EnterRegexDialog;
 import com.myutils.logbrowser.inquirer.gui.TabResultDataModel.TableRow;
@@ -26,7 +25,6 @@ import java.util.regex.Matcher;
 
 import static com.myutils.logbrowser.inquirer.EnterRegexDialog.RET_OK;
 import static javax.swing.JOptionPane.INFORMATION_MESSAGE;
-import org.immutables.value.Value;
 
 /**
  * @author ssydoruk
@@ -191,27 +189,29 @@ public abstract class JTablePopup extends JTable {
 
     abstract void callingPopup();
 
+    private final IRegexDialog regexDialog = CIRegexDialog.of();
+
     void showFindDialog() {
-        ScreenInfo.setVisible(this, CIRegexDialog.of().findDlg(), true);
-        if (CIRegexDialog.of().findDlg().getReturnStatus() == RET_OK) {
-            nextFind(CIRegexDialog.of().findDlg().isDownChecked());
+        ScreenInfo.setVisible(this, regexDialog.findDlg(), true);
+        if (regexDialog.findDlg().getReturnStatus() == RET_OK) {
+            nextFind(regexDialog.findDlg().isDownChecked());
         }
 
     }
 
     void findAndSelect() {
-        ScreenInfo.setVisible(this, CIRegexDialog.of().findDlg(), true);
-        if (CIRegexDialog.of().findDlg().getReturnStatus() == RET_OK) {
+        ScreenInfo.setVisible(this, regexDialog.findDlg(), true);
+        if (regexDialog.findDlg().getReturnStatus() == RET_OK) {
 
             TableModel model = getModel();
             ListSelectionModel selectionModel1 = getSelectionModel();
 
             selectionModel1.clearSelection();
-            String search = CIRegexDialog.of().findDlg().getSearch();
+            String search = regexDialog.findDlg().getSearch();
 
             if (search != null && !search.isEmpty()) {
-                boolean matchWholeWordSelected = CIRegexDialog.of().findDlg().isMatchWholeWordSelected();
-                Matcher pt = (CIRegexDialog.of().findDlg().isRegexChecked()) ? EnterRegexDialog.getRegex(search, matchWholeWordSelected).matcher(search) : null;
+                boolean matchWholeWordSelected = regexDialog.findDlg().isMatchWholeWordSelected();
+                Matcher pt = (regexDialog.findDlg().isRegexChecked()) ? EnterRegexDialog.getRegex(search, matchWholeWordSelected).matcher(search) : null;
                 search = search.toLowerCase();
 
                 for (int i = 0; i < getRowCount(); i++) {
@@ -228,10 +228,10 @@ public abstract class JTablePopup extends JTable {
     }
 
     protected EnterRegexDialog showFind() {
-        ScreenInfo.setVisible(this, CIRegexDialog.of().findDlg(), true);
+        ScreenInfo.setVisible(this, regexDialog.findDlg(), true);
 
-        if (CIRegexDialog.of().findDlg().getReturnStatus() == RET_OK) {
-            return CIRegexDialog.of().findDlg();
+        if (regexDialog.findDlg().getReturnStatus() == RET_OK) {
+            return regexDialog.findDlg();
         }
         return null;
     }
@@ -240,9 +240,10 @@ public abstract class JTablePopup extends JTable {
 //        return editRegexFields(t, null);
 //
 //    }
+
+    private final IEditRegexFields editRegexFields = CIEditRegexFields.of();
     protected EditRegexFields editRegexFields(TableRow row) throws IOException {
-        //EditRegexFields ret = CIEditRegexFields.do().searchExtract().doShow(this, true, row);
-        EditRegexFields ret=null;
+        EditRegexFields ret = editRegexFields.dlg().doShow(this, true, row);
         if (ret != null) {
             inquirer.getCr().setRegexSearches(row.getRowType(), ret.toArray());
             inquirer.saveCR();
@@ -299,8 +300,8 @@ public abstract class JTablePopup extends JTable {
     }
 
     void nextFind(boolean isDown) {
-        CIRegexDialog.of().findDlg().setDown(isDown);
-        Pair<Integer, Integer> cell = searchCell(CIRegexDialog.of().findDlg(), getPopupRow(), getPopupCol());
+        regexDialog.findDlg().setDown(isDown);
+        Pair<Integer, Integer> cell = searchCell(regexDialog.findDlg(), getPopupRow(), getPopupCol());
         inquirer.logger.debug("found cell: " + cell);
         if (cell != null) {
             Integer thePopupRow = cell.getKey();
