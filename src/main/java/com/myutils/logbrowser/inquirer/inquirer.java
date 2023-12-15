@@ -210,7 +210,9 @@ public class inquirer {
         if (ee.getConfig().toLowerCase().endsWith(".json")) {
             try (BufferedWriter bufferedWriter = new BufferedWriter(
                     new OutputStreamWriter(Files.newOutputStream(Paths.get(ee.getConfig())), StandardCharsets.UTF_8))) {
-                Gson gson = new GsonBuilder().enableComplexMapKeySerialization().setPrettyPrinting().create();
+                Gson gson = new GsonBuilder().enableComplexMapKeySerialization().setPrettyPrinting()
+                .excludeFieldsWithoutExposeAnnotation()
+                .create();
                 gson.toJson(cr, bufferedWriter);
                 jsonWritten = true;
 
@@ -293,8 +295,8 @@ public class inquirer {
             ee = new EnvInquirer();
             ee.parserCommandLine(args);
 
-            Thread.setDefaultUncaughtExceptionHandler(new ExceptionHandler());
-            System.setProperty("sun.awt.exception.handler", ExceptionHandler.class.getName());
+            // Thread.setDefaultUncaughtExceptionHandler(new ExceptionHandler());
+            // System.setProperty("sun.awt.exception.handler", ExceptionHandler.class.getName());
 
             Utils.FileUtils.mkDir(ee.getLogBrDir());
 
@@ -519,6 +521,7 @@ public class inquirer {
                     try (InputStreamReader streamReader = new InputStreamReader(Files.newInputStream(Paths.get(file)), StandardCharsets.UTF_8)) {
                         Gson gson = new GsonBuilder()
                                 .enableComplexMapKeySerialization()
+                                .excludeFieldsWithoutExposeAnnotation()
                                 .setPrettyPrinting()
                                 .create();
                         cr = gson.fromJson(streamReader, com.myutils.logbrowser.inquirer.InquirerCfg.class);

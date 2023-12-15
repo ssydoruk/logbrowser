@@ -5,57 +5,13 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "type": "bashdb",
-      "request": "launch",
-      "name": "Bash-Debug (hardcoded script name)",
-      "cwd": "${workspaceFolder}",
-      "program": "/Users/stepan_sydoruk/src/logbrowser/bin/logbrowser/aa.sh",
-      "args": []
-    },
-    {
-      "type": "graalvm",
-      "request": "launch",
-      "name": "Launch JavaScript graal",
-      "runtimeArgs": [
-        "--jvm"
-      ],
-      "runtimeExecutable": "node",
-      "program": "${file}"
-    },
-    {
-      "name": "Launch Program as node",
-      "program": "${file}",
-      "request": "launch",
-      "runtimeExecutable": "/Users/stepan_sydoruk/.sdkman/candidates/java/current/bin/node",
-      "runtimeArgs": [
-        "--jvm"
-      ],
-      "stopOnEntry": false,
-      "skipFiles": [
-        "<node_internals>/**"
-      ],
-      "type": "node"
-    },
-    {
       "type": "java",
-      "name": "Debug (Launch) - Current File",
-      "request": "launch",
-      "mainClass": "${file}"
+      "name": "Attach to Remote Program",
+      "request": "attach",
+      "hostName": "192.168.206.1",
+      "port": "8000"
     },
-    {
-      "type": "java",
-      "name": "Debug (Launch)-Main<logbrowser>",
-      "request": "launch",
-      "mainClass": "com.myutils.logbrowser.indexer.Main",
-      "projectName": "logbrowser"
-    },
-    {
-      "type": "java",
-      "name": "Debug (Launch)-Parser<logbrowser>",
-      "request": "launch",
-      "mainClass": "com.myutils.logbrowser.indexer.Parser",
-      "projectName": "logbrowser"
-    },
+
     {
       "type": "java",
       "name": "Debug (Launch)-inquirer<logbrowser>",
