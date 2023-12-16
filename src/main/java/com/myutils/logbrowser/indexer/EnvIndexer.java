@@ -13,8 +13,12 @@ import org.apache.commons.lang3.StringUtils;
  * @author stepan_sydoruk
  */
 public class EnvIndexer extends ExecutionEnvironment {
+    public static final int HTTP_NO_PORT = -1; // indication that HTTP port not set
+
+
     protected final Options options;
     protected final CommandLineParser parser;
+    private final Option optHTTPPort;
     protected CommandLine cmd;
     Option optHelp;
     private final Option optMaxThreads;
@@ -83,6 +87,16 @@ public class EnvIndexer extends ExecutionEnvironment {
                 .build();
         options.addOption(optMaxThreads);
 
+        optHTTPPort = Option.builder("p")
+                .hasArg(true)
+                .required(false)
+                .type(Integer.class)
+                .desc("HTTP port to listen. If specified, application gets files \n" +
+                        "\tfrom the interface instead of scanning directory")
+                .longOpt("port")
+                .build();
+        options.addOption(optHTTPPort);        
+        
         optTDiffParse = Option.builder()
                 .hasArg(false)
                 .required(false)
@@ -192,6 +206,8 @@ public class EnvIndexer extends ExecutionEnvironment {
 
         setMaxThreads(getOptMaxThreads());
 
+        setHttpPort(getOpHTTPPort());
+
         setXmlCFG(getOptValueXMLCfg());
         setBaseDir(getOptBaseDir());
 
@@ -203,6 +219,11 @@ public class EnvIndexer extends ExecutionEnvironment {
 
     private Integer getOptMaxThreads() {
         Integer ret = getIntOrDef(optMaxThreads, defProcessingThreads());
+        return ret;
+    }
+
+    private Integer getOpHTTPPort() {
+        Integer ret = getIntOrDef(optHTTPPort, HTTP_NO_PORT);
         return ret;
     }
 

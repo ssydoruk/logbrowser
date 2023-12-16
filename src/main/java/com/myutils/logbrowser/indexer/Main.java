@@ -5,6 +5,7 @@
 package com.myutils.logbrowser.indexer;
 
 import com.myutils.logbrowser.common.ExecutionEnvironment;
+import com.myutils.logbrowser.web.WEBLoader;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.concurrent.BasicThreadFactory;
@@ -80,6 +81,12 @@ public class Main {
     private boolean ignoreZIP = false;
     private int maxThreads = 1;
 
+    private static WEBLoader webLoader = null;
+
+    public static WEBLoader getWebLoader() {
+        return webLoader;
+    }
+
     public static Main getInstance() {
         return MainHolder.INSTANCE;
     }
@@ -138,13 +145,17 @@ public class Main {
         logger.info("starting");
         logger.info(new StringBuilder().append("Command line: ").append(StringUtils.join(args, " ")));
 
-        Main theParser = Main.getInstance().init(ee);
+        if(ee.getHttpPort()==EnvIndexer.HTTP_NO_PORT) { // parsing log files by scanning directory
+            Main theParser = Main.getInstance().init(ee);
 
-
-        theParser.setIgnoreZIP(ee.isIgnoreZIP());
+            theParser.setIgnoreZIP(ee.isIgnoreZIP());
 //        theParser.initExecutor(1);
-        theParser.parseAll();
-//        Thread.sleep(3000);
+            theParser.parseAll();
+        }
+        else { // starting http listener
+            webLoader = new WEBLoader(ee);
+            webLoader.listen();
+        }
     }
 
     public static String formatSize(long v) {

@@ -18,6 +18,8 @@ public class ExecutionEnvironment {
     private Boolean parseTDiff = "true".equalsIgnoreCase(System.getProperty("timediff.parse"));
     private boolean ignoreZIP = false;
     private int maxThreads;
+    private int httpPort;
+
     private String baseDir = Paths.get(".").toAbsolutePath().normalize().toString();
     private String xmlCFG = ".";
     private String alias = "logbr";
@@ -128,5 +130,13 @@ public class ExecutionEnvironment {
                 ", logbrowserDir='" + logbrowserDir + '\'' +
                 ", sqlPragma=" + sqlPragma +
                 '}';
+    }
+
+    public int getHttpPort() {
+        return httpPort;
+    }
+
+    public void setHttpPort(int httpPort) {
+        this.httpPort = httpPort;
     }
 }
