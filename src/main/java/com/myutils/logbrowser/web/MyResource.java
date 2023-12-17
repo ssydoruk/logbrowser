@@ -12,9 +12,10 @@ import org.apache.logging.log4j.Logger;
 @Path("/")
 public class MyResource {
     private static Logger logger = LogManager.getLogger(MyResource.class);
+
     /**
-     * Method handling HTTP GET requests. The returned object will be sent
-     * to the client as "text/plain" media type.
+     * Method handling HTTP GET requests. The returned object will be sent to the
+     * client as "text/plain" media type.
      *
      * @return String that will be returned as a text/plain response.
      */
@@ -26,16 +27,24 @@ public class MyResource {
         return "Got it!";
     }
 
+    @GET
+    @Path("die")
+    @Produces(MediaType.TEXT_PLAIN)
+    public String die() {
+        Main.getWebLoader().die();
+        return "Got it!";
+    }
 
     /**
      * add file to the queue
+     * 
      * @return
      */
     @POST
     @Path("add")
     @Consumes(MediaType.TEXT_PLAIN)
     @Produces(MediaType.TEXT_PLAIN)
-    public String add(String fileName){
+    public String add(String fileName) {
         Main.getWebLoader().addFile(fileName);
         return "OK";
     }

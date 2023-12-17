@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="error" strict="true" name="XMLConfigTest">
+    <Properties>
+        <Property name="IndexerFilename">${sys:logPath:-.}/indexer</Property>
+        <Property name="filename">.logbr</Property>
+    </Properties>
+    <Filter type="ThresholdFilter" level="trace"/>
+
+    <Appenders>
+        <RollingFile name="FileIndexer" fileName="${IndexerFilename}.log"
+                     filePattern="${IndexerFilename}-%d{yyyyMMdd-HHmmss_SSS}.log"
+                     immediateFlush="false">
+            <Layout type="PatternLayout">
+                <!--Pattern>%d %5.5p %30.30C [%t] %m%n</Pattern-->
+                <Pattern>%d %5.5p %m%n</Pattern>
+            </Layout>
+            <Policies>
+                <OnStartupTriggeringPolicy/>
+                <SizeBasedTriggeringPolicy size="20 MB"/>
+            </Policies>
+        </RollingFile>
+    </Appenders>
+
+    <Loggers>
+
+        <Logger name="indexer" level="info" additivity="false">
+            <AppenderRef ref="FileIndexer"/>
+        </Logger>
+
+        <Root level="info">
+            <AppenderRef ref="FileIndexer"/>
+        </Root>
+    </Loggers>
+
+</Configuration>

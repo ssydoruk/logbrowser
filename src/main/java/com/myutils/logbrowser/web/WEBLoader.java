@@ -9,7 +9,6 @@ import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.URI;
 
 /**
@@ -31,14 +30,16 @@ public class WEBLoader {
     }
 
     /**
-     * Starts Grizzly HTTP server exposing JAX-RS resources defined in this application.
+     * Starts Grizzly HTTP server exposing JAX-RS resources defined in this
+     * application.
      *
      * @return Grizzly HTTP server.
      */
     public HttpServer startServer() {
         // create a resource config that scans for JAX-RS resources and providers
         // in com.mycompany.grizzlytest package
-//        final ResourceConfig rc = new ResourceConfig().packages("com.myutils.logbrowser.web");
+        // final ResourceConfig rc = new
+        // ResourceConfig().packages("com.myutils.logbrowser.web");
         final ResourceConfig rc = new ResourceConfig().register(MyResource.class);
 
         // create and start a new instance of grizzly http server
@@ -51,34 +52,35 @@ public class WEBLoader {
         indexer = Main.getNewInstance().init(env);
         if (!indexer.kickQueueManager()) {
             logger.error("Failed to init logbrowser");
-        }
-        else {
+        } else {
             server = startServer();
-            System.out.println(String.format("Jersey app started with endpoints available at "
-                    + "%s%nHit Ctrl-C to stop it...", base_uri));
+            logger.info(String.format("Web server listens at %s", base_uri));
         }
     }
 
     public void addFile(String fileName) {
-        logger.debug("Received file[" + fileName + "]");
+        logger.info("WEB: added file [" + fileName + "]");
         indexer.processAddedFile(new File(fileName));
     }
 
     public void stop() {
-        new Thread(new Runnable(){
+        new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
                     if (indexer != null) {
+                        logger.info("WEB: stop ");
                         indexer.finishParsing();
                     }
                 } catch (Exception e) {
-                    logger.error("Exception while finishing parsing: "+e.getMessage());
-                    logger.error(e.getStackTrace());
+                    logger.error("Exception while finishing parsing: " + e.getMessage(), e);
                 }
-                server.stop();
+                server.shutdownNow();
             }
         }).start();
     }
-}
 
+    public void die() {
+        System.exit(-1);
+    }
+}

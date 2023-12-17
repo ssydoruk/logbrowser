@@ -44,6 +44,7 @@ public final class SqliteAccessor implements DBAccessor {
             Class.forName("org.sqlite.JDBC");
             String name = dbname + ".db";
 
+            Main.logger.info("Using DB: ["+name+"]");
             m_conn = DriverManager.getConnection("jdbc:sqlite:" + name);
 
             String s = "PRAGMA page_size = 32768;\n"
