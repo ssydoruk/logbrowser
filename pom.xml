@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xmlns="http://maven.apache.org/POM/4.0.0"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    xmlns="http://maven.apache.org/POM/4.0.0"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.myutils</groupId>
     <artifactId>logbrowser</artifactId>
@@ -67,9 +67,9 @@
             <type>jar</type>
         </dependency>
         <dependency>
-            <groupId>com.jidesoft</groupId>
+            <groupId>com.formdev</groupId>
             <artifactId>jide-oss</artifactId>
-            <version>3.6.18</version>
+            <version>3.7.14</version>
         </dependency>
         <dependency>
             <groupId>org.json</groupId>

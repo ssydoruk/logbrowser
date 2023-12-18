@@ -397,6 +397,7 @@ public class inquirer {
 //        UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName()); // you need to catch the exceptions
         // on this call.
         LookAndFeelFactory.installJideExtension();
+
         queryDialogSettings = geLocaltQuerySettings();
 
         if (DatabaseConnector.fileExits(FileInfoType.type_CallManager)) {

@@ -20,7 +20,7 @@ import java.util.ArrayList;
 /**
  * @author ssydoruk
  */
-public final class XmlCfg {
+public class XmlCfg {
 
     private final String xmlFile;
     private Document doc; // XML doc for the CFG
