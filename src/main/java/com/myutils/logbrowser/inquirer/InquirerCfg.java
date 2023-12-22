@@ -30,7 +30,7 @@ import static com.myutils.logbrowser.inquirer.QueryTools.getRefNames;
 public class InquirerCfg implements Serializable {
 
     private static final long serialVersionUID = 1L;
-    @Expose
+    
     private static final HashSet<Character> filenameProhibited = new HashSet<Character>(
             Arrays.asList(':',
                     '\"',
@@ -41,60 +41,60 @@ public class InquirerCfg implements Serializable {
                     '*',
                     '<',
                     '>'));
-    @Expose
+    
     HashMap<MsgType, ArrayList<CustomField>> customFieldsSettings = null;
-    @Expose
+    
     private HashMap<ReferenceType, ArrayList<OptionNode>> refsChecked = new HashMap<>(20);
-    @Expose
+    
     private HashMap<TableType, ArrayList<OptionNode>> logMessages = new HashMap<>();
-    @Expose
+    
     private int maxRecords;
 
-    @Expose
+    
     private boolean LimitQueryResults;
-    @Expose
+    
     private int MaxQueryLines;
-    @Expose
+    
     private String titleRegex;
-    @Expose
+    
     private String linuxEditor;
-    @Expose
+    
     private boolean fullTimeStamp;
-    @Expose
+    
     private String FileNameExcel;
-    @Expose
+    
     private int fileSizeWarn = 5; // in mb
-    @Expose
+    
     private GenesysConstants1 constants;
-    @Expose
+    
     private boolean refsLoaded;
-    @Expose
+    
     private boolean newTlibSearch;
-    @Expose
+    
     private boolean saveFileShort;
-    @Expose
+    
     private boolean saveFileLong;
-    @Expose
+    
     private boolean addShortToFull;
-    @Expose
+    
     private boolean applyFullFilter;
-    @Expose
+    
     private boolean addOrderBy;
-    @Expose
+    
     private boolean accessLogFiles;
-    @Expose
+    
     private boolean sorting;
-    @Expose
+    
     private boolean printLogFileName;
-    @Expose
+    
     private boolean ignoreFormatting;
-    @Expose
+    
     private String FileNameShort;
-    @Expose
+    
     private String FileNameLong;
-    @Expose
+    
     private HashMap<String, String> printFilters = new HashMap<>(2);
-    @Expose
+    
     private boolean messagesLoaded = false;
     public InquirerCfg() {
         this.constants = new GenesysConstants1();

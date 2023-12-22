@@ -210,9 +210,10 @@ public class inquirer {
         if (ee.getConfig().toLowerCase().endsWith(".json")) {
             try (BufferedWriter bufferedWriter = new BufferedWriter(
                     new OutputStreamWriter(Files.newOutputStream(Paths.get(ee.getConfig())), StandardCharsets.UTF_8))) {
-                Gson gson = new GsonBuilder().enableComplexMapKeySerialization().setPrettyPrinting()
-                .excludeFieldsWithoutExposeAnnotation()
-                .create();
+                Gson gson = new GsonBuilder()
+                        .enableComplexMapKeySerialization()
+                        .setPrettyPrinting()
+                        .create();
                 gson.toJson(cr, bufferedWriter);
                 jsonWritten = true;
 
@@ -522,8 +523,6 @@ public class inquirer {
                     try (InputStreamReader streamReader = new InputStreamReader(Files.newInputStream(Paths.get(file)), StandardCharsets.UTF_8)) {
                         Gson gson = new GsonBuilder()
                                 .enableComplexMapKeySerialization()
-                                .excludeFieldsWithoutExposeAnnotation()
-                                .setPrettyPrinting()
                                 .create();
                         cr = gson.fromJson(streamReader, com.myutils.logbrowser.inquirer.InquirerCfg.class);
                         crRead = true;

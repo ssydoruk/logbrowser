@@ -28,7 +28,7 @@ public class RegexFieldSettings implements Serializable {
     private String retValue;
     private boolean makeWholeWorld;
     private boolean caseSensitive;
-    private Matcher selectedRegEx = null;
+    transient private Matcher selectedRegEx = null;
 
     public RegexFieldSettings(String searchString, String retValue, boolean makeWholeWorld, boolean caseSensitive) {
 
