@@ -939,7 +939,7 @@ public class UrsParser extends Parser {
     }
 
     private void processWaitingCalls(String ag, String[] split) {
-        HashSet<String> hs = new HashSet();
+        HashSet<String> hs = new HashSet<>();
 
         hs.addAll(Arrays.asList(split)); //hashset would guarantee unique connIDs if multiple target blocks hit
         for (String h : hs) {

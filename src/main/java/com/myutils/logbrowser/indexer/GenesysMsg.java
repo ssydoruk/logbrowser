@@ -264,7 +264,7 @@ public final class GenesysMsg extends Message {
         private void addMap(String msgID, String line) {
             ArrayList<String> storedLine = get(msgID);
             if (storedLine == null) {
-                put(msgID, new ArrayList(Arrays.asList(StringUtils.split(line))));
+                put(msgID, new ArrayList<String>(Arrays.asList(StringUtils.split(line))));
             } else {
                 String[] split = StringUtils.split(line);
                 HashSet<String> oldWords = new HashSet<>(storedLine);

@@ -757,7 +757,7 @@ public abstract class Parser {
             if (repl == null) {
                 repl = new ArrayList<>();
             }
-            repl.add(new Pair(from, to));
+            repl.add(new Pair<String, String>(from, to));
         }
 
         public boolean isReplNull() {

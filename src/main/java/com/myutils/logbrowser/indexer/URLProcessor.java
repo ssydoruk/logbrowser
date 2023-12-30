@@ -131,7 +131,7 @@ public class URLProcessor {
     }
 
     void addPathProcessor(String PATH_UUID, Pattern compile) {
-        pathProcessing.add(new Pair(PATH_UUID, compile));
+        pathProcessing.add(new Pair<String, Pattern>(PATH_UUID, compile));
     }
 
     void addQueryProcessor(String QUERY_userName, String user) {

@@ -792,7 +792,7 @@ public abstract class Message extends Record {
             return null;
         }
         try {
-            return new Long(s);
+            return Long.valueOf(s);
         } catch (NumberFormatException e) {
             return null;
         }

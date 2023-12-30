@@ -220,6 +220,10 @@
                 <version>3.10.1</version>
                 <configuration>
                     <debug>true</debug>
+                    <compilerArgs>
+                        <!-- <arg>-verbose</arg> -->
+                        <arg>-Xlint:all,-options,-path</arg>
+                      </compilerArgs>
                 </configuration>
             </plugin>
         </plugins>

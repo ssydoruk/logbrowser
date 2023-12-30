@@ -56,7 +56,7 @@ public class Main {
     static String m_component = "all";
     static String m_executableName = "indexer.jar";
     static long totalBytes = 0;
-    private final ArrayList<File> m_files = new ArrayList();
+    private final ArrayList<File> m_files = new ArrayList<>();
     public XmlCfg xmlCfg = null;
     HashMap<FileInfoType, Parser> m_parsers = new HashMap<>();
     int m_current;
@@ -531,9 +531,9 @@ public class Main {
                     public void run() {
                         ArrayList<Callable<Integer>> parserTasks = new ArrayList<>(maxThreads);
                         for (int i = 0; i < maxThreads; i++) {
-                            parserTasks.add(new Callable() {
+                            parserTasks.add(new Callable<Integer>() {
                                 @Override
-                                public Object call() throws Exception {
+                                public Integer call() throws Exception {
                                     Main.logger.info("Starting added processing thread " + Thread.currentThread().getName());
                                     while (!queueEnd.get() || !fileQueue.isEmpty()) {
                                         File fileFromQueue;
@@ -608,7 +608,7 @@ public class Main {
      */
     synchronized private boolean scanLogDirectory() throws Exception {
 
-        ArrayList<FileInfo> filesToAccess = new ArrayList();
+        ArrayList<FileInfo> filesToAccess = new ArrayList<>();
         String startDir = baseDir;
 
         File f = new File(startDir);
