@@ -8,6 +8,7 @@ import com.myutils.logbrowser.indexer.TableType;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.logging.log4j.LogManager;
 import org.sqlite.Function;
+import org.sqlite.SQLiteDataSource;
 
 import java.io.File;
 import java.nio.file.Files;
@@ -66,7 +67,11 @@ public class DatabaseConnector {
 
         idsToName = new IDsToName();
 
-        m_conn = DriverManager.getConnection("jdbc:sqlite:" + name);
+        SQLiteDataSource ds = new SQLiteDataSource();
+        ds.setUrl("jdbc:sqlite:" + name);
+        m_conn=ds.getConnection();
+
+        
         Function.create(m_conn, "REGEXP", new Function() {
             @Override
             protected void xFunc() throws SQLException {
@@ -564,7 +569,7 @@ public class DatabaseConnector {
             if (!databaseConnector.m_freeStatements.isEmpty()) {
                 stmt = databaseConnector.m_freeStatements.remove(0);
             } else {
-                stmt = databaseConnector.m_conn.createStatement();
+                stmt = databaseConnector.m_conn.createStatement(ResultSet.TYPE_FORWARD_ONLY,ResultSet.CONCUR_READ_ONLY);
             }
             databaseConnector.m_activeStatements.put(obj, stmt);
 
@@ -700,7 +705,7 @@ public class DatabaseConnector {
         ResultSet ret = null;
 
         try {
-            currentStatement = databaseConnector.m_conn.createStatement();
+            currentStatement = databaseConnector.m_conn.createStatement(ResultSet.TYPE_FORWARD_ONLY,ResultSet.CONCUR_READ_ONLY);
             currentStatement.closeOnCompletion();
             inquirer.logger.debug("About to executeQuery [" + query + "]");
 
@@ -731,7 +736,7 @@ public class DatabaseConnector {
 
     public static int runQuery(String query) throws SQLException {
         long timeStart = new Date().getTime();
-        currentStatement = databaseConnector.m_conn.createStatement();
+        currentStatement = databaseConnector.m_conn.createStatement(ResultSet.TYPE_FORWARD_ONLY,ResultSet.CONCUR_READ_ONLY);
         synchronized (currentStatement) {
             currentStatement.closeOnCompletion();
             Explain(currentStatement, query);
@@ -1163,7 +1168,7 @@ public class DatabaseConnector {
 
         String s = exp.replaceAll("\\$1\\b", "'" + p + "'");
 
-        try (Statement createStatement = databaseConnector.m_conn.createStatement()) {
+        try (Statement createStatement = databaseConnector.m_conn.createStatement(ResultSet.TYPE_FORWARD_ONLY,ResultSet.CONCUR_READ_ONLY)) {
 
             ResultSet rs = createStatement.executeQuery(s);
 
@@ -1391,7 +1396,7 @@ public class DatabaseConnector {
             inquirer.logger.debug("[" + query + "]");
 
             try {
-                Statement stat = m_conn.createStatement();
+                Statement stat = m_conn.createStatement(ResultSet.TYPE_FORWARD_ONLY,ResultSet.CONCUR_READ_ONLY);
                 currentStatement = stat;
                 stat.closeOnCompletion();
                 Explain(stat, query);

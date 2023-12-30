@@ -5,6 +5,7 @@
 package com.myutils.logbrowser.indexer;
 
 import org.apache.logging.log4j.Logger;
+import org.sqlite.SQLiteDataSource;
 
 import java.sql.*;
 import java.time.Duration;
@@ -41,25 +42,31 @@ public final class SqliteAccessor implements DBAccessor {
         filesToDelete = Collections.synchronizedList(new ArrayList<>());
 
         try {
-            Class.forName("org.sqlite.JDBC");
             String name = dbname + ".db";
 
+            SQLiteDataSource ds = new SQLiteDataSource();
+            ds.setUrl("jdbc:sqlite:" + name);
+            m_conn=ds.getConnection();
+
             Main.logger.info("Using DB: ["+name+"]");
-            m_conn = DriverManager.getConnection("jdbc:sqlite:" + name);
+            // m_conn = DriverManager.getConnection("jdbc:sqlite:" + name);
 
-            String s = "PRAGMA page_size = 32768;\n"
-                    + "PRAGMA cache_size=10000;\n"
-                    + "pragma temp_store = memory;\n"
-                    + "pragma mmap_size = 30000000000;\n"
-                    + "PRAGMA synchronous=OFF;\n"
-                    //                    + "PRAGMA main.cache_size=5000;\n"
-                    + "PRAGMA automatic_index=false;\n";
+            String s = 
+            // "PRAGMA page_size = 32768;\n"
+            ""
+            + "PRAGMA cache_size=10000;\n"
+            + "pragma temp_store = memory;\n"
+            + "pragma mmap_size = 30000000000;\n"
+            + "PRAGMA synchronous=OFF;\n"
+            //                    + "PRAGMA main.cache_size=5000;\n"
+            + "PRAGMA automatic_index=false;\n";
 
-            if (Main.getInstance().getEe().isSqlPragma()) {
-                s += "PRAGMA journal_mode=WAL;\n";
-            } else {
-                logger.info("SQLite pragmas not turned");
-            }
+    if (Main.getInstance().getEe().isSqlPragma()) {
+        s += "PRAGMA journal_mode=OFF;\n";
+    } else {
+        logger.info("SQLite pragmas not turned");
+    }
+
 
             logger.info("Executing pragmas: " + s);
             runQuery(s);
@@ -68,7 +75,7 @@ public final class SqliteAccessor implements DBAccessor {
 
             stats = new Stats();
 
-        } catch (ClassNotFoundException | SQLException e) {
+        } catch (SQLException e) {
             logger.error("Creating accessor failed: " + e, e);
             throw new SQLException(e.getMessage());
         }
@@ -274,20 +281,8 @@ public final class SqliteAccessor implements DBAccessor {
         //
     }
 
-    public ResultSet GetRecords(String query) {
-        synchronized (m_conn) {
-            ResultSet ret;
-            try {
-                try (Statement statement = m_conn.createStatement()) {
-                    ret = statement.executeQuery(query);
-                    return ret;
-                }
-            } catch (SQLException e) {
-                logger.error("ExecuteQuery failed: " + e + " query " + query, e);
-            }
-        }
-
-        return null;
+    public ResultSet GetRecords(String query) throws SQLException {
+        return executeQuery( query);
     }
 
     public PreparedStatement getStatement(String query) throws SQLException {
@@ -366,16 +361,21 @@ public final class SqliteAccessor implements DBAccessor {
 
     public ResultSet executeQuery(String query) throws SQLException {
         Instant timeStart = Instant.now();
+        // * @param resultSetType a result set type; one of
+        // *        {@code ResultSet.TYPE_FORWARD_ONLY},
+        // *        {@code ResultSet.TYPE_SCROLL_INSENSITIVE}, or
+        // *        {@code ResultSet.TYPE_SCROLL_SENSITIVE}
+        // * @param resultSetConcurrency a concurrency type; one of
+        // *        {@code ResultSet.CONCUR_READ_ONLY} or
+        // *        {@code ResultSet.CONCUR_UPDATABLE}
 
-        try (
-                Statement stmt = getM_conn().createStatement()) {
+            Statement stmt = getM_conn().createStatement(ResultSet.TYPE_FORWARD_ONLY,ResultSet.CONCUR_READ_ONLY);
             stmt.closeOnCompletion();
             Main.logger.debug("About to executeQuery [" + query + "]");
 
             ResultSet ret = stmt.executeQuery(query);
             Main.logger.debug("\tExecuteQuery execution took " + pDuration(Duration.between(Instant.now(), timeStart).toMillis()));
             return ret;
-        }
     }
 
     public Integer[] getIDs(String query) throws SQLException {
@@ -384,7 +384,7 @@ public final class SqliteAccessor implements DBAccessor {
         Instant timeStart = Instant.now();
 
         Main.logger.debug("[" + query + "]");
-        try (Statement stmt = getM_conn().createStatement(); ResultSet rs = stmt.executeQuery(query)) {
+        try (ResultSet rs = executeQuery(query)) {
 
             Main.logger.debug("\t Execution took " + pDuration(Duration.between(Instant.now(), timeStart).toMillis()));
 
@@ -436,11 +436,8 @@ public final class SqliteAccessor implements DBAccessor {
 
     public List<ArrayList<Long>> getIDsMultiple(String query) throws SQLException {
 
-        Statement stmt = getM_conn().createStatement();
-        Main.logger.debug("[" + query + "]");
-
         ArrayList<ArrayList<Long>> ret;
-        try (ResultSet rs = stmt.executeQuery(query)) {
+        try (ResultSet rs = executeQuery(query)) {
             ResultSetMetaData rsmd = rs.getMetaData();
             ret = new ArrayList<>();
             int columnCount = rsmd.getColumnCount();
