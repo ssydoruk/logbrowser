@@ -76,6 +76,7 @@ public class WEBLoader {
                     logger.error("Exception while finishing parsing: " + e.getMessage(), e);
                 }
                 server.shutdownNow();
+                System.exit(-1);
             }
         }).start();
     }
