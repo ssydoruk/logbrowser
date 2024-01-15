@@ -10,6 +10,7 @@ import com.myutils.logbrowser.inquirer.IQuery.FieldType;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.logging.log4j.LogManager;
 
+import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
 import java.sql.SQLException;
@@ -50,7 +51,7 @@ public class GMSResults extends IQueryResults {
     }
 
     @Override
-    FullTableColors getAll(QueryDialog qd) throws SQLException {
+    FullTableColors getAll(QueryDialog qd, Component c, int x, int y)  throws SQLException {
         try {
             String tmpTable = "callFlowTmp";
             DynamicTreeNode.setNoRefNoLoad(true);

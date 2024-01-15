@@ -10,13 +10,23 @@ import Utils.Util;
 import com.myutils.logbrowser.indexer.FileInfoType;
 import com.myutils.logbrowser.indexer.ReferenceType;
 import com.myutils.logbrowser.indexer.TableType;
-import org.apache.logging.log4j.LogManager;
+import com.myutils.logbrowser.inquirer.gui.ReportFrameQuery;
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.w3c.dom.events.MouseEvent;
+
+import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashSet;
+
+import javax.swing.AbstractAction;
+import javax.swing.JButton;
+import javax.swing.JMenuItem;
+import javax.swing.JPopupMenu;
 
 import static com.myutils.logbrowser.indexer.OrsParser.MAX_ALARMS;
 import static com.myutils.logbrowser.inquirer.DatabaseConnector.TableExist;
@@ -273,14 +283,62 @@ final public class RoutingResults extends IQueryResults {
     }
 
     @Override
-    FullTableColors getAll(QueryDialog qd) throws SQLException {
+    FullTableColors getAll(QueryDialog qd, Component c, int x, int y)  throws SQLException {
+
+        JPopupMenu clonePopup = new JPopupMenu();
+
+        clonePopup.add(new JMenuItem(new AbstractAction("URS strategies") {
+            public void actionPerformed(ActionEvent e) {
+                return getAllURSStrategies();
+            }
+        }));
+
+        clonePopup.add(new JMenuItem(new AbstractAction("URS calls") {
+            public void actionPerformed(ActionEvent e) {
+                getAllURSCalls();
+
+            }
+        }));
+
+        clonePopup.add(new JMenuItem(new AbstractAction("Orchestration strategies") {
+            public void actionPerformed(ActionEvent e) {
+                getAllORSStrategies();
+            }
+        }));
+
+        clonePopup.add(new JMenuItem(new AbstractAction("Orchestration calls") {
+            public void actionPerformed(ActionEvent e) {
+                getAllORSCalls();
+
+            }
+        }));
+
+        clonePopup.show(c, x, y);
+
+    }
+
+    protected void getAllORSStrategies() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getAllORSStrategies'");
+    }
+
+    protected void getAllURSCalls() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getAllURSCalls'");
+    }
+
+    protected void getAllORSCalls() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getAllORSCalls'");
+    }
+
+    protected FullTableColors getAllURSStrategies() {
         try {
             String tmpTable = "callFlowTmp";
             DynamicTreeNode.setNoRefNoLoad(true);
 
             DatabaseConnector.dropTable(tmpTable);
             inquirer.logger.info("Building temp tables");
-            String tab = "urs_logbr";
 
             tellProgress("Creating temp table");
             DatabaseConnector.runQuery("create temp table " + tmpTable + " ("
@@ -292,7 +350,6 @@ final public class RoutingResults extends IQueryResults {
                     + ",thisdnid int"
                     + ",otherdnid int"
                     + ",nameid int"
-                    + ",isconsult bit"
                     + ",uuidid int"
                     + ",ixnidid int"
                     + ",strnameid int"
@@ -300,7 +357,6 @@ final public class RoutingResults extends IQueryResults {
                     + ",strstarted timestamp"
                     + ",strended timestamp"
                     + ",sidid timestamp"
-                    + ",seqno integer"
                     + ", sourceid int\n"
                     + ")\n;"
             );
@@ -314,10 +370,17 @@ final public class RoutingResults extends IQueryResults {
 
             String makeWhere = wh.makeWhere(false);
 
-            if (DatabaseConnector.TableExist(tab)) {
+            String tab = null;
+            if (DatabaseConnector.TableExist("ors_logbr"))
+                tab="ors_logbr";
+            else if(DatabaseConnector.TableExist("urs_logbr"))
+                tab="urs_logbr";
+
+
+            if (!StringUtils.isEmpty(tab)) {
                 tellProgress("Finding unique connIDs in URS");
 
-                getAllResults.add(new Pair("Unique calls in URS",
+                getAllResults.add(new Pair<>("Unique calls in URS",
                         DatabaseConnector.runQuery("insert into " + tmpTable + " (connectionidid, started, ended)"
                                 + "\nselect distinct connectionidid, min(time), max(time) from " + tab
                                 + "\nwhere connectionidid >0  "
@@ -344,8 +407,6 @@ final public class RoutingResults extends IQueryResults {
                         + ", uuidid"
                         + ", ixnidid"
                         + ", sourceid"
-                        + ", isconsult"
-                        + ", seqno"
                         + ") = "
                         + "\n("
                         + "select "
@@ -356,8 +417,6 @@ final public class RoutingResults extends IQueryResults {
                         + ", uuidid"
                         + ", ixnidid"
                         + ", sourceid"
-                        + ", transferidid>0 and transferidid<>connectionidid "
-                        + ", seqno"
                         + "\nfrom\n"
                         + "(select "
                         + tab + ".*"
@@ -374,6 +433,8 @@ final public class RoutingResults extends IQueryResults {
                         + ")"
                         + ";");
             }
+            else
+                logger.error("Neither routing table found");
 
             tab = "ursstrinit_logbr";
             tellProgress("Finding strategy init parameters");
@@ -484,7 +545,7 @@ final public class RoutingResults extends IQueryResults {
             if (DatabaseConnector.TableExist("orssessixn")) {
                 tellProgress("Finding interaction sessions in ORS");
                 tab = "orssessixn";
-                getAllResults.add(new Pair("Unique interaction sessions in ORS",
+                getAllResults.add(new Pair<>("Unique interaction sessions in ORS",
                         DatabaseConnector.runQuery("insert into " + tmpTable + " (appid, sidid, ixnidid, strnameid, urlid, started, rowtype)"
                                 + "\nselect appid, sidid, ixnid, appid, urlid, time,"
                                 + FileInfoType.type_ORS.getValue()
@@ -507,7 +568,7 @@ final public class RoutingResults extends IQueryResults {
                 /*Searching for sessions not created for voice nor multimedia interactions */
                 tab = "orsmetr_logbr";
                 tellProgress("Finding unique other sessions in ORS");
-                getAllResults.add(new Pair("Unique other sessions in ORS",
+                getAllResults.add(new Pair<>("Unique other sessions in ORS",
                         DatabaseConnector.runQuery("insert into " + tmpTable + " (sidid, rowtype)"
                                 + "\nselect sidid,"
                                 + FileInfoType.type_ORS.getValue()
@@ -577,7 +638,6 @@ final public class RoutingResults extends IQueryResults {
             DatabaseConnector.runQuery("create index idx_" + tmpTable + "uuidid on " + tmpTable + "(uuidid);");
             DatabaseConnector.runQuery("create index idx_" + tmpTable + "ixnidid on " + tmpTable + "(ixnidid);");
             DatabaseConnector.runQuery("create index idx_" + tmpTable + "sourceid on " + tmpTable + "(sourceid);");
-            DatabaseConnector.runQuery("create index idx_" + tmpTable + "strnameid on " + tmpTable + "(strnameid);");
             DatabaseConnector.runQuery("create index idx_" + tmpTable + "sidid on " + tmpTable + "(sidid);");
 
 
@@ -588,22 +648,17 @@ final public class RoutingResults extends IQueryResults {
             tabReport.addOutField("UTCtoDateTime(ended, \"YYYY-MM-dd HH:mm:ss.SSS\") ended");
             tabReport.addOutField("UTCtoDateTime(strended, \"YYYY-MM-dd HH:mm:ss.SSS\") \"Strategy ended\"");
             tabReport.addOutField("jduration(strended-strstarted) duration ");
-            tabReport.addOutField("case isconsult when 1 then \"true\" when 0 then \"false\" end isconsult ");
-            tabReport.addOutField("rowType");
             tabReport.setAddAll(false);
             tabReport.addRef("thisdnid", "thisdn", ReferenceType.DN.toString(), IQuery.FieldType.OPTIONAL);
             tabReport.addRef("otherdnid", "otherdn", ReferenceType.DN.toString(), IQuery.FieldType.OPTIONAL);
             tabReport.addRef("connectionidid", "connectionid", ReferenceType.ConnID.toString(), IQuery.FieldType.OPTIONAL);
-            tabReport.addOutField("intToHex( seqno) seqnoHex"); // bug in SQLite lib; does not accept full word
 
             tabReport.addRef("uuidid", "uuid", ReferenceType.UUID.toString(), IQuery.FieldType.OPTIONAL);
             tabReport.addRef("ixnidid", "ixnid", ReferenceType.IxnID.toString(), IQuery.FieldType.OPTIONAL);
             tabReport.addRef("sourceid", "\"Source Server\"", ReferenceType.App.toString(), IQuery.FieldType.OPTIONAL);
             tabReport.addRef("nameid", "\"First TEvent\"", ReferenceType.TEvent.toString(), IQuery.FieldType.OPTIONAL);
-            tabReport.addRef("strnameid", "Strategy", ReferenceType.URSStrategyName.toString(), IQuery.FieldType.OPTIONAL);
             tabReport.addRef("appid", "application", ReferenceType.App.toString(), IQuery.FieldType.OPTIONAL);
             tabReport.addRef("sidid", "sid", ReferenceType.ORSSID.toString(), IQuery.FieldType.OPTIONAL);
-            tabReport.addRef("urlid", "url", ReferenceType.URSStrategyName.toString(), IQuery.FieldType.OPTIONAL);
             tabReport.setOrderBy(tabReport.getTabAlias() + ".started");
             FullTableColors currTable = tabReport.getFullTable();
             currTable.setHiddenField("rowType");

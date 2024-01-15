@@ -7,6 +7,7 @@ import com.myutils.logbrowser.indexer.TableType;
 import com.myutils.logbrowser.inquirer.IQuery.FieldType;
 import org.apache.logging.log4j.LogManager;
 
+import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
 import java.sql.SQLException;
@@ -311,7 +312,7 @@ public class SCServerResults extends IQueryResults {
     }
 
     @Override
-    FullTableColors getAll(QueryDialog qd) throws SQLException {
+    FullTableColors getAll(QueryDialog qd, Component c, int x, int y)  throws SQLException {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 

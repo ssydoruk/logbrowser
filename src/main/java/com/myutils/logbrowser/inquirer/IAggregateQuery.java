@@ -6,6 +6,8 @@
 package com.myutils.logbrowser.inquirer;
 
 import javax.swing.*;
+
+import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
 import java.sql.SQLException;
@@ -55,7 +57,7 @@ public abstract class IAggregateQuery extends IQueryResults {
     }
 
     @Override
-    FullTableColors getAll(QueryDialog qd) {
+    FullTableColors getAll(QueryDialog qd, Component c, int x, int y)  {
         return null;
     }
 

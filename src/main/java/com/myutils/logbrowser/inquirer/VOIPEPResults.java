@@ -9,6 +9,8 @@ import com.myutils.logbrowser.inquirer.IQuery.FieldType;
 import org.apache.logging.log4j.LogManager;
 
 import javax.swing.*;
+
+import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
 import java.sql.SQLException;
@@ -54,7 +56,7 @@ public class VOIPEPResults extends IQueryResults {
     }
 
     @Override
-    FullTableColors getAll(QueryDialog qd) throws SQLException {
+    FullTableColors getAll(QueryDialog qd, Component c, int x, int y)  throws SQLException {
         try {
             String tmpTable = "callFlowTmp";
             DynamicTreeNode.setNoRefNoLoad(true);

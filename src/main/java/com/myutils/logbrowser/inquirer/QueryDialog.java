@@ -21,6 +21,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -221,9 +222,10 @@ public class QueryDialog extends javax.swing.JFrame {
         jPanel5.add(jbSettings);
 
         btAllCalls.setText("All calls");
-        btAllCalls.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btAllCallsActionPerformed(evt);
+        btAllCalls.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                btAllCallsActionPerformed(e.getComponent(), e.getX(), e.getY());
             }
         });
         jPanel5.add(btAllCalls);
@@ -368,7 +370,7 @@ public class QueryDialog extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_jbResetActionPerformed
 
-    private void btAllCallsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btAllCallsActionPerformed
+    private void btAllCallsActionPerformed(Component c, int x, int y) {//GEN-FIRST:event_btAllCallsActionPerformed
         try {
             IQueryResults qry = getSelectedQuery();
             if (qry != null) {
@@ -403,7 +405,7 @@ public class QueryDialog extends javax.swing.JFrame {
 
                     @Override
                     protected Void myDoInBackground() throws Exception {
-                        all = qry.getAll(frm);
+                        all = qry.getAll(frm, c, x, y);
                         inquirer.logger.debug("do in b done");
                         return null;
 

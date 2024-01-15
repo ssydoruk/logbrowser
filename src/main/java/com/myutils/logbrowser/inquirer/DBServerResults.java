@@ -6,6 +6,7 @@ import com.myutils.logbrowser.indexer.ReferenceType;
 import com.myutils.logbrowser.indexer.TableType;
 import com.myutils.logbrowser.inquirer.IQuery.FieldType;
 
+import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
 import java.sql.SQLException;
@@ -194,7 +195,7 @@ public class DBServerResults extends IQueryResults {
     }
 
     @Override
-    FullTableColors getAll(QueryDialog qd) throws Exception {
+    FullTableColors getAll(QueryDialog qd, Component c, int x, int y)  throws Exception {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 

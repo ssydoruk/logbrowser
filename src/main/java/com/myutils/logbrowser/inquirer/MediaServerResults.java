@@ -7,6 +7,7 @@ import com.myutils.logbrowser.indexer.ReferenceType;
 import com.myutils.logbrowser.indexer.TableType;
 import com.myutils.logbrowser.inquirer.IQuery.FieldType;
 
+import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
 import java.sql.SQLException;
@@ -53,7 +54,7 @@ public class MediaServerResults extends IQueryResults {
     private static final String C_CREATE_IDX="create index idx_";
 
     @Override
-    FullTableColors getAll(QueryDialog qd) throws SQLException {
+    FullTableColors getAll(QueryDialog qd, Component c, int x, int y)  throws SQLException {
         try {
             String tmpTable = "callFlowTmp";
             DynamicTreeNode.setNoRefNoLoad(true);

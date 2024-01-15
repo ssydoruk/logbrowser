@@ -538,7 +538,7 @@ public abstract class IQueryResults extends QueryTools
         return ret.toArray(new String[ret.size()]);
     }
 
-    abstract FullTableColors getAll(QueryDialog qd) throws Exception;
+    abstract FullTableColors getAll(QueryDialog qd, Component c, int x, int y) throws Exception;
 
     abstract void showAllResults();
 

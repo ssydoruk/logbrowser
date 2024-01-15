@@ -18,8 +18,8 @@
       "request": "launch",
       "mainClass": "com.myutils.logbrowser.inquirer.inquirer",
       "projectName": "logbrowser",
-      "vmArgs": "-Dlogbr.dir=.tmp -Dlog4j.configurationFile=/Users/stepan_sydoruk/GCTI/etc/logbrowser/logbr.log4j2.inquirer.xml -Dlog4j.logPath=/Users/stepan_sydoruk/GCTI/Work/Nov20_ppe/tmp -Dsun.java2d.d3d=false -Dall=1 -Xms8000m -Xmx8000m -Dsqlite.pragma=true -Dtlib.norequest=false -Dtimediff.parse=false",
-      "args": "--dbname=/Users/stepan_sydoruk/GCTI/Work/Nov20_ppe/logbr --config=/Users/stepan_sydoruk/GCTI/etc/logbrowser/inquirer.cfg.json --basedir=/Users/stepan_sydoruk/GCTI/Work/Nov20_ppe --outputspec=/Users/stepan_sydoruk/GCTI/etc/logbrowser/outputspec3.xml"
+      "vmArgs": "-Dlogbr.dir=.tmp -Dlog4j.configurationFile=/home/ssydoruk/src/install/etc/logbrowser/logbr.log4j2.inquirer.xml -Dlog4j.logPath=/home/ssydoruk/src/install/Work/Nov20_ppe/tmp -Dsun.java2d.d3d=false -Dall=1 -Xms8000m -Xmx8000m -Dsqlite.pragma=true -Dtlib.norequest=false -Dtimediff.parse=false",
+      "args": "--dbname=/home/ssydoruk/work/logs/2024-01-15.IT/logbr --config=/home/ssydoruk/src/install/etc/logbrowser/inquirer.cfg.json --basedir=/home/ssydoruk/work/logs/2024-01-15.IT --outputspec=/home/ssydoruk/src/install/etc/logbrowser/outputspec3.xml"
     }
   ]
 }
