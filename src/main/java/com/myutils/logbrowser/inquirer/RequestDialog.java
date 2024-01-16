@@ -26,16 +26,17 @@ import javax.swing.JPanel;
  *
  * @author stepan_sydoruk
  */
-final class RequestDialog extends StandardDialog {
+class RequestDialog extends StandardDialog {
 
-	private final JPanel contentPanel;
-
-
-	public RequestDialog(final Window parent, final JPanel contentPanel) {
-		super(parent);
-		setResizable(false);
+	public void setContentPanel(JPanel contentPanel) {
 		this.contentPanel = contentPanel;
-		setTitle("Request type");
+	}
+
+	private  JPanel contentPanel;
+
+
+	public RequestDialog(final Window parent) {
+		super(parent);
 	}
 
 	@Override

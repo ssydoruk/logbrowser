@@ -374,7 +374,7 @@ public class QueryDialog extends javax.swing.JFrame {
         try {
             IQueryResults qry = getSelectedQuery();
             if (qry != null) {
-                IGetAllProc getall = qry.getAllProc(c, x, y);
+                IGetAllProc getall = qry.getAllProc(SwingUtilities.windowForComponent(c), x, y);
                 if (getall != null) {
                     class QueryAllTask extends MySwingWorker<Void, String> {
 

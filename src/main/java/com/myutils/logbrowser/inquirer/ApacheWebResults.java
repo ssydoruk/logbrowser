@@ -10,7 +10,7 @@ import org.apache.logging.log4j.LogManager;
 
 import javax.swing.*;
 
-import java.awt.Component;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
 import java.sql.SQLException;
@@ -53,7 +53,7 @@ public class ApacheWebResults extends IQueryResults {
     }
 
         @Override
-    public IGetAllProc getAllProc(Component c, int x, int y) {
+    public IGetAllProc getAllProc(Window parent, int x, int y) {
         return qd -> getAll(qd);
     }
   FullTableColors getAll(QueryDialog qd)  throws Exception {

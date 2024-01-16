@@ -936,7 +936,7 @@ public abstract class IQueryResults extends QueryTools
 
     abstract boolean callRelatedSearch(IDsFinder cidFinder) throws SQLException;
 
-    public abstract IGetAllProc getAllProc(Component c, int x, int y);
+    public abstract IGetAllProc getAllProc(Window parent, int x, int y);
 
     public static abstract class ProgressNotifications {
 
