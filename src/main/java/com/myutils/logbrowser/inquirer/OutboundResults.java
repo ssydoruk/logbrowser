@@ -1304,8 +1304,11 @@ final class OutboundResults extends IQueryResults {
 
     }
 
-    @Override
-    FullTableColors getAll(QueryDialog qd, Component c, int x, int y)  throws SQLException {
+        @Override
+    public IGetAllProc getAllProc(Component c, int x, int y) {
+        return qd -> getAll(qd);
+    }
+  FullTableColors getAll(QueryDialog qd)  throws SQLException {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 

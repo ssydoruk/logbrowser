@@ -63,7 +63,7 @@ public class QueryDialog extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btAllCalls;
     private javax.swing.JButton btOK;
-//<editor-fold defaultstate="collapsed" desc="Query thread definition">
+    //<editor-fold defaultstate="collapsed" desc="Query thread definition">
     private javax.swing.JButton btRunSave;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel5;
@@ -374,81 +374,83 @@ public class QueryDialog extends javax.swing.JFrame {
         try {
             IQueryResults qry = getSelectedQuery();
             if (qry != null) {
-//<editor-fold defaultstate="collapsed" desc="Thread class">
-                class QueryAllTask extends MySwingWorker<Void, String> {
+                IGetAllProc getall = qry.getAllProc(c, x, y);
+                if (getall != null) {
+                    class QueryAllTask extends MySwingWorker<Void, String> {
 
-                    private final QueryDialog frm;
-                    private final IQueryResults qry;
-                    FullTableColors all;
-                    private QueryAllJTable allCalls;
-                    private RequestProgress rp;
+                        private final QueryDialog frm;
+                        private final IQueryResults qry;
+                        FullTableColors all;
+                        private QueryAllJTable allCalls;
+                        private RequestProgress rp;
 
-                    public QueryAllTask(QueryDialog frm, IQueryResults qry) {
-                        this.frm = frm;
-                        this.qry = qry;
-                        qry.setProgressCallback(new ProgressNotifications() {
-                            @Override
-                            void sayProgress(String s) {
-                                publish(s);
-                            }
-                        });
-                    }
-
-                    @Override
-                    protected void process(List<String> chunks) {
-                        rp.addProgress(chunks);
-                    }
-
-                    public void setRp(RequestProgress rp) {
-                        this.rp = rp;
-                    }
-
-                    @Override
-                    protected Void myDoInBackground() throws Exception {
-                        all = qry.getAll(frm, c, x, y);
-                        inquirer.logger.debug("do in b done");
-                        return null;
-
-                    }
-
-                    @Override
-                    protected void done() {
-                        inquirer.logger.debug("done");
-                        rp.dispose();
-                        if (isCancelled()) {
-                            JOptionPane.showMessageDialog(frm, "Query was cancelled", "Error", JOptionPane.ERROR_MESSAGE);
-                        } else {
-                            QueryTools.showQueryMessages(frm);
-
-                            qry.showAllResults();
-                            try {
-                                this.allCalls = new QueryAllJTable(qry, frm, all);
-                            } catch (Exception ex) {
-                                logger.error("fatal: ", ex);
-                            }
-                            Dimension d = allCalls.getPreferredSize();
-                            d.height = 400;
-                            d.width += 50;
-                            //            Dimension d = allApps.getPreferredSize();
-                            //            d.height = 300;
-                            //            d.width += 50;
-
-                            JScrollPane jScrollPane = new JScrollPane(allCalls);
-                            jScrollPane.setPreferredSize(d);
-                            AllCallsFrame allCallsFrame = new AllCallsFrame(jScrollPane);
-                            allCallsFrame.setTitle("All calls - " + qry.getAllCallsTitle(frm));
-                            allCallsFrame.setVisible(true);
+                        public QueryAllTask(QueryDialog frm, IQueryResults qry) {
+                            this.frm = frm;
+                            this.qry = qry;
+                            qry.setProgressCallback(new ProgressNotifications() {
+                                @Override
+                                void sayProgress(String s) {
+                                    publish(s);
+                                }
+                            });
                         }
-                    }
 
+                        @Override
+                        protected void process(List<String> chunks) {
+                            rp.addProgress(chunks);
+                        }
+
+                        public void setRp(RequestProgress rp) {
+                            this.rp = rp;
+                        }
+
+                        @Override
+                        protected Void myDoInBackground() throws Exception {
+                            all = getall.getAll(frm);
+                            inquirer.logger.debug("do in b done");
+                            return null;
+
+                        }
+
+                        @Override
+                        protected void done() {
+                            inquirer.logger.debug("done");
+                            rp.dispose();
+                            if (isCancelled()) {
+                                JOptionPane.showMessageDialog(frm, "Query was cancelled", "Error", JOptionPane.ERROR_MESSAGE);
+                            } else {
+                                QueryTools.showQueryMessages(frm);
+
+                                qry.showAllResults();
+                                try {
+                                    this.allCalls = new QueryAllJTable(qry, frm, all);
+                                } catch (Exception ex) {
+                                    logger.error("fatal: ", ex);
+                                }
+                                Dimension d = allCalls.getPreferredSize();
+                                d.height = 400;
+                                d.width += 50;
+                                //            Dimension d = allApps.getPreferredSize();
+                                //            d.height = 300;
+                                //            d.width += 50;
+
+                                JScrollPane jScrollPane = new JScrollPane(allCalls);
+                                jScrollPane.setPreferredSize(d);
+                                AllCallsFrame allCallsFrame = new AllCallsFrame(jScrollPane);
+                                allCallsFrame.setTitle("All calls - " + qry.getAllCallsTitle(frm));
+                                allCallsFrame.setVisible(true);
+                            }
+                        }
+
+                    }
+                    //</editor-fold>
+                    QueryTools.queryMessagesClear();
+                    QueryAllTask tsk = new QueryAllTask(this, qry);
+                    RequestProgress rp = new RequestProgress(this, true, tsk);
+                    tsk.setRp(rp);
+                    tsk.execute();
+                    rp.doShow();
                 }
-                //</editor-fold>
-                QueryTools.queryMessagesClear();
-                QueryAllTask tsk = new QueryAllTask(this, qry);
-                RequestProgress rp = new RequestProgress(this, true, tsk);
-                tsk.setRp(rp);
-                tsk.execute();
-                rp.doShow();
 
             }
         } catch (Exception exception) {
@@ -1028,7 +1030,7 @@ public class QueryDialog extends javax.swing.JFrame {
         protected JPanel bannerPanel;
         protected JLabel lbl;
         JRadioButton vimButton;
-//        private final JRadioButton excelButton;
+        //        private final JRadioButton excelButton;
         JRadioButton texpadButton;
         JRadioButton notepadButton;
         JRadioButton doneButton;

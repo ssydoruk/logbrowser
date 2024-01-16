@@ -194,8 +194,11 @@ public class DBServerResults extends IQueryResults {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
-    @Override
-    FullTableColors getAll(QueryDialog qd, Component c, int x, int y)  throws Exception {
+        @Override
+    public IGetAllProc getAllProc(Component c, int x, int y) {
+        return qd -> getAll(qd);
+    }
+  FullTableColors getAll(QueryDialog qd)  throws Exception {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 

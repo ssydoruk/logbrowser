@@ -76,8 +76,11 @@ public class CallFlowResults extends IQueryResults {
         return IDsFinder.RequestLevel.Level5; //To change body of generated methods, choose Tools | Templates.
     }
 
-    @Override
-    FullTableColors getAll(QueryDialog qd, Component c, int x, int y)  throws SQLException {
+        @Override
+    public IGetAllProc getAllProc(Component c, int x, int y) {
+        return qd -> getAll(qd);
+    }
+    FullTableColors getAll(QueryDialog qd)throws SQLException {
         try {
             String tmpTable = "callFlowTmp";
             DynamicTreeNode.setNoRefNoLoad(true);

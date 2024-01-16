@@ -21,12 +21,13 @@ import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.HashSet;
+import java.util.concurrent.CountDownLatch;
 
-import javax.swing.AbstractAction;
-import javax.swing.JButton;
-import javax.swing.JMenuItem;
-import javax.swing.JPopupMenu;
+import javax.swing.*;
+import javax.swing.event.PopupMenuEvent;
+import javax.swing.event.PopupMenuListener;
 
 import static com.myutils.logbrowser.indexer.OrsParser.MAX_ALARMS;
 import static com.myutils.logbrowser.inquirer.DatabaseConnector.TableExist;
@@ -282,57 +283,22 @@ final public class RoutingResults extends IQueryResults {
 
     }
 
-    @Override
-    FullTableColors getAll(QueryDialog qd, Component c, int x, int y)  throws SQLException {
-
-        JPopupMenu clonePopup = new JPopupMenu();
-
-        clonePopup.add(new JMenuItem(new AbstractAction("URS strategies") {
-            public void actionPerformed(ActionEvent e) {
-                return getAllURSStrategies();
-            }
-        }));
-
-        clonePopup.add(new JMenuItem(new AbstractAction("URS calls") {
-            public void actionPerformed(ActionEvent e) {
-                getAllURSCalls();
-
-            }
-        }));
-
-        clonePopup.add(new JMenuItem(new AbstractAction("Orchestration strategies") {
-            public void actionPerformed(ActionEvent e) {
-                getAllORSStrategies();
-            }
-        }));
-
-        clonePopup.add(new JMenuItem(new AbstractAction("Orchestration calls") {
-            public void actionPerformed(ActionEvent e) {
-                getAllORSCalls();
-
-            }
-        }));
-
-        clonePopup.show(c, x, y);
-
-    }
-
-    protected void getAllORSStrategies() {
+    protected FullTableColors getAllORSStrategies(QueryDialog qd) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'getAllORSStrategies'");
     }
 
-    protected void getAllURSCalls() {
+    protected FullTableColors getAllURSCalls(QueryDialog qd) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'getAllURSCalls'");
     }
 
-    protected void getAllORSCalls() {
+    protected FullTableColors getAllORSCalls(QueryDialog qd) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'getAllORSCalls'");
     }
 
-    protected FullTableColors getAllURSStrategies() {
+    protected FullTableColors getAllURSStrategies(QueryDialog qd) throws SQLException {
         try {
             String tmpTable = "callFlowTmp";
             DynamicTreeNode.setNoRefNoLoad(true);
@@ -372,9 +338,9 @@ final public class RoutingResults extends IQueryResults {
 
             String tab = null;
             if (DatabaseConnector.TableExist("ors_logbr"))
-                tab="ors_logbr";
-            else if(DatabaseConnector.TableExist("urs_logbr"))
-                tab="urs_logbr";
+                tab = "ors_logbr";
+            else if (DatabaseConnector.TableExist("urs_logbr"))
+                tab = "urs_logbr";
 
 
             if (!StringUtils.isEmpty(tab)) {
@@ -432,8 +398,7 @@ final public class RoutingResults extends IQueryResults {
                         + "\n" + IQuery.getDateTimeFilters(tab, "time", qd.getTimeRange(), "AND")
                         + ")"
                         + ";");
-            }
-            else
+            } else
                 logger.error("Neither routing table found");
 
             tab = "ursstrinit_logbr";
@@ -1024,7 +989,7 @@ final public class RoutingResults extends IQueryResults {
                         addUnique(refIDs, Util.intOrDef(rec.getFieldValue("refid"), (Long) null));
                         addUnique(reqIDs, Util.intOrDef(rec.getFieldValue("reqid"), (Long) null));
                         addUnique(iDs, rec.getID());
-                        addUnique(idFiles, new Long(rec.GetFileId()));
+                        addUnique(idFiles, Long.valueOf(rec.GetFileId()));
                     });
                 }
                 getRecords(UrsRLib);
@@ -1041,7 +1006,7 @@ final public class RoutingResults extends IQueryResults {
                     UrsRLib.setRecLoadedProc((ILogRecord rec) -> {
                         addUnique(reqIDs, Util.intOrDef(rec.getFieldValue("reqid"), (Long) null));
                         addUnique(iDs, rec.getID());
-                        addUnique(idFiles, new Long(rec.GetFileId()));
+                        addUnique(idFiles, Long.valueOf(rec.GetFileId()));
                     });
 
                     getRecords(UrsRLib);
@@ -1222,7 +1187,7 @@ final public class RoutingResults extends IQueryResults {
                     URSHTTP.setRecLoadedProc((ILogRecord rec) -> {
                         addUnique(httpHandlerID, Util.intOrDef(rec.getFieldValue("httpHandlerID"), (Long) null));
                         addUnique(iDs, rec.getID());
-                        addUnique(idFiles, new Long(rec.GetFileId()));
+                        addUnique(idFiles, Long.valueOf(rec.GetFileId()));
                     });
                 }
                 getRecords(URSHTTP);
@@ -1620,6 +1585,22 @@ final public class RoutingResults extends IQueryResults {
     @Override
     boolean callRelatedSearch(IDsFinder cidFinder) throws SQLException {
         return true;
+    }
+
+    @Override
+    public IGetAllProc getAllProc(Component c, int x, int y) {
+        SmartButtonGroup<IGetAllProc> group = new SmartButtonGroup<>();
+        JRadioButton bt = new JRadioButton("ORS interactions");
+        bt.setSelected(true);
+        group.add(bt, qd -> getAllORSCalls(qd));
+        group.add(new JRadioButton("ORS strategies"), qd -> getAllORSStrategies(qd));
+        group.add(new JRadioButton("URS interactions"), qd -> getAllURSCalls(qd));
+        group.add(new JRadioButton("URS strategies"), qd -> getAllURSStrategies(qd));
+
+        RequestDialog rd = new RequestDialog(SwingUtilities.windowForComponent(c), group.getPan());
+        return (rd.doShow()) ? group.getSelectedObject() : null;
+
+
     }
 
     private TableQuery newORSMMTable(DynamicTreeNode<OptionNode> orsReportSettings, QueryDialog dlg) throws SQLException {

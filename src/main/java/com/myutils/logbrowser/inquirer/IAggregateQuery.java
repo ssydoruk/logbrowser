@@ -56,8 +56,11 @@ public abstract class IAggregateQuery extends IQueryResults {
 
     }
 
-    @Override
-    FullTableColors getAll(QueryDialog qd, Component c, int x, int y)  {
+        @Override
+    public IGetAllProc getAllProc(Component c, int x, int y) {
+        return qd -> getAll(qd);
+    }
+  FullTableColors getAll(QueryDialog qd)  {
         return null;
     }
 

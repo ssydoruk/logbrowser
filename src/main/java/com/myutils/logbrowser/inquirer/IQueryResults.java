@@ -538,8 +538,6 @@ public abstract class IQueryResults extends QueryTools
         return ret.toArray(new String[ret.size()]);
     }
 
-    abstract FullTableColors getAll(QueryDialog qd, Component c, int x, int y) throws Exception;
-
     abstract void showAllResults();
 
     public boolean isPrintAlone() {
@@ -937,6 +935,8 @@ public abstract class IQueryResults extends QueryTools
     }
 
     abstract boolean callRelatedSearch(IDsFinder cidFinder) throws SQLException;
+
+    public abstract IGetAllProc getAllProc(Component c, int x, int y);
 
     public static abstract class ProgressNotifications {
 

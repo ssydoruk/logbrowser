@@ -58,8 +58,11 @@ public class WWEResults extends IQueryResults {
 
     }
 
-    @Override
-    FullTableColors getAll(QueryDialog qd, Component c, int x, int y)  throws Exception {
+        @Override
+    public IGetAllProc getAllProc(Component c, int x, int y) {
+        return qd -> getAll(qd);
+    }
+  FullTableColors getAll(QueryDialog qd)  throws Exception {
         try {
             String tmpTable = "callFlowTmp";
             DynamicTreeNode.setNoRefNoLoad(true);
