@@ -103,10 +103,6 @@ public class TableQuery extends IQuery {
         return ret;
     }
 
-    void addHiddenField(String rowType) {
-
-    }
-
     void setResultClass(Class<TLibEvent> aClass) {
         this.myClass = aClass;
     }

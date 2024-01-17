@@ -753,6 +753,7 @@ public abstract class IQuery extends QueryTools {
         outFields.add(fld);
     }
 
+
     public String addedFieldString(boolean startWithComa, boolean finishWithComa) {
         StringBuilder qString = new StringBuilder();
         if (outFields != null && !outFields.isEmpty()) {

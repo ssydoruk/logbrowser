@@ -301,6 +301,7 @@ final public class RoutingResults extends IQueryResults {
                     + ",strstarted timestamp"
                     + ",strended timestamp"
                     + ",sidid timestamp"
+                    + ",sesscount int"
                     + ", sourceid int\n"
                     + ")\n;"
             );
@@ -833,8 +834,7 @@ final public class RoutingResults extends IQueryResults {
                     + ",nameid int"
                     + ",uuidid int"
                     + ",ixnidid int"
-                    + ",strnameid int"
-                    + ",urlid int"
+                    + ",sess_count int"
                     + ", sourceid int\n"
                     + ")\n;"
             );
@@ -848,8 +848,6 @@ final public class RoutingResults extends IQueryResults {
             String makeWhere = wh.makeWhere(false);
 
             String tab = "ors_logbr";
-
-
 
             if (!StringUtils.isEmpty(tab)) {
                 tellProgress("Finding unique connIDs in ORS");
@@ -911,8 +909,6 @@ final public class RoutingResults extends IQueryResults {
             } else
                 logger.error("Neither routing table found");
 
-
-
             tellProgress("Creating indexes");
             DatabaseConnector.runQuery("create index idx_" + reportTable + "appid on " + reportTable + "(appid);");
             DatabaseConnector.runQuery("create index idx_" + reportTable + "thisdnid on " + reportTable + "(thisdnid);");
@@ -922,6 +918,32 @@ final public class RoutingResults extends IQueryResults {
             DatabaseConnector.runQuery("create index idx_" + reportTable + "ixnidid on " + reportTable + "(ixnidid);");
             DatabaseConnector.runQuery("create index idx_" + reportTable + "sourceid on " + reportTable + "(sourceid);");
 
+            tab = "ORSsess_logbr";
+
+            if (!StringUtils.isEmpty(tab)) {
+
+                tellProgress("Updating parameters of ORS calls");
+                DatabaseConnector.runQuery("update " + reportTable
+                        + "\nset ("
+                        + "sess_count"
+                        + ") = "
+                        + "\n("
+                        + "select "
+                        + "cnt "
+                        + "\nfrom\n"
+                        + "(select count(*) as cnt, uuidid"
+                        + "\nfrom " + tab
+                        + "\nwhere 1=1"
+                        + "\n" + IQuery.getFileFilters(tab, "fileid", qd.getSearchApps(false), "AND")
+                        + "\n" + IQuery.getDateTimeFilters(tab, "time", qd.getTimeRange(), "AND")
+                        + " group by uuidid"
+                        + ") as " + tab
+                        + "\nwhere "
+                        + reportTable + ".uuidid=" + tab + ".uuidid"
+//                        + "\nand\n"
+                        + ")"
+                        + ";");
+            }
 
             tellProgress("Extracting data");
             TableQuery tabReport = new TableQuery(reportTable);
@@ -929,6 +951,7 @@ final public class RoutingResults extends IQueryResults {
             tabReport.addOutField("UTCtoDateTime(ended, \"YYYY-MM-dd HH:mm:ss.SSS\") ended");
             tabReport.setAddAll(false);
             tabReport.addOutField("rowType");
+            tabReport.addOutField("sess_count \"ORS sessions\"");
             tabReport.addRef("thisdnid", "thisdn", ReferenceType.DN.toString(), IQuery.FieldType.OPTIONAL);
             tabReport.addRef("otherdnid", "otherdn", ReferenceType.DN.toString(), IQuery.FieldType.OPTIONAL);
             tabReport.addRef("connectionidid", "connectionid", ReferenceType.ConnID.toString(), IQuery.FieldType.OPTIONAL);
