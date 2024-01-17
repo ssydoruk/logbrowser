@@ -952,14 +952,15 @@ final public class RoutingResults extends IQueryResults {
 
     protected FullTableColors getAllORSCalls(QueryDialog qd) throws SQLException {
         try {
-            String tmpTable = "callFlowTmp";
+
+            String reportTable = "callFlowTmp";
             DynamicTreeNode.setNoRefNoLoad(true);
 
-            DatabaseConnector.dropTable(tmpTable);
+            DatabaseConnector.dropTable(reportTable);
             inquirer.logger.info("Building temp tables");
 
             tellProgress("Creating temp table");
-            DatabaseConnector.runQuery("create temp table " + tmpTable + " ("
+            DatabaseConnector.runQuery("create temp table " + reportTable + " ("
                     + "connectionidid int"
                     + ",started timestamp"
                     + ",ended timestamp"
@@ -972,34 +973,27 @@ final public class RoutingResults extends IQueryResults {
                     + ",ixnidid int"
                     + ",strnameid int"
                     + ",urlid int"
-                    + ",strstarted timestamp"
-                    + ",strended timestamp"
-                    + ",sidid timestamp"
                     + ", sourceid int\n"
                     + ")\n;"
             );
 
-//<editor-fold defaultstate="collapsed" desc="URS connIDs">
             Wheres wh = new Wheres();
             wh.addWhere(IQuery.getCheckedWhere("ThisDNid", ReferenceType.DN,
-                    FindNode(repComponents.getRoot(), DialogItem.URS, DialogItem.URS_EVENTS, DialogItem.URS_EVENTS_DN)), "OR");
+                    FindNode(repComponents.getRoot(), DialogItem.ORS, DialogItem.ORS_TEVENTS, DialogItem.ORS_TEVENTS_DN)), "OR");
             wh.addWhere(IQuery.getCheckedWhere("otherDNID", ReferenceType.DN,
-                    FindNode(repComponents.getRoot(), DialogItem.URS, DialogItem.URS_EVENTS, DialogItem.URS_EVENTS_DN)), "OR");
+                    FindNode(repComponents.getRoot(), DialogItem.ORS, DialogItem.ORS_TEVENTS, DialogItem.ORS_TEVENTS_DN)), "OR");
 
             String makeWhere = wh.makeWhere(false);
 
-            String tab = null;
-            if (DatabaseConnector.TableExist("ors_logbr"))
-                tab = "ors_logbr";
-            else if (DatabaseConnector.TableExist("urs_logbr"))
-                tab = "urs_logbr";
+            String tab = "ors_logbr";
+
 
 
             if (!StringUtils.isEmpty(tab)) {
-                tellProgress("Finding unique connIDs in URS");
+                tellProgress("Finding unique connIDs in ORS");
 
-                getAllResults.add(new Pair<>("Unique calls in URS",
-                        DatabaseConnector.runQuery("insert into " + tmpTable + " (connectionidid, started, ended)"
+                getAllResults.add(new Pair<>("Unique calls in ORS",
+                        DatabaseConnector.runQuery("insert into " + reportTable + " (connectionidid, started, ended)"
                                 + "\nselect distinct connectionidid, min(time), max(time) from " + tab
                                 + "\nwhere connectionidid >0  "
                                 + IQuery.getFileFilters(tab, "fileid", qd.getSearchApps(false), "AND")
@@ -1010,13 +1004,13 @@ final public class RoutingResults extends IQueryResults {
                                 + IQuery.getLimitClause(isLimitQueryResults(), getMaxQueryLines())
                                 + ";")));
 
-                DatabaseConnector.runQuery(" update " + tmpTable + " set rowtype=" + FileInfoType.type_URS.getValue());
+                DatabaseConnector.runQuery(" update " + reportTable + " set rowtype=" + FileInfoType.type_ORS.getValue());
 
-                DatabaseConnector.runQuery("create index idx_" + tmpTable + "connID on " + tmpTable + "(connectionidid);");
-                DatabaseConnector.runQuery("create index idx_" + tmpTable + "started on " + tmpTable + "(started);");
+                DatabaseConnector.runQuery("create index idx_" + reportTable + "connID on " + reportTable + "(connectionidid);");
+                DatabaseConnector.runQuery("create index idx_" + reportTable + "started on " + reportTable + "(started);");
 
                 tellProgress("Updating parameters of URS calls");
-                DatabaseConnector.runQuery("update " + tmpTable
+                DatabaseConnector.runQuery("update " + reportTable
                         + "\nset ("
                         + "nameid"
                         + ", thisdnid"
@@ -1043,9 +1037,10 @@ final public class RoutingResults extends IQueryResults {
                         + " inner join file_logbr on " + tab + ".fileid=file_logbr.id"
                         + ") as " + tab
                         + "\nwhere "
-                        + tmpTable + ".connectionidid=" + tab + ".connectionidid"
+                        + "thisdnid > 0 and\n"
+                        + reportTable + ".connectionidid=" + tab + ".connectionidid"
                         + "\nand\n"
-                        + tmpTable + ".started=" + tab + ".time"
+                        + reportTable + ".started=" + tab + ".time"
                         + "\n" + IQuery.getFileFilters(tab, "fileid", qd.getSearchApps(false), "AND")
                         + "\n" + IQuery.getDateTimeFilters(tab, "time", qd.getTimeRange(), "AND")
                         + ")"
@@ -1053,219 +1048,24 @@ final public class RoutingResults extends IQueryResults {
             } else
                 logger.error("Neither routing table found");
 
-            tab = "ursstrinit_logbr";
-            tellProgress("Finding strategy init parameters");
 
-            if (DatabaseConnector.TableExist(tab)) {
-                String tmpTable1 = tmpTable + "1";
-                DatabaseConnector.dropTable(tmpTable1);
-                DatabaseConnector.runQuery("create temp table "
-                        + tmpTable1
-                        + " as  SELECT\n"
-                        + "connidid\n"
-                        + ", max(time) as strended \n"
-                        + "    FROM\n"
-                        + tab
-                        + " where (strategynameid <=1 or strategynameid is null)"
-                        + "\n" + IQuery.getFileFilters(tab, "fileid", qd.getSearchApps(false), "AND")
-                        + "\n" + IQuery.getDateTimeFilters(tab, "time", qd.getTimeRange(), "AND")
-                        + "\ngroup by 1\n"
-                        + IQuery.getLimitClause(isLimitQueryResults(), getMaxQueryLines()));
-                DatabaseConnector.runQuery("create index idx_" + tmpTable1 + "connID on " + tmpTable1 + "(connidid);");
 
-                DatabaseConnector.runQuery("update " + tmpTable
-                        + "\nset ("
-                        + "strended"
-                        + ") = "
-                        + "\n( select strended"
-                        + "\nfrom "
-                        + tmpTable1 + " as a "
-                        + "\nwhere "
-                        + tmpTable + ".connectionidid=a.connidid"
-                        + ")"
-                        + ";");
-
-                DatabaseConnector.dropTable(tmpTable1);
-                DatabaseConnector.runQuery("create temp table "
-                        + tmpTable1
-                        + " as  SELECT\n"
-                        + "connidid\n"
-                        + ",min(time) as strstarted\n"
-                        + "    FROM\n"
-                        + tab
-                        + " where strategynameid>0"
-                        + "\n" + IQuery.getFileFilters(tab, "fileid", qd.getSearchApps(false), "AND")
-                        + "\n" + IQuery.getDateTimeFilters(tab, "time", qd.getTimeRange(), "AND")
-                        + "\ngroup by 1\n"
-                        + IQuery.getLimitClause(isLimitQueryResults(), getMaxQueryLines()));
-                DatabaseConnector.runQuery("create index idx_" + tmpTable1 + "connID on " + tmpTable1 + "(connidid);");
-                DatabaseConnector.runQuery("create index idx_" + tmpTable1 + "strstarted on " + tmpTable1 + "(strstarted);");
-
-                DatabaseConnector.runQuery("update " + tmpTable
-                        + "\nset ("
-                        + "strstarted"
-                        + ") = "
-                        + "\n( select strstarted "
-                        + "\nfrom "
-                        + tmpTable1 + " as a "
-                        + "\nwhere "
-                        + tmpTable + ".connectionidid=a.connidid"
-                        + ")"
-                        + ";");
-
-                DatabaseConnector.runQuery("update " + tmpTable
-                        + "\nset ("
-                        + "strnameid"
-                        + ") = "
-                        + "\n( select strategynameid "
-                        + "\nfrom "
-                        + tab + " as t "
-                        + "\n inner join " + tmpTable1 + " as t1 "
-                        + " on t.connidid=t1.connidid and t1.strstarted=t.time"
-                        + " where connectionidid=t1.connidid"
-                        + ")"
-                        + ";");
-            }
-//</editor-fold>
-
-//<editor-fold defaultstate="collapsed" desc="ORS Session IDs">
-            if (DatabaseConnector.TableExist("orssess_logbr")) {
-                wh = new Wheres();
-                wh.addWhere(IQuery.getCheckedWhere("ThisDNid", ReferenceType.DN,
-                        FindNode(repComponents.getRoot(), DialogItem.ORS, DialogItem.ORS_TEVENTS, DialogItem.ORS_TEVENTS_DN)), "OR");
-                wh.addWhere(IQuery.getCheckedWhere("otherDNID", ReferenceType.DN,
-                        FindNode(repComponents.getRoot(), DialogItem.ORS, DialogItem.ORS_TEVENTS, DialogItem.ORS_TEVENTS_DN)), "OR");
-
-                makeWhere = wh.makeWhere(false);
-
-                tellProgress("Finding unique voice sessions in ORS");
-                tab = "orssess_logbr";
-                getAllResults.add(new Pair<>("Unique voice sessions in ORS",
-                        DatabaseConnector.runQuery("insert into " + tmpTable + " (appid, sidid, uuidid, strnameid, urlid, started, rowtype)"
-                                + "\nselect appid, sidid, uuidid, appid, urlid, time,"
-                                + FileInfoType.type_ORS.getValue()
-                                + "\nfrom "
-                                + "(select "
-                                + tab + ".*"
-                                + ",file_logbr.appnameid as appid"
-                                + "\nfrom " + tab
-                                + " inner join file_logbr on " + tab + ".fileid=file_logbr.id"
-                                + ") as " + tab
-                                + "\nwhere sidid >0  "
-                                + IQuery.getFileFilters(tab, "fileid", qd.getSearchApps(false), "AND")
-                                + IQuery.getDateTimeFilters(tab, "time", qd.getTimeRange(), "AND")
-                                + ((makeWhere != null && !makeWhere.isEmpty()) ? " and (" + makeWhere + ")"
-                                : "")
-                                + IQuery.getLimitClause(isLimitQueryResults(), getMaxQueryLines())
-                        )));
-            }
-            if (DatabaseConnector.TableExist("orssessixn")) {
-                tellProgress("Finding interaction sessions in ORS");
-                tab = "orssessixn";
-                getAllResults.add(new Pair<>("Unique interaction sessions in ORS",
-                        DatabaseConnector.runQuery("insert into " + tmpTable + " (appid, sidid, ixnidid, strnameid, urlid, started, rowtype)"
-                                + "\nselect appid, sidid, ixnid, appid, urlid, time,"
-                                + FileInfoType.type_ORS.getValue()
-                                + "\nfrom "
-                                + "(select "
-                                + tab + ".*"
-                                + ",file_logbr.appnameid as appid"
-                                + "\nfrom " + tab
-                                + " inner join file_logbr on " + tab + ".fileid=file_logbr.id"
-                                + ") as " + tab
-                                + "\nwhere sidid >0  "
-                                + IQuery.getFileFilters(tab, "fileid", qd.getSearchApps(false), "AND")
-                                + IQuery.getDateTimeFilters(tab, "time", qd.getTimeRange(), "AND")
-                                + ((makeWhere != null && !makeWhere.isEmpty()) ? " and (" + makeWhere + ")"
-                                : "")
-                                + IQuery.getLimitClause(isLimitQueryResults(), getMaxQueryLines())
-                        )));
-            }
-            if (DatabaseConnector.TableExist("orsmetr_logbr")) {
-                /*Searching for sessions not created for voice nor multimedia interactions */
-                tab = "orsmetr_logbr";
-                tellProgress("Finding unique other sessions in ORS");
-                getAllResults.add(new Pair<>("Unique other sessions in ORS",
-                        DatabaseConnector.runQuery("insert into " + tmpTable + " (sidid, rowtype)"
-                                + "\nselect sidid,"
-                                + FileInfoType.type_ORS.getValue()
-                                + "\nfrom "
-                                + "(select "
-                                + "fileid, metricid, sidid, time"
-                                + ",file_logbr.appnameid as appid"
-                                + "\nfrom " + tab
-                                + " inner join file_logbr on " + tab + ".fileid=file_logbr.id"
-                                + ") as " + tab
-                                + "\nwhere sidid > 0  "
-                                //                        + "\n and sidid not in (select sidid from orssess_logbr) "
-                                //                        + "\n and sidid not in (select sidid from orssessixn) "
-                                + (DatabaseConnector.TableExist("orssess_logbr") ? "\nand not exists (select sidid from orssess_logbr where sidid=orsmetr_logbr.sidid)" : "")
-                                + (DatabaseConnector.TableExist("orssessixn") ? "\nand not exists (select sidid from orssessixn where sidid=orsmetr_logbr.sidid)" : "")
-                                + "\nand " + getWhere("metricid", ReferenceType.METRIC, new String[]{"doc_request"}, false)
-                                + IQuery.getFileFilters(tab, "fileid", qd.getSearchApps(false), "AND")
-                                + IQuery.getDateTimeFilters(tab, "time", qd.getTimeRange(), "AND")
-                                + ((makeWhere != null && !makeWhere.isEmpty()) ? " and (" + makeWhere + ")"
-                                : "")
-                                + IQuery.getLimitClause(isLimitQueryResults(), getMaxQueryLines())
-                        )));
-
-                tellProgress("Updating ORS sessions parameters");
-                tab = "orsmetr_logbr";
-                if (DatabaseConnector.TableExist(ReferenceType.METRIC.toString())) {
-                    DatabaseConnector.runQuery("update " + tmpTable
-                            + "\nset ("
-                            + "strstarted"
-                            + ") = "
-                            + "\n("
-                            + "select "
-                            + "time"
-                            + "\nfrom "
-                            + tab
-                            + "\nwhere "
-                            + tmpTable + ".sidid=" + tab + ".sidid"
-                            + "\nand\n"
-                            + IQuery.getWhere("metricid", ReferenceType.METRIC, "appl_begin", false)
-                            + ")"
-                            + ";");
-
-                    DatabaseConnector.runQuery("update " + tmpTable
-                            + "\nset ("
-                            + "strended"
-                            + ") = "
-                            + "\n("
-                            + "select "
-                            + "time"
-                            + "\nfrom "
-                            + tab
-                            + "\nwhere "
-                            + tmpTable + ".sidid=" + tab + ".sidid"
-                            + "\nand\n"
-                            + IQuery.getWhere("metricid", ReferenceType.METRIC, "appl_end", false)
-                            + ")"
-                            + ";");
-                }
-            }
-//</editor-fold>
-//<editor-fold defaultstate="collapsed" desc="indexes and extract">
             tellProgress("Creating indexes");
-            DatabaseConnector.runQuery("create index idx_" + tmpTable + "appid on " + tmpTable + "(appid);");
-            DatabaseConnector.runQuery("create index idx_" + tmpTable + "thisdnid on " + tmpTable + "(thisdnid);");
-            DatabaseConnector.runQuery("create index idx_" + tmpTable + "otherdnid on " + tmpTable + "(otherdnid);");
-            DatabaseConnector.runQuery("create index idx_" + tmpTable + "nameid on " + tmpTable + "(nameid);");
-            DatabaseConnector.runQuery("create index idx_" + tmpTable + "uuidid on " + tmpTable + "(uuidid);");
-            DatabaseConnector.runQuery("create index idx_" + tmpTable + "ixnidid on " + tmpTable + "(ixnidid);");
-            DatabaseConnector.runQuery("create index idx_" + tmpTable + "sourceid on " + tmpTable + "(sourceid);");
-            DatabaseConnector.runQuery("create index idx_" + tmpTable + "sidid on " + tmpTable + "(sidid);");
+            DatabaseConnector.runQuery("create index idx_" + reportTable + "appid on " + reportTable + "(appid);");
+            DatabaseConnector.runQuery("create index idx_" + reportTable + "thisdnid on " + reportTable + "(thisdnid);");
+            DatabaseConnector.runQuery("create index idx_" + reportTable + "otherdnid on " + reportTable + "(otherdnid);");
+            DatabaseConnector.runQuery("create index idx_" + reportTable + "nameid on " + reportTable + "(nameid);");
+            DatabaseConnector.runQuery("create index idx_" + reportTable + "uuidid on " + reportTable + "(uuidid);");
+            DatabaseConnector.runQuery("create index idx_" + reportTable + "ixnidid on " + reportTable + "(ixnidid);");
+            DatabaseConnector.runQuery("create index idx_" + reportTable + "sourceid on " + reportTable + "(sourceid);");
 
 
             tellProgress("Extracting data");
-            TableQuery tabReport = new TableQuery(tmpTable);
+            TableQuery tabReport = new TableQuery(reportTable);
             tabReport.addOutField("UTCtoDateTime(started, \"YYYY-MM-dd HH:mm:ss.SSS\") started");
-            tabReport.addOutField("UTCtoDateTime(strstarted, \"YYYY-MM-dd HH:mm:ss.SSS\") \"Strategy started\"");
             tabReport.addOutField("UTCtoDateTime(ended, \"YYYY-MM-dd HH:mm:ss.SSS\") ended");
-            tabReport.addOutField("UTCtoDateTime(strended, \"YYYY-MM-dd HH:mm:ss.SSS\") \"Strategy ended\"");
-            tabReport.addOutField("jduration(strended-strstarted) duration ");
             tabReport.setAddAll(false);
+            tabReport.addOutField("rowType");
             tabReport.addRef("thisdnid", "thisdn", ReferenceType.DN.toString(), IQuery.FieldType.OPTIONAL);
             tabReport.addRef("otherdnid", "otherdn", ReferenceType.DN.toString(), IQuery.FieldType.OPTIONAL);
             tabReport.addRef("connectionidid", "connectionid", ReferenceType.ConnID.toString(), IQuery.FieldType.OPTIONAL);
@@ -1275,15 +1075,12 @@ final public class RoutingResults extends IQueryResults {
             tabReport.addRef("sourceid", "\"Source Server\"", ReferenceType.App.toString(), IQuery.FieldType.OPTIONAL);
             tabReport.addRef("nameid", "\"First TEvent\"", ReferenceType.TEvent.toString(), IQuery.FieldType.OPTIONAL);
             tabReport.addRef("appid", "application", ReferenceType.App.toString(), IQuery.FieldType.OPTIONAL);
-            tabReport.addRef("sidid", "sid", ReferenceType.ORSSID.toString(), IQuery.FieldType.OPTIONAL);
             tabReport.setOrderBy(tabReport.getTabAlias() + ".started");
             FullTableColors currTable = tabReport.getFullTable();
             currTable.setHiddenField("rowType");
-//</editor-fold>
             return currTable; //To change body of generated methods, choose Tools | Templates.
         } finally {
             DynamicTreeNode.setNoRefNoLoad(false);
-
         }
     }
 
@@ -1684,6 +1481,7 @@ final public class RoutingResults extends IQueryResults {
         SearchFields ret = new SearchFields();
         ret.addRecMap(com.myutils.logbrowser.indexer.FileInfoType.type_URS, new Pair<>(SelectionType.CONNID, "connectionid"));
         ret.addRecMap(com.myutils.logbrowser.indexer.FileInfoType.type_ORS, new Pair<>(SelectionType.SESSION, "sid"));
+        ret.addRecMap(com.myutils.logbrowser.indexer.FileInfoType.type_ORS, new Pair<>(SelectionType.CONNID, "connectionid"));
         ret.setTypeField("rowType");
         return ret;
     }

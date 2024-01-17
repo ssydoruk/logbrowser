@@ -945,7 +945,7 @@ public abstract class IQueryResults extends QueryTools
 
     public static class SearchFields {
 
-        private final HashMap<com.myutils.logbrowser.indexer.FileInfoType, Pair<SelectionType, String>> recMap;
+        private final HashMap<com.myutils.logbrowser.indexer.FileInfoType, List<Pair<SelectionType, String>>> recMap;
         private String typeField = null;
 
         public SearchFields() {
@@ -960,19 +960,29 @@ public abstract class IQueryResults extends QueryTools
             this.typeField = typeField;
         }
 
-        public Pair<SelectionType, String> getSearchFieldName(com.myutils.logbrowser.indexer.FileInfoType type) {
+        public List<Pair<SelectionType, String>> getSearchFieldName(com.myutils.logbrowser.indexer.FileInfoType type) {
             return recMap.get(type);
         }
 
-        public Pair<SelectionType, String> getSearchFieldName() {
-            if (!recMap.isEmpty()) {
-                return recMap.values().iterator().next();
+
+        public List<Pair<SelectionType, String>> getSingle() throws Exception{
+            if( recMap.size()!=1){
+                throw new Exception("Expecting 1 element only!!!");
+            }
+            for (Map.Entry<FileInfoType, List<Pair<SelectionType, String>>> fileInfoTypeListEntry : recMap.entrySet()) {
+                return fileInfoTypeListEntry.getValue();
             }
             return null;
         }
 
         public void addRecMap(com.myutils.logbrowser.indexer.FileInfoType type, Pair<SelectionType, String> t) {
-            recMap.put(type, t);
+            List<Pair<SelectionType, String>> pairs = recMap.get(type);
+            if( pairs==null) {
+                pairs = new ArrayList<>();
+                recMap.put(type, pairs);
+            }
+            pairs.add(t);
+//            recMap.put(type, t);
         }
     }
 

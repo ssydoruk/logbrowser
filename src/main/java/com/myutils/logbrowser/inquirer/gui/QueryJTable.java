@@ -11,6 +11,7 @@ import com.myutils.logbrowser.inquirer.FullTableColors;
 import com.myutils.logbrowser.inquirer.IQueryResults;
 import com.myutils.logbrowser.inquirer.SelectionType;
 import com.myutils.logbrowser.inquirer.inquirer;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.swing.*;
 import javax.swing.event.TableModelListener;
@@ -24,6 +25,7 @@ import java.io.FileOutputStream;
 import java.io.PrintStream;
 import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Stepan
@@ -198,30 +200,37 @@ public class QueryJTable extends JTableCommon {
          * @param searchField
          * @return pair of Selection Type, value of ID for selectionType
          */
-        public Pair<SelectionType, String> getSearchColumn(int row, IQueryResults.SearchFields searchField) {
+        public Pair<SelectionType, String> getSearchColumn(int row, IQueryResults.SearchFields searchField) throws Exception {
             Pair<SelectionType, String> ret = null;
-            Pair<SelectionType, String> searchFieldName = null;
+            List<Pair<SelectionType, String>> searchFieldsList = null;
 
             String typeField = searchField.getTypeField();
 
             if (typeField == null) {
-                searchFieldName = searchField.getSearchFieldName();
+                searchFieldsList = searchField.getSingle();
             } else {
                 int columnIdx = tabData.getColumnIdx(typeField);
                 if (columnIdx > 0) {
-                    searchFieldName = searchField.getSearchFieldName(FileInfoType.GetvalueOf((Integer) getValueAt(row, columnIdx)));
+                    searchFieldsList = searchField.getSearchFieldName(FileInfoType.GetvalueOf((Integer) getValueAt(row, columnIdx)));
                 }
             }
-            if (searchFieldName != null) {
-                ret = new Pair<>();
-                ret.setKey(searchFieldName.getKey());
-                ret.setValue((String) getValueAt(row, tabData.getColumnIdx(searchFieldName.getValue())));
+            if (searchFieldsList != null) {
+                for (Pair<SelectionType, String> lst : searchFieldsList) {
+                    int columnIdx = tabData.getColumnIdx(lst.getValue());
+                    if(columnIdx>0) {
+                        String valueAt = (String) getValueAt(row, columnIdx);
+                        if(StringUtils.isNotEmpty(valueAt)) {
+                            ret = new Pair<>();
+                            ret.setKey(lst.getKey());
+                            ret.setValue(valueAt);
+                            return  ret;
+                        }
+                    }
+                }
             }
 //            return (String) getValueAt(row, tabData.getColumnIdx(searchField));
             return ret;
-
         }
-
     }
 
     class QueryJTableCellRenderer extends DefaultTableCellRenderer {
@@ -265,3 +274,4 @@ public class QueryJTable extends JTableCommon {
 
     }
 }
+

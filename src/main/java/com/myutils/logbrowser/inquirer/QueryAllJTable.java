@@ -50,7 +50,11 @@ public final class QueryAllJTable extends QueryJTable {
         menuItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                showCall(popupRow, false, true);
+                try {
+                    showCall(popupRow, false, true);
+                } catch (Exception ex) {
+                    throw new RuntimeException(ex);
+                }
             }
         });
 
@@ -82,14 +86,18 @@ public final class QueryAllJTable extends QueryJTable {
      *                   model
      * @param isDblClick
      */
-    public void showCall(int row, boolean isDblClick, boolean newForm) {
+    public void showCall(int row, boolean isDblClick, boolean newForm)  {
         QueryJTable.DataModel mod = (QueryJTable.DataModel) getModel();
 
         Pair<SelectionType, String> sc = null;
         row = convertRowIndexToModel(row);//Row is from table, so needs adjustment
 
         if (row >= 0) {
-            sc = mod.getSearchColumn(row, searchField);
+            try {
+                sc = mod.getSearchColumn(row, searchField);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
         }
         if (sc != null) {
 //                    ReportFrameQuery frm = new ReportFrameQuery(qry, searchField, searchID);
@@ -125,7 +133,11 @@ public final class QueryAllJTable extends QueryJTable {
 //                source.showCall(source.convertRowIndexToModel(source.rowAtPoint(e.getPoint())), true);
                 int rowAtPoint = source.rowAtPoint(e.getPoint());
                 int convertRowIndexToModel = source.convertRowIndexToModel(source.rowAtPoint(e.getPoint()));
-                source.showCall(source.rowAtPoint(e.getPoint()), true, false);
+                try {
+                    source.showCall(source.rowAtPoint(e.getPoint()), true, false);
+                } catch (Exception ex) {
+                    throw new RuntimeException(ex);
+                }
 
             } else {
             }
@@ -146,7 +158,11 @@ public final class QueryAllJTable extends QueryJTable {
             if (!e.getValueIsAdjusting()) {
                 DefaultListSelectionModel sm = (DefaultListSelectionModel) e.getSource();
                 inquirer.logger.trace("Selection Changed" + sm.toString());
-                theTable.showCall(sm.getMinSelectionIndex(), false, false);
+                try {
+                    theTable.showCall(sm.getMinSelectionIndex(), false, false);
+                } catch (Exception ex) {
+                    throw new RuntimeException(ex);
+                }
             }
         }
     }
