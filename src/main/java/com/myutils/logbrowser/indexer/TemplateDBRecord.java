@@ -11,7 +11,7 @@ import java.util.ArrayList;
 
 public class TemplateDBRecord extends Message {
 
-    public TemplateDBRecord(ArrayList messageLines, int fileID) {
+    public TemplateDBRecord(ArrayList<String> messageLines, int fileID) {
         super(TableType.ORSUrs, messageLines, fileID);
     }
 

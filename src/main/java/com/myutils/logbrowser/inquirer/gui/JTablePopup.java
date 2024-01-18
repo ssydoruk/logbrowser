@@ -192,7 +192,7 @@ public abstract class JTablePopup extends JTable {
     private final IRegexDialog regexDialog = CIRegexDialog.of();
 
     void showFindDialog() {
-        ScreenInfo.setVisible(this, regexDialog.findDlg(), true);
+        ScreenInfo.setVisible(SwingUtilities.windowForComponent(this), regexDialog.findDlg(), true);
         if (regexDialog.findDlg().getReturnStatus() == RET_OK) {
             nextFind(regexDialog.findDlg().isDownChecked());
         }
@@ -200,7 +200,7 @@ public abstract class JTablePopup extends JTable {
     }
 
     void findAndSelect() {
-        ScreenInfo.setVisible(this, regexDialog.findDlg(), true);
+        ScreenInfo.setVisible(SwingUtilities.windowForComponent(this), regexDialog.findDlg(), true);
         if (regexDialog.findDlg().getReturnStatus() == RET_OK) {
 
             TableModel model = getModel();
@@ -228,7 +228,7 @@ public abstract class JTablePopup extends JTable {
     }
 
     protected EnterRegexDialog showFind() {
-        ScreenInfo.setVisible(this, regexDialog.findDlg(), true);
+        ScreenInfo.setVisible(SwingUtilities.windowForComponent(this), regexDialog.findDlg(), true);
 
         if (regexDialog.findDlg().getReturnStatus() == RET_OK) {
             return regexDialog.findDlg();

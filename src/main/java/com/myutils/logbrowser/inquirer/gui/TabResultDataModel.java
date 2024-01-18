@@ -65,7 +65,7 @@ public class TabResultDataModel extends AbstractTableModel {
 //        this.columnIdxAdjusterType = new HashMap<>(srcModel.columnIdxAdjusterType);
         this.columnIdxAdjusterType = new HashMap<>();
 
-        this.columnsWithDataType = new HashMap(((TabResultDataModel) srcTab.getModel()).columnsWithDataType);
+        this.columnsWithDataType = new HashMap<>(((TabResultDataModel) srcTab.getModel()).columnsWithDataType);
         this.tableData = new ArrayList<>();
         copyData(tableData, srcTab, isFullClone);
 
@@ -100,20 +100,20 @@ public class TabResultDataModel extends AbstractTableModel {
      */
     private static HashMap<MsgType, Pair<Color, Color>> initMsgColors() {
         HashMap<MsgType, Pair<Color, Color>> ret = new HashMap<>();
-        ret.put(MsgType.TLIB, new Pair(Color.decode("#000000"), Color.decode("#FFFFFF")));
-        ret.put(MsgType.SIP, new Pair(Color.decode("#000000"), Color.decode("#D3D3D3")));
-        ret.put(MsgType.URSSTRATEGY, new Pair(Color.decode("#000000"), Color.decode("#D3D3D3")));
-        ret.put(MsgType.ORSM, new Pair(Color.decode("#000000"), Color.decode("#BDB76B")));
+        ret.put(MsgType.TLIB, new Pair<>(Color.decode("#000000"), Color.decode("#FFFFFF")));
+        ret.put(MsgType.SIP, new Pair<>(Color.decode("#000000"), Color.decode("#D3D3D3")));
+        ret.put(MsgType.URSSTRATEGY, new Pair<>(Color.decode("#000000"), Color.decode("#D3D3D3")));
+        ret.put(MsgType.ORSM, new Pair<>(Color.decode("#000000"), Color.decode("#BDB76B")));
         return ret;
     }
 
     private static ArrayList<Pair<Color, Color>> initStdColors() {
         ArrayList<Pair<Color, Color>> ret = new ArrayList<>();
-        ret.add(new Pair(Color.decode("#000000"), Color.decode("#DEB887")));
-        ret.add(new Pair(Color.decode("#000000"), Color.decode("#66CDAA")));
-        ret.add(new Pair(Color.decode("#FFFFFF"), Color.decode("#006400")));
-        ret.add(new Pair(Color.decode("#000000"), Color.decode("#FA8072")));
-        ret.add(new Pair(Color.decode("#FFFFFF"), Color.decode("#800000")));
+        ret.add(new Pair<>(Color.decode("#000000"), Color.decode("#DEB887")));
+        ret.add(new Pair<>(Color.decode("#000000"), Color.decode("#66CDAA")));
+        ret.add(new Pair<>(Color.decode("#FFFFFF"), Color.decode("#006400")));
+        ret.add(new Pair<>(Color.decode("#000000"), Color.decode("#FA8072")));
+        ret.add(new Pair<>(Color.decode("#FFFFFF"), Color.decode("#800000")));
         return ret;
     }
 

@@ -48,7 +48,7 @@ public final class QuerySetting extends javax.swing.JDialog {
     private ReferenceType lastRefType;
     private HashMap<TableType, ArrayList<OptionNode>> savedLogMessages;
     private JList lAppType;
-    // Variables declaration - do not modify//GEN-BEGIN:variables
+    // Variables declaration - do not modify                     
     private javax.swing.JButton btCancel;
     private javax.swing.JButton btOK;
     private javax.swing.JLabel jLabel1;
@@ -263,7 +263,7 @@ public final class QuerySetting extends javax.swing.JDialog {
 
         DefaultListModel lm = new DefaultListModel();
         pRefTypes.setLayout(new BorderLayout());
-        lReferenceType = new JList(lm);
+        lReferenceType = new JList<>(lm);
 //        lReferenceType.setVisibleRowCount(1000);
 //        lReferenceType.setFixedCellWidth(500);
         lReferenceType.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
@@ -1298,7 +1298,7 @@ public final class QuerySetting extends javax.swing.JDialog {
 
 // TODO add your handling code here:
     }//GEN-LAST:event_jbConstantRemoveActionPerformed
-    // End of variables declaration//GEN-END:variables
+    // End of variables declaration                   
 
     private static class ConstantsModel extends AbstractTableModel {
 

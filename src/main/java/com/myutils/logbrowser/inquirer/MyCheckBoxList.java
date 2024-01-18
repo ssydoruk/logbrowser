@@ -147,7 +147,7 @@ public class MyCheckBoxList extends CheckBoxList {
             dlg.setRegex(inquirer.geLocaltQuerySettings().getSavedFilters());
             dlg.setShowUps(true);
             dlg.setDown(searchForward);
-            ScreenInfo.setVisible(this, dlg, true);
+            ScreenInfo.setVisible(SwingUtilities.windowForComponent(this), dlg, true);
             runSearch = dlg.getReturnStatus() == RET_OK;
             if (runSearch) {
                 lastRegEx = dlg.getSearch();
