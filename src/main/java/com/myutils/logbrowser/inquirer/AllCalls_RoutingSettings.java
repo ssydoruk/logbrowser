@@ -18,15 +18,15 @@ import javax.swing.border.TitledBorder;
  *
  * @author ssydo
  */
-class CURSReportType extends AllInteractionsSettings {
+class AllCalls_RoutingSettings extends AllInteractionsSettings {
     
     private final RoutingResults routingResults;
     private final SmartButtonGroup<IGetAllProc> selectAllReportTypeGroup;
-    private static CURSReportType INSTANCE = null;
+    private static AllCalls_RoutingSettings INSTANCE = null;
 
-    public static CURSReportType getInstance(RoutingResults routingResults, Window c) {
+    public static AllCalls_RoutingSettings getInstance(RoutingResults routingResults, Window c) {
         if (INSTANCE == null) {
-            INSTANCE = new CURSReportType(routingResults, c);
+            INSTANCE = new AllCalls_RoutingSettings(routingResults, c);
         }
         return INSTANCE;
     }
@@ -35,7 +35,7 @@ class CURSReportType extends AllInteractionsSettings {
         return selectAllReportTypeGroup;
     }
 
-    public CURSReportType(RoutingResults routingResults, Window parent) {
+    public AllCalls_RoutingSettings(RoutingResults routingResults, Window parent) {
         super(parent);
         this.routingResults = routingResults;
         JPanel pan = new JPanel();

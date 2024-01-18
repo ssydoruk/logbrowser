@@ -2268,11 +2268,9 @@ final public class RoutingResults extends IQueryResults {
     }
 
 
-    private CURSReportType selectAllReportType = null;
-
     @Override
     public AllProcSettings getAllProc(Window parent, int x, int y) {
-        CURSReportType rd = CURSReportType.getInstance(this, parent);
+        AllCalls_RoutingSettings rd = AllCalls_RoutingSettings.getInstance(this, parent);
         return (rd.doShow()) ? new AllProcSettings( rd.getSelectAllReportTypeGroup().getSelectedObject(), rd) : null;
     }
 

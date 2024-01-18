@@ -21,7 +21,7 @@ import javax.swing.JPanel;
 abstract class AllInteractionsSettings extends RequestDialog {
 
     private static final long serialVersionUID = 1L;
-    
+
     AllSelection stdOptions = null;
 
     public AllInteractionsSettings(Window parent) {
@@ -37,10 +37,12 @@ abstract class AllInteractionsSettings extends RequestDialog {
     public void setContent(JPanel filterPanel) {
         JPanel pan = new JPanel();
         pan.setLayout(new BoxLayout(pan, BoxLayout.PAGE_AXIS));
-        pan.add(filterPanel);
+        if (filterPanel != null) {
+            pan.add(filterPanel);
+        }
 
         ArrayList<filterField> items = new ArrayList<>();
-        for ( Pair<String, String> f : sortFieldsModel()) {
+        for (Pair<String, String> f : sortFieldsModel()) {
             items.add(new filterField(f.getKey(), f.getValue()));
         }
         stdOptions = new AllSelection(new DefaultComboBoxModel(items.toArray()));

@@ -78,7 +78,9 @@ public class CallFlowResults extends IQueryResults {
 
     @Override
     public AllProcSettings getAllProc(Window parent, int x, int y) {
-        return new AllProcSettings((qd, settings) -> getAll(qd, settings), null);
+        AllCalls_CallFlowSettings rd = AllCalls_CallFlowSettings.getInstance(this, parent);
+        return (rd.doShow()) ? new AllProcSettings((qd, settings) -> getAll(qd, settings), rd) : null;
+
     }
 
     FullTableColors getAll(QueryDialog qd, AllInteractionsSettings settings) throws SQLException {
@@ -272,7 +274,12 @@ public class CallFlowResults extends IQueryResults {
             tabReport.addRef("connectionidid", "connectionid", ReferenceType.ConnID.toString(), FieldType.OPTIONAL);
             tabReport.addRef("nameid", "\"First TEvent\"", ReferenceType.TEvent.toString(), FieldType.OPTIONAL);
             tabReport.addRef("appid", "\"First TServer\"", ReferenceType.App.toString(), FieldType.OPTIONAL);
-            tabReport.setOrderBy(tabReport.getTabAlias() + ".started");
+            tabReport.setOrderBy(tabReport.getTabAlias() + "." + settings.getSortField() + ' ' + (settings.isAscendingSorting() ? "asc" : "desc") + " ");
+            
+            int maxRecs = settings.getMaxRecords();
+            if (maxRecs > 0)
+                tabReport.setLimit(maxRecs);
+            
             tellProgress("Extracting all data");
             FullTableColors currTable = tabReport.getFullTable();
 
@@ -913,6 +920,14 @@ public class CallFlowResults extends IQueryResults {
             return cidFinder.AnythingTLibRelated();
         }
         return true;
+    }
+
+    ArrayList<Pair<String, String>> getAllSortFields() {
+        ArrayList<Pair<String, String>> ret = new ArrayList<>();
+        ret.add(new Pair<>("Time", "started"));
+        ret.add(new Pair<>("This DN", "thisdnid"));
+        ret.add(new Pair<>("other DN", "otherdnid"));
+        return ret;
     }
 
     private class Handlers extends HashSet {
