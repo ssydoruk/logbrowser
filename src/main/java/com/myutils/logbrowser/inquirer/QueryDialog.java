@@ -60,7 +60,7 @@ public class QueryDialog extends javax.swing.JFrame {
     private FileOutSettings fileOutSetting;
     private JPanel aggregatePanel;
     private final ArrayList<ReportFrame> reps = new ArrayList<>();
-    // Variables declaration - do not modify//GEN-BEGIN:variables
+    // Variables declaration - do not modify                     
     private javax.swing.JButton btAllCalls;
     private javax.swing.JButton btOK;
     //<editor-fold defaultstate="collapsed" desc="Query thread definition">
@@ -374,7 +374,7 @@ public class QueryDialog extends javax.swing.JFrame {
         try {
             IQueryResults qry = getSelectedQuery();
             if (qry != null) {
-                IGetAllProc getall = qry.getAllProc(SwingUtilities.windowForComponent(c), x, y);
+                AllProcSettings getall = qry.getAllProc(SwingUtilities.windowForComponent(c), x, y);
                 if (getall != null) {
                     class QueryAllTask extends MySwingWorker<Void, String> {
 
@@ -406,7 +406,7 @@ public class QueryDialog extends javax.swing.JFrame {
 
                         @Override
                         protected Void myDoInBackground() throws Exception {
-                            all = getall.getAll(frm);
+                            all = getall.getProc().getAll(frm, getall.getSettings());
                             inquirer.logger.debug("do in b done");
                             return null;
 
@@ -739,7 +739,7 @@ public class QueryDialog extends javax.swing.JFrame {
     public ArrayList<Integer> getSearchApps() {
         return getSearchApps(false);
     }
-    // End of variables declaration//GEN-END:variables
+    // End of variables declaration                   
 
     public SelectionType getSelectionType() {
         Component selectedComponent = tabbedPane.getSelectedComponent();

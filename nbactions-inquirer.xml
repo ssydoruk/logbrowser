@@ -12,17 +12,9 @@
         <properties>
             <exec.args>${exec.vmArgs} -classpath %classpath ${exec.mainClass} ${exec.appArgs}</exec.args>
             <exec.executable>java</exec.executable>
-            <exec.workingdir>C:\Users\ssydoruk\GCTI\work\prod.c1.1230</exec.workingdir>
-            <exec.vmArgs>-Dall=1
-                -Dlog4j.configurationFile=C:\Users\ssydoruk\GCTI\etc\logbrowser\logbr.log4j2.inquirer-dev.xml
-                -Dsqlite.pragma=true -Dsun.java2d.d3d=false -Dtimediff.parse=false -Dtlib.norequest=false -DDlog4j.debug
-                -Xms8000m -Xmx8000m
-            </exec.vmArgs>
-            <exec.appArgs>--dbname=C:\Users\ssydoruk\GCTI\work\prod.c1.1230\logbr
-                --config=C:\Users\ssydoruk\GCTI\etc\logbrowser\inquirer.cfg.json
-                --basedir=C:\Users\ssydoruk\GCTI\work\prod.c1.1230
-                --outputspec=C:\Users\ssydoruk\GCTI\etc\logbrowser\outputspec3.xml
-            </exec.appArgs>
+            <exec.workingdir>C:\Users\ssydo\GCTI\work\2023-12-21</exec.workingdir>
+            <exec.vmArgs>-Dall=1 -Dlog4j.configurationFile=C:\Users\ssydo\GCTI\etc\logbrowser\logbr.log4j2.inquirer.xml -Dsqlite.pragma=true -Dsun.java2d.d3d=false -Dtimediff.parse=false -Dtlib.norequest=false -Dlog4j.debug -Xms8000m -Xmx8000m</exec.vmArgs>
+            <exec.appArgs>--dbname=C:\Users\ssydo\GCTI\work\2023-12-21\logbr --config=C:\Users\ssydo\GCTI\etc\logbrowser\inquirer.cfg.json --basedir=C:\Users\ssydo\GCTI\work\2023-12-21 --outputspec=C:\Users\ssydo\GCTI\etc\logbrowser\outputspec3.xml</exec.appArgs>
             <exec.mainClass>com.myutils.logbrowser.inquirer.inquirer</exec.mainClass>
         </properties>
     </action>
@@ -39,17 +31,9 @@
             <exec.args>${exec.vmArgs} -classpath %classpath ${exec.mainClass} ${exec.appArgs}</exec.args>
             <exec.executable>java</exec.executable>
             <jpda.listen>true</jpda.listen>
-            <exec.workingdir>C:\Users\ssydoruk\GCTI\work\prod.c1.1230</exec.workingdir>
-            <exec.vmArgs>-Dall=1
-                -Dlog4j.configurationFile=C:\Users\ssydoruk\GCTI\etc\logbrowser\logbr.log4j2.inquirer-dev.xml
-                -Dsqlite.pragma=true -Dsun.java2d.d3d=false -Dtimediff.parse=false -Dtlib.norequest=false -DDlog4j.debug
-                -Xms8000m -Xmx8000m -agentlib:jdwp=transport=dt_socket,server=n,address=${jpda.address}
-            </exec.vmArgs>
-            <exec.appArgs>--dbname=C:\Users\ssydoruk\GCTI\work\prod.c1.1230\logbr
-                --config=C:\Users\ssydoruk\GCTI\etc\logbrowser\inquirer.cfg.json
-                --basedir=C:\Users\ssydoruk\GCTI\work\prod.c1.1230
-                --outputspec=C:\Users\ssydoruk\GCTI\etc\logbrowser\outputspec3.xml
-            </exec.appArgs>
+            <exec.workingdir>C:\Users\ssydo\GCTI\work\2023-12-21</exec.workingdir>
+            <exec.vmArgs>-Dall=1 -Dlog4j.configurationFile=C:\Users\ssydo\GCTI\etc\logbrowser\logbr.log4j2.inquirer.xml -Dsqlite.pragma=true -Dsun.java2d.d3d=false -Dtimediff.parse=false -Dtlib.norequest=false -Dlog4j.debug -Xms8000m -Xmx8000m -agentlib:jdwp=transport=dt_socket,server=n,address=${jpda.address}</exec.vmArgs>
+            <exec.appArgs>--dbname=C:\Users\ssydo\GCTI\work\2023-12-21\logbr --config=C:\Users\ssydo\GCTI\etc\logbrowser\inquirer.cfg.json --basedir=C:\Users\ssydo\GCTI\work\2023-12-21 --outputspec=C:\Users\ssydo\GCTI\etc\logbrowser\outputspec3.xml</exec.appArgs>
             <exec.mainClass>com.myutils.logbrowser.inquirer.inquirer</exec.mainClass>
         </properties>
     </action>
@@ -65,17 +49,9 @@
         <properties>
             <exec.args>${exec.vmArgs} -classpath %classpath ${exec.mainClass} ${exec.appArgs}</exec.args>
             <exec.executable>java</exec.executable>
-            <exec.workingdir>C:\Users\ssydoruk\GCTI\work\prod.c1.1230</exec.workingdir>
-            <exec.vmArgs>-Dall=1
-                -Dlog4j.configurationFile=C:\Users\ssydoruk\GCTI\etc\logbrowser\logbr.log4j2.inquirer-dev.xml
-                -Dsqlite.pragma=true -Dsun.java2d.d3d=false -Dtimediff.parse=false -Dtlib.norequest=false -DDlog4j.debug
-                -Xms8000m -Xmx8000m
-            </exec.vmArgs>
-            <exec.appArgs>--dbname=C:\Users\ssydoruk\GCTI\work\prod.c1.1230\logbr
-                --config=C:\Users\ssydoruk\GCTI\etc\logbrowser\inquirer.cfg.json
-                --basedir=C:\Users\ssydoruk\GCTI\work\prod.c1.1230
-                --outputspec=C:\Users\ssydoruk\GCTI\etc\logbrowser\outputspec3.xml
-            </exec.appArgs>
+            <exec.workingdir>C:\Users\ssydo\GCTI\work\2023-12-21</exec.workingdir>
+            <exec.vmArgs>-Dall=1 -Dlog4j.configurationFile=C:\Users\ssydo\GCTI\etc\logbrowser\logbr.log4j2.inquirer.xml -Dsqlite.pragma=true -Dsun.java2d.d3d=false -Dtimediff.parse=false -Dtlib.norequest=false -Dlog4j.debug -Xms8000m -Xmx8000m</exec.vmArgs>
+            <exec.appArgs>--dbname=C:\Users\ssydo\GCTI\work\2023-12-21\logbr --config=C:\Users\ssydo\GCTI\etc\logbrowser\inquirer.cfg.json --basedir=C:\Users\ssydo\GCTI\work\2023-12-21 --outputspec=C:\Users\ssydo\GCTI\etc\logbrowser\outputspec3.xml</exec.appArgs>
             <exec.mainClass>com.myutils.logbrowser.inquirer.inquirer</exec.mainClass>
         </properties>
     </action>

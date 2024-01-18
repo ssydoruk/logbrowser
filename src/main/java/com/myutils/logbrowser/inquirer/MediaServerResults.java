@@ -43,7 +43,6 @@ public class MediaServerResults extends IQueryResults {
         addSelectionType(SelectionType.UUID);
     }
 
-
     @Override
     public void Retrieve(QueryDialog dlg, SelectionType key, String searchID) throws SQLException {
         runSelectionQuery(dlg, key, new IDsFinder(dlg, key, searchID));
@@ -51,13 +50,14 @@ public class MediaServerResults extends IQueryResults {
 
     }
 
-    private static final String C_CREATE_IDX="create index idx_";
+    private static final String C_CREATE_IDX = "create index idx_";
 
-        @Override
-    public IGetAllProc getAllProc(Window parent, int x, int y) {
-        return qd -> getAll(qd);
+    @Override
+    public AllProcSettings getAllProc(Window parent, int x, int y) {
+        return new AllProcSettings((qd, settings) -> getAll(qd, settings), null);
     }
-  FullTableColors getAll(QueryDialog qd)  throws SQLException {
+
+    FullTableColors getAll(QueryDialog qd, AllInteractionsSettings settings) throws SQLException {
         try {
             String tmpTable = "callFlowTmp";
             DynamicTreeNode.setNoRefNoLoad(true);
@@ -75,12 +75,11 @@ public class MediaServerResults extends IQueryResults {
                     + ")\n;"
             );
 
-
             Wheres wh = new Wheres();
             wh.addWhere(IQuery.getFileFilters(tab, "fileid", qd.getSearchApps(false)), "AND");
             wh.addWhere(IQuery.getDateTimeFilters(tab, "time", qd.getTimeRange()), "AND");
             wh.addWhere(getWhere("sipms.nameID", ReferenceType.SIPMETHOD, new String[]{"OPTIONS", "200 OK OPTIONS",
-                    "NOTIFY", "200 OK NOTIFY", "503 Service Unavailable OPTIONS"}, false, false, true), "AND");
+                "NOTIFY", "200 OK NOTIFY", "503 Service Unavailable OPTIONS"}, false, false, true), "AND");
 
             DatabaseConnector.runQuery("insert into " + tmpTable + " (callidid, started, ended)"
                     + "\nselect distinct callidid, min(time), max(time) from " + tab
@@ -212,13 +211,13 @@ public class MediaServerResults extends IQueryResults {
     }
 
     private void RetrieveSIP(QueryDialog dlg, DynamicTreeNode<OptionNode> reportSettings, IDsFinder cidFinder) throws SQLException {
-        if( (isChecked(reportSettings) && TableExist("SIPMS")) &&
-            (dlg.getSelectionType() == SelectionType.NO_SELECTION
-                    || cidFinder.getIDs(IDType.SIPCallID) != null || cidFinder.getIDs(IDType.PEERIP) != null)) {
-                SipMSQuery sipMsgsByCallid = new SipMSQuery(reportSettings, cidFinder, dlg, this);
-                inquirer.logger.debug("SIP report");
-                getRecords(sipMsgsByCallid);
-            }
+        if ((isChecked(reportSettings) && TableExist("SIPMS"))
+                && (dlg.getSelectionType() == SelectionType.NO_SELECTION
+                || cidFinder.getIDs(IDType.SIPCallID) != null || cidFinder.getIDs(IDType.PEERIP) != null)) {
+            SipMSQuery sipMsgsByCallid = new SipMSQuery(reportSettings, cidFinder, dlg, this);
+            inquirer.logger.debug("SIP report");
+            getRecords(sipMsgsByCallid);
+        }
     }
 
     private void runSelectionQuery(QueryDialog dlg, SelectionType selectionType, IDsFinder cidFinder) throws SQLException {

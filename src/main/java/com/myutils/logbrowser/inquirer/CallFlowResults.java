@@ -76,11 +76,12 @@ public class CallFlowResults extends IQueryResults {
         return IDsFinder.RequestLevel.Level5; //To change body of generated methods, choose Tools | Templates.
     }
 
-        @Override
-    public IGetAllProc getAllProc(Window parent, int x, int y) {
-        return qd -> getAll(qd);
+    @Override
+    public AllProcSettings getAllProc(Window parent, int x, int y) {
+        return new AllProcSettings((qd, settings) -> getAll(qd, settings), null);
     }
-    FullTableColors getAll(QueryDialog qd)throws SQLException {
+
+    FullTableColors getAll(QueryDialog qd, AllInteractionsSettings settings) throws SQLException {
         try {
             String tmpTable = "callFlowTmp";
             DynamicTreeNode.setNoRefNoLoad(true);
@@ -175,7 +176,7 @@ public class CallFlowResults extends IQueryResults {
                     + "and thisdnid>0\n"
                     + dnWhere
                     + IQuery.getCheckedWhere("nameID", ReferenceType.TEvent,
-                    FindNode(repComponents.getRoot(), DialogItem.TLIB_CALLS, DialogItem.TLIB_CALLS_TEVENT, DialogItem.TLIB_CALLS_TEVENT_NAME), "AND")
+                            FindNode(repComponents.getRoot(), DialogItem.TLIB_CALLS, DialogItem.TLIB_CALLS_TEVENT, DialogItem.TLIB_CALLS_TEVENT_NAME), "AND")
                     + IQuery.getFileFilters(tab, "fileid", qd.getSearchApps(false), "AND")
                     + IQuery.getDateTimeFilters(tab, "time", qd.getTimeRange(), "AND")
                     + "\n"
@@ -508,16 +509,15 @@ public class CallFlowResults extends IQueryResults {
 
     }
 
-
     private void RetrieveSIP(QueryDialog dlg, DynamicTreeNode<OptionNode> reportSettings, IDsFinder cidFinder) throws SQLException {
         if (isChecked(reportSettings) && DatabaseConnector.TableExist("sip_logbr")) {
             tellProgress("Retrieving SIP messages");
             inquirer.logger.debug("SIP report");
             if (inquirer.getCr().isNewTLibSearch() && (cidFinder != null && cidFinder.getSearchType() != SelectionType.NO_SELECTION)) {
-                    Integer[] iDs = cidFinder.getIDs(IDType.SIPCallID);
-                    if (iDs == null || iDs.length == 0) {
-                        return;
-                    }
+                Integer[] iDs = cidFinder.getIDs(IDType.SIPCallID);
+                if (iDs == null || iDs.length == 0) {
+                    return;
+                }
 
             }
             SipForScCmQuery sipMsgsByCallid = new SipForScCmQuery(reportSettings, cidFinder, true);
@@ -551,7 +551,6 @@ public class CallFlowResults extends IQueryResults {
                     }
                     addUnique(idDNs, ((TLibEvent) rec).getThisDNID(), ((TLibEvent) rec).getOtherDNID());
                 }
-
 
             });
             getRecords(tlibQuery);
@@ -627,18 +626,18 @@ public class CallFlowResults extends IQueryResults {
                 TableQuery TLibTimer;
                 if (DatabaseConnector.TableExist(TableType.TLIBTimerRedirect.toString())
                         && (cidFinder.getSearchType() == SelectionType.NO_SELECTION
-                            || !isEmpty(connIDs))) {
-                        TLibTimer = new TableQuery(MsgType.TLIBTimer, TableType.TLIBTimerRedirect.toString());
-                        if (connIDs != null) {
-                            TLibTimer.addWhere(getWhere("connIDID", connIDs, false), "AND");
-                        }
+                        || !isEmpty(connIDs))) {
+                    TLibTimer = new TableQuery(MsgType.TLIBTimer, TableType.TLIBTimerRedirect.toString());
+                    if (connIDs != null) {
+                        TLibTimer.addWhere(getWhere("connIDID", connIDs, false), "AND");
+                    }
 
-                        TLibTimer.addRef("msgid", "message", ReferenceType.TEvent.toString(), IQuery.FieldType.MANDATORY);
-                        TLibTimer.addRef("connIDID", "connID", ReferenceType.ConnID.toString(), IQuery.FieldType.OPTIONAL);
-                        TLibTimer.addRef("causeID", "cause", ReferenceType.TEventRedirectCause.toString(), IQuery.FieldType.OPTIONAL);
-                        TLibTimer.setCommonParams(this, dlg);
+                    TLibTimer.addRef("msgid", "message", ReferenceType.TEvent.toString(), IQuery.FieldType.MANDATORY);
+                    TLibTimer.addRef("connIDID", "connID", ReferenceType.ConnID.toString(), IQuery.FieldType.OPTIONAL);
+                    TLibTimer.addRef("causeID", "cause", ReferenceType.TEventRedirectCause.toString(), IQuery.FieldType.OPTIONAL);
+                    TLibTimer.setCommonParams(this, dlg);
 
-                        getRecords(TLibTimer);
+                    getRecords(TLibTimer);
 
                 }
             }
@@ -682,10 +681,10 @@ public class CallFlowResults extends IQueryResults {
             tellProgress("Retrieving JSON messages");
             if (inquirer.getCr().isNewTLibSearch()
                     && (cidFinder != null && cidFinder.getSearchType() != SelectionType.NO_SELECTION)) {
-                    Integer[] iDs = cidFinder.getIDs(IDType.JSONID);
-                    if (iDs == null || iDs.length == 0) {
-                        return;
-                    }
+                Integer[] iDs = cidFinder.getIDs(IDType.JSONID);
+                if (iDs == null || iDs.length == 0) {
+                    return;
+                }
 
             }
 

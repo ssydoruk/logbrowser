@@ -65,8 +65,6 @@ public class ConfServerResults extends IQueryResults {
         return "ConfServer";
     }
 
-
-
     private void loadStdOptions() throws SQLException {
         DynamicTreeNode<OptionNode> rootA = new DynamicTreeNode<>(null);
         repComponents.setRoot(rootA);
@@ -84,7 +82,6 @@ public class ConfServerResults extends IQueryResults {
         ndParams.addDynamicRef(DialogItem.CONFSERV_REQUESTS_OPERATION, ReferenceType.CfgOp, TableType.CSUpdate.toString(), "opID");
         ndParams.addDynamicRef(DialogItem.CONFSERV_CONFIGNOTIF_OBJNAME, ReferenceType.CfgObjName, TableType.CSUpdate.toString(), "objNameID");
 
-
         nd = new DynamicTreeNode<>(new OptionNode(DialogItem.CONFSERV_OBJCHANGES));
         rootA.addChild(nd);
         ndParams = new DynamicTreeNode<>(new OptionNode(DialogItem.CONFSERV_OBJCHANGES));
@@ -96,7 +93,6 @@ public class ConfServerResults extends IQueryResults {
         ndParams.addDynamicRef(DialogItem.CONFSERV_OBJCHANGES_CLIENTTYPE, ReferenceType.AppType, TableType.CSConfigChange.toString(), "clientTypeID");
         ndParams.addDynamicRef(DialogItem.CONFSERV_OBJCHANGES_OPERATION, ReferenceType.CfgOp, TableType.CSConfigChange.toString(), "opID");
         ndParams.addDynamicRef(DialogItem.CONFSERV_OBJCHANGES_OBJNAME, ReferenceType.CfgObjName, TableType.CSConfigChange.toString(), "objNameID");
-
 
 //<editor-fold defaultstate="collapsed" desc="connects">
         nd = new DynamicTreeNode<>(new OptionNode(DialogItem.CONFSERV_CLIENTCONN));
@@ -174,7 +170,6 @@ public class ConfServerResults extends IQueryResults {
         retrieveConnect(dlg,
                 FindNode(repComponents.getRoot(), DialogItem.CONFSERV_CLIENTCONN, DialogItem.CONFSERV_CLIENTCONN, null),
                 cidFinder);
-
 
         getCustom(FileInfoType.type_ConfServer, dlg, repComponents.getRoot(), cidFinder, null);
         getGenesysMessages(TableType.MsgConfServer, repComponents.getRoot(), dlg, this);
@@ -340,8 +335,6 @@ public class ConfServerResults extends IQueryResults {
     }
 
     //</editor-fold>
-
-
     private void retrieveConnect(QueryDialog dlg, DynamicTreeNode<OptionNode> reportSettings, IDsFinder cidFinder) throws SQLException {
 //<editor-fold defaultstate="collapsed" desc="retrieveConnect">
         if (isChecked(reportSettings) && DatabaseConnector.TableExist(TableType.CSClientConnect.toString())) {
@@ -387,11 +380,12 @@ public class ConfServerResults extends IQueryResults {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
-        @Override
-    public IGetAllProc getAllProc(Window parent, int x, int y) {
-        return qd -> getAll(qd);
+    @Override
+    public AllProcSettings getAllProc(Window parent, int x, int y) {
+        return new AllProcSettings((qd, settings) -> getAll(qd, settings), null);
     }
-  FullTableColors getAll(QueryDialog qd)  throws Exception {
+
+    FullTableColors getAll(QueryDialog qd, AllInteractionsSettings settings) throws SQLException {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 

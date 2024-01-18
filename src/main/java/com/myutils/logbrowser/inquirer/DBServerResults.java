@@ -64,8 +64,6 @@ public class DBServerResults extends IQueryResults {
         m_componentFilter = m_componentFilter | filter;
     }
 
-
-
     private void loadStdOptions() throws SQLException {
         DynamicTreeNode<OptionNode> rootA = new DynamicTreeNode<>(null);
         repComponents.setRoot(rootA);
@@ -194,11 +192,12 @@ public class DBServerResults extends IQueryResults {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
-        @Override
-    public IGetAllProc getAllProc(Window parent, int x, int y) {
-        return qd -> getAll(qd);
+    @Override
+    public AllProcSettings getAllProc(Window parent, int x, int y) {
+        return new AllProcSettings((qd, settings) -> getAll(qd, settings), null);
     }
-  FullTableColors getAll(QueryDialog qd)  throws Exception {
+
+    FullTableColors getAll(QueryDialog qd, AllInteractionsSettings settings) throws SQLException {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 

@@ -25,6 +25,7 @@ import java.util.HashSet;
 import static com.myutils.logbrowser.indexer.OrsParser.MAX_ALARMS;
 import static com.myutils.logbrowser.inquirer.DatabaseConnector.TableExist;
 import static com.myutils.logbrowser.inquirer.IQuery.getCheckedWhere;
+import java.util.HashMap;
 import static org.apache.commons.lang3.ArrayUtils.isEmpty;
 
 /**
@@ -276,7 +277,7 @@ final public class RoutingResults extends IQueryResults {
 
     }
 
-    protected FullTableColors getAllORSStrategies(QueryDialog qd) throws SQLException {
+    protected FullTableColors getAllORSStrategies(QueryDialog qd, AllInteractionsSettings settings) throws SQLException {
         try {
             String reqORSStrategies = "callFlowTmp";
             DynamicTreeNode.setNoRefNoLoad(true);
@@ -476,7 +477,7 @@ final public class RoutingResults extends IQueryResults {
         }
     }
 
-    protected FullTableColors getAllURSCalls(QueryDialog qd) throws SQLException {
+    protected FullTableColors getAllURSCalls(QueryDialog qd, AllInteractionsSettings settings) throws SQLException {
         try {
             String tmpTable = "callFlowTmp";
             DynamicTreeNode.setNoRefNoLoad(true);
@@ -813,7 +814,7 @@ final public class RoutingResults extends IQueryResults {
         }
     }
 
-    protected FullTableColors getAllORSCalls(QueryDialog qd) throws SQLException {
+    protected FullTableColors getAllORSCalls(QueryDialog qd, AllInteractionsSettings settings) throws SQLException {
         try {
 
             String reportTable = "callFlowTmp";
@@ -947,6 +948,7 @@ final public class RoutingResults extends IQueryResults {
 
             tellProgress("Extracting data");
             TableQuery tabReport = new TableQuery(reportTable);
+            tabReport.setOrderBy(tabReport.getTabAlias() +"."+settings.getSortField() + ' '+( settings.isAscendingSorting() ? "asc": "desc") +" ");
             tabReport.addOutField("UTCtoDateTime(started, \"YYYY-MM-dd HH:mm:ss.SSS\") started");
             tabReport.addOutField("UTCtoDateTime(ended, \"YYYY-MM-dd HH:mm:ss.SSS\") ended");
             tabReport.setAddAll(false);
@@ -961,7 +963,11 @@ final public class RoutingResults extends IQueryResults {
             tabReport.addRef("sourceid", "\"Source Server\"", ReferenceType.App.toString(), IQuery.FieldType.OPTIONAL);
             tabReport.addRef("nameid", "\"First TEvent\"", ReferenceType.TEvent.toString(), IQuery.FieldType.OPTIONAL);
             tabReport.addRef("appid", "application", ReferenceType.App.toString(), IQuery.FieldType.OPTIONAL);
-            tabReport.setOrderBy(tabReport.getTabAlias() + ".started");
+            int maxRecs = settings.getMaxRecords();
+            if( maxRecs > 0 )
+                tabReport.setLimit(maxRecs);
+                    
+//            tabReport.setOrderBy(tabReport.getTabAlias() + ".started");
             FullTableColors currTable = tabReport.getFullTable();
             currTable.setHiddenField("rowType");
             return currTable; //To change body of generated methods, choose Tools | Templates.
@@ -970,7 +976,7 @@ final public class RoutingResults extends IQueryResults {
         }
     }
 
-    protected FullTableColors getAllURSStrategies(QueryDialog qd) throws SQLException {
+    protected FullTableColors getAllURSStrategies(QueryDialog qd, AllInteractionsSettings settings) throws SQLException {
         try {
             String tmpTable = "callFlowTmp";
             DynamicTreeNode.setNoRefNoLoad(true);
@@ -2265,11 +2271,9 @@ final public class RoutingResults extends IQueryResults {
     private CURSReportType selectAllReportType = null;
 
     @Override
-    public IGetAllProc getAllProc(Window parent, int x, int y) {
-
-
+    public AllProcSettings getAllProc(Window parent, int x, int y) {
         CURSReportType rd = CURSReportType.getInstance(this, parent);
-        return (rd.doShow()) ? rd.getSelectAllReportTypeGroup().getSelectedObject() : null;
+        return (rd.doShow()) ? new AllProcSettings( rd.getSelectAllReportTypeGroup().getSelectedObject(), rd) : null;
     }
 
     private TableQuery newORSMMTable(DynamicTreeNode<OptionNode> orsReportSettings, QueryDialog dlg) throws SQLException {
@@ -2329,45 +2333,12 @@ final public class RoutingResults extends IQueryResults {
         return UrsRLib;
     }
 
-    static private class CURSReportType extends RequestDialog {
-        private final RoutingResults routingResults;
-        private final SmartButtonGroup<IGetAllProc> selectAllReportTypeGroup;
-        private static CURSReportType INSTANCE = null;
-
-        public static CURSReportType getInstance(RoutingResults routingResults, Window c) {
-            if (INSTANCE == null) {
-                INSTANCE = new CURSReportType(routingResults, c);
-            }
-            return INSTANCE;
-        }
-
-        public SmartButtonGroup<IGetAllProc> getSelectAllReportTypeGroup() {
-            return selectAllReportTypeGroup;
-        }
-
-        public CURSReportType(RoutingResults routingResults, Window parent) {
-            super(parent);
-            this.routingResults = routingResults;
-            JPanel pan = new JPanel();
-            pan.setLayout(new BoxLayout(pan, BoxLayout.PAGE_AXIS));
-
-            setResizable(false);
-            setTitle("Request type");
-            selectAllReportTypeGroup = new SmartButtonGroup<>();
-            JRadioButton bt = new JRadioButton("ORS interactions");
-            bt.setSelected(true);
-            pan.add(bt);
-            selectAllReportTypeGroup.add(bt, qd -> routingResults.getAllORSCalls(qd));
-            bt =new JRadioButton("ORS strategies");
-            pan.add(bt);
-            selectAllReportTypeGroup.add(bt, qd -> routingResults.getAllORSStrategies(qd));
-            bt =new JRadioButton("URS interactions");
-            pan.add(bt);
-            selectAllReportTypeGroup.add(bt, qd -> routingResults.getAllURSCalls(qd));
-            bt =new JRadioButton("URS strategies");
-            pan.add(bt);
-            selectAllReportTypeGroup.add(bt, qd -> routingResults.getAllURSStrategies(qd));
-            setContentPanel(pan);
-        }
+    ArrayList<Pair<String, String>> getAllSortFields() {
+        ArrayList<Pair<String, String>> ret = new ArrayList<>();
+        ret.add(new Pair<>("Time", "started"));
+        ret.add(new Pair<>("This DN", "thisdnid"));
+        ret.add(new Pair<>("other DN", "otherdnid"));
+        return ret;
     }
+
 }

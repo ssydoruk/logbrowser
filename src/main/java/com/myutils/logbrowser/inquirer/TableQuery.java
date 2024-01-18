@@ -23,6 +23,7 @@ public class TableQuery extends IQuery {
     //    private Class<ILogRecord> resultClass;
     private Class<TLibEvent> myClass;
     private WhereType whereType = WhereType.WhereNone;
+    private int limit=0;
 
     public TableQuery(MsgType msgType, String _tabName, String _idName, String _addWhere) {
         this(msgType, _tabName, _addWhere);
@@ -76,6 +77,12 @@ public class TableQuery extends IQuery {
     void setOrderBy(String string) {
         this.orderBy = string;
     }
+    
+    void setLimit(int maxRecs) {
+        this.limit=maxRecs;
+    }
+
+
 
     public void setAddAll(boolean b) {
         addAll = b;
@@ -192,6 +199,8 @@ public class TableQuery extends IQuery {
                 qString.append("\nORDER BY ").append(getTabAlias()).append(".time");
             }
         }
+        if(limit>0)
+            qString.append("\n LIMIT ").append(limit);
         qString.append("\n").append(getLimitClause());
         qString.append(";");
 

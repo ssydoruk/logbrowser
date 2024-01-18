@@ -227,8 +227,8 @@ public class IxnServerResults extends IQueryResults {
             ixnQuery.setCommonParams(this, dlg);
             getRecords(ixnQuery);
 
-            if ((cidFinder == null || cidFinder.getQueryLevel() > 1) &&
-                    ixnQuery.isCollectingID(IxnServerQuery.FIELD_REFID) && !ixnQuery.getCollectID(IxnServerQuery.FIELD_REFID).isEmpty()) {
+            if ((cidFinder == null || cidFinder.getQueryLevel() > 1)
+                    && ixnQuery.isCollectingID(IxnServerQuery.FIELD_REFID) && !ixnQuery.getCollectID(IxnServerQuery.FIELD_REFID).isEmpty()) {
 //                HashSet<Long> refIDs = ixnQuery.getCollectID("refid");
 
                 TableQuery TLibReq = IxnTable(MsgType.INTERACTION, "ixn");
@@ -291,11 +291,12 @@ public class IxnServerResults extends IQueryResults {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
-        @Override
-    public IGetAllProc getAllProc(Window parent, int x, int y) {
-        return qd -> getAll(qd);
+    @Override
+    public AllProcSettings getAllProc(Window parent, int x, int y) {
+        return new AllProcSettings((qd, settings) -> getAll(qd, settings), null);
     }
-  FullTableColors getAll(QueryDialog qd)  throws SQLException {
+
+    FullTableColors getAll(QueryDialog qd, AllInteractionsSettings settings) throws SQLException {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 

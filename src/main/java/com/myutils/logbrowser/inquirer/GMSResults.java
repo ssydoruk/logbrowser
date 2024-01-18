@@ -51,10 +51,10 @@ public class GMSResults extends IQueryResults {
     }
 
         @Override
-    public IGetAllProc getAllProc(Window parent, int x, int y) {
-        return qd -> getAll(qd);
+    public AllProcSettings getAllProc(Window parent, int x, int y) {
+        return new AllProcSettings((qd, settings) -> getAll(qd, settings), null);
     }
-  FullTableColors getAll(QueryDialog qd)  throws SQLException {
+  FullTableColors getAll(QueryDialog qd, AllInteractionsSettings settings)  throws SQLException {
         try {
             String tmpTable = "callFlowTmp";
             DynamicTreeNode.setNoRefNoLoad(true);

@@ -55,7 +55,7 @@ public class VOIPEPResults extends IQueryResults {
 
     }
 
-    FullTableColors getAll(QueryDialog qd)  throws SQLException {
+    FullTableColors getAll(QueryDialog qd, AllInteractionsSettings settings) throws SQLException {
         try {
             String tmpTable = "callFlowTmp";
             DynamicTreeNode.setNoRefNoLoad(true);
@@ -362,14 +362,14 @@ public class VOIPEPResults extends IQueryResults {
                 if (connIDs != null && connIDs.length > 0 && DatabaseConnector.TableExist(ReferenceType.TEvent.toString())) {
                     TableQuery TLibReq = MakeTLibReq();
                     TLibReq.addWhere(TLibReq.getTabAlias() + ".connectionidid<=0 and \n"
-                                    + getWhere(TLibReq.getTabAlias() + ".nameid", ReferenceType.TEvent, RequestsToShow, false)
-                                    + "\n and \n"
-                                    + getWhere(TLibReq.getTabAlias() + ".referenceid",
+                            + getWhere(TLibReq.getTabAlias() + ".nameid", ReferenceType.TEvent, RequestsToShow, false)
+                            + "\n and \n"
+                            + getWhere(TLibReq.getTabAlias() + ".referenceid",
                                     MakeQueryID("referenceid", "TLIB_logbr",
                                             getWhere("connectionidid", connIDs, true)
-                                                    + "\n\tand referenceid>0"
-                                                    + "\n\tand "
-                                                    + getWhere("nameid", ReferenceType.TEvent, EventsToShow, false)), false),
+                                            + "\n\tand referenceid>0"
+                                            + "\n\tand "
+                                            + getWhere("nameid", ReferenceType.TEvent, EventsToShow, false)), false),
                             "");
                     TLibReq.setCommonParams(this, dlg);
                     getRecords(TLibReq);
@@ -452,8 +452,8 @@ public class VOIPEPResults extends IQueryResults {
     }
 
     @Override
-    public IGetAllProc getAllProc(Window parent, int x, int y) {
-        return qd -> getAll(qd);
+    public AllProcSettings getAllProc(Window parent, int x, int y) {
+        return new AllProcSettings((qd, settings) -> getAll(qd, settings), null);
     }
 
 }
