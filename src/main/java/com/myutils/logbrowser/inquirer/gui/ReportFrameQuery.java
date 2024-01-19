@@ -20,6 +20,11 @@ public class ReportFrameQuery extends ReportFrame {
     protected ShowFullMessage fullMsg;
     private JCheckBox msgCheckBox;
     private JPopupMenu clonePopup;
+    private JPopupMenu placementPopup;
+    private JButton btPlacement;
+    private int fullPlacement = SwingConstants.TOP;
+    private javax.swing.ButtonGroup bgPlacement;
+    
 
     public ReportFrameQuery(ReportFrameQuery frm) {
         this(frm, true);
@@ -27,6 +32,7 @@ public class ReportFrameQuery extends ReportFrame {
 
     public ReportFrameQuery(ReportFrameQuery frm, boolean isFullClone) {
         super(frm, isFullClone);
+        bgPlacement = new ButtonGroup();
         createToolbar();
         this.fullMsg = new ShowFullMessage(this);
         tableView.setFullMsg(fullMsg);
@@ -114,6 +120,8 @@ public class ReportFrameQuery extends ReportFrame {
         });
 
         this.msgCheckBox = new JCheckBox(new ShowMsgAction());
+        addPlacementButton();
+
         addToolbarButton(msgCheckBox);
 
         addToolbarButton(new CopyAction());
@@ -130,6 +138,57 @@ public class ReportFrameQuery extends ReportFrame {
 
         addCloneButton();
         addToolbarButton(new InfoAction());
+
+    }
+
+    private void addPlacementButton() {
+        btPlacement = addToolbarButton("Full placement", "Placement of full message window");
+
+        placementPopup = new JPopupMenu();
+
+        JRadioButtonMenuItem mi = new JRadioButtonMenuItem(new AbstractAction("Top") {
+            public void actionPerformed(ActionEvent e) {
+                fullPlacement=SwingConstants.TOP;
+                showFull();
+            }
+        });
+        bgPlacement.add(mi);
+        placementPopup.add(mi);
+        
+        mi = new JRadioButtonMenuItem(new AbstractAction("Bottom") {
+            public void actionPerformed(ActionEvent e) {
+                fullPlacement = SwingConstants.BOTTOM;
+                showFull();
+            }
+        });
+        bgPlacement.add(mi);
+        placementPopup.add(mi);
+        
+        mi=new JRadioButtonMenuItem(new AbstractAction("Left") {
+            public void actionPerformed(ActionEvent e) {
+                fullPlacement = SwingConstants.LEFT;
+                showFull();
+            }
+        });
+        bgPlacement.add(mi);
+        placementPopup.add(mi);
+        
+        mi = new JRadioButtonMenuItem(new AbstractAction("Right") {
+            public void actionPerformed(ActionEvent e) {
+                fullPlacement = SwingConstants.RIGHT;
+                showFull();
+            }
+        });
+        bgPlacement.add(mi);
+        placementPopup.add(mi);
+        
+
+        btPlacement.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                placementPopup.show(e.getComponent(), e.getX(), e.getY());
+            }
+        });
 
     }
 
@@ -158,7 +217,6 @@ public class ReportFrameQuery extends ReportFrame {
                 clonePopup.show(e.getComponent(), e.getX(), e.getY());
             }
         });
-
 
     }
 
@@ -263,21 +321,29 @@ public class ReportFrameQuery extends ReportFrame {
         public void actionPerformed(ActionEvent e) {
             JToggleButton tBtn = (JToggleButton) e.getSource();
             if (tBtn.isSelected()) {
-                ScreenInfo.refitMainToMsg(theForm, fullMsg);
-                fullMsg.setVisible(true);
-                fullMsg.toFront();
-                java.awt.EventQueue.invokeLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        theForm.toFront();
-                        theForm.repaint();
-                    }
-                });
+                showFull();
+
             } else {
                 fullMsg.setVisible(false);
             }
+            btPlacement.setEnabled(tBtn.isSelected());
+            
         }
 
+    }
+    
+    void showFull(){
+        ScreenInfo.refitMainToMsg(theForm, fullMsg, fullPlacement);
+        fullMsg.setVisible(true);
+        fullMsg.toFront();
+        java.awt.EventQueue.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                theForm.toFront();
+                theForm.repaint();
+            }
+        });
+        
     }
 
     class FollowSourceAction extends AbstractAction {
@@ -294,14 +360,12 @@ public class ReportFrameQuery extends ReportFrame {
         }
     }
 
-
     class InfoAction extends AbstractAction {
 
         public InfoAction() {
             super("Info");
             putValue(Action.SHORT_DESCRIPTION, "Show report statistics");
 //            putValue(Action.SELECTED_KEY, tableView.isFollowLog());
-
 
         }
 
