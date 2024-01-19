@@ -16,6 +16,7 @@ import org.fife.ui.rtextarea.RTextScrollPane;
 
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import javax.swing.text.DefaultCaret;
 
 /**
  * @author ssydoruk
@@ -25,7 +26,7 @@ public class ShowFullMessage extends javax.swing.JFrame {
     RSyntaxTextArea detailedMessage;
     RSyntaxTextArea jtaMessageText;
     private ReportFrameQuery parentForm;
-    // Variables declaration - do not modify//GEN-BEGIN:variables
+    // Variables declaration - do not modify                     
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel pDetailedMessage;
     private javax.swing.JPanel pFullMessage;
@@ -42,6 +43,7 @@ public class ShowFullMessage extends javax.swing.JFrame {
         jtaMessageText.setWrapStyleWord(true);
         jtaMessageText.setLineWrap(true);
         jtaMessageText.setEditable(false);
+        ((DefaultCaret) jtaMessageText.getCaret()).setUpdatePolicy(DefaultCaret.NEVER_UPDATE);
 
         pFullMessage.add(new RTextScrollPane(jtaMessageText));
 
@@ -145,7 +147,7 @@ public class ShowFullMessage extends javax.swing.JFrame {
     private void formWindowStateChanged(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowStateChanged
         // TODO add your handling code here:
     }//GEN-LAST:event_formWindowStateChanged
-    // End of variables declaration//GEN-END:variables
+    // End of variables declaration                   
 
     void showMessage(String recordDisplayScript, ILogRecord record) {
         detailedMessage.setText("");
