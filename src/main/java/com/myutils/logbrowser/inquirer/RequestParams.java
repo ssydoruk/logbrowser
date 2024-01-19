@@ -432,7 +432,7 @@ public class RequestParams extends javax.swing.JPanel {
 //                }
                 int firstIdx = (l.isCheckBoxEnabled()) ? 1 : 0;
                 for (int i = firstIdx; i < lsm.getModel().getSize(); i++) {
-                    OptionNode node = ((OptionNode) ((DynamicTreeNode<OptionNode>) lsm.getModel().getElementAt(i)).getData());
+                    OptionNode node = (OptionNode) ((DynamicTreeNode<OptionNode>) lsm.getModel().getElementAt(i)).getData();
                     if (node.isChecked() != lsm.isSelectedIndex(i)) {     //value changed
                         node.setChecked(lsm.isSelectedIndex(i));
                         if (lChild != null) {

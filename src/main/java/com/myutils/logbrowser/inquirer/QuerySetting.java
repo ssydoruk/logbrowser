@@ -413,7 +413,7 @@ public final class QuerySetting extends javax.swing.JDialog {
         ArrayList<OptionNode> refs = savedLogMessages.get(newTableType);
         ArrayList<Integer> idx = new ArrayList<>();
 
-        DefaultListModel<OptionNode> model = (DefaultListModel) clbLogMessages.getModel();
+        DefaultListModel<OptionNode> model = (DefaultListModel<OptionNode>) clbLogMessages.getModel();
         for (int i = 0; i < refs.size(); i++) {
             OptionNode node = refs.get(i);
             model.addElement(node);

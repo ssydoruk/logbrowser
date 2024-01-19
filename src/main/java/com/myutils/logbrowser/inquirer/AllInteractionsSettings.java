@@ -45,7 +45,7 @@ abstract class AllInteractionsSettings extends RequestDialog {
         for (Pair<String, String> f : sortFieldsModel()) {
             items.add(new filterField(f.getKey(), f.getValue()));
         }
-        stdOptions = new AllSelection(new DefaultComboBoxModel((filterField[]) items.toArray()));
+        stdOptions = new AllSelection(new DefaultComboBoxModel(items.toArray()));
         pan.add(stdOptions);
         setContentPanel(pan);
     }
