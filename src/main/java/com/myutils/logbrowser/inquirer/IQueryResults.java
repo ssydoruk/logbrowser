@@ -39,8 +39,8 @@ public abstract class IQueryResults extends QueryTools
     private static final String APPSTARTTIME = "app_starttime";
     protected String m_startTime;
     protected String m_endTime;
-    protected ArrayList m_results = new ArrayList();
-    protected ArrayList<ILogRecordFormatter> m_formatters = new ArrayList();
+    protected ArrayList<ILogRecord> m_results = new ArrayList<>();
+    protected ArrayList<ILogRecordFormatter> m_formatters = new ArrayList<>();
     protected DynamicTree<OptionNode> repComponents;
     protected ArrayList<SelectionType> selectionTypes = new ArrayList<>();
     protected ArrayList<Pair<String, Integer>> getAllResults = new ArrayList<>();
@@ -337,7 +337,7 @@ public abstract class IQueryResults extends QueryTools
         tellProgress("Retrieved " + cnt + " records");
     }
 
-    public void getRecords(IQuery query, HashMap ids) throws Exception {
+    public void getRecords(IQuery query, HashMap<Long, ILogRecord> ids) throws Exception {
         query.Execute();
 
         for (ILogRecord record = query.GetNext();

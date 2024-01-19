@@ -871,7 +871,7 @@ public abstract class OutputSpecFormatter extends DefaultFormatter {
 // with values meaningful for String.format
 //            formatString = SubstituteEmbeddedFormats(formatStringFromXml);
 // iterate through child elements, save parameters
-            parameters = new ArrayList();
+            parameters = new ArrayList<>();
 
 //            Iterator itr = (el.getChildren()).iterator();
 //            while (itr.hasNext()) {

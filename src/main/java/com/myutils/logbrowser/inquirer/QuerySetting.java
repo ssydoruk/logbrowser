@@ -31,23 +31,23 @@ import java.util.regex.PatternSyntaxException;
 public final class QuerySetting extends javax.swing.JDialog {
 
     private static final org.apache.logging.log4j.Logger logger = LogManager.getLogger();
-    private final JList lPrintFilters;
+    private final JList<String> lPrintFilters;
     Object curSelected = null;
     TableType lastTableType;
-    private JList lReferenceType;
+    private JList<ReferenceType> lReferenceType;
     /**
      * Creates new form QuerySetting
      */
     private final InquirerCfg cr;
     private CheckBoxListSettings clbRefValues;
-    private DefaultListModel lmRefValues;
+    private DefaultListModel<OptionNode> lmRefValues;
     private int closeCause;
     private final HashMap<String, String> printFilters;
     private CheckBoxListSettings clbLogMessages;
     private HashMap<ReferenceType, ArrayList<OptionNode>> savedRefs;
     private ReferenceType lastRefType;
     private HashMap<TableType, ArrayList<OptionNode>> savedLogMessages;
-    private JList lAppType;
+    private JList<String> lAppType;
     // Variables declaration - do not modify                     
     private javax.swing.JButton btCancel;
     private javax.swing.JButton btOK;
@@ -157,8 +157,8 @@ public final class QuerySetting extends javax.swing.JDialog {
         /**
          * ********************************************
          */
-        DefaultListModel lmFilters = new DefaultListModel();
-        lPrintFilters = new JList(lmFilters);
+        DefaultListModel<String> lmFilters = new DefaultListModel();
+        lPrintFilters = new JList<>(lmFilters);
         lPrintFilters.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
         lPrintFilters.setLayoutOrientation(JList.VERTICAL);
         jpFileTypes.setLayout(new BorderLayout());
@@ -240,7 +240,7 @@ public final class QuerySetting extends javax.swing.JDialog {
 
     private void loadReferences() {
         lastRefType = ReferenceType.UNKNOWN;
-        lmRefValues = new DefaultListModel();
+        lmRefValues = new DefaultListModel<>();
         clbRefValues = new CheckBoxListSettings(lmRefValues, jpAllRefs);
 
         jpAllRefs.setLayout(new BorderLayout());
@@ -261,7 +261,7 @@ public final class QuerySetting extends javax.swing.JDialog {
             }
         });
 
-        DefaultListModel lm = new DefaultListModel();
+        DefaultListModel lm = new DefaultListModel<>();
         pRefTypes.setLayout(new BorderLayout());
         lReferenceType = new JList<>(lm);
 //        lReferenceType.setVisibleRowCount(1000);
@@ -340,9 +340,9 @@ public final class QuerySetting extends javax.swing.JDialog {
             }
         });
 
-        DefaultListModel lm = new DefaultListModel();
+        DefaultListModel lm = new DefaultListModel<>();
         pAppType.setLayout(new BorderLayout());
-        lAppType = new JList(lm);
+        lAppType = new JList<>(lm);
 //        lAppType.setVisibleRowCount(1000);
 //        lReferenceType.setFixedCellWidth(500);
         lAppType.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
@@ -413,7 +413,7 @@ public final class QuerySetting extends javax.swing.JDialog {
         ArrayList<OptionNode> refs = savedLogMessages.get(newTableType);
         ArrayList<Integer> idx = new ArrayList<>();
 
-        DefaultListModel model = (DefaultListModel) clbLogMessages.getModel();
+        DefaultListModel<OptionNode> model = (DefaultListModel) clbLogMessages.getModel();
         for (int i = 0; i < refs.size(); i++) {
             OptionNode node = refs.get(i);
             model.addElement(node);
@@ -1216,7 +1216,6 @@ public final class QuerySetting extends javax.swing.JDialog {
             DefaultListModel model = (DefaultListModel) jlConstants.getModel();
             model.addElement(new InquirerCfg.GenesysConstant(showInputDialog));
         }
-
     }//GEN-LAST:event_jbConstantAddActionPerformed
 
     private void jbTheConstantAddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbTheConstantAddActionPerformed
@@ -1271,7 +1270,7 @@ public final class QuerySetting extends javax.swing.JDialog {
             String showInputDialog = JOptionPane.showInputDialog(this, "Change constant alias", selectedValue.toString());
             if (showInputDialog != null) {
                 jlConstants.setValueIsAdjusting(true);
-                DefaultListModel model = (DefaultListModel) jlConstants.getModel();
+                DefaultListModel<GenesysConstant> model = (DefaultListModel) jlConstants.getModel();
                 GenesysConstant c = (InquirerCfg.GenesysConstant) model.getElementAt(selectedIndex);
 
                 c.setName(showInputDialog);

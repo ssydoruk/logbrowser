@@ -44,8 +44,8 @@ public class MyJTable extends JTableCommon {
     HideColumn hideColumn;
     ShowAllColumns showAllColumns;
     ShowMessage showMessage;
-    ArrayList<AbstractAction> copyMenus = new ArrayList();
-    ArrayList<AbstractAction> filterMenus = new ArrayList();
+    ArrayList<AbstractAction> copyMenus = new ArrayList<>();
+    ArrayList<AbstractAction> filterMenus = new ArrayList<>();
     JMenu jmAddFields;
     JMenu jmRegexFields;
     JMenu jmOpenIn;

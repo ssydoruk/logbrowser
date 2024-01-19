@@ -55,7 +55,7 @@ public class RequestParams extends javax.swing.JPanel {
     private final HashMap<Integer, int[]> compChecked = new HashMap<>();
     private final int rptSelected = -1;
     private final HashMap<CheckBoxList, ChangeListItem> changeList = new HashMap<>();
-    // Variables declaration - do not modify//GEN-BEGIN:variables
+    // Variables declaration - do not modify                     
     private javax.swing.JComboBox<String> cbSearchLevel;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel10;
@@ -285,7 +285,7 @@ public class RequestParams extends javax.swing.JPanel {
         boolean allChecked = true;
         cb.initFullUpdate();
         for (int i = 0; i < parent.getNumberOfChildren(); i++) {
-            DynamicTreeNode<OptionNode> node = parent.getChildAt(i);
+            DynamicTreeNode<OptionNode> node = (DynamicTreeNode<OptionNode>) parent.getChildAt(i);
             OptionNode opt = ((OptionNode) (node).getData());
             cb.getLm().addElement(node);
             if (opt.isChecked()) {
@@ -838,7 +838,7 @@ public class RequestParams extends javax.swing.JPanel {
         IReportConfigItem item = null;
         private int parentSelected = -1;
         private CheckBoxList chList = null;
-        private DefaultListModel chModel = null;
+        private DefaultListModel<String> chModel = null;
         private JPanel parentPanel = null;
         private ArrayList<String> valuesSource = null;
         private ChangeListItem childList = null;
@@ -848,7 +848,7 @@ public class RequestParams extends javax.swing.JPanel {
             this.item = item;
         }
 
-        public ChangeListItem(CheckBoxList _list, DefaultListModel _model) {
+        public ChangeListItem(CheckBoxList _list, DefaultListModel<String> _model) {
             this.chList = _list;
             this.chModel = _model;
         }
@@ -860,7 +860,7 @@ public class RequestParams extends javax.swing.JPanel {
             }
             chModel.removeAllElements();
             if (values != null) {
-                chModel.insertElementAt(CheckBoxList.ALL_ENTRY, 0);
+                chModel.insertElementAt((String) CheckBoxList.ALL_ENTRY, 0);
                 for (String value : values) {
                     chModel.addElement(value);
                 }
@@ -898,5 +898,5 @@ public class RequestParams extends javax.swing.JPanel {
         }
 
     }
-    // End of variables declaration//GEN-END:variables
+    // End of variables declaration                   
 }

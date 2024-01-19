@@ -666,9 +666,9 @@ public class Main {
 
         ArrayList<Callable<Integer>> parserTasks = new ArrayList<>(maxThreads);
         for (int i = 0; i < maxThreads; i++) {
-            parserTasks.add(new Callable() {
+            parserTasks.add(new Callable<Integer>() {
                 @Override
-                public Object call() throws Exception {
+                public Integer call() throws Exception {
                     Main.logger.info("Starting processing thread " + Thread.currentThread().getName());
                     FileInfo fileInfo;
                     while ((fileInfo = filesToProcess.poll()) != null) {
@@ -1214,7 +1214,7 @@ public class Main {
         private static Element root;
         private final Document doc; // XML doc for the CFG
 
-        private final HashMap<String, ArrayList> tablesCfg;
+        private final HashMap<String, ArrayList<Pattern>> tablesCfg;
         FilesParseSettings filesSettings = new FilesParseSettings();
 
         XmlCfg(String filePath) throws Exception {

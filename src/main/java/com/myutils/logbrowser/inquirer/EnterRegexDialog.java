@@ -29,7 +29,7 @@ public final class EnterRegexDialog extends javax.swing.JDialog {
     public static final int RET_OK = 1;
     private Pattern selectedRegEx = null;
     private String editLine;
-    // Variables declaration - do not modify//GEN-BEGIN:variables
+    // Variables declaration - do not modify                     
     private javax.swing.JButton cancelButton;
     private javax.swing.ButtonGroup group;
     private javax.swing.JPanel jPanel1;
@@ -124,7 +124,7 @@ public final class EnterRegexDialog extends javax.swing.JDialog {
     }
 
     static public void setJCBElements(JComboBox jcb, ArrayList<String> elements) {
-        DefaultComboBoxModel model = (DefaultComboBoxModel) jcb.getModel();
+        DefaultComboBoxModel<String> model = (DefaultComboBoxModel) jcb.getModel();
         model.removeAllElements();
         if (!elements.isEmpty()) {
             for (String regEx : elements) {
@@ -340,7 +340,7 @@ public final class EnterRegexDialog extends javax.swing.JDialog {
     public boolean isRegexChecked() {
         return jcbIsRegex.isSelected();
     }
-    // End of variables declaration//GEN-END:variables
+    // End of variables declaration                   
 
     public boolean isDownChecked() {
         return jrbDown.isSelected();

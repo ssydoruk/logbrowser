@@ -930,7 +930,7 @@ public abstract class IQuery extends QueryTools {
                 if (collectIDsValues.containsKey(collectID)) {
                     ids = collectIDsValues.get(collectID);
                 } else {
-                    ids = new HashSet();
+                    ids = new HashSet<>();
                     collectIDsValues.put(collectID, ids);
                 }
                 ids.add(l);

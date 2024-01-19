@@ -5,6 +5,8 @@
  */
 package com.myutils.logbrowser.inquirer.gui;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.myutils.logbrowser.inquirer.PrintStreams;
 import com.myutils.logbrowser.inquirer.inquirer;
 import org.apache.logging.log4j.LogManager;
@@ -12,6 +14,7 @@ import org.apache.logging.log4j.LogManager;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.io.StringWriter;
 
 /**
  * @author Stepan
@@ -129,6 +132,15 @@ public class ReportFrame extends javax.swing.JFrame implements Cloneable {
     }
 
     protected void windowClose() {
+        Gson gson = new GsonBuilder()
+                .enableComplexMapKeySerialization()
+                .setPrettyPrinting()
+                .excludeFieldsWithoutExposeAnnotation()
+                .create();
+        StringWriter sr = new StringWriter();
+        gson.toJson(tableView.getModel(), sr);
+        logger.info(sr.getBuffer());
+
         dispose();
         inquirer.logger.debug("window close");
 

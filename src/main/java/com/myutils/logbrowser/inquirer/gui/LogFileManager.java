@@ -26,7 +26,7 @@ import java.util.zip.ZipFile;
 public class LogFileManager {
 
     private static final org.apache.logging.log4j.Logger logger = LogManager.getLogger();
-    private final HashMap<String, LogFile> logFileStore = new HashMap();
+    private final HashMap<String, LogFile> logFileStore = new HashMap<>();
     HashSet<String> usedArchives = new HashSet<>();
 
     public static File newFile(File destinationDir, ZipEntry zipEntry) throws IOException {

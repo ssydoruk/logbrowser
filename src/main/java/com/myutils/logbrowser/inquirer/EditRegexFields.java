@@ -49,7 +49,7 @@ public class EditRegexFields extends javax.swing.JDialog {
     private TableDialog showLDAP;
     private String savedSearch;
     private String editLine;
-    // Variables declaration - do not modify//GEN-BEGIN:variables
+    // Variables declaration - do not modify                     
     private javax.swing.JButton bAddSaved;
     private javax.swing.ButtonGroup bgJSapplicationType;
     private javax.swing.JButton btEval;
@@ -753,7 +753,7 @@ public class EditRegexFields extends javax.swing.JDialog {
     private void jbRenameActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_jbRenameActionPerformed
         savedPressed(SaveAction.RENAME);
     }// GEN-LAST:event_jbRenameActionPerformed
-    // End of variables declaration//GEN-END:variables
+    // End of variables declaration                   
 
     private void btEvalActionPerformed(java.awt.event.ActionEvent evt) {// GEN-FIRST:event_btEvalActionPerformed
         evalPressed();

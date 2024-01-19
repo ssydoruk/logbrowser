@@ -1047,12 +1047,7 @@ abstract public class QueryTools {
         }
     }
     
-    int LowestID(HashMap m_callIdHash) {
-        List sortedKeys = new ArrayList(m_callIdHash.keySet());
-        Collections.sort(sortedKeys);
-        return (Integer) sortedKeys.get(0);
-    }
-    
+   
     public Integer[] getRecHandles(IxnIDs ConnIDs) throws SQLException {
         return DatabaseConnector.getDatabaseConnector(this).getIDs(this, "ocs_logbr", "recHandle", getWhere("ConnectionIDID", ConnIDs.ids, true));
     }

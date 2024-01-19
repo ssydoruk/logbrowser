@@ -237,7 +237,7 @@ public class FilesParseSettings {
                 if (valRead) {
                     return valRead;
                 }
-                Main.logger.entry("Attribute value [" + attr + "] not understood; using default [" + def + "]");
+                Main.logger.error("Attribute value [" + attr + "] not understood; using default [" + def + "]");
             }
             return def;
         }

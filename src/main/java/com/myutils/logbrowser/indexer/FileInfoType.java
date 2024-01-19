@@ -69,7 +69,7 @@ public enum FileInfoType {
             put(type_URSHTTP, "URS_HTTP");
         }
     };
-    private static final Map map = new HashMap<>();
+    private static final Map<Integer, FileInfoType> map = new HashMap<>();
 
     static {
         for (FileInfoType fileInfoType : FileInfoType.values()) {

@@ -91,7 +91,7 @@ public class DynamicTreeNode<T> extends GenericTreeNode implements Serializable 
                 setData(d.copy());
             }
             for (DynamicTreeNode<T> child : src.getChildren()) {
-                addChild(new DynamicTreeNode(child));
+                addChild(new DynamicTreeNode<T>(child));
             }
         }
     }

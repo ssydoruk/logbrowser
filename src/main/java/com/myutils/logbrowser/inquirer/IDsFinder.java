@@ -2576,7 +2576,7 @@ public final class IDsFinder extends QueryTools {
                     newCallIdsFromConnIds = false;
                     state = LoopState.NEW_CALLIDS_FROM_CONNIDS;
                     if (newCallIds == null) {
-                        newCallIds = new ArrayList();
+                        newCallIds = new ArrayList<>();
                     }
                     if (newConnIds == null || newConnIds.isEmpty()) {
                         break;
@@ -2699,7 +2699,7 @@ public final class IDsFinder extends QueryTools {
                     newCallIdsFromBlocks = false;
                     state = LoopState.NEW_CALLIDS_FROM_BLOCKS;
                     if (newCallIds == null) {
-                        newCallIds = new ArrayList();
+                        newCallIds = new ArrayList<>();
                     }
                     if (newCallIds.isEmpty()) {
                         break;
@@ -2781,7 +2781,7 @@ public final class IDsFinder extends QueryTools {
                     newConnIdsFound = false;
                     state = LoopState.NEW_CONNIDS;
                     if (newConnIds == null) {
-                        newConnIds = new ArrayList();
+                        newConnIds = new ArrayList<>();
                     }
                     if (newConnIds.isEmpty()) {
                         break;
@@ -2813,7 +2813,7 @@ public final class IDsFinder extends QueryTools {
                     newConnIdsFound = false;
                     state = LoopState.NEW_CONNIDS;
                     if (newConnIds == null) {
-                        newConnIds = new ArrayList();
+                        newConnIds = new ArrayList<>();
                     }
                     if (newCallIds.isEmpty()) {
                         break;

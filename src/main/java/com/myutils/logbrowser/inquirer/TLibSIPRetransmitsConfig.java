@@ -37,7 +37,7 @@ public class TLibSIPRetransmitsConfig extends javax.swing.JPanel {
     private DynamicTreeNode<OptionNode> root = null;
     private MyCheckBoxList clbOrderBy;
     private FileInfoType ft = FileInfoType.type_Unknown;
-    // Variables declaration - do not modify//GEN-BEGIN:variables
+    // Variables declaration - do not modify                     
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JPanel jPanel1;
@@ -82,7 +82,7 @@ public class TLibSIPRetransmitsConfig extends javax.swing.JPanel {
 
     private void FillElements(DefaultListModel lm, DynamicTreeNode<OptionNode> parent, boolean isChecked) {
         List<DynamicTreeNode<OptionNode>> l = parent.getChildren();
-        for (DynamicTreeNode<OptionNode> node : parent.getChildren()) {
+        for (DynamicTreeNode node : parent.getChildren()) {
 //            node.getData().setChecked(isChecked);
             lm.addElement(node);
         }
@@ -406,7 +406,7 @@ public class TLibSIPRetransmitsConfig extends javax.swing.JPanel {
 //        lChild.revalidate();
 //        lChild.repaint();
     }
-    // End of variables declaration//GEN-END:variables
+    // End of variables declaration                   
 
     private void setChildChecked(MyCheckBoxList lChild, boolean boxEnabled) {
         inquirer.logger.debug("in setChildChecked " + boxEnabled);

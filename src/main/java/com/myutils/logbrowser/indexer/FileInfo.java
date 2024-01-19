@@ -25,6 +25,7 @@ import java.util.zip.ZipFile;
 
 import static com.myutils.logbrowser.indexer.Main.m_component;
 import static java.lang.System.arraycopy;
+import java.util.HashSet;
 
 /**
  * @author ssydoruk
@@ -70,7 +71,7 @@ public final class FileInfo extends Record {
     private static final Pattern regFileNameTypeSIP = Pattern.compile("-(\\d+)\\.\\d{8}_\\d{6}_\\d{3}\\.log$");
     private static final Pattern regFileNameDate = Pattern.compile("\\.(\\d{8}_\\d{6}_\\d{3})\\.log");
     static private final DateTimeFormatter workSpaceDateTime = DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss_SSS");
-    static HashMap m_runIds;
+    static HashSet<Long> m_runIds;
     private final DateParsers dateParsers;
     private final byte[] buf = null;
     private final int bufRead = 0;
@@ -140,7 +141,7 @@ public final class FileInfo extends Record {
         m_componentType = FileInfoType.type_Unknown;
         m_fileFilterId = FileInfoType.type_Unknown;
         m_ServerStartTimeSet = false;
-        m_runIds = new HashMap();
+        m_runIds = new HashSet<>();
         dateParsers = new DateParsers();
     }
 
@@ -279,12 +280,12 @@ public final class FileInfo extends Record {
             double timeIn20SecIntervals = ((double) startTime) / 20000.0;
             long runId = Math.round(timeIn20SecIntervals);
 
-            if (m_runIds.containsKey(runId - 1)) {
+            if (m_runIds.contains(runId - 1)) {
                 runId = runId - 1;
-            } else if (m_runIds.containsKey(runId + 1)) {
+            } else if (m_runIds.contains(runId + 1)) {
                 runId = runId + 1;
-            } else if (!m_runIds.containsKey(runId)) {
-                m_runIds.put(runId, 0);
+            } else if (!m_runIds.contains(runId)) {
+                m_runIds.add(runId);
             }
 
             m_runId = runId;

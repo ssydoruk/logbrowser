@@ -771,6 +771,7 @@ public class inquirer {
 
                     cancelButton.setAction(new AbstractAction() {
                         @Override
+                        @SuppressWarnings("deprecation")
                         public void actionPerformed(ActionEvent e) {
                             setDialogResult(RESULT_CANCELLED);
                             setVisible(false);

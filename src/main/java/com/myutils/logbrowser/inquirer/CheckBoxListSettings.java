@@ -30,7 +30,7 @@ public class CheckBoxListSettings extends MyCheckBoxList {
     }
 
     private HashSet<Integer> hsFromArray(int[] arr) {
-        HashSet<Integer> idx = new HashSet(arr.length);
+        HashSet<Integer> idx = new HashSet<>(arr.length);
         for (int i = 0; i < arr.length; i++) {
             idx.add(arr[i]);
 

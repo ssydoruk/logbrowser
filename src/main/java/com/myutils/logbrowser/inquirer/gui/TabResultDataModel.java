@@ -18,12 +18,6 @@ import java.util.regex.Pattern;
 
 import static com.myutils.logbrowser.inquirer.gui.TabResultDataModel.TableRow.colPrefix;
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 /**
  * @author Stepan
  */
@@ -35,25 +29,20 @@ public class TabResultDataModel extends AbstractTableModel {
     private static final HashMap<MsgType, Pair<Color, Color>> msgRowColors = initMsgColors();
     private static final HashMap<MsgType, Pair<Color, Color>> msgAssignedColors = new HashMap<>();
     private static final ArrayList<Pair<Color, Color>> stdColors = initStdColors();
-    private static final HashMap<Integer, Pair<Color, Color>> assignedColorsAggregate = new HashMap<>();
     private static final Matcher normalPattern = Pattern.compile("^[\\s|]*(.+)[\\s|]*$").matcher("");
     private static final String VALUE_KEY = "value";
     private static final String HIDDEN_KEY = "hidden";
     private static int stdColorsIdx = 0;
     private final HashMap<String, Integer> columnTitle;
     private final ArrayList<TableRow> tableData;
-    //    private HashSet<Integer> columnsWithData;
     private final HashMap<MsgType, HashSet> columnsWithDataType;
-    //    private HashMap<Integer, Integer> columnIdxAdjuster;
     private final HashMap<MsgType, HashMap> columnIdxAdjusterType;
     private final ColumnParams columnParamsOrig;
     private final HashMap<MsgType, HashMap<Integer, CustomField>> customFields = new HashMap<>();
-    //    private int rowTypes = 0;
     MsgType lastRowType = MsgType.UNKNOWN;
     ArrayList<CustomField> searchParams = new ArrayList<>();
     private boolean isAggregate;
     private ArrayList<String> shortAbsoluteFileNames;
-    private int emptyColumns;
     private int maxColumnIdx;
     private ArrayList<String> fullFileNames;
     private ArrayList<String> shortFileNames;
@@ -62,7 +51,6 @@ public class TabResultDataModel extends AbstractTableModel {
 
     TabResultDataModel(MyJTable srcTab, boolean isFullClone) {
         super();
-//        this.columnIdxAdjusterType = new HashMap<>(srcModel.columnIdxAdjusterType);
         this.columnIdxAdjusterType = new HashMap<>();
 
         this.columnsWithDataType = new HashMap<>(((TabResultDataModel) srcTab.getModel()).columnsWithDataType);
@@ -78,12 +66,9 @@ public class TabResultDataModel extends AbstractTableModel {
     public TabResultDataModel() {
         super();
         this.columnIdxAdjusterType = new HashMap<>();
-        this.columnsWithDataType = new HashMap();
-//        this.columnIdxAdjuster = new HashMap<>();
-        this.emptyColumns = -1;
+        this.columnsWithDataType = new HashMap<>();
         this.tableData = new ArrayList<>();
         this.columnTitle = new HashMap<>();
-//        columnsWithData = new HashSet<Integer>();
         maxColumnIdx = 0;
 
         columnParams = new ColumnParams();
@@ -164,15 +149,6 @@ public class TabResultDataModel extends AbstractTableModel {
         }
     }
 
-    private <T, E> T getKeyByValue(Map<T, E> map, E value) {
-        for (Entry<T, E> entry : map.entrySet()) {
-            if (Objects.equals(value, entry.getValue())) {
-                return entry.getKey();
-            }
-        }
-        return null;
-    }
-
     @Override
     public int getColumnCount() {
         if (isAggregate) {
@@ -200,7 +176,7 @@ public class TabResultDataModel extends AbstractTableModel {
 
             for (Map.Entry<MsgType, HashSet> entry : columnsWithDataType.entrySet()) {
 //                HashSet<Integer> realColumnIdx = entry.getValue();
-                HashSet<Integer> realColumnIdx = columnParams.hideHidden(entry.getKey(), entry.getValue());
+                HashSet<Integer> realColumnIdx =  columnParams.hideHidden(entry.getKey(), entry.getValue());
                 inquirer.logger.trace("key: " + entry.getKey() + " cols: " + realColumnIdx);
                 HashMap<Integer, Integer> columnAdjuster = new HashMap<>(realColumnIdx.size());
                 //first set columns previously set by names
@@ -270,7 +246,7 @@ public class TabResultDataModel extends AbstractTableModel {
     }
 
     private Integer realColIdx(int colIdx, MsgType msgType) {
-        HashMap<Integer, Integer> mapPerType = columnIdxAdjusterType.get(msgType);
+        HashMap<Integer, Integer> mapPerType = (HashMap<Integer, Integer>) columnIdxAdjusterType.get(msgType);
         if (mapPerType != null) {
             return mapPerType.get(colIdx);
 
@@ -631,7 +607,7 @@ public class TabResultDataModel extends AbstractTableModel {
             String colName = "";
 
             if (row != null) {
-                HashMap<Integer, Integer> mapPerType = columnIdxAdjusterType.get(row.getRowType());
+                HashMap<Integer, Integer> mapPerType = (HashMap<Integer, Integer>) columnIdxAdjusterType.get(row.getRowType());
                 if (mapPerType != null) {
                     Integer realColumnIdx = mapPerType.get(tab.convertColumnIndexToModel(j));
                     if (realColumnIdx != null) {
@@ -703,7 +679,7 @@ public class TabResultDataModel extends AbstractTableModel {
             String colName = "";
 
             if (row != null) {
-                HashMap<Integer, Integer> mapPerType = columnIdxAdjusterType.get(row.getRowType());
+                HashMap<Integer, Integer> mapPerType = (HashMap<Integer, Integer>) columnIdxAdjusterType.get(row.getRowType());
                 if (mapPerType != null) {
                     Integer realColumnIdx = mapPerType.get(tab.convertColumnIndexToModel(j));
                     if (realColumnIdx != null) {
@@ -1097,12 +1073,14 @@ public class TabResultDataModel extends AbstractTableModel {
                 Object val = row.getValue();
                 if (val != null) {
                     if (val instanceof String) {
-                        if (StringUtils.isNotBlank((String) val))
+                        if (StringUtils.isNotBlank((String) val)) {
                             rowData.put(row.getKey(), val);
-                        else
+                        } else {
                             System.out.println("blank");
-                    } else
+                        }
+                    } else {
                         rowData.put(row.getKey(), val);
+                    }
                 } else {
                     System.out.println("null");
                 }
@@ -1385,8 +1363,8 @@ public class TabResultDataModel extends AbstractTableModel {
         }
 
         private void setParams(MsgType rowType, int columnIdx, boolean _hidden,
-                               String _title,
-                               String _type) {
+                String _title,
+                String _type) {
             HashMap<Integer, FieldParams> map = getFieldsMap(rowType);
 
             if (!map.containsKey(columnIdx)) {

@@ -72,8 +72,8 @@ public class DynamicTree<OptionNode> implements Serializable {
         return returnNode;
     }
 
-    private DynamicTreeNode<OptionNode> auxiliaryFind(DynamicTreeNode<OptionNode> currentNode, OptionNode dataToFind) {
-        DynamicTreeNode<OptionNode> returnNode = null;
+    private DynamicTreeNode<OptionNode> auxiliaryFind(DynamicTreeNode currentNode, OptionNode dataToFind) {
+        DynamicTreeNode returnNode = null;
         int i;
 
         if (currentNode.getData().equals(dataToFind)) {
