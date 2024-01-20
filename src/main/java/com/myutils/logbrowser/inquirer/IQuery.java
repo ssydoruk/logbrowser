@@ -3,6 +3,7 @@ package com.myutils.logbrowser.inquirer;
 import Utils.UTCTimeRange;
 import com.myutils.logbrowser.indexer.ReferenceType;
 import com.myutils.logbrowser.inquirer.Wheres.Where;
+import com.myutils.mygenerictree.GenericTreeNode;
 import org.apache.commons.lang3.StringUtils;
 
 import java.sql.ResultSet;
@@ -191,7 +192,7 @@ public abstract class IQuery extends QueryTools {
 
     static String getCheckedWhere(String nameID, ReferenceType referenceType, DynamicTreeNode<OptionNode> nameSettings, boolean optimize) {
         if (nameSettings != null) {
-            DynamicTreeNode<OptionNode> parent = (DynamicTreeNode<OptionNode>) nameSettings.getParent();
+            GenericTreeNode parent = nameSettings.getParent();
             if (parent != null
                 && (parent.getData() == null || ((OptionNode) parent.getData()).isChecked() && !OptionNode.AllChildrenChecked(nameSettings))) {
                     StringBuilder ret = new StringBuilder();
@@ -212,7 +213,7 @@ public abstract class IQuery extends QueryTools {
 
     static String getCheckedWhere(String nameID, DynamicTreeNode<OptionNode> nameSettings) {
         if (nameSettings != null) {
-            DynamicTreeNode<OptionNode> parent = (DynamicTreeNode<OptionNode>) nameSettings.getParent();
+            GenericTreeNode parent = nameSettings.getParent();
             if (parent != null) {
                 if (parent.getData() == null || ((OptionNode) parent.getData()).isChecked() && !OptionNode.AllChildrenChecked(nameSettings)) {
                     String checkedItems = getCheckedItems(nameSettings);
@@ -730,7 +731,7 @@ public abstract class IQuery extends QueryTools {
     }
 
     Where AddCheckedWhere(String nameID, ReferenceType referenceType, DynamicTreeNode<OptionNode> nameSettings, String AndOr) {
-        DynamicTreeNode<OptionNode> parent = (DynamicTreeNode<OptionNode>) nameSettings.getParent();
+        GenericTreeNode parent = nameSettings.getParent();
         if (parent != null) {
             if (parent.getData() == null || ((OptionNode) parent.getData()).isChecked() && !OptionNode.AllChildrenChecked(nameSettings)) {
                 String isNullClause = "";

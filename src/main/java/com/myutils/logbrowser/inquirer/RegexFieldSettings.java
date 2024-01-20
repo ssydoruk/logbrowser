@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
+import org.apache.commons.lang3.RegExUtils;
 
 /**
  * @author stepan_sydoruk
@@ -244,7 +245,7 @@ public class RegexFieldSettings implements Serializable {
         }
 
         private void appendSearched(String string) {
-            String s = StringUtils.replaceAll(string, "\t", "        ");
+            String s = RegExUtils.replaceAll(string, "\t", "        ");
             String key = getKey();
             if (key == null || key.isEmpty()) {
                 setKey(s);

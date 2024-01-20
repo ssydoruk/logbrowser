@@ -157,8 +157,8 @@ public final class QuerySetting extends javax.swing.JDialog {
         /**
          * ********************************************
          */
-        DefaultListModel<String> lmFilters = new DefaultListModel();
-        lPrintFilters = new JList<>(lmFilters);
+        DefaultListModel lmFilters = new DefaultListModel();
+        lPrintFilters = new JList<String>(lmFilters);
         lPrintFilters.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
         lPrintFilters.setLayoutOrientation(JList.VERTICAL);
         jpFileTypes.setLayout(new BorderLayout());

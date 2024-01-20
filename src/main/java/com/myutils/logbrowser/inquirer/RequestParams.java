@@ -285,7 +285,7 @@ public class RequestParams extends javax.swing.JPanel {
         boolean allChecked = true;
         cb.initFullUpdate();
         for (int i = 0; i < parent.getNumberOfChildren(); i++) {
-            DynamicTreeNode<OptionNode> node = (DynamicTreeNode<OptionNode>) parent.getChildAt(i);
+            DynamicTreeNode node = parent.getChildAt(i);
             OptionNode opt = ((OptionNode) (node).getData());
             cb.getLm().addElement(node);
             if (opt.isChecked()) {

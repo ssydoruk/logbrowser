@@ -246,7 +246,7 @@ public class TabResultDataModel extends AbstractTableModel {
     }
 
     private Integer realColIdx(int colIdx, MsgType msgType) {
-        HashMap<Integer, Integer> mapPerType = (HashMap<Integer, Integer>) columnIdxAdjusterType.get(msgType);
+        HashMap<Integer, Integer> mapPerType =  columnIdxAdjusterType.get(msgType);
         if (mapPerType != null) {
             return mapPerType.get(colIdx);
 
@@ -679,7 +679,7 @@ public class TabResultDataModel extends AbstractTableModel {
             String colName = "";
 
             if (row != null) {
-                HashMap<Integer, Integer> mapPerType = (HashMap<Integer, Integer>) columnIdxAdjusterType.get(row.getRowType());
+                HashMap<Integer, Integer> mapPerType = columnIdxAdjusterType.get(row.getRowType());
                 if (mapPerType != null) {
                     Integer realColumnIdx = mapPerType.get(tab.convertColumnIndexToModel(j));
                     if (realColumnIdx != null) {
@@ -1174,7 +1174,7 @@ public class TabResultDataModel extends AbstractTableModel {
                         putRowData(columnIdx, t, StringUtils.join(new String[]{curData, data}, " | "));
                     }
 
-                    HashSet hm = columnsWithDataType.get(getRowType());
+                    HashSet<Integer> hm = columnsWithDataType.get(getRowType());
                     if (hm == null) {
                         hm = new HashSet();
                         columnsWithDataType.put(getRowType(), hm);

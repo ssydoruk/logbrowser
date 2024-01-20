@@ -68,7 +68,7 @@ public abstract class IQueryResults extends QueryTools
         if (qdSettings != null) {
             DynamicTree tree = qdSettings.getQParams(this.getClass().getName());
             if (tree != null) {
-                DynamicTreeNode<OptionNode> rootA = tree.getRoot();
+                DynamicTreeNode rootA = tree.getRoot();
                 if (rootA != null) {
                     repComponents.setRoot(rootA);
                 }

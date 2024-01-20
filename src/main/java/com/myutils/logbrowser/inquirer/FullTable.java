@@ -39,7 +39,7 @@ public class FullTable {
         for (int i = 1; i <= rsmd.getColumnCount(); i++) {
 //            inquirer.logger.debug(" " + rsmd.getColumnName(i) + " " + rsmd.getColumnTypeName(i)+ " " + rsmd.getColumnType(i)
 //            + " " + rsmd.getPrecision(i)+ " " + rsmd.getScale(i));
-            columnNames.put(rsmd.getColumnName(i), new Pair(i - 1, rsmd.getColumnType(i)));
+            columnNames.put(rsmd.getColumnName(i), new Pair<>(i - 1, rsmd.getColumnType(i)));
         }
     }
 

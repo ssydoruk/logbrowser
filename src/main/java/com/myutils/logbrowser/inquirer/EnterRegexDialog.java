@@ -124,7 +124,7 @@ public final class EnterRegexDialog extends javax.swing.JDialog {
     }
 
     static public void setJCBElements(JComboBox jcb, ArrayList<String> elements) {
-        DefaultComboBoxModel<String> model = (DefaultComboBoxModel) jcb.getModel();
+        DefaultComboBoxModel model = (DefaultComboBoxModel) jcb.getModel();
         model.removeAllElements();
         if (!elements.isEmpty()) {
             for (String regEx : elements) {

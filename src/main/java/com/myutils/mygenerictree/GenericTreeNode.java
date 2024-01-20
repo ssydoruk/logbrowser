@@ -43,7 +43,7 @@ public class GenericTreeNode<T> implements Serializable {
                 setData(d.copy());
             }
             for (GenericTreeNode<T> child : src.getChildren()) {
-                addChild(new GenericTreeNode(child));
+                addChild(new GenericTreeNode<T>(child));
             }
         }
 

@@ -441,7 +441,7 @@ public class MyCheckBoxList extends CheckBoxList {
                     JPanel jp = new JPanel();
                     jd.add(jp);
                     jp.setLayout(new BoxLayout(jp, BoxLayout.PAGE_AXIS));
-                    jdList = new JList(new DefaultListModel());
+                    jdList = new JList<>(new DefaultListModel());
                     jdList.setVisibleRowCount(20);
                     jp.add(new JScrollPane(jdList));
 
@@ -456,7 +456,7 @@ public class MyCheckBoxList extends CheckBoxList {
                     jd.setSize(320, 420);
                 }
                 jd.setTitle(((shouldCheck) ? "Checked" : "Unchecked") + " " + matchedItems.size() + " elements");
-                DefaultListModel model1 = (DefaultListModel) jdList.getModel();
+                DefaultListModel<String> model1 = (DefaultListModel<String>) jdList.getModel();
                 model1.clear();
                 for (String string : matchedItems.values()) {
                     model1.addElement(string);
