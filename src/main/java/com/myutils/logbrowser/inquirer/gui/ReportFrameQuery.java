@@ -8,9 +8,14 @@ package com.myutils.logbrowser.inquirer.gui;
 import Utils.ScreenInfo;
 import com.myutils.logbrowser.inquirer.*;
 
+import static java.awt.Frame.MAXIMIZED_BOTH;
+
+import java.awt.GraphicsEnvironment;
+
 import javax.swing.*;
 import java.awt.event.*;
 import java.io.IOException;
+import java.util.Enumeration;
 
 /**
  * @author ssydoruk
@@ -18,13 +23,14 @@ import java.io.IOException;
 public class ReportFrameQuery extends ReportFrame {
 
     protected ShowFullMessage fullMsg;
-    private JCheckBox msgCheckBox;
     private JPopupMenu clonePopup;
     private JPopupMenu placementPopup;
     private JButton btPlacement;
-    private int fullPlacement = SwingConstants.TOP;
+    private int fullPlacement = 0; // no full window initially
     private javax.swing.ButtonGroup bgPlacement;
-    
+    private final ReportFrameQuery frm;
+    private JRadioButtonMenuItem miFullOff;
+
 
     public ReportFrameQuery(ReportFrameQuery frm) {
         this(frm, true);
@@ -32,7 +38,8 @@ public class ReportFrameQuery extends ReportFrame {
 
     public ReportFrameQuery(ReportFrameQuery frm, boolean isFullClone) {
         super(frm, isFullClone);
-        bgPlacement = new ButtonGroup();
+        this.frm = frm;
+
         createToolbar();
         this.fullMsg = new ShowFullMessage(this);
         tableView.setFullMsg(fullMsg);
@@ -119,10 +126,7 @@ public class ReportFrameQuery extends ReportFrame {
 
         });
 
-        this.msgCheckBox = new JCheckBox(new ShowMsgAction());
         addPlacementButton();
-
-        addToolbarButton(msgCheckBox);
 
         addToolbarButton(new CopyAction());
         addToolbarButton(new FilterAction());
@@ -142,47 +146,71 @@ public class ReportFrameQuery extends ReportFrame {
     }
 
     private void addPlacementButton() {
-        btPlacement = addToolbarButton("Full placement", "Placement of full message window");
+        bgPlacement = new ButtonGroup();
+        btPlacement = addToolbarButton("Full message", "Show/hide window with full log message");
 
         placementPopup = new JPopupMenu();
+        JRadioButtonMenuItem mi;
 
-        JRadioButtonMenuItem mi = new JRadioButtonMenuItem(new AbstractAction("Top") {
-            public void actionPerformed(ActionEvent e) {
-                fullPlacement=SwingConstants.TOP;
-                showFull();
-            }
-        });
-        bgPlacement.add(mi);
-        placementPopup.add(mi);
-        
-        mi = new JRadioButtonMenuItem(new AbstractAction("Bottom") {
-            public void actionPerformed(ActionEvent e) {
-                fullPlacement = SwingConstants.BOTTOM;
-                showFull();
-            }
-        });
-        bgPlacement.add(mi);
-        placementPopup.add(mi);
-        
-        mi=new JRadioButtonMenuItem(new AbstractAction("Left") {
-            public void actionPerformed(ActionEvent e) {
-                fullPlacement = SwingConstants.LEFT;
-                showFull();
-            }
-        });
-        bgPlacement.add(mi);
-        placementPopup.add(mi);
-        
         mi = new JRadioButtonMenuItem(new AbstractAction("Right") {
             public void actionPerformed(ActionEvent e) {
                 fullPlacement = SwingConstants.RIGHT;
                 showFull();
             }
         });
+//        mi.setModel(new MenuItemModel(SwingConstants.RIGHT));
         bgPlacement.add(mi);
         placementPopup.add(mi);
-        
 
+        mi = new JRadioButtonMenuItem(new AbstractAction("Left") {
+            public void actionPerformed(ActionEvent e) {
+                fullPlacement = SwingConstants.LEFT;
+                showFull();
+            }
+        });
+//        mi.setModel(new MenuItemModel(SwingConstants.LEFT));
+        bgPlacement.add(mi);
+        placementPopup.add(mi);
+
+        mi = new JRadioButtonMenuItem(new AbstractAction("Top") {
+            public void actionPerformed(ActionEvent e) {
+                fullPlacement = SwingConstants.TOP;
+                showFull();
+            }
+        });
+//        mi.setModel(new MenuItemModel(SwingConstants.TOP));
+        bgPlacement.add(mi);
+        placementPopup.add(mi);
+
+        mi = new JRadioButtonMenuItem(new AbstractAction("Bottom") {
+            public void actionPerformed(ActionEvent e) {
+                fullPlacement = SwingConstants.BOTTOM;
+                showFull();
+            }
+
+        });
+        bgPlacement.add(mi);
+        placementPopup.add(mi);
+//        mi.setModel(new MenuItemModel(SwingConstants.BOTTOM));
+
+        miFullOff = new JRadioButtonMenuItem(new AbstractAction("Off") {
+            public void actionPerformed(ActionEvent e) {
+                java.awt.EventQueue.invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        fullMsg.setVisible(false);
+                        setExtendedState(JFrame.MAXIMIZED_BOTH);
+                    }
+                });
+
+            }
+        });
+//        mi.setModel(new MenuItemModel(0));
+        bgPlacement.add(miFullOff);
+        placementPopup.add(miFullOff);
+        miFullOff.setSelected(true);
+
+//        choosePlacementButton();
         btPlacement.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
@@ -191,6 +219,7 @@ public class ReportFrameQuery extends ReportFrame {
         });
 
     }
+
 
     private void addCloneButton() {
         JButton bt = addToolbarButton("Clone", "Duplicate current report window");
@@ -229,8 +258,8 @@ public class ReportFrameQuery extends ReportFrame {
     }
 
     private void showFullMsg(boolean b) {
-        if (fullMsg != null && msgCheckBox.isSelected()) {
-            fullMsg.setVisible(b);
+        if (fullMsg != null ) {
+            fullMsg.setVisible(!miFullOff.isSelected());
         }
     }
 
@@ -269,10 +298,6 @@ public class ReportFrameQuery extends ReportFrame {
 //        pack();
     }
 
-    private void LoadShort() {
-        TabResultDataModel mod = (TabResultDataModel) tableView.getModel();
-        ExternalEditor.editFiles(mod.exportShort(tableView));
-    }
 
     private void LoadExcel() {
         TabResultDataModel mod = (TabResultDataModel) tableView.getModel();
@@ -292,47 +317,12 @@ public class ReportFrameQuery extends ReportFrame {
         }
     }
 
-    private void OpenNotepad() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    private void OpenSearch() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    private void printConsole() {
-        ps.printMemConsole();
-    }
-
     void fullMsgClosed() {
-        if (msgCheckBox.isSelected()) {
-            msgCheckBox.setSelected(false);
-        }
+        miFullOff.setSelected(true);
     }
 
-    class ShowMsgAction extends AbstractAction {
 
-        public ShowMsgAction() {
-            super("Message");
-            putValue(Action.SHORT_DESCRIPTION, "Toggle full message view window");
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            JToggleButton tBtn = (JToggleButton) e.getSource();
-            if (tBtn.isSelected()) {
-                showFull();
-
-            } else {
-                fullMsg.setVisible(false);
-            }
-            btPlacement.setEnabled(tBtn.isSelected());
-            
-        }
-
-    }
-    
-    void showFull(){
+    void showFull() {
         ScreenInfo.refitMainToMsg(theForm, fullMsg, fullPlacement);
         fullMsg.setVisible(true);
         fullMsg.toFront();
@@ -343,7 +333,7 @@ public class ReportFrameQuery extends ReportFrame {
                 theForm.repaint();
             }
         });
-        
+
     }
 
     class FollowSourceAction extends AbstractAction {
