@@ -9,6 +9,7 @@ import Utils.ScreenInfo;
 import com.myutils.logbrowser.common.JSRunner;
 import com.myutils.logbrowser.common.RecordPrintout;
 import com.myutils.logbrowser.inquirer.ILogRecord;
+import java.awt.event.ActionEvent;
 import org.apache.commons.lang3.StringUtils;
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
@@ -16,6 +17,10 @@ import org.fife.ui.rtextarea.RTextScrollPane;
 
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import javax.swing.AbstractAction;
+import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JMenuItem;
+import javax.swing.JSeparator;
 import javax.swing.text.DefaultCaret;
 
 /**
@@ -39,11 +44,22 @@ public class ShowFullMessage extends javax.swing.JFrame {
         initComponents();
         jtaMessageText = new RSyntaxTextArea();
         jtaMessageText.setCodeFoldingEnabled(false);
-        jtaMessageText.setSyntaxEditingStyle(SyntaxConstants.SYNTAX_STYLE_PYTHON);
+        jtaMessageText.setSyntaxEditingStyle(SyntaxConstants.SYNTAX_STYLE_RUBY);
         jtaMessageText.setWrapStyleWord(true);
-        jtaMessageText.setLineWrap(true);
+        jtaMessageText.setLineWrap(false);
         jtaMessageText.setEditable(false);
         ((DefaultCaret) jtaMessageText.getCaret()).setUpdatePolicy(DefaultCaret.NEVER_UPDATE);
+        jtaMessageText.getPopupMenu().add(new JSeparator());
+        
+        JCheckBoxMenuItem miWrap = new JCheckBoxMenuItem(new AbstractAction("Line wrap") {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                jtaMessageText.setLineWrap(((JCheckBoxMenuItem)e.getSource()).isSelected());
+                jtaMessageText.repaint();
+            }
+        });
+        miWrap.setSelected(jtaMessageText.getLineWrap());
+        jtaMessageText.getPopupMenu().add(miWrap);
 
         pFullMessage.add(new RTextScrollPane(jtaMessageText));
 
