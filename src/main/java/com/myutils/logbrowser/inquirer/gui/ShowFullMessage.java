@@ -9,7 +9,10 @@ import Utils.ScreenInfo;
 import com.myutils.logbrowser.common.JSRunner;
 import com.myutils.logbrowser.common.RecordPrintout;
 import com.myutils.logbrowser.inquirer.ILogRecord;
+import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import org.apache.commons.lang3.StringUtils;
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
@@ -17,10 +20,20 @@ import org.fife.ui.rtextarea.RTextScrollPane;
 
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Map;
 import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.BoxLayout;
+import javax.swing.Icon;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenuItem;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
+import javax.swing.JToggleButton;
+import javax.swing.table.DefaultTableModel;
 import javax.swing.text.DefaultCaret;
 
 /**
@@ -31,32 +44,58 @@ public class ShowFullMessage extends javax.swing.JFrame {
     RSyntaxTextArea detailedMessage;
     RSyntaxTextArea jtaMessageText;
     private ReportFrameQuery parentForm;
-    // Variables declaration - do not modify                     
-    private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel pDetailedMessage;
-    private javax.swing.JPanel pFullMessage;
-    private javax.swing.JSplitPane spSplitPane;
+    private ToggleButtonToolBar toolbar = null;
+    DefaultTableModel infoTableModel;
+    private javax.swing.JTable jtAllFields;
+    private JScrollPane jspAllFields;
+    private ILogRecord record;
+    private final Utils.swing.TableColumnAdjuster tca;
 
     /**
      * Creates new form ShowFullMessage
      */
     public ShowFullMessage() {
         initComponents();
+
+        jtAllFields = new javax.swing.JTable();
+        jspAllFields = new JScrollPane();
+        jspAllFields.setViewportView(jtAllFields);
+        infoTableModel = new DefaultTableModel() {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false; // To change body of generated methods, choose Tools | Templates.
+            }
+
+        };
+        for (String string : new String[]{"Field", "Value"}) {
+            infoTableModel.addColumn(string);
+        }
+        jtAllFields.setModel(infoTableModel);
+        jtAllFields.getColumnModel().getColumn(0).setPreferredWidth(10);
+        
+        tca = new Utils.swing.TableColumnAdjuster(jtAllFields);
+        tca.setColumnDataIncluded(true);
+        tca.setColumnHeaderIncluded(false);
+        tca.setDynamicAdjustment(true);
+
+//        tca.setMaxColumnWidth(getFontMetrics(getFont()).stringWidth(getSampleString(MAX_CHARS_IN_TABLE)));
+        
         jtaMessageText = new RSyntaxTextArea();
         jtaMessageText.setCodeFoldingEnabled(false);
         jtaMessageText.setSyntaxEditingStyle(SyntaxConstants.SYNTAX_STYLE_RUBY);
         jtaMessageText.setWrapStyleWord(true);
         jtaMessageText.setLineWrap(false);
         jtaMessageText.setEditable(false);
+        jtaMessageText.setTabSize(2);
         ((DefaultCaret) jtaMessageText.getCaret()).setUpdatePolicy(DefaultCaret.NEVER_UPDATE);
         jtaMessageText.getPopupMenu().add(new JSeparator());
-        
+
         JCheckBoxMenuItem miWrap = new JCheckBoxMenuItem(new AbstractAction("Line wrap") {
             @Override
             public void actionPerformed(ActionEvent e) {
-                jtaMessageText.setLineWrap(((JCheckBoxMenuItem)e.getSource()).isSelected());
-                jtaMessageText.repaint();
+                toggleLineWrap(((JCheckBoxMenuItem) e.getSource()).isSelected());
             }
+
         });
         miWrap.setSelected(jtaMessageText.getLineWrap());
         jtaMessageText.getPopupMenu().add(miWrap);
@@ -70,8 +109,60 @@ public class ShowFullMessage extends javax.swing.JFrame {
         detailedMessage.setEditable(false);
 
         pDetailedMessage.add(new RTextScrollPane(detailedMessage));
+        toolbar = new ToggleButtonToolBar();
+        JPanel pToolbarPanel = new JPanel(new BorderLayout());
+//
+        pToolbarPanel.add(toolbar, BorderLayout.PAGE_START);
+        pToolbar.add(toolbar, BorderLayout.PAGE_START);
+
+//        toolbar.addButton("Excel", "Open the report in Excel", (new ActionListener() {
+//            @Override
+//            public void actionPerformed(ActionEvent e) {
+//                
+//            }
+//        }));
+        JToggleButton bt = new JToggleButton("Line wrap", jtaMessageText.getLineWrap());
+        bt.setToolTipText("Toggle line wrap on/off");
+        bt.addActionListener(new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                toggleLineWrap(((JToggleButton) e.getSource()).isSelected());
+            }
+        });
+        toolbar.addButton(bt);
+
+        pAllFields.setVisible(false);
+        bt = new JToggleButton("All fields", pAllFields.isVisible());
+        bt.setToolTipText("Toggle panel with all fields on/off");
+        bt.addActionListener(new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                boolean selected = ((JToggleButton) e.getSource()).isSelected();
+                pAllFields.setVisible(selected);
+
+                if (selected) {
+                    pAllFields.add(jspAllFields, java.awt.BorderLayout.CENTER);
+                    spSplitPane.setRightComponent(pAllFields);
+                    tca.adjustColumns();
+                    showAllFields();
+
+//                    jtAllFields.setPreferredSize( new Dimension( jtAllFields.getSize().width, 200));
+//                    pAllFields.setSize((int) pAllFields.getSize().getWidth(), 200);
+                } else {
+                    pAllFields.remove(jspAllFields);
+                }
+                spSplitPane.revalidate();
+            }
+        });
+        toolbar.addButton(bt);
 
         pack();
+
+    }
+
+    private void toggleLineWrap(boolean selected) {
+        jtaMessageText.setLineWrap(selected);
+        jtaMessageText.repaint();
     }
 
     ShowFullMessage(ReportFrameQuery aThis) {
@@ -111,9 +202,11 @@ public class ShowFullMessage extends javax.swing.JFrame {
     private void initComponents() {
 
         jPanel1 = new javax.swing.JPanel();
+        pToolbar = new javax.swing.JPanel();
         spSplitPane = new javax.swing.JSplitPane();
         pFullMessage = new javax.swing.JPanel();
         pDetailedMessage = new javax.swing.JPanel();
+        pAllFields = new javax.swing.JPanel();
 
         setAutoRequestFocus(false);
         addWindowStateListener(new java.awt.event.WindowStateListener() {
@@ -125,14 +218,16 @@ public class ShowFullMessage extends javax.swing.JFrame {
             public void windowClosing(java.awt.event.WindowEvent evt) {
                 formWindowClosing(evt);
             }
-
             public void windowDeactivated(java.awt.event.WindowEvent evt) {
                 formWindowDeactivated(evt);
             }
         });
-        getContentPane().setLayout(new javax.swing.BoxLayout(getContentPane(), javax.swing.BoxLayout.LINE_AXIS));
+        getContentPane().setLayout(new javax.swing.BoxLayout(getContentPane(), javax.swing.BoxLayout.PAGE_AXIS));
 
         jPanel1.setLayout(new java.awt.BorderLayout());
+
+        pToolbar.setLayout(new java.awt.BorderLayout());
+        jPanel1.add(pToolbar, java.awt.BorderLayout.PAGE_START);
 
         spSplitPane.setDividerSize(2);
         spSplitPane.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
@@ -143,6 +238,9 @@ public class ShowFullMessage extends javax.swing.JFrame {
 
         pDetailedMessage.setLayout(new java.awt.BorderLayout());
         spSplitPane.setRightComponent(pDetailedMessage);
+
+        pAllFields.setLayout(new java.awt.BorderLayout());
+        spSplitPane.setRightComponent(pAllFields);
 
         jPanel1.add(spSplitPane, java.awt.BorderLayout.CENTER);
 
@@ -163,9 +261,20 @@ public class ShowFullMessage extends javax.swing.JFrame {
     private void formWindowStateChanged(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowStateChanged
         // TODO add your handling code here:
     }//GEN-LAST:event_formWindowStateChanged
-    // End of variables declaration                   
+
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel pAllFields;
+    private javax.swing.JPanel pDetailedMessage;
+    private javax.swing.JPanel pFullMessage;
+    private javax.swing.JPanel pToolbar;
+    private javax.swing.JSplitPane spSplitPane;
+    // End of variables declaration//GEN-END:variables
 
     void showMessage(String recordDisplayScript, ILogRecord record) {
+        this.record = record;
+        showAllFields();
+
         detailedMessage.setText("");
         if (StringUtils.isEmpty(recordDisplayScript)) {
             jtaMessageText.setText(record.getBytes());
@@ -177,6 +286,33 @@ public class ShowFullMessage extends javax.swing.JFrame {
                 detailedMessage.setSyntaxEditingStyle(SyntaxConstants.SYNTAX_STYLE_JSON);
 
             }
+        }
+    }
+
+    private void showAllFields() {
+        if (jtAllFields.isVisible()) {
+            ArrayList<String[]> kvps = new ArrayList<>();
+            for (Map.Entry<Object, Object> entry : record.m_fieldsAll.entrySet()) {
+                kvps.add(new String[]{entry.getKey().toString(), entry.getValue().toString()});
+            }
+//        for (Map.Entry<String, ILogRecord.IValueAssessor> entry : record.getStdFields().entrySet()) {
+//            kvps.add(new String[]{entry.getKey().toString(), entry.getValue().toString()});
+//        }
+
+//        for (Map.Entry<Object, Object> entry : curRow.getRecord().m_fields.entrySet()) {
+//            kvps.add(new String[]{entry.getKey().toString(), entry.getValue().toString()});
+//        }
+            Collections.sort(kvps, (o1, o2) -> {
+                return ((String[]) o1)[0].compareToIgnoreCase(((String[]) o2)[0]); //To change body of generated lambdas, choose Tools | Templates.
+            });
+
+            infoTableModel.setRowCount(0);
+
+            for (String[] entry : kvps) {
+                infoTableModel.addRow(entry);
+            }
+//        tab.setModel(infoTableModel);
+//        tca.adjustColumns();
         }
     }
 }

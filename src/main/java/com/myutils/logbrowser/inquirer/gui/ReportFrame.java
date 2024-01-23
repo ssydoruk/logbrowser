@@ -190,67 +190,6 @@ public class ReportFrame extends javax.swing.JFrame implements Cloneable {
         tableView.requestFocusInWindow();
     }//GEN-LAST:event_formWindowOpened
 
-    protected class ToggleButtonToolBar extends JToolBar {
-
-        public ToggleButtonToolBar() {
-            super();
-//            JButton bt = addButton("Console", "Print this report on console for navigation in Notepad++");
-//            bt.addActionListener(new ActionListener() {
-//                @Override
-//                public void actionPerformed(ActionEvent e) {
-//                    printConsole();
-//                }
-//
-//            });
-
-//            bt = addButton("Search", "Go back to search dialog");
-//            bt.addActionListener(new ActionListener() {
-//                @Override
-//                public void actionPerformed(ActionEvent e) {
-//                    OpenSearch();
-//                }
-//
-//            });
-//            bt = addButton("Notepad++", "Go to notepad");
-//            bt.addActionListener(new ActionListener() {
-//                @Override
-//                public void actionPerformed(ActionEvent e) {
-//                    OpenNotepad();
-//                }
-//
-//            });
-        }
-
-        private JButton addButton(String title, String hint0, ActionListener act) {
-            JButton tb = new JButton(title);
-            tb.setToolTipText(hint0);
-            tb.addActionListener(act);
-            add(tb);
-            return tb;
-        }
-
-        JToggleButton addToggleButton(Action a) {
-            JToggleButton tb = new JToggleButton(
-                    (String) a.getValue(Action.NAME),
-                    (Icon) a.getValue(Action.SMALL_ICON)
-            );
-            tb.setMargin(zeroInsets);
-            tb.setEnabled(a.isEnabled());
-            tb.setToolTipText((String) a.getValue(Action.SHORT_DESCRIPTION));
-            tb.setAction(a);
-            add(tb);
-            return tb;
-        }
-
-        JButton addButton(String title, String tooltip) {
-//            tb.setMargin(zeroInsets);
-            JButton tb = new JButton(title);
-            tb.setToolTipText(tooltip);
-            add(tb);
-            return tb;
-        }
-
-    }
 
     class ToolBarPanel extends JPanel implements ContainerListener {
 

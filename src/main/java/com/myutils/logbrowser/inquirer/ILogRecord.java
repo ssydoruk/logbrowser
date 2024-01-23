@@ -23,6 +23,10 @@ public abstract class ILogRecord {
     protected StdFields stdFields = new StdFields();
     private int appnameid;
     private int id;
+
+    public StdFields getStdFields() {
+        return stdFields;
+    }
     private boolean m_isMarked;
     private long m_unixtime;
     private long m_fileOffset;
@@ -451,7 +455,7 @@ public abstract class ILogRecord {
         }
     }
 
-    protected interface IValueAssessor {
+    public static interface IValueAssessor {
 
         Object getValue();
 
