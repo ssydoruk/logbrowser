@@ -287,7 +287,7 @@ public class LCAParser extends Parser {
         }
     }
 
-    protected void AddClientMessage(ArrayList contents, String header) throws Exception {
+    protected void AddClientMessage(ArrayList<String> contents, String header) throws Exception {
         LCAClient msg = new LCAClient(contents, fileInfo.getRecordID());
         msg.parseConnect();
         SetStdFieldsAndAdd(msg);

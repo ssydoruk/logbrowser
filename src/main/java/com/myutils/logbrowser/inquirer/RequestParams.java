@@ -138,7 +138,7 @@ public class RequestParams extends javax.swing.JPanel {
         }
 
 //<editor-fold defaultstate="collapsed" desc="Fill apps list">
-        lmApps = new DefaultListModel();
+        lmApps = new DefaultListModel<>();
         cblApps = new MyCheckBoxList(lmApps, jpApps);
 
         ArrayList<NameID> apps = qry.getApps();
@@ -432,7 +432,7 @@ public class RequestParams extends javax.swing.JPanel {
 //                }
                 int firstIdx = (l.isCheckBoxEnabled()) ? 1 : 0;
                 for (int i = firstIdx; i < lsm.getModel().getSize(); i++) {
-                    OptionNode node = (OptionNode) ((DynamicTreeNode<OptionNode>) lsm.getModel().getElementAt(i)).getData();
+                    OptionNode node = (OptionNode) ((DynamicTreeNode<OptionNode>) (lsm.getModel().getElementAt(i))).getData();
                     if (node.isChecked() != lsm.isSelectedIndex(i)) {     //value changed
                         node.setChecked(lsm.isSelectedIndex(i));
                         if (lChild != null) {
@@ -500,7 +500,7 @@ public class RequestParams extends javax.swing.JPanel {
                         for (int i = minIndex; i <= maxIndex; i++) {
                             if (lsm.isSelectedIndex(i)) {
 //                        inquirer.logger.debug("**current item " + i);
-                                DefaultListModel lm = (DefaultListModel) l.getModel();
+                                DefaultListModel<DynamicTreeNode<OptionNode>> lm = (DefaultListModel) l.getModel();
                                 int firstID = lm.get(i).equals(CheckBoxList.ALL_ENTRY) ? 1 : 0;
                                 if (lChild != null) {
 

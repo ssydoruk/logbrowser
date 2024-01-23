@@ -427,7 +427,7 @@ public class AggrORSDurationConfig extends javax.swing.JPanel {
 //                    }
 //                }
                 for (int i = 1; i < lsm.getModel().getSize(); i++) {
-                    OptionNode node = ((OptionNode) ((DynamicTreeNode<OptionNode>) lsm.getModel().getElementAt(i)).getData());
+                    OptionNode node = ((OptionNode) ((DynamicTreeNode<OptionNode>) (lsm.getModel().getElementAt(i))).getData());
                     if (node.isChecked() != lsm.isSelectedIndex(i)) {     //value changed
                         node.setChecked(lsm.isSelectedIndex(i));
                         if (lChild != null) {

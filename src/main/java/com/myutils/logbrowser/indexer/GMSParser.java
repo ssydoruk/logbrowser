@@ -588,7 +588,7 @@ public class GMSParser extends Parser {
             this.webReqID = webReqID;
             this.response = response;
             this.URL = URL;
-            allParams = Arrays.asList(new Pair[MAX_WEB_PARAMS]);
+            allParams = new ArrayList<>(MAX_WEB_PARAMS);
             int i = rest.indexOf('{');
             if (i >= 0) {
                 String r1 = rest.substring(i);

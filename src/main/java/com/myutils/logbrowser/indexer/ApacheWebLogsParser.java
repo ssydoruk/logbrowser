@@ -300,7 +300,7 @@ public class ApacheWebLogsParser extends WebParser {
         private void setExecutionTime(String group) {
             if (group != null) {
                 try {
-                    this.executionTime = new Integer(group);
+                    this.executionTime = Integer.parseInt(group);
                 } catch (NumberFormatException numberFormatException) {
                     Main.logger.error("Error parsing int [" + group + "]");
                 }

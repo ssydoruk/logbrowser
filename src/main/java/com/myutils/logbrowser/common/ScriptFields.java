@@ -16,7 +16,7 @@ public class ScriptFields<K, V> extends HashMap<K, V> {
             return put(key, value);
         } else {
             if (oldValue instanceof String && separator instanceof String && value instanceof String) {
-                return put(key, (V) StringUtils.joinWith((String) separator, oldValue, value));
+                return put(key, (V) StringUtils.joinWith((String) separator, (String) oldValue, (String) value));
             } else
                 return put(key, value);
         }

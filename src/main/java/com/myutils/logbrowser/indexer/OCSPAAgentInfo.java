@@ -24,7 +24,7 @@ public class OCSPAAgentInfo extends Message {
 
     private static final Pattern regRecHandle = Pattern.compile("RecHandle: (\\d+);");
 
-    public OCSPAAgentInfo(ArrayList messageLines, int fileID) {
+    public OCSPAAgentInfo(ArrayList<String> messageLines, int fileID) {
         super(TableType.OCSPAAgentInfo, messageLines, fileID);
     }
 

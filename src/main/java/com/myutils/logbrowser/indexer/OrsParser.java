@@ -107,7 +107,7 @@ public class OrsParser extends Parser {
     static String httpStart = "HTTP[";
     private final HashMap<Integer, OrsHTTP> partHTTP = new HashMap<>();
     private final HashMap<String, String> ThreadAlias = new HashMap<>();
-    HashMap<String, String> prevSeqno = new HashMap();
+    HashMap<String, String> prevSeqno = new HashMap<>();
     //    private final HashMap<String, ParserState> threadParserState = new HashMap<>();
     MsgType MessageType;
     ParserThreadsProcessor ptpsThreadProcessor;

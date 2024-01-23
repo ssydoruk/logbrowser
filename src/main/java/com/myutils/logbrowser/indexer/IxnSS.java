@@ -30,7 +30,7 @@ public class IxnSS extends Ixn {
     private final String messageName;
     private boolean customEvent = false;
 
-    public IxnSS(ArrayList messageLines, boolean customEvent, int fileID) {
+    public IxnSS(ArrayList<String> messageLines, boolean customEvent, int fileID) {
         super(TableType.IxnSS, messageLines, fileID);
         this.customEvent = customEvent;
         this.messageName = parseMessageName();

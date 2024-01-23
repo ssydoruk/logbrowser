@@ -414,7 +414,7 @@ public class SIPEPParser extends Parser {
         return null;
     }
 
-    protected void AddSipMessage(ArrayList contents, String header) throws Exception {
+    protected void AddSipMessage(ArrayList<String> contents, String header) throws Exception {
         Matcher m;
 
         // Populate our class representation of the message

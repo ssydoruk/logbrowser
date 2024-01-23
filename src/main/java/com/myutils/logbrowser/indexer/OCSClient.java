@@ -19,7 +19,7 @@ public class OCSClient extends Message {
 
     private static final Pattern regGetGroupID = Pattern.compile("^\\s*GSW_CM_AttrGroupID\\s*(\\d+)");
 
-    public OCSClient(ArrayList messageLines, int fileID) {
+    public OCSClient(ArrayList<String> messageLines, int fileID) {
         super(TableType.OCSClient, messageLines, fileID);
     }
 

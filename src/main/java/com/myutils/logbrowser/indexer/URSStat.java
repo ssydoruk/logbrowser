@@ -30,7 +30,7 @@ public class URSStat extends Message {
     private String EmailStat;
     private String StatServer;
 
-    public URSStat(ArrayList messageLines, int fileID) {
+    public URSStat(ArrayList<String> messageLines, int fileID) {
         super(TableType.URSSTAT, messageLines, fileID);
 
         Matcher m;

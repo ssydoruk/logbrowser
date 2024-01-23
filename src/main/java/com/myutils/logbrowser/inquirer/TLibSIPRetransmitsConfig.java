@@ -80,7 +80,7 @@ public class TLibSIPRetransmitsConfig extends javax.swing.JPanel {
         return root;
     }
 
-    private void FillElements(DefaultListModel lm, DynamicTreeNode<OptionNode> parent, boolean isChecked) {
+    private void FillElements(DefaultListModel<DynamicTreeNode<OptionNode>> lm, DynamicTreeNode<OptionNode> parent, boolean isChecked) {
         List<DynamicTreeNode<OptionNode>> l = parent.getChildren();
         for (DynamicTreeNode node : parent.getChildren()) {
 //            node.getData().setChecked(isChecked);
