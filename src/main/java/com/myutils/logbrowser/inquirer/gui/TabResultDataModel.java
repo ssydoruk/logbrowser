@@ -1107,6 +1107,10 @@ public class TabResultDataModel extends AbstractTableModel {
             return "TableRow{" + "fileID=" + fileID + ", rowData=" + rowData + ", rowType=" + rowType + ", columntIdx=" + maxColumn + ", FileName=" + FileName + ", fileBytes=" + fileBytes + ", line=" + line + ", offset=" + offset + ", cellColor=" + cellColor + '}';
         }
 
+        public HashMap<Integer, Object> getRowData() {
+            return rowData;
+        }
+
         public ILogRecord getRecord() {
             return record;
         }

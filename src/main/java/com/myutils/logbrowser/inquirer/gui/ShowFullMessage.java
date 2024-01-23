@@ -22,6 +22,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -48,8 +49,8 @@ public class ShowFullMessage extends javax.swing.JFrame {
     DefaultTableModel infoTableModel;
     private javax.swing.JTable jtAllFields;
     private JScrollPane jspAllFields;
-    private ILogRecord record;
     private final Utils.swing.TableColumnAdjuster tca;
+    private TabResultDataModel.TableRow row;
 
     /**
      * Creates new form ShowFullMessage
@@ -271,15 +272,15 @@ public class ShowFullMessage extends javax.swing.JFrame {
     private javax.swing.JSplitPane spSplitPane;
     // End of variables declaration//GEN-END:variables
 
-    void showMessage(String recordDisplayScript, ILogRecord record) {
-        this.record = record;
+    void showMessage(String recordDisplayScript, TabResultDataModel.TableRow row) {
+        this.row = row;
         showAllFields();
 
         detailedMessage.setText("");
         if (StringUtils.isEmpty(recordDisplayScript)) {
-            jtaMessageText.setText(record.getBytes());
+            jtaMessageText.setText(row.getRecord().getBytes());
         } else {
-            RecordPrintout recPrintout = JSRunner.evalFullRecordPrintout(recordDisplayScript, record);
+            RecordPrintout recPrintout = JSRunner.evalFullRecordPrintout(recordDisplayScript, row.getRecord());
             jtaMessageText.setText(recPrintout.fullMessage);
             if (StringUtils.isNotEmpty(recPrintout.detailsMessage)) {
                 detailedMessage.setText(recPrintout.detailsMessage);
@@ -291,9 +292,13 @@ public class ShowFullMessage extends javax.swing.JFrame {
 
     private void showAllFields() {
         if (jtAllFields.isVisible()) {
+            HashMap<Integer, Object> rowData = row.getRowData();
             ArrayList<String[]> kvps = new ArrayList<>();
-            for (Map.Entry<Object, Object> entry : record.m_fieldsAll.entrySet()) {
-                kvps.add(new String[]{entry.getKey().toString(), entry.getValue().toString()});
+            for (Map.Entry<Integer, Object> entry : rowData.entrySet()) {
+                kvps.add(new String[]{String.format("%03d", entry.getKey()), entry.getValue().toString()});
+            }
+            for (Map.Entry<Object, Object> entry : row.getRecord().m_fieldsAll.entrySet()) {
+                kvps.add(new String[]{entry.getKey().toString()+" (raw)", entry.getValue().toString()});
             }
 //        for (Map.Entry<String, ILogRecord.IValueAssessor> entry : record.getStdFields().entrySet()) {
 //            kvps.add(new String[]{entry.getKey().toString(), entry.getValue().toString()});

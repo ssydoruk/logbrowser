@@ -681,12 +681,12 @@ public class MyJTable extends JTableCommon {
                     TabResultDataModel.TableRow tableRow = ((TabResultDataModel) table.getModel()).getRow(table.convertRowIndexToModel(row));
                     MyJTable.this.repaint();
                     try {
-//                        if (fullMsg.isVisible()) {
+                        if (fullMsg.isVisible()) {
                             fullMsg.showMessage(
                                     inquirer.getInq().getRecordDisplayScript(tableRow.getRowType()),
-                                    tableRow.getRecord()
+                                    tableRow
                             );
-//                        }
+                        }
 
                         if (followLog) {
                             ExternalEditor.getEditor().jumpToFile(tableRow.getFileName(), tableRow.getLine(), false);

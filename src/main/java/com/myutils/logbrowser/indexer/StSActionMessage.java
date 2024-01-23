@@ -18,7 +18,7 @@ public class StSActionMessage extends Message {
     private String m_type = null;
     private String m_value = null;
 
-    public StSActionMessage(String header, ArrayList newMessageLines, int fileID) {
+    public StSActionMessage(String header, ArrayList<String> newMessageLines, int fileID) {
         super(TableType.StSAction, fileID);
 
         m_MessageLines = newMessageLines;
