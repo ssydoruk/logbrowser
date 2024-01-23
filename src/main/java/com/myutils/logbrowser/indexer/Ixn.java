@@ -31,58 +31,52 @@ public class Ixn extends Message {
     private static final Pattern regIxnSubmitted = Pattern.compile("^\\s+attr_itx_submitted_by .+ \"([^\"]+)\"$");
 
     private static final Regexs AgentIDs = new Regexs(new Pair[]{
-            new Pair("^\\s+attr_agent_id.+ \"([^\"]+)\"$", 1),
-            new Pair("^\\s+attr_actor_agent_id.+ \"([^\"]+)\"$", 1),
-            new Pair("^\\s+AttributeAgentID.+ \"([^\"]+)\"$", 1),
-            new Pair("^\\s+'Agent'.+ \"([^\"]+)\"$", 1)
+            new Pair<String, Integer>("^\\s+attr_agent_id.+ \"([^\"]+)\"$", 1),
+            new Pair<String, Integer>("^\\s+attr_actor_agent_id.+ \"([^\"]+)\"$", 1),
+            new Pair<String, Integer>("^\\s+AttributeAgentID.+ \"([^\"]+)\"$", 1),
+            new Pair<String, Integer>("^\\s+'Agent'.+ \"([^\"]+)\"$", 1)
     });
 
     private final static Message.Regexs IxnIDs = new Regexs(new Pair[]{
-            new Pair("^\\s+attr_itx_id .+ \"([^\"]+)\"$", 1),
-            new Pair("^\\s+'InteractionId'.+= \"([^\"]+)\"$", 1),
-            new Pair("^\\s+'Id' .+\"([^\"]+)\"$", 1),
-            new Pair("^\\s*'ORSI:.+:([\\w~]+)' \\[list\\]", 1)
+            new Pair<>("^\\s+attr_itx_id .+ \"([^\"]+)\"$", 1),
+            new Pair<>("^\\s+'InteractionId'.+= \"([^\"]+)\"$", 1),
+            new Pair<>("^\\s+'Id' .+\"([^\"]+)\"$", 1),
+            new Pair<>("^\\s*'ORSI:.+:([\\w~]+)' \\[list\\]", 1)
     });
 
     private final static Message.Regexs parentIxnID = new Regexs(new Pair[]{
-            new Pair("^\\s+attr_prnt_itx_id.+ \"([^\"]+)\"$", 1),
-            new Pair("^\\s+'attr_itx_prnt_itx_id'.+= \"([^\"]+)\"$", 1),
-            new Pair("^\\s+'Parent' .+\"([^\"]+)\"$", 1)
+            new Pair<>("^\\s+attr_prnt_itx_id.+ \"([^\"]+)\"$", 1),
+            new Pair<>("^\\s+'attr_itx_prnt_itx_id'.+= \"([^\"]+)\"$", 1),
+            new Pair<>("^\\s+'Parent' .+\"([^\"]+)\"$", 1)
     });
 
     private static final Regexs PlaceIDs = new Regexs(new Pair[]{
-            new Pair("^\\s+attr_place_id.+ \"([^\"]+)\"$", 1),
-            new Pair("^\\s+attr_actor_place_id.+ \"([^\"]+)\"$", 1),
-            new Pair("^\\s+AttributePlace.+ \"([^\"]+)\"$", 1)
+            new Pair<>("^\\s+attr_place_id.+ \"([^\"]+)\"$", 1),
+            new Pair<>("^\\s+attr_actor_place_id.+ \"([^\"]+)\"$", 1),
+            new Pair<>("^\\s+AttributePlace.+ \"([^\"]+)\"$", 1)
     });
 
     private static final Regexs refIDs = new Regexs(new Pair[]{
-            new Pair("^\\s+attr_ref_id.+ = (\\d+)", 1),
-            new Pair("^\\s+attr_esp_server_refid.+ = (\\d+)", 1),
-            new Pair("^\\s+AttributeReferenceID.+ = (\\d+)", 1),
-            new Pair("^\\s+AttributeConnID .+ (\\w+)$", 1)
+            new Pair<>("^\\s+attr_ref_id.+ = (\\d+)", 1),
+            new Pair<>("^\\s+attr_esp_server_refid.+ = (\\d+)", 1),
+            new Pair<>("^\\s+AttributeReferenceID.+ = (\\d+)", 1),
+            new Pair<>("^\\s+AttributeConnID .+ (\\w+)$", 1)
     });
 
-    //    private static final Regexs reChainIDs = new Regexs(new Pair[]{
-//        new Pair("^\\s+\'GSW_CHAIN_ID\'.+= (\\d+)", 1),
-//        new Pair("^\\s+\'chain_id\'.+= (\\d+)", 1),});
     private static final Regexs reQueue = new Regexs(new Pair[]{
-            new Pair("^\\s+(?:attr_queue|attr_itx_queue) .+ \"([^\"]+)\"$", 1),
-            new Pair("^\\s+AttributeThisDN .+ (\\w+)$", 1),});
+            new Pair<>("^\\s+(?:attr_queue|attr_itx_queue) .+ \"([^\"]+)\"$", 1),
+            new Pair<>("^\\s+AttributeThisDN .+ (\\w+)$", 1),});
 
     private static final Regexs reMediaType = new Regexs(new Pair[]{
-            new Pair("^\\s+(?:attr_media_type|attr_itx_media_type|attr_media_type_name) .+ \"([^\"]+)\"$", 1)}
+            new Pair<>("^\\s+(?:attr_media_type|attr_itx_media_type|attr_media_type_name) .+ \"([^\"]+)\"$", 1)}
     );
 
     private static final Regexs reConnID = new Regexs(new Pair[]{
-            new Pair("^\\s+AttributeConnID .+ (\\w+)$", 1)}
+            new Pair<>("^\\s+AttributeConnID .+ (\\w+)$", 1)}
     );
     private static final Pattern regService = Pattern.compile("^\\s+'Service'.+= \"([^\"]+)\"$");
     private static final Pattern regMethod = Pattern.compile("^\\s+'Method'.+= \"([^\"]+)\"$");
     private static final Pattern regRouteType = Pattern.compile("^\\s+AttributeRouteType.+ = (\\d+)");
-    //    private static final Regexs reContact = new Regexs(new Pair[]{
-//        new Pair("^\\s+\'GSW_PHONE\'.+= \"([^\"]+)\"", 1),
-//        new Pair("^\\s+\'contact_info\'.+= \"([^\"]+)\"", 1),});
     private final RegExAttribute reIxnID = new RegExAttribute(IxnIDs);
     private final RegExAttribute reAgentID = new RegExAttribute(AgentIDs);
     private final RegExAttribute placeID = new RegExAttribute(PlaceIDs);
@@ -124,7 +118,7 @@ public class Ixn extends Message {
     private String clientName = null;
     private String messageName = null;
 
-    public Ixn(TableType t, ArrayList messageLines, int fileID) {
+    public Ixn(TableType t, ArrayList<String> messageLines, int fileID) {
         super(t, messageLines, fileID);
         attrs.add(reIxnID);
         attrs.add(reAgentID);
@@ -138,7 +132,7 @@ public class Ixn extends Message {
         attrs.parseAttributes();
     }
 
-    public Ixn(ArrayList messageLines, int fileID) {
+    public Ixn(ArrayList<String> messageLines, int fileID) {
         this(TableType.Ixn, messageLines, fileID);
         this.messageName = parseMessageName();
     }
@@ -171,11 +165,7 @@ public class Ixn extends Message {
                 return m.group(2);
             }
 
-//            ret = FindByRx(regMsgNameSendingTo, m_MessageLines.get(0), 1, "");
-//            if (ret != null && !ret.isEmpty()) {
-//                SetInbound(false);
-//                return ret;
-//            }
+
             if ((m = regMsgAndClient.matcher(m_MessageLines.get(0))).find()) {
                 clientName = m.group(3);
                 String msg = m.group(1);
@@ -189,7 +179,6 @@ public class Ixn extends Message {
 
                     SetInbound(false);
                 }
-                Matcher m1;
                 if ((m = regMsgAndClientProxy.matcher(m_MessageLines.get(0).substring(m.end()))).find()) {
                     clientName = m.group(1);
                 }

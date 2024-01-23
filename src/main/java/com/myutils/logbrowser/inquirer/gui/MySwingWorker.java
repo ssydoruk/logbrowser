@@ -70,7 +70,7 @@ public abstract class MySwingWorker<T, V> extends SwingWorker<T, V> {
              */
             if (!isDone()) {
                 inquirer.logger.info("Thread not done; killing");
-                threadID.stop();
+                threadID.interrupt();
             }
 
         } catch (InterruptedException ex) {

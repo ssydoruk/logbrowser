@@ -16,7 +16,7 @@ public class AllSelection extends javax.swing.JPanel {
     /**
      * Creates new form AllSelection
      */
-    public AllSelection(ComboBoxModel sortFieldsModel) {
+    public AllSelection(ComboBoxModel<String> sortFieldsModel) {
         initComponents();
         cbField.setModel(sortFieldsModel);
         spRecords.setValue(10);

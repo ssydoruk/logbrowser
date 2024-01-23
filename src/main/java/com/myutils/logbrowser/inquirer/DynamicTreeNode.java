@@ -486,7 +486,7 @@ public class DynamicTreeNode<T> extends GenericTreeNode implements Serializable 
         } catch (Exception ex) {
             inquirer.ExceptionHandler.handleException(this.getClass().toString(), ex);
         }
-        return (List<DynamicTreeNode<T>>) super.getChildren(); //To change body of generated methods, choose Tools | Templates.
+        return super.getChildren(); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override

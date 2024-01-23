@@ -47,7 +47,7 @@ public final class QuerySetting extends javax.swing.JDialog {
     private HashMap<ReferenceType, ArrayList<OptionNode>> savedRefs;
     private ReferenceType lastRefType;
     private HashMap<TableType, ArrayList<OptionNode>> savedLogMessages;
-    private JList<String> lAppType;
+    private JList<TableType> lAppType;
     // Variables declaration - do not modify                     
     private javax.swing.JButton btCancel;
     private javax.swing.JButton btOK;
@@ -118,7 +118,7 @@ public final class QuerySetting extends javax.swing.JDialog {
     private javax.swing.JCheckBox jcbShowFullDate;
     private javax.swing.JCheckBox jcbSort;
     private javax.swing.JCheckBox jcbignoreFormatting;
-    private javax.swing.JList<String> jlConstants;
+    private javax.swing.JList<InquirerCfg.GenesysConstant> jlConstants;
     private javax.swing.JPanel jpAllRefs;
     private javax.swing.JPanel jpConstants;
     private javax.swing.JPanel jpFileTypes;
@@ -157,7 +157,7 @@ public final class QuerySetting extends javax.swing.JDialog {
         /**
          * ********************************************
          */
-        DefaultListModel lmFilters = new DefaultListModel();
+        DefaultListModel<String> lmFilters = new DefaultListModel();
         lPrintFilters = new JList<String>(lmFilters);
         lPrintFilters.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
         lPrintFilters.setLayoutOrientation(JList.VERTICAL);
@@ -212,7 +212,7 @@ public final class QuerySetting extends javax.swing.JDialog {
 
         jcbShowFullDate.setSelected(cr.isFullTimeStamp());
 
-        DefaultListModel model = new DefaultListModel<InquirerCfg.GenesysConstant>();
+        DefaultListModel<InquirerCfg.GenesysConstant> model = new DefaultListModel<InquirerCfg.GenesysConstant>();
         InquirerCfg.GenesysConstants constants = cr.getConstants();
         if (constants != null) {
             for (InquirerCfg.GenesysConstant c : constants.getConstants()) {
@@ -261,7 +261,7 @@ public final class QuerySetting extends javax.swing.JDialog {
             }
         });
 
-        DefaultListModel lm = new DefaultListModel<>();
+        DefaultListModel<ReferenceType> lm = new DefaultListModel<>();
         pRefTypes.setLayout(new BorderLayout());
         lReferenceType = new JList<>(lm);
 //        lReferenceType.setVisibleRowCount(1000);
@@ -340,7 +340,7 @@ public final class QuerySetting extends javax.swing.JDialog {
             }
         });
 
-        DefaultListModel lm = new DefaultListModel<>();
+        DefaultListModel<TableType> lm = new DefaultListModel<>();
         pAppType.setLayout(new BorderLayout());
         lAppType = new JList<>(lm);
 //        lAppType.setVisibleRowCount(1000);

@@ -25,7 +25,7 @@ public class WSStat extends Message {
     private final String fileHandle;
     private final String refID;
 
-    public WSStat(String event, String server, String fileHandle, String _refID, ArrayList newMessageLines, int fileID) {
+    public WSStat(String event, String server, String fileHandle, String _refID, ArrayList<String> newMessageLines, int fileID) {
         super(TableType.WSStat, fileID);
         Main.logger.trace("event=[" + event + "] " + "server=[" + server + "] " + "fileHandle=[" + fileHandle + "] " + "newMessageLines=[" + newMessageLines + "] ");
         m_MessageLines = newMessageLines;

@@ -19,7 +19,7 @@ public class ParserThreadsProcessor {
     private boolean threadWaitsForNonthreadMessage = false;
 
     public ParserThreadsProcessor() {
-        stateTransitions = new ArrayList();
+        stateTransitions = new ArrayList<>();
         threadStates = new HashMap<>();
     }
 

@@ -109,7 +109,7 @@ public class TabResultDataModel extends AbstractTableModel {
     public static Pair<Color, Color> getColorIdx(int idx) {
         Pair<Color, Color> ret = null;
         if (idx < msgRowColors.size()) {
-            ret = (Pair<Color, Color>) msgRowColors.values().toArray()[idx];
+            ret = (Pair<Color, Color>) (Pair<Color, Color>) msgRowColors.values().toArray()[idx];
         } else {
             idx -= msgRowColors.size();
             if (idx < stdColors.size()) {
@@ -1178,7 +1178,7 @@ public class TabResultDataModel extends AbstractTableModel {
                         putRowData(columnIdx, t, StringUtils.join(new String[]{curData, data}, " | "));
                     }
 
-                    HashSet<Integer> hm = columnsWithDataType.get(getRowType());
+                    HashSet hm = columnsWithDataType.get(getRowType());
                     if (hm == null) {
                         hm = new HashSet();
                         columnsWithDataType.put(getRowType(), hm);

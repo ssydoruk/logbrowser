@@ -211,7 +211,7 @@ public class EditRegexFields extends javax.swing.JDialog {
         msgType = row.getRowType();
         if (lSavedList == null) {
             // JPanel pRefTypes = new JPanel(new BorderLayout());
-            lmSavedList = new DefaultListModel();
+            lmSavedList = new DefaultListModel<>();
             jlSearches.setModel(lmSavedList);
         }
         lmSavedList.clear();

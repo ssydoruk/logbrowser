@@ -53,7 +53,7 @@ public class VOIPEPParser extends Parser {
     final int MSG_STRING_LIMIT = 200;
     private final ArrayList<String> extraBuff;
     // parse state contants
-    HashMap m_BlockNamesToIgnoreHash;
+    HashMap<String, Integer> m_BlockNamesToIgnoreHash;
     StringBuilder sipBuf = new StringBuilder();
     Pattern m_CustomRegexp;
     long m_CurrentFilePos;
@@ -81,7 +81,7 @@ public class VOIPEPParser extends Parser {
         super(FileInfoType.type_VOIPEP, m_tables);
         this.extraBuff = new ArrayList<>();
         //m_accessor = accessor;
-        m_BlockNamesToIgnoreHash = new HashMap();
+        m_BlockNamesToIgnoreHash = new HashMap<>();
         for (String BlockNamesToIgnoreArray1 : BlockNamesToIgnoreArray) {
             m_BlockNamesToIgnoreHash.put(BlockNamesToIgnoreArray1, 0);
         }
@@ -415,7 +415,7 @@ public class VOIPEPParser extends Parser {
         return null;
     }
 
-    protected void AddSipMessage(ArrayList contents, String header) throws Exception {
+    protected void AddSipMessage(ArrayList<String> contents, String header) throws Exception {
         Matcher m;
 
         // Populate our class representation of the message

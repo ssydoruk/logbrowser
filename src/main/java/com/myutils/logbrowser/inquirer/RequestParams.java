@@ -56,7 +56,7 @@ public class RequestParams extends javax.swing.JPanel {
     private final int rptSelected = -1;
     private final HashMap<CheckBoxList, ChangeListItem> changeList = new HashMap<>();
     // Variables declaration - do not modify                     
-    private javax.swing.JComboBox<String> cbSearchLevel;
+    private javax.swing.JComboBox<InquirerCfg.GenesysConstant> cbSearchLevel;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel10;
     private javax.swing.JPanel jPanel2;

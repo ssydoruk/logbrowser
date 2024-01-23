@@ -212,13 +212,13 @@ public abstract class URSRIBase extends Message {
 
     ArrayList<Pair<String, String>> getAttrs() {
         try {
-            ArrayList<Pair<String, String>> ret = new ArrayList();
+            ArrayList<Pair<String, String>> ret = new ArrayList<>();
             Map<String, List<String>> a = splitQuery(this.uriParams);
             if (a != null) {
                 for (Map.Entry<String, List<String>> entry : a.entrySet()) {
                     String key = entry.getKey();
                     List<String> value = entry.getValue();
-                    ret.add(new Pair(key, StringUtils.join(value, ",")));
+                    ret.add(new Pair<>(key, StringUtils.join(value, ",")));
                 }
             }
             return ret;

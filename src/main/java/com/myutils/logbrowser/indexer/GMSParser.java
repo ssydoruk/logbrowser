@@ -67,7 +67,7 @@ public class GMSParser extends Parser {
 
     GMSParser(DBTables m_tables) {
         super(FileInfoType.type_GMS, m_tables);
-        m_MessageContents = new ArrayList();
+        m_MessageContents = new ArrayList<>();
         ThreadAlias.put("ORSInternal", "FMWeb");
 
         ptpsThreadProcessor = new ParserThreadsProcessor();

@@ -602,11 +602,6 @@ public class inquirer {
         return null;
     }
 
-    @Override
-    protected void finalize() throws Throwable {
-        lfm.clear();
-    }
-
     public List<ILogRecordFormatter> getFormatters() throws Exception {
         for (ILogRecordFormatter formatter : formatters) {
             formatter.refreshFormatter();

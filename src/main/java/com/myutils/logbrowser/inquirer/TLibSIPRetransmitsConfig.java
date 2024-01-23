@@ -357,10 +357,10 @@ public class TLibSIPRetransmitsConfig extends javax.swing.JPanel {
                 for (int i = minIndex; i <= maxIndex; i++) {
                     if (lsm.isSelectedIndex(i)) {
                         inquirer.logger.debug("**current item " + i);
-                        DefaultListModel lm = (DefaultListModel) l.getModel();
+                        DefaultListModel<DynamicTreeNode<OptionNode>> lm = (DefaultListModel) l.getModel();
                         if (lChild != null) {
                             if (i > 0) {
-                                changeReportItem(i, (DynamicTreeNode<OptionNode>) lm.get(i), lChild);
+                                changeReportItem(i,  lm.get(i), lChild);
                             }
                         }
                     }
