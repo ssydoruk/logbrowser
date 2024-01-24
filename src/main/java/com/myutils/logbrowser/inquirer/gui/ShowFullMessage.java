@@ -13,6 +13,8 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+
+import com.myutils.logbrowser.inquirer.inquirer;
 import org.apache.commons.lang3.StringUtils;
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
@@ -56,7 +58,7 @@ public class ShowFullMessage extends javax.swing.JFrame {
     /**
      * Creates new form ShowFullMessage
      */
-    public ShowFullMessage() {
+    private ShowFullMessage() {
         initComponents();
 
         jtAllFields = new javax.swing.JTable();
@@ -158,6 +160,42 @@ public class ShowFullMessage extends javax.swing.JFrame {
         });
         toolbar.addButton(bt);
 
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowStateChanged(WindowEvent e) {
+                inquirer.logger.debug("windowStateChanged");
+                super.windowStateChanged(e);
+            }
+
+            @Override
+            public void windowActivated(WindowEvent e) {
+                inquirer.logger.debug("windowActivated old: "+e.getOldState()+" new:"+e.getNewState());
+                doShowMessage();
+                super.windowActivated(e);
+            }
+
+            @Override
+            public void windowClosing(WindowEvent e) {
+                inquirer.logger.debug("windowClosing");
+//                if (fullMsg != null) {
+//                    fullMsg.dispose();
+//                    fullMsg = null;
+//                }
+                parentForm.fullMsgClosed();
+                super.windowClosing(e); //To change body of generated methods, choose Tools | Templates.
+            }
+
+            @Override
+            public void windowGainedFocus(WindowEvent e) {
+                inquirer.logger.debug("windowGainedFocus");
+//                if (fullMsg != null) {
+//                    fullMsg.setVisible(true);
+//                }
+                super.windowGainedFocus(e); //To change body of generated methods, choose Tools | Templates.
+            }
+
+        });
+
         pack();
 
     }
@@ -171,26 +209,7 @@ public class ShowFullMessage extends javax.swing.JFrame {
         this();
         parentForm = aThis;
         ScreenInfo.CenterWindowTopMaxWidth(this);
-        addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosing(WindowEvent e) {
-//                if (fullMsg != null) {
-//                    fullMsg.dispose();
-//                    fullMsg = null;
-//                }
-                parentForm.fullMsgClosed();
-                super.windowClosing(e); //To change body of generated methods, choose Tools | Templates.
-            }
 
-            @Override
-            public void windowGainedFocus(WindowEvent e) {
-//                if (fullMsg != null) {
-//                    fullMsg.setVisible(true);
-//                }
-                super.windowGainedFocus(e); //To change body of generated methods, choose Tools | Templates.
-            }
-
-        });
 
     }
 
@@ -279,19 +298,21 @@ public class ShowFullMessage extends javax.swing.JFrame {
         doShowMessage();
     }
 
-    private void doShowMessage() {
-        showAllFields();
+    public void doShowMessage() {
+        if(row!= null) {
+            showAllFields();
 
-        detailedMessage.setText("");
-        if (StringUtils.isEmpty(recordDisplayScript)) {
-            jtaMessageText.setText(row.getRecord().getBytes());
-        } else {
-            RecordPrintout recPrintout = JSRunner.evalFullRecordPrintout(recordDisplayScript, row.getRecord());
-            jtaMessageText.setText(recPrintout.fullMessage);
-            if (StringUtils.isNotEmpty(recPrintout.detailsMessage)) {
-                detailedMessage.setText(recPrintout.detailsMessage);
-                detailedMessage.setSyntaxEditingStyle(SyntaxConstants.SYNTAX_STYLE_JSON);
+            detailedMessage.setText("");
+            if (StringUtils.isEmpty(recordDisplayScript)) {
+                jtaMessageText.setText(row.getRecord().getBytes());
+            } else {
+                RecordPrintout recPrintout = JSRunner.evalFullRecordPrintout(recordDisplayScript, row.getRecord());
+                jtaMessageText.setText(recPrintout.fullMessage);
+                if (StringUtils.isNotEmpty(recPrintout.detailsMessage)) {
+                    detailedMessage.setText(recPrintout.detailsMessage);
+                    detailedMessage.setSyntaxEditingStyle(SyntaxConstants.SYNTAX_STYLE_JSON);
 
+                }
             }
         }
     }

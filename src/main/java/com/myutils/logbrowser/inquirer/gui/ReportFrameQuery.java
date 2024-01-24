@@ -68,7 +68,6 @@ public class ReportFrameQuery extends ReportFrame {
             @Override
             public void windowActivated(WindowEvent e) {
                 showFullMsg(true);
-                inquirer.logger.debug("windowActivated");
 
                 super.windowActivated(e); //To change body of generated methods, choose Tools | Templates.
             }
@@ -324,6 +323,7 @@ public class ReportFrameQuery extends ReportFrame {
 
     void showFull() {
         ScreenInfo.refitMainToMsg(theForm, fullMsg, fullPlacement);
+        fullMsg.doShowMessage();
         fullMsg.setVisible(true);
         fullMsg.toFront();
         java.awt.EventQueue.invokeLater(new Runnable() {
