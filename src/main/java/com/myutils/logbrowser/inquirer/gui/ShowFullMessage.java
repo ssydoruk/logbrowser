@@ -51,6 +51,7 @@ public class ShowFullMessage extends javax.swing.JFrame {
     private JScrollPane jspAllFields;
     private final Utils.swing.TableColumnAdjuster tca;
     private TabResultDataModel.TableRow row;
+    private String recordDisplayScript;
 
     /**
      * Creates new form ShowFullMessage
@@ -274,6 +275,11 @@ public class ShowFullMessage extends javax.swing.JFrame {
 
     void showMessage(String recordDisplayScript, TabResultDataModel.TableRow row) {
         this.row = row;
+        this.recordDisplayScript = recordDisplayScript;
+        doShowMessage();
+    }
+
+    private void doShowMessage() {
         showAllFields();
 
         detailedMessage.setText("");
