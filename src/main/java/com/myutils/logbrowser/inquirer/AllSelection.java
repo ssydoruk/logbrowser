@@ -16,7 +16,7 @@ public class AllSelection extends javax.swing.JPanel {
     /**
      * Creates new form AllSelection
      */
-    public AllSelection(ComboBoxModel<String> sortFieldsModel) {
+    public AllSelection(ComboBoxModel<FilterField> sortFieldsModel) {
         initComponents();
         cbField.setModel(sortFieldsModel);
         spRecords.setValue(10);
@@ -192,7 +192,7 @@ public class AllSelection extends javax.swing.JPanel {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup bgMessagesNumber;
     private javax.swing.ButtonGroup bgSortOrder;
-    private javax.swing.JComboBox<String> cbField;
+    private javax.swing.JComboBox cbField;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;

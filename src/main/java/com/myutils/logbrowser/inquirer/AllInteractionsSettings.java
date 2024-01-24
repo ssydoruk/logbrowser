@@ -7,10 +7,7 @@ package com.myutils.logbrowser.inquirer;
 import Utils.Pair;
 import java.awt.Window;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 import javax.swing.BoxLayout;
-import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JPanel;
 
@@ -41,11 +38,11 @@ abstract class AllInteractionsSettings extends RequestDialog {
             pan.add(filterPanel);
         }
 
-        ArrayList<filterField> items = new ArrayList<>();
+        DefaultComboBoxModel<FilterField> model = new DefaultComboBoxModel<>();
         for (Pair<String, String> f : sortFieldsModel()) {
-            items.add(new filterField(f.getKey(), f.getValue()));
+            model.addElement(new FilterField(f.getKey(), f.getValue()));
         }
-        stdOptions = new AllSelection(new DefaultComboBoxModel<>((String[]) items.toArray()));
+        stdOptions = new AllSelection(model);
         pan.add(stdOptions);
         setContentPanel(pan);
     }
@@ -58,17 +55,4 @@ abstract class AllInteractionsSettings extends RequestDialog {
         return stdOptions.getSortField();
     }
 
-    @SuppressWarnings("serial")
-    class filterField extends Pair<String, String> {
-
-        public filterField(String key, String value) {
-            super(key, value);
-        }
-
-        @Override
-        public String toString() {
-            return getKey();
-        }
-
-    }
 }
