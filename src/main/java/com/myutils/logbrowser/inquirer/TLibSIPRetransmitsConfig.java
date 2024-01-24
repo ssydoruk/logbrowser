@@ -53,7 +53,7 @@ public class TLibSIPRetransmitsConfig extends javax.swing.JPanel {
         jpComponents.setLayout(new BorderLayout());
         jpAttrValues.setLayout(new BorderLayout());
 
-        lmAttr = new DefaultListModel();
+        lmAttr = new DefaultListModel<>();
         cblAttr = new MyCheckBoxList(lmAttr, jpComponents);
 
         lmAttrValues = new DefaultListModel();
@@ -412,7 +412,7 @@ public class TLibSIPRetransmitsConfig extends javax.swing.JPanel {
         inquirer.logger.debug("in setChildChecked " + boxEnabled);
         boolean checkedItem = false;
         lChild.setEnabled(boxEnabled);
-        DefaultListModel lm = (DefaultListModel) lChild.getModel();
+        DefaultListModel<DynamicTreeNode<OptionNode>> lm = (DefaultListModel) lChild.getModel();
         ArrayList<Integer> idx = new ArrayList<>();
         for (int i = 1; i < lm.size(); i++) {
             DynamicTreeNode<OptionNode> ch = (DynamicTreeNode<OptionNode>) lm.getElementAt(i);

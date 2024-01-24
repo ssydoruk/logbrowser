@@ -6,6 +6,7 @@
 package com.myutils.logbrowser.indexer;
 
 import Utils.Pair;
+import Utils.Util;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -50,7 +51,7 @@ public class Ixn extends Message {
             new Pair<>("^\\s+'Parent' .+\"([^\"]+)\"$", 1)
     });
 
-    private static final Regexs PlaceIDs = new Regexs(new Pair[]{
+    private static final Regexs PlaceIDs = new Regexs(new Utils.Pair[]{
             new Pair<>("^\\s+attr_place_id.+ \"([^\"]+)\"$", 1),
             new Pair<>("^\\s+attr_actor_place_id.+ \"([^\"]+)\"$", 1),
             new Pair<>("^\\s+AttributePlace.+ \"([^\"]+)\"$", 1)
@@ -64,8 +65,8 @@ public class Ixn extends Message {
     });
 
     private static final Regexs reQueue = new Regexs(new Pair[]{
-            new Pair<>("^\\s+(?:attr_queue|attr_itx_queue) .+ \"([^\"]+)\"$", 1),
-            new Pair<>("^\\s+AttributeThisDN .+ (\\w+)$", 1),});
+            new Pair<String, Integer>("^\\s+(?:attr_queue|attr_itx_queue) .+ \"([^\"]+)\"$", 1),
+            new Pair<String, Integer>("^\\s+AttributeThisDN .+ (\\w+)$", 1),});
 
     private static final Regexs reMediaType = new Regexs(new Pair[]{
             new Pair<>("^\\s+(?:attr_media_type|attr_itx_media_type|attr_media_type_name) .+ \"([^\"]+)\"$", 1)}

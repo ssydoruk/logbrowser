@@ -54,7 +54,7 @@ public class SIPEPParser extends Parser {
     final int MSG_STRING_LIMIT = 200;
     private final ArrayList<String> extraBuff;
     // parse state contants
-    HashMap m_BlockNamesToIgnoreHash;
+    HashMap<String, Integer> m_BlockNamesToIgnoreHash;
     StringBuilder sipBuf = new StringBuilder();
     Pattern m_CustomRegexp;
     long m_CurrentFilePos;
@@ -82,7 +82,7 @@ public class SIPEPParser extends Parser {
         super(FileInfoType.type_SIPEP, m_tables);
         this.extraBuff = new ArrayList<>();
         //m_accessor = accessor;
-        m_BlockNamesToIgnoreHash = new HashMap();
+        m_BlockNamesToIgnoreHash = new HashMap<>();
         for (String BlockNamesToIgnoreArray1 : BlockNamesToIgnoreArray) {
             m_BlockNamesToIgnoreHash.put(BlockNamesToIgnoreArray1, 0);
         }

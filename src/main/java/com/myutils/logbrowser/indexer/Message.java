@@ -1065,7 +1065,7 @@ public abstract class Message extends Record {
 
         private final ArrayList<Pair<Pattern, Integer>> regs;
 
-        public Regexs(Pair[] string) {
+        public Regexs(Pair<String, Integer>[] string) {
             regs = new ArrayList<>(string.length);
             for (Pair<String, Integer> string1 : string) {
                 regs.add(new Pair<>(Pattern.compile(string1.getKey()), string1.getValue()));
