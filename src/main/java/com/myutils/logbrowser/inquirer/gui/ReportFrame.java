@@ -30,6 +30,11 @@ public class ReportFrame extends javax.swing.JFrame implements Cloneable {
      */
     protected PrintStreams ps = null;
     JPanel reportArea;
+
+    public MyJTable getTableView() {
+        return tableView;
+    }
+
     JScrollPane pane;
     JPanel toolbarPanel;
     TableSorter sorter;

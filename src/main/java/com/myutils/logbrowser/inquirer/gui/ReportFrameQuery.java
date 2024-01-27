@@ -257,7 +257,7 @@ public class ReportFrameQuery extends ReportFrame {
     }
 
     private void showFullMsg(boolean b) {
-        if (fullMsg != null ) {
+        if (fullMsg != null) {
             fullMsg.setVisible(!miFullOff.isSelected());
         }
     }
@@ -270,8 +270,14 @@ public class ReportFrameQuery extends ReportFrame {
 
     public void doShow(boolean shouldFocus) {
         setAutoRequestFocus(shouldFocus);
-        toFront();
         setVisible(true);
+        toFront();
+        if (fullMsg != null && fullMsg.isVisible()) {
+            if (getTableView().getSelectedRow() < 0)
+                fullMsg.showMessage(null, null);
+            else
+                fullMsg.doShowMessage();
+        }
     }
 
     public void showReport(IQueryResults qry, QueryDialog qd, SelectionType selType, String searchID) throws Exception {

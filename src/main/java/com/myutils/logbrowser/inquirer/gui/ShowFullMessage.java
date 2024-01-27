@@ -9,6 +9,7 @@ import Utils.ScreenInfo;
 import com.myutils.logbrowser.common.JSRunner;
 import com.myutils.logbrowser.common.RecordPrintout;
 import com.myutils.logbrowser.inquirer.ILogRecord;
+
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
@@ -76,14 +77,14 @@ public class ShowFullMessage extends javax.swing.JFrame {
         }
         jtAllFields.setModel(infoTableModel);
         jtAllFields.getColumnModel().getColumn(0).setPreferredWidth(10);
-        
+
         tca = new Utils.swing.TableColumnAdjuster(jtAllFields);
         tca.setColumnDataIncluded(true);
         tca.setColumnHeaderIncluded(false);
         tca.setDynamicAdjustment(true);
 
 //        tca.setMaxColumnWidth(getFontMetrics(getFont()).stringWidth(getSampleString(MAX_CHARS_IN_TABLE)));
-        
+
         jtaMessageText = new RSyntaxTextArea();
         jtaMessageText.setCodeFoldingEnabled(false);
         jtaMessageText.setSyntaxEditingStyle(SyntaxConstants.SYNTAX_STYLE_RUBY);
@@ -169,7 +170,7 @@ public class ShowFullMessage extends javax.swing.JFrame {
 
             @Override
             public void windowActivated(WindowEvent e) {
-                inquirer.logger.debug("windowActivated old: "+e.getOldState()+" new:"+e.getNewState());
+                inquirer.logger.debug("windowActivated old: " + e.getOldState() + " new:" + e.getNewState());
                 doShowMessage();
                 super.windowActivated(e);
             }
@@ -239,6 +240,7 @@ public class ShowFullMessage extends javax.swing.JFrame {
             public void windowClosing(java.awt.event.WindowEvent evt) {
                 formWindowClosing(evt);
             }
+
             public void windowDeactivated(java.awt.event.WindowEvent evt) {
                 formWindowDeactivated(evt);
             }
@@ -299,7 +301,7 @@ public class ShowFullMessage extends javax.swing.JFrame {
     }
 
     public void doShowMessage() {
-        if(row!= null) {
+        if (row != null) {
             showAllFields();
 
             detailedMessage.setText("");
@@ -314,37 +316,30 @@ public class ShowFullMessage extends javax.swing.JFrame {
 
                 }
             }
+        } else {
+            jtaMessageText.setText("");
+            showAllFields();
         }
     }
 
     private void showAllFields() {
-        if (jtAllFields.isVisible()) {
+        infoTableModel.setRowCount(0);
+        if (row != null && jtAllFields.isVisible()) {
             HashMap<Integer, Object> rowData = row.getRowData();
             ArrayList<String[]> kvps = new ArrayList<>();
             for (Map.Entry<Integer, Object> entry : rowData.entrySet()) {
                 kvps.add(new String[]{String.format("%03d", entry.getKey()), entry.getValue().toString()});
             }
             for (Map.Entry<Object, Object> entry : row.getRecord().m_fieldsAll.entrySet()) {
-                kvps.add(new String[]{entry.getKey().toString()+" (raw)", entry.getValue().toString()});
+                kvps.add(new String[]{entry.getKey().toString() + " (raw)", entry.getValue().toString()});
             }
-//        for (Map.Entry<String, ILogRecord.IValueAssessor> entry : record.getStdFields().entrySet()) {
-//            kvps.add(new String[]{entry.getKey().toString(), entry.getValue().toString()});
-//        }
-
-//        for (Map.Entry<Object, Object> entry : curRow.getRecord().m_fields.entrySet()) {
-//            kvps.add(new String[]{entry.getKey().toString(), entry.getValue().toString()});
-//        }
             Collections.sort(kvps, (o1, o2) -> {
                 return ((String[]) o1)[0].compareToIgnoreCase(((String[]) o2)[0]); //To change body of generated lambdas, choose Tools | Templates.
             });
 
-            infoTableModel.setRowCount(0);
-
             for (String[] entry : kvps) {
                 infoTableModel.addRow(entry);
             }
-//        tab.setModel(infoTableModel);
-//        tca.adjustColumns();
         }
     }
 }

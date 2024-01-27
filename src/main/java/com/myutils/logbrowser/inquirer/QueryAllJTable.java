@@ -31,6 +31,7 @@ public final class QueryAllJTable extends QueryJTable {
     ListSelectionChanged listSelectionChanged = null;
     ReportFrameQuery frm = null;
     private boolean followLog = false;
+    private int currentSelection=-1;
 
     public QueryAllJTable(IQueryResults qry, QueryDialog qd, FullTableColors all) throws Exception {
         super(all);
@@ -86,7 +87,7 @@ public final class QueryAllJTable extends QueryJTable {
      *                   model
      * @param isDblClick
      */
-    public void showCall(int row, boolean isDblClick, boolean newForm)  {
+    public void showCall(int row, boolean isDblClick, boolean newForm) {
         QueryJTable.DataModel mod = (QueryJTable.DataModel) getModel();
 
         Pair<SelectionType, String> sc = null;
@@ -108,12 +109,17 @@ public final class QueryAllJTable extends QueryJTable {
             } else {
                 if (frm == null) {
                     frm = new ReportFrameQuery();
+                } else {
+                    currentSelection = frm.getTableView().getSelectedRow();
                 }
                 theFrm = frm;
             }
             try {
                 qd.addSelection(sc.getValue());
                 theFrm.showReport(qry, qd, sc.getKey(), sc.getValue());
+                if (currentSelection >= 0)
+                    theFrm.getTableView().setRowSelectionInterval(currentSelection, currentSelection);
+                theFrm.getTableView().invalidate();
                 theFrm.doShow(isDblClick);
             } catch (Exception ex) {
                 logger.error("fatal: ", ex);
