@@ -20,6 +20,8 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static java.lang.Character.OTHER_SYMBOL;
+
 /**
  * @author ssydoruk
  */
@@ -119,30 +121,67 @@ public abstract class Parser {
 
     }
 
-    public static HashMap<String, List<String>> splitQuery(String url) {
-        if (url != null && !url.isEmpty()) {
-            try {
-                final HashMap<String, List<String>> query_pairs = new LinkedHashMap<>();
-                final String[] pairs = url.split("&");
-                for (String pair : pairs) {
-                    final int idx = pair.indexOf('=');
-                    final String key = idx > 0 ? URLDecoder.decode(pair.substring(0, idx), "UTF-8") : pair;
-                    if (!query_pairs.containsKey(key)) {
-                        query_pairs.put(key, new LinkedList<>());
+    public static HashMap<String, List<String>> splitQuery(String _url) {
+        if (StringUtils.isNotEmpty(_url) ) {
+            String url=removeNonBMPCharacters(_url);
+            if (StringUtils.isNotEmpty(url) ) {
+                try {
+                    final HashMap<String, List<String>> query_pairs = new LinkedHashMap<>();
+                    final String[] pairs = url.split("&");
+                    for (String pair : pairs) {
+                        final int idx = pair.indexOf('=');
+                        final String key;
+                        try {
+                            key = idx > 0 ? URLDecoder.decode(pair.substring(0, idx), "UTF-8") : pair;
+                        } catch (IllegalArgumentException e) {
+                            return null;
+                        }
+                        if (!query_pairs.containsKey(key)) {
+                            query_pairs.put(key, new LinkedList<>());
+                        }
+                        String value;
+                        try {
+                            value = idx > 0 && pair.length() > idx + 1 ? URLDecoder.decode(pair.substring(idx + 1), "UTF-8") : "";
+                        } catch (IllegalArgumentException e) {
+                            value = "";
+                        }
+                        query_pairs.get(key).add(value);
                     }
-                    final String value = idx > 0 && pair.length() > idx + 1 ? URLDecoder.decode(pair.substring(idx + 1), "UTF-8") : null;
-                    query_pairs.get(key).add(value);
+                    if (query_pairs.isEmpty()) {
+                        return null;
+                    } else {
+                        return query_pairs;
+                    }
+                } catch (UnsupportedEncodingException | IllegalArgumentException ex) {
+                    Main.logger.error("Error spliting [" + url + "]", ex);
                 }
-                if (query_pairs.isEmpty()) {
-                    return null;
-                } else {
-                    return query_pairs;
-                }
-            } catch (UnsupportedEncodingException | IllegalArgumentException ex) {
-                Main.logger.error("Error spliting [" + url + "]", ex);
             }
         }
         return null;
+    }
+
+    private static String removeNonBMPCharacters(final String input) {
+//        return input.replaceAll("[\\p{C}]", "");
+        StringBuilder strBuilder = new StringBuilder();
+
+//        input.codePoints().forEach((i) -> {
+//            if (!Character.isISOControl(i) && !Character.isSupplementaryCodePoint(i)) {
+//                strBuilder.append(Character.toChars(i));
+//            }
+//            else {
+//                System.out.println(i);
+//            }
+//        });
+
+        char[] ch = input.toCharArray();
+
+        // Traverse the character array
+        for (int i = 0; i < ch.length; i++) {
+            if (!Character.isISOControl(ch[i]) && !Character.isSupplementaryCodePoint(ch[i]) && !(Character.getType(ch[i])==OTHER_SYMBOL)) {
+                strBuilder.append(ch[i]);
+            }
+        }
+        return strBuilder.toString();
     }
 
     public static String fldName(int i) {
