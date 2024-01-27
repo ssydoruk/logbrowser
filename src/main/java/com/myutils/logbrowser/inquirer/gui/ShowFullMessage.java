@@ -88,7 +88,7 @@ public class ShowFullMessage extends javax.swing.JFrame {
         jtaMessageText.setCodeFoldingEnabled(false);
         jtaMessageText.setSyntaxEditingStyle(SyntaxConstants.SYNTAX_STYLE_RUBY);
         jtaMessageText.setWrapStyleWord(true);
-        jtaMessageText.setLineWrap(false);
+        jtaMessageText.setLineWrap(true);
         jtaMessageText.setEditable(false);
         jtaMessageText.setTabSize(2);
         ((DefaultCaret) jtaMessageText.getCaret()).setUpdatePolicy(DefaultCaret.NEVER_UPDATE);
