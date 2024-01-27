@@ -5,6 +5,8 @@
  */
 package com.myutils.logbrowser.indexer;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -228,7 +230,7 @@ public class FilesParseSettings {
         }
 
         boolean boolAttr(String attr, boolean def) {
-            if (attr != null) {
+            if (StringUtils.isNotEmpty(attr)) {
                 boolean valRead = (attr.equalsIgnoreCase("yes") || attr.equalsIgnoreCase("true"));
                 if (valRead) {
                     return valRead;
