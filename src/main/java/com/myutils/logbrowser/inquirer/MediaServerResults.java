@@ -53,7 +53,7 @@ public class MediaServerResults extends IQueryResults {
     private static final String C_CREATE_IDX = "create index idx_";
 
     @Override
-    public AllProcSettings getAllProc(Window parent, int x, int y) {
+    public AllProcSettings getAllProc(Window parent) {
         return new AllProcSettings((qd, settings) -> getAll(qd, settings), null);
     }
 

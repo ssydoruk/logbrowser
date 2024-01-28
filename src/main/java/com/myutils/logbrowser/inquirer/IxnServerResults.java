@@ -292,7 +292,7 @@ public class IxnServerResults extends IQueryResults {
     }
 
     @Override
-    public AllProcSettings getAllProc(Window parent, int x, int y) {
+    public AllProcSettings getAllProc(Window parent) {
         return new AllProcSettings((qd, settings) -> getAll(qd, settings), null);
     }
 

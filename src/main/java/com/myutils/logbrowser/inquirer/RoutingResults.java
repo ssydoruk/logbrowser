@@ -1960,7 +1960,7 @@ final public class RoutingResults extends IQueryResults {
     }
 
     @Override
-    public AllProcSettings getAllProc(Window parent, int x, int y) {
+    public AllProcSettings getAllProc(Window parent) {
         AllCalls_RoutingSettings rd = AllCalls_RoutingSettings.getInstance(this, parent);
         return (rd.doShow()) ? new AllProcSettings(rd.getSelectAllReportTypeGroup().getSelectedObject(), rd) : null;
     }

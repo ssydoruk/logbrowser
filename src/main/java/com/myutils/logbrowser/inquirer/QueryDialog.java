@@ -373,7 +373,7 @@ public class QueryDialog extends javax.swing.JFrame {
         try {
             IQueryResults qry = getSelectedQuery();
             if (qry != null) {
-                AllProcSettings getall = qry.getAllProc(SwingUtilities.windowForComponent(c), x, y);
+                AllProcSettings getall = qry.getAllProc(SwingUtilities.windowForComponent(c));
                 if (getall != null) {
                     class QueryAllTask extends MySwingWorker<Void, String> {
 

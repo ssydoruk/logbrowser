@@ -77,7 +77,7 @@ public class CallFlowResults extends IQueryResults {
     }
 
     @Override
-    public AllProcSettings getAllProc(Window parent, int x, int y) {
+    public AllProcSettings getAllProc(Window parent) {
         AllCalls_CallFlowSettings rd = AllCalls_CallFlowSettings.getInstance(this, parent);
         return (rd.doShow()) ? new AllProcSettings((qd, settings) -> getAll(qd, settings), rd) : null;
 
