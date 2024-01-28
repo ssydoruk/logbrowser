@@ -166,6 +166,11 @@
             <artifactId>jakarta.activation-api</artifactId>
             <version>2.1.2</version>
         </dependency>
+        <dependency>
+            <groupId>com.myutils</groupId>
+            <artifactId>logbrowser</artifactId>
+            <version>1.0</version>
+        </dependency>
     </dependencies>
     <dependencyManagement>
         <dependencies>

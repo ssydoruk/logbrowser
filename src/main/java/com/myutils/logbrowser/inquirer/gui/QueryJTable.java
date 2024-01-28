@@ -217,13 +217,13 @@ public class QueryJTable extends JTableCommon {
             if (searchFieldsList != null) {
                 for (Pair<SelectionType, String> lst : searchFieldsList) {
                     int columnIdx = tabData.getColumnIdx(lst.getValue());
-                    if(columnIdx>0) {
+                    if (columnIdx > 0) {
                         String valueAt = (String) getValueAt(row, columnIdx);
-                        if(StringUtils.isNotEmpty(valueAt)) {
+                        if (StringUtils.isNotEmpty(valueAt)) {
                             ret = new Pair<>();
                             ret.setKey(lst.getKey());
                             ret.setValue(valueAt);
-                            return  ret;
+                            return ret;
                         }
                     }
                 }
@@ -236,6 +236,9 @@ public class QueryJTable extends JTableCommon {
     class QueryJTableCellRenderer extends DefaultTableCellRenderer {
 
         private final Font selectFont;
+        private static final int NUM_DOTS = 2;
+        private static final String DOTS_STRING = StringUtils.repeat('.', NUM_DOTS);
+
 
         public QueryJTableCellRenderer(Font f) {
             selectFont = f;
@@ -248,30 +251,50 @@ public class QueryJTable extends JTableCommon {
             Pair<Color, Color> fontBg = ((DataModel) table.getModel()).rowColors(row);
             if (fontBg == null) {
                 inquirer.logger.error("Empty font, row " + row);
-            }
-//        if (isSelected) {
-//            c.setBackground(Color.red);
-//        } else {
-//            c.setForeground(fontBg.getKey());
-//            c.setBackground(fontBg.getValue());
-//        }
-            if (isSelected) {
-//            c.setFont(selectFont);
-                Rectangle r = table.getCellRect(row, column, true);
-//                inquirer.logger.debug("r: " + r);
-                r.x = 0;
-                r.width = table.getWidth() - 2;
-                ((QueryJTable) table).setRect(r, fontBg.getKey());
             } else {
-//            ((MyJTable) table).setRect(null);
-            }
-            c.setForeground(fontBg.getKey());
-            c.setBackground(fontBg.getValue());
-            c.repaint();
+                Rectangle r = table.getCellRect(row, column, true);
+                if (isSelected) {
+                    r.x = 0;
+                    r.width = table.getWidth() - 2;
+                    ((QueryJTable) table).setRect(r, fontBg.getKey());
+                }
+                c.setForeground(fontBg.getKey());
+                c.setBackground(fontBg.getValue());
 
+                if(value!=null) {
+                    FontMetrics fontMetrics = table.getGraphics().getFontMetrics();
+
+                    String s = value.toString();
+                    if (fontMetrics.stringWidth(s) + table.getIntercellSpacing().width * NUM_DOTS >= r.getWidth()) {
+                        int chars = maxChars(s, fontMetrics, Math.round(r.getWidth()), fontMetrics.charWidth('.') * NUM_DOTS + table.getIntercellSpacing().width * 2);
+
+                        inquirer.logger.trace("chars:" + chars + " for [" + s + "] w:" + r.getWidth() + " spacing:" + table.getIntercellSpacing());
+                        if (chars > 0) {
+                            ((JLabel) c).setText(StringUtils.left(s, chars) + DOTS_STRING + StringUtils.right(s, chars));
+                        }
+                    }
+                }
+
+                c.repaint();
+            }
             return c;
         }
 
+        private int maxChars(String s, FontMetrics fontMetrics, long cellWidth, int dotsWidth) {
+            if (StringUtils.isNotBlank(s)) {
+                int currentWidth = 0;
+                for (int i = 0; i < s.length() / 2; i++) {
+                    currentWidth += fontMetrics.charWidth(s.charAt(i)) + fontMetrics.charWidth(s.charAt(s.length() - 1 - i));
+//                inquirer.logger.info("maxchars for [" + s + "] currentWidth:" + currentWidth + " dotWidth:" + dotWidth + " cellWidth:" + cellWidth
+//                        + " (currentWidth + dotWidth):" + (currentWidth + dotWidth));
+
+                    if (currentWidth + dotsWidth >= cellWidth) {
+                        return i;
+                    }
+                }
+            }
+            return 0;
+        }
     }
 }
 

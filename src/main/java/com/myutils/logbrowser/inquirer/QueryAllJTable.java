@@ -13,6 +13,7 @@ import org.apache.logging.log4j.LogManager;
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -35,6 +36,7 @@ public final class QueryAllJTable extends QueryJTable {
 
     public QueryAllJTable(IQueryResults qry, QueryDialog qd, FullTableColors all) throws Exception {
         super(all);
+
         this.searchField = qry.getSearchField();
         this.qry = qry;
         this.qd = qd;

@@ -16,7 +16,7 @@ import java.awt.*;
 /**
  * @author stepan_sydoruk
  */
-class CustomTableCellRenderer extends DefaultTableCellRenderer {
+public class CustomTableCellRenderer extends DefaultTableCellRenderer {
 
     /**
      *
@@ -27,7 +27,7 @@ class CustomTableCellRenderer extends DefaultTableCellRenderer {
     private static final String DOTS_STRING = StringUtils.repeat('.', NUM_DOTS);
     private final Font selectFont;
 
-    CustomTableCellRenderer(Font f) {
+    public CustomTableCellRenderer(Font f) {
         selectFont = f;
     }
 
@@ -50,17 +50,19 @@ class CustomTableCellRenderer extends DefaultTableCellRenderer {
             c.setForeground(fontBg.getKey());
             c.setBackground(fontBg.getValue());
 
-            FontMetrics fontMetrics = table.getGraphics().getFontMetrics();
+            if (value != null) {
+                FontMetrics fontMetrics = table.getGraphics().getFontMetrics();
 
-            String s = (String) value;
-            if (fontMetrics.stringWidth(s) + table.getIntercellSpacing().width * NUM_DOTS >= r.getWidth()) {
-                int chars = maxChars(s, fontMetrics, Math.round(r.getWidth()), fontMetrics.charWidth('.') * NUM_DOTS + table.getIntercellSpacing().width * 2);
+                String s = value.toString();
+                if (fontMetrics.stringWidth(s) + table.getIntercellSpacing().width * NUM_DOTS >= r.getWidth()) {
+                    int chars = maxChars(s, fontMetrics, Math.round(r.getWidth()), fontMetrics.charWidth('.') * NUM_DOTS + table.getIntercellSpacing().width * 2);
 
 //                inquirer.logger.info("chars:" + chars + " for [" + s + "] w:" + r.getWidth() + " spacing:" + table.getIntercellSpacing());
-                if (chars > 0) {
-                    ((JLabel) c).setText(StringUtils.left(s, chars) + DOTS_STRING + StringUtils.right(s, chars));
-                    return c;
-                } else {
+                    if (chars > 0) {
+                        ((JLabel) c).setText(StringUtils.left(s, chars) + DOTS_STRING + StringUtils.right(s, chars));
+                        return c;
+                    } else {
+                    }
                 }
             }
         }
