@@ -44,16 +44,24 @@ class AllCalls_RoutingSettings extends AllInteractionsSettings {
         setResizable(false);
         setTitle("Request type");
         selectAllReportTypeGroup = new SmartButtonGroup<>();
-        JRadioButton bt = new JRadioButton("ORS interactions");
+        JRadioButton bt = new JRadioButton("ORS calls");
         bt.setSelected(true);
         pan.add(bt);
         selectAllReportTypeGroup.add(bt, (qd, settings) -> routingResults.getAllORSCalls(qd, settings));
+
+        bt = new JRadioButton("ORS interactions");
+        pan.add(bt);
+        selectAllReportTypeGroup.add(bt, (qd, settings) -> routingResults.getAllORSInteractions(qd, settings));
+
+
         bt = new JRadioButton("ORS strategies");
         pan.add(bt);
         selectAllReportTypeGroup.add(bt, (qd, settings) -> routingResults.getAllORSStrategies(qd, settings));
+
         bt = new JRadioButton("URS interactions");
         pan.add(bt);
         selectAllReportTypeGroup.add(bt, (qd, settings) -> routingResults.getAllURSCalls(qd, settings));
+
         bt = new JRadioButton("URS strategies");
         pan.add(bt);
         selectAllReportTypeGroup.add(bt, (qd, settings) -> routingResults.getAllURSStrategies(qd, settings));

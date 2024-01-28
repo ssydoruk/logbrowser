@@ -43,6 +43,14 @@ public class ORSMM extends Message {
         return ret;
     }
 
+    String getMediaType() {
+        return getMMAttributeString("attr_itx_media_type");
+    }
+
+    String getQueue() {
+        return getMMAttributeString("attr_itx_queue");
+    }
+
     String GetNewIxnID() {
         return getMMAttrEnvelopeString("NewInteractionId");
     }
@@ -73,7 +81,8 @@ public class ORSMM extends Message {
         stmt.setLong(8, getM_refID());
         stmt.setBoolean(9, isIsTServerReq());
         setFieldInt(stmt, 10, Main.getRef(ReferenceType.IxnID, GetParentIxnID())); // UUID for ORS is the same as IxnID
+        setFieldInt(stmt, 11, Main.getRef(ReferenceType.Media, getMediaType())); // UUID for ORS is the same as IxnID
+        setFieldInt(stmt, 12, Main.getRef(ReferenceType.DN, getQueue())); // UUID for ORS is the same as IxnID
         return true;
-
     }
 }

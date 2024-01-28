@@ -27,6 +27,8 @@ public class ORSMMTable extends DBTable {
         addIndex("IXNIDID");
         addIndex("refid");
         addIndex("PARENTIXNIDID");
+        addIndex("mediaid");
+        addIndex("queueid");
         dropIndexes();
 
         String query = "create table if not exists ORSMM (id INTEGER PRIMARY KEY ASC"
@@ -41,6 +43,8 @@ public class ORSMMTable extends DBTable {
                 + ",refid INTEGER"
                 + ",inbound bit"
                 + ",PARENTIXNIDID INTEGER"
+                + ",mediaID INTEGER"
+                + ",queueid INTEGER"
                 + ");";
         getM_dbAccessor().runQuery(query);
 
@@ -51,6 +55,8 @@ public class ORSMMTable extends DBTable {
     public String getInsert() {
         return "INSERT INTO ORSMM VALUES(NULL,?,?,?,?,?"
                 /*standard first*/
+                + ",?"
+                + ",?"
                 + ",?"
                 + ",?"
                 + ",?"

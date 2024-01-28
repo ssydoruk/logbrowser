@@ -31,7 +31,7 @@ public final class QueryAllJTable extends QueryJTable {
     ListSelectionChanged listSelectionChanged = null;
     ReportFrameQuery frm = null;
     private boolean followLog = false;
-    private int currentSelection=-1;
+    private int currentSelection = -1;
 
     public QueryAllJTable(IQueryResults qry, QueryDialog qd, FullTableColors all) throws Exception {
         super(all);
