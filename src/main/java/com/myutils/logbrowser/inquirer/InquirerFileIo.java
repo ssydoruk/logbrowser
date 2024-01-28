@@ -3,6 +3,8 @@ package com.myutils.logbrowser.inquirer;
 import java.io.IOException;
 import java.util.HashMap;
 
+import org.apache.commons.lang3.ArrayUtils;
+
 public class InquirerFileIo {
 
     static HashMap<LogFile, InqFile> logReaderHash = null;
@@ -18,9 +20,7 @@ public class InquirerFileIo {
         }
     }
 
-    public static byte[] GetLogBytes(LogFile fileName,
-                                     long offset,
-                                     int bytes) throws Exception {
+    public static byte[] GetLogBytes(LogFile fileName, long offset, int bytes) throws Exception {
         InqFile retInqFile = null;
 
         if (logReaderHash == null) {
@@ -51,10 +51,7 @@ public class InquirerFileIo {
         try {
             byte[] recordBytes = null;
             try {
-                recordBytes = GetLogBytes(
-                        record.GetFileName(),
-                        record.GetFileOffset(),
-                        bytes);
+                recordBytes = GetLogBytes(record.GetFileName(), record.GetFileOffset(), bytes);
             } catch (IOException iOException) {
                 inquirer.logger.debug("Exception accessing file", iOException);
                 if (!inquirer.getEe().isIgnoreFileAccessErrors()) {
@@ -64,9 +61,7 @@ public class InquirerFileIo {
                 }
             }
             if (recordBytes != null) {
-                logBytes = new String(recordBytes,
-                        0,
-                        bytes);
+                logBytes = new String(recordBytes, 0, bytes);
             }
         } catch (Exception e) {
             inquirer.ExceptionHandler.handleException("Cannot read from file", e);
@@ -76,16 +71,13 @@ public class InquirerFileIo {
         return logBytes;
     }
 
-    public static String GetFileBytes(LogFile fileName,
-                                      long offSet, int bytes) {
+    public static String GetFileBytes(LogFile fileName, long offSet, int bytes) {
         String logBytes = "";
         try {
             if (fileName != null) {
                 byte[] GetLogBytes = GetLogBytes(fileName, offSet, bytes);
-                logBytes = new String(
-                        GetLogBytes,
-                        0,
-                        bytes);
+                if (ArrayUtils.isNotEmpty(GetLogBytes))
+                    logBytes = new String(GetLogBytes, 0, bytes);
             }
         } catch (Exception e) {
             inquirer.logger.error("error reading: ", e);
@@ -127,16 +119,16 @@ public class InquirerFileIo {
                 lastBytes = i;
                 return pseudoLogBuffer;
 
-//                if (i == bytes) {
-//                    return pseudoLogBuffer;
-//                } else {
-//                    byte[] bufTmp = new byte[i];
-//                    System.arraycopy(pseudoLogBuffer, 0, bufTmp, 0, i);
-//                    pseudoLogBufferSize = i;
-//                    pseudoLogBuffer = new byte[i];
-//                    System.arraycopy(bufTmp, 0, pseudoLogBuffer, 0, i);
-//                    return pseudoLogBuffer;
-//                }
+                // if (i == bytes) {
+                // return pseudoLogBuffer;
+                // } else {
+                // byte[] bufTmp = new byte[i];
+                // System.arraycopy(pseudoLogBuffer, 0, bufTmp, 0, i);
+                // pseudoLogBufferSize = i;
+                // pseudoLogBuffer = new byte[i];
+                // System.arraycopy(bufTmp, 0, pseudoLogBuffer, 0, i);
+                // return pseudoLogBuffer;
+                // }
             }
         }
 
