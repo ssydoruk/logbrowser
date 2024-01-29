@@ -29,7 +29,7 @@ public abstract class URSRIBase extends Message {
     private String UUID = null;
     private String uriParams;
 
-    public URSRIBase(TableType t, ArrayList messageLines, int fileID) {
+    public URSRIBase(TableType t, ArrayList<String> messageLines, int fileID) {
         this(t, fileID);
         setMessageLines(m_MessageLines);
     }

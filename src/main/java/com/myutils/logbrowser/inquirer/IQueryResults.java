@@ -915,7 +915,7 @@ public abstract class IQueryResults extends QueryTools
         if (inquirer.getCr().isSorting()) {
             tellProgress("Sorting");
             try {
-                DbRecordComparator comparator = new DbRecordComparator();
+                DbRecordComparator<ILogRecord> comparator = new DbRecordComparator();
                 Collections.sort(m_results, comparator);
 //            comparator.BlockSort(m_results);
                 comparator.Close();

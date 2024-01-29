@@ -621,7 +621,7 @@ public class Main {
             }
         }
 
-//        ArrayList<FileInfo> filesToProcess = new ArrayList();
+//        ArrayList<FileInfo> filesToProcess = new ArrayList<>();
         BlockingQueue<FileInfo> filesToProcess = new LinkedBlockingDeque<>();
 
         ArrayList<Long> filesToDelete = new ArrayList<>();

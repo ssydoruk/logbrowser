@@ -27,7 +27,7 @@ public class IxnServerParser extends Parser {
     private static final Pattern regTMessageEnd = Pattern.compile("^([^\\s\"]+|$)");
     //	private DBAccessor m_accessor;
     private static final HashSet<String> nonIxnMsg = getNonIxnMsg();
-    HashMap<String, String> prevSeqno = new HashMap();
+    HashMap<String, String> prevSeqno = new HashMap<>();
     private ParserState m_ParserState;
 
     IxnServerParser(DBTables m_tables) {
@@ -337,7 +337,7 @@ public class IxnServerParser extends Parser {
 //                //	 : message EventServerInfo
 //                //static Matcher regTMessageName=Pattern.compile(": message (.+)");
 ////                m_msgName = SubstrAfterPrefix(s, ": message ");
-//                m_MessageContents=new ArrayList();
+//                m_MessageContents=new ArrayList<>();
 //                m_ParserState=ParserState.STATE_TMESSAGE;
 //                break;
 //            case STATE_TMESSAGESTART:

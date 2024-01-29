@@ -30,7 +30,7 @@ public class StCapacity extends Message {
 
     private String dn = null;
 
-    public StCapacity(String name, ArrayList messageLines, int fileID) {
+    public StCapacity(String name, ArrayList<String> messageLines, int fileID) {
         super(TableType.StCapacity, messageLines, fileID);
         Matcher m;
         if ((m = regStatusLineAgent.matcher(name)).find()) {

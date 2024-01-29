@@ -32,7 +32,7 @@ public class ORSMetric extends Message {
         FindSID();
     }
 
-    ORSMetric(ArrayList m_MessageContents, int fileID) {
+    ORSMetric(ArrayList<String> m_MessageContents, int fileID) {
         super(TableType.ORSMetric, m_MessageContents, fileID);
         FindSID();
     }

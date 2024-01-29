@@ -44,7 +44,7 @@ public final class URSRlib extends Message {
     private String method;
     private String module;
 
-    public URSRlib(ArrayList messageLines, int fileID) {
+    public URSRlib(ArrayList<String> messageLines, int fileID) {
         super(TableType.URSRlib, messageLines, fileID);
         Matcher m;
         if (messageLines.size() > 0 && (m = regSource.matcher((String) messageLines.get(0))).find()) {

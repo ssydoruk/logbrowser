@@ -17,7 +17,7 @@ public class IconMessage extends Message {
     private static int m_statementId;
     String m_MessageName;
 
-    public IconMessage(String event, ArrayList newMessageLines, int fileID) {
+    public IconMessage(String event, ArrayList<String> newMessageLines, int fileID) {
         super(TableType.ICONMessage, fileID);
         m_MessageLines = newMessageLines;
         m_MessageName = event;

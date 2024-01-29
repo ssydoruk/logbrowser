@@ -30,7 +30,7 @@ public class OCSRecCreate extends Message {
     private String tabName;
     private boolean isCreate = true;
 
-    public OCSRecCreate(ArrayList newMessageLines, int fileID) {
+    public OCSRecCreate(ArrayList<String> newMessageLines, int fileID) {
         this(fileID);
         m_MessageLines = newMessageLines;
         Matcher m;

@@ -31,7 +31,7 @@ public class StSTEventMessage extends Message {
     private String m_TServer;
     private String m_MessageName = null;
 
-    public StSTEventMessage(ArrayList newMessageLines, int fileID) {
+    public StSTEventMessage(ArrayList<String> newMessageLines, int fileID) {
         super(TableType.StSTEvent, fileID);
         m_MessageLines = newMessageLines;
         Matcher m;

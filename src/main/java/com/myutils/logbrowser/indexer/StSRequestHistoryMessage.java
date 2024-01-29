@@ -12,7 +12,7 @@ public class StSRequestHistoryMessage extends Message {
 
     String m_MessageName;
 
-    public StSRequestHistoryMessage(String event, ArrayList newMessageLines, int fileID) {
+    public StSRequestHistoryMessage(String event, ArrayList<String> newMessageLines, int fileID) {
         super(TableType.StSRequestHistory, fileID);
         m_MessageLines = newMessageLines;
         m_MessageName = event;

@@ -26,7 +26,7 @@ public class StStatus extends Message {
 
     private String dn = null;
 
-    public StStatus(String name, ArrayList messageLines, int fileID) {
+    public StStatus(String name, ArrayList<String> messageLines, int fileID) {
         super(TableType.StStatus, messageLines, fileID);
         Matcher m;
         if ((m = regStatusLineAgent.matcher(name)).find()) {

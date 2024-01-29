@@ -23,7 +23,7 @@ public class IsccMessage extends SIPServerBaseMessage {
     private String app = null;
     private String connID = null;
 
-    public IsccMessage(String event, ArrayList newMessageLines, boolean m_handlerInProgress, int m_handlerId, int fileID) {
+    public IsccMessage(String event, ArrayList<String> newMessageLines, boolean m_handlerInProgress, int m_handlerId, int fileID) {
         super(TableType.ISCC, m_handlerInProgress, m_handlerId, fileID);
         m_MessageLines = newMessageLines;
         m_MessageName = event;

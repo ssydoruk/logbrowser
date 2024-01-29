@@ -32,10 +32,9 @@ public class OcsMessage extends Message {
     private String m_TserverSRCp;
     private String m_TserverSRCb;
     private String m_refID;
-    private String m_ThisDN;
     private Long recordHandle = null;
 
-    public OcsMessage(ArrayList newMessageLines, int fileID) {
+    public OcsMessage(ArrayList<String> newMessageLines, int fileID) {
         super(TableType.OCSTLib, fileID);
         m_MessageLines = newMessageLines;
         Matcher m;
@@ -120,12 +119,6 @@ public class OcsMessage extends Message {
         return ret;
     }
 
-    /**
-     * @param m_ThisDN the m_ThisDN to set
-     */
-    public void setM_ThisDN(String m_ThisDN) {
-        this.m_ThisDN = m_ThisDN;
-    }
 
     String getOtherDN() {
         return getAttributeDN("AttributeOtherDN");

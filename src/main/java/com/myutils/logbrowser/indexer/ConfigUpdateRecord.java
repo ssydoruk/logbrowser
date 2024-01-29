@@ -20,7 +20,7 @@ public class ConfigUpdateRecord extends Message {
     private String op = "";
     private String msg = null;
 
-    public ConfigUpdateRecord(ArrayList messageLines, int fileID) {
+    public ConfigUpdateRecord(ArrayList<String> messageLines, int fileID) {
         super(TableType.ConfigUpdate, messageLines, fileID);
     }
 

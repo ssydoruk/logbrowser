@@ -37,7 +37,7 @@ public class EditorUnix extends ExternalEditor {
      * @return
      * @throws IOException
      */
-    private static List<String> execGetStdOut(List params) throws IOException {
+    private static List<String> execGetStdOut(List<String> params) throws IOException {
         ExtProcess ep = new ExtProcess(params);
         ep.startProcess(true, true);
         List<String> execOuts = ep.execOuts();
@@ -60,7 +60,7 @@ public class EditorUnix extends ExternalEditor {
         return execOuts;
     }
 
-    private static List<String> makeExecCmd(List cmd) {
+    private static List<String> makeExecCmd(List<String> cmd) {
         ArrayList<String> params = new ArrayList<>(3 + ((cmd == null) ? 0 : cmd.size()));
         params.addAll(Arrays.asList(inquirer.getCr().getLinuxEditor(),
                 "--servername",

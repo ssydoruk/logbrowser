@@ -46,7 +46,7 @@ public class WWEParserTemplate extends WebParser {
 
     WWEParserTemplate(DBTables m_tables) {
         super(FileInfoType.type_WWE, m_tables);
-        m_MessageContents = new ArrayList();
+        m_MessageContents = new ArrayList<>();
         ThreadAlias.put("ORSInternal", "FMWeb");
     }
 

@@ -417,8 +417,7 @@ public class RMParser extends Parser {
         return null;
     }
 
-    protected void AddSipMessage(ArrayList contents, String header) throws Exception {
-        String str;
+    protected void AddSipMessage(ArrayList<String> contents, String header) throws Exception {
         Matcher m;
 
         // Populate our class representation of the message

@@ -418,7 +418,7 @@ public class MCPParser extends Parser {
         return null;
     }
 
-    protected void AddSipMessage(ArrayList contents) throws Exception {
+    protected void AddSipMessage(ArrayList<String> contents) throws Exception {
         Matcher m;
 
         // Populate our class representation of the message

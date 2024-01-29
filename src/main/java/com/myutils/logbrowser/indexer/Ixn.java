@@ -6,7 +6,6 @@
 package com.myutils.logbrowser.indexer;
 
 import Utils.Pair;
-import Utils.Util;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;

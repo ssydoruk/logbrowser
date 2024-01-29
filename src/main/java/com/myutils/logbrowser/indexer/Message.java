@@ -338,7 +338,6 @@ public abstract class Message extends Record {
      * @return Pair<SessionID, URIRequest>
      */
     public static Pair<String, String> parseORSURI(String uri) {
-        Matcher m;
         String[] split = StringUtils.split(uri, '/');
         int idx = getSessionIdx(split);
         if (idx >= 0) {
@@ -830,9 +829,8 @@ public abstract class Message extends Record {
         if (StringUtils.isNotBlank(s) && m_MessageLines != null) {
             for (String m_MessageLine : m_MessageLines) {
                 if (keyFound) {
-                    Matcher m;
 
-                    if ((m = regAttributeInList.matcher(m_MessageLine)).find()) {
+                    if (regAttributeInList.matcher(m_MessageLine).find()) {
                         ret.add(m_MessageLine);
                     } else {
                         break;

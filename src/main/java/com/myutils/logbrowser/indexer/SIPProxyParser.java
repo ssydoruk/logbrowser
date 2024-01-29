@@ -63,7 +63,7 @@ public class SIPProxyParser extends Parser {
     final int MSG_STRING_LIMIT = 200;
     private final ArrayList<String> extraBuff;
     // parse state contants
-    HashSet m_BlockNamesToIgnoreHash;
+    HashSet<String> m_BlockNamesToIgnoreHash;
     StringBuilder sipBuf = new StringBuilder();
     long m_CurrentFilePos;
     long m_HeaderOffset;
@@ -554,7 +554,7 @@ public class SIPProxyParser extends Parser {
         return null;
     }
 
-    protected void AddSipMessage(ArrayList contents, String header) throws Exception {
+    protected void AddSipMessage(ArrayList<String> contents, String header) throws Exception {
         String str;
         Matcher m;
 
@@ -768,7 +768,7 @@ public class SIPProxyParser extends Parser {
         }
     }
 
-    protected void AddCireqMessage(ArrayList contents, String header) throws Exception {
+    protected void AddCireqMessage(ArrayList<String> contents, String header) throws Exception {
         Matcher m;
         CIFaceRequest req = new CIFaceRequest(false, 0, fileInfo.getRecordID());
 

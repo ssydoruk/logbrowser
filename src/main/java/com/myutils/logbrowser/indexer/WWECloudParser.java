@@ -296,7 +296,7 @@ public class WWECloudParser extends Parser {
         private boolean isTServerReq = false;
 
 
-        public WWECloudMessage(String event, ArrayList newMessageLines, boolean isTServerReq) {
+        public WWECloudMessage(String event, ArrayList<String> newMessageLines, boolean isTServerReq) {
             super(TableType.WWECloud, fileInfo.getRecordID());
             m_MessageLines = newMessageLines;
             m_MessageName = event;

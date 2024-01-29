@@ -12,7 +12,7 @@ import java.util.ArrayList;
 
 public class URSRI extends URSRIBase {
 
-    public URSRI(TableType t, ArrayList messageLines, int fileID) {
+    public URSRI(TableType t, ArrayList<String> messageLines, int fileID) {
         super(t, messageLines, fileID);
     }
 

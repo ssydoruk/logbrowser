@@ -67,7 +67,7 @@ public class StSParser extends Parser {
 
     }
 
-    private void AddCapacityMessage(String m_Header, ArrayList m_MessageContents) {
+    private void AddCapacityMessage(String m_Header, ArrayList<String> m_MessageContents) {
         StCapacity msg = new StCapacity(m_Header, m_MessageContents, fileInfo.getRecordID());
         SetStdFieldsAndAdd(msg);
     }
@@ -171,7 +171,7 @@ public class StSParser extends Parser {
                 } else if (str.contains("Client:")) {
                     m_Header = trimmed;
                     m_HeaderOffset = m_CurrentFilePos;
-                    m_MessageContents = new ArrayList();
+                    m_MessageContents = new ArrayList<>();
 
                     if (m_lastClientName != null) {
                         m_MessageContents.add("Name " + m_lastClientName);
@@ -257,7 +257,7 @@ public class StSParser extends Parser {
                 } //                else if (str.contains("Server:") || str.contains("Init:")) {
                 //                    m_Header = trimmed;
                 //                    m_HeaderOffset = m_CurrentFilePos;
-                //                    m_MessageContents = new ArrayList();
+                //                    m_MessageContents = new ArrayList<>();
                 //
                 //                    /*check for single-line server requests*/
                 //                    if (trimmed.contains("Linking") || trimmed.contains("Unlinking")) {
@@ -425,7 +425,7 @@ public class StSParser extends Parser {
         }
     }
 
-    protected void AddClientMessage(ArrayList contents, String header) throws Exception {
+    protected void AddClientMessage(ArrayList<String> contents, String header) throws Exception {
         String[] headerList = header.split(" ");
         StSRequestHistoryMessage msg;
 
@@ -475,7 +475,7 @@ public class StSParser extends Parser {
         }
     }
 
-    protected void AddActionMessage(ArrayList contents, String header) throws Exception {
+    protected void AddActionMessage(ArrayList<String> contents, String header) throws Exception {
         StSActionMessage msg = new StSActionMessage(header, contents, fileInfo.getRecordID());
         SetStdFieldsAndAdd(msg);
     }

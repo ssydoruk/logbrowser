@@ -199,7 +199,7 @@ public class TLibMessage extends SIPServerBaseMessage {
         if (i == -1) {
             return null;
         }
-        return new Long(i);
+        return new Long.valueOf(i);
     }
 
     String getAttr1() {

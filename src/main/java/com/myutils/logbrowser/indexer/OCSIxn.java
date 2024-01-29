@@ -31,7 +31,7 @@ public class OCSIxn extends Message {
     private static final Pattern regGSW_CHAIN_ID = Pattern.compile("^\\s+'GSW_CHAIN_ID'.+= (\\d+)");
     private static final Pattern regchain_id = Pattern.compile("^\\s+'chain_id'.+= (\\d+)");
 
-    public OCSIxn(ArrayList messageLines, int fileID) {
+    public OCSIxn(ArrayList<String> messageLines, int fileID) {
         super(TableType.OCSIxn, messageLines, fileID);
     }
 

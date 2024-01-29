@@ -78,12 +78,12 @@ public class IconParser extends Parser {
                 if (str.contains("Trc 04541 Message") || str.contains("Int 04543 Interaction message")) {
                     m_Header = trimmed;
                     m_HeaderOffset = m_CurrentFilePos;
-                    m_MessageContents = new ArrayList();
+                    m_MessageContents = new ArrayList<>();
                     m_ParserState = STATE_TLIB_MESSAGE_IN;
                 } else if (str.startsWith("request to")) {
                     m_Header = trimmed;
                     m_HeaderOffset = m_CurrentFilePos;
-                    m_MessageContents = new ArrayList();
+                    m_MessageContents = new ArrayList<>();
                     m_ParserState = STATE_TLIB_MESSAGE_OUT;
                 }
                 break;
@@ -142,7 +142,7 @@ public class IconParser extends Parser {
         }
     }
 
-    protected void AddIconMessage(ArrayList contents, String header, String urs_message) throws Exception {
+    protected void AddIconMessage(ArrayList<String> contents, String header, String urs_message) throws Exception {
         String[] headerList = header.split(" ");
         IconMessage msg = null;
 //      TLibMessage msg = null;

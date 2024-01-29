@@ -326,7 +326,6 @@ public abstract class Parser {
     protected DateParsed ParseTimestamp(String str) throws Exception {
         dp = ParseFormatDate(str);
         if (dp != null) {
-            Matcher m;
             if (dp.fmtDate != null) {
                 m_LastTimeStamp = dp;
                 foundBodyDates = true;
@@ -425,7 +424,7 @@ public abstract class Parser {
         }
     }
 
-    public void PrintMsg(ArrayList contents) {
+    public void PrintMsg(ArrayList<String> contents) {
         if (contents == null || contents.isEmpty()) {
             Main.logger.error("Empty contents");
         } else {

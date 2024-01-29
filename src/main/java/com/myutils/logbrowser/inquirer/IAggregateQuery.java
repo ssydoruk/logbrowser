@@ -83,7 +83,7 @@ public abstract class IAggregateQuery extends IQueryResults {
     @Override
     protected void Sort() {
         try {
-            DbRecordComparator comparator = new DbRecordComparator();
+            DbRecordComparator<ILogRecord> comparator = new DbRecordComparator();
             Collections.sort(m_results, comparator);
 
             comparator.BlockSort(m_results);

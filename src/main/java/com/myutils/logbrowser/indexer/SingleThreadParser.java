@@ -93,7 +93,7 @@ public class SingleThreadParser extends Parser {
     private final ArrayList<String> extraBuff;
     boolean m_handlerInProgress;
     // parse state contants
-    HashSet m_BlockNamesToIgnoreHash;
+    HashSet<String> m_BlockNamesToIgnoreHash;
     StringBuilder sipBuf = new StringBuilder();
     long m_CurrentFilePos;
     long m_HeaderOffset;
@@ -130,7 +130,7 @@ public class SingleThreadParser extends Parser {
         Main.logger.debug("SingleThreadParser");
         this.extraBuff = new ArrayList<>();
         //m_accessor = accessor;
-        m_BlockNamesToIgnoreHash = new HashSet();
+        m_BlockNamesToIgnoreHash = new HashSet<>();
         m_BlockNamesToIgnoreHash.addAll(Arrays.asList(BlockNamesToIgnoreArray));
         ifSIPLinesForce = Main.ifSIPLines();
 
@@ -1050,7 +1050,7 @@ public class SingleThreadParser extends Parser {
         }
     }
 
-    protected void AddTlibMessage(ArrayList contents, String header) throws Exception {
+    protected void AddTlibMessage(ArrayList<String> contents, String header) throws Exception {
         String hdr;
 
         if (haMessage) {
@@ -1162,7 +1162,7 @@ public class SingleThreadParser extends Parser {
 
     }
 
-    protected void AddIsccMessage(ArrayList contents, String header) throws Exception {
+    protected void AddIsccMessage(ArrayList<String> contents, String header) throws Exception {
         if (msgName != null) {
             IsccMessage msg = new IsccMessage(msgName, contents, m_handlerInProgress, m_handlerId, fileInfo.getRecordID());
             msg.SetInbound(inbound);
@@ -1265,7 +1265,7 @@ public class SingleThreadParser extends Parser {
         }
     }
 
-    protected void AddCireqMessage(ArrayList contents, String header) throws Exception {
+    protected void AddCireqMessage(ArrayList<String> contents, String header) throws Exception {
         Matcher m;
         CIFaceRequest req = new CIFaceRequest(m_handlerInProgress, m_handlerId, fileInfo.getRecordID());
 
@@ -1378,7 +1378,6 @@ public class SingleThreadParser extends Parser {
     }
 
     private String ParseLine1536(BufferedReaderCrLf input, String str) throws Exception {
-        Matcher m;
         String s;
 
         m_PacketLength = 0;

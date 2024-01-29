@@ -585,7 +585,7 @@ public class OCSParser extends Parser {
 //                //	 : message EventServerInfo
 //                //static Matcher regTMessageName=Pattern.compile(": message (.+)");
 ////                m_msgName = SubstrAfterPrefix(s, ": message ");
-//                m_MessageContents=new ArrayList();
+//                m_MessageContents=new ArrayList<>();
 //                m_ParserState=ParserState.STATE_TMESSAGE;
 //                break;
             case STATE_TMESSAGESTART: {

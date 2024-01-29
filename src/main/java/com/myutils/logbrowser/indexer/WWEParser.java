@@ -149,7 +149,7 @@ public class WWEParser extends WebParser {
 
     WWEParser(DBTables m_tables) {
         super(FileInfoType.type_WWE, m_tables);
-        m_MessageContents = new ArrayList();
+        m_MessageContents = new ArrayList<>();
         ThreadAlias.put("ORSInternal", "FMWeb");
     }
 
@@ -1062,7 +1062,7 @@ public class WWEParser extends WebParser {
             @Override
             public Pair<String, String> cleanString1(String s) {
                 if (s != null && s.contains(searchString)) {
-                    return new Pair(replaceString, searchString);
+                    return new Pair<String, String>(replaceString, searchString);
                 } else {
                     return null;
                 }

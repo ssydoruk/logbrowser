@@ -16,11 +16,11 @@ public class ORSMM extends Message {
     private String m_MessageName;
     private boolean isTServerReq;
 
-    public ORSMM(ArrayList messageLines, int fileID) {
+    public ORSMM(ArrayList<String> messageLines, int fileID) {
         super(TableType.ORSMMessage, messageLines, fileID);
     }
 
-    ORSMM(String m_msgName, String m_TserverSRC, ArrayList m_MessageContents, boolean b, int fileID) {
+    ORSMM(String m_msgName, String m_TserverSRC, ArrayList<String> m_MessageContents, boolean b, int fileID) {
         super(TableType.ORSMMessage, fileID);
         m_MessageLines = m_MessageContents;
         m_MessageName = m_msgName;

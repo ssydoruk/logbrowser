@@ -18,7 +18,7 @@ public class OCSAgentAssignment extends Message {
     private String cgName;
     private int agsNo;
 
-    public OCSAgentAssignment(ArrayList messageLines, int fileID) {
+    public OCSAgentAssignment(ArrayList<String> messageLines, int fileID) {
         super(TableType.OCSAssignment, messageLines, fileID);
         Matcher m;
         if ((m = regCampaignAssignment.matcher((CharSequence) messageLines.get(0))).find()) {

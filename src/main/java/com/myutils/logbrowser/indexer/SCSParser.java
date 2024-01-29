@@ -351,7 +351,7 @@ public class SCSParser extends Parser {
         }
     }
 
-    protected void AddClientMessage(ArrayList contents, String header) throws Exception {
+    protected void AddClientMessage(ArrayList<String> contents, String header) throws Exception {
         String[] headerList = header.split(" ");
         StSRequestHistoryMessage _msg;
 

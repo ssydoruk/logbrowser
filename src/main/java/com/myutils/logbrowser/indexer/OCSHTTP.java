@@ -34,7 +34,7 @@ public final class OCSHTTP extends Message {
     private static final Pattern regchain_id = Pattern.compile("^\\s+'chain_id'.+= (\\d+)");
     private static final Pattern regGSW_CAMPAIGN = Pattern.compile("^\\s+'GSW_CAMPAIGN_NAME'.+= '([^']+)'");
 
-    public OCSHTTP(ArrayList messageLines, int fileID) {
+    public OCSHTTP(ArrayList<String> messageLines, int fileID) {
         super(TableType.OCSHTTP, messageLines, fileID);
         FindByRx(regIsInbound, 1, null);
         SetInbound(FindByRx(regIsInbound, 1, null) == null);

@@ -75,7 +75,7 @@ public class URShttpinterfaceParser extends WebParser {
 
     URShttpinterfaceParser(DBTables m_tables) {
         super(FileInfoType.type_URSHTTP, m_tables);
-        m_MessageContents = new ArrayList();
+        m_MessageContents = new ArrayList<>();
         ThreadAlias.put("ORSInternal", "FMWeb");
     }
 
@@ -465,7 +465,7 @@ public class URShttpinterfaceParser extends WebParser {
             super(TableType.URSHTTP, fileID);
         }
 
-        public ursHTTPMsg(ArrayList messageLines, int fileID) {
+        public ursHTTPMsg(ArrayList<String> messageLines, int fileID) {
             this(fileID);
             setMessageLines(messageLines);
         }

@@ -39,7 +39,7 @@ class DbRecordComparator implements Comparator {
         m_sipRecords = sip_records;
         m_tlibRecords = tlib_records;
 
-        m_anchors = new HashMap();
+        m_anchors = new HashMap<>();
         if (m_tlibRecords != null) {
             Set keys = m_tlibRecords.keySet();
             for (Object key : keys) {
@@ -531,7 +531,7 @@ class DbRecordComparator implements Comparator {
         }
     }
 
-    private int BlockSortSip(ArrayList list, int start) throws Exception {
+    private int BlockSortSip(ArrayList<ILogRecord> list, int start) throws Exception {
         int end = start;
         ILogRecord first = (ILogRecord) list.get(start);
         ILogRecord last = (ILogRecord) list.get(end);
@@ -550,7 +550,7 @@ class DbRecordComparator implements Comparator {
             return 1;
         }
 
-        ArrayList result = new ArrayList();
+        ArrayList<ILogRecord> result = new ArrayList<>();
 
         int srv = -1;
         for (int i = start; i < end; i++) {
@@ -620,7 +620,7 @@ class DbRecordComparator implements Comparator {
         return end - start;
     }
 
-    private int BlockSortTlib(ArrayList list, int start) throws Exception {
+    private int BlockSortTlib(ArrayList<ILogRecord> list, int start) throws Exception {
         int end = start;
         ILogRecord first = (ILogRecord) list.get(start);
         ILogRecord last = (ILogRecord) list.get(end);
@@ -639,8 +639,8 @@ class DbRecordComparator implements Comparator {
             return 1;
         }
 
-        ArrayList<ILogRecord> result = new ArrayList();
-        ArrayList<ILogRecord> unused = new ArrayList();
+        ArrayList<ILogRecord> result = new ArrayList<>();
+        ArrayList<ILogRecord> unused = new ArrayList<>();
         for (int i = start; i < end; i++) {
             unused.add((ILogRecord) list.get(i));
         }
@@ -687,7 +687,7 @@ class DbRecordComparator implements Comparator {
             result.add(orig);
             unused.remove(orig);
             // for request, try to find its outbound
-            ArrayList<ILogRecord> temp = new ArrayList();
+            ArrayList<ILogRecord> temp = new ArrayList<>();
             for (ILogRecord rec : unused) {
                 if (!rec.IsInbound() && Objects.equals(rec.GetFileId(), orig.GetFileId())) {
                     temp.add(rec);
@@ -706,7 +706,7 @@ class DbRecordComparator implements Comparator {
 
         while (!queue.isEmpty()) {
             ILogRecord out = queue.removeFirst();
-            ArrayList<ILogRecord> temp = new ArrayList();
+            ArrayList<ILogRecord> temp = new ArrayList<>();
             for (ILogRecord inb : unused) {
                 if (inb.getFieldValue("source").equals(out.getFieldValue("component"))
                         || inb.getFieldValue("source").equals("00000000 sessionController")
@@ -750,7 +750,7 @@ class DbRecordComparator implements Comparator {
         return end - start;
     }
 
-    public void BlockSort(ArrayList list) throws Exception {
+    public void BlockSort(ArrayList<ILogRecord> list) throws Exception {
         int start = 0;
         int len = list.size();
         while (start < len) {
