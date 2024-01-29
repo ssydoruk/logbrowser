@@ -16,7 +16,7 @@ import java.util.HashMap;
 public class SipMSQuery extends IQuery {
 
     private final boolean m_useProxy = true;
-    private final HashMap sipRecords = new HashMap();
+    private final HashMap<Long, ILogRecord> sipRecords = new HashMap();
     private String[] orderBy;
     private Integer[] m_CallIds;
     private DynamicTreeNode<OptionNode> node = null;
