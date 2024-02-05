@@ -778,11 +778,7 @@ final public class RoutingResults extends IQueryResults {
 
             String makeWhere = wh.makeWhere(false);
 
-            String tab = null;
-            if (DatabaseConnector.TableExist("ors_logbr"))
-                tab = "ors_logbr";
-            else if (DatabaseConnector.TableExist("urs_logbr"))
-                tab = "urs_logbr";
+            String tab = "urs_logbr";
 
             if (!StringUtils.isEmpty(tab)) {
                 tellProgress("Finding unique connIDs in URS");
@@ -855,84 +851,6 @@ final public class RoutingResults extends IQueryResults {
             }
             // </editor-fold>
 
-            // <editor-fold defaultstate="collapsed" desc="ORS Session IDs">
-            if (DatabaseConnector.TableExist("orssess_logbr")) {
-                wh = new Wheres();
-                wh.addWhere(IQuery.getCheckedWhere("ThisDNid", ReferenceType.DN, FindNode(repComponents.getRoot(),
-                        DialogItem.ORS, DialogItem.ORS_TEVENTS, DialogItem.ORS_TEVENTS_DN)), "OR");
-                wh.addWhere(IQuery.getCheckedWhere("otherDNID", ReferenceType.DN, FindNode(repComponents.getRoot(),
-                        DialogItem.ORS, DialogItem.ORS_TEVENTS, DialogItem.ORS_TEVENTS_DN)), "OR");
-
-                makeWhere = wh.makeWhere(false);
-
-                tellProgress("Finding unique voice sessions in ORS");
-                tab = "orssess_logbr";
-                getAllResults.add(new Pair<>("Unique voice sessions in ORS", DatabaseConnector.runQuery("insert into "
-                        + tmpTable + " (appid, sidid, uuidid, strnameid, urlid, started, rowtype)"
-                        + "\nselect appid, sidid, uuidid, appid, urlid, time," + FileInfoType.type_ORS.getValue()
-                        + "\nfrom " + "(select " + tab + ".*" + ",file_logbr.appnameid as appid" + "\nfrom " + tab
-                        + " inner join file_logbr on " + tab + ".fileid=file_logbr.id" + ") as " + tab
-                        + "\nwhere sidid >0  " + IQuery.getFileFilters(tab, "fileid", qd.getSearchApps(false), "AND")
-                        + IQuery.getDateTimeFilters(tab, "time", qd.getTimeRange(), "AND")
-                        + ((makeWhere != null && !makeWhere.isEmpty()) ? " and (" + makeWhere + ")" : "")
-                        + IQuery.getLimitClause(isLimitQueryResults(), getMaxQueryLines()))));
-            }
-            if (DatabaseConnector.TableExist("orssessixn")) {
-                tellProgress("Finding interaction sessions in ORS");
-                tab = "orssessixn";
-                getAllResults.add(new Pair<>("Unique interaction sessions in ORS",
-                        DatabaseConnector.runQuery("insert into " + tmpTable
-                                + " (appid, sidid, ixnidid, strnameid, urlid, started, rowtype)"
-                                + "\nselect appid, sidid, ixnid, appid, urlid, time," + FileInfoType.type_ORS.getValue()
-                                + "\nfrom " + "(select " + tab + ".*" + ",file_logbr.appnameid as appid" + "\nfrom "
-                                + tab + " inner join file_logbr on " + tab + ".fileid=file_logbr.id" + ") as " + tab
-                                + "\nwhere sidid >0  "
-                                + IQuery.getFileFilters(tab, "fileid", qd.getSearchApps(false), "AND")
-                                + IQuery.getDateTimeFilters(tab, "time", qd.getTimeRange(), "AND")
-                                + ((makeWhere != null && !makeWhere.isEmpty()) ? " and (" + makeWhere + ")" : "")
-                                + IQuery.getLimitClause(isLimitQueryResults(), getMaxQueryLines()))));
-            }
-            if (DatabaseConnector.TableExist("orsmetr_logbr")) {
-                /* Searching for sessions not created for voice nor multimedia interactions */
-                tab = "orsmetr_logbr";
-                tellProgress("Finding unique other sessions in ORS");
-                getAllResults.add(new Pair<>("Unique other sessions in ORS",
-                        DatabaseConnector.runQuery("insert into " + tmpTable + " (sidid, rowtype)" + "\nselect sidid,"
-                                + FileInfoType.type_ORS.getValue() + "\nfrom " + "(select "
-                                + "fileid, metricid, sidid, time" + ",file_logbr.appnameid as appid" + "\nfrom " + tab
-                                + " inner join file_logbr on " + tab + ".fileid=file_logbr.id" + ") as " + tab
-                                + "\nwhere sidid > 0  "
-                                // + "\n and sidid not in (select sidid from orssess_logbr) "
-                                // + "\n and sidid not in (select sidid from orssessixn) "
-                                + (DatabaseConnector.TableExist("orssess_logbr")
-                                ? "\nand not exists (select sidid from orssess_logbr where sidid=orsmetr_logbr.sidid)"
-                                : "")
-                                + (DatabaseConnector.TableExist("orssessixn")
-                                ? "\nand not exists (select sidid from orssessixn where sidid=orsmetr_logbr.sidid)"
-                                : "")
-                                + "\nand "
-                                + getWhere("metricid", ReferenceType.METRIC, new String[]{"doc_request"}, false)
-                                + IQuery.getFileFilters(tab, "fileid", qd.getSearchApps(false), "AND")
-                                + IQuery.getDateTimeFilters(tab, "time", qd.getTimeRange(), "AND")
-                                + ((makeWhere != null && !makeWhere.isEmpty()) ? " and (" + makeWhere + ")" : "")
-                                + IQuery.getLimitClause(isLimitQueryResults(), getMaxQueryLines()))));
-
-                tellProgress("Updating ORS sessions parameters");
-                tab = "orsmetr_logbr";
-                if (DatabaseConnector.TableExist(ReferenceType.METRIC.toString())) {
-                    DatabaseConnector.runQuery("update " + tmpTable + "\nset (" + "strstarted" + ") = " + "\n("
-                            + "select " + "time" + "\nfrom " + tab + "\nwhere " + tmpTable + ".sidid=" + tab + ".sidid"
-                            + "\nand\n" + IQuery.getWhere("metricid", ReferenceType.METRIC, "appl_begin", false) + ")"
-                            + ";");
-
-                    DatabaseConnector.runQuery(
-                            "update " + tmpTable + "\nset (" + "strended" + ") = " + "\n(" + "select " + "time"
-                                    + "\nfrom " + tab + "\nwhere " + tmpTable + ".sidid=" + tab + ".sidid" + "\nand\n"
-                                    + IQuery.getWhere("metricid", ReferenceType.METRIC, "appl_end", false) + ")" + ";");
-                }
-            }
-            // </editor-fold>
-            // <editor-fold defaultstate="collapsed" desc="indexes and extract">
             tellProgress("Creating indexes");
             DatabaseConnector.runQuery("create index idx_" + tmpTable + "appid on " + tmpTable + "(appid);");
             DatabaseConnector.runQuery("create index idx_" + tmpTable + "thisdnid on " + tmpTable + "(thisdnid);");
