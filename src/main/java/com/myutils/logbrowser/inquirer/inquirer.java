@@ -59,7 +59,7 @@ public class inquirer {
 
     private static final ZoneId zoneId = ZoneId.systemDefault();
     private static final HashMap<String, DateTimeFormatter> dateFormatters = new HashMap<>();
-    private static final String serFile = ".logbr_dialog.ser";
+    private static final String serFile = ".logbr_dialog.json";
     private static final String serFileDef = ".logbr_checkedref.ser";
     private static final boolean useXMLSerializer = false;
     public static Logger logger;
@@ -357,7 +357,20 @@ public class inquirer {
 
     public static QueryDialogSettings geLocaltQuerySettings() {
         if (queryDialogSettings == null) {
-            queryDialogSettings = readObj(getSerFile());
+            logger.info("Reading queryDialogSettings as json");
+            try (InputStreamReader streamReader = new InputStreamReader(Files.newInputStream(Paths.get(getSerFile())), StandardCharsets.UTF_8)) {
+                Gson gson = new GsonBuilder()
+                        .enableComplexMapKeySerialization()
+                        .create();
+                queryDialogSettings = gson.fromJson(streamReader, com.myutils.logbrowser.inquirer.QueryDialogSettings.class);
+
+            } catch (IOException | com.google.gson.JsonSyntaxException ex) {
+                logger.error("Failed to read queryDialogSettings as json", ex);
+            }
+            if(queryDialogSettings==null) {
+                logger.info("Reading queryDialogSettings as serialized java object");
+                queryDialogSettings = readObj(getSerFile());
+            }
             if (queryDialogSettings == null) {
                 queryDialogSettings = new QueryDialogSettings();
             }
@@ -723,7 +736,16 @@ public class inquirer {
                 dlg.wait();
             }
         }
-        saveObject(getSerFile(), queryDialogSettings);
+//        saveObject(getSerFile(), queryDialogSettings);
+
+        try (BufferedWriter bufferedWriter = new BufferedWriter(
+                new OutputStreamWriter(Files.newOutputStream(Paths.get(getSerFile())), StandardCharsets.UTF_8))) {
+            Gson gson = new GsonBuilder()
+                    .enableComplexMapKeySerialization()
+                    .setPrettyPrinting()
+                    .create();
+            gson.toJson(queryDialogSettings, bufferedWriter);
+        }
         lfm.clear();
     }
 

@@ -5,9 +5,13 @@
  */
 package com.myutils.logbrowser.inquirer;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.Serializable;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -26,7 +30,7 @@ public class QueryDialogSettings implements Serializable {
 //        public ArrayList<IQueryResults> getQueries() {
 //            return queries;
 //        }
-    private final ArrayList<String> savedSearches = new ArrayList<>();
+    private final ArrayList<SearchItem> savedSearches = new ArrayList<>();
     private ArrayList<String> savedFilters = new ArrayList<>();
 
     public QueryDialogSettings() {
@@ -79,7 +83,11 @@ public class QueryDialogSettings implements Serializable {
     }
 
     public ArrayList<String> getSavedSearches() {
-        return savedSearches;
+        ArrayList<String> ret = new ArrayList<>(savedSearches.size());
+        for(SearchItem s: savedSearches){
+            ret.add(s.getSearch());
+        }
+        return ret;
     }
 
     public ArrayList<String> getSavedFilters() {
@@ -91,7 +99,8 @@ public class QueryDialogSettings implements Serializable {
     }
 
     void saveSearch(String selection) {
-        addToList(selection, savedSearches);
+        if (StringUtils.isNotEmpty(selection))
+            addToList(new SearchItem(selection), savedSearches);
     }
 
     private void LoadRefs() {
@@ -99,13 +108,13 @@ public class QueryDialogSettings implements Serializable {
     }
 
     void saveRegex(String selectedRegEx) {
-        if (selectedRegEx != null && !selectedRegEx.isEmpty()) {
+        if (StringUtils.isNotEmpty(selectedRegEx)) {
             addToList(selectedRegEx, savedFilters);
         }
     }
 
-    private void addToList(String s, ArrayList<String> l) {
-        if (s != null && !s.isEmpty()) {
+    private <T> void addToList(T s, ArrayList<T> l) {
+        if (s != null) {
             Collections.reverse(l);
             for (int i = 0; i < l.size(); i++) {
                 if (l.get(i).equals(s)) {
@@ -116,6 +125,25 @@ public class QueryDialogSettings implements Serializable {
             l.add(s);
             Collections.reverse(l);
         }
+    }
 
+    private class SearchItem {
+        private String search;
+        private String saved_time;
+
+        public String getSearch() {
+            return search;
+        }
+
+        public String getSaved_time() {
+            return saved_time;
+        }
+
+        public SearchItem(String savedSearch) {
+            this.search = savedSearch;
+            this.saved_time = dtf.format(LocalDateTime.now());
+        }
+
+        static final DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
     }
 }
