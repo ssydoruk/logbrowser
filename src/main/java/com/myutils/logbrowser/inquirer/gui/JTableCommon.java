@@ -157,11 +157,11 @@ abstract class JTableCommon extends JTablePopup {
     }
 
     private void doCancelFilters() {
-        clearAllFilters();
         int sel = popupRow;
         if (sel >= 0) {
             sel = convertRowIndexToModel(sel);
         }
+        clearAllFilters();
         if (sel >= 0) {
             setRowSelectionInterval(sel, sel);
             scrollRectToVisible(new Rectangle(getCellRect(sel, 0, true)));

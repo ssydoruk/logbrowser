@@ -255,7 +255,7 @@ public class QueryJTable extends JTableCommon {
                 Rectangle r = table.getCellRect(row, column, true);
                 if (isSelected) {
                     r.x = 0;
-                    r.width = table.getWidth() - 2;
+                    r.width = table.getWidth() - 5;
                     ((QueryJTable) table).setRect(r, fontBg.getKey());
                 }
                 c.setForeground(fontBg.getKey());
