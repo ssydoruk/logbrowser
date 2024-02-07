@@ -1087,6 +1087,7 @@ public class TabResultDataModel extends AbstractTableModel {
             }
             setFileInfo(tableRow.FileName, tableRow.fileBytes, tableRow.line, tableRow.offset);
             rowType = tableRow.rowType;
+            setRecord(tableRow.getRecord());
         }
 
         public TableRow() {
