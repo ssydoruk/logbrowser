@@ -15,6 +15,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Objects;
 
 /**
  * @author ssydoruk
@@ -83,9 +84,11 @@ public class QueryDialogSettings implements Serializable {
     }
 
     public ArrayList<String> getSavedSearches() {
-        ArrayList<String> ret = new ArrayList<>(savedSearches.size());
-        for(SearchItem s: savedSearches){
-            ret.add(s.getSearch());
+        ArrayList<String> ret = new ArrayList<>();
+        for (SearchItem s : savedSearches) {
+            String line = s.getSearch();
+            if (!ret.contains(line))
+                ret.add(line);
         }
         return ret;
     }
@@ -99,8 +102,17 @@ public class QueryDialogSettings implements Serializable {
     }
 
     void saveSearch(String selection) {
-        if (StringUtils.isNotEmpty(selection))
+//        if (StringUtils.isNotEmpty(selection) && !present(selection, savedSearches))
+        if (StringUtils.isNotEmpty(selection) )
             addToList(new SearchItem(selection), savedSearches);
+    }
+
+    private boolean present(String selection, ArrayList<SearchItem> savedSearches) {
+        for (SearchItem item : savedSearches) {
+            if (StringUtils.equals(selection, item.getSearch()))
+                return true;
+        }
+        return false;
     }
 
     private void LoadRefs() {
@@ -142,6 +154,19 @@ public class QueryDialogSettings implements Serializable {
         public SearchItem(String savedSearch) {
             this.search = savedSearch;
             this.saved_time = dtf.format(LocalDateTime.now());
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            SearchItem that = (SearchItem) o;
+            return Objects.equals(search, that.search);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(search);
         }
 
         static final DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
