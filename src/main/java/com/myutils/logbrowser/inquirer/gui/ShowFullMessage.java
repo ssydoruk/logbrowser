@@ -8,12 +8,9 @@ package com.myutils.logbrowser.inquirer.gui;
 import Utils.ScreenInfo;
 import com.myutils.logbrowser.common.JSRunner;
 import com.myutils.logbrowser.common.RecordPrintout;
-import com.myutils.logbrowser.inquirer.ILogRecord;
 
 import java.awt.BorderLayout;
-import java.awt.Dimension;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 import com.myutils.logbrowser.inquirer.inquirer;
 import org.apache.commons.lang3.StringUtils;
@@ -28,11 +25,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.BoxLayout;
-import javax.swing.Icon;
 import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
@@ -55,6 +48,9 @@ public class ShowFullMessage extends javax.swing.JFrame {
     private final Utils.swing.TableColumnAdjuster tca;
     private TabResultDataModel.TableRow row;
     private String recordDisplayScript;
+    JToggleButton btLineWrap;
+    JToggleButton btAllFields;
+    JCheckBoxMenuItem miWrap;
 
     /**
      * Creates new form ShowFullMessage
@@ -95,7 +91,7 @@ public class ShowFullMessage extends javax.swing.JFrame {
         ((DefaultCaret) jtaMessageText.getCaret()).setUpdatePolicy(DefaultCaret.NEVER_UPDATE);
         jtaMessageText.getPopupMenu().add(new JSeparator());
 
-        JCheckBoxMenuItem miWrap = new JCheckBoxMenuItem(new AbstractAction("Line wrap") {
+         miWrap = new JCheckBoxMenuItem(new AbstractAction("Line wrap") {
             @Override
             public void actionPerformed(ActionEvent e) {
                 toggleLineWrap(((JCheckBoxMenuItem) e.getSource()).isSelected());
@@ -126,20 +122,20 @@ public class ShowFullMessage extends javax.swing.JFrame {
 //                
 //            }
 //        }));
-        JToggleButton bt = new JToggleButton("Line wrap", jtaMessageText.getLineWrap());
-        bt.setToolTipText("Toggle line wrap on/off");
-        bt.addActionListener(new AbstractAction() {
+        btLineWrap = new JToggleButton("Line wrap", jtaMessageText.getLineWrap());
+        btLineWrap.setToolTipText("Toggle line wrap on/off");
+        btLineWrap.addActionListener(new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 toggleLineWrap(((JToggleButton) e.getSource()).isSelected());
             }
         });
-        toolbar.addButton(bt);
+        toolbar.addButton(btLineWrap);
 
         pAllFields.setVisible(false);
-        bt = new JToggleButton("All fields", pAllFields.isVisible());
-        bt.setToolTipText("Toggle panel with all fields on/off");
-        bt.addActionListener(new AbstractAction() {
+        btAllFields = new JToggleButton("All fields", pAllFields.isVisible());
+        btAllFields.setToolTipText("Toggle panel with all fields on/off");
+        btAllFields.addActionListener(new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 boolean selected = ((JToggleButton) e.getSource()).isSelected();
@@ -159,7 +155,7 @@ public class ShowFullMessage extends javax.swing.JFrame {
                 spSplitPane.revalidate();
             }
         });
-        toolbar.addButton(bt);
+        toolbar.addButton(btAllFields);
 
         addWindowListener(new WindowAdapter() {
             @Override
@@ -203,6 +199,8 @@ public class ShowFullMessage extends javax.swing.JFrame {
 
     private void toggleLineWrap(boolean selected) {
         jtaMessageText.setLineWrap(selected);
+        miWrap.setSelected(selected);
+        btLineWrap.setSelected(selected);
         jtaMessageText.repaint();
     }
 
