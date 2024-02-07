@@ -15,6 +15,9 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author Stepan
@@ -40,7 +43,10 @@ public class ReportFrame extends javax.swing.JFrame implements Cloneable {
     TableSorter sorter;
     // Tool Bar
     private ToggleButtonToolBar toolbar = null;
+
+    private static final WindowTitles titles = new WindowTitles();
     private final ButtonGroup toolbarGroup = new ButtonGroup();
+
     public ReportFrame(ReportFrame theForm) throws HeadlessException {
         this(theForm, true);
     }
@@ -89,10 +95,10 @@ public class ReportFrame extends javax.swing.JFrame implements Cloneable {
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
-//                if (fullMsg != null) {
-//                    fullMsg.dispose();
-//                    fullMsg = null;
-//                }
+                Object src = e.getSource();
+                if(src instanceof JFrame) {
+                    titles.removeTitle(((JFrame) src).getTitle());
+                }
                 super.windowClosing(e); //To change body of generated methods, choose Tools | Templates.
             }
 
@@ -114,7 +120,7 @@ public class ReportFrame extends javax.swing.JFrame implements Cloneable {
 
     @Override
     public void setTitle(String title) {
-        super.setTitle(title);
+        super.setTitle(titles.addTitle(title));
     }
 
     public JButton addToolbarButton(String name, String hint, ActionListener act) {
@@ -145,7 +151,6 @@ public class ReportFrame extends javax.swing.JFrame implements Cloneable {
         StringWriter sr = new StringWriter();
         gson.toJson(tableView.getModel(), sr);
         logger.info(sr.getBuffer());
-
         dispose();
         inquirer.logger.debug("window close");
 
@@ -230,4 +235,51 @@ public class ReportFrame extends javax.swing.JFrame implements Cloneable {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     // End of variables declaration//GEN-END:variables
+    private static class WindowTitles extends HashMap<String, ArrayList<String>> {
+        String addTitle(String s) {
+            ArrayList<String> names = null;
+            String stdName=s;
+            if (containsKey(s)) {
+                names = get(s);
+            } else {
+                for (Map.Entry<String, ArrayList<String>> set :
+                        entrySet()) {
+                    if (set.getValue().contains(s)) {
+                        names = set.getValue();
+                        stdName=set.getKey();
+                        break;
+                    }
+                }
+            }
+            if (names == null) {
+                names = new ArrayList<>();
+                put(s, names);
+                return s;
+            }
+                for (int i = 1; i < 1000; i++) {
+                    String newName = stdName + "(" + i + ")";
+                    if (!names.contains(newName)) {
+                        names.add(newName);
+                        return newName;
+                    }
+            }
+            return s;
+        }
+
+        void removeTitle(String s) {
+            for (Map.Entry<String, ArrayList<String>> set :
+                    entrySet()) {
+                if (set.getValue().contains(s)) {
+                    set.getValue().remove(s);
+                    break;
+                }
+                else if(set.getKey().equals(s) && set.getValue().size()==0){
+                    remove(s);
+                    break;
+                }
+
+            }
+        }
+    }
+
 }

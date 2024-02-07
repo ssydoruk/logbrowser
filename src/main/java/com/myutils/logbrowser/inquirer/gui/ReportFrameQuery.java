@@ -250,14 +250,12 @@ public class ReportFrameQuery extends ReportFrame {
 
     @Override
     public void setTitle(String title) {
-        if (fullMsg != null) {
-            fullMsg.setTitle("Full message for [" + title + "]");
-        }
         super.setTitle(title); //To change body of generated methods, choose Tools | Templates.
     }
 
     private void showFullMsg(boolean b) {
         if (fullMsg != null) {
+            fullMsg.setTitle("Full message for [" + getTitle() + "]");
             fullMsg.setVisible(!miFullOff.isSelected());
         }
     }
