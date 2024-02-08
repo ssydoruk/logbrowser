@@ -368,9 +368,9 @@ public class inquirer {
                     logger.info("Reading queryDialogSettings as serialized java object");
                     queryDialogSettings = readObj(getSerFile());
                 }
-                if (queryDialogSettings == null) {
-                    queryDialogSettings = new QueryDialogSettings();
-                }
+            }
+            if (queryDialogSettings == null) {
+                queryDialogSettings = new QueryDialogSettings();
             }
         }
         return queryDialogSettings;
