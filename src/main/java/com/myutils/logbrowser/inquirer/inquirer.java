@@ -19,7 +19,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -136,12 +135,10 @@ public class inquirer {
     public static void showInfoPanel(Window p, String t, Container jScrollPane, boolean isModal) {
         InfoPanel allFiles = new InfoPanel(p, t, jScrollPane, JOptionPane.DEFAULT_OPTION);
 
-
         allFiles.pack();
         allFiles.setModal(isModal);
         ScreenInfo.setVisible(p, allFiles, true);
     }
-
 
     public static String getVersion() {
         try {
@@ -211,10 +208,7 @@ public class inquirer {
         if (ee.getConfig().toLowerCase().endsWith(".json")) {
             try (BufferedWriter bufferedWriter = new BufferedWriter(
                     new OutputStreamWriter(Files.newOutputStream(Paths.get(ee.getConfig())), StandardCharsets.UTF_8))) {
-                Gson gson = new GsonBuilder()
-                        .enableComplexMapKeySerialization()
-                        .setPrettyPrinting()
-                        .create();
+                Gson gson = new GsonBuilder().enableComplexMapKeySerialization().setPrettyPrinting().create();
                 gson.toJson(cr, bufferedWriter);
                 jsonWritten = true;
 
@@ -231,7 +225,8 @@ public class inquirer {
                             encoder.writeObject(cr);
                         }
                     } else {
-                        try (GZIPOutputStream gz = new GZIPOutputStream(fos); ObjectOutputStream out = new ObjectOutputStream(gz)) {
+                        try (GZIPOutputStream gz = new GZIPOutputStream(fos);
+                                ObjectOutputStream out = new ObjectOutputStream(gz)) {
                             out.writeObject(cr);
                         }
                     }
@@ -298,7 +293,8 @@ public class inquirer {
             ee.parserCommandLine(args);
 
             // Thread.setDefaultUncaughtExceptionHandler(new ExceptionHandler());
-            // System.setProperty("sun.awt.exception.handler", ExceptionHandler.class.getName());
+            // System.setProperty("sun.awt.exception.handler",
+            // ExceptionHandler.class.getName());
 
             Utils.FileUtils.mkDir(ee.getLogBrDir());
 
@@ -358,21 +354,23 @@ public class inquirer {
     public static QueryDialogSettings geLocaltQuerySettings() {
         if (queryDialogSettings == null) {
             logger.info("Reading queryDialogSettings as json");
-            try (InputStreamReader streamReader = new InputStreamReader(Files.newInputStream(Paths.get(getSerFile())), StandardCharsets.UTF_8)) {
-                Gson gson = new GsonBuilder()
-                        .enableComplexMapKeySerialization()
-                        .create();
-                queryDialogSettings = gson.fromJson(streamReader, com.myutils.logbrowser.inquirer.QueryDialogSettings.class);
+            if (Files.exists(Paths.get(getSerFile()))) {
+                try (InputStreamReader streamReader = new InputStreamReader(
+                        Files.newInputStream(Paths.get(getSerFile())), StandardCharsets.UTF_8)) {
+                    Gson gson = new GsonBuilder().enableComplexMapKeySerialization().create();
+                    queryDialogSettings = gson.fromJson(streamReader,
+                            com.myutils.logbrowser.inquirer.QueryDialogSettings.class);
 
-            } catch (IOException | com.google.gson.JsonSyntaxException ex) {
-                logger.error("Failed to read queryDialogSettings as json", ex);
-            }
-            if(queryDialogSettings==null) {
-                logger.info("Reading queryDialogSettings as serialized java object");
-                queryDialogSettings = readObj(getSerFile());
-            }
-            if (queryDialogSettings == null) {
-                queryDialogSettings = new QueryDialogSettings();
+                } catch (IOException | com.google.gson.JsonSyntaxException ex) {
+                    logger.error("Failed to read queryDialogSettings as json", ex);
+                }
+                if (queryDialogSettings == null) {
+                    logger.info("Reading queryDialogSettings as serialized java object");
+                    queryDialogSettings = readObj(getSerFile());
+                }
+                if (queryDialogSettings == null) {
+                    queryDialogSettings = new QueryDialogSettings();
+                }
             }
         }
         return queryDialogSettings;
@@ -392,7 +390,7 @@ public class inquirer {
                         decoder.close();
                     } else {
                         try (GZIPInputStream gz = new GZIPInputStream(fis);
-                             ObjectInputStream in = new ObjectInputStream(gz)) {
+                                ObjectInputStream in = new ObjectInputStream(gz)) {
                             ret = (T) in.readObject();
                         }
                     }
@@ -409,7 +407,8 @@ public class inquirer {
     }
 
     private static void ShowGui() throws Exception {
-//        UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName()); // you need to catch the exceptions
+        // UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
+        // // you need to catch the exceptions
         // on this call.
         LookAndFeelFactory.installJideExtension();
 
@@ -420,7 +419,7 @@ public class inquirer {
         }
 
         if (DatabaseConnector.fileExits(
-                new FileInfoType[]{FileInfoType.type_URS, FileInfoType.type_ORS, FileInfoType.type_URSHTTP})) {
+                new FileInfoType[] { FileInfoType.type_URS, FileInfoType.type_ORS, FileInfoType.type_URSHTTP })) {
             queries.add(new RoutingResults());
         }
         if (DatabaseConnector.fileExits(FileInfoType.type_OCS)) {
@@ -432,11 +431,10 @@ public class inquirer {
         if (DatabaseConnector.fileExits(FileInfoType.type_IxnServer)) {
             queries.add(new IxnServerResults(queryDialogSettings));
         }
-        if (DatabaseConnector.fileExits(new FileInfoType[]{FileInfoType.type_RM, FileInfoType.type_MCP})) {
+        if (DatabaseConnector.fileExits(new FileInfoType[] { FileInfoType.type_RM, FileInfoType.type_MCP })) {
             queries.add(new MediaServerResults(queryDialogSettings));
         }
-        if (DatabaseConnector
-                .fileExits(new FileInfoType[]{FileInfoType.type_WorkSpace, FileInfoType.type_SIPEP})) {
+        if (DatabaseConnector.fileExits(new FileInfoType[] { FileInfoType.type_WorkSpace, FileInfoType.type_SIPEP })) {
             queries.add(new WorkspaceResults(queryDialogSettings));
         }
         if (DatabaseConnector.fileExits(FileInfoType.type_VOIPEP)) {
@@ -454,8 +452,7 @@ public class inquirer {
         if (DatabaseConnector.fileExits(FileInfoType.type_ConfServer)) {
             queries.add(new ConfServerResults(queryDialogSettings));
         }
-        if (DatabaseConnector
-                .fileExits(new FileInfoType[]{FileInfoType.type_WWE, FileInfoType.type_ApacheWeb})) {
+        if (DatabaseConnector.fileExits(new FileInfoType[] { FileInfoType.type_WWE, FileInfoType.type_ApacheWeb })) {
             queries.add(new WWEResults(queryDialogSettings));
         }
         if (DatabaseConnector.fileExits(FileInfoType.type_WWECloud)) {
@@ -508,7 +505,7 @@ public class inquirer {
                     encoder.close();
                 } else {
                     try (GZIPOutputStream gz = new GZIPOutputStream(fos);
-                         ObjectOutputStream out = new ObjectOutputStream(gz)) {
+                            ObjectOutputStream out = new ObjectOutputStream(gz)) {
                         out.writeObject(obj);
                     }
                 }
@@ -534,10 +531,9 @@ public class inquirer {
                 boolean crRead = false;
                 if (f.getAbsolutePath().toLowerCase().endsWith(".json")) {
 
-                    try (InputStreamReader streamReader = new InputStreamReader(Files.newInputStream(Paths.get(file)), StandardCharsets.UTF_8)) {
-                        Gson gson = new GsonBuilder()
-                                .enableComplexMapKeySerialization()
-                                .create();
+                    try (InputStreamReader streamReader = new InputStreamReader(Files.newInputStream(Paths.get(file)),
+                            StandardCharsets.UTF_8)) {
+                        Gson gson = new GsonBuilder().enableComplexMapKeySerialization().create();
                         cr = gson.fromJson(streamReader, com.myutils.logbrowser.inquirer.InquirerCfg.class);
                         crRead = true;
 
@@ -577,7 +573,6 @@ public class inquirer {
         return cr;
 
     }
-
 
     public static boolean matchFound(String val, Matcher pt, String search, boolean matchWholeWordSelected) {
         if (val != null && !val.isEmpty()) {
@@ -736,14 +731,11 @@ public class inquirer {
                 dlg.wait();
             }
         }
-//        saveObject(getSerFile(), queryDialogSettings);
+        // saveObject(getSerFile(), queryDialogSettings);
 
         try (BufferedWriter bufferedWriter = new BufferedWriter(
                 new OutputStreamWriter(Files.newOutputStream(Paths.get(getSerFile())), StandardCharsets.UTF_8))) {
-            Gson gson = new GsonBuilder()
-                    .enableComplexMapKeySerialization()
-                    .setPrettyPrinting()
-                    .create();
+            Gson gson = new GsonBuilder().enableComplexMapKeySerialization().setPrettyPrinting().create();
             gson.toJson(queryDialogSettings, bufferedWriter);
         }
         lfm.clear();
@@ -761,7 +753,6 @@ public class inquirer {
             this.mainPanel = jScrollPane;
             this.buttonOptions = buttonOptions;
         }
-
 
         @Override
         public JComponent createBannerPanel() {
@@ -782,126 +773,126 @@ public class inquirer {
             ButtonPanel buttonPanel = new ButtonPanel();
             switch (buttonOptions) {
 
-                case JOptionPane.DEFAULT_OPTION: {
-                    JButton cancelButton = new JButton();
-                    buttonPanel.addButton(cancelButton);
+            case JOptionPane.DEFAULT_OPTION: {
+                JButton cancelButton = new JButton();
+                buttonPanel.addButton(cancelButton);
 
-                    cancelButton.setAction(new AbstractAction() {
-                        @Override
-                        @SuppressWarnings("deprecation")
-                        public void actionPerformed(ActionEvent e) {
-                            setDialogResult(RESULT_CANCELLED);
-                            setVisible(false);
-                            dispose();
-                        }
-                    });
-                    cancelButton.setText("Close");
+                cancelButton.setAction(new AbstractAction() {
+                    @Override
+                    @SuppressWarnings("deprecation")
+                    public void actionPerformed(ActionEvent e) {
+                        setDialogResult(RESULT_CANCELLED);
+                        setVisible(false);
+                        dispose();
+                    }
+                });
+                cancelButton.setText("Close");
 
-                    setDefaultCancelAction(cancelButton.getAction());
-                    getRootPane().setDefaultButton(cancelButton);
-                    break;
-                }
+                setDefaultCancelAction(cancelButton.getAction());
+                getRootPane().setDefaultButton(cancelButton);
+                break;
+            }
 
-                case JOptionPane.YES_NO_CANCEL_OPTION: {
+            case JOptionPane.YES_NO_CANCEL_OPTION: {
 
-                    JButton yesButton = new JButton();
-                    buttonPanel.addButton(yesButton);
+                JButton yesButton = new JButton();
+                buttonPanel.addButton(yesButton);
 
-                    yesButton.setAction(new AbstractAction("Yes") {
-                        @Override
-                        public void actionPerformed(ActionEvent e) {
-                            setDialogResult(JOptionPane.YES_OPTION);
-                            setVisible(false);
-                            dispose();
-                        }
-                    });
+                yesButton.setAction(new AbstractAction("Yes") {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        setDialogResult(JOptionPane.YES_OPTION);
+                        setVisible(false);
+                        dispose();
+                    }
+                });
 
-                    JButton noButton = new JButton();
-                    buttonPanel.addButton(noButton);
+                JButton noButton = new JButton();
+                buttonPanel.addButton(noButton);
 
-                    noButton.setAction(new AbstractAction("No") {
-                        @Override
-                        public void actionPerformed(ActionEvent e) {
-                            setDialogResult(JOptionPane.NO_OPTION);
-                            setVisible(false);
-                            dispose();
-                        }
-                    });
+                noButton.setAction(new AbstractAction("No") {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        setDialogResult(JOptionPane.NO_OPTION);
+                        setVisible(false);
+                        dispose();
+                    }
+                });
 
-                    JButton cancelButton = new JButton();
-                    buttonPanel.addButton(cancelButton);
+                JButton cancelButton = new JButton();
+                buttonPanel.addButton(cancelButton);
 
-                    cancelButton.setAction(new AbstractAction("Cancel") {
-                        @Override
-                        public void actionPerformed(ActionEvent e) {
-                            setDialogResult(JOptionPane.CANCEL_OPTION);
-                            setVisible(false);
-                            dispose();
-                        }
-                    });
+                cancelButton.setAction(new AbstractAction("Cancel") {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        setDialogResult(JOptionPane.CANCEL_OPTION);
+                        setVisible(false);
+                        dispose();
+                    }
+                });
 
-                    setDefaultCancelAction(cancelButton.getAction());
-                    getRootPane().setDefaultButton(noButton);
-                    break;
-                }
+                setDefaultCancelAction(cancelButton.getAction());
+                getRootPane().setDefaultButton(noButton);
+                break;
+            }
 
-                case JOptionPane.YES_NO_OPTION: {
-                    JButton yesButton = new JButton();
-                    buttonPanel.addButton(yesButton);
+            case JOptionPane.YES_NO_OPTION: {
+                JButton yesButton = new JButton();
+                buttonPanel.addButton(yesButton);
 
-                    yesButton.setAction(new AbstractAction("Yes") {
-                        @Override
-                        public void actionPerformed(ActionEvent e) {
-                            setDialogResult(JOptionPane.YES_OPTION);
-                            setVisible(false);
-                            dispose();
-                        }
-                    });
+                yesButton.setAction(new AbstractAction("Yes") {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        setDialogResult(JOptionPane.YES_OPTION);
+                        setVisible(false);
+                        dispose();
+                    }
+                });
 
-                    JButton noButton = new JButton();
-                    buttonPanel.addButton(noButton);
+                JButton noButton = new JButton();
+                buttonPanel.addButton(noButton);
 
-                    noButton.setAction(new AbstractAction("No") {
-                        @Override
-                        public void actionPerformed(ActionEvent e) {
-                            setDialogResult(JOptionPane.NO_OPTION);
-                            setVisible(false);
-                            dispose();
-                        }
-                    });
-                    setDefaultCancelAction(noButton.getAction());
-                    getRootPane().setDefaultButton(noButton);
-                    break;
-                }
-                case JOptionPane.OK_CANCEL_OPTION: {
-                    JButton yesButton = new JButton();
-                    buttonPanel.addButton(yesButton);
+                noButton.setAction(new AbstractAction("No") {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        setDialogResult(JOptionPane.NO_OPTION);
+                        setVisible(false);
+                        dispose();
+                    }
+                });
+                setDefaultCancelAction(noButton.getAction());
+                getRootPane().setDefaultButton(noButton);
+                break;
+            }
+            case JOptionPane.OK_CANCEL_OPTION: {
+                JButton yesButton = new JButton();
+                buttonPanel.addButton(yesButton);
 
-                    yesButton.setAction(new AbstractAction("OK") {
-                        @Override
-                        public void actionPerformed(ActionEvent e) {
-                            setDialogResult(JOptionPane.OK_OPTION);
-                            setVisible(false);
-                            dispose();
-                        }
-                    });
+                yesButton.setAction(new AbstractAction("OK") {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        setDialogResult(JOptionPane.OK_OPTION);
+                        setVisible(false);
+                        dispose();
+                    }
+                });
 
-                    JButton noButton = new JButton();
-                    buttonPanel.addButton(noButton);
+                JButton noButton = new JButton();
+                buttonPanel.addButton(noButton);
 
-                    noButton.setAction(new AbstractAction("Cancel") {
-                        @Override
-                        public void actionPerformed(ActionEvent e) {
-                            setDialogResult(JOptionPane.CANCEL_OPTION);
-                            setVisible(false);
-                            dispose();
-                        }
-                    });
-                    setDefaultCancelAction(noButton.getAction());
-                    getRootPane().setDefaultButton(noButton);
-                    break;
+                noButton.setAction(new AbstractAction("Cancel") {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        setDialogResult(JOptionPane.CANCEL_OPTION);
+                        setVisible(false);
+                        dispose();
+                    }
+                });
+                setDefaultCancelAction(noButton.getAction());
+                getRootPane().setDefaultButton(noButton);
+                break;
 
-                }
+            }
             }
             buttonPanel.setSizeConstraint(ButtonPanel.NO_LESS_THAN); // since the checkbox is quite wide, we don't want
             // all of them have the same size.
