@@ -372,6 +372,7 @@ public class inquirer {
             if (queryDialogSettings == null) {
                 queryDialogSettings = new QueryDialogSettings();
             }
+            queryDialogSettings.setLocalFile(getSerFile());
         }
         return queryDialogSettings;
     }
@@ -733,11 +734,6 @@ public class inquirer {
         }
         // saveObject(getSerFile(), queryDialogSettings);
 
-        try (BufferedWriter bufferedWriter = new BufferedWriter(
-                new OutputStreamWriter(Files.newOutputStream(Paths.get(getSerFile())), StandardCharsets.UTF_8))) {
-            Gson gson = new GsonBuilder().enableComplexMapKeySerialization().setPrettyPrinting().create();
-            gson.toJson(queryDialogSettings, bufferedWriter);
-        }
         lfm.clear();
     }
 
