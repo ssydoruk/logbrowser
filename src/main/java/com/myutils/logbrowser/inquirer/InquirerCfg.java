@@ -695,7 +695,7 @@ public class InquirerCfg implements Serializable {
             }
             Pair<String, Integer> el;
             if (rowIndex > size()) {
-                el = new Pair<>();
+                el = new Pair<> ();
                 values.add(el);
 
             } else {
@@ -888,7 +888,7 @@ public class InquirerCfg implements Serializable {
             }
             Pair<String, Integer> el;
             if (rowIndex > size()) {
-                el = new Pair<>();
+                el = new Pair<String, Integer>();
                 values.add(el);
 
             } else {
