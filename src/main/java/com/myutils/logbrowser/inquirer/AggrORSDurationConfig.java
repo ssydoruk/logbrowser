@@ -33,7 +33,7 @@ public class AggrORSDurationConfig extends javax.swing.JPanel {
     private final JPAppSelect jpAppSelect;
     private final TDateRange timeRange;
     private final ButtonGroup group = new ButtonGroup();
-    private DefaultListModel lmAttr;
+    private DefaultListModel <DynamicTreeNode<OptionNode>> lmAttr;
     private MyCheckBoxList cblAttr;
     private DefaultListModel lmAttrValues;
     private MyCheckBoxList cblAttrValues;
@@ -111,7 +111,7 @@ public class AggrORSDurationConfig extends javax.swing.JPanel {
 
     }
 
-    private void FillElements(DefaultListModel lm, DynamicTreeNode<OptionNode> parent, boolean isChecked) {
+    private void FillElements(DefaultListModel<DynamicTreeNode<OptionNode>> lm, DynamicTreeNode<OptionNode> parent, boolean isChecked) {
         List<DynamicTreeNode<OptionNode>> l = parent.getChildren();
         for (DynamicTreeNode<OptionNode> node : parent.getChildren()) {
 //            node.getData().setChecked(isChecked);
@@ -138,7 +138,7 @@ public class AggrORSDurationConfig extends javax.swing.JPanel {
         InitCB(cblAttrValues, null, jpAttrValues, 4);
 
         FillElements(lmAttr, root, true);
-        lmAttr.insertElementAt(MyCheckBoxList.ALL_ENTRY, 0);
+        lmAttr.insertElementAt((DynamicTreeNode<OptionNode>) MyCheckBoxList.ALL_ENTRY, 0);
         cblAttr.checkAll();
 
     }

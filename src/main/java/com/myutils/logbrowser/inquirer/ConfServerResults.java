@@ -104,7 +104,7 @@ public class ConfServerResults extends IQueryResults {
         ndParams.addDynamicRef(DialogItem.CONFSERV_CLIENTCONN_USER, ReferenceType.Agent, TableType.CSClientConnect.toString(), "userNameID");
         ndParams.addDynamicRef(DialogItem.CONFSERV_CLIENTCONN_HOSTPORT, ReferenceType.Host, TableType.CSClientConnect.toString(), "hostportID");
         ndParams.addPairChildren(DialogItem.CONFSERV_CLIENTCONN_ISCONNECT,
-                new Pair[]{new Pair("connected", "1"), new Pair("disconnected", "0")});
+                new Pair[]{new Pair<String, String>("connected", "1"), new Pair<String, String>("disconnected", "0")});
 
 //</editor-fold>
         //        DynamicTreeNode<OptionNode> nd = new DynamicTreeNode<>(new OptionNode(DialogItem.SCS));

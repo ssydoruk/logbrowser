@@ -31,10 +31,10 @@ public class Ixn extends Message {
     private static final Pattern regIxnSubmitted = Pattern.compile("^\\s+attr_itx_submitted_by .+ \"([^\"]+)\"$");
 
     private static final Regexs AgentIDs = new Regexs(new Pair[]{
-            new Pair<String, Integer>("^\\s+attr_agent_id.+ \"([^\"]+)\"$", 1),
-            new Pair<String, Integer>("^\\s+attr_actor_agent_id.+ \"([^\"]+)\"$", 1),
-            new Pair<String, Integer>("^\\s+AttributeAgentID.+ \"([^\"]+)\"$", 1),
-            new Pair<String, Integer>("^\\s+'Agent'.+ \"([^\"]+)\"$", 1)
+            new Pair<>("^\\s+attr_agent_id.+ \"([^\"]+)\"$", 1),
+            new Pair<>("^\\s+attr_actor_agent_id.+ \"([^\"]+)\"$", 1),
+            new Pair<>("^\\s+AttributeAgentID.+ \"([^\"]+)\"$", 1),
+            new Pair<>("^\\s+'Agent'.+ \"([^\"]+)\"$", 1)
     });
 
     private final static Message.Regexs IxnIDs = new Regexs(new Pair[]{
@@ -44,7 +44,7 @@ public class Ixn extends Message {
             new Pair<>("^\\s*'ORSI:.+:([\\w~]+)' \\[list\\]", 1)
     });
 
-    private final static Message.Regexs parentIxnID = new Regexs(new Pair[]{
+    private final static Message.Regexs parentIxnID = new Regexs(new Utils.Pair[]{
             new Pair<>("^\\s+attr_prnt_itx_id.+ \"([^\"]+)\"$", 1),
             new Pair<>("^\\s+'attr_itx_prnt_itx_id'.+= \"([^\"]+)\"$", 1),
             new Pair<>("^\\s+'Parent' .+\"([^\"]+)\"$", 1)
@@ -64,8 +64,8 @@ public class Ixn extends Message {
     });
 
     private static final Regexs reQueue = new Regexs(new Pair[]{
-            new Pair<String, Integer>("^\\s+(?:attr_queue|attr_itx_queue) .+ \"([^\"]+)\"$", 1),
-            new Pair<String, Integer>("^\\s+AttributeThisDN .+ (\\w+)$", 1),});
+            new Pair<>("^\\s+(?:attr_queue|attr_itx_queue) .+ \"([^\"]+)\"$", 1),
+            new Pair<>("^\\s+AttributeThisDN .+ (\\w+)$", 1),});
 
     private static final Regexs reMediaType = new Regexs(new Pair[]{
             new Pair<>("^\\s+(?:attr_media_type|attr_itx_media_type|attr_media_type_name) .+ \"([^\"]+)\"$", 1)}

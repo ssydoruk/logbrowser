@@ -357,7 +357,7 @@ public class TLibSIPRetransmitsConfig extends javax.swing.JPanel {
                 for (int i = minIndex; i <= maxIndex; i++) {
                     if (lsm.isSelectedIndex(i)) {
                         inquirer.logger.debug("**current item " + i);
-                        DefaultListModel<DynamicTreeNode<OptionNode>> lm = (DefaultListModel) l.getModel();
+                        DefaultListModel<DynamicTreeNode<OptionNode>> lm = (DefaultListModel<DynamicTreeNode<OptionNode>>) l.getModel();
                         if (lChild != null) {
                             if (i > 0) {
                                 changeReportItem(i,  lm.get(i), lChild);
@@ -412,7 +412,7 @@ public class TLibSIPRetransmitsConfig extends javax.swing.JPanel {
         inquirer.logger.debug("in setChildChecked " + boxEnabled);
         boolean checkedItem = false;
         lChild.setEnabled(boxEnabled);
-        DefaultListModel<DynamicTreeNode<OptionNode>> lm = (DefaultListModel) lChild.getModel();
+        DefaultListModel<DynamicTreeNode<OptionNode>> lm = (DefaultListModel<DynamicTreeNode<OptionNode>>) lChild.getModel();
         ArrayList<Integer> idx = new ArrayList<>();
         for (int i = 1; i < lm.size(); i++) {
             DynamicTreeNode<OptionNode> ch = (DynamicTreeNode<OptionNode>) lm.getElementAt(i);

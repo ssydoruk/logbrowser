@@ -3,7 +3,7 @@ package com.myutils.logbrowser.inquirer;
 import java.sql.SQLException;
 import java.util.*;
 
-class DbRecordComparator implements Comparator {
+class DbRecordComparator implements Comparator<ILogRecord> {
 
     private HashMap m_sipRecords;
     private HashMap m_tlibRecords;
@@ -105,11 +105,11 @@ class DbRecordComparator implements Comparator {
 
         if (itemType1.equals(itemType2)) {
             // both items are custom lines
-            Object owner1 = GetCustomItemOwner(
+            ILogRecord owner1 = GetCustomItemOwner(
                     item1.getFieldValue("issip").equals("1"),
                     Integer.parseInt(item1.getFieldValue("ownerid")));
 
-            Object owner2 = GetCustomItemOwner(
+            ILogRecord owner2 = GetCustomItemOwner(
                     item2.getFieldValue("issip").equals("1"),
                     Integer.parseInt(item2.getFieldValue("ownerid")));
 
@@ -423,7 +423,7 @@ class DbRecordComparator implements Comparator {
     }
 
     @Override
-    public int compare(Object o1, Object o2) {
+    public int compare(ILogRecord o1, ILogRecord o2) {
         if (Thread.currentThread().isInterrupted()) {
             throw new RuntimeInterruptException();
         }
