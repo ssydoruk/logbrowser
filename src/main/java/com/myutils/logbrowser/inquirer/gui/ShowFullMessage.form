@@ -45,7 +45,7 @@
         </Container>
         <Container class="javax.swing.JSplitPane" name="spSplitPane">
           <Properties>
-            <Property name="dividerSize" type="int" value="2"/>
+            <Property name="dividerSize" type="int" value="3"/>
             <Property name="orientation" type="int" value="0"/>
             <Property name="resizeWeight" type="double" value="0.95"/>
           </Properties>

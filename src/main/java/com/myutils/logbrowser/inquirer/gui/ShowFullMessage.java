@@ -9,7 +9,8 @@ import Utils.ScreenInfo;
 import com.myutils.logbrowser.common.JSRunner;
 import com.myutils.logbrowser.common.RecordPrintout;
 
-import java.awt.BorderLayout;
+import java.awt.*;
+import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
 
 import com.myutils.logbrowser.inquirer.inquirer;
@@ -24,12 +25,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import javax.swing.AbstractAction;
-import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JSeparator;
-import javax.swing.JToggleButton;
+import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.text.DefaultCaret;
 
@@ -51,6 +47,7 @@ public class ShowFullMessage extends javax.swing.JFrame {
     JToggleButton btLineWrap;
     JToggleButton btAllFields;
     JCheckBoxMenuItem miWrap;
+    JMenuItem miSplit5050;
 
     /**
      * Creates new form ShowFullMessage
@@ -64,7 +61,7 @@ public class ShowFullMessage extends javax.swing.JFrame {
         infoTableModel = new DefaultTableModel() {
             @Override
             public boolean isCellEditable(int row, int column) {
-                return false; // To change body of generated methods, choose Tools | Templates.
+                return column>0;
             }
 
         };
@@ -73,6 +70,7 @@ public class ShowFullMessage extends javax.swing.JFrame {
         }
         jtAllFields.setModel(infoTableModel);
         jtAllFields.getColumnModel().getColumn(0).setPreferredWidth(10);
+        jtAllFields.setColumnSelectionAllowed(true);
 
         tca = new Utils.swing.TableColumnAdjuster(jtAllFields);
         tca.setColumnDataIncluded(true);
@@ -91,7 +89,7 @@ public class ShowFullMessage extends javax.swing.JFrame {
         ((DefaultCaret) jtaMessageText.getCaret()).setUpdatePolicy(DefaultCaret.NEVER_UPDATE);
         jtaMessageText.getPopupMenu().add(new JSeparator());
 
-         miWrap = new JCheckBoxMenuItem(new AbstractAction("Line wrap") {
+        miWrap = new JCheckBoxMenuItem(new AbstractAction("Line wrap") {
             @Override
             public void actionPerformed(ActionEvent e) {
                 toggleLineWrap(((JCheckBoxMenuItem) e.getSource()).isSelected());
@@ -100,6 +98,17 @@ public class ShowFullMessage extends javax.swing.JFrame {
         });
         miWrap.setSelected(jtaMessageText.getLineWrap());
         jtaMessageText.getPopupMenu().add(miWrap);
+
+
+        miSplit5050 = new JMenuItem(new AbstractAction("Split 50/50") {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                split5050();
+            }
+
+        });
+        jtaMessageText.getPopupMenu().add(miSplit5050);
+
 
         pFullMessage.add(new RTextScrollPane(jtaMessageText));
 
@@ -146,6 +155,7 @@ public class ShowFullMessage extends javax.swing.JFrame {
                     spSplitPane.setRightComponent(pAllFields);
                     tca.adjustColumns();
                     showAllFields();
+                    spSplitPane.setDividerLocation(.5);
 
 //                    jtAllFields.setPreferredSize( new Dimension( jtAllFields.getSize().width, 200));
 //                    pAllFields.setSize((int) pAllFields.getSize().getWidth(), 200);
@@ -195,6 +205,12 @@ public class ShowFullMessage extends javax.swing.JFrame {
 
         pack();
 
+    }
+
+    private void split5050() {
+        if (jtAllFields.isVisible()) {
+            spSplitPane.setDividerLocation(.5);
+        }
     }
 
     private void toggleLineWrap(boolean selected) {
@@ -250,7 +266,7 @@ public class ShowFullMessage extends javax.swing.JFrame {
         pToolbar.setLayout(new java.awt.BorderLayout());
         jPanel1.add(pToolbar, java.awt.BorderLayout.PAGE_START);
 
-        spSplitPane.setDividerSize(2);
+        spSplitPane.setDividerSize(3);
         spSplitPane.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
         spSplitPane.setResizeWeight(0.95);
 
