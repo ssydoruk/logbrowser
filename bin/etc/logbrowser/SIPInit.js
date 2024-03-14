@@ -31,8 +31,8 @@ for (var s of RECORD.getBytes().split("\n")) {
   }
   if ((m = s.match(/Cisco-Gucid:\s*(.+)/)) != undefined) {
     FIELDS.put("Cisco-Gucid", {
-      value: m[1],
-      hidden: true
+      value: 'cuid:'+m[1],
+      hidden: false
     });
   }
   if (hasBody) {

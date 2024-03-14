@@ -73,7 +73,8 @@ switch (RECORD.getField("metric")) {
           p.startsWith("Entry1.done event") ||
           p.endsWith("End of this session") ||
           p.startsWith("return values = (") ||
-          p.includes("script.done event")
+          p.includes("script.done event") ||
+          p.includes("event received in user application thread")
         ) {
           IGNORE_RECORD = true;
         } else {

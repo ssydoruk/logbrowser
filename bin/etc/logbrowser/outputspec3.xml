@@ -1065,6 +1065,8 @@
         <!-- Orchestration METRIC -->
         <spec MsgType="orsm" format="filelink timestamp sid %s">
             <initScript src="./ORSM.js"/>
+			<recordDisplayScript src="./ORSMdisplay.js" />
+
 
             <param1 type="embedded" id="filelink" name="filename">
                 <pattern match="(log)" group="1"/>
