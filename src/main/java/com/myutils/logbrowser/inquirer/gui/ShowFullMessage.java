@@ -6,6 +6,7 @@
 package com.myutils.logbrowser.inquirer.gui;
 
 import Utils.ScreenInfo;
+import com.google.gson.*;
 import com.myutils.logbrowser.common.JSRunner;
 import com.myutils.logbrowser.common.RecordPrintout;
 
@@ -26,13 +27,15 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import javax.swing.*;
+import javax.swing.event.PopupMenuEvent;
+import javax.swing.event.PopupMenuListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.text.DefaultCaret;
 
 /**
  * @author ssydoruk
  */
-public class ShowFullMessage extends javax.swing.JFrame {
+public class ShowFullMessage extends javax.swing.JFrame implements PopupMenuListener {
 
     RSyntaxTextArea detailedMessage;
     RSyntaxTextArea jtaMessageText;
@@ -43,25 +46,33 @@ public class ShowFullMessage extends javax.swing.JFrame {
     private JScrollPane jspAllFields;
     private final Utils.swing.TableColumnAdjuster tca;
     private TabResultDataModel.TableRow row;
+
+    private final HashMap<TabResultDataModel.TableRow, String> detailedData = new HashMap<>();
     private String recordDisplayScript;
     JToggleButton btLineWrap;
     JToggleButton btAllFields;
+    JToggleButton btDetailedMessage;
     JCheckBoxMenuItem miWrap;
     JMenuItem miSplit5050;
+    JMenu mSelection;
+
+    JMenuItem miSelectionAsJson;
+    static final Gson gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
 
     /**
      * Creates new form ShowFullMessage
      */
     private ShowFullMessage() {
         initComponents();
-
         jtAllFields = new javax.swing.JTable();
         jspAllFields = new JScrollPane();
         jspAllFields.setViewportView(jtAllFields);
+        pAllFields.add(jspAllFields, java.awt.BorderLayout.CENTER);
+
         infoTableModel = new DefaultTableModel() {
             @Override
             public boolean isCellEditable(int row, int column) {
-                return column>0;
+                return column > 0;
             }
 
         };
@@ -108,7 +119,27 @@ public class ShowFullMessage extends javax.swing.JFrame {
 
         });
         jtaMessageText.getPopupMenu().add(miSplit5050);
+        mSelection = new JMenu("Selection");
+        jtaMessageText.getPopupMenu().add(mSelection);
+        jtaMessageText.getPopupMenu().addPopupMenuListener(this);
 
+        miSelectionAsJson = new JMenuItem(new AbstractAction("As JSON...") {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    String s = gson.toJson(JsonParser.parseString(jtaMessageText.getSelectedText()));
+                    detailedData.put(row, s);
+                    detailedMessage.setText(s);
+                    detailedMessage.setSyntaxEditingStyle(SyntaxConstants.SYNTAX_STYLE_JSON);
+                    detailedMessage.setCodeFoldingEnabled(true);
+
+                } catch (JsonSyntaxException ex) {
+                    detailedMessage.setText(">>SELECTION IS NOT JSON<<");
+                }
+            }
+
+        });
+        mSelection.add(miSelectionAsJson);
 
         pFullMessage.add(new RTextScrollPane(jtaMessageText));
 
@@ -117,20 +148,14 @@ public class ShowFullMessage extends javax.swing.JFrame {
         detailedMessage.setWrapStyleWord(true);
         detailedMessage.setLineWrap(true);
         detailedMessage.setEditable(false);
+        ((DefaultCaret) detailedMessage.getCaret()).setUpdatePolicy(DefaultCaret.NEVER_UPDATE);
 
         pDetailedMessage.add(new RTextScrollPane(detailedMessage));
         toolbar = new ToggleButtonToolBar();
         JPanel pToolbarPanel = new JPanel(new BorderLayout());
-//
         pToolbarPanel.add(toolbar, BorderLayout.PAGE_START);
         pToolbar.add(toolbar, BorderLayout.PAGE_START);
 
-//        toolbar.addButton("Excel", "Open the report in Excel", (new ActionListener() {
-//            @Override
-//            public void actionPerformed(ActionEvent e) {
-//                
-//            }
-//        }));
         btLineWrap = new JToggleButton("Line wrap", jtaMessageText.getLineWrap());
         btLineWrap.setToolTipText("Toggle line wrap on/off");
         btLineWrap.addActionListener(new AbstractAction() {
@@ -149,23 +174,35 @@ public class ShowFullMessage extends javax.swing.JFrame {
             public void actionPerformed(ActionEvent e) {
                 boolean selected = ((JToggleButton) e.getSource()).isSelected();
                 pAllFields.setVisible(selected);
-
+                updateSPDetails();
                 if (selected) {
-                    pAllFields.add(jspAllFields, java.awt.BorderLayout.CENTER);
-                    spSplitPane.setRightComponent(pAllFields);
-                    tca.adjustColumns();
                     showAllFields();
                     spSplitPane.setDividerLocation(.5);
-
-//                    jtAllFields.setPreferredSize( new Dimension( jtAllFields.getSize().width, 200));
-//                    pAllFields.setSize((int) pAllFields.getSize().getWidth(), 200);
                 } else {
-                    pAllFields.remove(jspAllFields);
                 }
                 spSplitPane.revalidate();
             }
         });
         toolbar.addButton(btAllFields);
+
+        pDetailedMessage.setVisible(false);
+        btDetailedMessage = new JToggleButton("Detailed message", pDetailedMessage.isVisible());
+        btDetailedMessage.setToolTipText("Toggle panel with all detailed on/off");
+        btDetailedMessage.addActionListener(new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                boolean selected = ((JToggleButton) e.getSource()).isSelected();
+                pDetailedMessage.setVisible(selected);
+                spSplitDetails.setVisible(selected);
+                if (selected) {
+                    spSplitDetails.setDividerLocation(.5);
+                } else {
+//                    pDetailedMessage.remove(detailedMessage);
+                }
+                spSplitPane.revalidate();
+            }
+        });
+        toolbar.addButton(btDetailedMessage);
 
         addWindowListener(new WindowAdapter() {
             @Override
@@ -184,10 +221,6 @@ public class ShowFullMessage extends javax.swing.JFrame {
             @Override
             public void windowClosing(WindowEvent e) {
                 inquirer.logger.debug("windowClosing");
-//                if (fullMsg != null) {
-//                    fullMsg.dispose();
-//                    fullMsg = null;
-//                }
                 parentForm.fullMsgClosed();
                 super.windowClosing(e); //To change body of generated methods, choose Tools | Templates.
             }
@@ -195,21 +228,23 @@ public class ShowFullMessage extends javax.swing.JFrame {
             @Override
             public void windowGainedFocus(WindowEvent e) {
                 inquirer.logger.debug("windowGainedFocus");
-//                if (fullMsg != null) {
-//                    fullMsg.setVisible(true);
-//                }
                 super.windowGainedFocus(e); //To change body of generated methods, choose Tools | Templates.
             }
 
         });
-
+        spSplitDetails.setVisible(false);
         pack();
+        invalidate();
+    }
 
+    private void updateSPDetails() {
+        spSplitDetails.setVisible(pAllFields.isVisible() || pFullMessage.isVisible());
     }
 
     private void split5050() {
-        if (jtAllFields.isVisible()) {
+        if (spSplitDetails.isVisible()) {
             spSplitPane.setDividerLocation(.5);
+            spSplitDetails.setDividerLocation(.5);
         }
     }
 
@@ -228,18 +263,13 @@ public class ShowFullMessage extends javax.swing.JFrame {
 
     }
 
-    /**
-     * This method is called from within the constructor to initialize the form.
-     * WARNING: Do NOT modify this code. The content of this method is always
-     * regenerated by the Form Editor.
-     */
-    @SuppressWarnings("unchecked")
-    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+
     private void initComponents() {
 
         jPanel1 = new javax.swing.JPanel();
         pToolbar = new javax.swing.JPanel();
         spSplitPane = new javax.swing.JSplitPane();
+        spSplitDetails = new javax.swing.JSplitPane();
         pFullMessage = new javax.swing.JPanel();
         pDetailedMessage = new javax.swing.JPanel();
         pAllFields = new javax.swing.JPanel();
@@ -270,21 +300,26 @@ public class ShowFullMessage extends javax.swing.JFrame {
         spSplitPane.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
         spSplitPane.setResizeWeight(0.95);
 
+        spSplitDetails.setDividerSize(3);
+        spSplitDetails.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
+        spSplitDetails.setResizeWeight(0.95);
+
         pFullMessage.setLayout(new java.awt.BorderLayout());
         spSplitPane.setLeftComponent(pFullMessage);
 
-        pDetailedMessage.setLayout(new java.awt.BorderLayout());
-        spSplitPane.setRightComponent(pDetailedMessage);
-
         pAllFields.setLayout(new java.awt.BorderLayout());
-        spSplitPane.setRightComponent(pAllFields);
+        spSplitPane.setRightComponent(spSplitDetails);
+
+        spSplitDetails.setLeftComponent(pAllFields);
+        pDetailedMessage.setLayout(new java.awt.BorderLayout());
+        spSplitDetails.setRightComponent(pDetailedMessage);
 
         jPanel1.add(spSplitPane, java.awt.BorderLayout.CENTER);
 
         getContentPane().add(jPanel1);
 
         pack();
-    }// </editor-fold>//GEN-END:initComponents
+    }
 
     private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
         parentForm.fullMsgClosed();
@@ -299,14 +334,13 @@ public class ShowFullMessage extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_formWindowStateChanged
 
-    // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel pAllFields;
-    private javax.swing.JPanel pDetailedMessage;
     private javax.swing.JPanel pFullMessage;
+    private javax.swing.JPanel pDetailedMessage;
     private javax.swing.JPanel pToolbar;
     private javax.swing.JSplitPane spSplitPane;
-    // End of variables declaration//GEN-END:variables
+    private javax.swing.JSplitPane spSplitDetails;
 
     void showMessage(String recordDisplayScript, TabResultDataModel.TableRow row) {
         this.row = row;
@@ -323,11 +357,16 @@ public class ShowFullMessage extends javax.swing.JFrame {
                 jtaMessageText.setText(row.getRecord().getBytes());
             } else {
                 RecordPrintout recPrintout = JSRunner.evalFullRecordPrintout(recordDisplayScript, row.getRecord());
-                jtaMessageText.setText(recPrintout.fullMessage);
-                if (StringUtils.isNotEmpty(recPrintout.detailsMessage)) {
-                    detailedMessage.setText(recPrintout.detailsMessage);
+                if (StringUtils.isNotBlank(recPrintout.fullMessage))
+                    jtaMessageText.setText(recPrintout.fullMessage);
+                else
+                    jtaMessageText.setText(row.getRecord().getBytes());
+                String s = detailedData.get(row);
+                if (StringUtils.isBlank(s))
+                    s = recPrintout.detailsMessage;
+                if (StringUtils.isNotEmpty(s)) {
+                    detailedMessage.setText(s);
                     detailedMessage.setSyntaxEditingStyle(SyntaxConstants.SYNTAX_STYLE_JSON);
-
                 }
             }
         } else {
@@ -354,6 +393,23 @@ public class ShowFullMessage extends javax.swing.JFrame {
             for (String[] entry : kvps) {
                 infoTableModel.addRow(entry);
             }
+            tca.adjustColumns();
         }
+    }
+
+    @Override
+    public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
+        mSelection.setEnabled(StringUtils.isNotEmpty(jtaMessageText.getSelectedText()));
+
+    }
+
+    @Override
+    public void popupMenuWillBecomeInvisible(PopupMenuEvent e) {
+
+    }
+
+    @Override
+    public void popupMenuCanceled(PopupMenuEvent e) {
+
     }
 }
