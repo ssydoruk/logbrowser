@@ -197,6 +197,7 @@ public class ReportFrameQuery extends ReportFrame {
                     @Override
                     public void run() {
                         fullMsg.setVisible(false);
+                        setExtendedState(JFrame.NORMAL);
                         setExtendedState(JFrame.MAXIMIZED_BOTH);
                     }
                 });
