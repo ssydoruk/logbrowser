@@ -31,7 +31,6 @@ public class ReportFrameQuery extends ReportFrame {
     private final ReportFrameQuery frm;
     private JRadioButtonMenuItem miFullOff;
 
-
     public ReportFrameQuery(ReportFrameQuery frm) {
         this(frm, true);
     }
@@ -55,21 +54,21 @@ public class ReportFrameQuery extends ReportFrame {
             public void windowIconified(WindowEvent e) {
                 showFullMsg(false);
                 inquirer.logger.debug("windowIconified");
-                super.windowIconified(e); //To change body of generated methods, choose Tools | Templates.
+                super.windowIconified(e); // To change body of generated methods, choose Tools | Templates.
             }
 
             @Override
             public void windowDeiconified(WindowEvent e) {
                 showFullMsg(true);
                 inquirer.logger.debug("windowDeiconified");
-                super.windowDeiconified(e); //To change body of generated methods, choose Tools | Templates.
+                super.windowDeiconified(e); // To change body of generated methods, choose Tools | Templates.
             }
 
             @Override
             public void windowActivated(WindowEvent e) {
                 showFullMsg(true);
 
-                super.windowActivated(e); //To change body of generated methods, choose Tools | Templates.
+                super.windowActivated(e); // To change body of generated methods, choose Tools | Templates.
             }
 
         });
@@ -78,14 +77,14 @@ public class ReportFrameQuery extends ReportFrame {
             public void componentShown(ComponentEvent e) {
                 showFullMsg(true);
                 inquirer.logger.debug("componentShown");
-                super.componentShown(e); //To change body of generated methods, choose Tools | Templates.
+                super.componentShown(e); // To change body of generated methods, choose Tools | Templates.
             }
 
             @Override
             public void componentHidden(ComponentEvent e) {
                 showFullMsg(false);
                 inquirer.logger.debug("componentHidden");
-                super.componentHidden(e); //To change body of generated methods, choose Tools | Templates.
+                super.componentHidden(e); // To change body of generated methods, choose Tools | Templates.
             }
 
         });
@@ -157,7 +156,7 @@ public class ReportFrameQuery extends ReportFrame {
                 showFull();
             }
         });
-//        mi.setModel(new MenuItemModel(SwingConstants.RIGHT));
+        // mi.setModel(new MenuItemModel(SwingConstants.RIGHT));
         bgPlacement.add(mi);
         placementPopup.add(mi);
 
@@ -167,7 +166,7 @@ public class ReportFrameQuery extends ReportFrame {
                 showFull();
             }
         });
-//        mi.setModel(new MenuItemModel(SwingConstants.LEFT));
+        // mi.setModel(new MenuItemModel(SwingConstants.LEFT));
         bgPlacement.add(mi);
         placementPopup.add(mi);
 
@@ -177,7 +176,7 @@ public class ReportFrameQuery extends ReportFrame {
                 showFull();
             }
         });
-//        mi.setModel(new MenuItemModel(SwingConstants.TOP));
+        // mi.setModel(new MenuItemModel(SwingConstants.TOP));
         bgPlacement.add(mi);
         placementPopup.add(mi);
 
@@ -190,7 +189,7 @@ public class ReportFrameQuery extends ReportFrame {
         });
         bgPlacement.add(mi);
         placementPopup.add(mi);
-//        mi.setModel(new MenuItemModel(SwingConstants.BOTTOM));
+        // mi.setModel(new MenuItemModel(SwingConstants.BOTTOM));
 
         miFullOff = new JRadioButtonMenuItem(new AbstractAction("Off") {
             public void actionPerformed(ActionEvent e) {
@@ -204,12 +203,12 @@ public class ReportFrameQuery extends ReportFrame {
 
             }
         });
-//        mi.setModel(new MenuItemModel(0));
+        // mi.setModel(new MenuItemModel(0));
         bgPlacement.add(miFullOff);
         placementPopup.add(miFullOff);
         miFullOff.setSelected(true);
 
-//        choosePlacementButton();
+        // choosePlacementButton();
         btPlacement.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
@@ -218,7 +217,6 @@ public class ReportFrameQuery extends ReportFrame {
         });
 
     }
-
 
     private void addCloneButton() {
         JButton bt = addToolbarButton("Clone", "Duplicate current report window");
@@ -250,7 +248,7 @@ public class ReportFrameQuery extends ReportFrame {
 
     @Override
     public void setTitle(String title) {
-        super.setTitle(title); //To change body of generated methods, choose Tools | Templates.
+        super.setTitle(title); // To change body of generated methods, choose Tools | Templates.
     }
 
     private void showFullMsg(boolean b) {
@@ -298,15 +296,14 @@ public class ReportFrameQuery extends ReportFrame {
         setTitle(theTitle);
         setPrintStreams(ps);
 
-//        pack();
+        // pack();
     }
-
 
     private void LoadExcel() {
         TabResultDataModel mod = (TabResultDataModel) tableView.getModel();
         try {
             Excel.reportEdit(mod.exportToExcel(tableView));
-//            Excel.aggregateEdit(mod.exportToExcel());
+            // Excel.aggregateEdit(mod.exportToExcel());
         } catch (IOException ex) {
             inquirer.ExceptionHandler.handleException(this.getClass().toString(), ex);
         }
@@ -315,7 +312,7 @@ public class ReportFrameQuery extends ReportFrame {
     private void LoadFull() {
         TabResultDataModel mod = (TabResultDataModel) tableView.getModel();
         if (tableView.canPrintFull(mod)) {
-//        ExternalEditor.editFiles(mod.getFullFileNames());
+            // ExternalEditor.editFiles(mod.getFullFileNames());
             ExternalEditor.editFiles(mod.exportFull(tableView));
         }
     }
@@ -324,19 +321,18 @@ public class ReportFrameQuery extends ReportFrame {
         miFullOff.setSelected(true);
     }
 
-
     void showFull() {
-        ScreenInfo.refitMainToMsg(theForm, fullMsg, fullPlacement);
         fullMsg.doShowMessage();
         fullMsg.setVisible(true);
         fullMsg.toFront();
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                theForm.toFront();
-                theForm.repaint();
-            }
-        });
+        ScreenInfo.refitMainToMsg(theForm, fullMsg, fullPlacement);
+        // java.awt.EventQueue.invokeLater(new Runnable() {
+        //     @Override
+        //     public void run() {
+        //         theForm.toFront();
+        //         theForm.repaint();
+        //     }
+        // });
 
     }
 
@@ -359,7 +355,7 @@ public class ReportFrameQuery extends ReportFrame {
         public InfoAction() {
             super("Info");
             putValue(Action.SHORT_DESCRIPTION, "Show report statistics");
-//            putValue(Action.SELECTED_KEY, tableView.isFollowLog());
+            // putValue(Action.SELECTED_KEY, tableView.isFollowLog());
 
         }
 
@@ -375,7 +371,7 @@ public class ReportFrameQuery extends ReportFrame {
         public CopyAction() {
             super("Copy");
             putValue(Action.SHORT_DESCRIPTION, "Copy to clipboard");
-//            putValue(Action.SELECTED_KEY, tableView.isFollowLog());
+            // putValue(Action.SELECTED_KEY, tableView.isFollowLog());
 
         }
 
@@ -390,7 +386,7 @@ public class ReportFrameQuery extends ReportFrame {
         public FilterAction() {
             super("Filter");
             putValue(Action.SHORT_DESCRIPTION, "Filter records");
-//            putValue(Action.SELECTED_KEY, tableView.isFollowLog());
+            // putValue(Action.SELECTED_KEY, tableView.isFollowLog());
         }
 
         @Override
