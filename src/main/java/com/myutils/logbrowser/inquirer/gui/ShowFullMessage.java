@@ -180,26 +180,23 @@ public class ShowFullMessage extends javax.swing.JFrame implements PopupMenuList
                     spSplitPane.setDividerLocation(.5);
                 } else {
                 }
-                spSplitPane.revalidate();
             }
         });
         toolbar.addButton(btAllFields);
 
         pDetailedMessage.setVisible(false);
-        btDetailedMessage = new JToggleButton("Detailed message", pDetailedMessage.isVisible());
-        btDetailedMessage.setToolTipText("Toggle panel with all detailed on/off");
+        btDetailedMessage = new JToggleButton("Extracts", pDetailedMessage.isVisible());
+        btDetailedMessage.setToolTipText("Toggle panel with message extracts on/off");
         btDetailedMessage.addActionListener(new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 boolean selected = ((JToggleButton) e.getSource()).isSelected();
                 pDetailedMessage.setVisible(selected);
-                spSplitDetails.setVisible(selected);
+                updateSPDetails();
                 if (selected) {
-                    spSplitDetails.setDividerLocation(.5);
+                    spSplitPane.setDividerLocation(.5);
                 } else {
-//                    pDetailedMessage.remove(detailedMessage);
                 }
-                spSplitPane.revalidate();
             }
         });
         toolbar.addButton(btDetailedMessage);
@@ -238,7 +235,10 @@ public class ShowFullMessage extends javax.swing.JFrame implements PopupMenuList
     }
 
     private void updateSPDetails() {
-        spSplitDetails.setVisible(pAllFields.isVisible() || pFullMessage.isVisible());
+        boolean bBottomVisible=pAllFields.isVisible() || pDetailedMessage.isVisible();
+        spSplitDetails.setVisible(bBottomVisible);
+        if(bBottomVisible)
+            spSplitDetails.setDividerLocation(.5);
     }
 
     private void split5050() {
@@ -250,9 +250,11 @@ public class ShowFullMessage extends javax.swing.JFrame implements PopupMenuList
 
     private void toggleLineWrap(boolean selected) {
         jtaMessageText.setLineWrap(selected);
+        jtaMessageText.repaint();
+        detailedMessage.setLineWrap(selected);
+        detailedMessage.repaint();
         miWrap.setSelected(selected);
         btLineWrap.setSelected(selected);
-        jtaMessageText.repaint();
     }
 
     ShowFullMessage(ReportFrameQuery aThis) {
