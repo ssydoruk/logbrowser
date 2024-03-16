@@ -485,7 +485,7 @@ public class InquirerCfg implements Serializable {
         return getConsts().getCaseExpr(fieldName, constantName);
     }
 
-    String lookupConst(String constName, int theConstInt) {
+    public String lookupConst(String constName, int theConstInt) {
         return getConsts().lookupConst(constName, theConstInt);
     }
 

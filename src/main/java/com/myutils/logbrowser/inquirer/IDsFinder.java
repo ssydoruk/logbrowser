@@ -11,6 +11,8 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static Utils.Util.sortedArray;
+
 public final class IDsFinder extends QueryTools {
 
     private static final Matcher regCampName = Pattern.compile("^([^@]+)@").matcher("");

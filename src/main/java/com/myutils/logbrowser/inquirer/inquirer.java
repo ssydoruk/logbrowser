@@ -107,7 +107,7 @@ public class inquirer {
         return prefix + " - " + title;
     }
 
-    static String UTCtoDateTime(String fieldValue, String dtFormat) {
+    public static String UTCtoDateTime(String fieldValue, String dtFormat) {
         try {
             long ts = Long.parseLong(fieldValue);
             DateTimeFormatter format = getDTFormat(dtFormat);
@@ -732,7 +732,7 @@ public class inquirer {
                 dlg.wait();
             }
         }
-        // saveObject(getSerFile(), queryDialogSettings);
+       // saveObject(getSerFile(), queryDialogSettings);
 
         lfm.clear();
     }

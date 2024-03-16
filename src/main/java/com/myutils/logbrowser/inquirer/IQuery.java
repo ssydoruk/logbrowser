@@ -12,6 +12,8 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import static Utils.Util.sortedArray;
+
 public abstract class IQuery extends QueryTools {
 
     private static final int SPLIT_ON = 1000;
