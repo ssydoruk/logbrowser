@@ -203,7 +203,7 @@
                             <id>inquirer</id>
                         </program>
                         <program>
-                            <mainClass>com.myutils.logbrowser.cmd</mainClass>
+                            <mainClass>com.myutils.logbrowser.cmd.inquirer</mainClass>
                             <id>logcmd</id>
                         </program>
                     </programs>

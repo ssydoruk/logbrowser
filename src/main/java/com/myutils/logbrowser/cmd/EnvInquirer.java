@@ -7,6 +7,7 @@ package com.myutils.logbrowser.cmd;
 
 import org.apache.commons.cli.*;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
@@ -49,40 +50,30 @@ public class EnvInquirer {
         this.options = new Options();
         this.parser = new DefaultParser();
 
-        optHelp = Option.builder("h").hasArg(false).required(false).desc("Show help and exit").longOpt("help")
-                .build();
+        optHelp = Option.builder("h").hasArg(false).required(false).desc("Show help and exit").longOpt("help").build();
         options.addOption(optHelp);
-
 
         optDBName = Option.builder("d").hasArg(true).required(true).desc("Name of the SQLite database file")
                 .valueSeparator('=').longOpt("dbname").build();
         options.addOption(optDBName);
 
-
-        optIsRegex = Option.builder("x").hasArg(false).required(false)
-                .desc("Search expression is regular expression")
+        optIsRegex = Option.builder("x").hasArg(false).required(false).desc("Search expression is regular expression")
                 .longOpt("regex").valueSeparator('=').build();
         options.addOption(optIsRegex);
 
-        optSearchString = Option.builder("s").hasArg(true).required(true)
-                .longOpt("search").valueSeparator(' ')
-                .desc("what to search for")
-                .build();
+        optSearchString = Option.builder("s").hasArg(true).required(true).longOpt("search").valueSeparator(' ')
+                .desc("what to search for").build();
         options.addOption(optSearchString);
 
-        optTables = Option.builder("t").hasArg().required(false)
-                .longOpt("tables").valueSeparator(' ')
-                .desc("Comma separated list of reftables to search in. Can be specified multiple times. Will search in all if not specified or value is 'all'")
+        optTables = Option.builder("t").hasArg().required(false).longOpt("tables").valueSeparator(' ').desc(
+                "Comma separated list of reftables to search in. Can be specified multiple times. Will search in all if not specified or value is 'all'")
                 .build();
         options.addOption(optTables);
     }
 
-
     public String getDbname() {
         return dbname;
     }
-
-
 
     public void printHelp() {
         HelpFormatter hf = new HelpFormatter();
@@ -128,7 +119,6 @@ public class EnvInquirer {
         return (ret || def);
     }
 
-
     public void parserCommandLine(String[] args) {
         try {
             cmd = parser.parse(options, args, false);
@@ -148,7 +138,6 @@ public class EnvInquirer {
 
         tables = getOptTables();
 
-
     }
 
     /**
@@ -158,12 +147,14 @@ public class EnvInquirer {
     private ArrayList<String> getOptTables() {
         HashSet<String> ret = new HashSet<>();
 
-        for (String s : Arrays.stream(cmd.getOptionValues(optTables)).toList()) {
-            ret.addAll(Arrays.stream(StringUtils.split(s.toLowerCase(), ",")).toList());
+        String[] optionValues = cmd.getOptionValues(optTables);
+        if (ArrayUtils.isNotEmpty(optionValues)) {
+            for (String s : Arrays.stream(optionValues).toList()) {
+                ret.addAll(Arrays.stream(StringUtils.split(s.toLowerCase(), ",")).toList());
+            }
+            return ret.isEmpty() || ret.contains("all") ? null : new ArrayList<>(ret.stream().toList());
         }
-        return ret.isEmpty() || ret.contains("all")
-                ?
-                null :
-                new ArrayList<>(ret.stream().toList());
+        else 
+            return null;
     }
 }

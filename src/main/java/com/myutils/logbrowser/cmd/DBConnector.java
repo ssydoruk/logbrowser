@@ -53,7 +53,7 @@ class DBConnector {
             logger.error("fatal: ", ex);
             throw new SQLException(ex);
         }
-        String name = dbName + ".db";
+        String name = dbName ;
         File f = new File(name);
         Path p = f.toPath();
         if (!Files.isRegularFile(p)) {
