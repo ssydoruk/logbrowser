@@ -939,27 +939,17 @@ public final class IDsFinder extends QueryTools {
             }
         }
 
-        if (selectionType == SelectionType.UUID || selectionType == SelectionType.GUESS_SELECTION) {
+        if (selectionType == SelectionType.UUID || selectionType == SelectionType.IXN || selectionType == SelectionType.GUESS_SELECTION) {
             Integer[] _refIDs = getRefIDs(ReferenceType.UUID, sIDs, regex);
             AddIDs(IDType.UUID, _refIDs);
-
-            if (IDsFound(IDType.UUID)) {
-                return true;
-            }
-
-            if (selectionType == SelectionType.UUID) {
-                return false;
-            }
-        }
-        if (selectionType == SelectionType.IXN || selectionType == SelectionType.GUESS_SELECTION) {
-            Integer[] _refIDs = getRefIDs(ReferenceType.IxnID, sIDs, regex);
+            _refIDs = getRefIDs(ReferenceType.IxnID, sIDs, regex);
             AddIDs(IDType.IxnID, _refIDs);
 
-            if (IDsFound(IDType.IxnID)) {
+            if (IDsFound(IDType.UUID) || IDsFound(IDType.IxnID)) {
                 return true;
             }
 
-            if (selectionType == SelectionType.IXN) {
+            if (selectionType == SelectionType.UUID || selectionType == SelectionType.IXN) {
                 return false;
             }
         }

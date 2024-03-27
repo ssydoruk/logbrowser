@@ -1588,19 +1588,22 @@ final public class RoutingResults extends IQueryResults {
                     ORSMM.addWhere(getWhere("IXNIDID", IxnID, false), "AND");
                     tmpIDs = new HashSet<>();
 
-                    ORSMM.setRecLoadedProc((ILogRecord rec) -> {
-                        addUnique(tmpIDs, Util.intOrDef(rec.getFieldValue("refid"), (Long) null));
-                    });
+                    // commenting out. This is probably mistake carried over from Interaction. Unlikely to have ixn requests in ORS logs
+                    // ORSMM.setRecLoadedProc((ILogRecord rec) -> {
+                    //     addUnique(tmpIDs, Util.intOrDef(rec.getFieldValue("refid"), (Long) null));
+                    // });
                 } else {
                     tmpIDs = null;
                 }
                 getRecords(ORSMM);
-                if (tmpIDs != null) {
-                    ORSMM = newORSMMTable(orsReportSettings, dlg);
-                    ORSMM.addWhere(getWhere(ORSMM.getTabAlias() + ".refid", tmpIDs, false), "AND");
-                    ORSMM.addWhere(ORSMM.getTabAlias() + ".IXNIDID < 1", "AND");
-                    getRecords(ORSMM);
-                }
+
+                // commenting out. This is probably mistake carried over from Interaction. Unlikely to have ixn requests in ORS logs
+                // if (tmpIDs != null) {
+                //     ORSMM = newORSMMTable(orsReportSettings, dlg);
+                //     ORSMM.addWhere(getWhere(ORSMM.getTabAlias() + ".refid", tmpIDs, false), "AND");
+                //     ORSMM.addWhere(ORSMM.getTabAlias() + ".IXNIDID < 1", "AND");
+                //     getRecords(ORSMM);
+                // }
             }
         }
         // </editor-fold>

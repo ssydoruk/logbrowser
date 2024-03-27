@@ -81,8 +81,6 @@ public final class URSRlib extends Message {
                             method = "Result";
                             reqID = Util.intOrDef(FindByRx(prnResult, 1, null), (Integer) null);
                             result = "";
-                        } else if (message.equals("RequestDeleteVCall") || message.equals("RequestUpdateVCall")) {
-                            sid = GetCall();
                         } else if (message.equals("EventOnInvoke")) {
                             this.result = FindByRx(prnResult, 1, "");
                             if (StringUtils.isNotBlank(result)) {
