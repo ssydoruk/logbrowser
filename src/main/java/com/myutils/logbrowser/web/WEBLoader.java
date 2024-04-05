@@ -81,6 +81,32 @@ public class WEBLoader {
         }).start();
     }
 
+    public void finish() {
+        try {
+            if (indexer != null) {
+                logger.info("WEB: stop ");
+                indexer.finishParsing();
+            }
+        } catch (Exception e) {
+            logger.error("Exception while finishing parsing: " + e.getMessage(), e);
+        }
+    }
+
+    public void terminate() {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Thread.sleep(300);
+                } catch (InterruptedException e) {
+                }
+                server.shutdownNow();
+                System.exit(-1);
+            }
+        }).start();
+
+    }
+
     public void die() {
         System.exit(-1);
     }

@@ -28,11 +28,20 @@ public class MyResource {
     }
 
     @GET
+    @Path("finish")
+    @Produces(MediaType.TEXT_PLAIN)
+    public String finish() {
+        Main.getWebLoader().finish();
+        Main.getWebLoader().terminate();
+        return "ok";
+    }
+
+    @GET
     @Path("die")
     @Produces(MediaType.TEXT_PLAIN)
     public String die() {
         Main.getWebLoader().die();
-        return "Got it!";
+        return "ok";
     }
 
     /**
