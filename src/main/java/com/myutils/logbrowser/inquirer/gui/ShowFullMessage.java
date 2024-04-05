@@ -22,10 +22,15 @@ import org.fife.ui.rtextarea.RTextScrollPane;
 
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
+
 import javax.swing.*;
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
@@ -76,7 +81,7 @@ public class ShowFullMessage extends javax.swing.JFrame implements PopupMenuList
             }
 
         };
-        for (String string : new String[]{"Field", "Value"}) {
+        for (String string : new String[] { "Field", "Value" }) {
             infoTableModel.addColumn(string);
         }
         jtAllFields.setModel(infoTableModel);
@@ -88,7 +93,7 @@ public class ShowFullMessage extends javax.swing.JFrame implements PopupMenuList
         tca.setColumnHeaderIncluded(false);
         tca.setDynamicAdjustment(true);
 
-//        tca.setMaxColumnWidth(getFontMetrics(getFont()).stringWidth(getSampleString(MAX_CHARS_IN_TABLE)));
+        // tca.setMaxColumnWidth(getFontMetrics(getFont()).stringWidth(getSampleString(MAX_CHARS_IN_TABLE)));
 
         jtaMessageText = new RSyntaxTextArea();
         jtaMessageText.setCodeFoldingEnabled(false);
@@ -110,7 +115,6 @@ public class ShowFullMessage extends javax.swing.JFrame implements PopupMenuList
         miWrap.setSelected(jtaMessageText.getLineWrap());
         jtaMessageText.getPopupMenu().add(miWrap);
 
-
         miSplit5050 = new JMenuItem(new AbstractAction("Split 50/50") {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -123,7 +127,7 @@ public class ShowFullMessage extends javax.swing.JFrame implements PopupMenuList
         jtaMessageText.getPopupMenu().add(mSelection);
         jtaMessageText.getPopupMenu().addPopupMenuListener(this);
 
-        miSelectionAsJson = new JMenuItem(new AbstractAction("As JSON...") {
+        miSelectionAsJson = new JMenuItem(new AbstractAction("As JSON") {
             @Override
             public void actionPerformed(ActionEvent e) {
                 try {
@@ -135,6 +139,32 @@ public class ShowFullMessage extends javax.swing.JFrame implements PopupMenuList
 
                 } catch (JsonSyntaxException ex) {
                     detailedMessage.setText(">>SELECTION IS NOT JSON<<");
+                }
+            }
+
+        });
+        mSelection.add(miSelectionAsJson);
+
+        miSelectionAsJson = new JMenuItem(new AbstractAction("URL decode") {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    String str = URLDecoder.decode(jtaMessageText.getSelectedText(), "UTF-8");
+
+                    String decodedQuery = Arrays.stream(str.split("&"))
+                            // .map(param -> param.split("=")[0] + "=" + decode(param.split("=")[1]))
+                            .collect(Collectors.joining("&\n\t"));
+
+                    detailedData.put(row, decodedQuery);
+                    detailedMessage.setText(decodedQuery);
+                    detailedMessage.setSyntaxEditingStyle(SyntaxConstants.SYNTAX_STYLE_PROPERTIES_FILE);
+                    detailedMessage.setCodeFoldingEnabled(false);
+
+                } catch (JsonSyntaxException ex) {
+                    detailedMessage.setText(">>SELECTION IS NOT JSON<<");
+                } catch (UnsupportedEncodingException e1) {
+                    // TODO Auto-generated catch block
+                    e1.printStackTrace();
                 }
             }
 
@@ -219,13 +249,13 @@ public class ShowFullMessage extends javax.swing.JFrame implements PopupMenuList
             public void windowClosing(WindowEvent e) {
                 inquirer.logger.debug("windowClosing");
                 parentForm.fullMsgClosed();
-                super.windowClosing(e); //To change body of generated methods, choose Tools | Templates.
+                super.windowClosing(e); // To change body of generated methods, choose Tools | Templates.
             }
 
             @Override
             public void windowGainedFocus(WindowEvent e) {
                 inquirer.logger.debug("windowGainedFocus");
-                super.windowGainedFocus(e); //To change body of generated methods, choose Tools | Templates.
+                super.windowGainedFocus(e); // To change body of generated methods, choose Tools | Templates.
             }
 
         });
@@ -235,9 +265,9 @@ public class ShowFullMessage extends javax.swing.JFrame implements PopupMenuList
     }
 
     private void updateSPDetails() {
-        boolean bBottomVisible=pAllFields.isVisible() || pDetailedMessage.isVisible();
+        boolean bBottomVisible = pAllFields.isVisible() || pDetailedMessage.isVisible();
         spSplitDetails.setVisible(bBottomVisible);
-        if(bBottomVisible)
+        if (bBottomVisible)
             spSplitDetails.setDividerLocation(.5);
     }
 
@@ -262,9 +292,7 @@ public class ShowFullMessage extends javax.swing.JFrame implements PopupMenuList
         parentForm = aThis;
         ScreenInfo.CenterWindowTopMaxWidth(this);
 
-
     }
-
 
     private void initComponents() {
 
@@ -323,18 +351,18 @@ public class ShowFullMessage extends javax.swing.JFrame implements PopupMenuList
         pack();
     }
 
-    private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
+    private void formWindowClosing(java.awt.event.WindowEvent evt) {// GEN-FIRST:event_formWindowClosing
         parentForm.fullMsgClosed();
         // TODO add your handling code here:
-    }//GEN-LAST:event_formWindowClosing
+    }// GEN-LAST:event_formWindowClosing
 
-    private void formWindowDeactivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowDeactivated
+    private void formWindowDeactivated(java.awt.event.WindowEvent evt) {// GEN-FIRST:event_formWindowDeactivated
         // TODO add your handling code here:
-    }//GEN-LAST:event_formWindowDeactivated
+    }// GEN-LAST:event_formWindowDeactivated
 
-    private void formWindowStateChanged(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowStateChanged
+    private void formWindowStateChanged(java.awt.event.WindowEvent evt) {// GEN-FIRST:event_formWindowStateChanged
         // TODO add your handling code here:
-    }//GEN-LAST:event_formWindowStateChanged
+    }// GEN-LAST:event_formWindowStateChanged
 
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel pAllFields;
@@ -383,13 +411,14 @@ public class ShowFullMessage extends javax.swing.JFrame implements PopupMenuList
             HashMap<Integer, Object> rowData = row.getRowData();
             ArrayList<String[]> kvps = new ArrayList<>();
             for (Map.Entry<Integer, Object> entry : rowData.entrySet()) {
-                kvps.add(new String[]{String.format("%03d", entry.getKey()), entry.getValue().toString()});
+                kvps.add(new String[] { String.format("%03d", entry.getKey()), entry.getValue().toString() });
             }
             for (Map.Entry<Object, Object> entry : row.getRecord().m_fieldsAll.entrySet()) {
-                kvps.add(new String[]{entry.getKey().toString() + " (raw)", entry.getValue().toString()});
+                kvps.add(new String[] { entry.getKey().toString() + " (raw)", entry.getValue().toString() });
             }
             Collections.sort(kvps, (o1, o2) -> {
-                return ((String[]) o1)[0].compareToIgnoreCase(((String[]) o2)[0]); //To change body of generated lambdas, choose Tools | Templates.
+                return ((String[]) o1)[0].compareToIgnoreCase(((String[]) o2)[0]); // To change body of generated
+                                                                                   // lambdas, choose Tools | Templates.
             });
 
             for (String[] entry : kvps) {
