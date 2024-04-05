@@ -31,7 +31,6 @@ public class inquirer {
     public inquirer() {
     }
 
-
     public static String getVersion() {
         try {
             String name = inquirer.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath()
@@ -49,6 +48,8 @@ public class inquirer {
     }
 
     public static void main(String[] args) throws Exception {
+        int ret = -1; // assume not found
+        boolean dbNamePrinted=false;
         try {
 
             ee = new EnvInquirer();
@@ -86,6 +87,10 @@ public class inquirer {
             for (ReferenceType tab : tablesToSearch) {
                 String[] refNames = inq.dbConnector.getRefNames(tab, ee.getSearch(), ee.isRegex());
                 if (ArrayUtils.isNotEmpty(refNames)) {
+                    ret = 0;
+                    if(!dbNamePrinted){
+                        System.out.println("Database: "+ee.getDbname());
+                    }
                     System.out.println("Found in tab [" + tab.toString() + "]");
                     for (String name : refNames) {
                         System.out.println("\t-" + name);
@@ -98,7 +103,7 @@ public class inquirer {
         } finally {
             inq.dbConnector.GracefulClose();
         }
-        System.exit(0);
+        System.exit(ret);
     }
 
     private static List<ReferenceType> getSubRefType(String tab) {
