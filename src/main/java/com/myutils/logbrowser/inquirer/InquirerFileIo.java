@@ -95,11 +95,7 @@ public class InquirerFileIo {
         private int lastBytes = 0;
 
         public InqFile(LogFile lf) throws IOException {
-            if (lf.isText()) {
-                rfr = new TextFileReader(lf.getFileName());
-            } else {
-                rfr = new ZIPFileReader(lf);
-            }
+            rfr = lf.createFileReader();
         }
 
         public boolean isInited() {

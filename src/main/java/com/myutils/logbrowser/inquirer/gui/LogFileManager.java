@@ -5,20 +5,25 @@
  */
 package com.myutils.logbrowser.inquirer.gui;
 
+import com.myutils.logbrowser.indexer.*;
 import com.myutils.logbrowser.inquirer.LogFile;
 import com.myutils.logbrowser.inquirer.inquirer;
+import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
+import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
+import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
+import org.apache.commons.compress.compressors.gzip.GzipParameters;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
+
+import static org.apache.commons.io.FileUtils.copyInputStreamToFile;
 
 /**
  * @author Stepan
@@ -55,22 +60,54 @@ public class LogFileManager {
             return;
         }
         inquirer.logger.debug("Unzipping " + logFile + "Out: " + extractedFile);
-        ZipFile logArchive = new ZipFile(new File(logFile.getArcName()), ZipFile.OPEN_READ);
+        String name = logFile.getArcName();
         (new File(logFile.getArcDir())).mkdirs();
-        byte[] buffer = new byte[1024];
-        ZipEntry entry = logArchive.getEntry(logFile.getFileName());
-
-        if (entry != null) {
-            InputStream curStream = logArchive.getInputStream(entry);
-            FileOutputStream fos = new FileOutputStream(newFile);
-            int len;
-            while ((len = curStream.read(buffer)) > 0) {
-                fos.write(buffer, 0, len);
-            }
-            fos.close();
+        if (name.endsWith(".tgz") || name.endsWith(".tar.gz")) {
+            extractTGZ(logFile.getArcName(), logFile.getFileName(), newFile);
+        } else if (name.endsWith(".zip")) {
+            extractZIP(logFile.getArcName(), logFile.getFileName(), newFile);
+        } else if (name.endsWith(".gz")) {
+            extractGZIP(logFile.getArcName(), logFile.getFileName(), newFile);
         }
-        logArchive.close();
+
         usedArchives.add(extractedFile);
+    }
+
+    private void extractGZIP(String arcName, String fileName, File newFile) throws IOException {
+        try (FileInputStream fis = new FileInputStream(arcName);
+             GzipCompressorInputStream gis = new GzipCompressorInputStream(fis)){
+            copyInputStreamToFile(gis, newFile);
+
+        }
+    }
+
+    private void extractZIP(String arcName, String fileName, File newFile) throws IOException {
+        ZipFile logArchive = null;
+        try {
+            logArchive = new ZipFile(new File(arcName), ZipFile.OPEN_READ);
+            byte[] buffer = new byte[1024];
+            ZipEntry entry = logArchive.getEntry(fileName);
+
+            if (entry != null) {
+                InputStream curStream = logArchive.getInputStream(entry);
+                copyInputStreamToFile(curStream, newFile);
+            }
+        } finally {
+            if (logArchive != null)
+                logArchive.close();
+        }
+    }
+
+    private void extractTGZ(String arcName, String fileName, File newFile) throws IOException {
+        TarArchiveEntry entry = null;
+        try (TarArchiveInputStream tarInput = new TarArchiveInputStream(new GzipCompressorInputStream(new FileInputStream(arcName)))) {
+            do {
+                entry = tarInput.getNextTarEntry(); // You forgot to iterate to the next file
+            } while (entry != null && !entry.isDirectory() && !entry.getName().equals(fileName));
+            if (entry == null)
+                throw new IOException("No file: " + fileName);
+            copyInputStreamToFile(tarInput, newFile);
+        }
     }
 
     public void clear() {

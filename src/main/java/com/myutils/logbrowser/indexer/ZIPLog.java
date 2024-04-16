@@ -53,7 +53,7 @@ public final class ZIPLog extends LogFileWrapper {
             while (e.hasMoreElements()) {
                 ZipEntry entry = (ZipEntry) e.nextElement();
                 if (!entry.isDirectory()) {
-                    FileInfo fi = new FileInfo(theArchive, entry, this);
+                    FileInfo fi = new FileInfo(this, entry.getName(), entry.getSize());
                     try (InputStream inputStream = theArchive.getInputStream(entry)) {
                         if (fi.CheckLog(inputStream) != FileInfoType.type_Unknown) {
                             goodFileFound = true;

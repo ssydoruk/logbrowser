@@ -9,6 +9,8 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
@@ -60,7 +62,22 @@ public class LogFile {
             }
 
         }
+    }
 
+    public RandomFileReader createFileReader() throws IOException {
+        if (arcName == null) {
+            return  new TextFileReader(fileName);
+        }
+        else {
+            if (arcName.endsWith(".tgz") || arcName.endsWith(".tar.gz")) {
+                return new TGZFileReader(this);
+            } else if (arcName.endsWith(".zip")) {
+                return new ZIPFileReader(this);
+            } else if (arcName.endsWith(".gz")) {
+                return new GZipFileReader(this);
+            }
+        }
+        return null;
     }
 
     public static String makeString(String fileName, String arcName) {

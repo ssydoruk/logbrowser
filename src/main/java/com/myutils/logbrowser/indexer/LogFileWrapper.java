@@ -5,10 +5,12 @@
  */
 package com.myutils.logbrowser.indexer;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
+import org.apache.commons.compress.compressors.CompressorException;
+import org.apache.commons.compress.compressors.CompressorInputStream;
+import org.apache.commons.compress.compressors.CompressorStreamFactory;
+import org.apache.commons.io.FilenameUtils;
+
+import java.io.*;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Set;
@@ -19,7 +21,7 @@ import java.util.Set;
 public abstract class LogFileWrapper {
 
     private final File file;
-    private final HashMap<FileInfo, Object> fileInfoFileMap = new HashMap<>();
+    private final HashMap<FileInfo, File> fileInfoFileMap = new HashMap<>();
     private final String baseDir;
     private boolean ignoreLog = false;
 
@@ -31,12 +33,35 @@ public abstract class LogFileWrapper {
     public static LogFileWrapper getContainer(File file, String baseDir) {
         LogFileWrapper ret = null;
         try {
-            if (file.getName().toLowerCase().endsWith(".log")) {
+            String name=file.getName().toLowerCase();
+            if (name.endsWith(".log")) {
                 ret = new TextLog(file, baseDir);
             } else if (!Main.getMain().isIgnoreZIP()) {
-                if (file.getName().toLowerCase().endsWith(".zip")) {
+                if(name.endsWith(".tgz") || name.endsWith(".tar.gz")){
+                    return new TarGZLog(file, baseDir);
+                } else if (name.endsWith(".zip")) {
                     return new ZIPLog(file, baseDir);
+                } else if (name.endsWith(".gz")) {
+                    return new GZLog(file, baseDir);
                 }
+//                String ext=FilenameUtils.getExtension(file.getName()).toLowerCase();
+//                if (ext.equals("zip") ) {
+//                    return new ZIPLog(file, baseDir);
+//                } else if (ext.equals("gz") || ext.equals("tgz")) {
+//                    try(FileInputStream fin = new FileInputStream(file);
+//                        BufferedInputStream bin = new BufferedInputStream(fin) ){
+//                        CompressorInputStream input = new CompressorStreamFactory()
+//                                .createCompressorInputStream(bin);
+//                        byte[] bytes = input.readNBytes(1000);
+//                        String s = new String(bytes);
+//                        System.out.println(s);
+//
+//                    } catch (CompressorException e) {
+//                        throw new RuntimeException(e);
+//                    }
+//
+//                    return new GZLog(file, baseDir);
+//                }
             }
         } catch (IOException ex) {
             Main.logger.error("Cannot determine type of file " + file, ex);

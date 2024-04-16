@@ -111,18 +111,32 @@ public final class FileInfo extends Record {
 
     }
 
-    FileInfo(ZipFile logArchive, ZipEntry entry, ZIPLog aThis) throws IOException {
+//    FileInfo( ZipEntry entry, LogFileWrapper logFile) throws IOException {
+//        this();
+//        m_path = entry.getName();
+//        m_name = entry.getName();
+//        filePath = logFile.getFile().getAbsolutePath();
+//        fileDir = logFile.getFile().getParent();
+//        setSize(entry.getSize());
+//        setFileFilter(m_component);
+//        Main.logger.trace(this.toString());
+//
+//        this.logFile = logFile;
+//        this.archiveName = logFile.getRelativeFile(this.logFile.getFile());
+//    }
+
+    FileInfo( LogFileWrapper logFile, String entryName, long entrySize) throws IOException {
         this();
-        m_path = entry.getName();
-        m_name = entry.getName();
-        filePath = aThis.getFile().getAbsolutePath();
-        fileDir = aThis.getFile().getParent();
-        setSize(entry.getSize());
+        m_path = entryName;
+        m_name = entryName;
+        filePath = logFile.getFile().getAbsolutePath();
+        fileDir = logFile.getFile().getParent();
+        setSize(entrySize);
         setFileFilter(m_component);
         Main.logger.trace(this.toString());
 
-        this.logFile = aThis;
-        this.archiveName = aThis.getRelativeFile(logFile.getFile());
+        this.logFile = logFile;
+        this.archiveName = logFile.getRelativeFile(this.logFile.getFile());
     }
 
     FileInfo(File _file) throws IOException {
