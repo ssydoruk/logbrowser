@@ -1,10 +1,12 @@
 package com.myutils.logbrowser.inquirer;
 
+import Utils.Pair;
 import Utils.UTCTimeRange;
 import com.myutils.logbrowser.indexer.FileInfoType;
 import com.myutils.logbrowser.indexer.ReferenceType;
 import com.myutils.logbrowser.indexer.TableType;
 import com.myutils.logbrowser.inquirer.IQuery.FieldType;
+import static com.myutils.logbrowser.inquirer.QueryTools.FindNode;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -12,12 +14,13 @@ import java.beans.PropertyChangeEvent;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Properties;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
 
 public class IxnServerResults extends IQueryResults {
 
-    private String m_tlibFilter;
+    private static final org.apache.logging.log4j.Logger logger = LogManager.getLogger();
 
-    private int m_componentFilter;
     private ArrayList<NameID> appType = null;
     private IDsFinder cidFinder = null;
 
@@ -106,12 +109,6 @@ public class IxnServerResults extends IQueryResults {
 
     }
 
-    public void SetConfig(Properties config) {
-        if (config != null && !config.isEmpty()) {
-            m_tlibFilter = config.getProperty("TlibFilter");
-        }
-    }
-
     private void addLogMessagesReportType(DynamicTreeNode<OptionNode> root, TableType tableType) {
         DynamicTreeNode<OptionNode> nd = new DynamicTreeNode<>(new OptionNode(false, "Log messages"));
         root.addChild(nd);
@@ -164,43 +161,14 @@ public class IxnServerResults extends IQueryResults {
 
     @Override
     public void Retrieve(QueryDialog dlg) throws SQLException {
-        SelectionType selectionType = dlg.getSelectionType();
-        String selection = dlg.getSelection();
-
         if (dlg.getSearchApps() == null) {
             inquirer.logger.info("No apps selected. Nothing to search in");
             return;
         }
 
-        if (selectionType != SelectionType.NO_SELECTION) {
-            cidFinder = new IDsFinder(dlg);
-            if (!cidFinder.initIxn()) {
-                inquirer.logger.error("Not found selection: ["
-                        + dlg.getSelection() + "] type: [" + dlg.getSelectionType() + "] isRegex: [" + dlg.isRegex()
-                        + "]");
-                return;
-            }
-        } else {
-            cidFinder = null;
-        }
+        cidFinder = new IDsFinder(dlg);
+        runSelectionQuery(dlg, dlg.getSelectionType(), cidFinder);
 
-//        doRetrieve(dlg, cidFinder);
-        if (cidFinder != null && cidFinder.getSearchType() == SelectionType.CALLID) {
-            inquirer.logger.info("No TLib events for CallID search without show related");
-        } else {
-            retrieveIxn(dlg,
-                    FindNode(repComponents.getRoot(), DialogItem.IXN, DialogItem.IXN_EVENT, null),
-                    cidFinder);
-            retrieveIxnNonIxn(dlg,
-                    FindNode(repComponents.getRoot(), DialogItem.IXN, DialogItem.IXN_NONEVENT, null),
-                    cidFinder);
-        }
-
-        getCustom(FileInfoType.type_StatServer, dlg, repComponents.getRoot(), cidFinder, null);
-
-        getGenesysMessages(TableType.MsgIxnServer, repComponents.getRoot(), dlg, this);
-        getConfigMessages(repComponents.getRoot(), dlg, this);
-        Sort();
     }
 
     private TableQuery IxnTable(MsgType tabType, String tab) throws SQLException {
@@ -288,26 +256,26 @@ public class IxnServerResults extends IQueryResults {
 
     @Override
     public void Retrieve(QueryDialog qd, SelectionType key, String searchID) throws SQLException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        runSelectionQuery(qd, key, new IDsFinder(qd, key, searchID));
     }
 
     @Override
     public AllProcSettings getAllProc(Window parent) {
-        return new AllProcSettings((qd, settings) -> getAll(qd, settings), null);
+        AllCalls_IxnSettings rd = AllCalls_IxnSettings.getInstance(this, parent);
+        return (rd.doShow()) ? new AllProcSettings(rd.getSelectAllReportTypeGroup().getSelectedObject(), rd) : null;
     }
 
-    FullTableColors getAll(QueryDialog qd, AllInteractionsSettings settings) throws SQLException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
 
     @Override
     void showAllResults() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+//        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
     SearchFields getSearchField() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        SearchFields ret = new SearchFields();
+        ret.addRecMap(FileInfoType.type_IxnServer, new Pair<>(SelectionType.IXN, "ixn"));
+        return ret;
     }
 
     @Override
@@ -328,6 +296,163 @@ public class IxnServerResults extends IQueryResults {
     @Override
     boolean callRelatedSearch(IDsFinder cidFinder) throws SQLException {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    ArrayList<Pair<String, String>> getAllSortFields() {
+        ArrayList<Pair<String, String>> ret = new ArrayList<>();
+        ret.add(new Pair<>("Time", "started"));
+        ret.add(new Pair<>("Interaction ID", "ixnID"));
+        return ret;
+    }
+
+    FullTableColors getAllInteractions(QueryDialog qd, AllInteractionsSettings settings) throws SQLException{
+        try {
+
+            String reportTable = "ixnAllTmp";
+            DynamicTreeNode.setNoRefNoLoad(true);
+
+            DatabaseConnector.dropTable(reportTable);
+            inquirer.logger.info("Building temp tables");
+
+            tellProgress("Creating temp table");
+            DatabaseConnector.runQuery("create temp table " + reportTable + " (" + "ixnid int"
+                    + ",parentixnidid int"
+                    + ",started timestamp" 
+                    + ",ended timestamp" 
+                    + ",stoppedat timestamp"
+                    + ",mediatypeid int" 
+                    + ",appid int" 
+                    + ",ixnqueueid int"
+                     + ")\n;");
+
+            Wheres wh = new Wheres();
+//            wh.addWhere(IQuery.getCheckedWhere("ThisDNid", ReferenceType.DN, FindNode(repComponents.getRoot(),
+//                    DialogItem.ORS, DialogItem.ORS_TEVENTS, DialogItem.ORS_TEVENTS_DN)), "OR");
+//            wh.addWhere(IQuery.getCheckedWhere("otherDNID", ReferenceType.DN, FindNode(repComponents.getRoot(),
+//                    DialogItem.ORS, DialogItem.ORS_TEVENTS, DialogItem.ORS_TEVENTS_DN)), "OR");
+
+            String makeWhere = wh.makeWhere(false);
+
+            String tab = TableType.Ixn.toString();
+
+            if (!StringUtils.isEmpty(tab)) {
+                tellProgress("Finding unique IxnIDs in interactions");
+
+                getAllResults.add(new Pair<>("Unique calls in Ixn table",
+                        DatabaseConnector.runQuery("insert into " + reportTable + " (ixnid, started, ended)"
+                                + "\nselect distinct ixnid, min(time), max(time) from " + tab
+                                + "\nwhere ixnid >0 AND ixnqueueid>0\n"
+                                + IQuery.getFileFilters(tab, "fileid", qd.getSearchApps(false), "AND")
+                                + IQuery.getDateTimeFilters(tab, "time", qd.getTimeRange(), "AND")
+                                + ((makeWhere != null && !makeWhere.isEmpty()) ? " and (" + makeWhere + ")" : "")
+                                + "\ngroup by 1" + IQuery.getLimitClause(isLimitQueryResults(), getMaxQueryLines())
+                                + ";")));
+
+                DatabaseConnector
+                        .runQuery("create index idx_" + reportTable + "ixnid on " + reportTable + "(ixnid);");
+                DatabaseConnector
+                        .runQuery("create index idx_" + reportTable + "started on " + reportTable + "(started);");
+
+                tellProgress("Updating parameters of interaction");
+                DatabaseConnector.runQuery("update " + reportTable + "\nset (" + "ixnqueueid" + ", mediatypeid" + ", appid"
+                        + ") = " + "\n(" + "select "
+                        + "ixnqueueid" + ", mediatypeid " + ", appid " 
+                        + "\nfrom\n" + "(select " + tab + ".*" + ",file_logbr.appnameid as appid"
+                        + "\nfrom " + tab + " inner join file_logbr on " + tab + ".fileid=file_logbr.id" + ") as " + tab
+                        + "\nwhere " + reportTable + ".ixnid=" + tab + ".ixnid"
+                        + "\nand\n" + reportTable + ".started=" + tab + ".time" + "\n"
+                        + IQuery.getFileFilters(tab, "fileid", qd.getSearchApps(false), "AND") + "\n"
+                        + IQuery.getDateTimeFilters(tab, "time", qd.getTimeRange(), "AND") + ")" + ";");
+
+
+                DatabaseConnector.runQuery("update " + reportTable + "\nset (" + "stoppedat" 
+                        + ") = " + "\n(" + "select "
+                        + "time"                        + "\nfrom " + tab 
+                        + "\nwhere " + reportTable + ".ixnid=" + tab + ".ixnid"
+                        + " AND " + getWhere(tab +".nameid", ReferenceType.TEvent, new String[]{"EventProcessingStopped"}, false)
+                       
+                        + IQuery.getFileFilters(tab, "fileid", qd.getSearchApps(false), "AND") + "\n"
+                        + IQuery.getDateTimeFilters(tab, "time", qd.getTimeRange(), "AND") + ")" + ";");
+
+            } else {
+                logger.error("Neither routing table found");
+            }
+
+            tellProgress("Creating indexes");
+            DatabaseConnector.runQuery("create index idx_" + reportTable + "appid on " + reportTable + "(appid);");
+            DatabaseConnector
+                    .runQuery("create index idx_" + reportTable + "mediatypeid on " + reportTable + "(mediatypeid);");
+            DatabaseConnector
+                    .runQuery("create index idx_" + reportTable + "ixnqueueid on " + reportTable + "(ixnqueueid);");
+
+
+            tellProgress("Extracting data");
+            TableQuery tabReport = new TableQuery(reportTable);
+            tabReport.setOrderBy(tabReport.getTabAlias() + "." + settings.getSortField() + ' '
+                    + (settings.isAscendingSorting() ? "asc" : "desc") + " ");
+            tabReport.addOutField("UTCtoDateTime(started, \"YYYY-MM-dd HH:mm:ss.SSS\") \"first ts\"");
+            tabReport.addOutField("UTCtoDateTime(ended, \"YYYY-MM-dd HH:mm:ss.SSS\") \"last ts\"");
+            tabReport.addOutField("UTCtoDateTime(stoppedat, \"YYYY-MM-dd HH:mm:ss.SSS\") \"stopped at\"");
+            tabReport.setAddAll(false);
+            tabReport.addRef("ixnQueueID", "Queue", ReferenceType.DN.toString(), IQuery.FieldType.OPTIONAL);
+            tabReport.addRef("ixnid", "ixn", ReferenceType.IxnID.toString(), IQuery.FieldType.OPTIONAL);
+            tabReport.addRef("MediaTypeID", "media", ReferenceType.Media.toString(), IQuery.FieldType.OPTIONAL);
+            tabReport.addRef("appid", "application", ReferenceType.App.toString(), IQuery.FieldType.OPTIONAL);
+            int maxRecs = settings.getMaxRecords();
+            if (maxRecs > 0) {
+                tabReport.setLimit(maxRecs);
+            }
+
+            // tabReport.setOrderBy(tabReport.getTabAlias() + ".started");
+            FullTableColors currTable = tabReport.getFullTable();
+            currTable.setHiddenField("rowType");
+            return currTable; // To change body of generated methods, choose Tools | Templates.
+        } finally {
+            DynamicTreeNode.setNoRefNoLoad(false);
+        }
+    }
+
+    FullTableColors getAllAgentLogins(QueryDialog qd, AllInteractionsSettings settings) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+
+    private void runSelectionQuery(QueryDialog dlg, SelectionType selectionType, IDsFinder cidFinder) throws SQLException {
+
+        String selection = dlg.getSelection();
+
+        if (dlg.getSearchApps() == null) {
+            inquirer.logger.info("No apps selected. Nothing to search in");
+            return;
+        }
+
+        if (selectionType != SelectionType.NO_SELECTION) {
+            if (!cidFinder.initIxn()) {
+                inquirer.logger.error("Not found selection: ["
+                        + dlg.getSelection() + "] type: [" + dlg.getSelectionType() + "] isRegex: [" + dlg.isRegex()
+                        + "]");
+                return;
+            }
+        } else {
+            cidFinder = null;
+        }
+
+        if (cidFinder != null && cidFinder.getSearchType() == SelectionType.CALLID) {
+            inquirer.logger.info("No TLib events for CallID search without show related");
+        } else {
+            retrieveIxn(dlg,
+                    FindNode(repComponents.getRoot(), DialogItem.IXN, DialogItem.IXN_EVENT, null),
+                    cidFinder);
+            retrieveIxnNonIxn(dlg,
+                    FindNode(repComponents.getRoot(), DialogItem.IXN, DialogItem.IXN_NONEVENT, null),
+                    cidFinder);
+        }
+
+        getCustom(FileInfoType.type_StatServer, dlg, repComponents.getRoot(), cidFinder, null);
+
+        getGenesysMessages(TableType.MsgIxnServer, repComponents.getRoot(), dlg, this);
+        getConfigMessages(repComponents.getRoot(), dlg, this);
+        Sort();
+
     }
 
 }
