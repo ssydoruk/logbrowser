@@ -81,7 +81,7 @@ public class ShowFullMessage extends javax.swing.JFrame implements PopupMenuList
             }
 
         };
-        for (String string : new String[] { "Field", "Value" }) {
+        for (String string : new String[]{"Field", "Value"}) {
             infoTableModel.addColumn(string);
         }
         jtAllFields.setModel(infoTableModel);
@@ -94,7 +94,6 @@ public class ShowFullMessage extends javax.swing.JFrame implements PopupMenuList
         tca.setDynamicAdjustment(true);
 
         // tca.setMaxColumnWidth(getFontMetrics(getFont()).stringWidth(getSampleString(MAX_CHARS_IN_TABLE)));
-
         jtaMessageText = new RSyntaxTextArea();
         jtaMessageText.setCodeFoldingEnabled(false);
         jtaMessageText.setSyntaxEditingStyle(SyntaxConstants.SYNTAX_STYLE_RUBY);
@@ -130,16 +129,7 @@ public class ShowFullMessage extends javax.swing.JFrame implements PopupMenuList
         miSelectionAsJson = new JMenuItem(new AbstractAction("As JSON") {
             @Override
             public void actionPerformed(ActionEvent e) {
-                try {
-                    String s = gson.toJson(JsonParser.parseString(jtaMessageText.getSelectedText()));
-                    detailedData.put(row, s);
-                    detailedMessage.setText(s);
-                    detailedMessage.setSyntaxEditingStyle(SyntaxConstants.SYNTAX_STYLE_JSON);
-                    detailedMessage.setCodeFoldingEnabled(true);
-
-                } catch (JsonSyntaxException ex) {
-                    detailedMessage.setText(">>SELECTION IS NOT JSON<<");
-                }
+                showJson();
             }
 
         });
@@ -220,14 +210,9 @@ public class ShowFullMessage extends javax.swing.JFrame implements PopupMenuList
         btDetailedMessage.addActionListener(new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                boolean selected = ((JToggleButton) e.getSource()).isSelected();
-                pDetailedMessage.setVisible(selected);
-                updateSPDetails();
-                if (selected) {
-                    spSplitPane.setDividerLocation(.5);
-                } else {
-                }
+                showDetailed(((JToggleButton) e.getSource()).isSelected());
             }
+
         });
         toolbar.addButton(btDetailedMessage);
 
@@ -264,11 +249,39 @@ public class ShowFullMessage extends javax.swing.JFrame implements PopupMenuList
         invalidate();
     }
 
+    private void showJson() {
+        try {
+            String s = gson.toJson(JsonParser.parseString(jtaMessageText.getSelectedText()));
+            detailedData.put(row, s);
+            detailedMessage.setText(s);
+            detailedMessage.setSyntaxEditingStyle(SyntaxConstants.SYNTAX_STYLE_JSON);
+            detailedMessage.setCodeFoldingEnabled(true);
+            btDetailedMessage.setSelected(true);
+            showDetailed(true);
+        } catch (JsonSyntaxException ex) {
+            detailedMessage.setText(">>SELECTION IS NOT JSON<<");
+        }
+    }
+
+    private void showDetailed(boolean selected) {
+        pDetailedMessage.setVisible(selected);
+        updateSPDetails();
+        if (selected) {
+            spSplitPane.setDividerLocation(.5);
+        } else {
+        }
+
+    }
+
     private void updateSPDetails() {
         boolean bBottomVisible = pAllFields.isVisible() || pDetailedMessage.isVisible();
         spSplitDetails.setVisible(bBottomVisible);
-        if (bBottomVisible)
+        if (bBottomVisible) {
             spSplitDetails.setDividerLocation(.5);
+        }
+        spSplitPane.revalidate();
+//        jtaMessageText.revalidate();
+//        invalidate();
     }
 
     private void split5050() {
@@ -387,13 +400,15 @@ public class ShowFullMessage extends javax.swing.JFrame implements PopupMenuList
                 jtaMessageText.setText(row.getRecord().getBytes());
             } else {
                 RecordPrintout recPrintout = JSRunner.evalFullRecordPrintout(recordDisplayScript, row.getRecord());
-                if (StringUtils.isNotBlank(recPrintout.fullMessage))
+                if (StringUtils.isNotBlank(recPrintout.fullMessage)) {
                     jtaMessageText.setText(recPrintout.fullMessage);
-                else
+                } else {
                     jtaMessageText.setText(row.getRecord().getBytes());
+                }
                 String s = detailedData.get(row);
-                if (StringUtils.isBlank(s))
+                if (StringUtils.isBlank(s)) {
                     s = recPrintout.detailsMessage;
+                }
                 if (StringUtils.isNotEmpty(s)) {
                     detailedMessage.setText(s);
                     detailedMessage.setSyntaxEditingStyle(SyntaxConstants.SYNTAX_STYLE_JSON);
@@ -411,14 +426,14 @@ public class ShowFullMessage extends javax.swing.JFrame implements PopupMenuList
             HashMap<Integer, Object> rowData = row.getRowData();
             ArrayList<String[]> kvps = new ArrayList<>();
             for (Map.Entry<Integer, Object> entry : rowData.entrySet()) {
-                kvps.add(new String[] { String.format("%03d", entry.getKey()), entry.getValue().toString() });
+                kvps.add(new String[]{String.format("%03d", entry.getKey()), entry.getValue().toString()});
             }
             for (Map.Entry<Object, Object> entry : row.getRecord().m_fieldsAll.entrySet()) {
-                kvps.add(new String[] { entry.getKey().toString() + " (raw)", entry.getValue().toString() });
+                kvps.add(new String[]{entry.getKey().toString() + " (raw)", entry.getValue().toString()});
             }
             Collections.sort(kvps, (o1, o2) -> {
                 return ((String[]) o1)[0].compareToIgnoreCase(((String[]) o2)[0]); // To change body of generated
-                                                                                   // lambdas, choose Tools | Templates.
+                // lambdas, choose Tools | Templates.
             });
 
             for (String[] entry : kvps) {
