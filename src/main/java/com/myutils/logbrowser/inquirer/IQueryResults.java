@@ -262,7 +262,7 @@ public abstract class IQueryResults extends QueryTools
 //                inquirer.ExceptionHandler.handleException("interrupted while printing", new InterruptedException());
                 throw new RuntimeInterruptException();
             }
-            ILogRecord record = (ILogRecord) m_results.get(i);
+            ILogRecord record = m_results.get(i);
             ps.newRow(record);
             record.debug();
             for (int j = 0; j < m_formatters.size(); j++) {

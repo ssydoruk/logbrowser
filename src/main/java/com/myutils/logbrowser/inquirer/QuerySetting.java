@@ -31,6 +31,7 @@ import java.util.regex.PatternSyntaxException;
 public final class QuerySetting extends javax.swing.JDialog {
 
     private static final org.apache.logging.log4j.Logger logger = LogManager.getLogger();
+    private static final long serialVersionUID = 1L;
     private final JList<String> lPrintFilters;
     Object curSelected = null;
     TableType lastTableType;

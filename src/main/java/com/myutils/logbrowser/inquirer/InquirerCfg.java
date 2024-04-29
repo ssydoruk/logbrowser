@@ -288,31 +288,31 @@ public class InquirerCfg implements Serializable {
         return logMessages.get(refType);
     }
 
-    public void LoadRefs() {
-        LoadRef(ReferenceType.TEvent);
-        LoadRef(ReferenceType.METRIC);
-        LoadRef(ReferenceType.SIPMETHOD);
-        LoadRef(ReferenceType.ORSMETHOD);
-        LoadRef(ReferenceType.ORSMODULE);
-        LoadRef(ReferenceType.StatType);
-        LoadRef(ReferenceType.ISCCEvent);
-        LoadRef(ReferenceType.URSStrategyMsg);
-        LoadRef(ReferenceType.MSGLEVEL);
-        LoadRef(ReferenceType.METRICFUNC);
-        LoadRef(ReferenceType.AgentStatType);
-        LoadRef(ReferenceType.DBRequest);
-        LoadRef(ReferenceType.OCSIconEvent);
-        LoadRef(ReferenceType.OCSIconCause);
-        LoadRef(ReferenceType.OCSClientRequest);
-        LoadRef(ReferenceType.GMSEvent);
-        LoadRef(ReferenceType.ORSREQ);
-        LoadRef(ReferenceType.VXMLCommand);
-        LoadRef(ReferenceType.CfgOp);
+    public void initCfg() {
+        loadRef(ReferenceType.TEvent);
+        loadRef(ReferenceType.METRIC);
+        loadRef(ReferenceType.SIPMETHOD);
+        loadRef(ReferenceType.ORSMETHOD);
+        loadRef(ReferenceType.ORSMODULE);
+        loadRef(ReferenceType.StatType);
+        loadRef(ReferenceType.ISCCEvent);
+        loadRef(ReferenceType.URSStrategyMsg);
+        loadRef(ReferenceType.MSGLEVEL);
+        loadRef(ReferenceType.METRICFUNC);
+        loadRef(ReferenceType.AgentStatType);
+        loadRef(ReferenceType.DBRequest);
+        loadRef(ReferenceType.OCSIconEvent);
+        loadRef(ReferenceType.OCSIconCause);
+        loadRef(ReferenceType.OCSClientRequest);
+        loadRef(ReferenceType.GMSEvent);
+        loadRef(ReferenceType.ORSREQ);
+        loadRef(ReferenceType.VXMLCommand);
+        loadRef(ReferenceType.CfgOp);
 
-        LoadPrintFilters();
+        loadPrintFilters();
     }
 
-    private void LoadRef(ReferenceType refType) {
+    private void loadRef(ReferenceType refType) {
         try {
             String[] refNames = getRefNames(this, refType);
             ArrayList<OptionNode> refs = getRefsChecked().get(refType);
@@ -418,7 +418,7 @@ public class InquirerCfg implements Serializable {
         return FileNameShort;
     }
 
-    private void LoadPrintFilters() {
+    private void loadPrintFilters() {
         try {
             if (DatabaseConnector.TableExist(ReferenceType.AppType.toString())) {
                 for (String refName : getRefNames(this, ReferenceType.AppType)) {
@@ -610,7 +610,7 @@ public class InquirerCfg implements Serializable {
 
     private void checkRefsLoaded() {
         if (!refsLoaded) {
-            LoadRefs();
+            initCfg();
             refsLoaded = true;
         }
     }
