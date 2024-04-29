@@ -91,10 +91,13 @@ public final class IDsFinder extends QueryTools {
                 break;
             case Level5:
                 queryLevel = 5;
+                break;
             case Level6:
                 queryLevel = 6;
+                break;
             case Level7:
                 queryLevel = 7;
+                break;
             case Level8:
                 queryLevel = 8;
                 break;
@@ -1447,6 +1450,7 @@ public final class IDsFinder extends QueryTools {
                                 : null;
 
                 }
+                break;
             }
 //</editor-fold>
 //<editor-fold defaultstate="collapsed" desc="AGENT">
@@ -1524,6 +1528,7 @@ public final class IDsFinder extends QueryTools {
                         return DatabaseConnector.getIDs("ocsscxmltr", "SessIDID", getWhere("chID", searchIDs, true));
 
                 }
+                break;
 
             case ConnID:
                 switch (providedIDType) {
@@ -1797,7 +1802,9 @@ public final class IDsFinder extends QueryTools {
                 switch (givenIDType) {
                     case ORSCallID: {
 //                        return DatabaseConnector.getIDs(TableType.ORSCallID.toString(), "uuidid", getWhere("callID", searchIDs, true));
+                    break;
                     }
+                   
 
                     case ConnID:
                         return QueryTools.uniqueInts(
@@ -1831,6 +1838,7 @@ public final class IDsFinder extends QueryTools {
                                 ? DatabaseConnector.getIDs("orshttp", "GMSServiceID", getWhere("sidid", searchIDs, true))
                                 : null;
                 }
+                break;
 
             case ORSSID:
                 switch (givenIDType) {

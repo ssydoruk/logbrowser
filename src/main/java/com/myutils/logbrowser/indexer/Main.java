@@ -971,6 +971,8 @@ public class Main {
 
     static class Constants extends HashMap<GenesysConstants, HashMap<Integer, String>> {
 
+        private static final long serialVersionUID = 1L;
+
         public Constants() {
             super();
             put(GenesysConstants.TSERVER, initTServerConstants());
@@ -1416,6 +1418,8 @@ public class Main {
     }
 
     class ProcessedFilesSet extends HashMap<String, ProcessedFiles> {
+
+        private static final long serialVersionUID = 1L;
 
         //"select id, intfilename, size from file_logbr
         public void loadFiles(List<ArrayList<Object>> objMultiple) {

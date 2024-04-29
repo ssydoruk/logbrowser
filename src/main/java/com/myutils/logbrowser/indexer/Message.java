@@ -1137,6 +1137,8 @@ public abstract class Message extends Record {
 
     public class MessageAttributes extends ArrayList<RegExAttribute> {
 
+        private static final long serialVersionUID = 1L;
+
         public void parseAttributes() {
             if (m_MessageLines != null) {
                 for (String s : m_MessageLines) {

@@ -261,6 +261,8 @@ public final class GenesysMsg extends Message {
 //    }
     static class GenesysMsgMap extends HashMap<String, ArrayList<String>> {
 
+        private static final long serialVersionUID = 1L;
+
         private void addMap(String msgID, String line) {
             ArrayList<String> storedLine = get(msgID);
             if (storedLine == null) {

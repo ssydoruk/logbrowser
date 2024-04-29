@@ -99,7 +99,7 @@ public enum FileInfoType {
     }
 
     public static FileInfoType GetvalueOf(int fileInfoType) {
-        return (FileInfoType) map.get(fileInfoType);
+        return map.get(fileInfoType);
     }
 
     public static String getTableName(FileInfoType t) {

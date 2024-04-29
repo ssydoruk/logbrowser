@@ -365,7 +365,7 @@ public class InquirerCfg implements Serializable {
 
     private void AddRefs(ReferenceType refType, String[] refNames, ArrayList<OptionNode> refs) {
         Stream.of(refNames).filter(ref->!RefExists(refs, ref)).forEach(ref->refs.add(new OptionNode(true, ref)));
-        Collections.sort((ArrayList<OptionNode>)refs);
+        Collections.sort(refs);
 
     }
 

@@ -464,6 +464,8 @@ public abstract class ILogRecord {
 
     public static class StdFields extends HashMap<String, IValueAssessor> {
 
+        private static final long serialVersionUID = 1L;
+
         /**
          * @param fieldName
          * @param valueAccessor - if null, this means field from record set is

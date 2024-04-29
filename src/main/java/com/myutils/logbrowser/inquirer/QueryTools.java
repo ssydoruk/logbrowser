@@ -22,41 +22,6 @@ import static Utils.Util.sortedArray;
 import static com.myutils.logbrowser.inquirer.QueryTools.getWhere;
 import static com.myutils.logbrowser.inquirer.QueryTools.uniqueInts;
 
-enum IDType {
-    UNKNOWN,
-    UUID,
-    ConnID,
-    OCSSID,
-    OCSRecordHandle,
-    ORSSID,
-    IxnID,
-    OCSChainID,
-    CG,
-    DN,
-    AGENT,
-    CGDBID,
-    PLACE,
-    IxnQueue,
-    OCSCampaign,
-    OCSCampaignDBID,
-    GMSSESSION,
-    SIPCallID,
-    TLibRefID,
-    JSONID,
-    SIPHandlerID,
-    SIPTriggerID,
-    TLIBID,
-    SIPID,
-    PEERIP,
-    ORSCallID,
-    MCPCallID,
-    JSessionID,
-    GWS_DeviceID,
-    BrowserClientID,
-    WWEUserID,
-    ANYPARAM,
-}
-
 /**
  * @author ssydoruk
  */
