@@ -25,6 +25,7 @@ import java.awt.event.ItemListener;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 
 /**
  * @author ssydoruk
@@ -146,21 +147,44 @@ public class RequestParams extends javax.swing.JPanel {
             for (NameID nameID : apps) {
                 lmApps.addElement(nameID);
             }
+            HashSet<String> disabledApps = inquirer.geLocaltQuerySettings().getDisabledApps(qry);
+            CheckBoxListSelectionModel checked = cblApps.getCheckBoxListSelectionModel();
             lmApps.insertElementAt(CheckBoxList.ALL_ENTRY, 0);
-            cblApps.getCheckBoxListSelectionModel().addSelectionInterval(0, 0);
+            if (disabledApps == null || disabledApps.size() == 0) {
+                checked.addSelectionInterval(0, 0);
+            } else {
+                ListModel model = cblApps.getModel();
+                checked.clearSelection();
+                for (int i = 0; i < model.getSize(); i++) {
+                    Object obj = model.getElementAt(i);
+                    if (obj instanceof NameID) {
+                        if (!disabledApps.contains(((NameID) obj).getName())) {
+                            checked.addSelectionInterval(i, i);
+                        }
+                    }
+                }
+            }
         }
+
         JScrollPane jsp = new JScrollPane(cblApps);
 
-        cblApps.getCheckBoxListSelectionModel().setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+        cblApps.getCheckBoxListSelectionModel()
+                .setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         SearchableUtils.installSearchable(cblApps);
+
         jpApps.add(jsp);
-        jpApps.setMaximumSize(new Dimension(jpApps.getMaximumSize().width, jpApps.getPreferredSize().height + 10));
-        jpApps.setMinimumSize(new Dimension(jpApps.getPreferredSize().width, jpApps.getMinimumSize().height));
+
+        jpApps.setMaximumSize(
+                new Dimension(jpApps.getMaximumSize().width, jpApps.getPreferredSize().height + 10));
+        jpApps.setMinimumSize(
+                new Dimension(jpApps.getPreferredSize().width, jpApps.getMinimumSize().height));
 
 //</editor-fold>
         timeRange = new TDateRange();
+
         timeRange.setTimeRange(qry.getTimeRange());
-        timeRange.setRefreshCB(new IRefresh() {
+        timeRange.setRefreshCB(
+                new IRefresh() {
             @Override
             public UTCTimeRange Refresh() {
                 try {
@@ -170,18 +194,29 @@ public class RequestParams extends javax.swing.JPanel {
                 }
                 return null;
             }
-        });
+        }
+        );
         jpDateTime.add(timeRange);
-        cbSearchLevel.setModel(new DefaultComboBoxModel(IDsFinder.RequestLevel.values()));
+
+        cbSearchLevel.setModel(
+                new DefaultComboBoxModel(IDsFinder.RequestLevel.values()));
         cbSearchLevel.setSelectedItem(q.getDefaultQueryLevel());
 
-        pSelectionType.setMaximumSize(new Dimension(pSelectionType.getMaximumSize().width, pSelectionType.getMinimumSize().height));
-        pSearchLevel.setMaximumSize(new Dimension(pSearchLevel.getMaximumSize().width, pSearchLevel.getMinimumSize().height));
-        pShowFiles.setMaximumSize(new Dimension(pShowFiles.getMaximumSize().width, pShowFiles.getMinimumSize().height));
+        pSelectionType.setMaximumSize(
+                new Dimension(pSelectionType.getMaximumSize().width, pSelectionType.getMinimumSize().height));
+        pSearchLevel.setMaximumSize(
+                new Dimension(pSearchLevel.getMaximumSize().width, pSearchLevel.getMinimumSize().height));
+        pShowFiles.setMaximumSize(
+                new Dimension(pShowFiles.getMaximumSize().width, pShowFiles.getMinimumSize().height));
     }
 
     ArrayList<Integer> getSearchApps() {
         return getSearchApps(false);
+    }
+
+    public void saveUncheckedApps() {
+        inquirer.geLocaltQuerySettings().saveUncheckedApps(getQry(),
+                getSearchAppsName(false, false));
     }
 
     ArrayList<Integer> getSearchApps(boolean returnAllIfListFull) {
@@ -205,13 +240,19 @@ public class RequestParams extends javax.swing.JPanel {
         }
     }
 
-    ArrayList<String> getSearchAppsName(boolean returnAllIfListFull) {
+    /**
+     *
+     * @param returnAllIfListFull
+     * @param getChecked - if true, returns checked; otherwise unchecked
+     * @return
+     */
+    public ArrayList<String> getSearchAppsName(boolean returnAllIfListFull, boolean getChecked) {
         CheckBoxListSelectionModel checkBoxListSelectionModel = cblApps.getCheckBoxListSelectionModel();
         ListModel model = cblApps.getModel();
         ArrayList<String> ret = new ArrayList<>();
 
         for (int i = 1; i < model.getSize(); i++) {
-            if (checkBoxListSelectionModel.isSelectedIndex(i)) {
+            if (checkBoxListSelectionModel.isSelectedIndex(i) == getChecked) {
                 ret.add(((NameID) model.getElementAt(i)).getName());
             }
         }
@@ -224,6 +265,10 @@ public class RequestParams extends javax.swing.JPanel {
                 return ret;
             }
         }
+    }
+
+    public ArrayList<String> getSearchAppsName(boolean returnAllIfListFull) {
+        return getSearchAppsName(returnAllIfListFull, true);
     }
 
     void uncheckReport() {
@@ -725,6 +770,7 @@ public class RequestParams extends javax.swing.JPanel {
             inquirer.showInfoPanel((Window) this.getRootPane().getParent(), "All files", jScrollPane, false);
         } catch (Exception ex) {
             inquirer.ExceptionHandler.handleException(this.getClass().toString(), ex);
+
         }
     }//GEN-LAST:event_jbShowFilesActionPerformed
 
@@ -898,5 +944,5 @@ public class RequestParams extends javax.swing.JPanel {
         }
 
     }
-    // End of variables declaration                   
+// End of variables declaration                   
 }

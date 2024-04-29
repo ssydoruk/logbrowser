@@ -36,7 +36,6 @@ import static javax.swing.JOptionPane.OK_OPTION;
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 /**
  * @author ssydoruk
  */
@@ -773,6 +772,12 @@ public class QueryDialog extends javax.swing.JFrame {
     }
 
     private void DoneWork() {
+        for (int i = 0; i < tabbedPane.getTabCount(); i++) {
+            Component tabComponentAt = tabbedPane.getComponentAt(i);
+            if (tabComponentAt != null && tabComponentAt instanceof RequestParams) {
+                ((RequestParams) tabComponentAt).saveUncheckedApps();
+            }
+        }
         inquirer.logger.info("Done work");
         synchronized (this) {
             inquirer.logger.info("Done work completely");
@@ -823,6 +828,7 @@ public class QueryDialog extends javax.swing.JFrame {
 
     public void addSelection(String s) {
         inquirer.geLocaltQuerySettings().saveSearch(s);
+        getRequestParams().saveUncheckedApps();
         reSetSelection();
 
     }
@@ -1006,7 +1012,7 @@ public class QueryDialog extends javax.swing.JFrame {
                     } else {
                         JideOptionPane.showMessageDialog(queryDialog,
                                 "Your search yielded " + objectsFound + " objects, however\n" + "no records returned\n"
-                                        + "Try changing filters or search",
+                                + "Try changing filters or search",
                                 "cannot run report", JideOptionPane.WARNING_MESSAGE);
                     }
                     if (frm != null) {
@@ -1178,7 +1184,7 @@ public class QueryDialog extends javax.swing.JFrame {
 
             buttonPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
             buttonPanel.setSizeConstraint(ButtonPanel.NO_LESS_THAN); // since the checkbox is quite wide, we don't want
-                                                                     // all of them have the same size.
+            // all of them have the same size.
             return buttonPanel;
         }
 
@@ -1282,7 +1288,7 @@ public class QueryDialog extends javax.swing.JFrame {
 
             buttonPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
             buttonPanel.setSizeConstraint(ButtonPanel.NO_LESS_THAN); // since the checkbox is quite wide, we don't want
-                                                                     // all of them have the same size.
+            // all of them have the same size.
             return buttonPanel;
         }
 

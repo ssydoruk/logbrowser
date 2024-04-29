@@ -23,6 +23,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Objects;
 
 /**
@@ -32,15 +33,9 @@ public class QueryDialogSettings implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private String localFile;
 
-    public String getLocalFile() {
-        return localFile;
-    }
+    private HashMap<String, HashSet<String>> disabledApps;
 
-    public void setLocalFile(String localFile) {
-        this.localFile = localFile;
-    }
 
     // private ArrayList<IQueryResults> queries;
     private final HashMap<String, DynamicTree> qParams;
@@ -105,8 +100,9 @@ public class QueryDialogSettings implements Serializable {
         ArrayList<String> ret = new ArrayList<>();
         for (SearchItem s : savedSearches) {
             String line = s.getSearch();
-            if (!ret.contains(line))
+            if (!ret.contains(line)) {
                 ret.add(line);
+            }
         }
         return ret;
     }
@@ -123,29 +119,16 @@ public class QueryDialogSettings implements Serializable {
         // if (StringUtils.isNotEmpty(selection) && !present(selection, savedSearches))
         if (StringUtils.isNotEmpty(selection)) {
             addToList(new SearchItem(selection), savedSearches);
-            saveToLocal();
+            inquirer.saveToLocal();
         }
     }
 
-    void saveToLocal() {
-        String f = getLocalFile();
-        if (StringUtils.isNotEmpty(f)) {
-            try {
-                try (BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(
-                        Files.newOutputStream(Paths.get(getLocalFile())), StandardCharsets.UTF_8))) {
-                    Gson gson = new GsonBuilder().enableComplexMapKeySerialization().setPrettyPrinting().create();
-                    gson.toJson(this, bufferedWriter);
-                }
-            } catch (IOException e) {
-                inquirer.logger.error("Failure to write to file [" + f + "]:" + e.getMessage());
-            }
-        }
-    }
 
     private boolean present(String selection, ArrayList<SearchItem> savedSearches) {
         for (SearchItem item : savedSearches) {
-            if (StringUtils.equals(selection, item.getSearch()))
+            if (StringUtils.equals(selection, item.getSearch())) {
                 return true;
+            }
         }
         return false;
     }
@@ -174,7 +157,38 @@ public class QueryDialogSettings implements Serializable {
         }
     }
 
+    public HashSet<String> getDisabledApps(IQueryResults qry) {
+        return (disabledApps != null) ? disabledApps.get(getLastClassName(qry)) : null;
+    }
+
+    private String getLastClassName(IQueryResults qry) {
+        String name = qry.getClass().getName();
+        int idx = name.lastIndexOf(".");
+        return (idx >= 0) ? name.substring(idx + 1) : name;
+
+    }
+
+    void saveUncheckedApps(IQueryResults qry, ArrayList<String> searchAppsName) {
+        String name = getLastClassName(qry);
+        if (disabledApps == null) {
+            disabledApps = new HashMap<>();
+        }
+        if (searchAppsName != null && !searchAppsName.isEmpty()) {
+            HashSet<String> apps = disabledApps.get(name);
+            if (apps == null) {
+                apps = new HashSet<>();
+                disabledApps.put(name, apps);
+            }
+            apps.addAll(searchAppsName);
+        }
+        else {
+            disabledApps.remove(name);
+        }
+
+    }
+
     private class SearchItem {
+
         private String search;
         private String saved_time;
 
@@ -193,10 +207,12 @@ public class QueryDialogSettings implements Serializable {
 
         @Override
         public boolean equals(Object o) {
-            if (this == o)
+            if (this == o) {
                 return true;
-            if (o == null || getClass() != o.getClass())
+            }
+            if (o == null || getClass() != o.getClass()) {
                 return false;
+            }
             SearchItem that = (SearchItem) o;
             return Objects.equals(search, that.search);
         }

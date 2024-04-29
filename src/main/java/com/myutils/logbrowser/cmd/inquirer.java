@@ -24,7 +24,6 @@ public class inquirer {
     public static Logger logger;
     static inquirer inq;
     static EnvInquirer ee;
-    private static QueryDialogSettings queryDialogSettings = null;
 
     DBConnector dbConnector;
 
