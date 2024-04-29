@@ -41,11 +41,11 @@ public class PrintStreams {
             inquirer.logger.info("Long output goes to " + fileName);
             addFullStream(fileName, -1, cfg.isAddShortToFull());
         }
-        if (cfg.isSaveFileShort()) {
-            String fileName = cfg.getFileNameShort();
-            inquirer.logger.info("Short output goes to " + fileName);
-            addShortStream(fileName, -1);
-        }
+//        if (cfg.isSaveFileShort()) {
+//            String fileName = cfg.getFileNameShort();
+//            inquirer.logger.info("Short output goes to " + fileName);
+//            addShortStream(fileName, -1);
+//        }
         tabDataModel.setFullFileNames(getFullStreamsFileNames());
         tabDataModel.setShortFileNames(getShortStreamsFileNames());
         tabDataModel.setShortAbsoluteFileNames(getShortStreamsFullFileNames());
