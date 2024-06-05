@@ -466,7 +466,9 @@ public class StSParser extends Parser {
     protected void AddServerMessage() throws Exception {
         if (customEvent || (m_MessageContents.size() > 0 && m_MessageContents.get(0).startsWith("Server: IxnEvent"))) {
             Main.logger.trace("is IxnEvent");
-            IxnSS msg = new IxnSS(m_MessageContents, customEvent, fileInfo.getRecordID());
+            // IxnSS msg = new IxnSS(m_MessageContents, customEvent, fileInfo.getRecordID());
+            Ixn msg=new Ixn(TableType.IxnSS, m_MessageContents, fileInfo.getRecordID()) ;
+            msg.parseSSIxnName();
             SetStdFieldsAndAdd(msg);
             customEvent = false;
         } else {

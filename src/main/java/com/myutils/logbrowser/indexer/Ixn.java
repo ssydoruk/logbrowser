@@ -23,6 +23,8 @@ public class Ixn extends Message {
     private static final Pattern regMsgNameReceivedfrom = Pattern.compile("Received from .+ ([^:]+):\\s+'([^']+)' \\(");
     private static final Pattern regMsgThirdParty = Pattern.compile("request to '([^']+)'");
 
+    private static final Pattern regSSIxnName = Pattern.compile("IxnEvent '([^']+)'");
+
     private static final Pattern regMsgAndClient = Pattern.compile("message '([^']+)'.+(to|from) (?:client|server) '([^']+)'");
     private static final Pattern regMsgAndClientProxy = Pattern.compile("through proxy '([^']+)'");
 
@@ -305,5 +307,12 @@ public class Ixn extends Message {
         setFieldInt(stmt, 17, Main.getRef(ReferenceType.TLIBATTR1, getAttr1()));
         setFieldInt(stmt, 18, Main.getRef(ReferenceType.TLIBATTR2, getAttr2()));
         return true;
+    }
+
+    public void parseSSIxnName() {
+        String ret = FindByRx(regSSIxnName, m_MessageLines.get(0), 1, null);
+        if (ret != null) {
+            messageName=ret;
+        }
     }
 }

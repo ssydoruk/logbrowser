@@ -8,6 +8,8 @@ import com.myutils.logbrowser.indexer.ReferenceType;
 
 import java.sql.SQLException;
 
+import org.apache.commons.lang3.ArrayUtils;
+
 /**
  * @author ssydoruk
  */
@@ -22,7 +24,7 @@ public class IxnSSQuery extends IQuery {
     public IxnSSQuery() throws SQLException {
         m_resultSet = null;
         addRef("IxnQueueID", "queue", ReferenceType.DN.toString(), FieldType.OPTIONAL);
-        addRef("nameID", "name", ReferenceType.TEvent.toString(), FieldType.MANDATORY);
+        addRef("nameID", "name", ReferenceType.TEvent.toString(), FieldType.OPTIONAL);
         addRef("ConnIDID", "ConnectionID", ReferenceType.ConnID.toString(), FieldType.OPTIONAL);
         addRef("IxnID", "InteractionID", ReferenceType.IxnID.toString(), FieldType.OPTIONAL);
         addRef("MediaTypeID", "MediaType", ReferenceType.IxnMedia.toString(), FieldType.OPTIONAL);
@@ -53,21 +55,20 @@ public class IxnSSQuery extends IQuery {
         m_connector = DatabaseConnector.getDatabaseConnector(this);
         String alias = m_connector.getAlias();
 
-        String myWhere = getMyWhere(); //it modifies ref table list, so should be before ref tables are requested
+        String myWhere = getMyWhere(); // it modifies ref table list, so should be before ref tables are requested
 
         query = "SELECT tlib.*,files.fileno as fileno, files.appnameid as appnameid, files.name as filename, files.arcname as arcname,  "
                 + "null as handlerId, null as seqno, 1 as inbound,"
                 + "files.component as component, app00.name as app, files.nodeId as nodeid";
         query += getRefFields() + getNullFields();
 
-        query += "\nFROM ixnss AS tlib"
-                + "\nINNER JOIN FILE_" + alias + " AS files ON tlib.fileId=files.id"
+        query += "\nFROM ixnss AS tlib" + "\nINNER JOIN FILE_" + alias + " AS files ON tlib.fileId=files.id"
                 + "\ninner join app as app00 on files.appnameid=app00.id\n";
         query += getRefs();
         query += myWhere;
 
-        query += "\n" + ((inquirer.getCr().isAddOrderBy()) ? " ORDER BY tlib.time" : "")
-                + "\n" + getLimitClause() + ";";
+        query += "\n" + ((inquirer.getCr().isAddOrderBy()) ? " ORDER BY tlib.time" : "") + "\n" + getLimitClause()
+                + ";";
         m_resultSet = m_connector.executeQuery(this, query);
         recCnt = 0;
     }
@@ -75,7 +76,7 @@ public class IxnSSQuery extends IQuery {
     @Override
     public ILogRecord GetNext() throws SQLException {
         if (m_resultSet.next()) {
-//            doCollectIDs(m_resultSet);
+            // doCollectIDs(m_resultSet);
             recCnt++;
             QueryTools.DebugRec(m_resultSet);
             ILogRecord rec = new TabRecord(MsgType.INTERACTION, m_resultSet);
@@ -112,54 +113,57 @@ public class IxnSSQuery extends IQuery {
 
         if (cif != null) {
             Integer[] dnID = null;
-            Integer[] dnConnIDs = null;
+            Integer[] ids = null;
             switch (cif.getSearchType()) {
-                case QUEUE:
-                    dnID = cif.getIDs(IDType.IxnQueue);
-                    if (dnID != null) {
-                        ret = " ( " + getWhere("tlib.ixnqueueid", dnID, false)
-                                + " )";
-                    }
-                    break;
+            case QUEUE:
+                dnID = cif.getIDs(IDType.IxnQueue);
+                if (dnID != null) {
+                    ret = " ( " + getWhere("tlib.ixnqueueid", dnID, false) + " )";
+                }
+                break;
 
-                case CONNID:
-                case CALLID:
-                    if (cif != null) {
-                        ret = getWhere("tlib.ConnIdid", cif.getIDs(IDType.ConnID), false);
-                    }
-                    break;
+            case CONNID:
+            case CALLID:
+                if (cif != null) {
+                    ret = getWhere("tlib.ConnIdid", cif.getIDs(IDType.ConnID), false);
+                }
+                break;
 
-                case IXN:
-                    if (cif != null) {
-                        ret = getWhere("tlib.ixnid", cif.getIDs(IDType.IxnID), false);
-                    }
-                    break;
+            case IXN:
+                if (cif != null) {
+                    ret = getWhere("tlib.ixnid", cif.getIDs(IDType.IxnID), false);
+                }
+                break;
 
-                case GUESS_SELECTION:
-                    if ((dnID = cif.getIDs(IDType.IxnQueue)) != null) {
-                        ret = " ( " + getWhere("tlib.ixnqueueid", dnID, false)
-                                + " )";
-                    } else {
-                        Wheres wh = new Wheres();
-                        if ((dnConnIDs = cif.getIDs(IDType.ConnID)) != null && dnConnIDs.length > 0) {
-                            wh.addWhere(getWhere("tlib.ConnIdid", dnConnIDs, false), "OR");
-                        }
-                        if ((dnConnIDs = cif.getIDs(IDType.IxnID)) != null && dnConnIDs.length > 0) {
-                            wh.addWhere(getWhere("tlib.ixnid", dnConnIDs, false), "OR");
-                        }
-                        addWhere(wh);
+            case GUESS_SELECTION:
+                if ((dnID = cif.getIDs(IDType.IxnQueue)) != null) {
+                    ret = " ( " + getWhere("tlib.ixnqueueid", dnID, false) + " )";
+                } else {
+                    Wheres wh = new Wheres();
+                    if (ArrayUtils.isNotEmpty(ids = cif.getIDs(IDType.ConnID))) {
+                        wh.addWhere(getWhere("tlib.ConnIdid", ids, false), "OR");
                     }
-                    break;
+                    if (ArrayUtils.isNotEmpty(ids = cif.getIDs(IDType.IxnID)) ) {
+                        wh.addWhere(getWhere("tlib.ixnid", ids, false), "OR");
+                    }
+                    if (ArrayUtils.isNotEmpty(ids = cif.getIDs(IDType.AGENT)) ) {
+                        wh.addWhere(getWhere("tlib.agentid", ids, false), "OR");
+                    }
 
-                default:
-                    break;
+                    addWhere(wh);
+                }
+                break;
+
+            default:
+                break;
             }
         }
         addFileFilters("tlib", "fileid");
         addDateTimeFilters("tlib", "time");
         if (node != null) {
             AddCheckedWhere("tlib.nameID", ReferenceType.TEvent, node, "AND", DialogItem.IXN_IXN_EVENT_NAME);
-//                        nd.addDynamicRef(DialogItem.IXN_IXN_EVENT_DN, ReferenceType.DN, "ixn", "ixnqueueid");
+            // nd.addDynamicRef(DialogItem.IXN_IXN_EVENT_DN, ReferenceType.DN, "ixn",
+            // "ixnqueueid");
             AddCheckedWhere("tlib.ixnqueueid", ReferenceType.DN, node, "AND", DialogItem.IXN_IXN_EVENT_DN);
 
         }

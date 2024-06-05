@@ -11,6 +11,8 @@ import java.sql.SQLException;
 import java.util.Collection;
 import java.util.HashSet;
 
+import org.apache.commons.lang3.ArrayUtils;
+
 /**
  * @author ssydoruk
  */
@@ -268,6 +270,7 @@ public final class TlibForScCmQuery extends IQuery {
                 }
             } else {
                 Integer[] dnID;
+                Integer[] ids;
                 Integer[] dnConnIDs;
                 switch (cif.getSearchType()) {
                     case DN:
@@ -284,7 +287,7 @@ public final class TlibForScCmQuery extends IQuery {
                         break;
 
                     case AGENTID:
-                        ret = getWhere("tlib.agentidid", cif.getAgentIDs(), false);
+                        ret = getWhere("tlib.agentid", cif.getAgentIDs(), false);
                         break;
 
                     case REFERENCEID:
@@ -292,16 +295,17 @@ public final class TlibForScCmQuery extends IQuery {
                         break;
 
                     case GUESS_SELECTION:
-                        if ((dnID = cif.getDNs()) != null && dnID.length > 0) {
+                        if (ArrayUtils.isNotEmpty(dnID = cif.getDNs()))  {
                             ret = " ( " + getWhere("tlib.thisdnid", dnID, false)
                                     + " or " + getWhere("tlib.otherdnid", dnID, false) + " )";
-                        } else {
-                            if ((dnConnIDs = cif.getConnIDs()) != null && dnConnIDs.length > 0) {
+                        } 
+                        else if (ArrayUtils.isNotEmpty(dnConnIDs = cif.getConnIDs())) {
                                 ret = getWhere("tlib.ConnectionIdid", dnConnIDs, false);
-                            }
-
                         }
-                        break;
+                        else if (ArrayUtils.isNotEmpty(ids = cif.getAgentIDs())) {
+                            ret = getWhere("tlib.agentid", ids, false);
+                    }
+                    break;
 
                     default:
                         break;
