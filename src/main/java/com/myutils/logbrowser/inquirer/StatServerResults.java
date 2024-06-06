@@ -5,6 +5,8 @@ import com.myutils.logbrowser.indexer.FileInfoType;
 import com.myutils.logbrowser.indexer.ReferenceType;
 import com.myutils.logbrowser.indexer.TableType;
 import com.myutils.logbrowser.inquirer.IQuery.FieldType;
+
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.logging.log4j.LogManager;
 
 import javax.swing.*;
@@ -54,9 +56,10 @@ public class StatServerResults extends IQueryResults {
             DynamicTreeNode<OptionNode> nd = new DynamicTreeNode<>(new OptionNode(DialogItem.STATCALLS_TEVENT));
             root.addChild(nd);
 
-//        DynamicTreeNode<OptionNode> ComponentNode;
-//        ComponentNode = new DynamicTreeNode<OptionNode>(new OptionNode(EVENTS_REPORT));
-//        nd.addChild(ComponentNode);
+            // DynamicTreeNode<OptionNode> ComponentNode;
+            // ComponentNode = new DynamicTreeNode<OptionNode>(new
+            // OptionNode(EVENTS_REPORT));
+            // nd.addChild(ComponentNode);
             /**
              * *****************
              */
@@ -72,9 +75,10 @@ public class StatServerResults extends IQueryResults {
             DynamicTreeNode<OptionNode> nd = new DynamicTreeNode<>(new OptionNode(DialogItem.STATCALLS_IXNEVENTS));
             root.addChild(nd);
 
-//        DynamicTreeNode<OptionNode> ComponentNode;
-//        ComponentNode = new DynamicTreeNode<OptionNode>(new OptionNode(EVENTS_REPORT));
-//        nd.addChild(ComponentNode);
+            // DynamicTreeNode<OptionNode> ComponentNode;
+            // ComponentNode = new DynamicTreeNode<OptionNode>(new
+            // OptionNode(EVENTS_REPORT));
+            // nd.addChild(ComponentNode);
             /**
              * *****************
              */
@@ -88,7 +92,7 @@ public class StatServerResults extends IQueryResults {
 
     @Override
     public UTCTimeRange refreshTimeRange(ArrayList<Integer> searchApps) throws SQLException {
-        return DatabaseConnector.getTimeRange(new FileInfoType[]{FileInfoType.type_StatServer}, searchApps);
+        return DatabaseConnector.getTimeRange(new FileInfoType[] { FileInfoType.type_StatServer }, searchApps);
     }
 
     @Override
@@ -128,7 +132,8 @@ public class StatServerResults extends IQueryResults {
 
         addTLibReportType(nd);
         addIxnReportType(nd);
-//        nd.addChild(new DynamicTreeNode<OptionNode>(new OptionNode(DialogItem.TLIB_CALLS_ISCC)));
+        // nd.addChild(new DynamicTreeNode<OptionNode>(new
+        // OptionNode(DialogItem.TLIB_CALLS_ISCC)));
 
         nd = new DynamicTreeNode<>(new OptionNode(DialogItem.STATAGENTPLACE));
         rootA.addChild(nd);
@@ -172,7 +177,8 @@ public class StatServerResults extends IQueryResults {
     }
 
     void SetConfig(InquirerCfg cr) {
-//        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        // throw new UnsupportedOperationException("Not supported yet."); //To change
+        // body of generated methods, choose Tools | Templates.
     }
 
     @Override
@@ -188,9 +194,8 @@ public class StatServerResults extends IQueryResults {
         if (selectionType != SelectionType.NO_SELECTION) {
             cidFinder = new IDsFinder(dlg);
             if (!cidFinder.initStatServer()) {
-                inquirer.logger.error("Not found selection: ["
-                        + dlg.getSelection() + "] type: [" + dlg.getSelectionType() + "] isRegex: [" + dlg.isRegex()
-                        + "]");
+                inquirer.logger.error("Not found selection: [" + dlg.getSelection() + "] type: ["
+                        + dlg.getSelectionType() + "] isRegex: [" + dlg.isRegex() + "]");
                 return;
             }
         } else {
@@ -200,8 +205,9 @@ public class StatServerResults extends IQueryResults {
         boolean canRunTLib = true;
         if (cidFinder != null && cidFinder.getSearchType() != SelectionType.NO_SELECTION
                 && !cidFinder.AnythingStatServerRelated()) {
-            int dialogResult = inquirer.showConfirmDialog(dlg, "No TLib calls found.\n"
-                    + "Do you want to show all TLib messages?", "Warning", JOptionPane.YES_NO_CANCEL_OPTION);
+            int dialogResult = inquirer.showConfirmDialog(dlg,
+                    "No TLib calls found.\n" + "Do you want to show all TLib messages?", "Warning",
+                    JOptionPane.YES_NO_CANCEL_OPTION);
             if (dialogResult == JOptionPane.CANCEL_OPTION) {
                 return;
             }
@@ -218,9 +224,8 @@ public class StatServerResults extends IQueryResults {
                     FindNode(repComponents.getRoot(), DialogItem.STAT_CALLS, DialogItem.STATCALLS_IXNEVENTS, null),
                     cidFinder);
         }
-        if (!RetrieveAgent(dlg,
-                FindNode(repComponents.getRoot(), DialogItem.STATAGENTPLACE, null, null),
-                cidFinder)) {
+
+        if (!RetrieveAgent(dlg, FindNode(repComponents.getRoot(), DialogItem.STATAGENTPLACE, null, null), cidFinder)) {
             return;
         }
         getCustom(FileInfoType.type_StatServer, dlg, repComponents.getRoot(), cidFinder, null);
@@ -230,7 +235,8 @@ public class StatServerResults extends IQueryResults {
         Sort();
     }
 
-    private void RetrieveTLib(QueryDialog dlg, DynamicTreeNode<OptionNode> eventsSettings, IDsFinder cidFinder) throws SQLException {
+    private void RetrieveTLib(QueryDialog dlg, DynamicTreeNode<OptionNode> eventsSettings, IDsFinder cidFinder)
+            throws SQLException {
         if (isChecked(eventsSettings) && DatabaseConnector.TableExist("ststevent_logbr")) {
             inquirer.logger.debug("TLib report");
             TlibStatServerQuery tlibQuery = new TlibStatServerQuery(eventsSettings, cidFinder);
@@ -240,7 +246,8 @@ public class StatServerResults extends IQueryResults {
         }
     }
 
-    private void RetrieveIxn(QueryDialog dlg, DynamicTreeNode<OptionNode> eventsSettings, IDsFinder cidFinder) throws SQLException {
+    private void RetrieveIxn(QueryDialog dlg, DynamicTreeNode<OptionNode> eventsSettings, IDsFinder cidFinder)
+            throws SQLException {
         if (isChecked(eventsSettings) && DatabaseConnector.TableExist("ixnss")) {
             inquirer.logger.debug("Ixn report");
 
@@ -250,12 +257,14 @@ public class StatServerResults extends IQueryResults {
         }
     }
 
-    private boolean RetrieveAgent(QueryDialog dlg, DynamicTreeNode<OptionNode> agentRoot, IDsFinder cidFinder) throws SQLException {
+    private boolean RetrieveAgent(QueryDialog dlg, DynamicTreeNode<OptionNode> agentRoot, IDsFinder cidFinder)
+            throws SQLException {
         if (isChecked(agentRoot)) {
             if (cidFinder != null && cidFinder.getSearchType() != SelectionType.NO_SELECTION
-                    && !cidFinder.AnythingStatServerRelated()) {
-                int dialogResult = inquirer.showConfirmDialog(dlg, "No Agent found.\n"
-                        + "Do you want to show all agents messages?", "Warning", JOptionPane.YES_NO_CANCEL_OPTION);
+                    && !cidFinder.AnythingAgentRelated()) {
+                int dialogResult = inquirer.showConfirmDialog(dlg,
+                        "No Agent found.\n" + "Do you want to show all agents messages?", "Warning",
+                        JOptionPane.YES_NO_CANCEL_OPTION);
                 if (dialogResult == JOptionPane.CANCEL_OPTION) {
                     return false;
                 }
@@ -266,22 +275,27 @@ public class StatServerResults extends IQueryResults {
 
             TableQuery statsAgents = null;
             Wheres wh1 = null;
+            Integer[] ids;
             if (DatabaseConnector.TableExist("ststatus")) {
                 statsAgents = new TableQuery(MsgType.STATSAgent, "ststatus");
 
                 Wheres wh = new Wheres();
-                wh.addWhere(TableQuery.getCheckedWhere("oldstatusid", ReferenceType.StatType,
-                        FindNode(agentRoot, DialogItem.STATAGENTPLACE_STATUS, DialogItem.STATAGENTPLACE_STATUS_NAME, null)), "OR");
+                wh.addWhere(TableQuery.getCheckedWhere("oldstatusid", ReferenceType.StatType, FindNode(agentRoot,
+                        DialogItem.STATAGENTPLACE_STATUS, DialogItem.STATAGENTPLACE_STATUS_NAME, null)), "OR");
 
-                wh.addWhere(TableQuery.getCheckedWhere("newstatusid", ReferenceType.StatType,
-                        FindNode(agentRoot, DialogItem.STATAGENTPLACE_STATUS, DialogItem.STATAGENTPLACE_STATUS_NAME, null)), "OR");
+                wh.addWhere(TableQuery.getCheckedWhere("newstatusid", ReferenceType.StatType, FindNode(agentRoot,
+                        DialogItem.STATAGENTPLACE_STATUS, DialogItem.STATAGENTPLACE_STATUS_NAME, null)), "OR");
 
                 wh1 = new Wheres();
-                wh1.addWhere(TableQuery.getCheckedWhere("placeid", ReferenceType.Place,
-                        FindNode(agentRoot, DialogItem.STATAGENTPLACE_PLACE, DialogItem.STATAGENTPLACE_PLACE_NAME, null)), "OR");
+                wh1.addWhere(TableQuery.getCheckedWhere("placeid", ReferenceType.Place, FindNode(agentRoot,
+                        DialogItem.STATAGENTPLACE_PLACE, DialogItem.STATAGENTPLACE_PLACE_NAME, null)), "OR");
 
-                wh1.addWhere(TableQuery.getCheckedWhere("agentid", ReferenceType.Agent,
-                        FindNode(agentRoot, DialogItem.STATAGENTPLACE_AGENT, DialogItem.STATAGENTPLACE_AGENT_NAME, null)), "OR");
+                wh1.addWhere(TableQuery.getCheckedWhere("agentid", ReferenceType.Agent, FindNode(agentRoot,
+                        DialogItem.STATAGENTPLACE_AGENT, DialogItem.STATAGENTPLACE_AGENT_NAME, null)), "OR");
+
+                if (cidFinder != null && ArrayUtils.isNotEmpty(ids = cidFinder.getIDs(IDType.AGENT))) {
+                    wh.addWhere(getWhere("agentid", ids, false), "OR");
+                }
 
                 statsAgents.addRef("placeid", "place", ReferenceType.Place.toString(), FieldType.OPTIONAL);
                 statsAgents.addRef("agentid", "agent", ReferenceType.Agent.toString(), FieldType.OPTIONAL);
@@ -293,16 +307,20 @@ public class StatServerResults extends IQueryResults {
                 statsAgents.setCommonParams(this, dlg);
                 getRecords(statsAgents);
             }
-//            ----------------------------------------------------
+            // ----------------------------------------------------
             if (DatabaseConnector.TableExist("stcapacity")) {
                 statsAgents = new TableQuery(MsgType.STATSCapacity, "stcapacity");
 
                 wh1 = new Wheres();
-                wh1.addWhere(TableQuery.getCheckedWhere("placeid", ReferenceType.Place,
-                        FindNode(agentRoot, DialogItem.STATAGENTPLACE_PLACE, DialogItem.STATAGENTPLACE_PLACE_NAME, null)), "OR");
+                wh1.addWhere(TableQuery.getCheckedWhere("placeid", ReferenceType.Place, FindNode(agentRoot,
+                        DialogItem.STATAGENTPLACE_PLACE, DialogItem.STATAGENTPLACE_PLACE_NAME, null)), "OR");
 
-                wh1.addWhere(TableQuery.getCheckedWhere("agentid", ReferenceType.Agent,
-                        FindNode(agentRoot, DialogItem.STATAGENTPLACE_AGENT, DialogItem.STATAGENTPLACE_AGENT_NAME, null)), "OR");
+                wh1.addWhere(TableQuery.getCheckedWhere("agentid", ReferenceType.Agent, FindNode(agentRoot,
+                        DialogItem.STATAGENTPLACE_AGENT, DialogItem.STATAGENTPLACE_AGENT_NAME, null)), "OR");
+
+                if (cidFinder != null && ArrayUtils.isNotEmpty(ids = cidFinder.getIDs(IDType.AGENT))) {
+                    wh1.addWhere(getWhere("agentid", ids, false), "OR");
+                }
 
                 statsAgents.addRef("placeid", "place", ReferenceType.Place.toString(), FieldType.OPTIONAL);
                 statsAgents.addRef("capacityid", "capacity", ReferenceType.Capacity.toString(), FieldType.OPTIONAL);
@@ -310,6 +328,9 @@ public class StatServerResults extends IQueryResults {
                 for (int i = 0; i < com.myutils.logbrowser.indexer.StCapacity.MAX_MEDIA; i++) {
                     String fldIdx = "media" + i + "name";
                     statsAgents.addRef(fldIdx + "id", fldIdx, ReferenceType.Media.toString(), FieldType.OPTIONAL);
+                    statsAgents.addOutField(String.format("media%dstate", i));
+                    statsAgents.addOutField(String.format("media%dcurnumber", i));
+                    statsAgents.addOutField(String.format("media%dmaxnumber", i));
                 }
                 statsAgents.addWhere(wh1, "AND");
 
@@ -327,7 +348,8 @@ public class StatServerResults extends IQueryResults {
 
     @Override
     public void Retrieve(QueryDialog qd, SelectionType key, String searchID) throws SQLException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        throw new UnsupportedOperationException("Not supported yet."); // To change body of generated methods, choose
+                                                                       // Tools | Templates.
     }
 
     @Override
@@ -336,37 +358,44 @@ public class StatServerResults extends IQueryResults {
     }
 
     FullTableColors getAll(QueryDialog qd, AllInteractionsSettings settings) throws SQLException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        throw new UnsupportedOperationException("Not supported yet."); // To change body of generated methods, choose
+                                                                       // Tools | Templates.
     }
 
     @Override
     void showAllResults() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        throw new UnsupportedOperationException("Not supported yet."); // To change body of generated methods, choose
+                                                                       // Tools | Templates.
     }
 
     @Override
     SearchFields getSearchField() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        throw new UnsupportedOperationException("Not supported yet."); // To change body of generated methods, choose
+                                                                       // Tools | Templates.
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        throw new UnsupportedOperationException("Not supported yet."); // To change body of generated methods, choose
+                                                                       // Tools | Templates.
     }
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        throw new UnsupportedOperationException("Not supported yet."); // To change body of generated methods, choose
+                                                                       // Tools | Templates.
     }
 
     @Override
     protected ArrayList<IAggregateQuery> loadReportAggregates() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        throw new UnsupportedOperationException("Not supported yet."); // To change body of generated methods, choose
+                                                                       // Tools | Templates.
     }
 
     @Override
     boolean callRelatedSearch(IDsFinder cidFinder) throws SQLException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        throw new UnsupportedOperationException("Not supported yet."); // To change body of generated methods, choose
+                                                                       // Tools | Templates.
     }
 
 }

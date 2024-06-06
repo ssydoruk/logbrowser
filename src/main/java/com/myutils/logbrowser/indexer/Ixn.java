@@ -14,6 +14,8 @@ import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.lang3.StringUtils;
+
 import static Utils.Util.intOrDef;
 
 public class Ixn extends Message {
@@ -257,7 +259,12 @@ public class Ixn extends Message {
     }
 
     String GetAgent() {
-        return reAgentID.toString();
+        String ag = reAgentID.toString();
+        if( StringUtils.isNotEmpty(ag)){
+            Main.logger.info("ag:"+ag);
+            PrintMsg();
+        }
+        return ag;
     }
 
     String GetPlace() {

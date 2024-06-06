@@ -273,6 +273,18 @@ public final class IDsFinder extends QueryTools {
                 return false;
             }
         }
+        if (selectionType == SelectionType.IXN || 
+            selectionType == SelectionType.UUID ||
+            selectionType == SelectionType.GUESS_SELECTION) {
+            AddIDs(IDType.IxnID, getRefIDs(ReferenceType.IxnID, sIDs, regex));
+            AddIDs(IDType.UUID, getRefIDs(ReferenceType.UUID, sIDs, regex));
+            if (IDsFound(IDType.IxnID) || IDsFound(IDType.UUID)) {
+                return true;
+            } else if (selectionType == SelectionType.IXN || selectionType == SelectionType.UUID) {
+                return false;
+            }
+            /* <--- Is this recHandle --- */
+        }        
         if (selectionType == SelectionType.DN || selectionType == SelectionType.GUESS_SELECTION) {
             AddIDs(IDType.DN, getRefIDs(ReferenceType.DN, sIDs, regex));
             if (IDsFound(IDType.DN)) {
@@ -407,6 +419,15 @@ public final class IDsFinder extends QueryTools {
         Integer[] iDs = getIDs(theSearchType, givenType, ids);
         if (AddIDs(theSearchType, iDs)) {
             LoadWWEType(theSearchType, findIDs(theSearchType), level);
+        }
+    }
+
+    private void LoadStatServerType(IDType givenType, IDType theSearchType, Integer[] ids, int level) throws SQLException {
+        inquirer.logger.debug("LoadStatServerType givenType: " + givenType + " theSearchType: " + theSearchType + " level: " + level + " ids: " + listIDs(ids));
+
+        Integer[] iDs = getIDs(theSearchType, givenType, ids);
+        if (AddIDs(theSearchType, iDs)) {
+            LoadStatServerType(theSearchType, findIDs(theSearchType), level);
         }
     }
 
@@ -659,8 +680,13 @@ public final class IDsFinder extends QueryTools {
     }
 
     boolean AnythingStatServerRelated() {
-        return IDsFound(IDType.ConnID) || IDsFound(IDType.DN) || IDsFound(IDType.PLACE) || IDsFound(IDType.AGENT);
+        return IDsFound(IDType.ConnID) || IDsFound(IDType.UUID) || IDsFound(IDType.IxnID) || IDsFound(IDType.DN) || IDsFound(IDType.PLACE) || IDsFound(IDType.AGENT);
     }
+
+    boolean AnythingAgentRelated() {
+        return IDsFound(IDType.PLACE) || IDsFound(IDType.AGENT);
+    }
+
 
     boolean initIxn() throws SQLException {
         searchType = SearchType.INTERACTION;
@@ -1327,6 +1353,77 @@ public final class IDsFinder extends QueryTools {
 
         return null;
     }
+
+
+
+    private Integer[] getIDsStatServer(IDType retIDType, IDType givenIDType, Integer[] searchIDs) throws SQLException {
+        if (retIDType == givenIDType) {
+            return null;
+        }
+
+        switch (retIDType) {
+            case ConnID: {
+                switch (givenIDType) {
+                    case ORSSID: {
+                        return QueryTools.uniqueInts(
+                                DatabaseConnector.getIDs("ursri", "connidid", getWhere("ORSSidID", searchIDs, true)),
+                                DatabaseConnector.getIDs("URSCONNIDSID", "connidid", getWhere("sidid", searchIDs, true))
+                        );
+                    }
+
+                    case IxnID: {
+                        return QueryTools.uniqueInts1(
+                            DatabaseConnector.getIDs("ixnss", "connidid", getWhere("ixnid", searchIDs, true)),
+                            DatabaseConnector.getIDs("ursconnidixnid", "connid", getWhere("ixnid", searchIDs, true)),
+                                DatabaseConnector.getIDs("URSSTR_logbr", "connidid", getWhere("ixnidid", searchIDs, true)),
+                                DatabaseConnector.getIDs("urs_logbr", "connectionidid", getWhere("ixnidid", searchIDs, true))
+                        );
+                    }
+
+                    case UUID: {
+                        return QueryTools.uniqueInts1(
+                                DatabaseConnector.getIDs("urs_logbr", "connectionidid", getWhere("uuidid", searchIDs, true)),
+                                DatabaseConnector.getIDs("tlib_logbr", "connectionidid", getWhere("uuidid", searchIDs, true))
+                        );
+                    }
+
+                    case ConnID: {
+                        return QueryTools.uniqueInts1(
+                            DatabaseConnector.getIDs("STSTEVENT_logbr", "TransferIdID", getWhere("ConnectionIDID", searchIDs, true)),
+                            DatabaseConnector.getIDs("ors_logbr", "TransferIdID", getWhere("ConnectionIDID", searchIDs, true)),
+                            DatabaseConnector.getIDs("urs_logbr", "TransferIdID", getWhere("ConnectionIDID", searchIDs, true))
+                        );
+                    }
+
+                    case DN: {
+                        return QueryTools.uniqueInts1(
+                            DatabaseConnector.getIDs("STSTEVENT_logbr", "ConnectionIDID", "where (" + getWhere("ThisDNID", searchIDs, false) + " or " + getWhere("OtherDNID", searchIDs, false) + ")"),
+                            DatabaseConnector.getIDs("ors_logbr", "ConnectionIDID", "where (" + getWhere("ThisDNID", searchIDs, false) + " or " + getWhere("OtherDNID", searchIDs, false) + ")"),
+                                DatabaseConnector.getIDs("urs_logbr", "ConnectionIDID", "where (" + getWhere("ThisDNID", searchIDs, false) + " or " + getWhere("OtherDNID", searchIDs, false) + ")")
+                        );
+                    }
+                }
+                break;
+            }
+
+            case IxnID: {
+                break;
+            }
+
+            case UUID: {
+                break;
+            }
+
+            default: {
+            }
+        }
+        inquirer.logger.trace(
+                "not implemented search of [" + retIDType + "] by " + givenIDType + " ids: " + listIDs(searchIDs));
+
+        return null;
+    }
+
+
 
     private Integer[] getIDsGMS(IDType retIDType, IDType providedIDType, Integer[] searchIDs) throws SQLException {
         if (retIDType == providedIDType) {
@@ -2241,7 +2338,20 @@ public final class IDsFinder extends QueryTools {
         }
     }
 
-    private void LoadStatServerType(IDType idType, Integer[] ids, int i) {
+    private void LoadStatServerType(IDType idGivenType, Integer[] ids, int level) throws SQLException {
+        inquirer.logger.debug("LoadStatServerType idGivenType[" + idGivenType + "] level[" + level + "]");
+        if (level <= 0) {
+            if (maxLevelSet) {
+                inquirer.logger.error("Max level reached");
+            }
+            return;
+        }
+        level--;
+
+        LoadStatServerType(idGivenType, IDType.ConnID, ids, level);
+        LoadStatServerType(idGivenType, IDType.UUID, ids, level);
+        LoadStatServerType(idGivenType, IDType.AGENT, ids, level);
+        LoadStatServerType(idGivenType, IDType.IxnID, ids, level);
     }
 
     boolean initSCS() {
@@ -2391,6 +2501,9 @@ public final class IDsFinder extends QueryTools {
 
             case INTERACTION:
                 return getIDsIxn(retIDType, searchIDType, searchIDs);
+
+            case STATSERVER:
+                return getIDsStatServer(retIDType, searchIDType, searchIDs);
 
             default:
                 throw new SQLException("Not implemented: retIDType: " + retIDType + " searchIDType: " + searchIDType);

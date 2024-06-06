@@ -995,9 +995,9 @@ public abstract class Message extends Record {
         if (m_MessageLines == null || m_MessageLines.isEmpty()) {
             Main.logger.error("Empty contents");
         } else {
-            Main.logger.debug("::");
+            Main.logger.info("::");
             for (Object content : m_MessageLines) {
-                Main.logger.debug("\t[" + content + "]");
+                Main.logger.info("\t[" + content + "]");
             }
         }
     }
