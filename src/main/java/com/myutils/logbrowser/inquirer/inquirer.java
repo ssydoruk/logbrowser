@@ -419,9 +419,15 @@ public class inquirer {
     }
 
     private static void ShowGui() throws Exception {
-        // UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
-        // // you need to catch the exceptions
-        // on this call.
+        try {
+            UIManager.setLookAndFeel(
+                    UIManager.getSystemLookAndFeelClassName());
+        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException
+                | UnsupportedLookAndFeelException ex) {
+            logger.fatal("Cannot load look and feel", ex);
+        }
+
+
         LookAndFeelFactory.installJideExtension();
 
         queryDialogSettings = geLocaltQuerySettings();
