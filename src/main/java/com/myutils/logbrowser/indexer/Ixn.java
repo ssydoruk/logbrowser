@@ -260,10 +260,10 @@ public class Ixn extends Message {
 
     String GetAgent() {
         String ag = reAgentID.toString();
-        if( StringUtils.isNotEmpty(ag)){
-            Main.logger.info("ag:"+ag);
-            PrintMsg();
-        }
+//        if( StringUtils.isNotEmpty(ag)){
+//            Main.logger.info("ag:"+ag);
+//            PrintMsg();
+//        }
         return ag;
     }
 

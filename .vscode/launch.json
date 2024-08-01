@@ -6,6 +6,12 @@
   "configurations": [
     {
       "type": "java",
+      "name": "Launch Current File",
+      "request": "launch",
+      "mainClass": "${file}"
+    },
+    {
+      "type": "java",
       "name": "Attach to Remote Program",
       "request": "attach",
       "hostName": "192.168.206.1",
