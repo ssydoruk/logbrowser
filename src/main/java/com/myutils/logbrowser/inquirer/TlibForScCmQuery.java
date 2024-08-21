@@ -23,14 +23,14 @@ public final class TlibForScCmQuery extends IQuery {
     private String m_msgFilter;
     private DynamicTreeNode<OptionNode> node;
     private IDsFinder cif = null;
-    private HashSet handlerIDs;
+    private final HashSet<Integer> handlerIDs;
     private Collection<Long> refIDs = null;
     private Collection<Long> recIDs = null;
     private Collection<Long> dnIDs;
     private boolean collectHandlers = false;
 
     public TlibForScCmQuery() throws SQLException {
-        this.handlerIDs = new HashSet();
+        this.handlerIDs = new HashSet<>();
         m_componentFilter = CallFlowResults.TLIB;
         m_msgFilter = "";
         addRef("thisDNID", "thisDN", ReferenceType.DN.toString(), FieldType.OPTIONAL);
@@ -57,13 +57,11 @@ public final class TlibForScCmQuery extends IQuery {
 
     public TlibForScCmQuery(Integer[] connectionIds) throws SQLException {
         this();
-        this.handlerIDs = new HashSet();
         m_connectionIds = connectionIds;
     }
 
     TlibForScCmQuery(DynamicTreeNode<OptionNode> eventsSettings, IDsFinder cif, boolean collectHandlers) throws SQLException {
         this();
-        this.handlerIDs = new HashSet();
         this.node = eventsSettings;
         this.cif = cif;
         if (cif != null) {
@@ -75,14 +73,12 @@ public final class TlibForScCmQuery extends IQuery {
 
     TlibForScCmQuery(Collection<Long> refIDs, Collection<Long> seqnoIDs) throws SQLException {
         this();
-        this.handlerIDs = new HashSet();
         this.refIDs = refIDs;
         this.recIDs = seqnoIDs;
     }
 
     TlibForScCmQuery(Collection<Long> refIDs, Collection<Long> ids, Collection<Long> dnIDs) throws SQLException {
         this(refIDs, ids);
-        this.handlerIDs = new HashSet();
         this.dnIDs = dnIDs;
     }
 
@@ -333,7 +329,7 @@ public final class TlibForScCmQuery extends IQuery {
 
     }
 
-    public HashSet getHandlerIDs() {
+    public HashSet<Integer> getHandlerIDs() {
         return handlerIDs;
     }
 

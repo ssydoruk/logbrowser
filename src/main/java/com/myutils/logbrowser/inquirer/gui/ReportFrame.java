@@ -22,10 +22,12 @@ import java.util.Map;
 /**
  * @author Stepan
  */
+@SuppressWarnings({"unchecked", "rawtypes", "serial", "deprecation", "this-escape"})
 public class ReportFrame extends javax.swing.JFrame implements Cloneable {
 
     private static final org.apache.logging.log4j.Logger logger = LogManager.getLogger();
     static Insets zeroInsets = new Insets(1, 1, 1, 1);
+    private static final long serialVersionUID = 1L;
     final protected ReportFrame theForm; // to close from Toolbar
     protected MyJTable tableView;
     /**
@@ -203,6 +205,8 @@ public class ReportFrame extends javax.swing.JFrame implements Cloneable {
 
     class ToolBarPanel extends JPanel implements ContainerListener {
 
+        private static final long serialVersionUID = 1L;
+
         @Override
         public boolean contains(int x, int y) {
             Component c = getParent();
@@ -236,6 +240,8 @@ public class ReportFrame extends javax.swing.JFrame implements Cloneable {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     // End of variables declaration//GEN-END:variables
     private static class WindowTitles extends HashMap<String, ArrayList<String>> {
+
+        private static final long serialVersionUID = 1L;
         String addTitle(String s) {
             ArrayList<String> names = null;
             String stdName=s;

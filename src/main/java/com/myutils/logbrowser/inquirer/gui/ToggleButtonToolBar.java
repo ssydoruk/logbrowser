@@ -15,6 +15,7 @@ import javax.swing.JToolBar;
  *
  * @author ssydo
  */
+@SuppressWarnings({"unchecked", "rawtypes", "serial", "deprecation"})
 class ToggleButtonToolBar extends JToolBar {
     
     public ToggleButtonToolBar() {

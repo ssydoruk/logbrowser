@@ -24,6 +24,8 @@ import java.util.List;
 /**
  * @author ssydoruk
  */
+@SuppressWarnings({"unchecked", "rawtypes", "serial", "deprecation", "this-escape"})
+
 public class TLibSIPRetransmitsConfig extends javax.swing.JPanel {
 
     private final DefaultListModel lmAttr;
@@ -415,7 +417,7 @@ public class TLibSIPRetransmitsConfig extends javax.swing.JPanel {
         DefaultListModel<DynamicTreeNode<OptionNode>> lm = (DefaultListModel<DynamicTreeNode<OptionNode>>) lChild.getModel();
         ArrayList<Integer> idx = new ArrayList<>();
         for (int i = 1; i < lm.size(); i++) {
-            DynamicTreeNode<OptionNode> ch = (DynamicTreeNode<OptionNode>) lm.getElementAt(i);
+            DynamicTreeNode<OptionNode> ch = lm.getElementAt(i);
 //            inquirer.logger.info("verifying item "+ i+ ch.getData().toString());
             if (((OptionNode) ch.getData()).isChecked()) {
 //                inquirer.logger.info("Checking item "+ i );

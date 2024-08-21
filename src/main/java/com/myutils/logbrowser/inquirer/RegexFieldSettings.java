@@ -20,6 +20,7 @@ import org.apache.commons.lang3.RegExUtils;
 /**
  * @author stepan_sydoruk
  */
+@SuppressWarnings({"unchecked", "rawtypes", "serial"})
 public class RegexFieldSettings implements Serializable {
 
     private static final long serialVersionUID = 1L;

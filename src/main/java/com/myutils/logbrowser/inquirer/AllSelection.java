@@ -11,6 +11,7 @@ import javax.swing.ComboBoxModel;
  *
  * @author ssydo
  */
+@SuppressWarnings({"unchecked", "rawtypes", "serial", "deprecation"})
 public class AllSelection extends javax.swing.JPanel {
 
     /**

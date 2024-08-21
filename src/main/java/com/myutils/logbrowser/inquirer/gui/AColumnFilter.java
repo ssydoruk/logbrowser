@@ -17,6 +17,7 @@ import static com.myutils.logbrowser.inquirer.gui.JTableCommon.RECORD_EMPTY;
 /**
  * @author ssydoruk
  */
+@SuppressWarnings({"unchecked", "rawtypes", "serial", "deprecation"})
 abstract class AColumnFilter {
 
     public AColumnFilter() {

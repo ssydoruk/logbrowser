@@ -38,7 +38,7 @@ public class QueryDialogSettings implements Serializable {
 
 
     // private ArrayList<IQueryResults> queries;
-    private final HashMap<String, DynamicTree> qParams;
+    private final HashMap<String, DynamicTree<OptionNode>> qParams;
     // private HashMap<String , DynamicTreeNode> qParams1;
     //
     // public ArrayList<IQueryResults> getQueries() {
@@ -58,7 +58,7 @@ public class QueryDialogSettings implements Serializable {
     // }
     //
 
-    public DynamicTree getQParams(String iq) {
+    public DynamicTree<OptionNode> getQParams(String iq) {
         return qParams.get(iq);
     }
     //
@@ -84,7 +84,7 @@ public class QueryDialogSettings implements Serializable {
         for (IQueryResults query : queries) {
             // lst = new ArrayList<DynamicTreeNode<OptionNode>>(
             // query.repComponents.build(GenericTreeTraversalOrderEnum.PRE_ORDER));
-            qParams.put(query.getClass().getName(), new DynamicTree(query.repComponents));
+            qParams.put(query.getClass().getName(), new DynamicTree<>(query.repComponents));
             // qParams.put(query.getClass().getName(), query.repComponents);
             return;
         }

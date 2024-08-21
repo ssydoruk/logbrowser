@@ -14,13 +14,16 @@ import java.util.ArrayList;
 /**
  * @author ssydoruk
  */
+@SuppressWarnings({"unchecked", "rawtypes", "serial", "deprecation"})
 public class AggregatesPanel extends javax.swing.JPanel {
+
+    private static final long serialVersionUID = 1L;
 
     ButtonGroup group = new ButtonGroup();
     JPanel radioPanel;
     JScrollPane jScrollPane1;
     private IAggregateQuery AggregateQuerySelected = null;
-    // Variables declaration - do not modify//GEN-BEGIN:variables
+    // Variables declaration - do not modify                     
     private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
@@ -146,6 +149,8 @@ public class AggregatesPanel extends javax.swing.JPanel {
 
     public class JReferencingButton<T> extends JRadioButton {
 
+        private static final long serialVersionUID = 1L;
+
         private T value;
 
         private JReferencingButton(String name, T qr) {
@@ -161,5 +166,5 @@ public class AggregatesPanel extends javax.swing.JPanel {
             this.value = value;
         }
     }
-    // End of variables declaration//GEN-END:variables
+    // End of variables declaration                   
 }

@@ -15,6 +15,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+@SuppressWarnings({"unchecked", "rawtypes", "serial", "deprecation", "this-escape"})
+
 public class DynamicTree<OptionNode> implements Serializable {
 
     private static final long serialVersionUID = 1L;

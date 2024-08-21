@@ -30,6 +30,7 @@ import java.util.List;
 /**
  * @author Stepan
  */
+@SuppressWarnings({"unchecked", "rawtypes", "serial", "deprecation", "this-escape"})
 public class QueryJTable extends JTableCommon {
 
     private static final DefaultTableCellRenderer DEFAULT_RENDERER = new DefaultTableCellRenderer();

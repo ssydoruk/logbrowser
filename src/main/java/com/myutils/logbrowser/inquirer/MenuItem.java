@@ -10,6 +10,7 @@ import Utils.Pair;
 /**
  * @author ssydoruk
  */
+@SuppressWarnings({"unchecked", "rawtypes", "serial", "deprecation", "this-escape"})
 public class MenuItem extends Pair<String, Object> {
 
     public MenuItem(String key, Object value) {

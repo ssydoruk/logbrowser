@@ -18,6 +18,7 @@ import javax.swing.border.TitledBorder;
  *
  * @author ssydo
  */
+@SuppressWarnings({"unchecked", "rawtypes", "serial", "deprecation", "this-escape"})
 class AllCalls_RoutingSettings extends AllInteractionsSettings {
     
     private final RoutingResults routingResults;

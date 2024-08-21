@@ -27,7 +27,7 @@ import java.util.regex.Pattern;
 import static com.myutils.logbrowser.indexer.Parser.MAX_CUSTOM_FIELDS;
 import static org.sqlite.SQLiteErrorCode.SQLITE_INTERRUPT;
 
-
+@SuppressWarnings({"unchecked", "rawtypes", "serial"})
 public abstract class IQueryResults extends QueryTools
         implements ActionListener,
         PropertyChangeListener {
@@ -377,7 +377,7 @@ public abstract class IQueryResults extends QueryTools
         return selectionTypes;
     }
 
-    void setQParams(GenericTree qParams) {
+    void setQParams(GenericTree<OptionNode> qParams) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
 
     }

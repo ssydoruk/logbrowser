@@ -13,12 +13,14 @@ import javax.swing.*;
 /**
  * @author ssydoruk
  */
+@SuppressWarnings({"unchecked", "rawtypes", "serial", "deprecation", "this-escape"})
+
 public class TLibDelaysConfig extends javax.swing.JPanel {
 
     private final JPSecSelect jpTimeDiff;
     private final ButtonGroup group = new ButtonGroup();
     private final FileInfoType ft = FileInfoType.type_Unknown;
-    // Variables declaration - do not modify//GEN-BEGIN:variables
+    // Variables declaration - do not modify                     
     private javax.swing.JPanel jpAppSettings;
     private javax.swing.JPanel jpTimeSettings;
 
@@ -57,7 +59,7 @@ public class TLibDelaysConfig extends javax.swing.JPanel {
         add(jpAppSettings);
         add(jpTimeSettings);
     }// </editor-fold>//GEN-END:initComponents
-    // End of variables declaration//GEN-END:variables
+    // End of variables declaration                   
 
     /**
      * @return the ft

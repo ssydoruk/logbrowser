@@ -51,7 +51,6 @@ public class MCPParser extends Parser {
 
     private static final HashSet<String> IGNORE_MPC = getIGNORE_MPC();
     private final ArrayList<String> extraBuff;
-    HashMap m_BlockNamesToIgnoreHash;
     StringBuilder sipBuf = new StringBuilder();
     long m_CurrentFilePos;
     long m_HeaderOffset;
@@ -68,10 +67,6 @@ public class MCPParser extends Parser {
         super(FileInfoType.type_MCP, m_tables);
         this.extraBuff = new ArrayList<>();
         //m_accessor = accessor;
-        m_BlockNamesToIgnoreHash = new HashMap();
-        for (String BlockNamesToIgnoreArray1 : BlockNamesToIgnoreArray) {
-            m_BlockNamesToIgnoreHash.put(BlockNamesToIgnoreArray1, 0);
-        }
     }
 
     private static HashSet<String> getIGNORE_MPC() {

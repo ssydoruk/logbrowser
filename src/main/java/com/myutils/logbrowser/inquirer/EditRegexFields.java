@@ -29,6 +29,8 @@ import java.util.Map;
 /**
  * @author ssydoruk
  */
+@SuppressWarnings({"unchecked", "rawtypes", "serial"})
+
 public class EditRegexFields extends javax.swing.JDialog {
 
     /**
@@ -718,7 +720,7 @@ public class EditRegexFields extends javax.swing.JDialog {
 //            kvps.add(new String[]{entry.getKey().toString(), entry.getValue().toString()});
 //        }
         Collections.sort(kvps, (o1, o2) -> {
-            return ((String[]) o1)[0].compareToIgnoreCase(((String[]) o2)[0]); //To change body of generated lambdas, choose Tools | Templates.
+            return o1[0].compareToIgnoreCase(o2[0]); //To change body of generated lambdas, choose Tools | Templates.
         });
         showLDAP.shouldProceed(new String[]{"Field", "Value"}, kvps, "All record fields (" + kvps.size() + ")");
     }//GEN-LAST:event_btRecFieldsActionPerformed

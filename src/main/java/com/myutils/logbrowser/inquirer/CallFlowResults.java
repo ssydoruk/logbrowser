@@ -20,6 +20,7 @@ import java.util.HashSet;
 
 import static org.apache.commons.lang3.ArrayUtils.isEmpty;
 
+@SuppressWarnings({"unchecked", "rawtypes", "serial", "deprecation", "this-escape"})
 public class CallFlowResults extends IQueryResults {
 
     public static final int TLIB = 0x01;

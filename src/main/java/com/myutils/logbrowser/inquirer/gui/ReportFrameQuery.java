@@ -20,6 +20,7 @@ import java.util.Enumeration;
 /**
  * @author ssydoruk
  */
+@SuppressWarnings({"unchecked", "rawtypes", "serial"})
 public class ReportFrameQuery extends ReportFrame {
 
     protected ShowFullMessage fullMsg;

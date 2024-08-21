@@ -14,6 +14,7 @@ import java.util.logging.Logger;
 
 import static Utils.Util.sortedArray;
 
+@SuppressWarnings("rawtypes")
 public abstract class IQuery extends QueryTools {
 
     private static final int SPLIT_ON = 1000;

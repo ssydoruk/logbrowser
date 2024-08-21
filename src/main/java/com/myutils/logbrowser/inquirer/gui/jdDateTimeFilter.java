@@ -24,6 +24,7 @@ import java.awt.event.KeyEvent;
 /**
  * @author ssydoruk
  */
+@SuppressWarnings({"unchecked", "rawtypes", "serial", "deprecation", "this-escape"})
 public class jdDateTimeFilter extends javax.swing.JDialog {
 
     private static final org.apache.logging.log4j.Logger logger = LogManager.getLogger();
@@ -33,7 +34,7 @@ public class jdDateTimeFilter extends javax.swing.JDialog {
     private int closeCause = JOptionPane.CANCEL_OPTION;
     private final DateTimePicker dtFrom;
     private final DateTimePicker dtTo;
-    // Variables declaration - do not modify//GEN-BEGIN:variables
+    // Variables declaration - do not modify                     
     private javax.swing.JButton btEarlyFirst;
     private javax.swing.JButton btEarlySecond;
     private javax.swing.JButton btLateFirst;
@@ -488,7 +489,7 @@ public class jdDateTimeFilter extends javax.swing.JDialog {
         jbOK.requestFocus();
         pack();
     }//GEN-LAST:event_formWindowActivated
-    // End of variables declaration//GEN-END:variables
+    // End of variables declaration                   
 
     void setTimeRange(UTCTimeRange timeRange) {
         this.timeRange = timeRange;

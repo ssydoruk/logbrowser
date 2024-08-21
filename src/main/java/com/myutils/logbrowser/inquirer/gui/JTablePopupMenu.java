@@ -16,6 +16,7 @@ import java.awt.*;
 /**
  * @author Stepan
  */
+@SuppressWarnings({"unchecked", "rawtypes", "serial", "deprecation", "this-escape"})
 class JTablePopupMenu extends JPopupMenu {
 
     private final JTablePopup tab;

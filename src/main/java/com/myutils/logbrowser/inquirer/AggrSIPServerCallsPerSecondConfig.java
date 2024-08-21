@@ -26,6 +26,7 @@ import java.util.List;
 /**
  * @author ssydoruk
  */
+@SuppressWarnings({"unchecked", "rawtypes", "serial", "deprecation", "this-escape"})
 public class AggrSIPServerCallsPerSecondConfig extends javax.swing.JPanel {
 
     private final JPSecSelect jpSecSelect;
@@ -50,7 +51,7 @@ public class AggrSIPServerCallsPerSecondConfig extends javax.swing.JPanel {
     private GroupByPanel gpGroupBy;
     private GroupByPanel gpOrderBy;
     private FileInfoType ft = FileInfoType.type_Unknown;
-    // Variables declaration - do not modify//GEN-BEGIN:variables
+    // Variables declaration - do not modify                     
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
@@ -653,7 +654,7 @@ public class AggrSIPServerCallsPerSecondConfig extends javax.swing.JPanel {
 //        lChild.revalidate();
 //        lChild.repaint();
     }
-    // End of variables declaration//GEN-END:variables
+    // End of variables declaration                   
 
     private void setChildChecked(MyCheckBoxList lChild, boolean boxEnabled) {
         inquirer.logger.debug("in setChildChecked " + boxEnabled);

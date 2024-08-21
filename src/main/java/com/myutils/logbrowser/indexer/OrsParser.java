@@ -986,6 +986,7 @@ public class OrsParser extends Parser {
                         return ParserThreadsProcessor.StateTransitionResult.ERROR_STATE;
                     }
                 }
+                break;
 
                 case STATE_EXTENSION_FETCH2:
                     //07:23:25.200 [T:47294533855552] {ORSInternal:3} ~OrsEvent[0x80566090]:name=start

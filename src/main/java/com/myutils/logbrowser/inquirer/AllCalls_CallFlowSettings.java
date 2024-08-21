@@ -7,17 +7,12 @@ package com.myutils.logbrowser.inquirer;
 import Utils.Pair;
 import java.awt.Window;
 import java.util.ArrayList;
-import java.util.HashMap;
-import javax.swing.BoxLayout;
-import javax.swing.ComboBoxModel;
-import javax.swing.JPanel;
-import javax.swing.JRadioButton;
-import javax.swing.border.TitledBorder;
 
 /**
  *
  * @author ssydo
  */
+@SuppressWarnings({"unchecked", "rawtypes", "serial", "deprecation", "this-escape"})
 class AllCalls_CallFlowSettings extends AllInteractionsSettings {
 
     private final CallFlowResults callFlowResults;

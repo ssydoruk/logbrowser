@@ -13,19 +13,17 @@ import static com.jidesoft.dialog.StandardDialog.RESULT_CANCELLED;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.Collection;
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComponent;
-import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 
 /**
  *
  * @author stepan_sydoruk
  */
+@SuppressWarnings({"unchecked", "rawtypes", "serial", "deprecation"})
 class RequestDialog extends StandardDialog {
 
 	public void setContentPanel(JPanel contentPanel) {

@@ -30,6 +30,8 @@ import static javax.swing.JOptionPane.INFORMATION_MESSAGE;
 /**
  * @author ssydoruk
  */
+@SuppressWarnings({"unchecked", "rawtypes", "serial"})
+
 public class MyCheckBoxList extends CheckBoxList {
 
     MyChBoxListPopup menu;

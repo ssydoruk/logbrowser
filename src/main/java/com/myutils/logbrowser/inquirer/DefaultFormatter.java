@@ -5,6 +5,7 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 
+@SuppressWarnings({"unchecked", "rawtypes", "serial", "deprecation", "this-escape"})
 public class DefaultFormatter implements ILogRecordFormatter {
 
     static protected HashMap<String, Integer> m_callIdHash = new HashMap<>();

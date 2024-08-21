@@ -111,7 +111,6 @@ public class OCSParser extends Parser {
     private static final Pattern regCfgObjectType = Pattern.compile("CfgDelta([^=]+)=");
     private static final Pattern regCfgOp = Pattern.compile("PopCfg.+\\s(\\w+)$");
     private static final Pattern regCfgObjectDBID = Pattern.compile("\\WDBID=(\\d+)\\W");
-    HashMap<String, String> prevSeqno = new HashMap();
     private int m_CurrentLine;
     private StatEventType statEventType;
     private ParserState m_ParserState;
@@ -192,7 +191,7 @@ public class OCSParser extends Parser {
     }
 
     private void AddSCXMLTreatmentMessage(String campDBID, String recHandle, String chainID,
-                                          String rest) {
+            String rest) {
         OCSSCXMLTreatment msg = new OCSSCXMLTreatment(campDBID, chainID, recHandle, rest, fileInfo.getRecordID());
         SetStdFieldsAndAdd(msg);
 //        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
@@ -238,7 +237,6 @@ public class OCSParser extends Parser {
         Main.logger.trace("ParseFrom offset:" + offset + " line:" + line);
         m_CurrentLine = line;
 
-
         try {
             input.skip(offset);
 
@@ -275,7 +273,6 @@ public class OCSParser extends Parser {
         } catch (Exception e) {
             Main.logger.error(e);
         }
-
 
         return m_CurrentLine - line;
     }
@@ -611,6 +608,7 @@ public class OCSParser extends Parser {
                     return str;
                 }
             }
+            break;
 
             case STATE_TMESSAGE: {
                 if (regTMessageEnd.matcher(str).find()) {
@@ -843,7 +841,6 @@ public class OCSParser extends Parser {
                     + ");";
             getM_dbAccessor().runQuery(query);
 
-
         }
 
         @Override
@@ -866,7 +863,6 @@ public class OCSParser extends Parser {
         public void FinalizeDB() throws SQLException {
             createIndexes();
         }
-
 
     }
 

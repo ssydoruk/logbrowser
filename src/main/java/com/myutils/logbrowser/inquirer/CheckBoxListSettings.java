@@ -15,6 +15,7 @@ import java.util.HashSet;
 /**
  * @author ssydoruk
  */
+@SuppressWarnings({"unchecked", "rawtypes", "serial", "deprecation"})
 public class CheckBoxListSettings extends MyCheckBoxList {
 
     public CheckBoxListSettings(DefaultListModel lmRefValues, JPanel jpo) {

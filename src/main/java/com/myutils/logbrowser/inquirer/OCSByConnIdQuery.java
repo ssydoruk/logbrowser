@@ -13,12 +13,9 @@ import java.util.Collection;
 /**
  * @author ssydoruk
  */
+@SuppressWarnings({"unchecked", "rawtypes", "serial", "deprecation", "this-escape"})
 public class OCSByConnIdQuery extends IQuery {
 
-    private Integer[] m_ConnIds;
-    private ResultSet m_resultSet;
-    private DatabaseConnector m_connector;
-    private int recCnt;
     private IDsFinder cidFinder = null;
     private DynamicTreeNode<OptionNode> node = null;
     private Collection<Long> recIDs = null;
@@ -27,7 +24,6 @@ public class OCSByConnIdQuery extends IQuery {
 
     public OCSByConnIdQuery(Integer[] connIds) throws SQLException {
         this();
-        m_ConnIds = connIds;
     }
 
     public OCSByConnIdQuery() throws SQLException {

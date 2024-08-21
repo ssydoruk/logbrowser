@@ -23,6 +23,8 @@ import java.util.logging.Logger;
 /**
  * @author Stepan
  */
+@SuppressWarnings({"unchecked", "rawtypes", "serial", "deprecation", "this-escape"})
+
 public class EditorUnix extends ExternalEditor {
 
     private static final org.apache.logging.log4j.Logger logger = LogManager.getLogger();

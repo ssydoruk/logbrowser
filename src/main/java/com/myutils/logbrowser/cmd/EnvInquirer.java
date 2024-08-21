@@ -33,6 +33,7 @@ public class EnvInquirer {
     private String search;
 
     private ArrayList<String> tables;
+    private final Option optStartDirectory;
 
     public boolean isRegex() {
         return isRegex;
@@ -53,9 +54,13 @@ public class EnvInquirer {
         optHelp = Option.builder("h").hasArg(false).required(false).desc("Show help and exit").longOpt("help").build();
         options.addOption(optHelp);
 
-        optDBName = Option.builder("d").hasArg(true).required(true).desc("Name of the SQLite database file")
+        optDBName = Option.builder("d").hasArg(true).required(false).desc("Name of the SQLite database file")
                 .valueSeparator('=').longOpt("dbname").build();
         options.addOption(optDBName);
+
+        optStartDirectory = Option.builder("i").hasArg(true).required(false).desc("Initial directory. If not specified, using current")
+                .valueSeparator('=').longOpt("initdir").build();
+        options.addOption(optStartDirectory);
 
         optIsRegex = Option.builder("x").hasArg(false).required(false).desc("Search expression is regular expression")
                 .longOpt("regex").valueSeparator('=').build();

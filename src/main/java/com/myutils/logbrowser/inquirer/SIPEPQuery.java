@@ -17,7 +17,7 @@ import java.util.HashMap;
  */
 public class SIPEPQuery extends IQuery {
 
-    private final HashMap sipRecords = new HashMap();
+    private final HashMap<Long, SipMessage> sipRecords = new HashMap<>();
     private String[] orderBy;
     private String tabName;
     private Integer[] m_CallIds;
@@ -44,9 +44,9 @@ public class SIPEPQuery extends IQuery {
         setOrderBy(new String[]{"time"});
     }
 
-    public SIPEPQuery(HashMap callIds, boolean useProxy) throws Exception {
+    public SIPEPQuery(HashMap<Integer, String> callIds, boolean useProxy) throws Exception {
         this();
-        m_CallIds = (Integer[]) callIds.keySet().toArray(new Integer[callIds.size()]);
+        m_CallIds = callIds.keySet().toArray(new Integer[callIds.size()]);
         m_useProxy = useProxy;
     }
 
@@ -94,7 +94,7 @@ public class SIPEPQuery extends IQuery {
         recCnt = 0;
     }
 
-    public HashMap getSipRecords() {
+    public HashMap<Long, SipMessage> getSipRecords() {
         return sipRecords;
     }
 
@@ -194,7 +194,7 @@ public class SIPEPQuery extends IQuery {
 //    void setSearchType(SelectionType st) {
 //        this.searchType = st;
 //    }
-    void setOrderBy(String[] orderBy
+    final void setOrderBy(String[] orderBy
     ) {
         String[] arr = new String[orderBy.length];
         for (int i = 0; i < orderBy.length; i++) {

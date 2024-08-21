@@ -19,6 +19,7 @@ import java.io.IOException;
 /**
  * @author ssydoruk
  */
+@SuppressWarnings({"unchecked", "rawtypes", "serial", "deprecation", "this-escape"})
 public class ReportFrameAggregate extends ReportFrame {
 
     private IAggregateQuery query;

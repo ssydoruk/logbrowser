@@ -21,6 +21,7 @@ import static com.myutils.logbrowser.inquirer.gui.TabResultDataModel.TableRow.co
 /**
  * @author Stepan
  */
+@SuppressWarnings({"unchecked", "rawtypes", "serial", "deprecation"})
 public class TabResultDataModel extends AbstractTableModel {
 
     private static final org.apache.logging.log4j.Logger logger = LogManager.getLogger();
@@ -35,8 +36,8 @@ public class TabResultDataModel extends AbstractTableModel {
     private static int stdColorsIdx = 0;
     private final HashMap<String, Integer> columnTitle;
     private final ArrayList<TableRow> tableData;
-    private final HashMap<MsgType, HashSet> columnsWithDataType;
-    private final HashMap<MsgType, HashMap> columnIdxAdjusterType;
+    private final HashMap<MsgType, HashSet<Integer>> columnsWithDataType;
+    private final HashMap<MsgType, HashMap<Integer, Integer>> columnIdxAdjusterType;
     private final ColumnParams columnParamsOrig;
     private final HashMap<MsgType, HashMap<Integer, CustomField>> customFields = new HashMap<>();
     MsgType lastRowType = MsgType.UNKNOWN;
@@ -109,7 +110,7 @@ public class TabResultDataModel extends AbstractTableModel {
     public static Pair<Color, Color> getColorIdx(int idx) {
         Pair<Color, Color> ret = null;
         if (idx < msgRowColors.size()) {
-            ret = (Pair<Color, Color>) (Pair<Color, Color>) msgRowColors.values().toArray()[idx];
+            ret = (Pair<Color, Color>) msgRowColors.values().toArray()[idx];
         } else {
             idx -= msgRowColors.size();
             if (idx < stdColors.size()) {
@@ -174,7 +175,7 @@ public class TabResultDataModel extends AbstractTableModel {
                 columnTitleIdx.put(entry.getValue(), entry.getKey());
             }
 
-            for (Map.Entry<MsgType, HashSet> entry : columnsWithDataType.entrySet()) {
+            for (Map.Entry<MsgType, HashSet<Integer>> entry : columnsWithDataType.entrySet()) {
 //                HashSet<Integer> realColumnIdx = entry.getValue();
                 HashSet<Integer> realColumnIdx =  columnParams.hideHidden(entry.getKey(), entry.getValue());
                 inquirer.logger.trace("key: " + entry.getKey() + " cols: " + realColumnIdx);
@@ -231,7 +232,7 @@ public class TabResultDataModel extends AbstractTableModel {
 
 //        return columnTitle.size();
         int totalColumns = 0;
-        for (HashMap value : columnIdxAdjusterType.values()) {
+        for (HashMap<Integer, Integer> value : columnIdxAdjusterType.values()) {
             if (value.size() > totalColumns) {
                 totalColumns = value.size();
             }
@@ -607,7 +608,7 @@ public class TabResultDataModel extends AbstractTableModel {
             String colName = "";
 
             if (row != null) {
-                HashMap<Integer, Integer> mapPerType = (HashMap<Integer, Integer>) columnIdxAdjusterType.get(row.getRowType());
+                HashMap<Integer, Integer> mapPerType = columnIdxAdjusterType.get(row.getRowType());
                 if (mapPerType != null) {
                     Integer realColumnIdx = mapPerType.get(tab.convertColumnIndexToModel(j));
                     if (realColumnIdx != null) {
@@ -1179,9 +1180,9 @@ public class TabResultDataModel extends AbstractTableModel {
                         putRowData(columnIdx, t, StringUtils.join(new String[]{curData, data}, " | "));
                     }
 
-                    HashSet hm = columnsWithDataType.get(getRowType());
+                    HashSet<Integer> hm = columnsWithDataType.get(getRowType());
                     if (hm == null) {
-                        hm = new HashSet();
+                        hm = new HashSet<>();
                         columnsWithDataType.put(getRowType(), hm);
                     }
                     hm.add(columnIdx);

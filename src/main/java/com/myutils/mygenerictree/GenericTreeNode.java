@@ -10,6 +10,8 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+@SuppressWarnings({"rawtypes", "serial", "this-escape"})
+
 public class GenericTreeNode<T> implements Serializable {
 
     /**
@@ -28,12 +30,12 @@ public class GenericTreeNode<T> implements Serializable {
 
     public GenericTreeNode(TClonable dataSrc) {
         this();
-        setData(dataSrc);
+        data=dataSrc;
     }
 
     public GenericTreeNode(GenericTreeNode<T> src) {
         this();
-        NodeCopy(src);
+        this.NodeCopy(src);
     }
 
     protected void NodeCopy(GenericTreeNode<T> src) {
@@ -43,7 +45,7 @@ public class GenericTreeNode<T> implements Serializable {
                 setData(d.copy());
             }
             for (GenericTreeNode<T> child : src.getChildren()) {
-                addChild(new GenericTreeNode<T>(child));
+                addChild(new GenericTreeNode<>(child));
             }
         }
 

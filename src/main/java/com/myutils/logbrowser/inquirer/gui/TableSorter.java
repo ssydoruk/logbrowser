@@ -27,7 +27,7 @@ import java.util.List;
  *
  * @author Philip Milne
  */
-@SuppressWarnings("serial")
+@SuppressWarnings({"unchecked", "rawtypes", "serial", "deprecation"})
 public final class TableSorter extends TableMap {
 
     int[] indexes;

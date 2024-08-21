@@ -29,6 +29,7 @@ import static javax.swing.JOptionPane.INFORMATION_MESSAGE;
 /**
  * @author ssydoruk
  */
+@SuppressWarnings({"unchecked", "rawtypes", "serial", "deprecation", "this-escape"})
 public abstract class JTablePopup extends JTable {
 
     /**

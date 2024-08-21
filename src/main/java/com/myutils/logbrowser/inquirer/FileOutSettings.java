@@ -6,16 +6,16 @@
 package com.myutils.logbrowser.inquirer;
 
 import javax.swing.*;
-import javax.swing.filechooser.FileNameExtensionFilter;
 import java.io.File;
 
 /**
  * @author ssydoruk
  */
+@SuppressWarnings({"unchecked", "rawtypes", "serial"})
 public class FileOutSettings extends javax.swing.JPanel {
 
     static ICSVFileChooser chooser = CICSVFileChooser.of();
-    // Variables declaration - do not modify//GEN-BEGIN:variables
+    // Variables declaration - do not modify                     
     private javax.swing.ButtonGroup btgAllFields;
     private javax.swing.ButtonGroup btgFieldDelimiter;
     private javax.swing.ButtonGroup btgHeaders;
@@ -667,7 +667,7 @@ public class FileOutSettings extends javax.swing.JPanel {
     private void jrbCommaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jrbCommaActionPerformed
         enableJtfOther();
     }//GEN-LAST:event_jrbCommaActionPerformed
-    // End of variables declaration//GEN-END:variables
+    // End of variables declaration                   
 
     private void enableJtfOther() {
         boolean isEnabled = jrbOther.isSelected();

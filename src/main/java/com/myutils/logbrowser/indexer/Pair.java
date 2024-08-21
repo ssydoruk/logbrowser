@@ -3,6 +3,8 @@ package com.myutils.logbrowser.indexer;
 import java.io.Serializable;
 import java.util.Objects;
 
+@SuppressWarnings({"unchecked", "rawtypes", "serial", "deprecation", "this-escape"})
+
 public class Pair<K, V> implements Serializable {
 
     private static final String OPEN_BRACE = "{";

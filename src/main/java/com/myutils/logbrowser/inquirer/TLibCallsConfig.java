@@ -22,6 +22,7 @@ import java.sql.SQLException;
 /**
  * @author ssydoruk
  */
+@SuppressWarnings({"unchecked", "rawtypes", "serial", "deprecation", "this-escape"})
 public class TLibCallsConfig extends javax.swing.JPanel {
 
     private static final org.apache.logging.log4j.Logger logger = LogManager.getLogger();
@@ -30,7 +31,7 @@ public class TLibCallsConfig extends javax.swing.JPanel {
     private final ButtonGroup group = new ButtonGroup();
     private DefaultListModel _model;
     private FileInfoType ft = FileInfoType.type_Unknown;
-    // Variables declaration - do not modify//GEN-BEGIN:variables
+    // Variables declaration - do not modify                     
     private javax.swing.JCheckBox jCheckBox1;
     private javax.swing.JCheckBox jCheckBox2;
     private javax.swing.JPanel jPanel1;
@@ -301,7 +302,7 @@ public class TLibCallsConfig extends javax.swing.JPanel {
         // TODO add your handling code here:
 
     }//GEN-LAST:event_jcbCollateAncestorAdded
-    // End of variables declaration//GEN-END:variables
+    // End of variables declaration                   
 
     private void addRadioButton(String btTitle, final FileInfoType fileInfoType) {
         JRadioButton btn = new JRadioButton(btTitle);

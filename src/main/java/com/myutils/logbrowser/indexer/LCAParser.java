@@ -28,11 +28,7 @@ public class LCAParser extends Parser {
     private static final Pattern regCfgObjectName = Pattern.compile("(?:name|userName)='([^']+)'");
     private static final Pattern regCfgObjectType = Pattern.compile("^Cfg([^=]+)=\\{DBID=(\\w+)");
     private static final Pattern regCfgOp = Pattern.compile("^(Creating|Adding\\s[\\w]+)");
-    final int MSG_STRING_LIMIT = 200;
-    private final HashMap m_BlockNamesToIgnoreHash;
     // parse state contants
-    long m_CurrentFilePos;
-    long m_HeaderOffset;
     String m_ServerName;
 
     int m_dbRecords = 0;
@@ -40,13 +36,10 @@ public class LCAParser extends Parser {
 
     public LCAParser(DBTables m_tables) {
         super(FileInfoType.type_LCA, m_tables);
-        m_BlockNamesToIgnoreHash = new HashMap();
-
     }
 
     @Override
     public int ParseFrom(BufferedReaderCrLf input, long offset, int line, FileInfo fi) {
-        m_CurrentFilePos = offset;
         m_CurrentLine = line;
 
 

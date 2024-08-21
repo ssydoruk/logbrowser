@@ -25,6 +25,7 @@ import java.util.List;
 /**
  * @author ssydoruk
  */
+@SuppressWarnings({"unchecked", "rawtypes", "serial", "deprecation", "this-escape"})
 public class AggrApacheURIPerSecondConfig extends javax.swing.JPanel {
 
     /**
@@ -34,10 +35,6 @@ public class AggrApacheURIPerSecondConfig extends javax.swing.JPanel {
     private final JPSecSelect jpSecSelect;
     private final JPSecSelect jpHavingSelect;
     private final ButtonGroup group = new ButtonGroup();
-    private DefaultListModel lmAttr;
-    private MyCheckBoxList cblAttr;
-    private DefaultListModel lmAttrValues;
-    private MyCheckBoxList cblAttrValues;
     private MyCheckBoxList clbOrderBy;
     private DefaultListModel lmAttrTLib;
     private MyCheckBoxList cblAttrTLib;
@@ -47,9 +44,8 @@ public class AggrApacheURIPerSecondConfig extends javax.swing.JPanel {
     private GroupByPanel gpOrderByTLib;
     private GroupByPanel gpGroupByTLib;
     private GroupByPanel gpGroupBy;
-    private GroupByPanel gpOrderBy;
     private FileInfoType ft = FileInfoType.type_Unknown;
-    // Variables declaration - do not modify//GEN-BEGIN:variables
+    // Variables declaration - do not modify                     
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JPanel jPanel3;
@@ -383,7 +379,7 @@ public class AggrApacheURIPerSecondConfig extends javax.swing.JPanel {
 //        lChild.revalidate();
 //        lChild.repaint();
     }
-    // End of variables declaration//GEN-END:variables
+    // End of variables declaration                   
 
     private void setChildChecked(MyCheckBoxList lChild, boolean boxEnabled) {
         inquirer.logger.debug("in setChildChecked " + boxEnabled);

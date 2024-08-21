@@ -24,7 +24,7 @@ public class InquirerFileIo {
         InqFile retInqFile = null;
 
         if (logReaderHash == null) {
-            logReaderHash = new HashMap();
+            logReaderHash = new HashMap<>();
         }
         if (logReaderHash.containsKey(fileName)) {
             retInqFile = logReaderHash.get(fileName);

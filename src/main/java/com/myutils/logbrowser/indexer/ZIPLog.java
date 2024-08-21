@@ -48,10 +48,10 @@ public final class ZIPLog extends LogFileWrapper {
     public void open() throws IOException {
         boolean goodFileFound;
         try (ZipFile theArchive = new ZipFile(getFile(), ZipFile.OPEN_READ)) {
-            Enumeration e = theArchive.entries();
+            Enumeration <? extends ZipEntry> e = theArchive.entries();
             goodFileFound = false;
             while (e.hasMoreElements()) {
-                ZipEntry entry = (ZipEntry) e.nextElement();
+                ZipEntry entry = e.nextElement();
                 if (!entry.isDirectory()) {
                     FileInfo fi = new FileInfo(this, entry.getName(), entry.getSize());
                     try (InputStream inputStream = theArchive.getInputStream(entry)) {

@@ -29,6 +29,7 @@ import static javax.swing.JOptionPane.ERROR_MESSAGE;
 /**
  * @author Stepan
  */
+@SuppressWarnings({"unchecked", "rawtypes", "serial"})
 public class MyJTable extends JTableCommon {
 
     /**

@@ -12,6 +12,7 @@ import java.io.Serializable;
 /**
  * @author stepan_sydoruk
  */
+@SuppressWarnings({"unchecked", "rawtypes", "serial", "deprecation"})
 public class CustomField implements Serializable {
 
     private static final org.apache.logging.log4j.Logger logger = LogManager.getLogger();

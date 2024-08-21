@@ -16,13 +16,14 @@ import static Utils.Util.pDuration;
 /**
  * @author ssydoruk
  */
+@SuppressWarnings({"unchecked", "rawtypes", "serial"})
 public class RequestProgress extends javax.swing.JDialog {
 
     public static final Object dialogStarted = new Object();
     private static final org.apache.logging.log4j.Logger logger = LogManager.getLogger();
     ElapsedTimer elapsedTimer = null;
     private final MySwingWorker wrk;
-    // Variables declaration - do not modify//GEN-BEGIN:variables
+    // Variables declaration - do not modify                     
     private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
@@ -147,7 +148,7 @@ public class RequestProgress extends javax.swing.JDialog {
             taMessages.append(chunk + "\n");
         }
     }
-    // End of variables declaration//GEN-END:variables
+    // End of variables declaration                   
 
     class ElapsedTimer extends SwingWorker<Void, Integer> {
 

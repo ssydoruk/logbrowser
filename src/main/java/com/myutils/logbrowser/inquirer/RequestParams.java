@@ -30,6 +30,8 @@ import java.util.HashSet;
 /**
  * @author ssydoruk
  */
+@SuppressWarnings({"unchecked", "rawtypes", "serial"})
+
 public class RequestParams extends javax.swing.JPanel {
 
     private static final org.apache.logging.log4j.Logger logger = LogManager.getLogger();
@@ -550,7 +552,7 @@ public class RequestParams extends javax.swing.JPanel {
                                 if (lChild != null) {
 
                                     if (i >= firstID) {
-                                        changeReportItem(i, (DynamicTreeNode<OptionNode>) lm.get(i), lChild);
+                                        changeReportItem(i, lm.get(i), lChild);
                                     }
                                 }
                             }

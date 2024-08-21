@@ -47,7 +47,7 @@ public final class URSRlib extends Message {
     public URSRlib(ArrayList<String> messageLines, int fileID) {
         super(TableType.URSRlib, messageLines, fileID);
         Matcher m;
-        if (messageLines.size() > 0 && (m = regSource.matcher((String) messageLines.get(0))).find()) {
+        if (messageLines.size() > 0 && (m = regSource.matcher(messageLines.get(0))).find()) {
             this.source = m.group(2);
             SetInbound(m.group(1).endsWith("m")); // from
             this.message = m.group(3);

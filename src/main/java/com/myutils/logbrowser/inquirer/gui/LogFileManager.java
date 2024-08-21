@@ -5,16 +5,13 @@
  */
 package com.myutils.logbrowser.inquirer.gui;
 
-import com.myutils.logbrowser.indexer.*;
 import com.myutils.logbrowser.inquirer.LogFile;
 import com.myutils.logbrowser.inquirer.inquirer;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
-import org.apache.commons.compress.compressors.gzip.GzipParameters;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.io.IOUtils;
 import org.apache.logging.log4j.LogManager;
 
 import java.io.*;
@@ -28,6 +25,8 @@ import static org.apache.commons.io.FileUtils.copyInputStreamToFile;
 /**
  * @author Stepan
  */
+@SuppressWarnings({"unchecked", "rawtypes", "serial", "deprecation", "this-escape"})
+
 public class LogFileManager {
 
     private static final org.apache.logging.log4j.Logger logger = LogManager.getLogger();

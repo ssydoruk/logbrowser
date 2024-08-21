@@ -24,6 +24,8 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+@SuppressWarnings({"unchecked", "rawtypes", "serial", "deprecation", "this-escape"})
+
 public abstract class OutputSpecFormatter extends DefaultFormatter {
 
     final static String FILELINK = "filelink";
@@ -47,8 +49,8 @@ public abstract class OutputSpecFormatter extends DefaultFormatter {
     private final HashMap<String, RecordLayout> outSpec = new HashMap<>();
 
     public OutputSpecFormatter(XmlCfg cfg,
-                               boolean isLongFileNameEnabled,
-                               HashSet<String> components) throws Exception {
+            boolean isLongFileNameEnabled,
+            HashSet<String> components) throws Exception {
         super(isLongFileNameEnabled, components);
         inquirer.logger.debug("OutputSpecFormatter " + cfg.getXmlFile());
         this.cfg = cfg;
@@ -314,14 +316,14 @@ public abstract class OutputSpecFormatter extends DefaultFormatter {
                 if (!ignorePatternForDBFields) {
                     ArrayList<Element> els = getElementsChildByName(e, "pattern");
                     if (els != null && els.size() > 0) {
-                        for (Iterator<Element> iterator = els.iterator(); iterator.hasNext(); ) {
+                        for (Iterator<Element> iterator = els.iterator(); iterator.hasNext();) {
                             Element next = iterator.next();
                             SetMatch(next);
                         }
                     }
                 }
                 for (Iterator<Element> el = getElementsChildByName(e, "filter").iterator();
-                     el != null && el.hasNext(); ) {
+                        el != null && el.hasNext();) {
                     SetFilter(el.next());
 
                 }
@@ -910,9 +912,10 @@ public abstract class OutputSpecFormatter extends DefaultFormatter {
                                 break;
 
                         }
-                        parameter.setHidden(getAttribute(paramElement, "hidden", false));
-
-                        parameters.add(parameter);
+                        if (parameter != null) {
+                            parameter.setHidden(getAttribute(paramElement, "hidden", false));
+                            parameters.add(parameter);
+                        }
                     }
                 }
             }

@@ -14,9 +14,10 @@ import java.text.NumberFormat;
 /**
  * @author ssydoruk
  */
+@SuppressWarnings({"unchecked", "rawtypes", "serial", "deprecation", "this-escape"})
 public class JPSecSelect extends javax.swing.JPanel {
 
-    // Variables declaration - do not modify//GEN-BEGIN:variables
+    // Variables declaration - do not modify                     
     private javax.swing.JFormattedTextField jtfSeconds;
     private javax.swing.JLabel lbEnd;
     private javax.swing.JLabel lbStart;
@@ -95,6 +96,6 @@ public class JPSecSelect extends javax.swing.JPanel {
         lbEnd.setText("second(s)");
         add(lbEnd);
     }// </editor-fold>//GEN-END:initComponents
-    // End of variables declaration//GEN-END:variables
+    // End of variables declaration                   
 
 }

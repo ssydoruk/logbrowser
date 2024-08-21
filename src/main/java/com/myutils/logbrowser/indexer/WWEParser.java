@@ -21,6 +21,8 @@ import static com.myutils.logbrowser.indexer.Message.getRx;
 /**
  * @author ssydoruk
  */
+@SuppressWarnings({"unchecked", "rawtypes", "serial", "deprecation", "this-escape", "removal"})
+
 public class WWEParser extends WebParser {
 
     private static final org.apache.logging.log4j.Logger logger = Main.logger;
@@ -679,6 +681,7 @@ public class WWEParser extends WebParser {
                     return str;
                 }
             }
+            break;
 
             case STATE_INTERACTION_PROPERTIES: {
                 if (ParseFormatDate(str) == null) {

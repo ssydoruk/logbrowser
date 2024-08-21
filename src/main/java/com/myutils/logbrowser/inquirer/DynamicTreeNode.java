@@ -23,6 +23,7 @@ import static com.myutils.logbrowser.inquirer.inquirer.getFirstWord;
 /**
  * @author ssydoruk
  */
+@SuppressWarnings({"rawtypes", "unchecked", "this-escape", "serial"})
 public class DynamicTreeNode<T> extends GenericTreeNode implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -526,13 +527,13 @@ public class DynamicTreeNode<T> extends GenericTreeNode implements Serializable 
         }
     }
 
-    public static abstract class ILoadChildrenProc {
+    public static abstract class ILoadChildrenProc<T> {
 
         private boolean treeLoad = false;
 
-        abstract ArrayList<NameID> LoadChidlren(DynamicTreeNode parent);
+        abstract ArrayList<NameID> LoadChidlren(DynamicTreeNode<T> parent);
 
-        abstract void treeLoad(DynamicTreeNode parent);
+        abstract void treeLoad(DynamicTreeNode<T> parent);
 
         public boolean isTreeLoad() {
             return treeLoad;

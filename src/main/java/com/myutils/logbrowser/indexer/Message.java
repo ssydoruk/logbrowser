@@ -19,7 +19,7 @@ import java.util.regex.Pattern;
 import static Utils.Util.StripQuotes;
 import static Utils.Util.intOrDef;
 
-
+@SuppressWarnings({"unchecked", "rawtypes", "serial", "deprecation", "this-escape"})
 public abstract class Message extends Record {
 
     private static final Pattern ptAttrInBrackets = Pattern.compile("\\[(.+)\\]$");

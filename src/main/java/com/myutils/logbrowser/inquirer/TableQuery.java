@@ -8,6 +8,7 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
+@SuppressWarnings({"unchecked", "rawtypes", "serial", "deprecation", "this-escape"})
 public class TableQuery extends IQuery {
 
     private static final org.apache.logging.log4j.Logger logger = LogManager.getLogger();

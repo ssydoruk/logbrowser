@@ -28,6 +28,7 @@ import java.util.regex.PatternSyntaxException;
 /**
  * @author ssydoruk
  */
+@SuppressWarnings({"unchecked", "rawtypes", "serial", "deprecation"})
 public final class QuerySetting extends javax.swing.JDialog {
 
     private static final org.apache.logging.log4j.Logger logger = LogManager.getLogger();
@@ -1271,8 +1272,8 @@ public final class QuerySetting extends javax.swing.JDialog {
             String showInputDialog = JOptionPane.showInputDialog(this, "Change constant alias", selectedValue.toString());
             if (showInputDialog != null) {
                 jlConstants.setValueIsAdjusting(true);
-                DefaultListModel<GenesysConstant> model = (DefaultListModel) jlConstants.getModel();
-                GenesysConstant c = (InquirerCfg.GenesysConstant) model.getElementAt(selectedIndex);
+                DefaultListModel<GenesysConstant> model = (DefaultListModel<GenesysConstant>) jlConstants.getModel();
+                GenesysConstant c = model.getElementAt(selectedIndex);
 
                 c.setName(showInputDialog);
 

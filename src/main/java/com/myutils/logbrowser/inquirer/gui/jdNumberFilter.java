@@ -20,12 +20,14 @@ import static com.myutils.logbrowser.inquirer.gui.AColumnFilter.convertDouble;
 /**
  * @author ssydoruk
  */
+@SuppressWarnings({"unchecked", "rawtypes", "serial", "deprecation", "this-escape"})
+
 public final class jdNumberFilter extends javax.swing.JDialog {
 
     private static final org.apache.logging.log4j.Logger logger = LogManager.getLogger();
     private int closeCause = JOptionPane.CANCEL_OPTION;
     private NumberFilter numberSelection = null;
-    // Variables declaration - do not modify//GEN-BEGIN:variables
+    // Variables declaration - do not modify                     
     private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
@@ -292,7 +294,7 @@ public final class jdNumberFilter extends javax.swing.JDialog {
         dispose();
         // TODO add your handling code here:
     }//GEN-LAST:event_jbOKActionPerformed
-    // End of variables declaration//GEN-END:variables
+    // End of variables declaration                   
 
     private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated
         getRootPane().setDefaultButton(jbOK);

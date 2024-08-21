@@ -39,6 +39,8 @@ import static javax.swing.JOptionPane.OK_OPTION;
 /**
  * @author ssydoruk
  */
+@SuppressWarnings({"unchecked", "rawtypes", "serial", "deprecation"})
+
 public class QueryDialog extends javax.swing.JFrame {
 
     private static final org.apache.logging.log4j.Logger logger = LogManager.getLogger();

@@ -1,8 +1,8 @@
 package com.myutils.logbrowser.inquirer;
 
 import javax.swing.*;
-import java.awt.*;
 
+@SuppressWarnings({"unchecked", "rawtypes", "serial", "deprecation"})
 public class SmartButtonGroup<T> extends ButtonGroup {
     @Override
     public void add(AbstractButton b) {

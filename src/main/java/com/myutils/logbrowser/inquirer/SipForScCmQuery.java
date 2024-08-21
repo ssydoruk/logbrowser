@@ -16,9 +16,10 @@ import java.util.HashSet;
 /**
  * @author ssydoruk
  */
+@SuppressWarnings({"unchecked", "rawtypes", "serial", "deprecation", "this-escape"})
 public class SipForScCmQuery extends IQuery {
 
-    private final HashSet handlerIDs = new HashSet();
+    private final HashSet<Integer> handlerIDs;
     private String[] orderBy;
     private boolean collectHandlers = false;
 
@@ -31,6 +32,7 @@ public class SipForScCmQuery extends IQuery {
     private IDsFinder cidFinder;
 
     public SipForScCmQuery() throws SQLException {
+        this.handlerIDs = new HashSet<>();
         addRef("ToUriID", "ToUri", ReferenceType.SIPURI.toString(), FieldType.OPTIONAL);
         addRef("FromUriID", "FromUri", ReferenceType.SIPURI.toString(), FieldType.OPTIONAL);
         addRef("ViaUriID", "ViaUri", ReferenceType.SIPURI.toString(), FieldType.OPTIONAL);
@@ -239,7 +241,7 @@ public class SipForScCmQuery extends IQuery {
 //    void setSearchType(SelectionType st) {
 //        this.searchType = st;
 //    }
-    void setOrderBy(String[] orderBy
+    final void setOrderBy(String[] orderBy
     ) {
         String[] arr = new String[orderBy.length];
         for (int i = 0; i < orderBy.length; i++) {

@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+@SuppressWarnings({"unchecked", "rawtypes", "serial", "deprecation", "this-escape"})
 public class OptionNode implements Serializable, TClonable, Comparable {
 
     private static final long serialVersionUID = 2L;
@@ -38,7 +39,7 @@ public class OptionNode implements Serializable, TClonable, Comparable {
         this.dialogItem = dialogItem;
     }
 
-    OptionNode(boolean b, Pair pr) {
+    OptionNode(boolean b, Pair<String, String> pr) {
         this(b, pr.getKey().toString());
         thePr = pr;
     }

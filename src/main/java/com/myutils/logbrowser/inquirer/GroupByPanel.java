@@ -16,6 +16,7 @@ import java.util.ArrayList;
 /**
  * @author ssydoruk
  */
+@SuppressWarnings({"unchecked", "rawtypes", "serial", "deprecation"})
 public class GroupByPanel extends javax.swing.JPanel {
 
     // Variables declaration - do not modify                     

@@ -19,6 +19,8 @@ import static com.myutils.logbrowser.inquirer.QueryTools.getRefNames;
 /**
  * @author ssydoruk
  */
+@SuppressWarnings({"unchecked", "rawtypes", "serial", "deprecation", "this-escape"})
+
 public class InquirerCfgNonSerial {
 
     private final HashMap<ReferenceType, ArrayList<OptionNode>> refsChecked = new HashMap<>(20);

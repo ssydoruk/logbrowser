@@ -19,9 +19,10 @@ import java.util.ArrayList;
 /**
  * @author ssydoruk
  */
+@SuppressWarnings({"unchecked", "rawtypes", "serial", "deprecation"})
 public class JPAppSelect extends javax.swing.JPanel {
 
-    // Variables declaration - do not modify//GEN-BEGIN:variables
+    // Variables declaration - do not modify                     
     private javax.swing.JLabel jLabel1;
     private javax.swing.JComboBox<String> jcbApps;
 
@@ -91,7 +92,7 @@ public class JPAppSelect extends javax.swing.JPanel {
     public void actionPerformed(ActionEvent e) {
         jcbApps.actionPerformed(e);
     }
-    // End of variables declaration//GEN-END:variables
+    // End of variables declaration                   
 
     public int getAppID() {
         return ((NameID) jcbApps.getSelectedItem()).getId();

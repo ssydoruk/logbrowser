@@ -32,6 +32,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * @author ssydoruk
  */
+@SuppressWarnings({"unchecked", "rawtypes", "serial", "deprecation"})
 abstract class JTableCommon extends JTablePopup {
 
     static final String RECORD_EMPTY = "<(Empty)>";

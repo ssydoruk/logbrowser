@@ -10,6 +10,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Properties;
 
+@SuppressWarnings({"unchecked", "rawtypes", "serial", "deprecation", "this-escape"})
 public abstract class ILogRecord {
 
     private static final String[] sInboundFieldNames = {"inbound"

@@ -17,6 +17,7 @@ import java.util.regex.PatternSyntaxException;
 /**
  * @author ssydoruk
  */
+@SuppressWarnings({"unchecked", "rawtypes", "serial", "deprecation"})
 public final class EnterRegexDialog extends javax.swing.JDialog {
 
     /**
@@ -123,8 +124,8 @@ public final class EnterRegexDialog extends javax.swing.JDialog {
         return null;
     }
 
-    static public void setJCBElements(JComboBox jcb, ArrayList<String> elements) {
-        DefaultComboBoxModel model = (DefaultComboBoxModel) jcb.getModel();
+    static public void setJCBElements(JComboBox<String> jcb, ArrayList<String> elements) {
+        DefaultComboBoxModel<String> model = (DefaultComboBoxModel <String>) jcb.getModel();
         model.removeAllElements();
         if (!elements.isEmpty()) {
             for (String regEx : elements) {

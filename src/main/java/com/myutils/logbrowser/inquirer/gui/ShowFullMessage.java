@@ -40,6 +40,7 @@ import javax.swing.text.DefaultCaret;
 /**
  * @author ssydoruk
  */
+@SuppressWarnings({"unchecked", "rawtypes", "serial", "deprecation"})
 public class ShowFullMessage extends javax.swing.JFrame implements PopupMenuListener {
 
     RSyntaxTextArea detailedMessage;
@@ -432,7 +433,7 @@ public class ShowFullMessage extends javax.swing.JFrame implements PopupMenuList
                 kvps.add(new String[]{entry.getKey().toString() + " (raw)", entry.getValue().toString()});
             }
             Collections.sort(kvps, (o1, o2) -> {
-                return ((String[]) o1)[0].compareToIgnoreCase(((String[]) o2)[0]); // To change body of generated
+                return o1[0].compareToIgnoreCase(o2[0]); // To change body of generated
                 // lambdas, choose Tools | Templates.
             });
 

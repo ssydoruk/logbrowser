@@ -27,6 +27,8 @@ import java.util.List;
 /**
  * @author ssydoruk
  */
+@SuppressWarnings({"unchecked", "rawtypes", "serial", "deprecation"})
+
 public class AggrORSDurationConfig extends javax.swing.JPanel {
 
     private static final org.apache.logging.log4j.Logger logger = LogManager.getLogger();
@@ -51,7 +53,7 @@ public class AggrORSDurationConfig extends javax.swing.JPanel {
     private GroupByPanel gpGroupByTLib;
     private JPSecSelect jpSecSelect;
     private FileInfoType ft = FileInfoType.type_Unknown;
-    // Variables declaration - do not modify//GEN-BEGIN:variables
+    // Variables declaration - do not modify                     
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JPanel jPanel1;
@@ -380,7 +382,7 @@ public class AggrORSDurationConfig extends javax.swing.JPanel {
 //        lChild.revalidate();
 //        lChild.repaint();
     }
-    // End of variables declaration//GEN-END:variables
+    // End of variables declaration                   
 
     private void setChildChecked(MyCheckBoxList lChild, boolean boxEnabled) {
         inquirer.logger.debug("in setChildChecked " + boxEnabled);

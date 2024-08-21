@@ -41,7 +41,7 @@ class SearchIDs {
 
     final static int m_maxDepth = 5;
 
-    private static final HashMap<Integer, Integer> tmpConnIDs = new HashMap();
+    private static final HashMap<Integer, Integer> tmpConnIDs = new HashMap<>();
     private final HashMap<IDType, Integer[]> CallIDs = new HashMap<>();
 
     private static Integer[] getCallIDs(Integer[] ids) throws SQLException {
