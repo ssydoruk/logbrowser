@@ -20,6 +20,7 @@ import java.util.HashSet;
  * @author stepan_sydoruk
  */
 public class EnvInquirer {
+
     private final Option optDBName;
     private final Option optIsRegex;
     private final Option optSearchString;
@@ -34,6 +35,12 @@ public class EnvInquirer {
 
     private ArrayList<String> tables;
     private final Option optStartDirectory;
+    private String startDirectory;
+    private final Option optDBNamePattern;
+    private String fileNamePattern;
+    static private final String DEF_PATTERM = "*.db";
+    private final Option optDBPathPattern;
+    private String filePathPattern;
 
     public boolean isRegex() {
         return isRegex;
@@ -61,6 +68,14 @@ public class EnvInquirer {
         optStartDirectory = Option.builder("i").hasArg(true).required(false).desc("Initial directory. If not specified, using current")
                 .valueSeparator('=').longOpt("initdir").build();
         options.addOption(optStartDirectory);
+
+        optDBNamePattern = Option.builder("p").hasArg(true).required(false).desc("DB name pattern against file name (shell style) if searching. Default to [" + DEF_PATTERM + "]")
+                .valueSeparator('=').longOpt("pattern").build();
+        options.addOption(optDBNamePattern);
+
+        optDBPathPattern = Option.builder("f").hasArg(true).required(false).desc("Path pattern (java style) if searching.")
+                .valueSeparator('=').longOpt("namepattern").build();
+        options.addOption(optDBPathPattern);
 
         optIsRegex = Option.builder("x").hasArg(false).required(false).desc("Search expression is regular expression")
                 .longOpt("regex").valueSeparator('=').build();
@@ -93,7 +108,22 @@ public class EnvInquirer {
     }
 
     private String getOptDBName() {
-        return getStringOrDef(optDBName, "logbr");
+        return getStringOrDef(optDBName, "");
+    }
+
+    private String getOptStartDirectory() {
+        return getStringOrDef(optStartDirectory, ".");
+    }
+
+    private String getOptFileNamePattern() {
+        return getStringOrDef(optDBNamePattern, DEF_PATTERM);
+    }
+
+    private String getOptFilePathPattern() {
+        return getStringOrDef(optDBPathPattern, "");
+    }
+    public String getFileNamePattern() {
+        return fileNamePattern;
     }
 
     private String getOptSearchString() {
@@ -143,6 +173,20 @@ public class EnvInquirer {
 
         tables = getOptTables();
 
+        startDirectory = getOptStartDirectory();
+
+        fileNamePattern = getOptFileNamePattern();
+        
+        filePathPattern = getOptFilePathPattern();
+
+    }
+
+    public String getFilePathPattern() {
+        return filePathPattern;
+    }
+
+    public String getStartDirectory() {
+        return startDirectory;
     }
 
     /**
@@ -158,8 +202,8 @@ public class EnvInquirer {
                 ret.addAll(Arrays.stream(StringUtils.split(s.toLowerCase(), ",")).toList());
             }
             return ret.isEmpty() || ret.contains("all") ? null : new ArrayList<>(ret.stream().toList());
-        }
-        else 
+        } else {
             return null;
+        }
     }
 }
