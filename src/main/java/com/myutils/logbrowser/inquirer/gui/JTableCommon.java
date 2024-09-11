@@ -766,7 +766,7 @@ abstract class JTableCommon extends JTablePopup {
 
         public ReverseSelection() {
             super("Reverse selection");
-            putValue(SHORT_DESCRIPTION, "Find and select");
+            putValue(SHORT_DESCRIPTION, "Reverse selection");
         }
 
         @Override
