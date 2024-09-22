@@ -1,3 +1,4 @@
+// FIELDS.put("name", RECORD.getField("metric"));
 switch (RECORD.getField("metric")) {
   case "eval_expr": {
     var s = RECORD.getBytes();
@@ -49,24 +50,32 @@ switch (RECORD.getField("metric")) {
     var s = RECORD.getBytes();
     var m;
 
+    var name1 = undefined, evt = undefined, target = undefined, cond = undefined;
+
     if ((m = s.match(/name='([^\']+)'/)) != undefined) {
-      FIELDS.put("param1", {
-        value: m[1],
-        hidden: true
-      });
+      name1 = m[1];
     }
     if ((m = s.match(/cond='([^\']+)'/)) != undefined) {
-      FIELDS.put("cond", {
-        value: "cond:" + m[1],
-        hidden: true
-      });
+      cond = m[1];
+
     }
     if ((m = s.match(/event='([^\']+)'/)) != undefined) {
-      if (!m[1].endsWith('.script.done'))
-        FIELDS.put("event", "evt:" + m[1]);
+      evt = m[1];
     }
     if ((m = s.match(/target='([^\']+)'/)) != undefined) {
-      FIELDS.put("target", "targ:" + m[1]);
+      target = m[1];
+    }
+    if (evt == '*' && !target)
+      IGNORE_RECORD = true;
+    else {
+      if (name1)
+        FIELDS.put("param1", name1);
+      if (cond)
+        FIELDS.put("cond", { value: "cond:" + cond, hidden: true });
+      if (evt && !evt.endsWith('.script.done'))
+        FIELDS.put("event", "evt:" + evt);
+      if (target)
+        FIELDS.put("target", "targ:" + target);
     }
     break;
   }
