@@ -1024,12 +1024,14 @@
         <!-- ORSHTTP -->
         <!-- Genesys messages for ORSINTERACTION -->
         <spec MsgType="ORSINTERACTION" format="filelink timestamp">
+            <initScript src="./INTERACTION.js"/>
             <param1 type="embedded" id="filelink" name="filename">
                 <pattern match="(log)" group="1"/>
             </param1>
             <param2 type="embedded" id="timestamp" name="timestamp"/>
             <param type="database" id="app" name="app"/>
 
+            <param6 type="database" id="name" format="|Event: %s" name="name"></param6>
             <param6 type="database" id="IXNID" format="|ixn: %s" name="ixnid">
                 <!--pattern match="(.{3})(?:@|$)" group="1" ignorecase="true" /-->
             </param6>
@@ -1038,7 +1040,6 @@
                 <pattern match="^\tattr_itx_media_type \[str\] = &quot;([^&quot;]+)" ignorecase="true" groups="1"/>
             </param>
 
-            <param6 type="database" id="name" format="|Event: %s"></param6>
 
             <param type="file" format="|q: %s">
                 <pattern match="^\tattr_itx_queue \[str\] = &quot;([^&quot;]+)" ignorecase="true" groups="1"/>
@@ -1065,8 +1066,7 @@
         <!-- Orchestration METRIC -->
         <spec MsgType="orsm" format="filelink timestamp sid %s">
             <initScript src="./ORSM.js"/>
-			<recordDisplayScript src="./ORSMdisplay.js" />
-
+			<!-- <recordDisplayScript src="./ORSMdisplay.js" /> -->
 
             <param1 type="embedded" id="filelink" name="filename">
                 <pattern match="(log)" group="1"/>
@@ -1077,13 +1077,10 @@
           <pattern match="." ignorecase="true" return="-" />
       </param-->
 
-            <param3 type="database" id="sid" name="sid">
-                <!--pattern match="(.{3})$" group="1" ignorecase="true" /-->
-            </param3>
             <param4 type="database" id="metric" format="|%16s" name="name">
-                <!--filter match="(eval_expr|state_exit|log|eval_condition|event_queued|event_processed)" ignorecase="true" /-->
-                <!--pattern match="^(?!state_enter|extension$)(.*)" group="1" /-->
             </param4>
+            <param3 type="database" id="sid" name="sid">
+            </param3>            
             <!--param4 type="database" id="metric" >
               <pattern match="(log)" filematch="log .+ expr='(.+)' label" retgroup="1" />
               <pattern match="(eval_condition)" filematch="((?:condition|result)='.+') " retgroup="1" />
@@ -1246,6 +1243,7 @@
 
         <!-- Genesys messages for INTERACTION -->
         <spec MsgType="INTERACTION" format="filelink timestamp">
+            <initScript src="./INTERACTION.js"/>
             <param1 type="embedded" id="filelink" name="filename">
                 <pattern match="(log)" group="1"/>
             </param1>
