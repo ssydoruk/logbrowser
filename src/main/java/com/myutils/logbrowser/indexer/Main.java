@@ -42,12 +42,14 @@ import static Utils.Util.pDuration;
  * @author ssydoruk
  */
 public class Main {
+
     @Value.Style(
             typeAbstract = {"Abstract*"}, // 'Abstract' prefix will be detected and trimmed
             typeImmutable = "C*", // No prefix or suffix for generated immutable type
             visibility = Value.Style.ImplementationVisibility.PUBLIC, // Generated class will be always public
             defaults = @Value.Immutable(copy = false, builder = false, singleton = true)) // Disable copy methods by default
-    public @interface MySingleton {}
+    public @interface MySingleton {
+    }
 
     private static final Constants constants = new Constants();
     private static final Pattern regFilesNotGood = Pattern.compile("(^\\.logbr|logbr.db)");
@@ -145,14 +147,13 @@ public class Main {
         logger.info("starting");
         logger.info(new StringBuilder().append("Command line: ").append(StringUtils.join(args, " ")));
 
-        if(ee.getHttpPort()==EnvIndexer.HTTP_NO_PORT) { // parsing log files by scanning directory
+        if (ee.getHttpPort() == EnvIndexer.HTTP_NO_PORT) { // parsing log files by scanning directory
             Main theParser = Main.getInstance().init(ee);
 
             theParser.setIgnoreZIP(ee.isIgnoreZIP());
 //        theParser.initExecutor(1);
             theParser.parseAll();
-        }
-        else { // starting http listener
+        } else { // starting http listener
             webLoader = new WEBLoader(ee);
             webLoader.listen();
         }
@@ -256,7 +257,6 @@ public class Main {
     public void setIgnoreZIP(boolean ignoreZIP) {
         this.ignoreZIP = ignoreZIP;
     }
-
 
     private void initExecutor(int maxThreads) {
         parserThreads = (ThreadPoolExecutor) Executors.newFixedThreadPool(maxThreads,
@@ -527,56 +527,55 @@ public class Main {
 
         new Thread(
                 new Runnable() {
-                    @Override
-                    public void run() {
-                        ArrayList<Callable<Integer>> parserTasks = new ArrayList<>(maxThreads);
-                        for (int i = 0; i < maxThreads; i++) {
-                            parserTasks.add(new Callable<Integer>() {
-                                @Override
-                                public Integer call() throws Exception {
-                                    Main.logger.info("Starting added processing thread " + Thread.currentThread().getName());
-                                    while (!queueEnd.get() || !fileQueue.isEmpty()) {
-                                        File fileFromQueue;
-                                        while (
-                                                (fileFromQueue = fileQueue.poll(300, TimeUnit.MILLISECONDS)) != null) {
-                                            LogFileWrapper logFile = LogFileWrapper.getContainer(fileFromQueue, baseDir);
-                                            if (logFile != null) {
-                                                for (FileInfo fi : logFile.getFileInfos()) {
-                                                    logger.debug("Processing added file: [" + fi.getM_path() + "] log name [" + fi.getLogFileName() + "]");
+            @Override
+            public void run() {
+                ArrayList<Callable<Integer>> parserTasks = new ArrayList<>(maxThreads);
+                for (int i = 0; i < maxThreads; i++) {
+                    parserTasks.add(new Callable<Integer>() {
+                        @Override
+                        public Integer call() throws Exception {
+                            Main.logger.info("Starting added processing thread " + Thread.currentThread().getName());
+                            while (!queueEnd.get() || !fileQueue.isEmpty()) {
+                                File fileFromQueue;
+                                while ((fileFromQueue = fileQueue.poll(300, TimeUnit.MILLISECONDS)) != null) {
+                                    LogFileWrapper logFile = LogFileWrapper.getContainer(fileFromQueue, baseDir);
+                                    if (logFile != null) {
+                                        for (FileInfo fi : logFile.getFileInfos()) {
+                                            logger.debug("Processing added file: [" + fi.getM_path() + "] log name [" + fi.getLogFileName() + "]");
 
-                                                    ProcessedFiles processedFiles = Main.getInstance().getProcessedFiles().get(fi.getLogFileName());
-                                                    if (processedFiles != null) {
-                                                        if (processedFiles.getSize() < fi.getSize()) {
-                                                            logger.info(fi.getLogFileName()
-                                                                    + " id(" + processedFiles.getId() + ")"
-                                                                    + ": size[" + fi.getSize()
-                                                                    + "] size in DB[" + processedFiles.getSize() + "]; file data to be removed");
-                                                            m_accessor.addFileToDelete(processedFiles.getId());
-                                                        } else {
-                                                            logger.info(fi.getLogFileName()
-                                                                    + " id(" + processedFiles.getId() + ")"
-                                                                    + ": size[" + fi.getSize()
-                                                                    + "] size in DB[" + processedFiles.getSize() + "]; new file ignored");
-                                                            continue;
-                                                        }
-                                                    }
-                                                    Parse(fi);
-                                                    logger.debug("Done " + fi);
+                                            ProcessedFiles processedFiles = Main.getInstance().getProcessedFiles().get(fi.getLogFileName());
+                                            if (processedFiles != null) {
+                                                if (processedFiles.getSize() < fi.getSize()) {
+                                                    logger.info(fi.getLogFileName()
+                                                            + " id(" + processedFiles.getId() + ")"
+                                                            + ": size[" + fi.getSize()
+                                                            + "] size in DB[" + processedFiles.getSize() + "]; file data to be removed");
+                                                    m_accessor.addFileToDelete(processedFiles.getId());
+                                                } else {
+                                                    logger.info(fi.getLogFileName()
+                                                            + " id(" + processedFiles.getId() + ")"
+                                                            + ": size[" + fi.getSize()
+                                                            + "] size in DB[" + processedFiles.getSize() + "]; new file ignored");
+                                                    continue;
                                                 }
                                             }
+                                            Parse(fi);
+                                            logger.debug("Done " + fi);
                                         }
                                     }
-                                    return 0;
                                 }
-                            });
+                            }
+                            return 0;
                         }
-                        try {
-                            parserThreadsAdded.invokeAll(parserTasks);
-                        } catch (InterruptedException e) {
-                            logger.info("Interrupted manager thread", e);
-                        }
-                    }
-                }).start();
+                    });
+                }
+                try {
+                    parserThreadsAdded.invokeAll(parserTasks);
+                } catch (InterruptedException e) {
+                    logger.info("Interrupted manager thread", e);
+                }
+            }
+        }).start();
 
         return true;
     }
@@ -588,9 +587,9 @@ public class Main {
     private synchronized Pair<Long, Long> getDBFile(String f) throws SQLException {
         List<ArrayList<Long>> iDs = m_accessor.getIDsMultiple(
                 "select id, size from file_logbr where intfilename = '"
-                        + f + "'"
-                        //                            + "and size=" + fi.getSize()
-                        + " ;");
+                + f + "'"
+                //                            + "and size=" + fi.getSize()
+                + " ;");
         if (iDs == null || iDs.size() == 0) {
             return null;
         } else {
@@ -648,8 +647,9 @@ public class Main {
             }
         } catch (Exception exception) {
             logger.error("Failed to verify for new log files. Will parse a new");
-            if (!initDB(true))
+            if (!initDB(true)) {
                 return false;
+            }
         }
 
         if (filesToProcess.isEmpty()) {
@@ -713,8 +713,9 @@ public class Main {
                 System.out.println("Could not create accessor: " + e);
                 restartParsing = true;
             }
-        } else
+        } else {
             restartParsing = true;
+        }
 
         if (restartParsing) {
             logger.debug("Restart parsing");
@@ -761,12 +762,12 @@ public class Main {
         return true;
     }
 
-
     @SuppressWarnings("UseOfSystemOutOrSystemErr")
     private void parseAll() throws Exception {
         Instant start = Instant.now();
-        if (!initDB(false))
+        if (!initDB(false)) {
             return;
+        }
 
         if (scanLogDirectory()) {
             logger.info("Parsing took " + pDuration(Duration.between(start, Instant.now()).toMillis()) + ".");
@@ -889,6 +890,10 @@ public class Main {
 
             case type_WWE:
                 ret = new WWEParser(m_tables);
+                break;
+
+            case type_GRE:
+                ret = new GREParser(m_tables);
                 break;
 
             case type_URSHTTP:

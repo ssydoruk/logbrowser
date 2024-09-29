@@ -15,66 +15,62 @@ import java.util.regex.Pattern;
 
 import static Utils.Util.intOrDef;
 
-@SuppressWarnings("unchecked")
-public final class IxnGMS extends Message {
+public final class GREClientMessage extends Message {
 
     //    private static final Pattern regGSW_RECORD_HANDLE = Pattern.compile("^\\s*\'GSW_RECORD_HANDLE\'.+= (\\d+)");
     private static final Pattern regIxnActor = Pattern.compile("^\\s*attr_actor_router_id .+ \"([^\"]+)\"$");
     private static final Pattern regIxnSubmitted = Pattern.compile("^\\s*attr_itx_submitted_by .+ \"([^\"]+)\"$");
 
-    private static final Regexs AgentIDs = new Regexs(new Pair[]{
+    private static final Regexs AgentIDs = new Regexs(
             new Pair<>("^\\s*attr_agent_id.+ \"([^\"]+)\"$", 1),
             new Pair<>("^\\s*attr_actor_agent_id.+ \"([^\"]+)\"$", 1),
             new Pair<>("^\\s*AttributeAgentID.+ \"([^\"]+)\"$", 1)
-    });
+    );
 
-    private final static Message.Regexs IxnIDs = new Regexs(new Pair[]{
+    private final static Message.Regexs IxnIDs = new Regexs(
             new Pair<>("^\\s*attr_itx_id .+ \"([^\"]+)\"$", 1),
             new Pair<>("^\\s*'InteractionId'.+= \"([^\"]+)\"$", 1),
             new Pair<>("^\\s*'Id' .+\"([^\"]+)\"$", 1),
             new Pair<>("^\\s*'ORSI:.+:([\\w~]+)' \\[list\\]", 1)
-    });
+    );
 
-    private final static Message.Regexs parentIxnID = new Regexs(new Pair[]{
+    private final static Message.Regexs parentIxnID = new Regexs(
             new Pair<>("^\\s*attr_prnt_itx_id.+ \"([^\"]+)\"$", 1),
             new Pair<>("^\\s*'attr_itx_prnt_itx_id'.+= \"([^\"]+)\"$", 1),
             new Pair<>("^\\s*'Parent' .+\"([^\"]+)\"$", 1)
-    });
+    );
 
-    private static final Regexs PlaceIDs = new Regexs(new Pair[]{
+    private static final Regexs PlaceIDs = new Regexs(
             new Pair<>("^\\s*attr_place_id.+ \"([^\"]+)\"$", 1),
             new Pair<>("^\\s*attr_actor_place_id.+ \"([^\"]+)\"$", 1),
             new Pair<>("^\\s*AttributePlace.+ \"([^\"]+)\"$", 1)
-    });
-
-    private static final Regexs refIDs = new Regexs(new Pair[]{
-            new Pair<>("^\\s*attr_ref_id.+ = (\\d+)", 1),
-            new Pair<>("^\\s*attr_esp_server_refid.+ = (\\d+)", 1),
-            new Pair<>("^\\s*AttributeReferenceID.+ = (\\d+)", 1),
-            new Pair<>("^\\s*AttributeConnID .+ (\\w+)$", 1)
-    });
-
-    //    private static final Regexs reChainIDs = new Regexs(new Pair[]{
-//        new Pair<>("^\\s*\'GSW_CHAIN_ID\'.+= (\\d+)", 1),
-//        new Pair<>("^\\s*\'chain_id\'.+= (\\d+)", 1),});
-    private static final Regexs reQueue = new Regexs(new Pair[]{
-            new Pair<>("^\\s*(?:attr_queue|attr_itx_queue) .+ \"([^\"]+)\"$", 1),
-            new Pair<>("^\\s*AttributeThisDN .+ (\\w+)$", 1),});
-
-    private static final Regexs reMediaType = new Regexs(new Pair[]{
-            new Pair<>("^\\s*(?:attr_media_type|attr_itx_media_type|attr_media_type_name) .+ \"([^\"]+)\"$", 1)}
     );
 
-    private static final Regexs reConnID = new Regexs(new Pair[]{
-            new Pair<>("^\\s*AttributeConnID .+ (\\w+)$", 1)}
+    private static final Regexs refIDs = new Regexs(
+            new Pair<>("^\\s*ReferenceId.+ = (\\d+)", 1)
+    );
+
+    //    private static final Regexs reChainIDs = new Regexs(
+//        new Pair<>("^\\s*\'GSW_CHAIN_ID\'.+= (\\d+)", 1),
+//        new Pair<>("^\\s*\'chain_id\'.+= (\\d+)", 1),);
+    private static final Regexs reQueue = new Regexs(
+            new Pair<>("^\\s*(?:attr_queue|attr_itx_queue) .+ \"([^\"]+)\"$", 1),
+            new Pair<>("^\\s*AttributeThisDN .+ (\\w+)$", 1));
+
+    private static final Regexs reMediaType = new Regexs(
+            new Pair<>("^\\s*(?:attr_media_type|attr_itx_media_type|attr_media_type_name) .+ \"([^\"]+)\"$", 1)
+    );
+
+    private static final Regexs reConnID = new Regexs(
+            new Pair<>("^\\s*AttributeConnID .+ (\\w+)$", 1)
     );
     private static final Pattern regService = Pattern.compile("^\\s*'Service'.+= \"([^\"]+)\"$");
     private static final Pattern regMethod = Pattern.compile("^\\s*'Method'.+= \"([^\"]+)\"$");
     private static final Pattern regRouteType = Pattern.compile("^\\s*AttributeRouteType.+ = (\\d+)");
     private final String clientName = null;
-    //    private static final Regexs reContact = new Regexs(new Pair[]{
+    //    private static final Regexs reContact = new Regexs(
 //        new Pair<>("^\\s*\'GSW_PHONE\'.+= \"([^\"]+)\"", 1),
-//        new Pair<>("^\\s*\'contact_info\'.+= \"([^\"]+)\"", 1),});
+//        new Pair<>("^\\s*\'contact_info\'.+= \"([^\"]+)\"", 1),);
     private final RegExAttribute reIxnID = new RegExAttribute(IxnIDs);
     private final RegExAttribute reAgentID = new RegExAttribute(AgentIDs);
     private final RegExAttribute placeID = new RegExAttribute(PlaceIDs);
@@ -115,7 +111,7 @@ public final class IxnGMS extends Message {
     };
     private String messageName = null;
 
-    public IxnGMS(TableType t, int fileID) {
+    public GREClientMessage(TableType t, int fileID) {
         super(t, fileID);
         attrs.add(reIxnID);
         attrs.add(reAgentID);
@@ -128,10 +124,10 @@ public final class IxnGMS extends Message {
 
     }
 
-    public IxnGMS(String fromTo, String msgName, int fileID) {
-        this(TableType.IxnGMS, fileID);
+    public GREClientMessage(String msgName, ArrayList<String> m_MessageContents, int fileID) {
+        this(TableType.GREClient, fileID);
         this.messageName = msgName;
-        SetInbound(fromTo != null && fromTo.toLowerCase().startsWith("from"));
+        setAttributes(m_MessageContents);
     }
 
     @Override
@@ -150,11 +146,11 @@ public final class IxnGMS extends Message {
         setFieldInt(stmt, 11, Main.getRef(ReferenceType.ConnID, GetConnID()));
         stmt.setBoolean(12, isInbound());
         setFieldInt(stmt, 13, Main.getRef(ReferenceType.IxnID, GetParentIxnID()));
-        setFieldInt(stmt, 14, Main.getRef(ReferenceType.App, GetClient()));
-        setFieldInt(stmt, 15, Main.getRef(ReferenceType.Agent, GetAgent()));
-        setFieldInt(stmt, 16, Main.getRef(ReferenceType.Place, GetPlace()));
-        setFieldInt(stmt, 17, Main.getRef(ReferenceType.TLIBATTR1, getAttr1()));
-        setFieldInt(stmt, 18, Main.getRef(ReferenceType.TLIBATTR2, getAttr2()));
+//        setFieldInt(stmt, 14, Main.getRef(ReferenceType.App, GetClient()));
+//        setFieldInt(stmt, 15, Main.getRef(ReferenceType.Agent, GetAgent()));
+//        setFieldInt(stmt, 16, Main.getRef(ReferenceType.Place, GetPlace()));
+//        setFieldInt(stmt, 17, Main.getRef(ReferenceType.TLIBATTR1, getAttr1()));
+//        setFieldInt(stmt, 18, Main.getRef(ReferenceType.TLIBATTR2, getAttr2()));
         return true;
 
     }

@@ -135,7 +135,10 @@ public enum TableType {
     IxnGMS("IxnGMS"),
     SCSAlarm("SCSAlarm"),
     IxnNonIxn("IxnNonIxn"),
-    HTTP_TO_URS("httpTOurs"), ICONMessage("iconmessage");
+    HTTP_TO_URS("httpTOurs"), 
+    ICONMessage("iconmessage"),
+    GREClient("GREClient")
+    ;
 
     private final String name;
 

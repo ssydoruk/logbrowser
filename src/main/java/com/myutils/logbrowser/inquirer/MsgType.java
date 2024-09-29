@@ -57,6 +57,7 @@ public enum MsgType {
     OCSICON("OCSICON"),
     EXCEPTION("EXCEPTIONS"),
     GMSORS("GMStoORS"),
+    GREClient("GREClient"),
     GMSPOST("GMSPOST"),
     GMSWEBREQUESTS("GMSWEB"),
     LCA_APP("LCAAppStatus"),

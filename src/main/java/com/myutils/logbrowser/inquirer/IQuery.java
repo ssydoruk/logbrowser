@@ -48,7 +48,6 @@ public abstract class IQuery extends QueryTools {
         incQueryTypes();
     }
 
-
     static void reSetQueryNo() {
         queryTypes = 0;
     }
@@ -197,17 +196,17 @@ public abstract class IQuery extends QueryTools {
         if (nameSettings != null) {
             GenericTreeNode parent = nameSettings.getParent();
             if (parent != null
-                && (parent.getData() == null || ((OptionNode) parent.getData()).isChecked() && !OptionNode.AllChildrenChecked(nameSettings))) {
-                    StringBuilder ret = new StringBuilder();
+                    && (parent.getData() == null || ((OptionNode) parent.getData()).isChecked() && !OptionNode.AllChildrenChecked(nameSettings))) {
+                StringBuilder ret = new StringBuilder();
 
-                    if (optimize) {
-                        ret.append("+(");
-                    }
-                    ret.append(nameID).append(" in \n").append(getRefSubQuery(referenceType, OptionNode.getChecked(nameSettings)));
-                    if (optimize) {
-                        ret.append(")");
-                    }
-                    return ret.toString();
+                if (optimize) {
+                    ret.append("+(");
+                }
+                ret.append(nameID).append(" in \n").append(getRefSubQuery(referenceType, OptionNode.getChecked(nameSettings)));
+                if (optimize) {
+                    ret.append(")");
+                }
+                return ret.toString();
 
             }
         }
@@ -749,14 +748,14 @@ public abstract class IQuery extends QueryTools {
         AddCheckedWhere(nameID, referenceType, nameSettings, "or");
     }
 
-    void addOutFields(String[] strings) {
+    void addOutFields(String [] strings) {
         Collections.addAll(this.outFields, strings);
     }
+
 
     final void addOutField(String fld) {
         outFields.add(fld);
     }
-
 
     public String addedFieldString(boolean startWithComa, boolean finishWithComa) {
         StringBuilder qString = new StringBuilder();
@@ -777,6 +776,10 @@ public abstract class IQuery extends QueryTools {
             qString.append(" ,");
         }
         return qString.toString();
+    }
+
+    final public void addRef(String refField, String outField, ReferenceType refTable, FieldType ft) throws SQLException {
+        addRef(refField, outField, refTable.toString(), ft);
     }
 
     final public void addRef(String refField, String outField, String refTable, FieldType ft) throws SQLException {
@@ -961,8 +964,8 @@ public abstract class IQuery extends QueryTools {
     }
 
     protected String tlibReqs(String tabName, String id, Collection<Long> recIDs, String referenceID,
-                              Collection<Long> refIDs,
-                              String[] dnIDsFields, Collection<Long> dnIDs) {
+            Collection<Long> refIDs,
+            String[] dnIDsFields, Collection<Long> dnIDs) {
         String s = null;
         if (recIDs != null && !recIDs.isEmpty()) {
             s = getWhere(fullFieldName(tabName, "id"), recIDs, false);
@@ -1000,12 +1003,12 @@ public abstract class IQuery extends QueryTools {
     public String stdFields(String alias) {
         StringBuilder ret = new StringBuilder();
         for (String s : new String[]{
-                "id",
-                "time",
-                "FileId",
-                "FileOffset",
-                "FileBytes",
-                "line"
+            "id",
+            "time",
+            "FileId",
+            "FileOffset",
+            "FileBytes",
+            "line"
         }) {
             if (ret.length() > 0) {
                 ret.append(",");
@@ -1019,8 +1022,7 @@ public abstract class IQuery extends QueryTools {
     public enum ANDOR {
 
         AND("AND"),
-        OR("OR"),
-        ;
+        OR("OR"),;
 
         private final String name;
 
@@ -1145,10 +1147,9 @@ public abstract class IQuery extends QueryTools {
             //            if (JoinWhere != null) {
 //                ret.append(" where " + JoinWhere);
 //            }
-            return jType + " JOIN " + joinTable + " AS " + tabAlias + " on " + JoinExpr + "\n"
-//            if (JoinWhere != null) {
-//                ret.append(" where " + JoinWhere);
-//            }
+            return jType + " JOIN " + joinTable + " AS " + tabAlias + " on " + JoinExpr + "\n" //            if (JoinWhere != null) {
+                    //                ret.append(" where " + JoinWhere);
+                    //            }
                     ;
         }
 

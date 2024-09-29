@@ -38,7 +38,8 @@ public enum FileInfoType {
     type_VOIPEP(23),
     type_WWECloud(24),
     type_ApacheWeb(25),
-    type_URSHTTP(26);
+    type_URSHTTP(26),
+    type_GRE(27);
 
     private static final Map<FileInfoType, String> TypeFile = new HashMap<FileInfoType, String>() {
         {
@@ -67,6 +68,7 @@ public enum FileInfoType {
             put(type_WWECloud, "WWECloud");
             put(type_ApacheWeb, "ApacheWeb");
             put(type_URSHTTP, "URS_HTTP");
+            put(type_GRE, "CFGBusinessRulesExecutionServer");
         }
     };
     private static final Map<Integer, FileInfoType> map = new HashMap<>();

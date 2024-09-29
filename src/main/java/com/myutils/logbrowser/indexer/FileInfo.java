@@ -65,7 +65,7 @@ public final class FileInfo extends Record {
     private static final Pattern regHostSIPEP = Pattern.compile("^Application Host.+:\\s+(\\S.+)$");
     private static final Pattern regTimezone = Pattern.compile("^Time zone:\\s+(\\d+)");
     private static final Pattern regFileName = Pattern.compile("^File:\\s+\\((\\d+)\\)\\s+(\\S.+)");
-    private static final Pattern regFileNameGMS = Pattern.compile("^FILE:\\s+(\\S.+)");
+    private static final Pattern regFileNameGMS = Pattern.compile("^FILE:\\s+(\\S.+)", Pattern.CASE_INSENSITIVE);
     private static final Pattern regWWECloud = Pattern.compile("(DEBUG|ERROR|WARN|INFO)\\s+\\[");
     private static final int NUM_PARAMS_TO_READ = 7;
     private static final Pattern regFileNameTypeSIP = Pattern.compile("-(\\d+)\\.\\d{8}_\\d{6}_\\d{3}\\.log$");
@@ -101,7 +101,6 @@ public final class FileInfo extends Record {
     private FileInfoType m_componentTypeSuspect = FileInfoType.type_Unknown;
     private byte[] startBuf = null;
 
-
     FileInfo(File file, LogFileWrapper wrapper) throws IOException {
         this(file);
         m_path = wrapper.getRelativeFile(file);
@@ -124,8 +123,7 @@ public final class FileInfo extends Record {
 //        this.logFile = logFile;
 //        this.archiveName = logFile.getRelativeFile(this.logFile.getFile());
 //    }
-
-    FileInfo( LogFileWrapper logFile, String entryName, long entrySize) throws IOException {
+    FileInfo(LogFileWrapper logFile, String entryName, long entrySize) throws IOException {
         this();
         m_path = entryName;
         m_name = entryName;
@@ -413,12 +411,13 @@ public final class FileInfo extends Record {
     private void setWWEParams() {
         appType = FileInfoType.getFileType(m_componentType);
         (new File(FilenameUtils.normalize(this.filePath))).getParentFile().getName();
-        if (fileStartTime == null)
+        if (fileStartTime == null) {
             logFileName = ((new File(FilenameUtils.normalize(this.filePath))).getParentFile().getName())
                     + File.separatorChar + m_name;
-        else
+        } else {
             logFileName = ((new File(FilenameUtils.normalize(this.filePath))).getParentFile().getName())
                     + File.separatorChar + m_name + "." + fileStartTime.fmtDate.format(DateTimeFormatter.ofPattern("yyyyddmm_kkmmss.SSS"));
+        }
         setM_app(fileDir);
         m_host = fileDir;
 
@@ -663,8 +662,9 @@ public final class FileInfo extends Record {
 //</editor-fold>
                 }
             }
-            if (m_componentType == FileInfoType.type_WWE)
+            if (m_componentType == FileInfoType.type_WWE) {
                 setWWEParams();
+            }
 
             if (m_ServerStartTimeSet) {
                 String temp = m_app + m_host + m_runId;
@@ -768,8 +768,6 @@ public final class FileInfo extends Record {
         }
     }
      */
-
-
     public long getSize() {
         return size;
     }

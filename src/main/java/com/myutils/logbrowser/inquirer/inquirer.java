@@ -449,6 +449,9 @@ public class inquirer {
         if (DatabaseConnector.fileExits(FileInfoType.type_IxnServer)) {
             queries.add(new IxnServerResults(queryDialogSettings));
         }
+        if (DatabaseConnector.fileExits(FileInfoType.type_GRE)) {
+            queries.add(new GREServerResults(queryDialogSettings));
+        }
         if (DatabaseConnector.fileExits(new FileInfoType[]{FileInfoType.type_RM, FileInfoType.type_MCP})) {
             queries.add(new MediaServerResults(queryDialogSettings));
         }

@@ -175,7 +175,7 @@ public class VOIPEPResults extends IQueryResults {
         nd.addDynamicRef(DialogItem.TLIB_CALLS_SIP_ENDPOINT, ReferenceType.DN);
         nd.addDynamicRef(DialogItem.TLIB_CALLS_SIP_PEERIP, ReferenceType.IP);
         nd.addPairChildren(DialogItem.TLIB_CALLS_SIP_DIRECTION,
-                new Pair[]{new Pair("inbound", "1"), new Pair("outbound", "0")});
+                new Pair[]{new Pair<>("inbound", "1"), new Pair<>("outbound", "0")});
 
 //        nd.addDynamicRef(DialogItem.TLIB_CALLS_SIP_CALL_ID, ReferenceType.SIPCALLID);
 //        DynamicTreeNode<OptionNode> AttrValue;

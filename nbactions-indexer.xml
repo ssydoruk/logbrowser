@@ -10,7 +10,7 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:3.1.0:exec</goal>
             </goals>
             <properties>
-                <exec.vmArgs>-Dlogbr.dir=.tmp -Dlog4j.configurationFile=/Users/ssydoruk/GCTI/etc/logbrowser/logbr.log4j2.indexer.xml -DlogPath=.tmp -Dsun.java2d.d3d=false -Dall=1 -Xms8000m -Xmx8000m -Dsqlite.pragma=true -Dtlib.norequest=false -Dtimediff.parse=false</exec.vmArgs>
+                <exec.vmArgs>-Dlogbr.dir=.tmp -Dlog4j.configurationFile=/Users/ssydoruk/GCTI/etc/logbrowser/logbr.log4j2.indexer-dev.xml -DlogPath=.tmp -Dsun.java2d.d3d=false -Dall=1 -Xms8000m -Xmx8000m -Dsqlite.pragma=true -Dtlib.norequest=false -Dtimediff.parse=false</exec.vmArgs>
                 <exec.args>${exec.vmArgs} -classpath %classpath ${exec.mainClass} ${exec.appArgs}</exec.args>
                 <exec.appArgs>--dbname=/Users/ssydoruk/work/logs/2024-07-25.PROD/logbr --basedir=/Users/ssydoruk/work/logs/2024-07-25.PROD --cfgxml /Users/ssydoruk/GCTI/etc/logbrowser/backend.xml</exec.appArgs>
                 <exec.mainClass>com.myutils.logbrowser.indexer.Main</exec.mainClass>
@@ -28,7 +28,7 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:3.1.0:exec</goal>
             </goals>
             <properties>
-                <exec.vmArgs>-Dlogbr.dir=.tmp -Dlog4j.configurationFile=/Users/ssydoruk/GCTI/etc/logbrowser/logbr.log4j2.indexer.xml -DlogPath=.tmp -Dsun.java2d.d3d=false -Dall=1 -Xms8000m -Xmx8000m -Dsqlite.pragma=true -Dtlib.norequest=false -Dtimediff.parse=false -agentlib:jdwp=transport=dt_socket,server=n,address=${jpda.address}</exec.vmArgs>
+                <exec.vmArgs>-Dlogbr.dir=.tmp -Dlog4j.configurationFile=/Users/ssydoruk/GCTI/etc/logbrowser/logbr.log4j2.indexer-dev.xml -DlogPath=.tmp -Dsun.java2d.d3d=false -Dall=1 -Xms8000m -Xmx8000m -Dsqlite.pragma=true -Dtlib.norequest=false -Dtimediff.parse=false -agentlib:jdwp=transport=dt_socket,server=n,address=${jpda.address}</exec.vmArgs>
                 <exec.args>${exec.vmArgs} -classpath %classpath ${exec.mainClass} ${exec.appArgs}</exec.args>
                 <exec.appArgs>--dbname=/Users/ssydoruk/work/logs/2024-07-25.PROD/logbr --basedir=/Users/ssydoruk/work/logs/2024-07-25.PROD --cfgxml /Users/ssydoruk/GCTI/etc/logbrowser/backend.xml</exec.appArgs>
                 <exec.mainClass>com.myutils.logbrowser.indexer.Main</exec.mainClass>
@@ -47,7 +47,7 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:3.1.0:exec</goal>
             </goals>
             <properties>
-                <exec.vmArgs>-Dlogbr.dir=.tmp -Dlog4j.configurationFile=/Users/ssydoruk/GCTI/etc/logbrowser/logbr.log4j2.indexer.xml -DlogPath=.tmp -Dsun.java2d.d3d=false -Dall=1 -Xms8000m -Xmx8000m -Dsqlite.pragma=true -Dtlib.norequest=false -Dtimediff.parse=false</exec.vmArgs>
+                <exec.vmArgs>-Dlogbr.dir=.tmp -Dlog4j.configurationFile=/Users/ssydoruk/GCTI/etc/logbrowser/logbr.log4j2.indexer-dev.xml -DlogPath=.tmp -Dsun.java2d.d3d=false -Dall=1 -Xms8000m -Xmx8000m -Dsqlite.pragma=true -Dtlib.norequest=false -Dtimediff.parse=false</exec.vmArgs>
                 <exec.args>${exec.vmArgs} -classpath %classpath ${exec.mainClass} ${exec.appArgs}</exec.args>
                 <exec.mainClass>com.myutils.logbrowser.indexer.Main</exec.mainClass>
                 <exec.executable>java</exec.executable>
