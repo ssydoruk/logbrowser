@@ -86,8 +86,8 @@ public class AggrGREClientDelays extends IAggregateQuery {
 
         tellProgress("extracting data");
         TableQuery GREDelays = new TableQuery(MsgType.GRE_DELAYS, tab);
-        GREDelays.setAddAll(false);
-        GREDelays.setAutoAddFile(false);
+//        GREDelays.setAddAll(false);
+//        GREDelays.setAutoAddFile(false);
         String durationExpr = tab1 + ".time-" + GREDelays.getTabAlias() + ".time";
         wh = new Wheres();
 //        wh.addWhere(GREDelays.getTabAlias() + ".reqid in (select reqid from " + tab2 + ")");
