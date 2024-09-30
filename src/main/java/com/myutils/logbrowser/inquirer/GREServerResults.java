@@ -359,7 +359,7 @@ public class GREServerResults extends IQueryResults {
         }
         
         if (selectionType != SelectionType.NO_SELECTION) {
-            if (!cidFinder.initIxn()) {
+            if (!cidFinder.initGRE()) {
                 inquirer.logger.error("Not found selection: ["
                         + dlg.getSelection() + "] type: [" + dlg.getSelectionType() + "] isRegex: [" + dlg.isRegex()
                         + "]");
@@ -394,14 +394,11 @@ public class GREServerResults extends IQueryResults {
             if (cidFinder != null && cidFinder.getSearchType() != SelectionType.NO_SELECTION) {
                 Wheres wh = new Wheres();
                 Integer[] iDs;
-                if ((iDs = cidFinder.getIDs(IDType.ConnID)) != null) {
-                    wh.addWhere(getWhere(tab.getTabAlias() + ".ConnIdid", iDs, false), "OR");
+                if ((iDs = cidFinder.getIDs(IDType.IxnID)) != null) {
+                    wh.addWhere(getWhere(tab.getTabAlias() + ".ixnID", iDs, false), "OR");
                 }
-                if ((iDs = cidFinder.getIDs(IDType.ORSSID)) != null) {
-                    wh.addWhere(getWhere(tab.getTabAlias() + ".ORSSessionid", iDs, false), "OR");
-                }
-                if ((iDs = cidFinder.getIDs(IDType.GMSSESSION)) != null) {
-                    wh.addWhere(getWhere(tab.getTabAlias() + ".GMSServiceID", iDs, false), "OR");
+                if ((iDs = cidFinder.getIDs(IDType.ReferenceID)) != null) {
+                    wh.addWhere(getWhere(tab.getTabAlias() + ".RefId", iDs, false), "OR");
                 }
                 
                 if (!wh.isEmpty()) {
@@ -436,6 +433,10 @@ public class GREServerResults extends IQueryResults {
 //            }
             tab.addRef("nameID", "name", ReferenceType.TEvent, FieldType.OPTIONAL);
             tab.addRef("IxnID", "interactionID", ReferenceType.IxnID, FieldType.OPTIONAL);
+            tab.addRef("MediaTypeID", "media", ReferenceType.IxnMedia, FieldType.OPTIONAL);
+            tab.addRef("IxnQueueID", "queue", ReferenceType.DN, FieldType.OPTIONAL);
+            tab.addRef("appid", "app", ReferenceType.App, FieldType.OPTIONAL);
+            tab.addRef("strategyid", "strategy", ReferenceType.URSStrategyName, FieldType.OPTIONAL);
             tab.addOutFields(new String[]{"RefId"});
             
             tab.setCommonParams(this, dlg);

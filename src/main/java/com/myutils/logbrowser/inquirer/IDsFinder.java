@@ -12,6 +12,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static Utils.Util.sortedArray;
+import static com.myutils.logbrowser.inquirer.IDType.ReferenceID;
 
 public final class IDsFinder extends QueryTools {
 
@@ -365,6 +366,22 @@ public final class IDsFinder extends QueryTools {
         return false;
     }
 
+        private boolean getGREIDType() throws SQLException {
+        String[] sIDs = {selection};
+
+        if (selectionType == SelectionType.IXN || selectionType == SelectionType.GUESS_SELECTION) {
+            AddIDs(IDType.IxnID, getRefIDs(ReferenceType.IxnID, sIDs, regex));
+            if (IDsFound(IDType.IxnID)) {
+                return true;
+            } else if (selectionType == SelectionType.IXN) {
+                return false;
+            }
+        }
+
+
+        return false;
+    }
+
     public Integer[] findIDs(IDType idType) {
         if (CallIDs.containsKey(idType)) {
             return CallIDs.get(idType);
@@ -571,6 +588,10 @@ public final class IDsFinder extends QueryTools {
                     LoadIxnType(idType, ids, queryLevel);
                     break;
 
+                case GRE:
+                    LoadGREType(idType, ids, queryLevel);
+                    break;
+
                 case STATSERVER:
                     LoadStatServerType(idType, ids, queryLevel);
                     break;
@@ -692,6 +713,12 @@ public final class IDsFinder extends QueryTools {
         searchType = SearchType.INTERACTION;
 
         return getIxnServerIDType();
+    }
+    
+    boolean initGRE() throws SQLException {
+        searchType = SearchType.GRE;
+
+        return getGREIDType();
     }
 
     private boolean getApacheWebIDType() throws SQLException {
@@ -2269,6 +2296,29 @@ public final class IDsFinder extends QueryTools {
         LoadIxnType(idGivenType, IDType.UUID, ids, level);
     }
 
+    private void LoadGREType(IDType idGivenType, Integer[] ids, int level) throws SQLException {
+        inquirer.logger.debug("idGivenType[" + idGivenType + "] level[" + level + "]");
+        if (level <= 0) {
+            if (maxLevelSet) {
+                inquirer.logger.error("Max level reached");
+            }
+            return;
+        }
+        level--;
+
+        LoadGREType(idGivenType, IDType.IxnID, ids, level);
+        LoadGREType(idGivenType, IDType.ReferenceID, ids, level);
+    }
+
+    private void LoadGREType(IDType givenType, IDType theSearchType, Integer[] ids, int level) throws SQLException {
+        inquirer.logger.debug("LoadGREType givenType: " + givenType + " theSearchType: " + theSearchType + " level: " + level + " ids: " + listIDs(ids));
+
+        if (AddIDs(theSearchType, getIDs(theSearchType, givenType, ids))) {
+            LoadGREType(theSearchType, findIDs(theSearchType), level);
+        }
+    }
+
+    
     private void LoadIxnType(IDType givenType, IDType theSearchType, Integer[] ids, int level) throws SQLException {
         inquirer.logger.debug("LoadIxnType givenType: " + givenType + " theSearchType: " + theSearchType + " level: " + level + " ids: " + listIDs(ids));
 
@@ -2306,6 +2356,31 @@ public final class IDsFinder extends QueryTools {
                 switch (searchIDType) {
                     case ConnID:
                         return DatabaseConnector.getIDs("ocs_logbr", "thisdnid", getWhere("connectionidid", searchIDs, true));
+
+                }
+                break;
+
+            default:
+        }
+        return null;
+    }
+
+    private Integer[] getIDsGRE(IDType retIDType, IDType searchIDType, Integer[] searchIDs) throws SQLException {
+        switch (retIDType) {
+
+            case IxnID:
+                switch (searchIDType) {
+                    case ReferenceID: {
+                        return DatabaseConnector.getIDs(TableType.GREClient, "ixnid", getWhere("RefId", searchIDs, true));
+                    }
+                }
+                break;
+
+            case ReferenceID:
+                switch (searchIDType) {
+                    case IxnID: {
+                        return DatabaseConnector.getIDs(TableType.GREClient, "RefId", getWhere("IxnID", searchIDs, true));
+                    }
 
                 }
                 break;
@@ -2501,6 +2576,9 @@ public final class IDsFinder extends QueryTools {
 
             case INTERACTION:
                 return getIDsIxn(retIDType, searchIDType, searchIDs);
+
+                case GRE:
+                return getIDsGRE(retIDType, searchIDType, searchIDs);
 
             case STATSERVER:
                 return getIDsStatServer(retIDType, searchIDType, searchIDs);
@@ -3047,6 +3125,7 @@ public final class IDsFinder extends QueryTools {
         WWE,
         MediaServer,
         ApacheWeb,
+        GRE,
         CONFSERV
     }
 

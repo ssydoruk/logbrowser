@@ -8,6 +8,7 @@ public enum IDType {
     OCSRecordHandle,
     ORSSID,
     IxnID,
+    ReferenceID,
     OCSChainID,
     CG,
     DN,

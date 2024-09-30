@@ -1456,6 +1456,22 @@
         </spec>
         <!--ORS_DELAYS -->
 
+                <!--GRE_DELAYS -->
+        <spec MsgType="GRE_DELAYS" format="filelink timestamp">
+            <param1 type="embedded" id="filelink" name="filename">
+                <pattern match="(log)" group="1"/>
+            </param1>
+            <param2 type="embedded" id="timestamp" name="timestamp"/>
+
+            <param type="database" id="app" name="app"/>
+            <param type="database" id="sid"/>
+            <param type="database" id="name"/>
+            <param type="database" id="duration" name="duration"/>
+            <param type="database" id="rollduration" name="duration from start"/>
+
+        </spec>
+        <!--GRE_DELAYS -->
+
         <!--JSON -->
         <spec MsgType="JSON" format="filelink timestamp">
             <param1 type="embedded" id="filelink" name="filename">

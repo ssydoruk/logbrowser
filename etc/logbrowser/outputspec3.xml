@@ -1456,6 +1456,28 @@
         </spec>
         <!--ORS_DELAYS -->
 
+                <!--GRE_DELAYS -->
+        <spec MsgType="GRE_DELAYS" format="filelink timestamp">
+            <!-- <initScript src="./GREClientDelays.js"/> -->
+
+            <param1 type="embedded" id="filelink" name="filename">
+                <pattern match="(log)" group="1"/>
+            </param1>
+            <param2 type="embedded" id="timestamp" name="timestamp"/>
+            <param type="database" id="app" name="app"/>
+
+            <param type="database" id="refID" name="refID"/>
+            <param type="database" id="idxID" name="ixnID"/>
+            <param type="database" id="duration" name="duration"/>
+            <param type="database" id="media" name="media"/>
+            <param type="database" id="queue" name="queue"/>
+            <param type="database" id="app" name="app"/>
+            <param type="database" id="strategy" name="strategy"/>
+            <param type="database" id="duration_read" name="duration_read"/>
+
+        </spec>
+        <!--GRE_DELAYS -->        
+
         <!--JSON -->
         <spec MsgType="JSON" format="filelink timestamp">
             <param1 type="embedded" id="filelink" name="filename">

@@ -24,12 +24,11 @@ public class GREClientTable extends DBTable {
         addIndex("time");
         addIndex("nameID");
         addIndex("IxnID");
-        addIndex("PARENTIXNIDID");
         addIndex("MediaTypeID");
         addIndex("IxnQueueID");
         addIndex("RefId");
-        addIndex("connIDID");
         addIndex("appid");
+        addIndex("strategyid");
         dropIndexes();
 
         String query = "create table if not exists " + getTabName() + " (id INTEGER PRIMARY KEY ASC"
@@ -44,10 +43,8 @@ public class GREClientTable extends DBTable {
                 + ",MediaTypeID INTEGER"
                 + ",IxnQueueID INTEGER"
                 + ",RefId INTEGER"
-                + ",connIDID INTEGER"
-                + ",inbound bit"
-                + ",PARENTIXNIDID INTEGER"
                 + ",appid INTEGER"
+                + ",strategyid INTEGER"
                 + ");";
         getM_dbAccessor().runQuery(query);
 
@@ -58,8 +55,6 @@ public class GREClientTable extends DBTable {
     public String getInsert() {
         return "INSERT INTO " + getTabName() + " VALUES(NULL,?,?,?,?,?"
                 /*standard first*/
-                + ",?"
-                + ",?"
                 + ",?"
                 + ",?"
                 + ",?"

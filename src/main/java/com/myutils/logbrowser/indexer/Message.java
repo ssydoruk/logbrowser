@@ -18,6 +18,8 @@ import java.util.regex.Pattern;
 
 import static Utils.Util.StripQuotes;
 import static Utils.Util.intOrDef;
+import com.myutils.logbrowser.inquirer.inquirer;
+import org.apache.commons.lang3.ArrayUtils;
 
 @SuppressWarnings({"unchecked", "rawtypes", "serial", "deprecation", "this-escape"})
 public abstract class Message extends Record {
@@ -108,9 +110,9 @@ public abstract class Message extends Record {
     }
 
     static String replaceElement(String s, Matcher m, int i, String replace) {
-        return s.substring(0, m.start(i)) +
-                replace +
-                s.substring(m.end(i));
+        return s.substring(0, m.start(i))
+                + replace
+                + s.substring(m.end(i));
     }
 
     static Pair<String, String> getLiteralReplace(String s, String searchString, String replaceString) {
@@ -309,8 +311,8 @@ public abstract class Message extends Record {
                 if (header != null && header.toLowerCase().startsWith(s)
                         && header.length() > iSLen //removing = changes order in reports!!!
                         && ((Sep == null)
-                        ? Character.isWhitespace(header.charAt(iSLen))
-                        : Sep.equals(header.charAt(iSLen)))) {
+                                ? Character.isWhitespace(header.charAt(iSLen))
+                                : Sep.equals(header.charAt(iSLen)))) {
                     String ret = header.substring(iSLen + 1).trim();
                     return (ret.isEmpty()) ? null : ret;
                 }
@@ -450,9 +452,9 @@ public abstract class Message extends Record {
      * strStartRX will check if the line starts with start and then apply rx to
      * the end of the line if it matches, then return groupIdx from match
      *
-     * @param line     - String
-     * @param start    - String
-     * @param rx       - Pattern
+     * @param line - String
+     * @param start - String
+     * @param rx - Pattern
      * @param groupIdx - index of the group expression in Pattern
      * @return null if the line does not begin with start; empty string if RX
      * does not match
@@ -603,7 +605,6 @@ public abstract class Message extends Record {
         return FindByRx(m_MessageLines, rx, groupId, def);
     }
 
-
     public int toInt(String s, int def) {
         try {
             return Integer.parseInt(s);
@@ -656,8 +657,8 @@ public abstract class Message extends Record {
         if ((headerLong != null && headerLong.length() > 0
                 || headerShort != null && headerShort.length() > 0)
                 && m_MessageLines != null) {
-            for (Iterator<String> i = m_MessageLines.iterator(); i.hasNext(); ) {
-                ret = GetSIPHeader( i.next(), headerLong, headerShort);
+            for (Iterator<String> i = m_MessageLines.iterator(); i.hasNext();) {
+                ret = GetSIPHeader(i.next(), headerLong, headerShort);
                 if (ret != null && !ret.isEmpty()) {
                     break;
                 }
@@ -701,10 +702,9 @@ public abstract class Message extends Record {
             synchronized (m_MessageLines) {
                 if (s != null && !s.isEmpty() && m_MessageLines != null && !m_MessageLines.isEmpty()) {
                     for (String m_MessageLine : m_MessageLines) {
-                        if (m_MessageLine != null && m_MessageLine.startsWith(s) &&
-                                (m_MessageLine.length() > s.length() + 1 && (Character.isWhitespace(m_MessageLine.charAt(s.length()))))) {
-                                return m_MessageLine.substring(s.length() + 1);
-
+                        if (m_MessageLine != null && m_MessageLine.startsWith(s)
+                                && (m_MessageLine.length() > s.length() + 1 && (Character.isWhitespace(m_MessageLine.charAt(s.length()))))) {
+                            return m_MessageLine.substring(s.length() + 1);
 
                         }
                     }
@@ -815,7 +815,7 @@ public abstract class Message extends Record {
         Matcher m;
         String s = getAttribute(attr);
         if (StringUtils.isNotBlank(s) && ((m = regStringAttribute.matcher(s)).find())) {
-                return m.group(1);
+            return m.group(1);
 
         }
         return "";
@@ -839,14 +839,13 @@ public abstract class Message extends Record {
                     if (m_MessageLine.startsWith(s)
                             && (m_MessageLine.length() > s.length() + 1)
                             && (Character.isWhitespace(m_MessageLine.charAt(s.length())))) {
-                                keyFound = true;
-
+                        keyFound = true;
 
                     }
                 }
             }
         }
-        return (ret.isEmpty())?null:ret;
+        return (ret.isEmpty()) ? null : ret;
     }
 
     private ArrayList<String> getMMUserData() {
@@ -874,7 +873,7 @@ public abstract class Message extends Record {
                         if ((m = regListKeyEnd.matcher(ret)).find()) {
                             ret = ret.substring(m.end(0));
                             if (!ret.isEmpty() && ((m = regStringAttribute.matcher(ret)).find())) {
-                                    return m.group(1);
+                                return m.group(1);
 
                             }
                         }
@@ -1024,7 +1023,6 @@ public abstract class Message extends Record {
         this.m_isInbound = m_isInbound;
     }
 
-
     private String checkTab(String key) {
         if (key != null && key.length() > 0) {
             if (key.charAt(0) == '\t') {
@@ -1063,7 +1061,11 @@ public abstract class Message extends Record {
 
         private final ArrayList<Pair<Pattern, Integer>> regs;
 
-        public Regexs(Pair<String, Integer> ... string) {
+        public Regexs(ArrayList<Pair<Pattern, Integer>> _regs) {
+            regs = new ArrayList<>(_regs);
+        }
+
+        public Regexs(Pair<String, Integer>... string) {
             regs = new ArrayList<>(string.length);
             for (Pair<String, Integer> string1 : string) {
                 regs.add(new Pair<>(Pattern.compile(string1.getKey()), string1.getValue()));
@@ -1121,16 +1123,29 @@ public abstract class Message extends Record {
         private void tryMatch(String s) {
             for (Pair<Pattern, Integer> ixnID : re.getRegs()) {
                 Matcher m;
+                boolean matched1=false;
                 if ((m = ixnID.getKey().matcher(s)).find()) {
                     attrValue = m.group(ixnID.getValue());
                     matched = true;
+                    matched1=true;
+                    break;
                 }
+//                Main.logger.debug("re:["+ixnID.getKey().pattern()+"] m:"+matched1+ " res: "+(matched1?attrValue:"<NA>") +" str["+s+"]");
+
             }
         }
 
         @Override
         public String toString() {
             return attrValue;
+        }
+
+        String getStringValue() {
+            return attrValue;
+        }
+        
+        Integer getIntValue(){
+            return intOrDef(attrValue, 0);
         }
 
     }
@@ -1152,6 +1167,20 @@ public abstract class Message extends Record {
                 }
             }
 
+        }
+    }
+
+    public void parseAttributes(ArrayList<String> lines, RegExAttribute... attrs) {
+        if (lines != null && !lines.isEmpty()) {
+            for (String s : lines) {
+                if (StringUtils.isNotEmpty(s)) {
+                    for (RegExAttribute rea : attrs) {
+                        if (!rea.matched()) {
+                            rea.tryMatch(s);
+                        }
+                    }
+                }
+            }
         }
     }
 }

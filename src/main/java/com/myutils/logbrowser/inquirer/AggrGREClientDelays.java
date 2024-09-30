@@ -67,7 +67,7 @@ public class AggrGREClientDelays extends IAggregateQuery {
         wh.addWhere(IQuery.getDateTimeFilters(tab, "time", qd.getTimeRange()), "AND");
         wh.addWhere(getWhere("nameID", ReferenceType.TEvent, new String[]{"Event3rdServerResponse"}, false, false, false), "AND");
 
-        DatabaseConnector.runQuery("create table " + tab1 + " as\n"
+        DatabaseConnector.runQuery("create temp table " + tab1 + " as\n"
                 + "select time, refid, f.AppNameID from " + tab + "\n"
                 + "\ninner join file_logbr f on f.id=" + tab + ".fileid"
                 + wh.makeWhere(true)
@@ -86,7 +86,7 @@ public class AggrGREClientDelays extends IAggregateQuery {
 
         tellProgress("extracting data");
         TableQuery GREDelays = new TableQuery(MsgType.GRE_DELAYS, tab);
-//        GREDelays.setAddAll(false);
+        GREDelays.setAddAll(true);
 //        GREDelays.setAutoAddFile(false);
         String durationExpr = tab1 + ".time-" + GREDelays.getTabAlias() + ".time";
         wh = new Wheres();
@@ -96,9 +96,16 @@ public class AggrGREClientDelays extends IAggregateQuery {
         GREDelays.addJoin(tab1, IQuery.FieldType.MANDATORY, tab1 + ".refid=" + GREDelays.getTabAlias() + ".refid AND " + tab1 + ".AppNameID=f.AppNameID", null, tab1);
         GREDelays.addOutField(GREDelays.getTabAlias() + ".id");
         GREDelays.addOutField(GREDelays.getTabAlias() + ".time");
+        GREDelays.addOutField(GREDelays.getTabAlias() + ".refid");
         GREDelays.addOutField(durationExpr + " duration");
         
         GREDelays.addRef(GREDelays.getTabAlias() + ".ixnID", "idxID", ReferenceType.IxnID, IQuery.FieldType.MANDATORY);
+        
+        GREDelays.addRef(GREDelays.getTabAlias() + ".MediaTypeID", "media", ReferenceType.IxnMedia, IQuery.FieldType.OPTIONAL);
+        GREDelays.addRef(GREDelays.getTabAlias() + ".IxnQueueID", "queue", ReferenceType.DN, IQuery.FieldType.OPTIONAL);
+        GREDelays.addRef(GREDelays.getTabAlias() + ".appid", "app", ReferenceType.App, IQuery.FieldType.OPTIONAL);
+        GREDelays.addRef(GREDelays.getTabAlias() + ".strategyid", "strategy", ReferenceType.URSStrategyName, IQuery.FieldType.OPTIONAL);
+        
 //        GREDelays.addOutField("diff diff_ms");
         GREDelays.addOutField("jduration( "+durationExpr+") duration_read");
         GREDelays.addWhere(wh);

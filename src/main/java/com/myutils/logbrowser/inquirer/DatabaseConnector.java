@@ -843,6 +843,11 @@ public class DatabaseConnector {
                 : null;
     }
 
+    
+    public static Integer[] getIDs(TableType tab, String retField, String where) throws SQLException {
+        return getIDs(tab.toString(), retField, where);
+    }
+    
     public static Integer[] getIDs(String tab, String retField, String where) throws SQLException {
 //        m_connector.getIDs(this, "select sid from orssess_logbr WHERE "+getWhere("connid", m_ConnIds));
         return (TableExist(tab))
