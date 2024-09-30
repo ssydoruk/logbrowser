@@ -225,7 +225,12 @@ public class GREServerResults extends IQueryResults {
     
     @Override
     protected ArrayList<IAggregateQuery> loadReportAggregates() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        ArrayList<IAggregateQuery> ret = new ArrayList<>();
+        ret.add(new GREAggrTimestampDelays());
+        ret.add(new GREAggrRequestsPerSecond(true));
+        ret.add(new AggrGREClientDelays());        
+
+        return ret;
     }
     
     @Override
