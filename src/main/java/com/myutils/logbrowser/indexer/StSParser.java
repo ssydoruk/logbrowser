@@ -29,9 +29,7 @@ public class StSParser extends Parser {
             + ")");
     private static final Pattern ptServerName = Pattern.compile("^Application\\s+name:\\s+(\\S+)");
     final int MSG_STRING_LIMIT = 200;
-    private final HashMap m_BlockNamesToIgnoreHash;
     // parse state contants
-    private final FileInfoType m_fileFilterId;
     long m_CurrentFilePos;
     long m_HeaderOffset;
     String m_Header;
@@ -49,9 +47,7 @@ public class StSParser extends Parser {
 
     public StSParser(DBTables m_tables) {
         super(FileInfoType.type_StatServer, m_tables);
-        m_BlockNamesToIgnoreHash = new HashMap();
 
-        m_fileFilterId = FileInfoType.type_StatServer;
 //        for (int i = 0; i < BlockNamesToIgnoreArray.length; i++) {
 //            m_BlockNamesToIgnoreHash.put(BlockNamesToIgnoreArray[i], 0);
 //        }

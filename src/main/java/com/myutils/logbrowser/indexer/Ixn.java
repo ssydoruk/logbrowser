@@ -13,10 +13,7 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import org.apache.commons.lang3.StringUtils;
-
-import static Utils.Util.intOrDef;
 
 public class Ixn extends Message {
 
@@ -30,57 +27,115 @@ public class Ixn extends Message {
     private static final Pattern regMsgAndClient = Pattern.compile("message '([^']+)'.+(to|from) (?:client|server) '([^']+)'");
     private static final Pattern regMsgAndClientProxy = Pattern.compile("through proxy '([^']+)'");
 
-    //    private static final Pattern regGSW_RECORD_HANDLE = Pattern.compile("^\\s+\'GSW_RECORD_HANDLE\'.+= (\\d+)");
-    private static final Pattern regIxnActor = Pattern.compile("^\\s+attr_actor_router_id .+ \"([^\"]+)\"$");
-    private static final Pattern regIxnSubmitted = Pattern.compile("^\\s+attr_itx_submitted_by .+ \"([^\"]+)\"$");
-
-    private static final Regexs AgentIDs = new Regexs(new Pair[]{
-            new Pair<>("^\\s+attr_agent_id.+ \"([^\"]+)\"$", 1),
-            new Pair<>("^\\s+attr_actor_agent_id.+ \"([^\"]+)\"$", 1),
-            new Pair<>("^\\s+AttributeAgentID.+ \"([^\"]+)\"$", 1),
-            new Pair<>("^\\s+'Agent'.+ \"([^\"]+)\"$", 1)
+    private static final Regexs AgentIDs = new Regexs(
+            new ArrayList<Pair<Pattern, Integer>>() {
+        {
+            add(new Pair<>(Pattern.compile("^\\s+attr_agent_id.+ \"([^\"]+)\"$"), 1));
+            add(new Pair<>(Pattern.compile("^\\s+attr_actor_agent_id.+ \"([^\"]+)\"$"), 1));
+            add(new Pair<>(Pattern.compile("^\\s+AttributeAgentID.+ \"([^\"]+)\"$"), 1));
+            add(new Pair<>(Pattern.compile("^\\s+'Agent'.+ \"([^\"]+)\"$"), 1));
+        }
     });
 
-    private final static Message.Regexs IxnIDs = new Regexs(new Pair[]{
-            new Pair<>("^\\s+attr_itx_id .+ \"([^\"]+)\"$", 1),
-            new Pair<>("^\\s+'InteractionId'.+= \"([^\"]+)\"$", 1),
-            new Pair<>("^\\s+'Id' .+\"([^\"]+)\"$", 1),
-            new Pair<>("^\\s*'ORSI:.+:([\\w~]+)' \\[list\\]", 1)
+    private final static Message.Regexs IxnIDs = new Regexs(
+            new ArrayList<Pair<Pattern, Integer>>() {
+        {
+            add(new Pair<>(Pattern.compile("^\\s+attr_itx_id .+ \"([^\"]+)\"$"), 1));
+            add(new Pair<>(Pattern.compile("^\\s+'InteractionId'.+= \"([^\"]+)\"$"), 1));
+            add(new Pair<>(Pattern.compile("^\\s+'Id' .+\"([^\"]+)\"$"), 1));
+            add(new Pair<>(Pattern.compile("^\\s*'ORSI:.+:([\\w~]+)' \\[list\\]"), 1));
+        }
     });
 
-    private final static Message.Regexs parentIxnID = new Regexs(new Utils.Pair[]{
-            new Pair<>("^\\s+attr_prnt_itx_id.+ \"([^\"]+)\"$", 1),
-            new Pair<>("^\\s+'attr_itx_prnt_itx_id'.+= \"([^\"]+)\"$", 1),
-            new Pair<>("^\\s+'Parent' .+\"([^\"]+)\"$", 1)
+    private final static Message.Regexs parentIxnID = new Regexs(
+            new ArrayList<Pair<Pattern, Integer>>() {
+        {
+            add(new Pair<>(Pattern.compile("^\\s+attr_prnt_itx_id.+ \"([^\"]+)\"$"), 1));
+            add(new Pair<>(Pattern.compile("^\\s+'attr_itx_prnt_itx_id'.+= \"([^\"]+)\"$"), 1));
+            add(new Pair<>(Pattern.compile("^\\s+'Parent' .+\"([^\"]+)\"$"), 1));
+        }
     });
 
-    private static final Regexs PlaceIDs = new Regexs(new Utils.Pair[]{
-            new Pair<>("^\\s+attr_place_id.+ \"([^\"]+)\"$", 1),
-            new Pair<>("^\\s+attr_actor_place_id.+ \"([^\"]+)\"$", 1),
-            new Pair<>("^\\s+AttributePlace.+ \"([^\"]+)\"$", 1)
+    private static final Regexs PlaceIDs = new Regexs(
+            new ArrayList<Pair<Pattern, Integer>>() {
+        {
+            add(new Pair<>(Pattern.compile("^\\s+attr_place_id.+ \"([^\"]+)\"$"), 1));
+            add(new Pair<>(Pattern.compile("^\\s+attr_actor_place_id.+ \"([^\"]+)\"$"), 1));
+            add(new Pair<>(Pattern.compile("^\\s+AttributePlace.+ \"([^\"]+)\"$"), 1));
+        }
     });
 
-    private static final Regexs refIDs = new Regexs(new Pair[]{
-            new Pair<>("^\\s+attr_ref_id.+ = (\\d+)", 1),
-            new Pair<>("^\\s+attr_esp_server_refid.+ = (\\d+)", 1),
-            new Pair<>("^\\s+AttributeReferenceID.+ = (\\d+)", 1),
-            new Pair<>("^\\s+AttributeConnID .+ (\\w+)$", 1)
+    private static final Regexs refIDs = new Regexs(
+            new ArrayList<Pair<Pattern, Integer>>() {
+        {
+            add(new Pair<>(Pattern.compile("^\\s+attr_ref_id.+ = (\\d+)"), 1));
+            add(new Pair<>(Pattern.compile("^\\s+attr_esp_server_refid.+ = (\\d+)"), 1));
+            add(new Pair<>(Pattern.compile("^\\s+AttributeReferenceID.+ = (\\d+)"), 1));
+            add(new Pair<>(Pattern.compile("^\\s+AttributeConnID .+ (\\w+)$"), 1));
+        }
     });
 
-    private static final Regexs reQueue = new Regexs(new Pair[]{
-            new Pair<>("^\\s+(?:attr_queue|attr_itx_queue) .+ \"([^\"]+)\"$", 1),
-            new Pair<>("^\\s+AttributeThisDN .+ (\\w+)$", 1),});
-
-    private static final Regexs reMediaType = new Regexs(new Pair[]{
-            new Pair<>("^\\s+(?:attr_media_type|attr_itx_media_type|attr_media_type_name) .+ \"([^\"]+)\"$", 1)}
+    private static final Regexs reQueue = new Regexs(
+            new ArrayList<Pair<Pattern, Integer>>() {
+        {
+            add(new Pair<>(Pattern.compile("^\\s+(?:attr_queue|attr_itx_queue) .+ \"([^\"]+)\"$"), 1));
+            add(new Pair<>(Pattern.compile("^\\s+AttributeThisDN .+ (\\w+)$"), 1));
+        }
+    }
     );
 
-    private static final Regexs reConnID = new Regexs(new Pair[]{
-            new Pair<>("^\\s+AttributeConnID .+ (\\w+)$", 1)}
+    private static final Regexs reMediaType = new Regexs(
+            new ArrayList<Pair<Pattern, Integer>>() {
+        {
+            add(new Pair<>(Pattern.compile("^\\s+(?:attr_media_type|attr_itx_media_type|attr_media_type_name) .+ \"([^\"]+)\"$"), 1));
+        }
+    }
     );
-    private static final Pattern regService = Pattern.compile("^\\s+'Service'.+= \"([^\"]+)\"$");
-    private static final Pattern regMethod = Pattern.compile("^\\s+'Method'.+= \"([^\"]+)\"$");
-    private static final Pattern regRouteType = Pattern.compile("^\\s+AttributeRouteType.+ = (\\d+)");
+
+    private static final Regexs reConnID = new Regexs(
+            new ArrayList<Pair<Pattern, Integer>>() {
+        {
+            add(new Pair<>(Pattern.compile("^\\s+AttributeConnID .+ (\\w+)$"), 1));
+        }
+    }
+    );
+    private static final Regexs reService = new Regexs(
+            new ArrayList<Pair<Pattern, Integer>>() {
+        {
+            add(new Pair<>(Pattern.compile("^\\s+'Service'.+= \"([^\"]+)\"$"), 1));
+        }
+    });
+    private static final Regexs reMethod = new Regexs(
+            new ArrayList<Pair<Pattern, Integer>>() {
+        {
+            add(new Pair<>(Pattern.compile("^\\s+'Method'.+= \"([^\"]+)\"$"), 1));
+        }
+    });
+
+    private static final Regexs regIxnActor = new Regexs(
+            new ArrayList<Pair<Pattern, Integer>>() {
+        {
+            add(new Pair<>(Pattern.compile("^\\s+attr_actor_router_id .+ \"([^\"]+)\"$"), 1));
+        }
+    });
+    private static final Regexs regIxnSubmitted = new Regexs(
+            new ArrayList<Pair<Pattern, Integer>>() {
+        {
+            add(new Pair<>(Pattern.compile("^\\s+attr_itx_submitted_by .+ \"([^\"]+)\"$"), 1));
+        }
+    });
+
+    private static final Regexs regRouteType = new Regexs(
+            new ArrayList<Pair<Pattern, Integer>>() {
+        {
+            add(new Pair<>(Pattern.compile("^\\s+AttributeRouteType.+ = (\\d+)"), 1));
+        }
+    });
+
+    private final RegExAttribute attrRouteType = new RegExAttribute(regRouteType);
+    private final RegExAttribute attrIxnActor = new RegExAttribute(regIxnActor);
+    private final RegExAttribute attrIxnSubmitted = new RegExAttribute(regIxnSubmitted);
+
     private final RegExAttribute reIxnID = new RegExAttribute(IxnIDs);
     private final RegExAttribute reAgentID = new RegExAttribute(AgentIDs);
     private final RegExAttribute placeID = new RegExAttribute(PlaceIDs);
@@ -91,49 +146,31 @@ public class Ixn extends Message {
     //    private RegExAttribute ContactID = new RegExAttribute(reContact);
     private final RegExAttribute mediaType = new RegExAttribute(reMediaType);
     private final RegExAttribute connID = new RegExAttribute(reConnID);
-    MessageAttributes attrs = new MessageAttributes();
-    Attribute ixnID = new Attribute() {
-        @Override
-        String getValue() {
-            return FindByRx(IxnIDs);
-        }
-    };
-    Attribute attr1 = new Attribute() {
-        @Override
-        String getValue() {
-            String retService = FindByRx(regService, 1, null);
-            String retMethod = FindByRx(regMethod, 1, null);
-            StringBuilder ret = new StringBuilder(50);
-            if (retService != null) {
-                ret.append(retService);
-            }
-            if (retMethod != null) {
-                if (ret.length() > 0) {
-                    ret.append("|");
-                }
-                ret.append(retMethod);
-            }
-            if (ret.length() > 0) {
-                return ret.toString();
-            }
-            return null;
-        }
-    };
+    private final RegExAttribute attrService = new RegExAttribute(reService);
+    private final RegExAttribute attrMethod = new RegExAttribute(reMethod);
+
     private String clientName = null;
     private String messageName = null;
 
     public Ixn(TableType t, ArrayList<String> messageLines, int fileID) {
         super(t, messageLines, fileID);
-        attrs.add(reIxnID);
-        attrs.add(reAgentID);
-        attrs.add(placeID);
-        attrs.add(parentIxnIDAttr);
-        attrs.add(refID);
-        attrs.add(QueueID);
-        attrs.add(mediaType);
-        attrs.add(connID);
 
-        attrs.parseAttributes();
+        parseAttributes(
+                messageLines,
+                reIxnID,
+                reAgentID,
+                placeID,
+                parentIxnIDAttr,
+                refID,
+                QueueID,
+                mediaType,
+                connID,
+                attrService,
+                attrMethod,
+                attrIxnActor,
+                attrIxnSubmitted,
+                attrRouteType
+        );
     }
 
     public Ixn(ArrayList<String> messageLines, int fileID) {
@@ -158,17 +195,14 @@ public class Ixn extends Message {
             if ((m = regMsgNameReceivedfrom.matcher(m_MessageLines.get(0))).find()) {
                 clientName = m.group(1);
                 SetInbound(true);
-                Main.logger.debug("[-1-]");
                 return m.group(2);
             }
 
             if ((m = regMsgNameSendingTo.matcher(m_MessageLines.get(0))).find()) {
                 clientName = m.group(1);
                 SetInbound(false);
-                Main.logger.debug("[-2-]");
                 return m.group(2);
             }
-
 
             if ((m = regMsgAndClient.matcher(m_MessageLines.get(0))).find()) {
                 clientName = m.group(3);
@@ -215,7 +249,7 @@ public class Ixn extends Message {
         if (messageName != null && !messageName.isEmpty()) {
             return messageName;
         }
-        String attr = attr1.toString();
+        String attr = getAttr1();
         if (attr != null && !attr.isEmpty()) {
             return "ExternalServiceRequest";
         }
@@ -224,51 +258,47 @@ public class Ixn extends Message {
     }
 
     String GetIxnID() {
-        return ixnID.toString();
+        return reIxnID.getStringValue();
     }
 
     String GetMedia() {
-        return mediaType.toString();
+        return mediaType.getStringValue();
     }
 
     String GetIxnQueue() {
-        return QueueID.toString();
+        return QueueID.getStringValue();
     }
 
     long getM_refID() {
-        return intOrDef(refID.toString(), 0);
+        return refID.getIntValue();
     }
 
     String GetConnID() {
-        return connID.toString();
+        return connID.getStringValue();
     }
 
     String GetParentIxnID() {
-        return parentIxnIDAttr.toString();
+        return parentIxnIDAttr.getStringValue();
     }
 
     String GetClient() {
         String ret = clientName;
-        if (ret == null || ret.length() == 0) {
-            ret = FindByRx(regIxnActor, 1, "");
+        if (StringUtils.isEmpty(ret)) {
+            ret = attrIxnActor.getStringValue();
         }
-        if (ret == null || ret.length() == 0) {
-            ret = FindByRx(regIxnSubmitted, 1, "");
+        if (StringUtils.isEmpty(ret)) {
+            ret = attrIxnSubmitted.getStringValue();
         }
         return ret;
     }
 
     String GetAgent() {
-        String ag = reAgentID.toString();
-//        if( StringUtils.isNotEmpty(ag)){
-//            Main.logger.info("ag:"+ag);
-//            PrintMsg();
-//        }
+        String ag = reAgentID.getStringValue();
         return ag;
     }
 
     String GetPlace() {
-        return placeID.toString();
+        return placeID.getStringValue();
     }
 
     String GetRouter() {
@@ -276,14 +306,19 @@ public class Ixn extends Message {
     }
 
     String getAttr1() {
-        return attr1.toString();
+        StringBuilder ret = new StringBuilder(StringUtils.defaultIfBlank(attrService.getStringValue(), ""));
+        if (StringUtils.isNotBlank(ret)) {
+            ret.append("|");
+        }
+        ret.append(StringUtils.defaultIfBlank(attrMethod.getStringValue(), ""));
+        return StringUtils.isNotBlank(ret) ? ret.toString() : "";
     }
 
     String getAttr2() {
         String msgName = GetMessageName();
         if (msgName != null && msgName.contentEquals("RequestRouteCall")) {
 
-            String ret = FindByRx(regRouteType, 1, null);
+            String ret = attrRouteType.getStringValue();
             if (ret != null) {
                 return "RouteType=" + ret;
             }
@@ -319,7 +354,7 @@ public class Ixn extends Message {
     public void parseSSIxnName() {
         String ret = FindByRx(regSSIxnName, m_MessageLines.get(0), 1, null);
         if (ret != null) {
-            messageName=ret;
+            messageName = ret;
         }
     }
 }
