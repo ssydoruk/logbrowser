@@ -311,7 +311,7 @@ public class Ixn extends Message {
             ret.append("|");
         }
         ret.append(StringUtils.defaultIfBlank(attrMethod.getStringValue(), ""));
-        return StringUtils.isNotBlank(ret) ? ret.toString() : "";
+        return StringUtils.isNotBlank(ret) ? ret.toString() : null;
     }
 
     String getAttr2() {
