@@ -44,7 +44,7 @@ class AllCalls_IxnSettings extends AllInteractionsSettings {
         setTitle("Request type");
         selectAllReportTypeGroup = new SmartButtonGroup<>();
         JRadioButton bt;
-        bt = new JRadioButton("ORS interactions");
+        bt = new JRadioButton("Interactions");
         bt.setSelected(true);
         pan.add(bt);
         selectAllReportTypeGroup.add(bt, (qd, settings) -> _ixnResults.getAllInteractions(qd, settings));
