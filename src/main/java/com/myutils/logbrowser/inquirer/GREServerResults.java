@@ -82,16 +82,12 @@ public class GREServerResults extends IQueryResults {
         DynamicTreeNode<OptionNode> nd = new DynamicTreeNode<>(new OptionNode(DialogItem.IXN_EVENT));
         root.addChild(nd);
         
-        nd.addDynamicRef(DialogItem.IXN_IXN_EVENT_NAME, ReferenceType.TEvent, "ixn", "nameID");
-        nd.addDynamicRef(DialogItem.IXN_IXN_EVENT_APP, ReferenceType.App, "ixn", "appid");
-        nd.addDynamicRef(DialogItem.IXN_IXN_EVENT_MEDIA, ReferenceType.IxnMedia, "ixn", "MediaTypeID");
-        nd.addDynamicRef(DialogItem.IXN_IXN_EVENT_AGENT, ReferenceType.Agent, "ixn", "AgentID");
-        nd.addDynamicRef(DialogItem.IXN_IXN_EVENT_PLACE, ReferenceType.Place, "ixn", "PlaceID");
+        nd.addDynamicRef(DialogItem.IXN_IXN_EVENT_NAME, ReferenceType.TEvent, TableType.GREClient, "nameID");
+        nd.addDynamicRef(DialogItem.IXN_IXN_EVENT_APP, ReferenceType.App, TableType.GREClient, "appid");
+        nd.addDynamicRef(DialogItem.IXN_IXN_EVENT_MEDIA, ReferenceType.IxnMedia, TableType.GREClient, "MediaTypeID");
+        nd.addDynamicRef(DialogItem.URS_STRATEGY, ReferenceType.URSStrategyName, TableType.GREClient, "strategyid");
         
-        nd.addDynamicRef(DialogItem.IXN_IXN_EVENT_ATTR1, ReferenceType.TLIBATTR1, "ixn", "attr1ID");
-        nd.addDynamicRef(DialogItem.IXN_IXN_EVENT_ATTR2, ReferenceType.TLIBATTR2, "ixn", "attr2ID");
-        
-        nd.addDynamicRef(DialogItem.IXN_IXN_EVENT_DN, ReferenceType.DN, "ixn", "ixnqueueid");
+        nd.addDynamicRef(DialogItem.IXN_IXN_EVENT_DN, ReferenceType.DN, TableType.GREClient, "ixnqueueid");
         
         DynamicTreeNode<OptionNode> AttrValue;
         
@@ -130,7 +126,6 @@ public class GREServerResults extends IQueryResults {
         rootA.addChild(nd);
         
         addIxnReportType(nd);
-        addIxnNonIxnReportType(nd);
 //        nd.addChild(new DynamicTreeNode<OptionNode>(new OptionNode(DialogItem.TLIB_CALLS_ISCC)));
 
         nd = new DynamicTreeNode<>(new OptionNode(false, DialogItem.CONFIGUPDATES));
@@ -408,6 +403,33 @@ public class GREServerResults extends IQueryResults {
                     return;
                 }
             }
+            
+            tab.AddCheckedWhere(tab.getTabAlias() + ".nameID",
+                    ReferenceType.TEvent,
+                    eventsSettings,
+                    "AND",
+                    DialogItem.IXN_IXN_EVENT_NAME);
+            tab.AddCheckedWhere(tab.getTabAlias() + ".appid",
+                    ReferenceType.App,
+                    eventsSettings,
+                    "AND",
+                    DialogItem.IXN_IXN_EVENT_APP);
+            tab.AddCheckedWhere(tab.getTabAlias() + ".MediaTypeID",
+                    ReferenceType.IxnMedia,
+                    eventsSettings,
+                    "AND",
+                    DialogItem.IXN_IXN_EVENT_MEDIA);
+            tab.AddCheckedWhere(tab.getTabAlias() + ".strategyid",
+                    ReferenceType.URSStrategyName,
+                    eventsSettings,
+                    "AND",
+                    DialogItem.URS_STRATEGY);
+            tab.AddCheckedWhere(tab.getTabAlias() + ".ixnqueueid",
+                    ReferenceType.DN,
+                    eventsSettings,
+                    "AND",
+                    DialogItem.IXN_IXN_EVENT_DN);            
+
 
 //            tab.AddCheckedWhere(tab.getTabAlias() + ".reqid",
 //                    ReferenceType.ORSREQ,

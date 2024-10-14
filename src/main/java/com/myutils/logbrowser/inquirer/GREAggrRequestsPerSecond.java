@@ -29,7 +29,7 @@ public class GREAggrRequestsPerSecond extends IAggregateAggregate {
     private boolean isTLibReport;
 
     public GREAggrRequestsPerSecond(boolean hasSIP) {
-        setJpConfig(new AggrSIPServerCallsPerSecondConfig(hasSIP));
+        setJpConfig(new AggrGREMessagePerSecondConfig(hasSIP));
     }
 
     @Override
@@ -50,7 +50,7 @@ public class GREAggrRequestsPerSecond extends IAggregateAggregate {
     @Override
     void runQuery() throws SQLException {
 //        select datetime(time/1000,'unixepoch', 'localtime') ts,* from ocs_logbr
-        AggrSIPServerCallsPerSecondConfig cfg = (AggrSIPServerCallsPerSecondConfig) getJpConfig();
+        AggrGREMessagePerSecondConfig cfg = (AggrGREMessagePerSecondConfig) getJpConfig();
 //        setMaxRecords(2000);
 
         ArrayList<Integer> searchApps = qd.getSearchApps(true);
@@ -66,11 +66,11 @@ public class GREAggrRequestsPerSecond extends IAggregateAggregate {
         if (tabName == null || tabName.length() == 0) {
             JOptionPane.showMessageDialog(null, "No table for the application ");
         } else {
-            if (cfg.isTLibReport()) {
-                runTLibReport(cfg, appIDs, tabName);
-            } else if (cfg.isSIPReport()) {
-                runSIPReport(cfg, appIDs);
-            }
+//            if (cfg.isTLibReport()) {
+//                runTLibReport(cfg, appIDs, tabName);
+//            } else if (cfg.isSIPReport()) {
+//                runSIPReport(cfg, appIDs);
+//            }
         }
     }
 

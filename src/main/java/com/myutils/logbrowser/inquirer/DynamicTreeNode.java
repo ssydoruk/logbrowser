@@ -173,6 +173,10 @@ public class DynamicTreeNode<T> extends GenericTreeNode implements Serializable 
     void addDynamicRef(DialogItem name, final ReferenceType referenceType, final String CheckTab, final String CheckIDField) {
         addDynamicRef(new DynamicTreeNode<>(new OptionNode(name)), referenceType, CheckTab, CheckIDField);
     }
+    
+    void addDynamicRef(DialogItem name, final ReferenceType referenceType, final TableType CheckTab, final String CheckIDField) {
+        addDynamicRef(new DynamicTreeNode<>(new OptionNode(name)), referenceType, CheckTab.toString(), CheckIDField);
+    }
 
     void addDynamicRef(DialogItem name, final ReferenceType referenceType, final String CheckTab, final String CheckIDField, final boolean alwaysCheck) {
         addDynamicRef(new DynamicTreeNode<>(new OptionNode(name)), referenceType, CheckTab, CheckIDField, null, alwaysCheck);
