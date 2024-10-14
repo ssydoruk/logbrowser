@@ -19,20 +19,6 @@ import java.util.ArrayList;
 @SuppressWarnings({"unchecked", "rawtypes", "serial", "deprecation"})
 public class GroupByPanel extends javax.swing.JPanel {
 
-    // Variables declaration - do not modify                     
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JButton jbDown;
-    private javax.swing.JButton jbMoveAll;
-    private javax.swing.JButton jbMoveCurrent;
-    private javax.swing.JButton jbRemoveAll;
-    private javax.swing.JButton jbRemoveCurrent;
-    private javax.swing.JButton jbUp;
-    private javax.swing.JList<String> jlAvailable;
-    private javax.swing.JList<String> jlInList;
-
     /**
      * Creates new form GroupByPanel
      */
@@ -238,6 +224,22 @@ public class GroupByPanel extends javax.swing.JPanel {
                                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
+    
+    // Variables declaration - do not modify                     
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JButton jbDown;
+    private javax.swing.JButton jbMoveAll;
+    private javax.swing.JButton jbMoveCurrent;
+    private javax.swing.JButton jbRemoveAll;
+    private javax.swing.JButton jbRemoveCurrent;
+    private javax.swing.JButton jbUp;
+    private javax.swing.JList<String> jlAvailable;
+    private javax.swing.JList<String> jlInList;
+    // End of variables declaration                   
+
 
     private void jbMoveCurrentActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbMoveCurrentActionPerformed
         ListSelectionModel selectAvailableModel = jlAvailable.getSelectionModel();
@@ -315,7 +317,6 @@ public class GroupByPanel extends javax.swing.JPanel {
         }
         setUpDownButtonsState();
     }//GEN-LAST:event_jbRemoveCurrentActionPerformed
-    // End of variables declaration                   
 
     private void setMoveButtonsState() {
         jbMoveCurrent.setEnabled(jlAvailable.getSelectedIndex() >= 0);

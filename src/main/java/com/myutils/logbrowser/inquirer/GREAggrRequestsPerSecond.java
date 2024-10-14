@@ -7,6 +7,7 @@ package com.myutils.logbrowser.inquirer;
 
 import Utils.UTCTimeRange;
 import com.myutils.logbrowser.indexer.ReferenceType;
+import com.myutils.logbrowser.indexer.TableType;
 import com.myutils.logbrowser.inquirer.IQuery.FieldType;
 import org.apache.commons.lang3.StringUtils;
 
@@ -62,16 +63,12 @@ public class GREAggrRequestsPerSecond extends IAggregateAggregate {
         String[] names = DatabaseConnector.getNames(this, ReferenceType.AppType.toString(), "name",
                 IQueryResults.getWhere("id", "select apptypeid from file_logbr" + getWhere("appnameid", appIDs, true),
                         true));
-        String tabName = QueryTools.TLibTableByFileType(names[0]);
-        if (tabName == null || tabName.length() == 0) {
-            JOptionPane.showMessageDialog(null, "No table for the application ");
-        } else {
+                runTLibReport(cfg, appIDs);
 //            if (cfg.isTLibReport()) {
 //                runTLibReport(cfg, appIDs, tabName);
 //            } else if (cfg.isSIPReport()) {
 //                runSIPReport(cfg, appIDs);
 //            }
-        }
     }
 
     @Override
@@ -90,16 +87,17 @@ public class GREAggrRequestsPerSecond extends IAggregateAggregate {
         return null;
     }
 
-    private void runTLibReport(AggrSIPServerCallsPerSecondConfig cfg, Integer[] appIDs, String tabName) throws SQLException {
+    private void runTLibReport(AggrGREMessagePerSecondConfig cfg, Integer[] appIDs) throws SQLException {
         isTLibReport = true;
         DynamicTreeNode<OptionNode> attrRoot = cfg.getAttrTLibRoot();
         Wheres wh = new Wheres();
-        wh.addWhere(IQuery.getAttrsWhere("nameid", ReferenceType.TEvent, FindNode(attrRoot, DialogItem.TLIB_CALLS_TEVENT_NAME, null, null)), "AND");
-        wh.addWhere(IQuery.getAttrsWhere("sourceid", ReferenceType.App, FindNode(attrRoot, DialogItem.TLIB_CALLS_SOURCE, null, null)), "AND");
-        wh.addWhere(IQuery.getAttrsWhere(new String[]{"thisDNID", "otherDNID"}, ReferenceType.DN, FindNode(attrRoot, DialogItem.TLIB_CALLS_TEVENT_DN, null, null)), "AND");
-        wh.addWhere(IQuery.getAttrsWhere("inbound", FindNode(attrRoot, DialogItem.TLIB_CALLS_TEVENT_DIRECTION, null, null)), "AND");
+        wh.addWhere(IQuery.getAttrsWhere("nameid", ReferenceType.TEvent, FindNode(attrRoot, DialogItem.IXN_IXN_EVENT_NAME, null, null)), "AND");
+        wh.addWhere(IQuery.getAttrsWhere("sourceid", ReferenceType.App, FindNode(attrRoot, DialogItem.IXN_IXN_EVENT_APP, null, null)), "AND");
+        wh.addWhere(IQuery.getAttrsWhere("ixnqueueid", ReferenceType.DN, FindNode(attrRoot, DialogItem.IXN_IXN_EVENT_DN, null, null)), "AND");
+        wh.addWhere(IQuery.getAttrsWhere("strategyid", ReferenceType.URSStrategyName, FindNode(attrRoot, DialogItem.URS_STRATEGY, null, null)), "AND");
+
         wh.addWhere("fileid in (select id from file_logbr " + getWhere("appnameid", appIDs, true) + ")", "AND");
-        wh.addWhere(tabName, "time", qd.getTimeRange(), "AND");
+        wh.addWhere(TableType.GREClient, "time", qd.getTimeRange(), "AND");
         inquirer.logger.info("Building temp tables");
         String tab = resetTempTable();
         DBField[] grpBy = cfg.getGroupByTLib();
@@ -121,7 +119,7 @@ public class GREAggrRequestsPerSecond extends IAggregateAggregate {
                 : "0") + " ts, \n"
                 + ((sGrpBy.length() > 0) ? sGrpBy + "," : "")
                 + " count(*) cnt from "
-                + tabName
+                + TableType.GREClient
                 + "\n"
                 + wh.makeWhere(true)
                 + "\n group by 1" + ((sGrpBy.length() > 0) ? "," + sGrpBy : "")

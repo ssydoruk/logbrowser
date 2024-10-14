@@ -6,6 +6,7 @@
 package com.myutils.logbrowser.inquirer;
 
 import Utils.UTCTimeRange;
+import com.myutils.logbrowser.indexer.TableType;
 
 import java.util.ArrayList;
 
@@ -33,9 +34,16 @@ class Wheres {
     }
 
     public void addWhere(String timeField, UTCTimeRange timeRange, String andOr) {
-        addWhere(null, timeField, timeRange, andOr);
+        addWhere((String)null, timeField, timeRange, andOr);
     }
 
+    public void addWhere(TableType tab, String timeField, UTCTimeRange timeRange, String andOr) {
+        addWhere( tab.toString()
+        ,  timeField,  timeRange
+        ,  andOr
+    );
+    }
+        
     public void addWhere(String tab, String timeField, UTCTimeRange timeRange, String andOr) {
         if (timeRange != null && timeField != null) {
             addWhere(((tab != null) ? (tab + ".") : "") + timeField + " between " + timeRange.getStart() + " and " + timeRange.getEnd(), "AND");
