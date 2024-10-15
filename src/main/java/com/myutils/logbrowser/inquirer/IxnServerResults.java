@@ -95,6 +95,7 @@ public class IxnServerResults extends IQueryResults {
         nd.addDynamicRef(DialogItem.IXN_IXN_EVENT_ATTR2, ReferenceType.TLIBATTR2, "ixn", "attr2ID");
 
         nd.addDynamicRef(DialogItem.IXN_IXN_EVENT_DN, ReferenceType.DN, "ixn", "ixnqueueid");
+        nd.addDynamicRef(DialogItem.URS_STRATEGY, ReferenceType.URSStrategyName, "ixn", "strategyID");
 
         DynamicTreeNode<OptionNode> AttrValue;
 
@@ -180,6 +181,7 @@ public class IxnServerResults extends IQueryResults {
         TLibReq.addRef("appid", "client", ReferenceType.App.toString(), FieldType.OPTIONAL);
 
         TLibReq.addRef("MediaTypeID", "MediaType", ReferenceType.IxnMedia.toString(), FieldType.OPTIONAL);
+        TLibReq.addRef("strategyID", "strategy", ReferenceType.URSStrategyName, FieldType.OPTIONAL);
         TLibReq.addRef("AgentID", "Agent", ReferenceType.Agent.toString(), FieldType.OPTIONAL);
         TLibReq.addRef("PlaceID", "Place", ReferenceType.Place.toString(), FieldType.OPTIONAL);
         TLibReq.addRef("attr1ID", "attr1", ReferenceType.TLIBATTR1.toString(), FieldType.OPTIONAL);
@@ -290,7 +292,12 @@ public class IxnServerResults extends IQueryResults {
 
     @Override
     protected ArrayList<IAggregateQuery> loadReportAggregates() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        ArrayList<IAggregateQuery> ret = new ArrayList<>();
+//        ret.add(new GREAggrTimestampDelays());
+        ret.add(new AggrIxnServerMsgPerSecond());
+//        ret.add(new AggrGREClientDelays());
+
+        return ret;
     }
 
     @Override

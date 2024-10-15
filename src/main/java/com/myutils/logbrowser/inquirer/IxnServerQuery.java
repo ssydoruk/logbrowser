@@ -35,6 +35,7 @@ public final class IxnServerQuery extends IQuery {
         addRef("PlaceID", "Place", ReferenceType.Place.toString(), FieldType.OPTIONAL);
         addRef("attr1ID", "attr1", ReferenceType.TLIBATTR1.toString(), FieldType.OPTIONAL);
         addRef("attr2ID", "attr2", ReferenceType.TLIBATTR2.toString(), FieldType.OPTIONAL);
+        addRef("strategyID", "strategy", ReferenceType.URSStrategyName, FieldType.OPTIONAL);
 
     }
 

@@ -83,6 +83,15 @@ public class Ixn extends Message {
         }
     }
     );
+    
+    private static final Regexs reStrategy = new Regexs(
+            new ArrayList<Pair<Pattern, Integer>>() {
+        {
+            add(new Pair<>(Pattern.compile("^\\s+(?:attr_actor_strategy_id|attr_strategy_id) .+ \"([^\"]+)\"$"), 1));
+            add(new Pair<>(Pattern.compile("^\\s+AttributeThisDN .+ (\\w+)$"), 1));
+        }
+    }
+    );
 
     private static final Regexs reMediaType = new Regexs(
             new ArrayList<Pair<Pattern, Integer>>() {
@@ -148,6 +157,7 @@ public class Ixn extends Message {
     private final RegExAttribute connID = new RegExAttribute(reConnID);
     private final RegExAttribute attrService = new RegExAttribute(reService);
     private final RegExAttribute attrMethod = new RegExAttribute(reMethod);
+    private final RegExAttribute attrStrategy = new RegExAttribute(reStrategy);
 
     private String clientName = null;
     private String messageName = null;
@@ -169,7 +179,8 @@ public class Ixn extends Message {
                 attrMethod,
                 attrIxnActor,
                 attrIxnSubmitted,
-                attrRouteType
+                attrRouteType,
+                attrStrategy
         );
     }
 
@@ -260,6 +271,10 @@ public class Ixn extends Message {
     String GetIxnID() {
         return reIxnID.getStringValue();
     }
+    
+    String getStrategy(){
+        return attrStrategy.getStringValue();
+    }
 
     String GetMedia() {
         return mediaType.getStringValue();
@@ -348,6 +363,7 @@ public class Ixn extends Message {
         setFieldInt(stmt, 16, Main.getRef(ReferenceType.Place, GetPlace()));
         setFieldInt(stmt, 17, Main.getRef(ReferenceType.TLIBATTR1, getAttr1()));
         setFieldInt(stmt, 18, Main.getRef(ReferenceType.TLIBATTR2, getAttr2()));
+        setFieldInt(stmt, 19, Main.getRef(ReferenceType.URSStrategyName, getStrategy()));
         return true;
     }
 

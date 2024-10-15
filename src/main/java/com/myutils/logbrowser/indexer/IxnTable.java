@@ -34,6 +34,7 @@ public class IxnTable extends DBTable {
         addIndex("PlaceID");
         addIndex("attr1ID");
         addIndex("attr2ID");
+        addIndex("strategyID");
         dropIndexes();
 
         String query = "create table if not exists Ixn (id INTEGER PRIMARY KEY ASC"
@@ -56,6 +57,7 @@ public class IxnTable extends DBTable {
                 + ",PlaceID INTEGER"
                 + ",attr1ID INTEGER"
                 + ",attr2ID INTEGER"
+                + ",strategyID INTEGER"
                 + ");";
         getM_dbAccessor().runQuery(query);
 
@@ -66,6 +68,7 @@ public class IxnTable extends DBTable {
     public String getInsert() {
         return "INSERT INTO Ixn VALUES(NULL,?,?,?,?,?"
                 /*standard first*/
+                + ",?"
                 + ",?"
                 + ",?"
                 + ",?"

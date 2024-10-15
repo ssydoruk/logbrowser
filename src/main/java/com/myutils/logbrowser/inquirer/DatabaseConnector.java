@@ -40,6 +40,12 @@ public class DatabaseConnector {
     static public Statement currentStatement = null;
     private static DatabaseConnector databaseConnector = null;
     static private int noAppTypes = -1;
+
+    static void safeCreateIndex(String tab, String fieldName) throws SQLException {
+        runQuery("drop index if exists idx_" + fieldName + ";");
+        runQuery("create index idx_" + fieldName + " on " + tab + "(" + fieldName + ");");
+
+    }
     private final String m_dbAlias;
     private final Connection m_conn;
     private final Map<ReferenceType, Map<Integer, String>> thePersistentRef = new HashMap<>();
