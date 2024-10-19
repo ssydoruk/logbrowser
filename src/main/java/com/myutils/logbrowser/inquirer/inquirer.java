@@ -407,6 +407,8 @@ public class inquirer {
                         }
                     }
                 }
+            } catch (java.io.EOFException ex) {
+                ret = null;
             } catch (IOException ex) {
                 ExceptionHandler.handleException("IOException reading settings", ex);
                 ret = null;
