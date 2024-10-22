@@ -181,7 +181,6 @@ public class IxnServerResults extends IQueryResults {
         TLibReq.addRef("appid", "client", ReferenceType.App.toString(), FieldType.OPTIONAL);
 
         TLibReq.addRef("MediaTypeID", "MediaType", ReferenceType.IxnMedia.toString(), FieldType.OPTIONAL);
-        TLibReq.addRef("strategyID", "strategy", ReferenceType.URSStrategyName, FieldType.OPTIONAL);
         TLibReq.addRef("AgentID", "Agent", ReferenceType.Agent.toString(), FieldType.OPTIONAL);
         TLibReq.addRef("PlaceID", "Place", ReferenceType.Place.toString(), FieldType.OPTIONAL);
         TLibReq.addRef("attr1ID", "attr1", ReferenceType.TLIBATTR1.toString(), FieldType.OPTIONAL);
@@ -202,6 +201,8 @@ public class IxnServerResults extends IQueryResults {
 //                HashSet<Long> refIDs = ixnQuery.getCollectID("refid");
 
                 TableQuery TLibReq = IxnTable(MsgType.INTERACTION, "ixn");
+                TLibReq.addRef("strategyID", "strategy", ReferenceType.URSStrategyName, FieldType.OPTIONAL);
+
 //                TLibReq.addWhere(TLibReq.getTabAlias() + ".ixnid>0 ", "AND");
                 TLibReq.AddCheckedWhere(TLibReq.getTabAlias() + ".nameID", ReferenceType.TEvent, eventsSettings, "AND", DialogItem.IXN_IXN_EVENT_NAME);
 //                        nd.addDynamicRef(DialogItem.IXN_IXN_EVENT_DN, ReferenceType.DN, "ixn", "ixnqueueid");
