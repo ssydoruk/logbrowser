@@ -171,7 +171,7 @@ public abstract class DBTable {
     }
 
     void checkInit() {
-        synchronized (m_dbAccessor) {
+        synchronized (m_dbAccessor.getM_conn()) {
             if (!tabCreated) {
                 m_dbAccessor.Commit();
                 InitDB();
