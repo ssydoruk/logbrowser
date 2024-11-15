@@ -397,6 +397,7 @@ public class ShowFullMessage extends javax.swing.JFrame implements PopupMenuList
             showAllFields();
 
             detailedMessage.setText("");
+            String s=null;
             if (StringUtils.isEmpty(recordDisplayScript)) {
                 jtaMessageText.setText(row.getRecord().getBytes());
             } else {
@@ -406,15 +407,16 @@ public class ShowFullMessage extends javax.swing.JFrame implements PopupMenuList
                 } else {
                     jtaMessageText.setText(row.getRecord().getBytes());
                 }
-                String s = detailedData.get(row);
-                if (StringUtils.isBlank(s)) {
-                    s = recPrintout.detailsMessage;
-                }
-                if (StringUtils.isNotEmpty(s)) {
-                    detailedMessage.setText(s);
-                    detailedMessage.setSyntaxEditingStyle(SyntaxConstants.SYNTAX_STYLE_JSON);
-                }
+                s = recPrintout.detailsMessage;
             }
+            if (StringUtils.isBlank(s)) {
+                s = detailedData.get(row);
+            }
+            if (StringUtils.isNotEmpty(s)) {
+                detailedMessage.setText(s);
+                detailedMessage.setSyntaxEditingStyle(SyntaxConstants.SYNTAX_STYLE_JSON);
+            }
+
         } else {
             jtaMessageText.setText("");
             showAllFields();
