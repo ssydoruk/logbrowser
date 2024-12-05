@@ -15,6 +15,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 
 /**
  * @author stepan_sydoruk
@@ -102,7 +103,7 @@ public class EnvInquirer {
 
     private void showHelpExit(Options options) {
         HelpFormatter formatter = new HelpFormatter();
-        formatter.printHelp("utility-name", options);
+        formatter.printHelp("./app", "where options are", options, "---\nFinal argument can be list of directories to search in", true);
 
         System.exit(0);
     }
@@ -181,6 +182,11 @@ public class EnvInquirer {
 
     }
 
+    public List<String> getDirList(){
+        return cmd.getArgList();
+    }
+    
+    
     public String getFilePathPattern() {
         return filePathPattern;
     }

@@ -109,26 +109,49 @@ public class inquirer {
         StringBuilder s = new StringBuilder();
         s.append("Command line: ").append(StringUtils.join(args, " "));
         s.append("\n\tCurrent directory: ").append(Utils.FileUtils.getCurrentDirectory());
+
         if (StringUtils.isNotBlank(ee.getDbname())) {
             s.append("\n\tChecking database dbname: ").append(ee.getDbname());
-        } else {
-            s.append("\n\tSearching directory: ").append(ee.getStartDirectory());
-        }
-
-        logger.info(s);
-
-        if (StringUtils.isNotBlank(ee.getDbname())) {
-            ret=doSearchDB(ee.getDbname());
+            logger.info(s);
+            System.out.println(s);
+            ret = doSearchDB(ee.getDbname());
         } else {
             try {
-                if (StringUtils.isNotBlank(ee.getFilePathPattern())) {
-                    filePathPattern = Pattern.compile(ee.getFilePathPattern());
-                }
-                File f = new File(ee.getStartDirectory());
-                if (f.isDirectory()) {
-                    ScanDir(f);
+                List<String> searchList = ee.getDirList();
+                if (searchList == null || searchList.isEmpty()) {
+                    s.append("\n\tSearching directory: ").append(ee.getStartDirectory());
+                    if (StringUtils.isNotBlank(ee.getFilePathPattern())) {
+                        filePathPattern = Pattern.compile(ee.getFilePathPattern());
+                        s.append("\n\tFile pattern: >>").append(filePathPattern.toString()).append("<<");
+                    }
+                    logger.info(s);
+                    System.out.println(s);
+                    File f = new File(ee.getStartDirectory());
+                    if (f.isDirectory()) {
+                        ScanDir(f);
+                    } else {
+                        doSearchDB(ee.getDbname());
+                    }
                 } else {
-                    doSearchDB(ee.getDbname());
+                    if (StringUtils.isNotBlank(ee.getFilePathPattern())) {
+                        filePathPattern = Pattern.compile(ee.getFilePathPattern());
+                        s.append("\n\tFile pattern: >>").append(filePathPattern.toString()).append("<<");
+                    }
+                    s.append("Search locations");
+                    logger.info(s);
+                    System.out.println(s);
+                    for (String searchItem : searchList) {
+                        s.setLength(0);
+                        s.append("Searching location: ").append(searchItem);
+                        logger.info(s);
+                        System.out.println(s);
+                        File f = new File(searchItem);
+                        if (f.isDirectory()) {
+                            ScanDir(f);
+                        } else {
+                            doSearchDB(ee.getDbname());
+                        }
+                    }
                 }
             } catch (Exception exception) {
                 logger.error("Exception while scanning", exception);
