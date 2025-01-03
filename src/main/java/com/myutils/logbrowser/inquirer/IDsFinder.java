@@ -1616,6 +1616,7 @@ public final class IDsFinder extends QueryTools {
 //                                        searchIDs, true));
 
                     }
+                    break;
                     case OCSRecordHandle: {
                         return (DatabaseConnector.TableExist("ocspaevi_logbr")) ? DatabaseConnector.getIDs(
                                 "select distinct cgDBID "
