@@ -157,7 +157,7 @@
         <dependency>
             <groupId>com.fifesoft</groupId>
             <artifactId>rsyntaxtextarea</artifactId>
-            <version>3.4.0</version>
+            <version>3.5.3</version>
             <type>jar</type>
         </dependency>
         <!-- Need this to hide warning for jakarta.activation.DataSource -->
