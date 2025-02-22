@@ -12,10 +12,10 @@
             <properties>
                 <exec.vmArgs>-Dlog4j.configurationFile=C:\Users\ssydo\GCTI\etc\logbrowser\logbr.log4j2.inquirer.xml -Dsun.java2d.d3d=false -Dall=1 -Dsqlite.pragma=true -Dtlib.norequest=false -Dtimediff.parse=false -Djacob.dll=C:\Users\ssydo\GCTI\bin\logbrowser\jacob-1.20-x64.dll -D_log4j2.debug</exec.vmArgs>
                 <exec.args>${exec.vmArgs} -classpath %classpath ${exec.mainClass} ${exec.appArgs}</exec.args>
-                <exec.appArgs>--dbname=/Users/ssydoruk/work/logs/2024-07-25.PROD/logbr --config=/Users/ssydoruk/GCTI/etc/logbrowser/inquirer.cfg.json --basedir=/Users/ssydoruk/work/logs/2024-07-25.PROD --outputspec=/Users/ssydoruk/GCTI/etc/logbrowser/outputspec3.xml</exec.appArgs>
+                <exec.appArgs>--dbname=/Users/ssydoruk/work/logs/2025-02-22.aws/logbr --config=/Users/ssydoruk/GCTI/etc/logbrowser/inquirer.cfg.json --basedir=/Users/ssydoruk/work/logs/2025-02-22.aws --outputspec=/Users/ssydoruk/GCTI/etc/logbrowser/outputspec3.xml</exec.appArgs>
                 <exec.mainClass>com.myutils.logbrowser.inquirer.inquirer</exec.mainClass>
                 <exec.executable>java</exec.executable>
-                <exec.workingdir>/Users/ssydoruk/work/logs/2024-07-25.PROD</exec.workingdir>
+                <exec.workingdir>/Users/ssydoruk/work/logs/2025-02-22.aws</exec.workingdir>
             </properties>
         </action>
         <action>
@@ -30,11 +30,11 @@
             <properties>
                 <exec.vmArgs>-Dlog4j.configurationFile=C:\Users\ssydo\GCTI\etc\logbrowser\logbr.log4j2.inquirer.xml -Dsun.java2d.d3d=false -Dall=1 -Dsqlite.pragma=true -Dtlib.norequest=false -Dtimediff.parse=false -Djacob.dll=C:\Users\ssydo\GCTI\bin\logbrowser\jacob-1.20-x64.dll -D_log4j2.debug -agentlib:jdwp=transport=dt_socket,server=n,address=${jpda.address}</exec.vmArgs>
                 <exec.args>${exec.vmArgs} -classpath %classpath ${exec.mainClass} ${exec.appArgs}</exec.args>
-                <exec.appArgs>--dbname=/Users/ssydoruk/work/logs/2024-07-25.PROD/logbr --config=/Users/ssydoruk/GCTI/etc/logbrowser/inquirer.cfg.json --basedir=/Users/ssydoruk/work/logs/2024-07-25.PROD --outputspec=/Users/ssydoruk/GCTI/etc/logbrowser/outputspec3.xml</exec.appArgs>
+                <exec.appArgs>--dbname=/Users/ssydoruk/work/logs/2025-02-22.aws/logbr --config=/Users/ssydoruk/GCTI/etc/logbrowser/inquirer.cfg.json --basedir=/Users/ssydoruk/work/logs/2025-02-22.aws --outputspec=/Users/ssydoruk/GCTI/etc/logbrowser/outputspec3.xml</exec.appArgs>
                 <exec.mainClass>com.myutils.logbrowser.inquirer.inquirer</exec.mainClass>
                 <exec.executable>java</exec.executable>
                 <jpda.listen>true</jpda.listen>
-                <exec.workingdir>/Users/ssydoruk/work/logs/2024-07-25.PROD</exec.workingdir>
+                <exec.workingdir>/Users/ssydoruk/work/logs/2025-02-22.aws</exec.workingdir>
             </properties>
         </action>
         <action>
@@ -51,8 +51,8 @@
                 <exec.args>${exec.vmArgs} -classpath %classpath ${exec.mainClass} ${exec.appArgs}</exec.args>
                 <exec.mainClass>com.myutils.logbrowser.inquirer.inquirer</exec.mainClass>
                 <exec.executable>java</exec.executable>
-                <exec.appArgs>--dbname=/Users/ssydoruk/work/logs/2024-07-25.PROD/logbr --config=/Users/ssydoruk/GCTI/etc/logbrowser/inquirer.cfg.json --basedir=/Users/ssydoruk/work/logs/2024-07-25.PROD --outputspec=/Users/ssydoruk/GCTI/etc/logbrowser/outputspec3.xml</exec.appArgs>
-                <exec.workingdir>/Users/ssydoruk/work/logs/2024-07-25.PROD</exec.workingdir>
+                <exec.appArgs>--dbname=/Users/ssydoruk/work/logs/2025-02-22.aws/logbr --config=/Users/ssydoruk/GCTI/etc/logbrowser/inquirer.cfg.json --basedir=/Users/ssydoruk/work/logs/2025-02-22.aws --outputspec=/Users/ssydoruk/GCTI/etc/logbrowser/outputspec3.xml</exec.appArgs>
+                <exec.workingdir>/Users/ssydoruk/work/logs/2025-02-22.aws</exec.workingdir>
             </properties>
         </action>
     </actions>

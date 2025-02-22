@@ -22,6 +22,16 @@ public class MediaServerResults extends IQueryResults {
     public static final int TC = 0x04;
     public static final int SIP = 0x08;
     public static final int PROXY = 0x10;
+
+    static ArrayList<Pair<String, String>> getAllSortFields() {
+        ArrayList<Pair<String, String>> ret = new ArrayList<>();
+        ret.add(new Pair<>("Time", "started"));
+        ret.add(new Pair<>("To URI", "thisdnid"));
+        ret.add(new Pair<>("From URI", "ToUriID"));
+        return ret;
+    }
+    
+    
     ArrayList<NameID> appsType = null;
     private Object cidFinder;
 
@@ -54,7 +64,9 @@ public class MediaServerResults extends IQueryResults {
 
     @Override
     public AllProcSettings getAllProc(Window parent) {
-        return new AllProcSettings((qd, settings) -> getAll(qd, settings), null);
+        AllMedia_CallFlowSettings rd = AllMedia_CallFlowSettings.getInstance(this, parent);
+        return (rd.doShow()) ? new AllProcSettings((qd, settings) -> getAll(qd, settings), rd) : null;
+//        return new AllProcSettings((qd, settings) -> getAll(qd, settings), null);
     }
 
     FullTableColors getAll(QueryDialog qd, AllInteractionsSettings settings) throws SQLException {
@@ -112,6 +124,12 @@ public class MediaServerResults extends IQueryResults {
             tabReport.addRef("FromUriID", "FromUri", ReferenceType.SIPURI.toString(), FieldType.OPTIONAL);
 
             tabReport.setOrderBy(tabReport.getTabAlias() + ".started");
+            tabReport.setOrderBy(tabReport.getTabAlias() + "." + settings.getSortField() + ' ' + (settings.isAscendingSorting() ? "asc" : "desc") + " ");
+            
+            int maxRecs = settings.getMaxRecords();
+            if (maxRecs > 0) {
+                tabReport.setLimit(maxRecs);
+            }
 
             return tabReport.getFullTable(); //To change body of generated methods, choose Tools | Templates.
         } finally {
