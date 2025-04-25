@@ -72,7 +72,7 @@ public class UrsParser extends Parser {
     private static final Pattern regTMessageOutFirstLine = Pattern.compile("^(request to|\\tAttribute|\\t\\()");
     private static final Pattern regReceived = Pattern.compile("^received from (\\d+)\\(([^\\)]+)\\).+message (Event\\w+)(?:\\(refid=(\\d+)\\))*");
     private static final Pattern regEventAttachedData = Pattern.compile("dn=([^,]+), refid=\\d+\\)$");
-    private static final Pattern regSentTo = Pattern.compile("^send to ts (.+) (Request\\w+)");
+    private static final Pattern regSentTo = Pattern.compile("^send to ts (.+) (Request\\w+)(:? to dn \\+?(\\w+))?");
     private static final Pattern regReqTo = Pattern.compile("^request to (\\d+).+message (Request\\w+)");
     private static final Pattern regStrategy = Pattern.compile("strategy:.+\\*+(\\S+)");
     //[14:33] strategy: **ORS (1085200831) is attached to the call
@@ -343,12 +343,9 @@ public class UrsParser extends Parser {
                             msg.setFunc(((split.length > 2) ? StringUtils.joinWith("/", split[1], getFunc(split, 3)) : split[1]));
                         } else {
                             msg.setFunc(((split.length > 2)
-                                    ?
-                                    ((StringUtils.compareIgnoreCase(split[2], "max") == 0)
-                                            ? StringUtils.joinWith("/", split[1], split[3])
-                                            :
-                                            StringUtils.joinWith("/", split[1], split[2])
-                                    )
+                                    ? ((StringUtils.compareIgnoreCase(split[2], "max") == 0)
+                                    ? StringUtils.joinWith("/", split[1], split[3])
+                                    : StringUtils.joinWith("/", split[1], split[2]))
                                     : split[1]));
                         }
                     } else if (StringUtils.startsWithIgnoreCase(split[1], "console")) {
@@ -358,8 +355,9 @@ public class UrsParser extends Parser {
                                 StringUtils.substringBefore(split[2], "?")) : split[1]));
                     }
                 }
-            } else
+            } else {
                 Main.logger.info("Strange URI [" + reqURIreq + "] l=" + split.length + " line " + m_CurrentLine);
+            }
             SetStdFieldsAndAdd(msg);
         }
     }
@@ -370,8 +368,9 @@ public class UrsParser extends Parser {
                 return ((split.length > startIdx) ? StringUtils.joinWith("/", split[startIdx],
                         StringUtils.substringBefore(split[startIdx + 1], "?"))
                         : StringUtils.substringBefore(split[startIdx], "?"));
-            } else
+            } else {
                 return split[startIdx];
+            }
         }
         return "";
     }
@@ -415,7 +414,6 @@ public class UrsParser extends Parser {
         } catch (Exception e) {
             Main.logger.error(e);
         }
-
 
         return m_CurrentLine - line;
     }
@@ -831,14 +829,15 @@ public class UrsParser extends Parser {
 //01:54:29.226_T_I_10630289b590f7ae [14:02] sending event 58 for vq vq_MB_Backoffice_Inquiries (9601 0 1 1470815342 28185 50)
 //01:54:29.226_M_I_10630289b590f7ae [13:03] call (vq 0000000014a50c20, id=1758045, priority 58) doesn't wait for VQ 000000000d765070 (name="vq_MB_Backoffice_Inquiries" stats=15 281824 10) now (10)
                     boolean endMsg = false;
-                    if (m_MessageContents.isEmpty()) {//filter out TEvent without attributes
-                        if (str != null && str.length() > 0
-                                && !regTMessageOutFirstLine.matcher(str).find()) {
-                            endMsg = true;
-                        }
+                    if (str != null && str.length() > 0
+                            && !regTMessageOutFirstLine.matcher(str).find()) {
+                        endMsg = true;
                     }
                     if (endMsg) {
+                        AddUrsMessage(m_MessageContents, m_Header, null);
                         m_ParserState = ParserState.STATE_COMMENTS;
+                        m_MessageContents.clear();
+                        m_Header = null;
                         return str;
                     } else {
                         m_MessageContents.add(str);
@@ -870,7 +869,6 @@ public class UrsParser extends Parser {
             isInbound = true;
         } else {
             if (!contents.isEmpty()) {
-
                 if (((m = regReceived.matcher(contents.get(0))).find())) {
                     fileHandle = m.group(1);
                     server = m.group(2);
@@ -888,6 +886,9 @@ public class UrsParser extends Parser {
                 } else if ((m = regSentTo.matcher(contents.get(0))).find()) {
                     server = m.group(1);
                     event = m.group(2);
+                    if (m.groupCount() >= 4) {
+                        thisDN = m.group(4);
+                    }
                     Main.logger.trace("2event [" + event + "] fileHandle:" + fileHandle);
                 }
 
@@ -1132,7 +1133,6 @@ public class UrsParser extends Parser {
             createIndexes();
         }
 
-
     }
 
     private class ObjectDBID extends Message {
@@ -1205,7 +1205,6 @@ public class UrsParser extends Parser {
         public void FinalizeDB() throws SQLException {
             createIndexes();
         }
-
 
     }
 
@@ -1301,7 +1300,6 @@ public class UrsParser extends Parser {
             getM_dbAccessor().runQuery("drop index if exists " + tabName() + "_levelID;");
             getM_dbAccessor().runQuery("drop index if exists " + tabName() + "_MSGID;");
         }
-
 
     }
 
