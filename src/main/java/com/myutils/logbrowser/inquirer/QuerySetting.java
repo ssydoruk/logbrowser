@@ -50,97 +50,7 @@ public final class QuerySetting extends javax.swing.JDialog {
     private ReferenceType lastRefType;
     private HashMap<TableType, ArrayList<OptionNode>> savedLogMessages;
     private JList<TableType> lAppType;
-    // Variables declaration - do not modify                     
-    private javax.swing.JButton btCancel;
-    private javax.swing.JButton btOK;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel10;
-    private javax.swing.JLabel jLabel11;
-    private javax.swing.JLabel jLabel12;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel4;
-    private javax.swing.JLabel jLabel5;
-    private javax.swing.JLabel jLabel6;
-    private javax.swing.JLabel jLabel7;
-    private javax.swing.JLabel jLabel8;
-    private javax.swing.JLabel jLabel9;
-    private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel10;
-    private javax.swing.JPanel jPanel11;
-    private javax.swing.JPanel jPanel12;
-    private javax.swing.JPanel jPanel13;
-    private javax.swing.JPanel jPanel14;
-    private javax.swing.JPanel jPanel15;
-    private javax.swing.JPanel jPanel16;
-    private javax.swing.JPanel jPanel17;
-    private javax.swing.JPanel jPanel18;
-    private javax.swing.JPanel jPanel19;
-    private javax.swing.JPanel jPanel2;
-    private javax.swing.JPanel jPanel20;
-    private javax.swing.JPanel jPanel21;
-    private javax.swing.JPanel jPanel22;
-    private javax.swing.JPanel jPanel23;
-    private javax.swing.JPanel jPanel24;
-    private javax.swing.JPanel jPanel25;
-    private javax.swing.JPanel jPanel26;
-    private javax.swing.JPanel jPanel27;
-    private javax.swing.JPanel jPanel28;
-    private javax.swing.JPanel jPanel29;
-    private javax.swing.JPanel jPanel3;
-    private javax.swing.JPanel jPanel30;
-    private javax.swing.JPanel jPanel31;
-    private javax.swing.JPanel jPanel32;
-    private javax.swing.JPanel jPanel34;
-    private javax.swing.JPanel jPanel35;
-    private javax.swing.JPanel jPanel4;
-    private javax.swing.JPanel jPanel5;
-    private javax.swing.JPanel jPanel6;
-    private javax.swing.JPanel jPanel7;
-    private javax.swing.JPanel jPanel8;
-    private javax.swing.JPanel jPanel9;
-    private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JScrollPane jScrollPane3;
-    private javax.swing.JTabbedPane jTabbedPane1;
-    private javax.swing.JTabbedPane jTabbedPane2;
-    private javax.swing.JButton jbConstantAdd;
-    private javax.swing.JButton jbConstantRemove;
-    private javax.swing.JButton jbConstantRename;
-    private javax.swing.JButton jbTheConstantAdd;
-    private javax.swing.JButton jbTheConstantPaste;
-    private javax.swing.JButton jbTheConstantRemove;
-    private javax.swing.JButton jbTheConstantRename;
-    private javax.swing.JCheckBox jcbAccessFiles;
-    private javax.swing.JCheckBox jcbDoSkip;
-    private javax.swing.JCheckBox jcbIncludeOrderBy;
-    private javax.swing.JCheckBox jcbLimitQueryResults;
-    private javax.swing.JCheckBox jcbNewTLibSearch;
-    private javax.swing.JCheckBox jcbPrintLogFileName;
-    private javax.swing.JCheckBox jcbShowFullDate;
-    private javax.swing.JCheckBox jcbSort;
-    private javax.swing.JCheckBox jcbignoreFormatting;
-    private javax.swing.JList<InquirerCfg.GenesysConstant> jlConstants;
-    private javax.swing.JPanel jpAllRefs;
-    private javax.swing.JPanel jpConstants;
-    private javax.swing.JPanel jpFileTypes;
-    private javax.swing.JPanel jpGenesysMessages;
-    private javax.swing.JPanel jpLogMessages;
-    private javax.swing.JPanel jpOutput;
-    private javax.swing.JPanel jpReferences;
-    private javax.swing.JPanel jpRegExps;
-    private javax.swing.JSpinner jsMaxQueryLines;
-    private javax.swing.JSpinner jsMaxRecords;
-    private javax.swing.JTable jtConstants;
-    private javax.swing.JFormattedTextField jtfFileSize;
-    private javax.swing.JTextField jtfLinuxEditor;
-    private javax.swing.JTextField jtfTitleRegex;
-    private javax.swing.JPanel pAppType;
-    private javax.swing.JPanel pRefTypes;
-    private javax.swing.JTextArea taRegExs;
-    private javax.swing.JTextField tfFileNameExcel;
-    private javax.swing.JTextField tfFileNameLong;
-    private javax.swing.JTextField tfFileNameShort;
+   
     public QuerySetting(java.awt.Frame parent, boolean modal, InquirerCfg cr) {
         super(parent, modal);
         setTitle("Settings");
@@ -514,17 +424,20 @@ public final class QuerySetting extends javax.swing.JDialog {
         jcbPrintLogFileName = new javax.swing.JCheckBox();
         jcbignoreFormatting = new javax.swing.JCheckBox();
         jcbShowFullDate = new javax.swing.JCheckBox();
-        jPanel9 = new javax.swing.JPanel();
+        jpQuery = new javax.swing.JPanel();
         jPanel27 = new javax.swing.JPanel();
+        jPanel36 = new javax.swing.JPanel();
+        jcbLimitQueryResults = new javax.swing.JCheckBox();
         jPanel26 = new javax.swing.JPanel();
         jLabel4 = new javax.swing.JLabel();
         jsMaxQueryLines = new javax.swing.JSpinner();
-        jcbLimitQueryResults = new javax.swing.JCheckBox();
+        jPanel33 = new javax.swing.JPanel();
         jcbIncludeOrderBy = new javax.swing.JCheckBox();
         jcbAccessFiles = new javax.swing.JCheckBox();
         jcbSort = new javax.swing.JCheckBox();
         jcbNewTLibSearch = new javax.swing.JCheckBox();
-        jPanel12 = new javax.swing.JPanel();
+        jPanel37 = new javax.swing.JPanel();
+        jpGUI = new javax.swing.JPanel();
         jPanel35 = new javax.swing.JPanel();
         jPanel34 = new javax.swing.JPanel();
         jLabel12 = new javax.swing.JLabel();
@@ -533,7 +446,6 @@ public final class QuerySetting extends javax.swing.JDialog {
         jLabel6 = new javax.swing.JLabel();
         jtfTitleRegex = new javax.swing.JTextField();
         jpConstants = new javax.swing.JPanel();
-        jPanel31 = new javax.swing.JPanel();
         jPanel13 = new javax.swing.JPanel();
         jPanel14 = new javax.swing.JPanel();
         jPanel30 = new javax.swing.JPanel();
@@ -546,7 +458,6 @@ public final class QuerySetting extends javax.swing.JDialog {
         jbConstantAdd = new javax.swing.JButton();
         jbConstantRemove = new javax.swing.JButton();
         jbConstantRename = new javax.swing.JButton();
-        jPanel29 = new javax.swing.JPanel();
         jPanel16 = new javax.swing.JPanel();
         jPanel20 = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
@@ -582,12 +493,12 @@ public final class QuerySetting extends javax.swing.JDialog {
         javax.swing.GroupLayout pRefTypesLayout = new javax.swing.GroupLayout(pRefTypes);
         pRefTypes.setLayout(pRefTypesLayout);
         pRefTypesLayout.setHorizontalGroup(
-                pRefTypesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGap(0, 183, Short.MAX_VALUE)
+            pRefTypesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 183, Short.MAX_VALUE)
         );
         pRefTypesLayout.setVerticalGroup(
-                pRefTypesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGap(0, 491, Short.MAX_VALUE)
+            pRefTypesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 451, Short.MAX_VALUE)
         );
 
         jPanel5.add(pRefTypes);
@@ -646,22 +557,22 @@ public final class QuerySetting extends javax.swing.JDialog {
         javax.swing.GroupLayout jPanel22Layout = new javax.swing.GroupLayout(jPanel22);
         jPanel22.setLayout(jPanel22Layout);
         jPanel22Layout.setHorizontalGroup(
-                jPanel22Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(jPanel22Layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addComponent(jLabel5)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(tfFileNameLong, javax.swing.GroupLayout.PREFERRED_SIZE, 438, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addContainerGap())
+            jPanel22Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel22Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jLabel5)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(tfFileNameLong, javax.swing.GroupLayout.PREFERRED_SIZE, 438, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
         );
         jPanel22Layout.setVerticalGroup(
-                jPanel22Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(jPanel22Layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addGroup(jPanel22Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                        .addComponent(tfFileNameLong, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addComponent(jLabel5))
-                                .addContainerGap())
+            jPanel22Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel22Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel22Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(tfFileNameLong, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel5))
+                .addContainerGap())
         );
 
         jPanel8.add(jPanel22);
@@ -673,12 +584,12 @@ public final class QuerySetting extends javax.swing.JDialog {
         javax.swing.GroupLayout jpFileTypesLayout = new javax.swing.GroupLayout(jpFileTypes);
         jpFileTypes.setLayout(jpFileTypesLayout);
         jpFileTypesLayout.setHorizontalGroup(
-                jpFileTypesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGap(0, 171, Short.MAX_VALUE)
+            jpFileTypesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 171, Short.MAX_VALUE)
         );
         jpFileTypesLayout.setVerticalGroup(
-                jpFileTypesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGap(0, 110, Short.MAX_VALUE)
+            jpFileTypesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 110, Short.MAX_VALUE)
         );
 
         jpRegExps.setBorder(javax.swing.BorderFactory.createTitledBorder("Regexps list"));
@@ -701,29 +612,29 @@ public final class QuerySetting extends javax.swing.JDialog {
         javax.swing.GroupLayout jPanel7Layout = new javax.swing.GroupLayout(jPanel7);
         jPanel7.setLayout(jPanel7Layout);
         jPanel7Layout.setHorizontalGroup(
-                jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(jPanel7Layout.createSequentialGroup()
-                                .addGap(22, 22, 22)
-                                .addComponent(jpFileTypes, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(jpRegExps, javax.swing.GroupLayout.DEFAULT_SIZE, 793, Short.MAX_VALUE)
-                                .addContainerGap())
-                        .addGroup(jPanel7Layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addComponent(jcbDoSkip)
-                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel7Layout.createSequentialGroup()
+                .addGap(22, 22, 22)
+                .addComponent(jpFileTypes, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jpRegExps, javax.swing.GroupLayout.DEFAULT_SIZE, 556, Short.MAX_VALUE)
+                .addContainerGap())
+            .addGroup(jPanel7Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jcbDoSkip)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel7Layout.setVerticalGroup(
-                jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel7Layout.createSequentialGroup()
-                                .addComponent(jcbDoSkip)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addComponent(jpRegExps, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                        .addGroup(jPanel7Layout.createSequentialGroup()
-                                                .addComponent(jpFileTypes, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                .addGap(0, 0, Short.MAX_VALUE)))
-                                .addContainerGap())
+            jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel7Layout.createSequentialGroup()
+                .addComponent(jcbDoSkip)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jpRegExps, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(jPanel7Layout.createSequentialGroup()
+                        .addComponent(jpFileTypes, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, Short.MAX_VALUE)))
+                .addContainerGap())
         );
 
         jPanel8.add(jPanel7);
@@ -739,22 +650,22 @@ public final class QuerySetting extends javax.swing.JDialog {
         javax.swing.GroupLayout jPanel23Layout = new javax.swing.GroupLayout(jPanel23);
         jPanel23.setLayout(jPanel23Layout);
         jPanel23Layout.setHorizontalGroup(
-                jPanel23Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(jPanel23Layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addComponent(jLabel7)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(tfFileNameExcel, javax.swing.GroupLayout.PREFERRED_SIZE, 432, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addContainerGap())
+            jPanel23Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel23Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jLabel7)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(tfFileNameExcel, javax.swing.GroupLayout.PREFERRED_SIZE, 432, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
         );
         jPanel23Layout.setVerticalGroup(
-                jPanel23Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(jPanel23Layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addGroup(jPanel23Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                        .addComponent(tfFileNameExcel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addComponent(jLabel7))
-                                .addContainerGap())
+            jPanel23Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel23Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel23Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(tfFileNameExcel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel7))
+                .addContainerGap())
         );
 
         jPanel8.add(jPanel23);
@@ -768,25 +679,25 @@ public final class QuerySetting extends javax.swing.JDialog {
         javax.swing.GroupLayout jPanel24Layout = new javax.swing.GroupLayout(jPanel24);
         jPanel24.setLayout(jPanel24Layout);
         jPanel24Layout.setHorizontalGroup(
-                jPanel24Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(jPanel24Layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addComponent(jLabel8)
-                                .addGap(2, 2, 2)
-                                .addComponent(jtfFileSize, javax.swing.GroupLayout.PREFERRED_SIZE, 106, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jLabel9)
-                                .addContainerGap())
+            jPanel24Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel24Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jLabel8)
+                .addGap(2, 2, 2)
+                .addComponent(jtfFileSize, javax.swing.GroupLayout.PREFERRED_SIZE, 106, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jLabel9)
+                .addContainerGap())
         );
         jPanel24Layout.setVerticalGroup(
-                jPanel24Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(jPanel24Layout.createSequentialGroup()
-                                .addContainerGap()
-                                .addGroup(jPanel24Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                        .addComponent(jLabel8)
-                                        .addComponent(jLabel9)
-                                        .addComponent(jtfFileSize, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addContainerGap())
+            jPanel24Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel24Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel24Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel8)
+                    .addComponent(jLabel9)
+                    .addComponent(jtfFileSize, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap())
         );
 
         jPanel8.add(jPanel24);
@@ -807,25 +718,25 @@ public final class QuerySetting extends javax.swing.JDialog {
         javax.swing.GroupLayout jPanel11Layout = new javax.swing.GroupLayout(jPanel11);
         jPanel11.setLayout(jPanel11Layout);
         jPanel11Layout.setHorizontalGroup(
-                jPanel11Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(jPanel11Layout.createSequentialGroup()
-                                .addGap(21, 21, 21)
-                                .addGroup(jPanel11Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addComponent(jcbShowFullDate)
-                                        .addComponent(jcbignoreFormatting)
-                                        .addComponent(jcbPrintLogFileName))
-                                .addContainerGap(711, Short.MAX_VALUE))
+            jPanel11Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel11Layout.createSequentialGroup()
+                .addGap(21, 21, 21)
+                .addGroup(jPanel11Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jcbShowFullDate)
+                    .addComponent(jcbignoreFormatting)
+                    .addComponent(jcbPrintLogFileName))
+                .addContainerGap(524, Short.MAX_VALUE))
         );
         jPanel11Layout.setVerticalGroup(
-                jPanel11Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(jPanel11Layout.createSequentialGroup()
-                                .addGap(19, 19, 19)
-                                .addComponent(jcbPrintLogFileName)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jcbignoreFormatting)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jcbShowFullDate)
-                                .addContainerGap(361, Short.MAX_VALUE))
+            jPanel11Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel11Layout.createSequentialGroup()
+                .addGap(19, 19, 19)
+                .addComponent(jcbPrintLogFileName)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jcbignoreFormatting)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jcbShowFullDate)
+                .addContainerGap(341, Short.MAX_VALUE))
         );
 
         jTabbedPane2.addTab("Formated", jPanel11);
@@ -834,11 +745,15 @@ public final class QuerySetting extends javax.swing.JDialog {
 
         jTabbedPane1.addTab("Output", jpOutput);
 
-        jPanel9.setLayout(new javax.swing.BoxLayout(jPanel9, javax.swing.BoxLayout.LINE_AXIS));
+        jpQuery.setLayout(new javax.swing.BoxLayout(jpQuery, javax.swing.BoxLayout.LINE_AXIS));
 
         jPanel27.setLayout(new javax.swing.BoxLayout(jPanel27, javax.swing.BoxLayout.PAGE_AXIS));
 
-        jPanel26.setLayout(new javax.swing.BoxLayout(jPanel26, javax.swing.BoxLayout.LINE_AXIS));
+        jPanel36.setLayout(new javax.swing.BoxLayout(jPanel36, javax.swing.BoxLayout.LINE_AXIS));
+
+        jcbLimitQueryResults.setSelected(true);
+        jcbLimitQueryResults.setText("Limit results in a query");
+        jPanel36.add(jcbLimitQueryResults);
 
         jLabel4.setText("max results in a query");
         jPanel26.add(jLabel4);
@@ -846,33 +761,48 @@ public final class QuerySetting extends javax.swing.JDialog {
         jsMaxQueryLines.setModel(new javax.swing.SpinnerNumberModel(2000, 0, null, 1));
         jPanel26.add(jsMaxQueryLines);
 
-        jPanel27.add(jPanel26);
+        jPanel36.add(jPanel26);
 
-        jcbLimitQueryResults.setSelected(true);
-        jcbLimitQueryResults.setText("Limit results in a query");
-        jPanel27.add(jcbLimitQueryResults);
+        jPanel27.add(jPanel36);
+
+        jPanel33.setLayout(new javax.swing.BoxLayout(jPanel33, javax.swing.BoxLayout.PAGE_AXIS));
 
         jcbIncludeOrderBy.setSelected(true);
         jcbIncludeOrderBy.setText("Include \"ORDER BY\" in requests");
-        jPanel27.add(jcbIncludeOrderBy);
+        jPanel33.add(jcbIncludeOrderBy);
 
         jcbAccessFiles.setSelected(true);
         jcbAccessFiles.setText("access log files while printing (uncheck for huge amount of logs)");
-        jPanel27.add(jcbAccessFiles);
+        jPanel33.add(jcbAccessFiles);
 
         jcbSort.setSelected(true);
         jcbSort.setText("sort results (uncheck for huge amount of logs)");
-        jPanel27.add(jcbSort);
+        jPanel33.add(jcbSort);
 
         jcbNewTLibSearch.setSelected(true);
         jcbNewTLibSearch.setText("use new TLib search procedure");
-        jPanel27.add(jcbNewTLibSearch);
+        jPanel33.add(jcbNewTLibSearch);
 
-        jPanel9.add(jPanel27);
+        jPanel27.add(jPanel33);
 
-        jTabbedPane1.addTab("Query", jPanel9);
+        javax.swing.GroupLayout jPanel37Layout = new javax.swing.GroupLayout(jPanel37);
+        jPanel37.setLayout(jPanel37Layout);
+        jPanel37Layout.setHorizontalGroup(
+            jPanel37Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 807, Short.MAX_VALUE)
+        );
+        jPanel37Layout.setVerticalGroup(
+            jPanel37Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 355, Short.MAX_VALUE)
+        );
 
-        jPanel12.setLayout(new javax.swing.BoxLayout(jPanel12, javax.swing.BoxLayout.PAGE_AXIS));
+        jPanel27.add(jPanel37);
+
+        jpQuery.add(jPanel27);
+
+        jTabbedPane1.addTab("Query", jpQuery);
+
+        jpGUI.setLayout(new javax.swing.BoxLayout(jpGUI, javax.swing.BoxLayout.PAGE_AXIS));
 
         jPanel34.setLayout(new java.awt.GridLayout(1, 1));
 
@@ -890,24 +820,11 @@ public final class QuerySetting extends javax.swing.JDialog {
 
         jPanel35.add(jPanel28);
 
-        jPanel12.add(jPanel35);
+        jpGUI.add(jPanel35);
 
-        jTabbedPane1.addTab("GUI", jPanel12);
+        jTabbedPane1.addTab("GUI", jpGUI);
 
         jpConstants.setLayout(new java.awt.BorderLayout());
-
-        javax.swing.GroupLayout jPanel31Layout = new javax.swing.GroupLayout(jPanel31);
-        jPanel31.setLayout(jPanel31Layout);
-        jPanel31Layout.setHorizontalGroup(
-                jPanel31Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGap(0, 1073, Short.MAX_VALUE)
-        );
-        jPanel31Layout.setVerticalGroup(
-                jPanel31Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGap(0, 100, Short.MAX_VALUE)
-        );
-
-        jpConstants.add(jPanel31, java.awt.BorderLayout.PAGE_START);
 
         jPanel13.setLayout(new javax.swing.BoxLayout(jPanel13, javax.swing.BoxLayout.LINE_AXIS));
 
@@ -959,19 +876,6 @@ public final class QuerySetting extends javax.swing.JDialog {
 
         jPanel30.add(jPanel15);
 
-        javax.swing.GroupLayout jPanel29Layout = new javax.swing.GroupLayout(jPanel29);
-        jPanel29.setLayout(jPanel29Layout);
-        jPanel29Layout.setHorizontalGroup(
-                jPanel29Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGap(0, 578, Short.MAX_VALUE)
-        );
-        jPanel29Layout.setVerticalGroup(
-                jPanel29Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGap(0, 177, Short.MAX_VALUE)
-        );
-
-        jPanel30.add(jPanel29);
-
         jPanel14.add(jPanel30);
 
         jPanel16.setLayout(new javax.swing.BoxLayout(jPanel16, javax.swing.BoxLayout.PAGE_AXIS));
@@ -983,12 +887,12 @@ public final class QuerySetting extends javax.swing.JDialog {
         jScrollPane1.setAutoscrolls(true);
 
         jtConstants.setModel(new javax.swing.table.DefaultTableModel(
-                new Object[][]{
+            new Object [][] {
 
-                },
-                new String[]{
+            },
+            new String [] {
 
-                }
+            }
         ));
         jtConstants.setCellSelectionEnabled(true);
         jScrollPane1.setViewportView(jtConstants);
@@ -1035,12 +939,12 @@ public final class QuerySetting extends javax.swing.JDialog {
         javax.swing.GroupLayout jPanel32Layout = new javax.swing.GroupLayout(jPanel32);
         jPanel32.setLayout(jPanel32Layout);
         jPanel32Layout.setHorizontalGroup(
-                jPanel32Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGap(0, 26, Short.MAX_VALUE)
+            jPanel32Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 26, Short.MAX_VALUE)
         );
         jPanel32Layout.setVerticalGroup(
-                jPanel32Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGap(0, 407, Short.MAX_VALUE)
+            jPanel32Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 467, Short.MAX_VALUE)
         );
 
         jPanel13.add(jPanel32);
@@ -1075,12 +979,12 @@ public final class QuerySetting extends javax.swing.JDialog {
         javax.swing.GroupLayout jPanel25Layout = new javax.swing.GroupLayout(jPanel25);
         jPanel25.setLayout(jPanel25Layout);
         jPanel25Layout.setHorizontalGroup(
-                jPanel25Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGap(0, 933, Short.MAX_VALUE)
+            jPanel25Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 663, Short.MAX_VALUE)
         );
         jPanel25Layout.setVerticalGroup(
-                jPanel25Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGap(0, 29, Short.MAX_VALUE)
+            jPanel25Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 23, Short.MAX_VALUE)
         );
 
         jPanel1.add(jPanel25);
@@ -1299,7 +1203,100 @@ public final class QuerySetting extends javax.swing.JDialog {
 
 // TODO add your handling code here:
     }//GEN-LAST:event_jbConstantRemoveActionPerformed
-    // End of variables declaration                   
+
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btCancel;
+    private javax.swing.JButton btOK;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel10;
+    private javax.swing.JLabel jLabel11;
+    private javax.swing.JLabel jLabel12;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
+    private javax.swing.JLabel jLabel7;
+    private javax.swing.JLabel jLabel8;
+    private javax.swing.JLabel jLabel9;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel10;
+    private javax.swing.JPanel jPanel11;
+    private javax.swing.JPanel jPanel13;
+    private javax.swing.JPanel jPanel14;
+    private javax.swing.JPanel jPanel15;
+    private javax.swing.JPanel jPanel16;
+    private javax.swing.JPanel jPanel17;
+    private javax.swing.JPanel jPanel18;
+    private javax.swing.JPanel jPanel19;
+    private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel20;
+    private javax.swing.JPanel jPanel21;
+    private javax.swing.JPanel jPanel22;
+    private javax.swing.JPanel jPanel23;
+    private javax.swing.JPanel jPanel24;
+    private javax.swing.JPanel jPanel25;
+    private javax.swing.JPanel jPanel26;
+    private javax.swing.JPanel jPanel27;
+    private javax.swing.JPanel jPanel28;
+    private javax.swing.JPanel jPanel3;
+    private javax.swing.JPanel jPanel30;
+    private javax.swing.JPanel jPanel32;
+    private javax.swing.JPanel jPanel33;
+    private javax.swing.JPanel jPanel34;
+    private javax.swing.JPanel jPanel35;
+    private javax.swing.JPanel jPanel36;
+    private javax.swing.JPanel jPanel37;
+    private javax.swing.JPanel jPanel4;
+    private javax.swing.JPanel jPanel5;
+    private javax.swing.JPanel jPanel6;
+    private javax.swing.JPanel jPanel7;
+    private javax.swing.JPanel jPanel8;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JTabbedPane jTabbedPane1;
+    private javax.swing.JTabbedPane jTabbedPane2;
+    private javax.swing.JButton jbConstantAdd;
+    private javax.swing.JButton jbConstantRemove;
+    private javax.swing.JButton jbConstantRename;
+    private javax.swing.JButton jbTheConstantAdd;
+    private javax.swing.JButton jbTheConstantPaste;
+    private javax.swing.JButton jbTheConstantRemove;
+    private javax.swing.JButton jbTheConstantRename;
+    private javax.swing.JCheckBox jcbAccessFiles;
+    private javax.swing.JCheckBox jcbDoSkip;
+    private javax.swing.JCheckBox jcbIncludeOrderBy;
+    private javax.swing.JCheckBox jcbLimitQueryResults;
+    private javax.swing.JCheckBox jcbNewTLibSearch;
+    private javax.swing.JCheckBox jcbPrintLogFileName;
+    private javax.swing.JCheckBox jcbShowFullDate;
+    private javax.swing.JCheckBox jcbSort;
+    private javax.swing.JCheckBox jcbignoreFormatting;
+    private javax.swing.JList<InquirerCfg.GenesysConstant> jlConstants;
+    private javax.swing.JPanel jpAllRefs;
+    private javax.swing.JPanel jpConstants;
+    private javax.swing.JPanel jpFileTypes;
+    private javax.swing.JPanel jpGUI;
+    private javax.swing.JPanel jpGenesysMessages;
+    private javax.swing.JPanel jpLogMessages;
+    private javax.swing.JPanel jpOutput;
+    private javax.swing.JPanel jpQuery;
+    private javax.swing.JPanel jpReferences;
+    private javax.swing.JPanel jpRegExps;
+    private javax.swing.JSpinner jsMaxQueryLines;
+    private javax.swing.JSpinner jsMaxRecords;
+    private javax.swing.JTable jtConstants;
+    private javax.swing.JFormattedTextField jtfFileSize;
+    private javax.swing.JTextField jtfLinuxEditor;
+    private javax.swing.JTextField jtfTitleRegex;
+    private javax.swing.JPanel pAppType;
+    private javax.swing.JPanel pRefTypes;
+    private javax.swing.JTextArea taRegExs;
+    private javax.swing.JTextField tfFileNameExcel;
+    private javax.swing.JTextField tfFileNameLong;
+    private javax.swing.JTextField tfFileNameShort;
+    // End of variables declaration//GEN-END:variables
 
     private static class ConstantsModel extends AbstractTableModel {
 

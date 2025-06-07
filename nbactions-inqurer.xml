@@ -10,12 +10,12 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:3.1.0:exec</goal>
             </goals>
             <properties>
-                <exec.vmArgs>-Dlog4j.configurationFile=/Users/ssydoruk/GCTI/etc/logbrowser/logbr.log4j2.inquirer-dev.xml -Dsun.java2d.d3d=false -Dall=1 -Dsqlite.pragma=true -Dtlib.norequest=false -Dtimediff.parse=false -Djacob.dll=/Users/ssydoruk/GCTI/bin/logbrowser/jacob-1.20-x64.dll -Dlogbr.dir=.tmp -D_log4j2.debug -XX:+UnlockExperimentalVMOptions -XX:+EnableJVMCI</exec.vmArgs>
+                <exec.vmArgs>-Dlog4j.configurationFile=C:\Users\ssydo\GCTI\etc\logbrowser\logbr.log4j2.inquirer-dev.xml -Dsun.java2d.d3d=false -Dall=1 -Dsqlite.pragma=true -Dtlib.norequest=false -Dtimediff.parse=false -Djacob.dll=C:\Users\ssydo\GCTI\bin\logbrowser/jacob-1.20-x64.dll -Dlogbr.dir=.tmp -D_log4j2.debug -XX:+UnlockExperimentalVMOptions -XX:+EnableJVMCI</exec.vmArgs>
                 <exec.args>${exec.vmArgs} -classpath %classpath ${exec.mainClass} ${exec.appArgs}</exec.args>
-                <exec.appArgs>--dbname=/Users/ssydoruk/work/logs/2024-11-14.UAT/logbr --config=/Users/ssydoruk/GCTI/etc/logbrowser/inquirer.cfg.json --basedir=/Users/ssydoruk/work/logs/2024-11-14.UAT/ --outputspec=/Users/ssydoruk/GCTI/etc/logbrowser/outputspec3.xml</exec.appArgs>
+                <exec.appArgs>--dbname=C:\src\tmp\2024-12-10.PROD\logbr --config=C:\Users\ssydo\GCTI\etc\logbrowser\inquirer.cfg.json --basedir=C:\src\tmp\2024-12-10.PROD --outputspec=C:\Users\ssydo\GCTI\etc\logbrowser\outputspec3.xml</exec.appArgs>
                 <exec.mainClass>com.myutils.logbrowser.inquirer.inquirer</exec.mainClass>
                 <exec.executable>java</exec.executable>
-                <exec.workingdir>/Users/ssydoruk/work/logs/2024-11-14.UAT/</exec.workingdir>
+                <exec.workingdir>C:\src\tmp\2024-12-10.PROD</exec.workingdir>
             </properties>
         </action>
         <action>
@@ -28,13 +28,13 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:3.1.0:exec</goal>
             </goals>
             <properties>
-                <exec.vmArgs>-Dlog4j.configurationFile=/Users/ssydoruk/GCTI/etc/logbrowser/logbr.log4j2.inquirer-dev.xml -Dsun.java2d.d3d=false -Dall=1 -Dsqlite.pragma=true -Dtlib.norequest=false -Dtimediff.parse=false -Djacob.dll=/Users/ssydoruk/GCTI/bin/logbrowser/jacob-1.20-x64.dll -Dlogbr.dir=.tmp -D_log4j2.debug -XX:+UnlockExperimentalVMOptions -XX:+EnableJVMCI -agentlib:jdwp=transport=dt_socket,server=n,address=${jpda.address}</exec.vmArgs>
+                <exec.vmArgs>-Dlog4j.configurationFile=C:\Users\ssydo\GCTI\etc\logbrowser\logbr.log4j2.inquirer-dev.xml -Dsun.java2d.d3d=false -Dall=1 -Dsqlite.pragma=true -Dtlib.norequest=false -Dtimediff.parse=false -Djacob.dll=C:\Users\ssydo\GCTI\bin\logbrowser/jacob-1.20-x64.dll -Dlogbr.dir=.tmp -D_log4j2.debug -XX:+UnlockExperimentalVMOptions -XX:+EnableJVMCI -agentlib:jdwp=transport=dt_socket,server=n,address=${jpda.address}</exec.vmArgs>
                 <exec.args>${exec.vmArgs} -classpath %classpath ${exec.mainClass} ${exec.appArgs}</exec.args>
-                <exec.appArgs>--dbname=/Users/ssydoruk/work/logs/2024-11-14.UAT/logbr --config=/Users/ssydoruk/GCTI/etc/logbrowser/inquirer.cfg.json --basedir=/Users/ssydoruk/work/logs/2024-11-14.UAT/ --outputspec=/Users/ssydoruk/GCTI/etc/logbrowser/outputspec3.xml</exec.appArgs>
+                <exec.appArgs>--dbname=C:\src\tmp\2024-12-10.PROD\logbr --config=C:\Users\ssydo\GCTI\etc\logbrowser\inquirer.cfg.json --basedir=C:\src\tmp\2024-12-10.PROD --outputspec=C:\Users\ssydo\GCTI\etc\logbrowser\outputspec3.xml</exec.appArgs>
                 <exec.mainClass>com.myutils.logbrowser.inquirer.inquirer</exec.mainClass>
                 <exec.executable>java</exec.executable>
                 <jpda.listen>true</jpda.listen>
-                <exec.workingdir>/Users/ssydoruk/work/logs/2024-11-14.UAT/</exec.workingdir>
+                <exec.workingdir>C:\src\tmp\2024-12-10.PROD</exec.workingdir>
             </properties>
         </action>
         <action>
@@ -47,12 +47,12 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:3.1.0:exec</goal>
             </goals>
             <properties>
-                <exec.vmArgs>-Dlog4j.configurationFile=/Users/ssydoruk/GCTI/etc/logbrowser/logbr.log4j2.inquirer-dev.xml -Dsun.java2d.d3d=false -Dall=1 -Dsqlite.pragma=true -Dtlib.norequest=false -Dtimediff.parse=false -Djacob.dll=/Users/ssydoruk/GCTI/bin/logbrowser/jacob-1.20-x64.dll -Dlogbr.dir=.tmp -D_log4j2.debug -XX:+UnlockExperimentalVMOptions -XX:+EnableJVMCI</exec.vmArgs>
+                <exec.vmArgs>-Dlog4j.configurationFile=C:\Users\ssydo\GCTI\etc\logbrowser\logbr.log4j2.inquirer-dev.xml -Dsun.java2d.d3d=false -Dall=1 -Dsqlite.pragma=true -Dtlib.norequest=false -Dtimediff.parse=false -Djacob.dll=C:\Users\ssydo\GCTI\bin\logbrowser/jacob-1.20-x64.dll -Dlogbr.dir=.tmp -D_log4j2.debug -XX:+UnlockExperimentalVMOptions -XX:+EnableJVMCI</exec.vmArgs>
                 <exec.args>${exec.vmArgs} -classpath %classpath ${exec.mainClass} ${exec.appArgs}</exec.args>
                 <exec.mainClass>com.myutils.logbrowser.inquirer.inquirer</exec.mainClass>
                 <exec.executable>java</exec.executable>
-                <exec.appArgs>--dbname=/Users/ssydoruk/work/logs/2024-11-14.UAT/logbr --config=/Users/ssydoruk/GCTI/etc/logbrowser/inquirer.cfg.json --basedir=/Users/ssydoruk/work/logs/2024-11-14.UAT/ --outputspec=/Users/ssydoruk/GCTI/etc/logbrowser/outputspec3.xml</exec.appArgs>
-                <exec.workingdir>/Users/ssydoruk/work/logs/2024-11-14.UAT/</exec.workingdir>
+                <exec.appArgs>--dbname=C:\src\tmp\2024-12-10.PROD\logbr --config=C:\Users\ssydo\GCTI\etc\logbrowser\inquirer.cfg.json --basedir=C:\src\tmp\2024-12-10.PROD --outputspec=C:\Users\ssydo\GCTI\etc\logbrowser\outputspec3.xml</exec.appArgs>
+                <exec.workingdir>C:\src\tmp\2024-12-10.PROD</exec.workingdir>
             </properties>
         </action>
     </actions>
