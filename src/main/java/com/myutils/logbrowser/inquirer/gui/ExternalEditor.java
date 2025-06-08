@@ -113,7 +113,7 @@ public abstract class ExternalEditor {
     static public void openNotepad(String fileName, int line) {
 
         String[] cmd = {
-            "C:\\Program Files\\Notepad++\\notepad++.exe",
+            inquirer.getCr().getNotepadPath(),
             "-n" + line,
             fileName
         };
