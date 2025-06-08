@@ -989,7 +989,7 @@ public final class QuerySetting extends javax.swing.JDialog {
 
         jpConstants.add(jPanel14, java.awt.BorderLayout.PAGE_START);
 
-        jPanel13.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+        jPanel13.setLayout(new javax.swing.BoxLayout(jPanel13, javax.swing.BoxLayout.LINE_AXIS));
         jpConstants.add(jPanel13, java.awt.BorderLayout.CENTER);
 
         jTabbedPane1.addTab("Constants", jpConstants);
