@@ -48,6 +48,7 @@ public abstract class ExternalEditor {
         if (editor == null) {
 
             if (Utils.Util.getOS() == Util.OS.WINDOWS) {
+//                inquirer.getCr().
                 inquirer.logger.debug("is windows");
                 editor = new EditorWindows();
             } else {

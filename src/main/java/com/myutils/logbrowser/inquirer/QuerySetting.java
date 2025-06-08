@@ -9,6 +9,10 @@ import com.jidesoft.swing.CheckBoxListSelectionModel;
 import com.jidesoft.swing.SearchableUtils;
 import com.myutils.logbrowser.indexer.ReferenceType;
 import com.myutils.logbrowser.indexer.TableType;
+import static com.myutils.logbrowser.inquirer.EditorType.NONE;
+import static com.myutils.logbrowser.inquirer.EditorType.NotepadPP;
+import static com.myutils.logbrowser.inquirer.EditorType.VIMActiveX;
+import static com.myutils.logbrowser.inquirer.EditorType.VIMCommandLine;
 import com.myutils.logbrowser.inquirer.InquirerCfg.GenesysConstant;
 import org.apache.logging.log4j.LogManager;
 
@@ -50,7 +54,7 @@ public final class QuerySetting extends javax.swing.JDialog {
     private ReferenceType lastRefType;
     private HashMap<TableType, ArrayList<OptionNode>> savedLogMessages;
     private JList<TableType> lAppType;
-   
+
     public QuerySetting(java.awt.Frame parent, boolean modal, InquirerCfg cr) {
         super(parent, modal);
         setTitle("Settings");
@@ -119,10 +123,28 @@ public final class QuerySetting extends javax.swing.JDialog {
         jcbPrintLogFileName.setSelected(cr.isPrintLogFileName());
         jcbignoreFormatting.setSelected(cr.isIgnoreFormatting());
         jtfTitleRegex.setText(cr.getTitleRegex());
-        jtfLinuxEditor.setText(cr.getLinuxEditor());
+        jtfVIMEditor.setText(cr.getLinuxEditor());
         jcbNewTLibSearch.setSelected(cr.isNewTLibSearch());
 
         jcbShowFullDate.setSelected(cr.isFullTimeStamp());
+        tfNotepadPath.setText(cr.getNotepadPath());
+        switch (cr.getEditorType()) {
+            case NotepadPP:
+                rbNotepad.setSelected(true);
+                break;
+
+            case VIMActiveX:
+                rbVIMActiveX.setSelected(true);
+                break;
+
+            case VIMCommandLine:
+                rbVIM.setSelected(true);
+                break;
+
+            case NONE:
+            default:
+                throw new AssertionError();
+        }
 
         DefaultListModel<InquirerCfg.GenesysConstant> model = new DefaultListModel<InquirerCfg.GenesysConstant>();
         InquirerCfg.GenesysConstants constants = cr.getConstants();
@@ -386,6 +408,7 @@ public final class QuerySetting extends javax.swing.JDialog {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        bgEditor = new javax.swing.ButtonGroup();
         jPanel2 = new javax.swing.JPanel();
         jTabbedPane1 = new javax.swing.JTabbedPane();
         jpReferences = new javax.swing.JPanel();
@@ -438,15 +461,21 @@ public final class QuerySetting extends javax.swing.JDialog {
         jcbNewTLibSearch = new javax.swing.JCheckBox();
         jPanel37 = new javax.swing.JPanel();
         jpGUI = new javax.swing.JPanel();
-        jPanel35 = new javax.swing.JPanel();
-        jPanel34 = new javax.swing.JPanel();
-        jLabel12 = new javax.swing.JLabel();
-        jtfLinuxEditor = new javax.swing.JTextField();
         jPanel28 = new javax.swing.JPanel();
         jLabel6 = new javax.swing.JLabel();
         jtfTitleRegex = new javax.swing.JTextField();
+        jPanel34 = new javax.swing.JPanel();
+        jLabel12 = new javax.swing.JLabel();
+        jtfVIMEditor = new javax.swing.JTextField();
+        jPanel38 = new javax.swing.JPanel();
+        jLabel13 = new javax.swing.JLabel();
+        tfNotepadPath = new javax.swing.JTextField();
+        jPanel12 = new javax.swing.JPanel();
+        rbVIM = new javax.swing.JRadioButton();
+        rbNotepad = new javax.swing.JRadioButton();
+        rbVIMActiveX = new javax.swing.JRadioButton();
+        jPanel9 = new javax.swing.JPanel();
         jpConstants = new javax.swing.JPanel();
-        jPanel13 = new javax.swing.JPanel();
         jPanel14 = new javax.swing.JPanel();
         jPanel30 = new javax.swing.JPanel();
         jPanel15 = new javax.swing.JPanel();
@@ -467,7 +496,7 @@ public final class QuerySetting extends javax.swing.JDialog {
         jbTheConstantRename = new javax.swing.JButton();
         jbTheConstantPaste = new javax.swing.JButton();
         jbTheConstantAdd = new javax.swing.JButton();
-        jPanel32 = new javax.swing.JPanel();
+        jPanel13 = new javax.swing.JPanel();
         jpGenesysMessages = new javax.swing.JPanel();
         jPanel21 = new javax.swing.JPanel();
         jLabel11 = new javax.swing.JLabel();
@@ -802,15 +831,7 @@ public final class QuerySetting extends javax.swing.JDialog {
 
         jTabbedPane1.addTab("Query", jpQuery);
 
-        jpGUI.setLayout(new javax.swing.BoxLayout(jpGUI, javax.swing.BoxLayout.PAGE_AXIS));
-
-        jPanel34.setLayout(new java.awt.GridLayout(1, 1));
-
-        jLabel12.setText("Linux editor path and params");
-        jPanel34.add(jLabel12);
-        jPanel34.add(jtfLinuxEditor);
-
-        jPanel35.add(jPanel34);
+        jpGUI.setLayout(new javax.swing.BoxLayout(jpGUI, javax.swing.BoxLayout.Y_AXIS));
 
         jPanel28.setLayout(new java.awt.GridLayout(1, 1));
 
@@ -818,15 +839,47 @@ public final class QuerySetting extends javax.swing.JDialog {
         jPanel28.add(jLabel6);
         jPanel28.add(jtfTitleRegex);
 
-        jPanel35.add(jPanel28);
+        jpGUI.add(jPanel28);
 
-        jpGUI.add(jPanel35);
+        jPanel34.setLayout(new java.awt.GridLayout(1, 1));
+
+        jLabel12.setText("VIM path and params");
+        jPanel34.add(jLabel12);
+        jPanel34.add(jtfVIMEditor);
+
+        jpGUI.add(jPanel34);
+
+        jPanel38.setLayout(new java.awt.GridLayout(1, 1));
+
+        jLabel13.setText("Notepad++ path and params");
+        jPanel38.add(jLabel13);
+        jPanel38.add(tfNotepadPath);
+
+        jpGUI.add(jPanel38);
+
+        jPanel12.setBorder(javax.swing.BorderFactory.createTitledBorder("Windows editor to use"));
+        jPanel12.setLayout(new java.awt.BorderLayout());
+
+        bgEditor.add(rbVIM);
+        rbVIM.setText("VIM via command line");
+        jPanel12.add(rbVIM, java.awt.BorderLayout.CENTER);
+
+        bgEditor.add(rbNotepad);
+        rbNotepad.setText("Notepad++");
+        jPanel12.add(rbNotepad, java.awt.BorderLayout.PAGE_START);
+
+        bgEditor.add(rbVIMActiveX);
+        rbVIMActiveX.setText("VIM (active X, VIM installed properly)");
+        jPanel12.add(rbVIMActiveX, java.awt.BorderLayout.PAGE_END);
+
+        jpGUI.add(jPanel12);
+
+        jPanel9.setLayout(new java.awt.BorderLayout());
+        jpGUI.add(jPanel9);
 
         jTabbedPane1.addTab("GUI", jpGUI);
 
         jpConstants.setLayout(new java.awt.BorderLayout());
-
-        jPanel13.setLayout(new javax.swing.BoxLayout(jPanel13, javax.swing.BoxLayout.LINE_AXIS));
 
         jPanel14.setLayout(new javax.swing.BoxLayout(jPanel14, javax.swing.BoxLayout.LINE_AXIS));
 
@@ -934,21 +987,9 @@ public final class QuerySetting extends javax.swing.JDialog {
 
         jPanel14.add(jPanel16);
 
-        jPanel13.add(jPanel14);
+        jpConstants.add(jPanel14, java.awt.BorderLayout.PAGE_START);
 
-        javax.swing.GroupLayout jPanel32Layout = new javax.swing.GroupLayout(jPanel32);
-        jPanel32.setLayout(jPanel32Layout);
-        jPanel32Layout.setHorizontalGroup(
-            jPanel32Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 26, Short.MAX_VALUE)
-        );
-        jPanel32Layout.setVerticalGroup(
-            jPanel32Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 467, Short.MAX_VALUE)
-        );
-
-        jPanel13.add(jPanel32);
-
+        jPanel13.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
         jpConstants.add(jPanel13, java.awt.BorderLayout.CENTER);
 
         jTabbedPane1.addTab("Constants", jpConstants);
@@ -1045,7 +1086,19 @@ public final class QuerySetting extends javax.swing.JDialog {
                 inquirer.ExceptionHandler.handleException("Error compiling regex [" + rx + "]: " + e.getMessage(), e);
             }
             cr.setTitleRegex(rx);
-            cr.setLinuxEditor(jtfLinuxEditor.getText());
+            cr.setLinuxEditor(jtfVIMEditor.getText());
+
+            if (rbNotepad.isSelected()) {
+                cr.setEditorType(EditorType.NotepadPP);
+            } else if (rbVIMActiveX.isSelected()) {
+                cr.setEditorType(EditorType.VIMActiveX);
+            } else if (rbVIM.isSelected()) {
+                cr.setEditorType(EditorType.VIMCommandLine);
+            } else {
+                throw new AssertionError();
+            }
+            
+            cr.setNotepadPath(tfNotepadPath.getText());
 
             try {
                 jsMaxRecords.commitEdit();
@@ -1205,12 +1258,14 @@ public final class QuerySetting extends javax.swing.JDialog {
     }//GEN-LAST:event_jbConstantRemoveActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.ButtonGroup bgEditor;
     private javax.swing.JButton btCancel;
     private javax.swing.JButton btOK;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel12;
+    private javax.swing.JLabel jLabel13;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
@@ -1222,6 +1277,7 @@ public final class QuerySetting extends javax.swing.JDialog {
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel10;
     private javax.swing.JPanel jPanel11;
+    private javax.swing.JPanel jPanel12;
     private javax.swing.JPanel jPanel13;
     private javax.swing.JPanel jPanel14;
     private javax.swing.JPanel jPanel15;
@@ -1241,17 +1297,17 @@ public final class QuerySetting extends javax.swing.JDialog {
     private javax.swing.JPanel jPanel28;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel30;
-    private javax.swing.JPanel jPanel32;
     private javax.swing.JPanel jPanel33;
     private javax.swing.JPanel jPanel34;
-    private javax.swing.JPanel jPanel35;
     private javax.swing.JPanel jPanel36;
     private javax.swing.JPanel jPanel37;
+    private javax.swing.JPanel jPanel38;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
     private javax.swing.JPanel jPanel7;
     private javax.swing.JPanel jPanel8;
+    private javax.swing.JPanel jPanel9;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
@@ -1288,14 +1344,18 @@ public final class QuerySetting extends javax.swing.JDialog {
     private javax.swing.JSpinner jsMaxRecords;
     private javax.swing.JTable jtConstants;
     private javax.swing.JFormattedTextField jtfFileSize;
-    private javax.swing.JTextField jtfLinuxEditor;
     private javax.swing.JTextField jtfTitleRegex;
+    private javax.swing.JTextField jtfVIMEditor;
     private javax.swing.JPanel pAppType;
     private javax.swing.JPanel pRefTypes;
+    private javax.swing.JRadioButton rbNotepad;
+    private javax.swing.JRadioButton rbVIM;
+    private javax.swing.JRadioButton rbVIMActiveX;
     private javax.swing.JTextArea taRegExs;
     private javax.swing.JTextField tfFileNameExcel;
     private javax.swing.JTextField tfFileNameLong;
     private javax.swing.JTextField tfFileNameShort;
+    private javax.swing.JTextField tfNotepadPath;
     // End of variables declaration//GEN-END:variables
 
     private static class ConstantsModel extends AbstractTableModel {
@@ -1309,11 +1369,11 @@ public final class QuerySetting extends javax.swing.JDialog {
 
             columnNames
                     = new String[]{
-                    "String value", "Constant ID"
-            };
+                        "String value", "Constant ID"
+                    };
 
             types = new Class[]{
-                    java.lang.String.class, java.lang.Integer.class
+                java.lang.String.class, java.lang.Integer.class
             };
 
         }
