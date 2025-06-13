@@ -10,12 +10,12 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:3.1.0:exec</goal>
             </goals>
             <properties>
-                <exec.vmArgs>-Dlogbr.dir=.tmp -Dlog4j.configurationFile=/Users/ssydoruk/GCTI/etc/logbrowser/logbr.log4j2.indexer-dev.xml -DlogPath=.tmp -Dsun.java2d.d3d=false -Dall=1 -Xms8000m -Xmx8000m -Dsqlite.pragma=true -Dtlib.norequest=false -Dtimediff.parse=false</exec.vmArgs>
+                <exec.vmArgs>-Dlogbr.dir=.tmp -Dlog4j.configurationFile=C:\Users\ssydo\GCTI\etc\logbrowser\logbr.log4j2.indexer-dev.xml -DlogPath=.tmp -Dsun.java2d.d3d=false -Dall=1 -Xms8000m -Xmx8000m -Dsqlite.pragma=true -Dtlib.norequest=false -Dtimediff.parse=false</exec.vmArgs>
                 <exec.args>${exec.vmArgs} -classpath %classpath ${exec.mainClass} ${exec.appArgs}</exec.args>
-                <exec.appArgs>--dbname=/Users/ssydoruk/work/logs/2024-10-14.PROD_iwd_6-12/logbr --basedir=/Users/ssydoruk/work/logs/2024-10-14.PROD_iwd_6-12 --cfgxml /Users/ssydoruk/GCTI/etc/logbrowser/backend.xml</exec.appArgs>
+                <exec.appArgs>--dbname=C:\src\tmp\indexer\logbr --basedir=C:\src\tmp\indexer --cfgxml C:\Users\ssydo\GCTI\etc\logbrowser\backend.xml</exec.appArgs>
                 <exec.mainClass>com.myutils.logbrowser.indexer.Main</exec.mainClass>
                 <exec.executable>java</exec.executable>
-                <exec.workingdir>/Users/ssydoruk/work/logs/2024-10-14.PROD_iwd_6-12</exec.workingdir>
+                <exec.workingdir>C:\src\tmp\indexer</exec.workingdir>
             </properties>
         </action>
         <action>
@@ -28,13 +28,13 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:3.1.0:exec</goal>
             </goals>
             <properties>
-                <exec.vmArgs>-Dlogbr.dir=.tmp -Dlog4j.configurationFile=/Users/ssydoruk/GCTI/etc/logbrowser/logbr.log4j2.indexer-dev.xml -DlogPath=.tmp -Dsun.java2d.d3d=false -Dall=1 -Xms8000m -Xmx8000m -Dsqlite.pragma=true -Dtlib.norequest=false -Dtimediff.parse=false -agentlib:jdwp=transport=dt_socket,server=n,address=${jpda.address}</exec.vmArgs>
+                <exec.vmArgs>-Dlogbr.dir=.tmp -Dlog4j.configurationFile=C:\Users\ssydo\GCTI\etc\logbrowser\logbr.log4j2.indexer-dev.xml -DlogPath=.tmp -Dsun.java2d.d3d=false -Dall=1 -Xms8000m -Xmx8000m -Dsqlite.pragma=true -Dtlib.norequest=false -Dtimediff.parse=false -agentlib:jdwp=transport=dt_socket,server=n,address=${jpda.address}</exec.vmArgs>
                 <exec.args>${exec.vmArgs} -classpath %classpath ${exec.mainClass} ${exec.appArgs}</exec.args>
-                <exec.appArgs>--dbname=/Users/ssydoruk/work/logs/2024-10-14.PROD_iwd_6-12/logbr --basedir=/Users/ssydoruk/work/logs/2024-10-14.PROD_iwd_6-12 --cfgxml /Users/ssydoruk/GCTI/etc/logbrowser/backend.xml</exec.appArgs>
+                <exec.appArgs>--dbname=C:\src\tmp\indexer\logbr --basedir=C:\src\tmp\indexer --cfgxml C:\Users\ssydo\GCTI\etc\logbrowser\backend.xml</exec.appArgs>
                 <exec.mainClass>com.myutils.logbrowser.indexer.Main</exec.mainClass>
                 <exec.executable>java</exec.executable>
                 <jpda.listen>true</jpda.listen>
-                <exec.workingdir>/Users/ssydoruk/work/logs/2024-10-14.PROD_iwd_6-12</exec.workingdir>
+                <exec.workingdir>C:\src\tmp\indexer</exec.workingdir>
             </properties>
         </action>
         <action>
@@ -47,12 +47,12 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:3.1.0:exec</goal>
             </goals>
             <properties>
-                <exec.vmArgs>-Dlogbr.dir=.tmp -Dlog4j.configurationFile=/Users/ssydoruk/GCTI/etc/logbrowser/logbr.log4j2.indexer-dev.xml -DlogPath=.tmp -Dsun.java2d.d3d=false -Dall=1 -Xms8000m -Xmx8000m -Dsqlite.pragma=true -Dtlib.norequest=false -Dtimediff.parse=false</exec.vmArgs>
+                <exec.vmArgs>-Dlogbr.dir=.tmp -Dlog4j.configurationFile=C:\Users\ssydo\GCTI\etc\logbrowser\logbr.log4j2.indexer-dev.xml -DlogPath=.tmp -Dsun.java2d.d3d=false -Dall=1 -Xms8000m -Xmx8000m -Dsqlite.pragma=true -Dtlib.norequest=false -Dtimediff.parse=false</exec.vmArgs>
                 <exec.args>${exec.vmArgs} -classpath %classpath ${exec.mainClass} ${exec.appArgs}</exec.args>
                 <exec.mainClass>com.myutils.logbrowser.indexer.Main</exec.mainClass>
                 <exec.executable>java</exec.executable>
-                <exec.appArgs>--dbname=/Users/ssydoruk/work/logs/2024-10-14.PROD_iwd_6-12/logbr --basedir=/Users/ssydoruk/work/logs/2024-10-14.PROD_iwd_6-12 --cfgxml /Users/ssydoruk/GCTI/etc/logbrowser/backend.xml</exec.appArgs>
-                <exec.workingdir>/Users/ssydoruk/work/logs/2024-10-14.PROD_iwd_6-12</exec.workingdir>
+                <exec.appArgs>--dbname=C:\src\tmp\indexer\logbr --basedir=C:\src\tmp\indexer --cfgxml C:\Users\ssydo\GCTI\etc\logbrowser\backend.xml</exec.appArgs>
+                <exec.workingdir>C:\src\tmp\indexer</exec.workingdir>
             </properties>
         </action>
     </actions>
