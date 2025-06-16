@@ -137,7 +137,8 @@ public class EditorNotepadPP extends ExternalEditor {
 
     @Override
     void ediFile(LogFile lf) throws IOException {
-        loadFile(lf.getFileName(), lf.getFileName());
+        jumpToFile(lf, 0);
+//        loadFile(lf.getFileName(), lf.getFileName());
     }
 
     protected boolean loadFile(String fileName, String fileModified) throws IOException {
