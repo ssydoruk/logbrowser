@@ -81,7 +81,8 @@ switch (RECORD.getField("metric")) {
   }
 
   case "log": {
-    var s = RECORD.getBytes();
+    var s = RECORD.getBytes().replaceAll(/[\r\n]+/g,' ').trimStart();
+
     var m;
     if ((m = s.match(/expr='(.+)' lab/)) != undefined) {
       var p = m[1];

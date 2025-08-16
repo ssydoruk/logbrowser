@@ -263,7 +263,8 @@ public class QueryDialog extends javax.swing.JFrame {
     private QuerySetting getQuerySetting() {
         if (_querySetting == null) {
             _querySetting = new QuerySetting(null, rootPaneCheckingEnabled, inquirer.getCr());
-            fixOversizedWindow(_querySetting);
+//            fixOversizedWindow(_querySetting);
+            _querySetting.invalidate();
         }
         return _querySetting;
     }

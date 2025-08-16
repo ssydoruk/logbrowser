@@ -49,7 +49,24 @@ public abstract class ExternalEditor {
 
             if (Utils.Util.getOS() == Util.OS.WINDOWS) {
                 inquirer.logger.debug("is windows");
-                editor = new EditorWindows();
+                switch (inquirer.getCr().getEditorType()) {
+                    case VIMActiveX:
+                        editor = new EditorWindows();
+                        break;
+                    case VIMCommandLine:
+                        editor = new EditorUnix();
+                        break;
+
+                    case NotepadPP:
+                        editor = new EditorNotepadPP(inquirer.getCr().getNotepadPath());
+                        break;
+
+                    case NONE:
+                    default:
+                        throw new AssertionError();
+
+                }
+
             } else {
                 inquirer.logger.debug("is not windows");
                 editor = new EditorUnix();
@@ -60,10 +77,10 @@ public abstract class ExternalEditor {
 
     static public void openTextpad(String fileName, int line) {
         String[] cmd = {
-                "C:\\Program Files\\TextPad 7\\TextPad.exe",
-                "-q",
-                "-u",
-                fileName + "(" + line + ")"
+            "C:\\Program Files\\TextPad 7\\TextPad.exe",
+            "-q",
+            "-u",
+            fileName + "(" + line + ")"
         };
         try {
             Runtime.getRuntime().exec(cmd, null, null);
@@ -96,9 +113,9 @@ public abstract class ExternalEditor {
     static public void openNotepad(String fileName, int line) {
 
         String[] cmd = {
-                "C:\\Program Files\\Notepad++\\notepad++.exe",
-                "-n" + line,
-                fileName
+            inquirer.getCr().getNotepadPath(),
+            "-n" + line,
+            fileName
         };
         try {
             Runtime.getRuntime().exec(cmd, null, null);

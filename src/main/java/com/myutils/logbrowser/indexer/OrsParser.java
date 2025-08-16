@@ -85,8 +85,8 @@ public class OrsParser extends Parser {
     private static final Pattern regNotParseMessage = Pattern.compile(
             //07:47:39.182 Trc 09900  [qtp747464370-17] >>> /1/service/callback/RCC_CORK_CallBack - CCID [null]
             "^(04543"
-                    + "|04541"
-                    + ")");
+            + "|04541"
+            + ")");
     //    10:38:29.173  -State[102-56433-0-100] processing is ... 10:38:29.173  skipped.
     private static final Pattern regStateProcessing = Pattern.compile("-State\\[[^\\]]+\\] processing is \\.{3}\\s*");
     private static final Pattern regMetricMessage = Pattern.compile("^<([\\w~]+) sid='([\\w~]+)'");
@@ -167,7 +167,6 @@ public class OrsParser extends Parser {
         return (ret != null) ? ret : thr;
     }
 
-
     private String getThread(String s) {
         if (s != null) {
             Matcher m;
@@ -207,7 +206,6 @@ public class OrsParser extends Parser {
         m_input = input; // to use from subroutines
         m_CurrentFilePos = offset;
         m_CurrentLine = line;
-
 
         URL = null;
         app = null;
@@ -249,7 +247,6 @@ public class OrsParser extends Parser {
         } catch (Exception e) {
             Main.logger.error(e);
         }
-
 
         return m_CurrentLine - line;
     }
@@ -482,7 +479,6 @@ public class OrsParser extends Parser {
         theMsg.setM_isInbound(isInbound);
         addToDB(theMsg);
 
-
 //        prevSeqno.put(msg.getM_TserverSRC(), msg.getAttributeTrim("AttributeEventSequenceNumber"));
         m_MessageContents.clear(); // clear messages
     }
@@ -675,6 +671,7 @@ public class OrsParser extends Parser {
             if (s.endsWith("/>")) { // METRIC on one line
                 AddMetricMessage(s.substring(p + m_strMetric.length()));
             } else {
+                setSavedFilePos(getFilePos());
                 m_MessageContents.add(s.substring(p + m_strMetric.length()));
                 m_ParserState = ParserState.STATE_CLUSTER;
 
@@ -748,12 +745,14 @@ public class OrsParser extends Parser {
         ORSMetric themsg = new ORSMetric(m_MessageContents, fileInfo.getRecordID());
 
         themsg.setM_Timestamp(getLastTimeStamp());
-        themsg.SetOffset(getFilePos());
-        themsg.SetFileBytes(getEndFilePos() - getFilePos());
+        long start = getSavedFilePos() > 0 ? getSavedFilePos() : getFilePos();
+        themsg.SetOffset(start);
+        themsg.SetFileBytes(getEndFilePos() - start);
         themsg.SetLine(m_lineStarted);
         addToDB(themsg);
 
         m_MessageContents.clear(); // clear messages
+        setSavedFilePos(-1);
     }
 
     private void AddORSURSMessage() throws Exception {
@@ -858,7 +857,6 @@ public class OrsParser extends Parser {
 //        m_MessageContents.addAll(Arrays.asList(StringUtils.splitPreserveAllTokens(buf.toString(), '\n')));
 //        return m_MessageContents.size();
 
-
         int linesRead = 0;
         int i = 0, start = 0, newLine;
 
@@ -956,7 +954,7 @@ public class OrsParser extends Parser {
 
         @Override
         public ParserThreadsProcessor.StateTransitionResult stateTransition(ParserThreadState threadState,
-                                                                            String sOrig, String sParsedAndTruncated, String threadID, Parser parser) {
+                String sOrig, String sParsedAndTruncated, String threadID, Parser parser) {
             Matcher m;
             Message msg1 = threadState.getMsg();
 
@@ -1026,7 +1024,7 @@ public class OrsParser extends Parser {
 
         @Override
         public ParserThreadsProcessor.StateTransitionResult stateTransition(ParserThreadState threadState,
-                                                                            String sOrig, String sParsedAndTruncated, String threadID, Parser parser) {
+                String sOrig, String sParsedAndTruncated, String threadID, Parser parser) {
             Matcher m;
             ORSSessionStartMessage msg = (ORSSessionStartMessage) threadState.getMsg();
 
@@ -1077,7 +1075,7 @@ public class OrsParser extends Parser {
 //        private static final Pattern regFMSession = Pattern.compile("\\{FMSession:");
         @Override
         public ParserThreadsProcessor.StateTransitionResult stateTransition(ParserThreadState threadState,
-                                                                            String sOrig, String sParsedAndTruncated, String threadID, Parser parser) {
+                String sOrig, String sParsedAndTruncated, String threadID, Parser parser) {
             Matcher m;
             OrsHTTP msg = (OrsHTTP) threadState.getMsg();
 
@@ -1094,7 +1092,7 @@ public class OrsParser extends Parser {
                         msg.SetStdFieldsAndAdd(parser);
                         return ParserThreadsProcessor.StateTransitionResult.FINAL_REACHED_CONTINUE;
                     }
-                    //error by default
+                //error by default
 
                 default:
                     Main.logger.error("l:" + parser.getM_CurrentLine() + " unexpected state " + threadState.getParserState() + " s[" + sOrig + "]");
@@ -1182,7 +1180,6 @@ public class OrsParser extends Parser {
         public void FinalizeDB() throws SQLException {
             createIndexes();
         }
-
 
     }
 
@@ -1296,7 +1293,6 @@ public class OrsParser extends Parser {
                     + ");";
             getM_dbAccessor().runQuery(query);
 
-
         }
 
         @Override
@@ -1319,7 +1315,6 @@ public class OrsParser extends Parser {
         public void FinalizeDB() throws SQLException {
             createIndexes();
         }
-
 
     }
 

@@ -1,6 +1,6 @@
 switch (RECORD.getField("metric")) {
   
-    case "log": {
+    case "log1": {
       var s = RECORD.getBytes();
       PRINTOUT.lang="json";
 

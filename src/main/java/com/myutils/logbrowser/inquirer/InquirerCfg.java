@@ -6,6 +6,7 @@
 package com.myutils.logbrowser.inquirer;
 
 import Utils.Pair;
+import Utils.Util;
 import com.google.gson.annotations.Expose;
 import com.myutils.logbrowser.indexer.ReferenceType;
 import com.myutils.logbrowser.indexer.TableType;
@@ -30,7 +31,7 @@ import static com.myutils.logbrowser.inquirer.QueryTools.getRefNames;
 public class InquirerCfg implements Serializable {
 
     private static final long serialVersionUID = 1L;
-    
+
     private static final HashSet<Character> filenameProhibited = new HashSet<Character>(
             Arrays.asList(':',
                     '\"',
@@ -41,61 +42,96 @@ public class InquirerCfg implements Serializable {
                     '*',
                     '<',
                     '>'));
-    
+
     HashMap<MsgType, ArrayList<CustomField>> customFieldsSettings = null;
-    
+
     private HashMap<ReferenceType, ArrayList<OptionNode>> refsChecked = new HashMap<>(20);
-    
+
     private HashMap<TableType, ArrayList<OptionNode>> logMessages = new HashMap<>();
-    
+
     private int maxRecords;
 
-    
     private boolean LimitQueryResults;
-    
+
     private int MaxQueryLines;
-    
+
     private String titleRegex;
-    
+
     private String linuxEditor;
-    
+
     private boolean fullTimeStamp;
-    
+
     private String FileNameExcel;
-    
+
     private int fileSizeWarn = 5; // in mb
-    
+
     private GenesysConstants1 constants;
-    
+
     private boolean refsLoaded;
-    
+
     private boolean newTlibSearch;
-    
+
     private boolean saveFileShort;
-    
+
     private boolean saveFileLong;
-    
+
     private boolean addShortToFull;
-    
+
     private boolean applyFullFilter;
-    
+
     private boolean addOrderBy;
-    
+
     private boolean accessLogFiles;
-    
+
     private boolean sorting;
-    
+
     private boolean printLogFileName;
-    
+
     private boolean ignoreFormatting;
-    
+
     private String FileNameShort;
-    
+
     private String FileNameLong;
-    
+
+    private String notepadPath;
+    private static final String DEFAULT_VIM = "gvim";
+    private static final String DEFAULT_NOTEPAD_PATH = "C:\\Program Files\\Notepad++\\notepad++.exe";
+
+
+    public String getNotepadPath() {
+        if (StringUtils.isBlank(notepadPath)) {
+            notepadPath = DEFAULT_NOTEPAD_PATH;
+        }
+        return notepadPath;
+    }
+
+    public void setNotepadPath(String notepadPath) {
+        this.notepadPath = notepadPath;
+    }
+
+
+    public EditorType getEditorType() {
+        if(editorType==EditorType.NONE){
+            if (Utils.Util.getOS() == Util.OS.WINDOWS) {
+                editorType=EditorType.VIMActiveX;
+            } else {
+                editorType=EditorType.VIMCommandLine;
+            }
+        }
+
+        return editorType;
+    }
+
+    public void setEditorType(EditorType editorType) {
+        this.editorType = editorType;
+    }
+
+    private EditorType editorType;
+
     private HashMap<String, String> printFilters = new HashMap<>(2);
-    
+
     private boolean messagesLoaded = false;
+
     public InquirerCfg() {
         this.constants = new GenesysConstants1();
         FileNameShort = ".logbr_short.txt";
@@ -117,6 +153,9 @@ public class InquirerCfg implements Serializable {
         refsLoaded = false;
         messagesLoaded = false;
         newTlibSearch = false;
+        editorType = EditorType.VIMActiveX;
+        linuxEditor=DEFAULT_VIM;
+        notepadPath = DEFAULT_NOTEPAD_PATH;
     }
 
     public static String getFileUnique(String name) {
@@ -137,7 +176,7 @@ public class InquirerCfg implements Serializable {
 
     public String getLinuxEditor() {
         if (StringUtils.isBlank(linuxEditor)) {
-            linuxEditor = "gvim";
+            linuxEditor = DEFAULT_VIM;
         }
         return linuxEditor;
     }
@@ -364,7 +403,7 @@ public class InquirerCfg implements Serializable {
     }
 
     private void AddRefs(ReferenceType refType, String[] refNames, ArrayList<OptionNode> refs) {
-        Stream.of(refNames).filter(ref->!RefExists(refs, ref)).forEach(ref->refs.add(new OptionNode(true, ref)));
+        Stream.of(refNames).filter(ref -> !RefExists(refs, ref)).forEach(ref -> refs.add(new OptionNode(true, ref)));
         Collections.sort(refs);
 
     }
@@ -695,7 +734,7 @@ public class InquirerCfg implements Serializable {
             }
             Pair<String, Integer> el;
             if (rowIndex > size()) {
-                el = new Pair<> ();
+                el = new Pair<>();
                 values.add(el);
 
             } else {
