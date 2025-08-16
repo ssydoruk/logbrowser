@@ -54,3 +54,4 @@ package-lock.json
 etc/logbrowser/aa.js
 logbrowser.iml
 logbrowser.iml
+.vscode/
