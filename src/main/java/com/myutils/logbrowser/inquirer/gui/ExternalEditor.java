@@ -54,7 +54,7 @@ public abstract class ExternalEditor {
                         editor = new EditorWindows();
                         break;
                     case VIMCommandLine:
-                        editor = new EditorUnix();
+                        editor = new EditorVIMWindows();
                         break;
 
                     case NotepadPP:
