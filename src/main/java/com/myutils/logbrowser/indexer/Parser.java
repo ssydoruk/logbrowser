@@ -29,7 +29,7 @@ public abstract class Parser {
 
     public static final int MAX_CUSTOM_FIELDS = 3;
     private static final int BASE_CUSTOM_FIELDS = 8;
-    private static final Pattern regORSSessionID = Pattern.compile("^[~\\w]{32}$");
+    private static final Pattern regORSSessionID = Pattern.compile("^(?:~\\d+~)?[~\\w]{32}$");
     private final static HashMap<String, ArrayList<DateFmt>> appPreferedFormats = new HashMap<>();
     private final String m_StringType;
     private final FileInfoType m_type;

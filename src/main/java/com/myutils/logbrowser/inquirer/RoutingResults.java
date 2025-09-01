@@ -49,14 +49,14 @@ final public class RoutingResults extends IQueryResults {
         boolean isORS = true;
         boolean isURS = true;
         try {
-            isORS = (DatabaseConnector.fileExits(new FileInfoType[]{FileInfoType.type_ORS}));
+            isORS = (DatabaseConnector.fileExits(new FileInfoType[] { FileInfoType.type_ORS }));
         } catch (SQLException e) {
             logger.error("fatal: ", e);
 
         }
         try {
             isURS = (DatabaseConnector
-                    .fileExits(new FileInfoType[]{FileInfoType.type_URS, FileInfoType.type_URSHTTP}));
+                    .fileExits(new FileInfoType[] { FileInfoType.type_URS, FileInfoType.type_URSHTTP }));
         } catch (SQLException e) {
             logger.error("fatal: ", e);
         }
@@ -306,17 +306,16 @@ final public class RoutingResults extends IQueryResults {
 
             tellProgress("Creating temp table");
             DatabaseConnector.runQuery("create temp table " + reqORSStrategies + " ("
-                    + "started timestamp"  + ",rowtype int" + ",appid int"
+                    + "started timestamp" + ",rowtype int" + ",appid int"
                     + ",uuidid int" + ",ixnidid int" + ",strnameid int"
                     + ",urlid int" + ",ended timestamp" + ",sidid timestamp"
-                     + ", sourceid int\n" + ")\n;");
-
-            Wheres wh = new Wheres();
-            String makeWhere = wh.makeWhere(false);
+                    + ", sourceid int\n" + ")\n;");
 
             String tab = null;
 
             if (DatabaseConnector.TableExist("orssess_logbr")) {
+                Wheres wh = new Wheres();
+                String makeWhere = wh.makeWhere(false);
                 wh = new Wheres();
 
                 makeWhere = wh.makeWhere(false);
@@ -334,6 +333,11 @@ final public class RoutingResults extends IQueryResults {
                         + IQuery.getLimitClause(isLimitQueryResults(), getMaxQueryLines()))));
             }
             if (DatabaseConnector.TableExist("orssessixn")) {
+                Wheres wh = new Wheres();
+                String makeWhere = wh.makeWhere(false);
+                wh = new Wheres();
+
+                makeWhere = wh.makeWhere(false);
                 tellProgress("Finding interaction sessions in ORS");
                 tab = "orssessixn";
                 getAllResults.add(new Pair<>("Unique interaction sessions in ORS",
@@ -350,24 +354,29 @@ final public class RoutingResults extends IQueryResults {
             }
             if (DatabaseConnector.TableExist("orsmetr_logbr")) {
                 /* Searching for sessions not created for voice nor multimedia interactions */
+                Wheres wh = new Wheres();
+                String makeWhere = wh.makeWhere(false);
+                wh = new Wheres();
+
+                makeWhere = wh.makeWhere(false);
                 tab = "orsmetr_logbr";
                 tellProgress("Finding unique other sessions in ORS");
                 getAllResults.add(new Pair<>("Unique other sessions in ORS",
-                        DatabaseConnector.runQuery("insert into " + reqORSStrategies + " (sidid, rowtype)"
-                                + "\nselect sidid," + FileInfoType.type_ORS.getValue() + "\nfrom " + "(select "
+                        DatabaseConnector.runQuery("insert into " + reqORSStrategies + " (sidid, rowtype, started)"
+                                + "\nselect sidid," + FileInfoType.type_ORS.getValue() + ",time\nfrom " + "(select "
                                 + "fileid, metricid, sidid, time" + ",file_logbr.appnameid as appid" + "\nfrom " + tab
                                 + " inner join file_logbr on " + tab + ".fileid=file_logbr.id" + ") as " + tab
                                 + "\nwhere sidid > 0  "
                                 // + "\n and sidid not in (select sidid from orssess_logbr) "
                                 // + "\n and sidid not in (select sidid from orssessixn) "
                                 + (DatabaseConnector.TableExist("orssess_logbr")
-                                ? "\nand not exists (select sidid from orssess_logbr where sidid=orsmetr_logbr.sidid)"
-                                : "")
+                                        ? "\nand not exists (select sidid from orssess_logbr where sidid=orsmetr_logbr.sidid)"
+                                        : "")
                                 + (DatabaseConnector.TableExist("orssessixn")
-                                ? "\nand not exists (select sidid from orssessixn where sidid=orsmetr_logbr.sidid)"
-                                : "")
+                                        ? "\nand not exists (select sidid from orssessixn where sidid=orsmetr_logbr.sidid)"
+                                        : "")
                                 + "\nand "
-                                + getWhere("metricid", ReferenceType.METRIC, new String[]{"doc_request"}, false)
+                                + getWhere("metricid", ReferenceType.METRIC, new String[] { "doc_request" }, false)
                                 + IQuery.getFileFilters(tab, "fileid", qd.getSearchApps(false), "AND")
                                 + IQuery.getDateTimeFilters(tab, "time", qd.getTimeRange(), "AND")
                                 + ((makeWhere != null && !makeWhere.isEmpty()) ? " and (" + makeWhere + ")" : "")
@@ -386,8 +395,9 @@ final public class RoutingResults extends IQueryResults {
                             + IQuery.getWhere("metricid", ReferenceType.METRIC, "doc_request", false) + ")" + ";");
                 }
             }
-//            DatabaseConnector
-//                    .runQuery(" update " + reqORSStrategies + " set rowtype=" + FileInfoType.type_ORS.getValue());
+            // DatabaseConnector
+            // .runQuery(" update " + reqORSStrategies + " set rowtype=" +
+            // FileInfoType.type_ORS.getValue());
 
             tellProgress("Creating indexes");
             DatabaseConnector
@@ -401,7 +411,8 @@ final public class RoutingResults extends IQueryResults {
             DatabaseConnector
                     .runQuery("create index idx_" + reqORSStrategies + "sidid on " + reqORSStrategies + "(sidid);");
             DatabaseConnector
-                    .runQuery("create index idx_" + reqORSStrategies + "strnameid on " + reqORSStrategies + "(strnameid);");
+                    .runQuery("create index idx_" + reqORSStrategies + "strnameid on " + reqORSStrategies
+                            + "(strnameid);");
 
             tellProgress("Extracting data");
             TableQuery tabReport = new TableQuery(reqORSStrategies);
@@ -416,9 +427,11 @@ final public class RoutingResults extends IQueryResults {
 
             tabReport.addRef("uuidid", "uuid", ReferenceType.UUID.toString(), IQuery.FieldType.OPTIONAL);
             tabReport.addRef("ixnidid", "ixnid", ReferenceType.IxnID.toString(), IQuery.FieldType.OPTIONAL);
-//            tabReport.addRef("appid", "app", ReferenceType.App.toString(), IQuery.FieldType.OPTIONAL);
+            // tabReport.addRef("appid", "app", ReferenceType.App.toString(),
+            // IQuery.FieldType.OPTIONAL);
             tabReport.addRef("sidid", "sid", ReferenceType.ORSSID.toString(), IQuery.FieldType.OPTIONAL);
-            tabReport.addRef("strnameid", "strategy", ReferenceType.METRIC_PARAM1.toString(), IQuery.FieldType.OPTIONAL);
+            tabReport.addRef("strnameid", "strategy", ReferenceType.METRIC_PARAM1.toString(),
+                    IQuery.FieldType.OPTIONAL);
             int maxRecs = settings.getMaxRecords();
             if (maxRecs > 0)
                 tabReport.setLimit(maxRecs);
@@ -451,10 +464,10 @@ final public class RoutingResults extends IQueryResults {
             // <editor-fold defaultstate="collapsed" desc="URS connIDs">
             Wheres wh = new Wheres();
             wh.addWhere(IQuery.getCheckedWhere("ThisDNid", ReferenceType.DN,
-                            FindNode(repComponents.getRoot(), DialogItem.URS, DialogItem.URS_EVENTS, DialogItem.URS_EVENTS_DN)),
+                    FindNode(repComponents.getRoot(), DialogItem.URS, DialogItem.URS_EVENTS, DialogItem.URS_EVENTS_DN)),
                     "OR");
             wh.addWhere(IQuery.getCheckedWhere("otherDNID", ReferenceType.DN,
-                            FindNode(repComponents.getRoot(), DialogItem.URS, DialogItem.URS_EVENTS, DialogItem.URS_EVENTS_DN)),
+                    FindNode(repComponents.getRoot(), DialogItem.URS, DialogItem.URS_EVENTS, DialogItem.URS_EVENTS_DN)),
                     "OR");
 
             String makeWhere = wh.makeWhere(false);
@@ -474,11 +487,14 @@ final public class RoutingResults extends IQueryResults {
                                 + "\ngroup by 1" + IQuery.getLimitClause(isLimitQueryResults(), getMaxQueryLines())
                                 + ";")));
 
-                DatabaseConnector.runQuery(" update " + orsCallsReport + " set rowtype=" + FileInfoType.type_URS.getValue());
+                DatabaseConnector
+                        .runQuery(" update " + orsCallsReport + " set rowtype=" + FileInfoType.type_URS.getValue());
 
                 DatabaseConnector
-                        .runQuery("create index idx_" + orsCallsReport + "connID on " + orsCallsReport + "(connectionidid);");
-                DatabaseConnector.runQuery("create index idx_" + orsCallsReport + "started on " + orsCallsReport + "(started);");
+                        .runQuery("create index idx_" + orsCallsReport + "connID on " + orsCallsReport
+                                + "(connectionidid);");
+                DatabaseConnector
+                        .runQuery("create index idx_" + orsCallsReport + "started on " + orsCallsReport + "(started);");
 
                 tellProgress("Updating parameters of URS calls");
                 DatabaseConnector.runQuery("update " + orsCallsReport + "\nset (" + "nameid" + ", thisdnid" + ", appid"
@@ -486,7 +502,8 @@ final public class RoutingResults extends IQueryResults {
                         + "nameid" + ", thisdnid " + ", appid " + ", otherdnid" + ", uuidid" + ", ixnidid"
                         + ", sourceid" + "\nfrom\n" + "(select " + tab + ".*" + ",file_logbr.appnameid as appid"
                         + "\nfrom " + tab + " inner join file_logbr on " + tab + ".fileid=file_logbr.id" + ") as " + tab
-                        + "\nwhere " + orsCallsReport + ".connectionidid=" + tab + ".connectionidid" + "\nand\n" + orsCallsReport
+                        + "\nwhere " + orsCallsReport + ".connectionidid=" + tab + ".connectionidid" + "\nand\n"
+                        + orsCallsReport
                         + ".started=" + tab + ".time" + "\n"
                         + IQuery.getFileFilters(tab, "fileid", qd.getSearchApps(false), "AND") + "\n"
                         + IQuery.getDateTimeFilters(tab, "time", qd.getTimeRange(), "AND") + ")" + ";");
@@ -494,14 +511,22 @@ final public class RoutingResults extends IQueryResults {
                 logger.error("Neither routing table found");
 
             tellProgress("Creating indexes");
-            DatabaseConnector.runQuery("create index idx_" + orsCallsReport + "appid on " + orsCallsReport + "(appid);");
-            DatabaseConnector.runQuery("create index idx_" + orsCallsReport + "thisdnid on " + orsCallsReport + "(thisdnid);");
-            DatabaseConnector.runQuery("create index idx_" + orsCallsReport + "otherdnid on " + orsCallsReport + "(otherdnid);");
-            DatabaseConnector.runQuery("create index idx_" + orsCallsReport + "nameid on " + orsCallsReport + "(nameid);");
-            DatabaseConnector.runQuery("create index idx_" + orsCallsReport + "uuidid on " + orsCallsReport + "(uuidid);");
-            DatabaseConnector.runQuery("create index idx_" + orsCallsReport + "ixnidid on " + orsCallsReport + "(ixnidid);");
-            DatabaseConnector.runQuery("create index idx_" + orsCallsReport + "sourceid on " + orsCallsReport + "(sourceid);");
-            DatabaseConnector.runQuery("create index idx_" + orsCallsReport + "sidid on " + orsCallsReport + "(sidid);");
+            DatabaseConnector
+                    .runQuery("create index idx_" + orsCallsReport + "appid on " + orsCallsReport + "(appid);");
+            DatabaseConnector
+                    .runQuery("create index idx_" + orsCallsReport + "thisdnid on " + orsCallsReport + "(thisdnid);");
+            DatabaseConnector
+                    .runQuery("create index idx_" + orsCallsReport + "otherdnid on " + orsCallsReport + "(otherdnid);");
+            DatabaseConnector
+                    .runQuery("create index idx_" + orsCallsReport + "nameid on " + orsCallsReport + "(nameid);");
+            DatabaseConnector
+                    .runQuery("create index idx_" + orsCallsReport + "uuidid on " + orsCallsReport + "(uuidid);");
+            DatabaseConnector
+                    .runQuery("create index idx_" + orsCallsReport + "ixnidid on " + orsCallsReport + "(ixnidid);");
+            DatabaseConnector
+                    .runQuery("create index idx_" + orsCallsReport + "sourceid on " + orsCallsReport + "(sourceid);");
+            DatabaseConnector
+                    .runQuery("create index idx_" + orsCallsReport + "sidid on " + orsCallsReport + "(sidid);");
 
             tellProgress("Extracting data");
             TableQuery tabReport = new TableQuery(orsCallsReport);
@@ -527,7 +552,6 @@ final public class RoutingResults extends IQueryResults {
             int maxRecs = settings.getMaxRecords();
             if (maxRecs > 0)
                 tabReport.setLimit(maxRecs);
-
 
             FullTableColors currTable = tabReport.getFullTable();
             currTable.setHiddenField("rowType");
@@ -581,13 +605,13 @@ final public class RoutingResults extends IQueryResults {
             DatabaseConnector.runQuery("update " + reportTable + "\nset (" + "nameid" + ", appid"
                     + ", sourceid" + ", mediaid" + ", queueid" + ") = " + "\n(" + "select "
                     + "nameid" + ", appid "
-                    + ", sourceid" + ", mediaID" + ", queueid" + "\nfrom\n" + "(select " + tab + ".*" + ",file_logbr.appnameid as appid"
+                    + ", sourceid" + ", mediaID" + ", queueid" + "\nfrom\n" + "(select " + tab + ".*"
+                    + ",file_logbr.appnameid as appid"
                     + "\nfrom " + tab + " inner join file_logbr on " + tab + ".fileid=file_logbr.id" + ") as " + tab
                     + "\nwhere " + reportTable + ".ixnidid=" + tab + ".ixnidid"
                     + "\nand\n" + reportTable + ".started=" + tab + ".time" + "\n"
                     + IQuery.getFileFilters(tab, "fileid", qd.getSearchApps(false), "AND") + "\n"
                     + IQuery.getDateTimeFilters(tab, "time", qd.getTimeRange(), "AND") + ")" + ";");
-
 
             DatabaseConnector.runQuery("create index idx_" + reportTable + "appid on " + reportTable + "(appid);");
         } else
@@ -606,7 +630,6 @@ final public class RoutingResults extends IQueryResults {
                     // + "\nand\n"
                     + ")" + ";");
         }
-
 
         tellProgress("Extracting data");
         TableQuery tabReport = new TableQuery(reportTable);
@@ -770,10 +793,10 @@ final public class RoutingResults extends IQueryResults {
             // <editor-fold defaultstate="collapsed" desc="URS connIDs">
             Wheres wh = new Wheres();
             wh.addWhere(IQuery.getCheckedWhere("ThisDNid", ReferenceType.DN,
-                            FindNode(repComponents.getRoot(), DialogItem.URS, DialogItem.URS_EVENTS, DialogItem.URS_EVENTS_DN)),
+                    FindNode(repComponents.getRoot(), DialogItem.URS, DialogItem.URS_EVENTS, DialogItem.URS_EVENTS_DN)),
                     "OR");
             wh.addWhere(IQuery.getCheckedWhere("otherDNID", ReferenceType.DN,
-                            FindNode(repComponents.getRoot(), DialogItem.URS, DialogItem.URS_EVENTS, DialogItem.URS_EVENTS_DN)),
+                    FindNode(repComponents.getRoot(), DialogItem.URS, DialogItem.URS_EVENTS, DialogItem.URS_EVENTS_DN)),
                     "OR");
 
             String makeWhere = wh.makeWhere(false);
@@ -1520,7 +1543,7 @@ final public class RoutingResults extends IQueryResults {
         // appsType = getAppsType(FileInfoType.type_ORS);
         // appsType.addAll(getAppsType(FileInfoType.type_URS));
         return DatabaseConnector.getTimeRange(
-                new FileInfoType[]{FileInfoType.type_ORS, FileInfoType.type_URS, FileInfoType.type_URSHTTP},
+                new FileInfoType[] { FileInfoType.type_ORS, FileInfoType.type_URS, FileInfoType.type_URSHTTP },
                 searchApps);
         // return DatabaseConnector.getTimeRange(new String[]{"urs_logbr", "ors_logbr",
         // "ursstr_logbr", ",orsmetr_logbr"}, searchApps);
@@ -1588,21 +1611,24 @@ final public class RoutingResults extends IQueryResults {
                     ORSMM.addWhere(getWhere("IXNIDID", IxnID, false), "AND");
                     tmpIDs = new HashSet<>();
 
-                    // commenting out. This is probably mistake carried over from Interaction. Unlikely to have ixn requests in ORS logs
+                    // commenting out. This is probably mistake carried over from Interaction.
+                    // Unlikely to have ixn requests in ORS logs
                     // ORSMM.setRecLoadedProc((ILogRecord rec) -> {
-                    //     addUnique(tmpIDs, Util.intOrDef(rec.getFieldValue("refid"), (Long) null));
+                    // addUnique(tmpIDs, Util.intOrDef(rec.getFieldValue("refid"), (Long) null));
                     // });
                 } else {
                     tmpIDs = null;
                 }
                 getRecords(ORSMM);
 
-                // commenting out. This is probably mistake carried over from Interaction. Unlikely to have ixn requests in ORS logs
+                // commenting out. This is probably mistake carried over from Interaction.
+                // Unlikely to have ixn requests in ORS logs
                 // if (tmpIDs != null) {
-                //     ORSMM = newORSMMTable(orsReportSettings, dlg);
-                //     ORSMM.addWhere(getWhere(ORSMM.getTabAlias() + ".refid", tmpIDs, false), "AND");
-                //     ORSMM.addWhere(ORSMM.getTabAlias() + ".IXNIDID < 1", "AND");
-                //     getRecords(ORSMM);
+                // ORSMM = newORSMMTable(orsReportSettings, dlg);
+                // ORSMM.addWhere(getWhere(ORSMM.getTabAlias() + ".refid", tmpIDs, false),
+                // "AND");
+                // ORSMM.addWhere(ORSMM.getTabAlias() + ".IXNIDID < 1", "AND");
+                // getRecords(ORSMM);
                 // }
             }
         }
@@ -1756,11 +1782,11 @@ final public class RoutingResults extends IQueryResults {
                             where += " and " + checkedWhere;
                         }
                         OrsUrs = new TableQuery(MsgType.ORSURS, "orsurs_logbr", "sidid", "(" + where // + " or ( refid =
-                                // 0 and sidid <=0
-                                // ) "
+                        // 0 and sidid <=0
+                        // ) "
                                 + " or ("
                                 + getWhere("refid", "select refid from orsurs_logbr where " + where + " and refid > 0",
-                                false)
+                                        false)
                                 + ")" + "or (event=1000000102\n" + " and reqid in (select reqid from orsurs_logbr \n"
                                 + " where refid in (select refid from orsurs_logbr where " + where
                                 + "  and refid > 0 ))" + ") " + "\n)");
@@ -1799,7 +1825,7 @@ final public class RoutingResults extends IQueryResults {
     }
 
     private void getRecords(ORSMetricByCallIdQuery orsMetricByCallIdQuery,
-                            DynamicTreeNode<OptionNode> orsReportComponent) {
+            DynamicTreeNode<OptionNode> orsReportComponent) {
         throw new UnsupportedOperationException("Not supported yet."); // To change body of generated methods, choose
         // Tools | Templates.
     }
@@ -1879,7 +1905,7 @@ final public class RoutingResults extends IQueryResults {
         URSRI.addRef("subfuncID", "subfunc", ReferenceType.URSMETHOD.toString(), IQuery.FieldType.OPTIONAL);
         URSRI.addRef("clientappID", "client", ReferenceType.App.toString(), IQuery.FieldType.OPTIONAL);
         URSRI.addRef("URLID", "URL", ReferenceType.HTTPRequest.toString(), IQuery.FieldType.OPTIONAL);
-        URSRI.addOutFields(new String[]{"ref", "clientno"});
+        URSRI.addOutFields(new String[] { "ref", "clientno" });
 
         for (int i = 1; i <= com.myutils.logbrowser.indexer.URSRI.MAX_WEB_PARAMS; i++) {
             String fldName = "attr" + i;
@@ -1901,7 +1927,7 @@ final public class RoutingResults extends IQueryResults {
         UrsRLib.addRef("methodid", "method", ReferenceType.ORSMETHOD.toString(), IQuery.FieldType.OPTIONAL);
         UrsRLib.addRef("sourceid", "source", ReferenceType.App.toString(), IQuery.FieldType.OPTIONAL);
 
-        UrsRLib.addOutFields(new String[]{"refid", "reqid", "inbound"});
+        UrsRLib.addOutFields(new String[] { "refid", "reqid", "inbound" });
         String methodFilter = getCheckedWhere(UrsRLib.getTabAlias() + ".methodid", ReferenceType.ORSMETHOD,
                 FindNode(ursReportSettings, DialogItem.URS_RLIB, null, null), DialogItem.URS_RLIB_METHOD);
         UrsRLib.addWhere(methodFilter, "");
@@ -1917,6 +1943,5 @@ final public class RoutingResults extends IQueryResults {
         ret.add(new Pair<>("other DN", "otherdnid"));
         return ret;
     }
-
 
 }
