@@ -25,12 +25,11 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static com.myutils.logbrowser.indexer.Parser.MAX_CUSTOM_FIELDS;
+import org.json.JSONObject;
 import static org.sqlite.SQLiteErrorCode.SQLITE_INTERRUPT;
 
-@SuppressWarnings({"unchecked", "rawtypes", "serial"})
-public abstract class IQueryResults extends QueryTools
-        implements ActionListener,
-        PropertyChangeListener {
+@SuppressWarnings({ "unchecked", "rawtypes", "serial" })
+public abstract class IQueryResults extends QueryTools implements ActionListener, PropertyChangeListener {
 
     public final static String KEY_ID_FIELD = "keyid";
     private static final org.apache.logging.log4j.Logger logger = inquirer.logger;
@@ -46,7 +45,7 @@ public abstract class IQueryResults extends QueryTools
     protected ArrayList<Pair<String, Integer>> getAllResults = new ArrayList<>();
     PrintStream os = null;
     AggregatesPanel aggregateParams = null;
-    //</editor-fold>
+    // </editor-fold>
     CustomStorage cs;
     HashMap<MsgType, ArrayList<OutputSpecFormatter.Parameter>> addOutParams = new HashMap<>();
     private int objectsFound;
@@ -56,15 +55,22 @@ public abstract class IQueryResults extends QueryTools
     private JTextArea taskOutput;
     private Task task;
     private boolean suppressConfirms = true;
+    private QueryDialogSettings qdSettings;
 
-    //    public void getGenesysMessages(TableType t, UTCTimeRange timeRange) throws SQLException {
-//        getGenesysMessages(t, null, timeRange, null);
-//    }
-//    public void getGenesysMessages(TableType t) throws SQLException {
-//        getGenesysMessages(t, null, null, null);
-//    }
-    public IQueryResults(QueryDialogSettings qdSettings) {
+    public QueryDialogSettings getQdSettings() {
+        return qdSettings;
+    }
+
+    // public void getGenesysMessages(TableType t, UTCTimeRange timeRange) throws
+    // SQLException {
+    // getGenesysMessages(t, null, timeRange, null);
+    // }
+    // public void getGenesysMessages(TableType t) throws SQLException {
+    // getGenesysMessages(t, null, null, null);
+    // }
+    public IQueryResults(QueryDialogSettings _qdSettings) {
         this();
+        qdSettings = _qdSettings;
         if (qdSettings != null) {
             DynamicTree tree = qdSettings.getQParams(this.getClass().getName());
             if (tree != null) {
@@ -84,10 +90,11 @@ public abstract class IQueryResults extends QueryTools
         if (fileInfoType == null) {
             return getRefNameIDs(owner, ReferenceType.App, "id in (select distinct appnameid from file_logbr)", true);
         } else {
-            return getRefNameIDs(owner, ReferenceType.App, "id in (select distinct appnameid from file_logbr"
-                    + " where apptypeid = (select id from "
-                    + ReferenceType.AppType + " where name =\""
-                    + FileInfoType.getFileType(fileInfoType) + "\"))", true);
+            return getRefNameIDs(owner, ReferenceType.App,
+                    "id in (select distinct appnameid from file_logbr" + " where apptypeid = (select id from "
+                            + ReferenceType.AppType + " where name =\"" + FileInfoType.getFileType(fileInfoType)
+                            + "\"))",
+                    true);
         }
     }
 
@@ -137,6 +144,15 @@ public abstract class IQueryResults extends QueryTools
         return null;
     }
 
+    protected DynamicTreeNode<Object> getNode(DialogItem dialogItem, String tabName, JSONObject savedOptions,
+            DialogItem... savedOptionPath) throws SQLException {
+        if (DatabaseConnector.TableExist(tabName)) {
+            return new DynamicTreeNode<>(new OptionNode(false, dialogItem, savedOptions, savedOptionPath));
+
+        }
+        return null;
+    }
+
     abstract public String getReportSummary();
 
     protected abstract ArrayList<IAggregateQuery> loadReportAggregates() throws SQLException;
@@ -156,14 +172,10 @@ public abstract class IQueryResults extends QueryTools
     }
 
     public boolean callRelated(QueryDialog dlg) {
-        return dlg.getSelectionType() == SelectionType.CONNID
-                || dlg.getSelectionType() == SelectionType.IXN
-                || dlg.getSelectionType() == SelectionType.UUID
-                || dlg.getSelectionType() == SelectionType.CALLID
-                || dlg.getSelectionType() == SelectionType.ChainID
-                || dlg.getSelectionType() == SelectionType.IXN
-                || dlg.getSelectionType() == SelectionType.OCSSID
-                || dlg.getSelectionType() == SelectionType.SESSION;
+        return dlg.getSelectionType() == SelectionType.CONNID || dlg.getSelectionType() == SelectionType.IXN
+                || dlg.getSelectionType() == SelectionType.UUID || dlg.getSelectionType() == SelectionType.CALLID
+                || dlg.getSelectionType() == SelectionType.ChainID || dlg.getSelectionType() == SelectionType.IXN
+                || dlg.getSelectionType() == SelectionType.OCSSID || dlg.getSelectionType() == SelectionType.SESSION;
     }
 
     public ArrayList<NameID> getAppsType(FileInfoType fileInfoType, String[] tabAndField) throws Exception {
@@ -173,7 +185,8 @@ public abstract class IQueryResults extends QueryTools
             int i = 0;
             StringBuilder ret = new StringBuilder(tabAndField.length * 50);
 
-//            ret.append("id in (select distinct appnameid from file_logbr\nwhere id in (");
+            // ret.append("id in (select distinct appnameid from file_logbr\nwhere id in
+            // (");
             while (i < tabAndField.length) {
                 if (DatabaseConnector.TableExist(tabAndField[i])) {
                     if (ret.length() > 0) {
@@ -184,12 +197,9 @@ public abstract class IQueryResults extends QueryTools
                 i += 2;
             }
             if (ret.length() > 0) {
-//                ret.append("))");
+                // ret.append("))");
                 return getRefNameIDs(this, ReferenceType.App,
-                        "id in (select distinct appnameid from file_logbr\nwhere id in ("
-                                + ret
-                                + "))"
-                );
+                        "id in (select distinct appnameid from file_logbr\nwhere id in (" + ret + "))");
             }
         }
         return null;
@@ -198,10 +208,10 @@ public abstract class IQueryResults extends QueryTools
     public abstract UTCTimeRange refreshTimeRange(ArrayList<Integer> searchApps) throws SQLException;
 
     public ArrayList<NameID> getAppsType(FileInfoType fileInfoType) throws SQLException {
-        return getRefNameIDs(this, ReferenceType.App, "id in (select distinct appnameid from file_logbr"
-                + " where apptypeid = (select id from "
-                + ReferenceType.AppType + " where name =\""
-                + FileInfoType.getFileType(fileInfoType) + "\"))", true);
+        return getRefNameIDs(this, ReferenceType.App,
+                "id in (select distinct appnameid from file_logbr" + " where apptypeid = (select id from "
+                        + ReferenceType.AppType + " where name =\"" + FileInfoType.getFileType(fileInfoType) + "\"))",
+                true);
     }
 
     public void printDBRecords(PrintStreams ps) throws Exception {
@@ -210,39 +220,23 @@ public abstract class IQueryResults extends QueryTools
 
     void Print(PrintStreams ps) throws Exception {
         /*
-        boolean isLayoutRequired = false;
-        for (int j = 0; j < m_formatters.size(); j++) {
-            ILogRecordFormatter formatter
-                    = (ILogRecordFormatter) m_formatters.get(j);
-
-            if (formatter.IsLayoutRequired()) {
-                isLayoutRequired = true;
-                break;
-            }
-        }
-
-        if (isLayoutRequired) {
-            for (int i = 0; i < m_results.size(); i++) {
-                ILogRecord record = (ILogRecord) m_results.get(i);
-                for (int j = 0; j < m_formatters.size(); j++) {
-                    ILogRecordFormatter formatter
-                            = (ILogRecordFormatter) m_formatters.get(j);
-
-                    if (formatter.IsLayoutRequired()) {
-                        formatter.Layout(record);
-                    }
-                }
-            }
-
-            for (int j = 0; j < m_formatters.size(); j++) {
-                ILogRecordFormatter formatter
-                        = (ILogRecordFormatter) m_formatters.get(j);
-
-                if (formatter.IsLayoutRequired()) {
-                    formatter.ProcessLayout();
-                }
-            }
-        }
+         * boolean isLayoutRequired = false; for (int j = 0; j < m_formatters.size();
+         * j++) { ILogRecordFormatter formatter = (ILogRecordFormatter)
+         * m_formatters.get(j);
+         * 
+         * if (formatter.IsLayoutRequired()) { isLayoutRequired = true; break; } }
+         * 
+         * if (isLayoutRequired) { for (int i = 0; i < m_results.size(); i++) {
+         * ILogRecord record = (ILogRecord) m_results.get(i); for (int j = 0; j <
+         * m_formatters.size(); j++) { ILogRecordFormatter formatter =
+         * (ILogRecordFormatter) m_formatters.get(j);
+         * 
+         * if (formatter.IsLayoutRequired()) { formatter.Layout(record); } } }
+         * 
+         * for (int j = 0; j < m_formatters.size(); j++) { ILogRecordFormatter formatter
+         * = (ILogRecordFormatter) m_formatters.get(j);
+         * 
+         * if (formatter.IsLayoutRequired()) { formatter.ProcessLayout(); } } }
          */
         doPrinting(ps);
         if (os != null) {
@@ -252,25 +246,25 @@ public abstract class IQueryResults extends QueryTools
 
     private void doPrinting(PrintStreams ps) throws Exception {
         int i = 0;
-//        try {
-//            ps.printSummary(getReportSummary());
-//        } catch (Exception e) {
-//            inquirer.ExceptionHandler.handleException("Header not printed", e);
-//        }
+        // try {
+        // ps.printSummary(getReportSummary());
+        // } catch (Exception e) {
+        // inquirer.ExceptionHandler.handleException("Header not printed", e);
+        // }
         for (; i < m_results.size(); i++) {
             if (Thread.currentThread().isInterrupted()) {
-//                inquirer.ExceptionHandler.handleException("interrupted while printing", new InterruptedException());
+                // inquirer.ExceptionHandler.handleException("interrupted while printing", new
+                // InterruptedException());
                 throw new RuntimeInterruptException();
             }
             ILogRecord record = m_results.get(i);
             ps.newRow(record);
             record.debug();
             for (int j = 0; j < m_formatters.size(); j++) {
-                ILogRecordFormatter formatter
-                        = m_formatters.get(j);
+                ILogRecordFormatter formatter = m_formatters.get(j);
 
                 formatter.Print(record, ps, this);
-//                Thread.sleep(200);
+                // Thread.sleep(200);
             }
         }
         inquirer.logger.info("Processed all " + m_results.size() + " records");
@@ -295,16 +289,14 @@ public abstract class IQueryResults extends QueryTools
 
     public void getRecords(IQuery query) throws SQLException {
 
-        if (!query.refTablesExist()) //do not send query if reference does not exist
+        if (!query.refTablesExist()) // do not send query if reference does not exist
         {
             throw new SQLException("Referenced table does not exist! Cannot execute the query");
         }
         query.Execute();
         int cnt = 0;
         try {
-            for (ILogRecord record = query.GetNext();
-                 record != null;
-                 record = query.GetNext()) {
+            for (ILogRecord record = query.GetNext(); record != null; record = query.GetNext()) {
                 if (Thread.currentThread().isInterrupted()) {
                     throw new RuntimeInterruptException();
                 }
@@ -327,7 +319,8 @@ public abstract class IQueryResults extends QueryTools
                 Thread.currentThread().interrupt();
                 throw new RuntimeInterruptException();
             } else {
-                inquirer.ExceptionHandler.handleException("RunQuery failed: " + sQLException + " query " + query, sQLException);
+                inquirer.ExceptionHandler.handleException("RunQuery failed: " + sQLException + " query " + query,
+                        sQLException);
                 throw sQLException;
             }
         }
@@ -340,9 +333,7 @@ public abstract class IQueryResults extends QueryTools
     public void getRecords(IQuery query, HashMap<Long, ILogRecord> ids) throws Exception {
         query.Execute();
 
-        for (ILogRecord record = query.GetNext();
-             record != null;
-             record = query.GetNext()) {
+        for (ILogRecord record = query.GetNext(); record != null; record = query.GetNext()) {
             long id = record.getID();
             if (ids.containsKey(id)) {
                 continue;
@@ -378,7 +369,8 @@ public abstract class IQueryResults extends QueryTools
     }
 
     void setQParams(GenericTree<OptionNode> qParams) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        throw new UnsupportedOperationException("Not supported yet."); // To change body of generated methods, choose
+                                                                       // Tools | Templates.
 
     }
 
@@ -386,10 +378,10 @@ public abstract class IQueryResults extends QueryTools
         selectionTypes.add(id);
     }
 
-    //    public abstract
+    // public abstract
     private void ShowProgressDlg() {
-        //Schedule a job for the event-dispatching thread:
-        //creating and showing this application's GUI.
+        // Schedule a job for the event-dispatching thread:
+        // creating and showing this application's GUI.
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
@@ -414,7 +406,8 @@ public abstract class IQueryResults extends QueryTools
         Retrieve(dlg);
         DynamicTreeNode.setNoRefNoLoad(false);
         long time4 = new Date().getTime();
-        inquirer.logger.info("Retrieved " + m_results.size() + " records for query type " + dlg.getName() + ". Took " + Utils.Util.pDuration(time4 - time3));
+        inquirer.logger.info("Retrieved " + m_results.size() + " records for query type " + dlg.getName() + ". Took "
+                + Utils.Util.pDuration(time4 - time3));
     }
 
     public void reset() {
@@ -436,7 +429,7 @@ public abstract class IQueryResults extends QueryTools
         try (ResultSet rs = DatabaseConnector.executeQuery(query)) {
             ResultSetMetaData rsmd = rs.getMetaData();
 
-// The column count starts from 1
+            // The column count starts from 1
             for (int i = 1; i <= rsmd.getColumnCount(); i++) {
                 if (FILENO.equals(rsmd.getColumnName(i))) {
                     fileNoIdx = i;
@@ -495,20 +488,14 @@ public abstract class IQueryResults extends QueryTools
         FullTableColors currTable;
         FullTableColors retTable = null;
         for (int i = 0; i < searchApps.size(); i++) {
-            currTable = getFileTable("select "
-                    + "REGEXP_group('([^\\\\/]+)$', intfilename, 1) infilename, "
-                    + "hostname, "
-                    + "file_logbr.name filename, file_logbr.arcname as arcname, "
-                    + "app.name as name, "
+            currTable = getFileTable("select " + "REGEXP_group('([^\\\\/]+)$', intfilename, 1) infilename, "
+                    + "hostname, " + "file_logbr.name filename, file_logbr.arcname as arcname, " + "app.name as name, "
                     + "UTCtoDateTime(starttime, \"YYYY-MM-dd HH:mm:ss.SSS\") " + APPSTARTTIME + ","
                     + "UTCtoDateTime(filestarttime, \"YYYY-MM-dd HH:mm:ss.SSS\") file_starttime,"
                     + "UTCtoDateTime(endtime, \"YYYY-MM-dd HH:mm:ss.SSS\") endtime, "
-                    + "jduration(endtime-filestarttime) duration, "
-                    + "fileno " + FILENO + ","
-                    + "filesize(size) size"
-                    + "\nfrom file_logbr "
-                    + "\ninner join app on app.id=file_logbr.appnameid"
-                    + IQuery.getWhere("appnameid", new Integer[]{searchApps.get(i)}, true)
+                    + "jduration(endtime-filestarttime) duration, " + "fileno " + FILENO + "," + "filesize(size) size"
+                    + "\nfrom file_logbr " + "\ninner join app on app.id=file_logbr.appnameid"
+                    + IQuery.getWhere("appnameid", new Integer[] { searchApps.get(i) }, true)
                     + "\norder by name, starttime, filestarttime");
             if (retTable == null) {
                 retTable = currTable;
@@ -522,7 +509,8 @@ public abstract class IQueryResults extends QueryTools
     public String[] getAllFiles(ArrayList<Integer> searchApps) throws Exception {
         ArrayList<String> ret = new ArrayList<>();
         for (Integer searchApp : searchApps) {
-            String[] names = DatabaseConnector.getNames(this, "file_logbr", "intfilename", IQuery.getWhere("appnameid", new Integer[]{searchApp}, true));
+            String[] names = DatabaseConnector.getNames(this, "file_logbr", "intfilename",
+                    IQuery.getWhere("appnameid", new Integer[] { searchApp }, true));
             ArrayList<String> trimNames = new ArrayList<>(names.length);
             for (String name : names) {
                 Matcher m;
@@ -566,9 +554,7 @@ public abstract class IQueryResults extends QueryTools
     }
 
     private void createAndShowGUI() {
-        progressMonitor = new ProgressMonitor(null,
-                "Running a Long Task",
-                "", 0, 100);
+        progressMonitor = new ProgressMonitor(null, "Running a Long Task", "", 0, 100);
         progressMonitor.setProgress(0);
         task = new Task();
         task.addPropertyChangeListener(this);
@@ -576,26 +562,33 @@ public abstract class IQueryResults extends QueryTools
 
     }
 
-    //    public void getConfigMessages(ArrayList<Integer> searchApps, DynamicTreeNode<OptionNode> root) throws Exception {
-//        getConfigMessages(searchApps, root, null);
-//
-//    }
+    // public void getConfigMessages(ArrayList<Integer> searchApps,
+    // DynamicTreeNode<OptionNode> root) throws Exception {
+    // getConfigMessages(searchApps, root, null);
+    //
+    // }
     protected void addConfigUpdates(DynamicTreeNode<OptionNode> rootA) {
         DynamicTreeNode<OptionNode> topConfig = new DynamicTreeNode<>(new OptionNode(false, DialogItem.CONFIGUPDATES));
         rootA.addChild(topConfig);
 
-        DynamicTreeNode<OptionNode> configConfig = new DynamicTreeNode<>(new OptionNode(true, DialogItem.CONFIGUPDATES_CONFIGUPDATES));
+        DynamicTreeNode<OptionNode> configConfig = new DynamicTreeNode<>(
+                new OptionNode(true, DialogItem.CONFIGUPDATES_CONFIGUPDATES));
         topConfig.addChild(configConfig);
         configConfig.addDynamicRef(DialogItem.CONFIGUPDATES_CONFIGUPDATES_OBJECTTYPE, ReferenceType.CfgObjectType);
     }
 
-    protected void getConfigMessages(DynamicTreeNode<OptionNode> root, QueryDialog dlg, IQueryResults qry) throws SQLException {
-//        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-//    }
-//    public void getConfigMessages(ArrayList<Integer> searchApps, DynamicTreeNode<OptionNode> root, UTCTimeRange timeRange) throws SQLException {
+    protected void getConfigMessages(DynamicTreeNode<OptionNode> root, QueryDialog dlg, IQueryResults qry)
+            throws SQLException {
+        // throw new UnsupportedOperationException("Not supported yet."); //To change
+        // body of generated methods, choose Tools | Templates.
+        // }
+        // public void getConfigMessages(ArrayList<Integer> searchApps,
+        // DynamicTreeNode<OptionNode> root, UTCTimeRange timeRange) throws SQLException
+        // {
         String tabName = "cfg";
         DynamicTreeNode<OptionNode> cfgUpdateNode = FindNode(root, DialogItem.CONFIGUPDATES, null, null);
-        if (cfgUpdateNode != null && ((OptionNode) cfgUpdateNode.getData()).isChecked() && DatabaseConnector.TableExist(tabName)) {
+        if (cfgUpdateNode != null && ((OptionNode) cfgUpdateNode.getData()).isChecked()
+                && DatabaseConnector.TableExist(tabName)) {
             if (Thread.currentThread().isInterrupted()) {
                 throw new RuntimeInterruptException();
             }
@@ -606,24 +599,24 @@ public abstract class IQueryResults extends QueryTools
             genCfg.addRef("objtypeID", "objtype", ReferenceType.CfgObjectType.toString(), FieldType.OPTIONAL);
             genCfg.addRef("objNameID", "objName", ReferenceType.CfgObjName.toString(), FieldType.OPTIONAL);
             genCfg.addRef("msgID", "msg", ReferenceType.CfgMsg.toString(), FieldType.OPTIONAL);
-            genCfg.AddCheckedWhere(genCfg.getTabAlias() + ".objtypeID",
-                    ReferenceType.CfgObjectType,
-                    FindNode(cfgUpdateNode, DialogItem.CONFIGUPDATES_CONFIGUPDATES, null, null),
-                    "AND",
+            genCfg.AddCheckedWhere(genCfg.getTabAlias() + ".objtypeID", ReferenceType.CfgObjectType,
+                    FindNode(cfgUpdateNode, DialogItem.CONFIGUPDATES_CONFIGUPDATES, null, null), "AND",
                     DialogItem.CONFIGUPDATES_CONFIGUPDATES_OBJECTTYPE);
-//            genCfg.AddCheckedWhere(genCfg.getTabAlias() + ".MSGID", ReferenceType.LOGMESSAGE, logMsgType, "AND", DialogItem.APP_LOG_MESSAGES_TYPE_MESSAGE_ID);
+            // genCfg.AddCheckedWhere(genCfg.getTabAlias() + ".MSGID",
+            // ReferenceType.LOGMESSAGE, logMsgType, "AND",
+            // DialogItem.APP_LOG_MESSAGES_TYPE_MESSAGE_ID);
             genCfg.setCommonParams(qry, dlg);
             getRecords(genCfg);
 
         }
     }
 
-    //    public void getGenesysMessages(TableType tableType, DynamicTreeNode<OptionNode> root) throws Exception {
-//        getGenesysMessages(tableType, root, null, null);
-//    }
-    public void getGenesysMessagesApp(TableType tableType,
-                                      DynamicTreeNode<OptionNode> root,
-                                      QueryDialog dlg, IQueryResults qry) throws SQLException {
+    // public void getGenesysMessages(TableType tableType,
+    // DynamicTreeNode<OptionNode> root) throws Exception {
+    // getGenesysMessages(tableType, root, null, null);
+    // }
+    public void getGenesysMessagesApp(TableType tableType, DynamicTreeNode<OptionNode> root, QueryDialog dlg,
+            IQueryResults qry) throws SQLException {
         boolean shouldRunQuery;
         DynamicTreeNode<OptionNode> logMsgType;
         if (root != null) {
@@ -638,11 +631,14 @@ public abstract class IQueryResults extends QueryTools
                         tellProgress("Getting log messages");
 
                         TableQuery genMsg = new TableQuery(MsgType.GENESYS_MSG, tableType.toString());
-//        genMsg.setIdsSubQuery("fileid", "select id from file_logbr "+ getWhere("component", new Integer[] {ft.getValue()}, true));        
+                        // genMsg.setIdsSubQuery("fileid", "select id from file_logbr "+
+                        // getWhere("component", new Integer[] {ft.getValue()}, true));
                         genMsg.addRef("levelID", "level", ReferenceType.MSGLEVEL.toString(), FieldType.MANDATORY);
                         genMsg.addRef("msgID", "msg", ReferenceType.LOGMESSAGE.toString(), FieldType.OPTIONAL);
-                        genMsg.AddCheckedWhere(genMsg.getTabAlias() + ".levelID", ReferenceType.MSGLEVEL, logMsgType, "AND", DialogItem.APP_LOG_MESSAGES_TYPE_LEVEL);
-                        genMsg.AddCheckedWhere(genMsg.getTabAlias() + ".MSGID", ReferenceType.LOGMESSAGE, logMsgType, "AND", DialogItem.APP_LOG_MESSAGES_TYPE_MESSAGE_ID);
+                        genMsg.AddCheckedWhere(genMsg.getTabAlias() + ".levelID", ReferenceType.MSGLEVEL, logMsgType,
+                                "AND", DialogItem.APP_LOG_MESSAGES_TYPE_LEVEL);
+                        genMsg.AddCheckedWhere(genMsg.getTabAlias() + ".MSGID", ReferenceType.LOGMESSAGE, logMsgType,
+                                "AND", DialogItem.APP_LOG_MESSAGES_TYPE_MESSAGE_ID);
                         genMsg.setCommonParams(qry, dlg);
                         getRecords(genMsg);
                     }
@@ -651,11 +647,13 @@ public abstract class IQueryResults extends QueryTools
         }
     }
 
-    //    private void getGenesysMessages(TableType tableType, DynamicTreeNode<OptionNode> root, QueryDialog dlg, IQueryResults qry) {
-//        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-//    }
-    public void getGenesysMessages(TableType tableType, DynamicTreeNode<OptionNode> root,
-                                   QueryDialog dlg, IQueryResults qry) throws SQLException {
+    // private void getGenesysMessages(TableType tableType,
+    // DynamicTreeNode<OptionNode> root, QueryDialog dlg, IQueryResults qry) {
+    // throw new UnsupportedOperationException("Not supported yet."); //To change
+    // body of generated methods, choose Tools | Templates.
+    // }
+    public void getGenesysMessages(TableType tableType, DynamicTreeNode<OptionNode> root, QueryDialog dlg,
+            IQueryResults qry) throws SQLException {
         if (root != null) {
             getGenesysMessagesApp(tableType, getChildByName(root, DialogItem.APP_LOG_MESSAGES), dlg, qry);
         }
@@ -687,29 +685,29 @@ public abstract class IQueryResults extends QueryTools
     }
 
     protected void showAllResults(ArrayList<Pair<String, Integer>> allResults) {
-//        DefaultTableModel infoTableModel = new DefaultTableModel();
-//        infoTableModel.addColumn("Report");
-//        infoTableModel.addColumn("count");
-//        int grandTotal = 0;
-//        for (Pair<String, Integer> entry : allResults) {
-//            infoTableModel.addRow(new Object[]{entry.getKey(), entry.getValue()});
-//        }
-//        infoTableModel.setRowCount(allResults.size());
-////        for (Map.Entry<MsgType, Integer> entry : typeStat.entrySet()) {
-////            infoTableModel.addRow(new Object[]{entry.getKey(), entry.getValue()});
-////            grandTotal += entry.getValue();
-////        }
-////        infoTableModel.addRow(new Object[]{"TOTAL", grandTotal});
-//
-//        JTable tab = new JTable(infoTableModel);
-//        tab.getTableHeader().setVisible(true);
-//        tab.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-//        Dimension preferredSize = tab.getPreferredSize();
-//
-//        JPanel jScrollPane = new JPanel(new BorderLayout());
-//        jScrollPane.add(tab);
-//        jScrollPane.setPreferredSize(preferredSize);
-//        inquirer.showInfoPanel(null, "Title", jScrollPane, true);
+        // DefaultTableModel infoTableModel = new DefaultTableModel();
+        // infoTableModel.addColumn("Report");
+        // infoTableModel.addColumn("count");
+        // int grandTotal = 0;
+        // for (Pair<String, Integer> entry : allResults) {
+        // infoTableModel.addRow(new Object[]{entry.getKey(), entry.getValue()});
+        // }
+        // infoTableModel.setRowCount(allResults.size());
+        //// for (Map.Entry<MsgType, Integer> entry : typeStat.entrySet()) {
+        //// infoTableModel.addRow(new Object[]{entry.getKey(), entry.getValue()});
+        //// grandTotal += entry.getValue();
+        //// }
+        //// infoTableModel.addRow(new Object[]{"TOTAL", grandTotal});
+        //
+        // JTable tab = new JTable(infoTableModel);
+        // tab.getTableHeader().setVisible(true);
+        // tab.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+        // Dimension preferredSize = tab.getPreferredSize();
+        //
+        // JPanel jScrollPane = new JPanel(new BorderLayout());
+        // jScrollPane.add(tab);
+        // jScrollPane.setPreferredSize(preferredSize);
+        // inquirer.showInfoPanel(null, "Title", jScrollPane, true);
 
     }
 
@@ -734,7 +732,8 @@ public abstract class IQueryResults extends QueryTools
                     CustomStorage.CustomComponent customItem = item.getValue();
                     DynamicTreeNode<OptionNode> key = new DynamicTreeNode<>(
                             new CustomOptionNode(true, customItem, customItem.getName())
-                            //                            new CustomOptionNode(true, customItem.getFieldName(), customItem.getId(), item.getKey())
+                    // new CustomOptionNode(true, customItem.getFieldName(), customItem.getId(),
+                    // item.getKey())
                     );
                     nd.addChild(key);
                     ILoadChildrenProc keyLoadProc = new ILoadChildrenProc() {
@@ -745,36 +744,28 @@ public abstract class IQueryResults extends QueryTools
 
                         @Override
                         void treeLoad(DynamicTreeNode parent) {
-                            CustomStorage.CustomComponent customComponent = (CustomStorage.CustomComponent) ((CustomOptionNode) parent.getData()).getData();
-//                            System.out.println(customComponent.getName());
-                            for (Map.Entry<String, CustomStorage.CustomComponent.KeyValues> entry : customComponent.getKeyValues().entrySet()) {
+                            CustomStorage.CustomComponent customComponent = (CustomStorage.CustomComponent) ((CustomOptionNode) parent
+                                    .getData()).getData();
+                            // System.out.println(customComponent.getName());
+                            for (Map.Entry<String, CustomStorage.CustomComponent.KeyValues> entry : customComponent
+                                    .getKeyValues().entrySet()) {
                                 String fld = entry.getKey();
                                 CustomStorage.CustomComponent.KeyValues value = entry.getValue();
                                 for (Map.Entry<Integer, HashSet<Integer>> entry1 : value.entrySet()) {
                                     Integer keyID = entry1.getKey();
                                     HashSet<Integer> value1 = entry1.getValue();
                                     try {
-                                        String key = DatabaseConnector.getDatabaseConnector(null).persistentRef(
-                                                ReferenceType.CUSTKKEY,
-                                                keyID);
+                                        String key = DatabaseConnector.getDatabaseConnector(null)
+                                                .persistentRef(ReferenceType.CUSTKKEY, keyID);
 
                                         DynamicTreeNode<OptionNode> attrName = new DynamicTreeNode<>(
-                                                new CustomOptionNode(
-                                                        true,
-                                                        fld,
-                                                        keyID,
-                                                        key));
+                                                new CustomOptionNode(true, fld, keyID, key));
                                         parent.addChild(attrName);
                                         for (Integer valueID : value1) {
-                                            String val = DatabaseConnector.getDatabaseConnector(null).persistentRef(
-                                                    ReferenceType.CUSTVALUE,
-                                                    valueID);
+                                            String val = DatabaseConnector.getDatabaseConnector(null)
+                                                    .persistentRef(ReferenceType.CUSTVALUE, valueID);
                                             DynamicTreeNode<OptionNode> attrValue = new DynamicTreeNode<>(
-                                                    new CustomOptionNode(
-                                                            true,
-                                                            null,
-                                                            valueID,
-                                                            val));
+                                                    new CustomOptionNode(true, null, valueID, val));
                                             attrName.addChild(attrValue);
 
                                         }
@@ -782,19 +773,22 @@ public abstract class IQueryResults extends QueryTools
                                         inquirer.logger.error(exception);
                                     }
                                 }
-//                                
-//                                java.lang.Object key1 = entry.getKey();
-//                                Map.Entry<MsgType, ArrayList<Parameter>> value = entry.getValue();
-//                                
+                                //
+                                // java.lang.Object key1 = entry.getKey();
+                                // Map.Entry<MsgType, ArrayList<Parameter>> value = entry.getValue();
+                                //
                             }
-//                            for (CustomStorage.CustomComponent.KeyValues v : customComponent.getKeyValues().g) {
-//                                DynamicTreeNode<OptionNode> attrName = new DynamicTreeNode<>(new CustomOptionNode(true, v.field, null, v.key));
-//                                parent.addChild(attrName);
-//                                for (CustomStorage.CustomComponent value : v.values) {
-//                                    DynamicTreeNode<OptionNode> vNode = new DynamicTreeNode<>(new CustomOptionNode(true, value.fieldName, value.getId(), value.getValue()));
-//                                    attrName.addChild(vNode);
-//                                }
-//                            }
+                            // for (CustomStorage.CustomComponent.KeyValues v :
+                            // customComponent.getKeyValues().g) {
+                            // DynamicTreeNode<OptionNode> attrName = new DynamicTreeNode<>(new
+                            // CustomOptionNode(true, v.field, null, v.key));
+                            // parent.addChild(attrName);
+                            // for (CustomStorage.CustomComponent value : v.values) {
+                            // DynamicTreeNode<OptionNode> vNode = new DynamicTreeNode<>(new
+                            // CustomOptionNode(true, value.fieldName, value.getId(), value.getValue()));
+                            // attrName.addChild(vNode);
+                            // }
+                            // }
                         }
                     };
                     keyLoadProc.setTreeLoad(true);
@@ -806,8 +800,10 @@ public abstract class IQueryResults extends QueryTools
         iLoadChildrenProc.setTreeLoad(true);
         nd.setLoadChildrenProc(iLoadChildrenProc);
 
-        //node.addDynamicRef(DialogItem.CUSTOM, ReferenceType.CUSTCOMP, FileInfoType.getFileType(FileInfoType.type_CallManager) + "_custom", "keyid");
-//        nd.addDynamicRef(DialogItem.TLIB_CALLS_SIP_ENDPOINT, ReferenceType.DN);
+        // node.addDynamicRef(DialogItem.CUSTOM, ReferenceType.CUSTCOMP,
+        // FileInfoType.getFileType(FileInfoType.type_CallManager) + "_custom",
+        // "keyid");
+        // nd.addDynamicRef(DialogItem.TLIB_CALLS_SIP_ENDPOINT, ReferenceType.DN);
     }
 
     private boolean isCustomField(String col) {
@@ -830,27 +826,29 @@ public abstract class IQueryResults extends QueryTools
         return false;
     }
 
-    protected void getCustom(FileInfoType ft, QueryDialog dlg, DynamicTreeNode<OptionNode> reportSettings, IDsFinder cidFinder) throws SQLException {
+    protected void getCustom(FileInfoType ft, QueryDialog dlg, DynamicTreeNode<OptionNode> reportSettings,
+            IDsFinder cidFinder) throws SQLException {
         getCustom(ft, dlg, reportSettings, cidFinder, null);
     }
 
-    protected void getCustom(FileInfoType ft, QueryDialog dlg, DynamicTreeNode<OptionNode> reportSettings, IDsFinder cidFinder,
-                             HashSet handlerIDs) throws SQLException {
+    protected void getCustom(FileInfoType ft, QueryDialog dlg, DynamicTreeNode<OptionNode> reportSettings,
+            IDsFinder cidFinder, HashSet handlerIDs) throws SQLException {
 
         if (!DatabaseConnector.TableExist(Parser.getCustomTab(ft))) {
             return;
         }
         DynamicTreeNode<OptionNode> node = FindNode(reportSettings, DialogItem.CUSTOM, null, null);
         boolean handlersFound = (handlerIDs != null && !handlerIDs.isEmpty());
-        if (isChecked(node) && ((cidFinder == null || cidFinder.getSearchType() == SelectionType.NO_SELECTION
-                || handlersFound))) {
-//<editor-fold defaultstate="collapsed" desc="Custom searches">
+        if (isChecked(node)
+                && ((cidFinder == null || cidFinder.getSearchType() == SelectionType.NO_SELECTION || handlersFound))) {
+            // <editor-fold defaultstate="collapsed" desc="Custom searches">
             tellProgress("Custom searches");
             TableQuery customQuery = new TableQuery(MsgType.CUSTOM, Parser.getCustomTab(ft));
 
             if (handlersFound) {
                 Wheres wh = new Wheres();
-                wh.addWhere(getWhere("handler", (Integer[]) handlerIDs.toArray(new Integer[handlerIDs.size()]), "", false));
+                wh.addWhere(
+                        getWhere("handler", (Integer[]) handlerIDs.toArray(new Integer[handlerIDs.size()]), "", false));
                 wh.addWhere("handler is null", "or");
                 customQuery.addWhere(wh, "AND");
             }
@@ -859,20 +857,23 @@ public abstract class IQueryResults extends QueryTools
 
             customQuery.addRef("keyid", "keycomponent", ReferenceType.CUSTCOMP.toString(), FieldType.OPTIONAL);
             for (int i = 1; i <= Parser.MAX_CUSTOM_FIELDS; i++) {
-                customQuery.addRef(Parser.fldName(i), Parser.fldNameFull(i), ReferenceType.CUSTKKEY.toString(), FieldType.OPTIONAL);
-                customQuery.addRef(Parser.valName(i), Parser.valNameFull(i), ReferenceType.CUSTVALUE.toString(), FieldType.OPTIONAL);
+                customQuery.addRef(Parser.fldName(i), Parser.fldNameFull(i), ReferenceType.CUSTKKEY.toString(),
+                        FieldType.OPTIONAL);
+                customQuery.addRef(Parser.valName(i), Parser.valNameFull(i), ReferenceType.CUSTVALUE.toString(),
+                        FieldType.OPTIONAL);
 
             }
 
             customQuery.setCommonParams(this, dlg);
             getRecords(customQuery);
         }
-//</editor-fold>      
+        // </editor-fold>
     }
 
     private void fillCustom(FileInfoType fileType) {
         try {
-            ResultSet rs = DatabaseConnector.executeQuery("PRAGMA table_info ('" + Parser.getCustomTab(fileType) + "')");
+            ResultSet rs = DatabaseConnector
+                    .executeQuery("PRAGMA table_info ('" + Parser.getCustomTab(fileType) + "')");
 
             ResultSetMetaData rsmd = rs.getMetaData();
             int idx = getColumnIdx(rsmd, "name");
@@ -917,7 +918,7 @@ public abstract class IQueryResults extends QueryTools
             try {
                 DbRecordComparator comparator = new DbRecordComparator();
                 Collections.sort(m_results, comparator);
-//            comparator.BlockSort(m_results);
+                // comparator.BlockSort(m_results);
                 comparator.Close();
             } catch (IllegalArgumentException illegalArgumentException) {
                 inquirer.ExceptionHandler.handleException("Sorting", illegalArgumentException);
@@ -937,6 +938,27 @@ public abstract class IQueryResults extends QueryTools
     abstract boolean callRelatedSearch(IDsFinder cidFinder) throws SQLException;
 
     public abstract AllProcSettings getAllProc(Window parent);
+
+    public JSONObject getSelectedJSON() {
+        DynamicTreeNode<OptionNode> root = repComponents.getRoot();
+        JSONObject jsonObject = new org.json.JSONObject();
+        boolean blockLoad = DynamicTreeNode.isBlockLoad();
+        DynamicTreeNode.setBlockLoad(true);
+        nodesToJson(root, jsonObject);
+        DynamicTreeNode.setBlockLoad(blockLoad);
+        return jsonObject;
+    }
+
+    private void nodesToJson(DynamicTreeNode<OptionNode> root, JSONObject rootObj) {
+        for (DynamicTreeNode<OptionNode> treeNode : root.getChildren()) {
+            JSONObject nodeObj = new JSONObject();
+            rootObj.put(((OptionNode) treeNode.getData()).getName(),
+                    nodeObj.put("enabled", ((OptionNode) treeNode.getData()).isChecked()));
+            if (treeNode.hasChildren()) {
+                nodesToJson(treeNode, nodeObj);
+            }
+        }
+    }
 
     public static abstract class ProgressNotifications {
 
@@ -964,9 +986,8 @@ public abstract class IQueryResults extends QueryTools
             return recMap.get(type);
         }
 
-
-        public List<Pair<SelectionType, String>> getSingle() throws Exception{
-            if( recMap.size()!=1){
+        public List<Pair<SelectionType, String>> getSingle() throws Exception {
+            if (recMap.size() != 1) {
                 throw new Exception("Expecting 1 element only!!!");
             }
             for (Map.Entry<FileInfoType, List<Pair<SelectionType, String>>> fileInfoTypeListEntry : recMap.entrySet()) {
@@ -977,12 +998,12 @@ public abstract class IQueryResults extends QueryTools
 
         public void addRecMap(com.myutils.logbrowser.indexer.FileInfoType type, Pair<SelectionType, String> t) {
             List<Pair<SelectionType, String>> pairs = recMap.get(type);
-            if( pairs==null) {
+            if (pairs == null) {
                 pairs = new ArrayList<>();
                 recMap.put(type, pairs);
             }
             pairs.add(t);
-//            recMap.put(type, t);
+            // recMap.put(type, t);
         }
     }
 
@@ -1016,7 +1037,8 @@ public abstract class IQueryResults extends QueryTools
         }
 
         String getIdsClause() {
-            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            throw new UnsupportedOperationException("Not supported yet."); // To change body of generated methods,
+                                                                           // choose Tools | Templates.
         }
     }
 
@@ -1061,17 +1083,14 @@ public abstract class IQueryResults extends QueryTools
             return item;
         }
 
-        //</editor-fold>//</editor-fold>
+        // </editor-fold>//</editor-fold>
         public HashMap<Integer, CustomComponent> getItems() {
             return items;
         }
 
         private void addRow(FullTable fullTable, ArrayList<Object> row) throws Exception {
             Integer id = (Integer) row.get(keyIdx);
-            String component = DatabaseConnector.getDatabaseConnector(null).persistentRef(
-                    ReferenceType.CUSTCOMP,
-                    id
-            );
+            String component = DatabaseConnector.getDatabaseConnector(null).persistentRef(ReferenceType.CUSTCOMP, id);
             CustomComponent customComponent = newRow(component, id, KEY_ID_FIELD);
             customComponent.fillRow(fullTable, row);
         }
@@ -1081,7 +1100,7 @@ public abstract class IQueryResults extends QueryTools
             private final Integer id;
             // keyfield1->val1,val2,val3,...
             private final HashMap<String, KeyValues> keyValues;
-            //            private String value;
+            // private String value;
             private String name;
             private String fieldName = null;
 
@@ -1100,9 +1119,9 @@ public abstract class IQueryResults extends QueryTools
                 return keyValues;
             }
 
-            //            public String getValue() {
-//                return value;
-//            }
+            // public String getValue() {
+            // return value;
+            // }
             public Integer getId() {
                 return id;
             }
@@ -1111,9 +1130,9 @@ public abstract class IQueryResults extends QueryTools
                 return fieldName;
             }
 
-            //            private void setValue(String value) {
-//                this.value = value;
-//            }
+            // private void setValue(String value) {
+            // this.value = value;
+            // }
             public String getName() {
                 return name;
             }
@@ -1122,47 +1141,47 @@ public abstract class IQueryResults extends QueryTools
                 for (int i = 1; i <= MAX_CUSTOM_FIELDS; i++) {
                     String keyFieldName = Parser.fldName(i);
                     Integer keyID = (Integer) row.get(fullTable.getColumnIdx(keyFieldName));
-//                    String key = DatabaseConnector.getDatabaseConnector(null).persistentRef(
-//                            ReferenceType.CUSTKKEY,
-//                            (Integer) row.get(fullTable.getColumnIdx(keyFieldName))
-//                    );
+                    // String key = DatabaseConnector.getDatabaseConnector(null).persistentRef(
+                    // ReferenceType.CUSTKKEY,
+                    // (Integer) row.get(fullTable.getColumnIdx(keyFieldName))
+                    // );
                     String valueFieldName = Parser.valName(i);
                     Integer valueID = (Integer) row.get(fullTable.getColumnIdx(valueFieldName));
 
-//                    String value = DatabaseConnector.getDatabaseConnector(null).persistentRef(
-//                            ReferenceType.CUSTVALUE,
-//                            valueID
-//                    );
+                    // String value = DatabaseConnector.getDatabaseConnector(null).persistentRef(
+                    // ReferenceType.CUSTVALUE,
+                    // valueID
+                    // );
                     if (keyID != null && keyID > 0 && valueID != null && valueID > 0) {
-                        //using valueFieldName to be used later for search parameter
+                        // using valueFieldName to be used later for search parameter
                         putKeyValue(valueFieldName, keyID, valueID);
                     }
                 }
 
-//                for (int i = 1; i <= MAX_CUSTOM_FIELDS; i++) {
-//                    String keyFieldName = Parser.fldName(i);
-//                    String key = DatabaseConnector.getDatabaseConnector(null).persistentRef(
-//                            ReferenceType.CUSTKKEY,
-//                            (Integer) row.get(fullTable.getColumnIdx(keyFieldName))
-//                    );
-//                    String valueFieldName = Parser.valName(i);
-//                    Integer valueID = (Integer) row.get(fullTable.getColumnIdx(valueFieldName));
-//                    
-//                    String value = DatabaseConnector.getDatabaseConnector(null).persistentRef(
-//                            ReferenceType.CUSTVALUE,
-//                            valueID
-//                    );
-//                    
-//                    if (value != null && !value.isEmpty()
-//                            && key != null && !key.isEmpty()) {
-//                        ArrayList<CustomItem> val = getPair(valueFieldName, key);
-//                        if (!valuePresent(val, valueID)) {
-//                            CustomComponent customItem = new CustomComponent(valueID);
-//                            customItem.setValue(value);
-//                            val.add(customItem);
-//                        }
-//                    }
-//                }
+                // for (int i = 1; i <= MAX_CUSTOM_FIELDS; i++) {
+                // String keyFieldName = Parser.fldName(i);
+                // String key = DatabaseConnector.getDatabaseConnector(null).persistentRef(
+                // ReferenceType.CUSTKKEY,
+                // (Integer) row.get(fullTable.getColumnIdx(keyFieldName))
+                // );
+                // String valueFieldName = Parser.valName(i);
+                // Integer valueID = (Integer) row.get(fullTable.getColumnIdx(valueFieldName));
+                //
+                // String value = DatabaseConnector.getDatabaseConnector(null).persistentRef(
+                // ReferenceType.CUSTVALUE,
+                // valueID
+                // );
+                //
+                // if (value != null && !value.isEmpty()
+                // && key != null && !key.isEmpty()) {
+                // ArrayList<CustomItem> val = getPair(valueFieldName, key);
+                // if (!valuePresent(val, valueID)) {
+                // CustomComponent customItem = new CustomComponent(valueID);
+                // customItem.setValue(value);
+                // val.add(customItem);
+                // }
+                // }
+                // }
             }
 
             private void putKeyValue(String keyFieldName, Integer keyID, Integer valueID) {

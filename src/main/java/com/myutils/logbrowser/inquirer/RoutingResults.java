@@ -29,6 +29,7 @@ import static com.myutils.logbrowser.inquirer.IQuery.getCheckedWhere;
 import java.util.HashMap;
 
 import static org.apache.commons.lang3.ArrayUtils.isEmpty;
+import org.json.JSONObject;
 
 /**
  * @author ssydoruk
@@ -44,8 +45,8 @@ final public class RoutingResults extends IQueryResults {
     private DynamicTreeNode<OptionNode> msgUrsConfig;
     private DynamicTreeNode<OptionNode> msgOrsConfig;
 
-    public RoutingResults() throws SQLException {
-        super();
+    public RoutingResults(QueryDialogSettings qdSettings) throws SQLException {
+        super(qdSettings);
         boolean isORS = true;
         boolean isURS = true;
         try {
@@ -144,73 +145,99 @@ final public class RoutingResults extends IQueryResults {
     }
 
     public void addURSReportType(DynamicTreeNode<OptionNode> root) {
-        DynamicTreeNode<OptionNode> reportTypeURSStrategy = new DynamicTreeNode<>(new OptionNode(true, DialogItem.URS));
+        JSONObject savedOptions = getQdSettings().getSavedOptions().get(this.getName());
+
+        DynamicTreeNode<OptionNode> reportTypeURSStrategy = new DynamicTreeNode<>(
+                new OptionNode(true, DialogItem.URS, savedOptions, DialogItem.URS));
         root.addChild(reportTypeURSStrategy);
 
         DynamicTreeNode<OptionNode> tEventsNode;
         try {
             if (DatabaseConnector.TableExist("urs_logbr")) {
-                tEventsNode = new DynamicTreeNode<>(new OptionNode(true, DialogItem.URS_EVENTS));
+                tEventsNode = new DynamicTreeNode<>(new OptionNode(true, DialogItem.URS_EVENTS, savedOptions,
+                        DialogItem.URS, DialogItem.URS_EVENTS));
                 reportTypeURSStrategy.addChild(tEventsNode);
 
-                tEventsNode.addDynamicRef(DialogItem.URS_EVENTS_NAME, ReferenceType.TEvent, "urs_logbr", "nameid");
-                tEventsNode.addDynamicRef(DialogItem.URS_EVENTS_ATTR1, ReferenceType.TLIBATTR1, "urs_logbr", "attr1ID");
+                tEventsNode.addDynamicRef(DialogItem.URS_EVENTS_NAME, ReferenceType.TEvent, "urs_logbr", "nameid",
+                        savedOptions, DialogItem.URS, DialogItem.URS_EVENTS, DialogItem.URS_EVENTS_NAME);
+                tEventsNode.addDynamicRef(DialogItem.URS_EVENTS_ATTR1, ReferenceType.TLIBATTR1, "urs_logbr", "attr1ID",
+                        savedOptions, DialogItem.URS, DialogItem.URS_EVENTS, DialogItem.URS_EVENTS_ATTR1);
 
                 tEventsNode.addDynamicRef(DialogItem.URS_EVENTS_DN, ReferenceType.DN, "urs_logbr", "thisdnid",
-                        "otherdnid");
-                tEventsNode.addDynamicRef(DialogItem.URS_EVENTS_SERVER, ReferenceType.App, "urs_logbr", "sourceid");
+                        "otherdnid", savedOptions, DialogItem.URS, DialogItem.URS_EVENTS, DialogItem.URS_EVENTS_DN);
+                tEventsNode.addDynamicRef(DialogItem.URS_EVENTS_SERVER, ReferenceType.App, "urs_logbr", "sourceid",
+                        savedOptions, DialogItem.URS, DialogItem.URS_EVENTS, DialogItem.URS_EVENTS_SERVER);
 
-                tEventsNode.addDynamicRef(DialogItem.TLIB_CALLS_TEVENT_ANI, ReferenceType.DN, "urs_logbr", "aniid");
-                tEventsNode.addDynamicRef(DialogItem.TLIB_CALLS_TEVENT_DNIS, ReferenceType.DN, "urs_logbr", "dnisid");
+                tEventsNode.addDynamicRef(DialogItem.TLIB_CALLS_TEVENT_ANI, ReferenceType.DN, "urs_logbr", "aniid",
+                        savedOptions, DialogItem.URS, DialogItem.URS_EVENTS, DialogItem.TLIB_CALLS_TEVENT_ANI);
+                tEventsNode.addDynamicRef(DialogItem.TLIB_CALLS_TEVENT_DNIS, ReferenceType.DN, "urs_logbr", "dnisid",
+                        savedOptions, DialogItem.URS, DialogItem.URS_EVENTS, DialogItem.TLIB_CALLS_TEVENT_DNIS);
 
             }
         } catch (SQLException ex) {
             logger.error("fatal: ", ex);
         }
         if (!DatabaseConnector.TableEmptySilent(TableType.URSGenesysMessage.toString())) {
-            tEventsNode = new DynamicTreeNode<>(new OptionNode(true, DialogItem.URS_GENMESSAGE));
+            tEventsNode = new DynamicTreeNode<>(new OptionNode(true, DialogItem.URS_GENMESSAGE, savedOptions,
+                    DialogItem.URS, DialogItem.URS_GENMESSAGE));
             reportTypeURSStrategy.addChild(tEventsNode);
-            tEventsNode.addDynamicRef(DialogItem.URS_GENMESSAGE_TYPE, ReferenceType.MSGLEVEL);
+            tEventsNode.addDynamicRef(DialogItem.URS_GENMESSAGE_TYPE, ReferenceType.MSGLEVEL, savedOptions,
+                    DialogItem.URS, DialogItem.URS_GENMESSAGE, DialogItem.URS_GENMESSAGE_TYPE);
             tEventsNode.addDynamicRef(DialogItem.URS_GENMESSAGE_MSG, ReferenceType.LOGMESSAGE,
-                    TableType.URSGenesysMessage.toString(), "msgid");
+                    TableType.URSGenesysMessage.toString(), "msgid", savedOptions, DialogItem.URS,
+                    DialogItem.URS_GENMESSAGE, DialogItem.URS_GENMESSAGE_TYPE);
         }
         try {
             if (DatabaseConnector.TableExist("ursstat")) {
-                tEventsNode = new DynamicTreeNode<>(new OptionNode(false, DialogItem.URS_AGENTDN));
+                tEventsNode = new DynamicTreeNode<>(new OptionNode(false, DialogItem.URS_AGENTDN, savedOptions,
+                        DialogItem.URS, DialogItem.URS_AGENTDN));
                 reportTypeURSStrategy.addChild(tEventsNode);
                 tEventsNode.addDynamicRef(DialogItem.URS_AGENTDN_NEWSTAT, ReferenceType.StatType, "ursstat",
-                        "statNewID");
+                        "statNewID", savedOptions, DialogItem.URS, DialogItem.URS_AGENTDN,
+                        DialogItem.URS_AGENTDN_NEWSTAT);
                 tEventsNode.addDynamicRef(DialogItem.URS_AGENTDN_STATSWITCH, ReferenceType.Switch, "ursstat",
-                        "VoiceSwitchID");
-                tEventsNode.addDynamicRef(DialogItem.URS_AGENTDN_AGENT, ReferenceType.Agent, "ursstat", "AgentNameID");
+                        "VoiceSwitchID", savedOptions, DialogItem.URS, DialogItem.URS_AGENTDN,
+                        DialogItem.URS_AGENTDN_STATSWITCH);
+                tEventsNode.addDynamicRef(DialogItem.URS_AGENTDN_AGENT, ReferenceType.Agent, "ursstat", "AgentNameID",
+                        savedOptions, DialogItem.URS, DialogItem.URS_AGENTDN, DialogItem.URS_AGENTDN_AGENT);
             }
         } catch (SQLException ex) {
             logger.error("fatal: ", ex);
         }
-        tEventsNode = new DynamicTreeNode<>(new OptionNode(true, DialogItem.URS_STRATEGY));
+        tEventsNode = new DynamicTreeNode<>(
+                new OptionNode(true, DialogItem.URS_STRATEGY, savedOptions, DialogItem.URS, DialogItem.URS_STRATEGY));
         reportTypeURSStrategy.addChild(tEventsNode);
         tEventsNode.addDynamicRef(DialogItem.URS_STRATEGY_MESSAGE, ReferenceType.URSStrategyMsg);
         tEventsNode.addDynamicRef(DialogItem.URS_STRATEGY_SCRIPT, ReferenceType.URSStrategyName);
 
         try {
             if (DatabaseConnector.TableExist("ursrlib")) {
-                tEventsNode = new DynamicTreeNode<>(new OptionNode(true, DialogItem.URS_RLIB));
+                tEventsNode = new DynamicTreeNode<>(
+                        new OptionNode(true, DialogItem.URS_RLIB, savedOptions, DialogItem.URS, DialogItem.URS_RLIB));
                 reportTypeURSStrategy.addChild(tEventsNode);
-                tEventsNode.addDynamicRef(DialogItem.URS_RLIB_METHOD, ReferenceType.ORSMETHOD);
+                tEventsNode.addDynamicRef(DialogItem.URS_RLIB_METHOD, ReferenceType.ORSMETHOD, savedOptions,
+                        DialogItem.URS, DialogItem.URS_RLIB, DialogItem.URS_RLIB_METHOD);
             }
         } catch (SQLException ex) {
             logger.error("fatal: ", ex);
         }
         try {
             if (DatabaseConnector.TableExist("ursri")) {
-                tEventsNode = new DynamicTreeNode<>(new OptionNode(true, DialogItem.URS_RI));
+                tEventsNode = new DynamicTreeNode<>(
+                        new OptionNode(true, DialogItem.URS_RI, savedOptions, DialogItem.URS, DialogItem.URS_RI));
                 reportTypeURSStrategy.addChild(tEventsNode);
-                tEventsNode.addDynamicRef(DialogItem.URS_RI_FUNCTION, ReferenceType.URSMETHOD, "ursri", "funcID");
-                tEventsNode.addDynamicRef(DialogItem.URS_RI_PARAM1, ReferenceType.Misc, "ursri", "value1id");
-                tEventsNode.addDynamicRef(DialogItem.URS_RI_PARAM2, ReferenceType.Misc, "ursri", "value2id");
-                tEventsNode.addDynamicRef(DialogItem.URS_RI_PARAM3, ReferenceType.Misc, "ursri", "value3id");
-                tEventsNode.addDynamicRef(DialogItem.URS_RI_PARAM4, ReferenceType.Misc, "ursri", "value4id");
-                tEventsNode.addDynamicRef(DialogItem.URS_RI_PARAM5, ReferenceType.Misc, "ursri", "value5id");
+                tEventsNode.addDynamicRef(DialogItem.URS_RI_FUNCTION, ReferenceType.URSMETHOD, "ursri", "funcID",
+                        savedOptions, DialogItem.URS, DialogItem.URS_RI, DialogItem.URS_RI_FUNCTION);
+                tEventsNode.addDynamicRef(DialogItem.URS_RI_PARAM1, ReferenceType.Misc, "ursri", "value1id",
+                        savedOptions, DialogItem.URS, DialogItem.URS_RI, DialogItem.URS_RI_PARAM1);
+                tEventsNode.addDynamicRef(DialogItem.URS_RI_PARAM2, ReferenceType.Misc, "ursri", "value2id",
+                        savedOptions, DialogItem.URS, DialogItem.URS_RI, DialogItem.URS_RI_PARAM2);
+                tEventsNode.addDynamicRef(DialogItem.URS_RI_PARAM3, ReferenceType.Misc, "ursri", "value3id",
+                        savedOptions, DialogItem.URS, DialogItem.URS_RI, DialogItem.URS_RI_PARAM3);
+                tEventsNode.addDynamicRef(DialogItem.URS_RI_PARAM4, ReferenceType.Misc, "ursri", "value4id",
+                        savedOptions, DialogItem.URS, DialogItem.URS_RI, DialogItem.URS_RI_PARAM4);
+                tEventsNode.addDynamicRef(DialogItem.URS_RI_PARAM5, ReferenceType.Misc, "ursri", "value5id",
+                        savedOptions, DialogItem.URS, DialogItem.URS_RI, DialogItem.URS_RI_PARAM5);
 
                 // tEventsNode.addDynamicRef(DialogItem.URS_RI_SUBFUNCTION,
                 // ReferenceType.URSMETHOD, "ursri", "subfuncID");
@@ -220,29 +247,33 @@ final public class RoutingResults extends IQueryResults {
         }
         try {
             if (DatabaseConnector.TableExist(TableType.URSHTTP)) {
-                tEventsNode = new DynamicTreeNode<>(new OptionNode(true, DialogItem.URS_HTTP));
+                tEventsNode = new DynamicTreeNode<>(
+                        new OptionNode(true, DialogItem.URS_HTTP, savedOptions, DialogItem.URS, DialogItem.URS_HTTP));
                 reportTypeURSStrategy.addChild(tEventsNode);
                 tEventsNode.addDynamicRef(DialogItem.URS_HTTP_METHOD, ReferenceType.HTTPMethod,
-                        TableType.URSHTTP.toString(), "methodID");
+                        TableType.URSHTTP.toString(), "methodID", savedOptions, DialogItem.URS, DialogItem.URS_HTTP,
+                        DialogItem.URS_HTTP_METHOD);
                 tEventsNode.addDynamicRef(DialogItem.URS_HTTP_URI, ReferenceType.HTTPRequest,
-                        TableType.URSHTTP.toString(), "URIID");
+                        TableType.URSHTTP.toString(), "URIID", savedOptions, DialogItem.URS, DialogItem.URS_HTTP,
+                        DialogItem.URS_HTTP_URI);
                 tEventsNode.addDynamicRef(DialogItem.URS_RI_PARAM1, ReferenceType.Misc, TableType.URSHTTP.toString(),
-                        "value1id");
+                        "value1id", savedOptions, DialogItem.URS, DialogItem.URS_HTTP, DialogItem.URS_RI_PARAM1);
                 tEventsNode.addDynamicRef(DialogItem.URS_RI_PARAM2, ReferenceType.Misc, TableType.URSHTTP.toString(),
-                        "value2id");
+                        "value2id", savedOptions, DialogItem.URS, DialogItem.URS_HTTP, DialogItem.URS_RI_PARAM2);
                 tEventsNode.addDynamicRef(DialogItem.URS_RI_PARAM3, ReferenceType.Misc, TableType.URSHTTP.toString(),
-                        "value3id");
+                        "value3id", savedOptions, DialogItem.URS, DialogItem.URS_HTTP, DialogItem.URS_RI_PARAM3);
                 tEventsNode.addDynamicRef(DialogItem.URS_RI_PARAM4, ReferenceType.Misc, TableType.URSHTTP.toString(),
-                        "value4id");
+                        "value4id", savedOptions, DialogItem.URS, DialogItem.URS_HTTP, DialogItem.URS_RI_PARAM4);
                 tEventsNode.addDynamicRef(DialogItem.URS_RI_PARAM5, ReferenceType.Misc, TableType.URSHTTP.toString(),
-                        "value5id");
+                        "value5id", savedOptions, DialogItem.URS, DialogItem.URS_HTTP, DialogItem.URS_RI_PARAM5);
 
             }
         } catch (SQLException ex) {
             logger.error("fatal: ", ex);
         }
 
-        tEventsNode = new DynamicTreeNode<>(new OptionNode(true, DialogItem.URS_VQ));
+        tEventsNode = new DynamicTreeNode<>(
+                new OptionNode(true, DialogItem.URS_VQ, savedOptions, DialogItem.URS, DialogItem.URS_VQ));
         reportTypeURSStrategy.addChild(tEventsNode);
 
     }
@@ -251,46 +282,64 @@ final public class RoutingResults extends IQueryResults {
         DynamicTreeNode<OptionNode> Attr;
         DynamicTreeNode<OptionNode> tEventsNode;
 
-        DynamicTreeNode<OptionNode> reportTypeORSStrategy = new DynamicTreeNode<>(new OptionNode(true, DialogItem.ORS));
+        JSONObject savedOptions = getQdSettings().getSavedOptions().get(this.getName());
+
+        DynamicTreeNode<OptionNode> reportTypeORSStrategy = new DynamicTreeNode<>(
+                new OptionNode(true, DialogItem.ORS, savedOptions, DialogItem.ORS));
         root.addChild(reportTypeORSStrategy);
 
         if (DatabaseConnector.TableExist("ors_logbr")) {
-            tEventsNode = new DynamicTreeNode<>(new OptionNode(true, DialogItem.ORS_TEVENTS));
+            tEventsNode = new DynamicTreeNode<>(
+                    new OptionNode(true, DialogItem.ORS_TEVENTS, savedOptions, DialogItem.ORS, DialogItem.ORS_TEVENTS));
             reportTypeORSStrategy.addChild(tEventsNode);
-            tEventsNode.addDynamicRef(DialogItem.ORS_TEVENTS_NAME, ReferenceType.TEvent, "ors_logbr", "nameid");
-            tEventsNode.addDynamicRef(DialogItem.ORS_TEVENTS_DN, ReferenceType.DN, "ors_logbr", "thisdnid",
-                    "otherdnid");
-            tEventsNode.addDynamicRef(DialogItem.ORS_TEVENTS_SOURCE, ReferenceType.App, "ors_logbr", "sourceID");
-            tEventsNode.addDynamicRef(DialogItem.TLIB_CALLS_TEVENT_ANI, ReferenceType.DN, "ors_logbr", "aniid");
-            tEventsNode.addDynamicRef(DialogItem.TLIB_CALLS_TEVENT_DNIS, ReferenceType.DN, "ors_logbr", "dnisid");
+            tEventsNode.addDynamicRef(DialogItem.ORS_TEVENTS_NAME, ReferenceType.TEvent, "ors_logbr", "nameid",
+                    savedOptions, DialogItem.ORS, DialogItem.ORS_TEVENTS, DialogItem.ORS_TEVENTS_NAME);
+            tEventsNode.addDynamicRef(DialogItem.ORS_TEVENTS_DN, ReferenceType.DN, "ors_logbr", "thisdnid", "otherdnid",
+                    savedOptions, DialogItem.ORS, DialogItem.ORS_TEVENTS, DialogItem.ORS_TEVENTS_DN);
+            tEventsNode.addDynamicRef(DialogItem.ORS_TEVENTS_SOURCE, ReferenceType.App, "ors_logbr", "sourceID",
+                    savedOptions, DialogItem.ORS, DialogItem.ORS_TEVENTS, DialogItem.ORS_TEVENTS_SOURCE);
+            tEventsNode.addDynamicRef(DialogItem.TLIB_CALLS_TEVENT_ANI, ReferenceType.DN, "ors_logbr", "aniid",
+                    savedOptions, DialogItem.ORS, DialogItem.ORS_TEVENTS, DialogItem.TLIB_CALLS_TEVENT_ANI);
+            tEventsNode.addDynamicRef(DialogItem.TLIB_CALLS_TEVENT_DNIS, ReferenceType.DN, "ors_logbr", "dnisid",
+                    savedOptions, DialogItem.ORS, DialogItem.ORS_TEVENTS, DialogItem.TLIB_CALLS_TEVENT_DNIS);
 
         }
 
         if (DatabaseConnector.TableExist("orsmm")) {
-            tEventsNode = new DynamicTreeNode<>(new OptionNode(true, DialogItem.ORS_IXN));
+            tEventsNode = new DynamicTreeNode<>(
+                    new OptionNode(true, DialogItem.ORS_IXN, savedOptions, DialogItem.ORS, DialogItem.ORS_IXN));
             reportTypeORSStrategy.addChild(tEventsNode);
-            tEventsNode.addDynamicRef(DialogItem.ORS_IXN_NAME, ReferenceType.TEvent, "orsmm", "nameid");
+            tEventsNode.addDynamicRef(DialogItem.ORS_IXN_NAME, ReferenceType.TEvent, "orsmm", "nameid", savedOptions,
+                    DialogItem.ORS, DialogItem.ORS_IXN, DialogItem.ORS_IXN_NAME);
             // tEventsNode.addDynamicRef(DialogItem.ORS_TEVENTS_DN, ReferenceType.DN,
             // "orsmm", "thisdnid", "otherdnid");
         }
 
-        DynamicTreeNode<OptionNode> strategy = new DynamicTreeNode<>(new OptionNode(true, DialogItem.ORS_STRATEGY));
+        DynamicTreeNode<OptionNode> strategy = new DynamicTreeNode<>(
+                new OptionNode(true, DialogItem.ORS_STRATEGY, savedOptions, DialogItem.ORS, DialogItem.ORS_STRATEGY));
         reportTypeORSStrategy.addChild(strategy);
-        strategy.addDynamicRef(DialogItem.ORS_STRATEGY_METRIC, ReferenceType.METRIC);
-        strategy.addDynamicRef(DialogItem.ORS_STRATEGY_METRICPARAM1, ReferenceType.METRIC_PARAM1);
-        strategy.addDynamicRef(DialogItem.ORS_STRATEGY_METRICEXT, ReferenceType.METRICFUNC);
+        strategy.addDynamicRef(DialogItem.ORS_STRATEGY_METRIC, ReferenceType.METRIC, savedOptions, DialogItem.ORS,
+                DialogItem.ORS_STRATEGY, DialogItem.ORS_STRATEGY_METRIC);
+        strategy.addDynamicRef(DialogItem.ORS_STRATEGY_METRICPARAM1, ReferenceType.METRIC_PARAM1, savedOptions,
+                DialogItem.ORS, DialogItem.ORS_STRATEGY, DialogItem.ORS_STRATEGY_METRICPARAM1);
+        strategy.addDynamicRef(DialogItem.ORS_STRATEGY_METRICEXT, ReferenceType.METRICFUNC, savedOptions,
+                DialogItem.ORS, DialogItem.ORS_STRATEGY, DialogItem.ORS_STRATEGY_METRICEXT);
 
-        Attr = new DynamicTreeNode<>(new OptionNode(true, DialogItem.ORS_SESSION));
+        Attr = new DynamicTreeNode<>(
+                new OptionNode(true, DialogItem.ORS_SESSION, savedOptions, DialogItem.ORS, DialogItem.ORS_SESSION));
         reportTypeORSStrategy.addChild(Attr);
 
         if (DatabaseConnector.TableExist("orshttp")) {
-            Attr = new DynamicTreeNode<>(new OptionNode(true, DialogItem.ORS_HTTP));
+            Attr = new DynamicTreeNode<>(
+                    new OptionNode(true, DialogItem.ORS_HTTP, savedOptions, DialogItem.ORS, DialogItem.ORS_HTTP));
             reportTypeORSStrategy.addChild(Attr);
         }
         if (DatabaseConnector.TableExist("orsurs_logbr")) {
-            strategy = new DynamicTreeNode<>(new OptionNode(true, DialogItem.ORS_ORSURS));
+            strategy = new DynamicTreeNode<>(
+                    new OptionNode(true, DialogItem.ORS_ORSURS, savedOptions, DialogItem.ORS, DialogItem.ORS_ORSURS));
             reportTypeORSStrategy.addChild(strategy);
-            strategy.addDynamicRef(DialogItem.ORS_ORSURS_METHOD, ReferenceType.ORSMETHOD);
+            strategy.addDynamicRef(DialogItem.ORS_ORSURS_METHOD, ReferenceType.ORSMETHOD, savedOptions, DialogItem.ORS,
+                    DialogItem.ORS_ORSURS, DialogItem.ORS_ORSURS_METHOD);
         }
 
     }
@@ -305,11 +354,9 @@ final public class RoutingResults extends IQueryResults {
             inquirer.logger.info("Building temp tables");
 
             tellProgress("Creating temp table");
-            DatabaseConnector.runQuery("create temp table " + reqORSStrategies + " ("
-                    + "started timestamp" + ",rowtype int" + ",appid int"
-                    + ",uuidid int" + ",ixnidid int" + ",strnameid int"
-                    + ",urlid int" + ",ended timestamp" + ",sidid timestamp"
-                    + ", sourceid int\n" + ")\n;");
+            DatabaseConnector.runQuery("create temp table " + reqORSStrategies + " (" + "started timestamp"
+                    + ",rowtype int" + ",appid int" + ",uuidid int" + ",ixnidid int" + ",strnameid int" + ",urlid int"
+                    + ",ended timestamp" + ",sidid timestamp" + ", sourceid int\n" + ")\n;");
 
             String tab = null;
 
@@ -410,9 +457,8 @@ final public class RoutingResults extends IQueryResults {
                     "create index idx_" + reqORSStrategies + "sourceid on " + reqORSStrategies + "(sourceid);");
             DatabaseConnector
                     .runQuery("create index idx_" + reqORSStrategies + "sidid on " + reqORSStrategies + "(sidid);");
-            DatabaseConnector
-                    .runQuery("create index idx_" + reqORSStrategies + "strnameid on " + reqORSStrategies
-                            + "(strnameid);");
+            DatabaseConnector.runQuery(
+                    "create index idx_" + reqORSStrategies + "strnameid on " + reqORSStrategies + "(strnameid);");
 
             tellProgress("Extracting data");
             TableQuery tabReport = new TableQuery(reqORSStrategies);
@@ -433,8 +479,9 @@ final public class RoutingResults extends IQueryResults {
             tabReport.addRef("strnameid", "strategy", ReferenceType.METRIC_PARAM1.toString(),
                     IQuery.FieldType.OPTIONAL);
             int maxRecs = settings.getMaxRecords();
-            if (maxRecs > 0)
+            if (maxRecs > 0) {
                 tabReport.setLimit(maxRecs);
+            }
 
             FullTableColors currTable = tabReport.getFullTable();
             currTable.setHiddenField("rowType");
@@ -458,8 +505,7 @@ final public class RoutingResults extends IQueryResults {
             DatabaseConnector.runQuery("create temp table " + orsCallsReport + " (" + "connectionidid int"
                     + ",started timestamp" + ",ended timestamp" + ",rowtype int" + ",appid int" + ",thisdnid int"
                     + ",otherdnid int" + ",nameid int" + ",uuidid int" + ",ixnidid int" + ",strnameid int"
-                    + ",urlid int" + ",sidid timestamp"
-                    + ", sourceid int\n" + ")\n;");
+                    + ",urlid int" + ",sidid timestamp" + ", sourceid int\n" + ")\n;");
 
             // <editor-fold defaultstate="collapsed" desc="URS connIDs">
             Wheres wh = new Wheres();
@@ -490,9 +536,8 @@ final public class RoutingResults extends IQueryResults {
                 DatabaseConnector
                         .runQuery(" update " + orsCallsReport + " set rowtype=" + FileInfoType.type_URS.getValue());
 
-                DatabaseConnector
-                        .runQuery("create index idx_" + orsCallsReport + "connID on " + orsCallsReport
-                                + "(connectionidid);");
+                DatabaseConnector.runQuery(
+                        "create index idx_" + orsCallsReport + "connID on " + orsCallsReport + "(connectionidid);");
                 DatabaseConnector
                         .runQuery("create index idx_" + orsCallsReport + "started on " + orsCallsReport + "(started);");
 
@@ -503,12 +548,12 @@ final public class RoutingResults extends IQueryResults {
                         + ", sourceid" + "\nfrom\n" + "(select " + tab + ".*" + ",file_logbr.appnameid as appid"
                         + "\nfrom " + tab + " inner join file_logbr on " + tab + ".fileid=file_logbr.id" + ") as " + tab
                         + "\nwhere " + orsCallsReport + ".connectionidid=" + tab + ".connectionidid" + "\nand\n"
-                        + orsCallsReport
-                        + ".started=" + tab + ".time" + "\n"
+                        + orsCallsReport + ".started=" + tab + ".time" + "\n"
                         + IQuery.getFileFilters(tab, "fileid", qd.getSearchApps(false), "AND") + "\n"
                         + IQuery.getDateTimeFilters(tab, "time", qd.getTimeRange(), "AND") + ")" + ";");
-            } else
+            } else {
                 logger.error("Neither routing table found");
+            }
 
             tellProgress("Creating indexes");
             DatabaseConnector
@@ -550,8 +595,9 @@ final public class RoutingResults extends IQueryResults {
             tabReport.addRef("appid", "application", ReferenceType.App.toString(), IQuery.FieldType.OPTIONAL);
             tabReport.addRef("sidid", "sid", ReferenceType.ORSSID.toString(), IQuery.FieldType.OPTIONAL);
             int maxRecs = settings.getMaxRecords();
-            if (maxRecs > 0)
+            if (maxRecs > 0) {
                 tabReport.setLimit(maxRecs);
+            }
 
             FullTableColors currTable = tabReport.getFullTable();
             currTable.setHiddenField("rowType");
@@ -571,14 +617,9 @@ final public class RoutingResults extends IQueryResults {
         inquirer.logger.info("Building temp tables");
 
         tellProgress("Creating temp table");
-        DatabaseConnector.runQuery("create temp table " + reportTable + "\n(" + "ixnidid int"
-                + ",\nstarted timestamp" + ",ended timestamp" + ",appid int"
-                + ",rowtype int"
-                + ",\nnameid int" + ",uuidid int" + ",sess_count int"
-                + ",\nsourceid int"
-                + ",\nmediaid int"
-                + ",\nqueueid int"
-                + ")\n;");
+        DatabaseConnector.runQuery("create temp table " + reportTable + "\n(" + "ixnidid int" + ",\nstarted timestamp"
+                + ",ended timestamp" + ",appid int" + ",rowtype int" + ",\nnameid int" + ",uuidid int"
+                + ",sess_count int" + ",\nsourceid int" + ",\nmediaid int" + ",\nqueueid int" + ")\n;");
 
         String tab = "orsmm";
 
@@ -587,46 +628,40 @@ final public class RoutingResults extends IQueryResults {
 
             getAllResults.add(new Pair<>("Unique interactions in ORS",
                     DatabaseConnector.runQuery("insert into " + reportTable + " (ixnidid, started, ended)"
-                            + "\nselect distinct ixnidid, min(time), max(time) from " + tab
-                            + "\nwhere ixnidid >0  "
+                            + "\nselect distinct ixnidid, min(time), max(time) from " + tab + "\nwhere ixnidid >0  "
                             + IQuery.getFileFilters(tab, "fileid", qd.getSearchApps(false), "AND")
-                            + IQuery.getDateTimeFilters(tab, "time", qd.getTimeRange(), "AND")
-                            + "\ngroup by 1" + IQuery.getLimitClause(isLimitQueryResults(), getMaxQueryLines())
-                            + ";")));
-            DatabaseConnector
-                    .runQuery(" update " + reportTable + " set rowtype=" + FileInfoType.type_ORS.getValue());
+                            + IQuery.getDateTimeFilters(tab, "time", qd.getTimeRange(), "AND") + "\ngroup by 1"
+                            + IQuery.getLimitClause(isLimitQueryResults(), getMaxQueryLines()) + ";")));
+            DatabaseConnector.runQuery(" update " + reportTable + " set rowtype=" + FileInfoType.type_ORS.getValue());
 
-            DatabaseConnector
-                    .runQuery("create index idx_" + reportTable + "ixnidid on " + reportTable + "(ixnidid);");
-            DatabaseConnector
-                    .runQuery("create index idx_" + reportTable + "started on " + reportTable + "(started);");
+            DatabaseConnector.runQuery("create index idx_" + reportTable + "ixnidid on " + reportTable + "(ixnidid);");
+            DatabaseConnector.runQuery("create index idx_" + reportTable + "started on " + reportTable + "(started);");
 
             tellProgress("Updating parameters of ORS calls");
-            DatabaseConnector.runQuery("update " + reportTable + "\nset (" + "nameid" + ", appid"
-                    + ", sourceid" + ", mediaid" + ", queueid" + ") = " + "\n(" + "select "
-                    + "nameid" + ", appid "
-                    + ", sourceid" + ", mediaID" + ", queueid" + "\nfrom\n" + "(select " + tab + ".*"
-                    + ",file_logbr.appnameid as appid"
-                    + "\nfrom " + tab + " inner join file_logbr on " + tab + ".fileid=file_logbr.id" + ") as " + tab
-                    + "\nwhere " + reportTable + ".ixnidid=" + tab + ".ixnidid"
-                    + "\nand\n" + reportTable + ".started=" + tab + ".time" + "\n"
+            DatabaseConnector.runQuery("update " + reportTable + "\nset (" + "nameid" + ", appid" + ", sourceid"
+                    + ", mediaid" + ", queueid" + ") = " + "\n(" + "select " + "nameid" + ", appid " + ", sourceid"
+                    + ", mediaID" + ", queueid" + "\nfrom\n" + "(select " + tab + ".*"
+                    + ",file_logbr.appnameid as appid" + "\nfrom " + tab + " inner join file_logbr on " + tab
+                    + ".fileid=file_logbr.id" + ") as " + tab + "\nwhere " + reportTable + ".ixnidid=" + tab
+                    + ".ixnidid" + "\nand\n" + reportTable + ".started=" + tab + ".time" + "\n"
                     + IQuery.getFileFilters(tab, "fileid", qd.getSearchApps(false), "AND") + "\n"
                     + IQuery.getDateTimeFilters(tab, "time", qd.getTimeRange(), "AND") + ")" + ";");
 
             DatabaseConnector.runQuery("create index idx_" + reportTable + "appid on " + reportTable + "(appid);");
-        } else
+        } else {
             logger.error("Neither routing table found");
+        }
 
         tab = "ORSsessixn";
 
         if (!StringUtils.isEmpty(tab)) {
 
             tellProgress("Updating parameters of ORS calls");
-            DatabaseConnector.runQuery("update " + reportTable + "\nset (" + "sess_count" + ") = " + "\n("
-                    + "select " + "cnt " + "\nfrom\n" + "(select count(*) as cnt, ixnid" + "\nfrom " + tab
-                    + "\nwhere 1=1" + "\n" + IQuery.getFileFilters(tab, "fileid", qd.getSearchApps(false), "AND")
-                    + "\n" + IQuery.getDateTimeFilters(tab, "time", qd.getTimeRange(), "AND") + " group by ixnid"
-                    + ") as " + tab + "\nwhere " + reportTable + ".ixnidid=" + tab + ".ixnid"
+            DatabaseConnector.runQuery("update " + reportTable + "\nset (" + "sess_count" + ") = " + "\n(" + "select "
+                    + "cnt " + "\nfrom\n" + "(select count(*) as cnt, ixnid" + "\nfrom " + tab + "\nwhere 1=1" + "\n"
+                    + IQuery.getFileFilters(tab, "fileid", qd.getSearchApps(false), "AND") + "\n"
+                    + IQuery.getDateTimeFilters(tab, "time", qd.getTimeRange(), "AND") + " group by ixnid" + ") as "
+                    + tab + "\nwhere " + reportTable + ".ixnidid=" + tab + ".ixnid"
                     // + "\nand\n"
                     + ")" + ";");
         }
@@ -648,8 +683,9 @@ final public class RoutingResults extends IQueryResults {
         tabReport.addRef("mediaid", "media", ReferenceType.Media.toString(), IQuery.FieldType.OPTIONAL);
         tabReport.addRef("queueid", "\"First Queue\"", ReferenceType.DN.toString(), IQuery.FieldType.OPTIONAL);
         int maxRecs = settings.getMaxRecords();
-        if (maxRecs > 0)
+        if (maxRecs > 0) {
             tabReport.setLimit(maxRecs);
+        }
 
         FullTableColors currTable = tabReport.getFullTable();
         currTable.setHiddenField("rowType");
@@ -713,8 +749,9 @@ final public class RoutingResults extends IQueryResults {
                         + "\nand\n" + reportTable + ".started=" + tab + ".time" + "\n"
                         + IQuery.getFileFilters(tab, "fileid", qd.getSearchApps(false), "AND") + "\n"
                         + IQuery.getDateTimeFilters(tab, "time", qd.getTimeRange(), "AND") + ")" + ";");
-            } else
+            } else {
                 logger.error("Neither routing table found");
+            }
 
             tellProgress("Creating indexes");
             DatabaseConnector.runQuery("create index idx_" + reportTable + "appid on " + reportTable + "(appid);");
@@ -762,8 +799,9 @@ final public class RoutingResults extends IQueryResults {
             tabReport.addRef("nameid", "\"First TEvent\"", ReferenceType.TEvent.toString(), IQuery.FieldType.OPTIONAL);
             tabReport.addRef("appid", "application", ReferenceType.App.toString(), IQuery.FieldType.OPTIONAL);
             int maxRecs = settings.getMaxRecords();
-            if (maxRecs > 0)
+            if (maxRecs > 0) {
                 tabReport.setLimit(maxRecs);
+            }
 
             // tabReport.setOrderBy(tabReport.getTabAlias() + ".started");
             FullTableColors currTable = tabReport.getFullTable();
@@ -832,8 +870,9 @@ final public class RoutingResults extends IQueryResults {
                         + ".started=" + tab + ".time" + "\n"
                         + IQuery.getFileFilters(tab, "fileid", qd.getSearchApps(false), "AND") + "\n"
                         + IQuery.getDateTimeFilters(tab, "time", qd.getTimeRange(), "AND") + ")" + ";");
-            } else
+            } else {
                 logger.error("Neither routing table found");
+            }
 
             tab = "ursstrinit_logbr";
             tellProgress("Finding strategy init parameters");
@@ -970,10 +1009,8 @@ final public class RoutingResults extends IQueryResults {
         SearchFields ret = new SearchFields();
         ret.addRecMap(com.myutils.logbrowser.indexer.FileInfoType.type_URS,
                 new Pair<>(SelectionType.CONNID, "connectionid"));
-        ret.addRecMap(com.myutils.logbrowser.indexer.FileInfoType.type_URS,
-                new Pair<>(SelectionType.UUID, "uuid"));
-        ret.addRecMap(com.myutils.logbrowser.indexer.FileInfoType.type_URS,
-                new Pair<>(SelectionType.IXN, "ixnid"));
+        ret.addRecMap(com.myutils.logbrowser.indexer.FileInfoType.type_URS, new Pair<>(SelectionType.UUID, "uuid"));
+        ret.addRecMap(com.myutils.logbrowser.indexer.FileInfoType.type_URS, new Pair<>(SelectionType.IXN, "ixnid"));
         ret.addRecMap(com.myutils.logbrowser.indexer.FileInfoType.type_ORS, new Pair<>(SelectionType.SESSION, "sid"));
         ret.addRecMap(com.myutils.logbrowser.indexer.FileInfoType.type_ORS,
                 new Pair<>(SelectionType.CONNID, "connectionid"));

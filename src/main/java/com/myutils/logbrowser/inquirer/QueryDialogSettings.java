@@ -25,6 +25,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Objects;
+import org.json.JSONObject;
 
 /**
  * @author ssydoruk
@@ -45,6 +46,7 @@ public class QueryDialogSettings implements Serializable {
     // return queries;
     // }
     private final ArrayList<SearchItem> savedSearches = new ArrayList<>();
+    private final SavedOptions savedOptions = new SavedOptions();
     private ArrayList<String> savedFilters = new ArrayList<>();
 
     public QueryDialogSettings() {
@@ -57,6 +59,10 @@ public class QueryDialogSettings implements Serializable {
     // queries.add(qry);
     // }
     //
+
+    public SavedOptions getSavedOptions() {
+        return savedOptions;
+    }
 
     public DynamicTree<OptionNode> getQParams(String iq) {
         return qParams.get(iq);
@@ -185,6 +191,10 @@ public class QueryDialogSettings implements Serializable {
             disabledApps.remove(name);
         }
 
+    }
+
+    void changeSelection(String name, JSONObject selectedJSON) {
+        savedOptions.put(name, selectedJSON);
     }
 
     private class SearchItem {

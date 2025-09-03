@@ -18,12 +18,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.json.JSONObject;
+
 import static com.myutils.logbrowser.inquirer.inquirer.getFirstWord;
 
 /**
  * @author ssydoruk
  */
-@SuppressWarnings({"rawtypes", "unchecked", "this-escape", "serial"})
+@SuppressWarnings({ "rawtypes", "unchecked", "this-escape", "serial" })
 public class DynamicTreeNode<T> extends GenericTreeNode implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -39,17 +41,21 @@ public class DynamicTreeNode<T> extends GenericTreeNode implements Serializable 
 
     public DynamicTreeNode() {
         super();
-//        inquirer.logger.debug(" DynamicTreeNode()");
+        // inquirer.logger.debug(" DynamicTreeNode()");
     }
 
-    //    @Override
-//    public String toString() {
-//        return "DynamicTreeNode{" + "dynamicChildren=" + dynamicChildren + ", ChildrenLoaded=" + ChildrenLoaded + ", refType=" + refType + ", onlyChildrenChecked=" + onlyChildrenChecked + ", loadChildrenProc=" + loadChildrenProc + '}' + ", data: " + ((getData() != null) ? getData().toString() : "[NULL]");
-//    }
+    // @Override
+    // public String toString() {
+    // return "DynamicTreeNode{" + "dynamicChildren=" + dynamicChildren + ",
+    // ChildrenLoaded=" + ChildrenLoaded + ", refType=" + refType + ",
+    // onlyChildrenChecked=" + onlyChildrenChecked + ", loadChildrenProc=" +
+    // loadChildrenProc + '}' + ", data: " + ((getData() != null) ?
+    // getData().toString() : "[NULL]");
+    // }
     public DynamicTreeNode(DynamicTreeNode<T> src) {
         this();
         if (src != null) {
-//            inquirer.logger.debug("Duplicating " + src.toString());
+            // inquirer.logger.debug("Duplicating " + src.toString());
             setData(src.getData());
             if (!src.dynamicChildren || src.ChildrenLoaded) {
                 NodeCopy(src);
@@ -101,25 +107,27 @@ public class DynamicTreeNode<T> extends GenericTreeNode implements Serializable 
         addDynamicRef(AttrDynamic, referenceType, null, null);
     }
 
-    void addDynamicRef(DynamicTreeNode<OptionNode> AttrDynamic, final ReferenceType referenceType, final String CheckTab, final String CheckIDField1) {
+    void addDynamicRef(DynamicTreeNode<OptionNode> AttrDynamic, final ReferenceType referenceType,
+            final String CheckTab, final String CheckIDField1) {
         addDynamicRef(AttrDynamic, referenceType, CheckTab, CheckIDField1, null, false);
     }
 
-    private void addDynamicRef(DynamicTreeNode<OptionNode> AttrDynamic, final ReferenceType referenceType, final String CheckTab,
-                               final String CheckIDField1, final String CheckIDField2, final boolean alwaysCheck) {
+    private void addDynamicRef(DynamicTreeNode<OptionNode> AttrDynamic, final ReferenceType referenceType,
+            final String CheckTab, final String CheckIDField1, final String CheckIDField2, final boolean alwaysCheck) {
         AttrDynamic.setRefType(referenceType);
         AttrDynamic.setLoadChildrenProc(new DynamicTreeNode.ILoadChildrenProc() {
             @Override
             public ArrayList<NameID> LoadChidlren(DynamicTreeNode node) {
                 try {
 
-                    // quick shortcut to make it run faster. Need to add option to check reference 
+                    // quick shortcut to make it run faster. Need to add option to check reference
                     if (inquirer.ee.isRefSyncDisabled()) {
                         return QueryTools.getRefNamesNameID(this, referenceType, null, null, null);
                     } else {
-                        return QueryTools.getRefNamesNameID(this, referenceType, CheckTab, CheckIDField1, CheckIDField2);
+                        return QueryTools.getRefNamesNameID(this, referenceType, CheckTab, CheckIDField1,
+                                CheckIDField2);
                     }
-//                    }
+                    // }
 
                 } catch (SQLException ex) {
                     inquirer.ExceptionHandler.handleException(this.getClass().toString(), ex);
@@ -134,26 +142,29 @@ public class DynamicTreeNode<T> extends GenericTreeNode implements Serializable 
         addChild(AttrDynamic);
     }
 
-    //    private void addDynamicRef(DynamicTreeNode<OptionNode> AttrDynamic, final ReferenceType referenceType, final String CheckTab,
-//            final String CheckIDField1, final String CheckIDField2, final boolean alwaysCheck) {
-//        AttrDynamic.setRefType(referenceType);
-//        AttrDynamic.setLoadChildrenProc(new DynamicTreeNode.ILoadChildrenProc() {
-//            public String[] LoadChidlren() {
-//                try {
-//                    if (!alwaysCheck && DatabaseConnector.onlyOneApp()) {
-//                        return getRefNames(this, referenceType);
-//                    } else {
-//                        return getRefNames(this, referenceType, CheckTab, CheckIDField1, CheckIDField2);
-//                    }
-//
-//                } catch (Exception ex) {
-//                    inquirer.ExceptionHandler.handleException(this.getClass().toString(), ex);
-//                }
-//                return null;
-//            }
-//        });
-//        addChild(AttrDynamic);
-//    }
+    // private void addDynamicRef(DynamicTreeNode<OptionNode> AttrDynamic, final
+    // ReferenceType referenceType, final String CheckTab,
+    // final String CheckIDField1, final String CheckIDField2, final boolean
+    // alwaysCheck) {
+    // AttrDynamic.setRefType(referenceType);
+    // AttrDynamic.setLoadChildrenProc(new DynamicTreeNode.ILoadChildrenProc() {
+    // public String[] LoadChidlren() {
+    // try {
+    // if (!alwaysCheck && DatabaseConnector.onlyOneApp()) {
+    // return getRefNames(this, referenceType);
+    // } else {
+    // return getRefNames(this, referenceType, CheckTab, CheckIDField1,
+    // CheckIDField2);
+    // }
+    //
+    // } catch (Exception ex) {
+    // inquirer.ExceptionHandler.handleException(this.getClass().toString(), ex);
+    // }
+    // return null;
+    // }
+    // });
+    // addChild(AttrDynamic);
+    // }
     void addDynamicRef(String name, final ReferenceType referenceType) {
         addDynamicRef(new DynamicTreeNode<>(new OptionNode(name)), referenceType);
     }
@@ -164,26 +175,53 @@ public class DynamicTreeNode<T> extends GenericTreeNode implements Serializable 
         return ret;
     }
 
-    DynamicTreeNode<OptionNode> addDynamicRef(DialogItem dialogItem, ReferenceType referenceType, String[] onlyChecked) {
+    DynamicTreeNode<OptionNode> addDynamicRef(DialogItem name, final ReferenceType referenceType,
+            JSONObject savedOptions, DialogItem... savedOptionPath) {
+        DynamicTreeNode<OptionNode> ret = new DynamicTreeNode<>(new OptionNode(name, savedOptions, savedOptionPath));
+        addDynamicRef(ret, referenceType);
+        return ret;
+    }
+
+    DynamicTreeNode<OptionNode> addDynamicRef(DialogItem dialogItem, ReferenceType referenceType,
+            String[] onlyChecked) {
         DynamicTreeNode<OptionNode> ret = addDynamicRef(dialogItem, referenceType);
         ret.setOnlyChecked(onlyChecked);
         return ret;
     }
 
-    void addDynamicRef(DialogItem name, final ReferenceType referenceType, final String CheckTab, final String CheckIDField) {
+    void addDynamicRef(DialogItem name, final ReferenceType referenceType, final String CheckTab,
+            final String CheckIDField) {
         addDynamicRef(new DynamicTreeNode<>(new OptionNode(name)), referenceType, CheckTab, CheckIDField);
     }
-    
-    void addDynamicRef(DialogItem name, final ReferenceType referenceType, final TableType CheckTab, final String CheckIDField) {
+
+    void addDynamicRef(DialogItem name, final ReferenceType referenceType, final String CheckTab,
+            final String CheckIDField, JSONObject savedOptions, DialogItem... savedOptionPath) {
+        addDynamicRef(new DynamicTreeNode<>(new OptionNode(name, savedOptions, savedOptionPath)), referenceType,
+                CheckTab, CheckIDField);
+    }
+
+    void addDynamicRef(DialogItem name, final ReferenceType referenceType, final TableType CheckTab,
+            final String CheckIDField) {
         addDynamicRef(new DynamicTreeNode<>(new OptionNode(name)), referenceType, CheckTab.toString(), CheckIDField);
     }
 
-    void addDynamicRef(DialogItem name, final ReferenceType referenceType, final String CheckTab, final String CheckIDField, final boolean alwaysCheck) {
-        addDynamicRef(new DynamicTreeNode<>(new OptionNode(name)), referenceType, CheckTab, CheckIDField, null, alwaysCheck);
+    void addDynamicRef(DialogItem name, final ReferenceType referenceType, final String CheckTab,
+            final String CheckIDField, final boolean alwaysCheck) {
+        addDynamicRef(new DynamicTreeNode<>(new OptionNode(name)), referenceType, CheckTab, CheckIDField, null,
+                alwaysCheck);
     }
 
-    void addDynamicRef(DialogItem name, final ReferenceType referenceType, final String CheckTab, final String CheckIDField1, final String CheckIDField2) {
-        addDynamicRef(new DynamicTreeNode<>(new OptionNode(name)), referenceType, CheckTab, CheckIDField1, CheckIDField2, false);
+    void addDynamicRef(DialogItem name, final ReferenceType referenceType, final String CheckTab,
+            final String CheckIDField1, final String CheckIDField2) {
+        addDynamicRef(new DynamicTreeNode<>(new OptionNode(name)), referenceType, CheckTab, CheckIDField1,
+                CheckIDField2, false);
+    }
+
+    void addDynamicRef(DialogItem name, final ReferenceType referenceType, final String CheckTab,
+            final String CheckIDField1, final String CheckIDField2, JSONObject savedOptions,
+            DialogItem... savedOptionPath) {
+        addDynamicRef(new DynamicTreeNode<>(new OptionNode(name, savedOptions, savedOptionPath)), referenceType,
+                CheckTab, CheckIDField1, CheckIDField2, false);
     }
 
     private void addDynamicRefLogMessage(DynamicTreeNode<OptionNode> AttrDynamic, final TableType tableType) {
@@ -193,10 +231,10 @@ public class DynamicTreeNode<T> extends GenericTreeNode implements Serializable 
             @Override
             public ArrayList<NameID> LoadChidlren(DynamicTreeNode node) {
                 try {
-//                    return DatabaseConnector.getRefNameIDs(this, ReferenceType.LOGMESSAGE.toString(), null);
+                    // return DatabaseConnector.getRefNameIDs(this,
+                    // ReferenceType.LOGMESSAGE.toString(), null);
 
-                    return DatabaseConnector.getRefNamesNameID(null,
-                            AttrDynamic.refType.toString(),
+                    return DatabaseConnector.getRefNamesNameID(null, AttrDynamic.refType.toString(),
                             tableType.toString(), "MSGID", null);
                 } catch (SQLException ex) {
                     inquirer.ExceptionHandler.handleException(this.getClass().toString(), ex);
@@ -223,11 +261,13 @@ public class DynamicTreeNode<T> extends GenericTreeNode implements Serializable 
     }
 
     public void writeExternal(ObjectOutput out) throws IOException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        throw new UnsupportedOperationException("Not supported yet."); // To change body of generated methods, choose
+                                                                       // Tools | Templates.
     }
 
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        throw new UnsupportedOperationException("Not supported yet."); // To change body of generated methods, choose
+                                                                       // Tools | Templates.
     }
 
     private void setRefType(ReferenceType referenceType) {
@@ -236,23 +276,25 @@ public class DynamicTreeNode<T> extends GenericTreeNode implements Serializable 
 
     void removeDynamicChildren() {
         if (dynamicChildren) {
-//            if (inquirer.logger.isDebugEnabled()) {
-//                if ((OptionNode) getData() == null) {
-//                    inquirer.logger.debug("removing dynamic children; no data");
-//                } else {
-//                    inquirer.logger.debug("removing dynamic children of " + ((OptionNode) getData()).toString() + " (childrenloaded: " + ChildrenLoaded);
-//                }
-//            }
+            // if (inquirer.logger.isDebugEnabled()) {
+            // if ((OptionNode) getData() == null) {
+            // inquirer.logger.debug("removing dynamic children; no data");
+            // } else {
+            // inquirer.logger.debug("removing dynamic children of " + ((OptionNode)
+            // getData()).toString() + " (childrenloaded: " + ChildrenLoaded);
+            // }
+            // }
             removeChildren();
             ChildrenLoaded = false;
         } else {
-//            if (inquirer.logger.isDebugEnabled()) {
-//                if ((OptionNode) getData() == null) {
-//                    inquirer.logger.debug("removing nondynamic children; no data");
-//                } else {
-//                    inquirer.logger.debug("removing nondynamic children of " + ((OptionNode) getData()).toString() + " (childrenloaded: " + ChildrenLoaded);
-//                }
-//            }
+            // if (inquirer.logger.isDebugEnabled()) {
+            // if ((OptionNode) getData() == null) {
+            // inquirer.logger.debug("removing nondynamic children; no data");
+            // } else {
+            // inquirer.logger.debug("removing nondynamic children of " + ((OptionNode)
+            // getData()).toString() + " (childrenloaded: " + ChildrenLoaded);
+            // }
+            // }
             for (DynamicTreeNode<T> ch : getChildren()) {
                 ch.removeDynamicChildren();
             }
@@ -287,7 +329,8 @@ public class DynamicTreeNode<T> extends GenericTreeNode implements Serializable 
          * *****************
          */
         ComponentNode.addDynamicRef(DialogItem.APP_LOG_MESSAGES_TYPE_LEVEL, ReferenceType.MSGLEVEL);
-//        ComponentNode.addDynamicRef(DialogItem.APP_LOG_MESSAGES_TYPE_MESSAGE_ID, ReferenceType.LOGMESSAGE, tableType.toString(), "MSGID");
+        // ComponentNode.addDynamicRef(DialogItem.APP_LOG_MESSAGES_TYPE_MESSAGE_ID,
+        // ReferenceType.LOGMESSAGE, tableType.toString(), "MSGID");
         ComponentNode.addDynamicRefLogMessage(DialogItem.APP_LOG_MESSAGES_TYPE_MESSAGE_ID, tableType);
         return nd;
     }
@@ -317,8 +360,7 @@ public class DynamicTreeNode<T> extends GenericTreeNode implements Serializable 
                             ret.append(",");
                         }
                         if (true) {
-                            ret.append(nameIfChecked).append("{")
-                                    .append(object.getSummary(loadDynamicItems, level - 1))
+                            ret.append(nameIfChecked).append("{").append(object.getSummary(loadDynamicItems, level - 1))
                                     .append("}");
                         }
                     }
@@ -331,15 +373,18 @@ public class DynamicTreeNode<T> extends GenericTreeNode implements Serializable 
     }
 
     String checkedChildrenToString() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        throw new UnsupportedOperationException("Not supported yet."); // To change body of generated methods, choose
+                                                                       // Tools | Templates.
     }
 
     /**
-     * For log messages; searches in the refsHash hashmap and compares only
-     * first word from first word in name
+     * For log messages; searches in the refsHash hashmap and compares only first
+     * word from first word in name
      *
-     * @param name     comes from reference table read from database
-     * @param refsHash hash for name/selected from options
+     * @param name
+     *            comes from reference table read from database
+     * @param refsHash
+     *            hash for name/selected from options
      * @return
      */
     private Boolean checkSelected(String name, HashMap<String, Boolean> refsHash) {
@@ -408,7 +453,8 @@ public class DynamicTreeNode<T> extends GenericTreeNode implements Serializable 
                                     DynamicTreeNode<OptionNode> n = new DynamicTreeNode<>(inst);
                                     addChild(n);
                                 }
-//                            addChildAt(0, new DynamicTreeNode<OptionNode>(new OptionNode(true, true, "<Empty>")));
+                                // addChildAt(0, new DynamicTreeNode<OptionNode>(new OptionNode(true, true,
+                                // "<Empty>")));
                             }
                         }
                         ChildrenLoaded = true;
@@ -431,35 +477,38 @@ public class DynamicTreeNode<T> extends GenericTreeNode implements Serializable 
         } catch (Exception ex) {
             inquirer.ExceptionHandler.handleException(this.getClass().toString(), ex);
         }
-        return (DynamicTreeNode) super.getChildAt(index); //To change body of generated methods, choose Tools | Templates.
+        return (DynamicTreeNode) super.getChildAt(index); // To change body of generated methods, choose Tools |
+                                                          // Templates.
     }
 
     @Override
     public void addChildAt(int index, GenericTreeNode child) throws IndexOutOfBoundsException {
-        super.addChildAt(index, child); //To change body of generated methods, choose Tools | Templates.
-//        dynamicChildren = false;
-//            if (inquirer.logger.isDebugEnabled()) {
-//                if ((OptionNode) getData() == null) {
-//                    inquirer.logger.debug("addChildAt 1 no data");
-//                } else {
-//                    inquirer.logger.debug("addChildAt 1 " + ((OptionNode) getData()).toString() + " (childrenloaded: " + ChildrenLoaded);
-//                }
-//            }
+        super.addChildAt(index, child); // To change body of generated methods, choose Tools | Templates.
+        // dynamicChildren = false;
+        // if (inquirer.logger.isDebugEnabled()) {
+        // if ((OptionNode) getData() == null) {
+        // inquirer.logger.debug("addChildAt 1 no data");
+        // } else {
+        // inquirer.logger.debug("addChildAt 1 " + ((OptionNode) getData()).toString() +
+        // " (childrenloaded: " + ChildrenLoaded);
+        // }
+        // }
 
     }
 
     @Override
     public void addChild(GenericTreeNode child) {
         if (child != null) {
-            super.addChild(child); //To change body of generated methods, choose Tools | Templates.
-        }//        dynamicChildren = false;
-//            if (inquirer.logger.isDebugEnabled()) {
-//                if ((OptionNode) getData() == null) {
-//                    inquirer.logger.debug("addChildAt 2 no data");
-//                } else {
-//                    inquirer.logger.debug("addChildAt 2  " + ((OptionNode) getData()).toString() + " (childrenloaded: " + ChildrenLoaded);
-//                }
-//            }
+            super.addChild(child); // To change body of generated methods, choose Tools | Templates.
+        } // dynamicChildren = false;
+          // if (inquirer.logger.isDebugEnabled()) {
+          // if ((OptionNode) getData() == null) {
+          // inquirer.logger.debug("addChildAt 2 no data");
+          // } else {
+          // inquirer.logger.debug("addChildAt 2 " + ((OptionNode) getData()).toString() +
+          // " (childrenloaded: " + ChildrenLoaded);
+          // }
+          // }
 
     }
 
@@ -470,7 +519,7 @@ public class DynamicTreeNode<T> extends GenericTreeNode implements Serializable 
         } catch (Exception ex) {
             inquirer.ExceptionHandler.handleException(this.getClass().toString(), ex);
         }
-        return super.hasChildren(); //To change body of generated methods, choose Tools | Templates.
+        return super.hasChildren(); // To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
@@ -480,7 +529,7 @@ public class DynamicTreeNode<T> extends GenericTreeNode implements Serializable 
         } catch (Exception ex) {
             inquirer.ExceptionHandler.handleException(this.getClass().toString(), ex);
         }
-        return super.getNumberOfChildren(); //To change body of generated methods, choose Tools | Templates.
+        return super.getNumberOfChildren(); // To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
@@ -491,25 +540,25 @@ public class DynamicTreeNode<T> extends GenericTreeNode implements Serializable 
         } catch (Exception ex) {
             inquirer.ExceptionHandler.handleException(this.getClass().toString(), ex);
         }
-        return super.getChildren(); //To change body of generated methods, choose Tools | Templates.
+        return super.getChildren(); // To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
     public void setChildren(List children) {
-        super.setChildren(children); //To change body of generated methods, choose Tools | Templates.
-//            if (inquirer.logger.isDebugEnabled()) {
-//                if ((OptionNode) getData() == null) {
-//                    inquirer.logger.debug("addChildAt 3 no data");
-//                } else {
-//                    inquirer.logger.debug("addChildAt 3  " + ((OptionNode) getData()).toString() + " (childrenloaded: " + ChildrenLoaded);
-//                }
-//            }
+        super.setChildren(children); // To change body of generated methods, choose Tools | Templates.
+        // if (inquirer.logger.isDebugEnabled()) {
+        // if ((OptionNode) getData() == null) {
+        // inquirer.logger.debug("addChildAt 3 no data");
+        // } else {
+        // inquirer.logger.debug("addChildAt 3 " + ((OptionNode) getData()).toString() +
+        // " (childrenloaded: " + ChildrenLoaded);
+        // }
+        // }
 
-//        dynamicChildren = false;
+        // dynamicChildren = false;
     }
 
-    private void writeObject(ObjectOutputStream s)
-            throws IOException {
+    private void writeObject(ObjectOutputStream s) throws IOException {
         s.defaultWriteObject();
         s.writeObject(getData());
         if (!dynamicChildren || ChildrenLoaded) {
@@ -521,8 +570,7 @@ public class DynamicTreeNode<T> extends GenericTreeNode implements Serializable 
         }
     }
 
-    private void readObject(ObjectInputStream s)
-            throws IOException, ClassNotFoundException {
+    private void readObject(ObjectInputStream s) throws IOException, ClassNotFoundException {
         s.defaultReadObject();
         setData((OptionNode) s.readObject());
         int chN = s.readInt();

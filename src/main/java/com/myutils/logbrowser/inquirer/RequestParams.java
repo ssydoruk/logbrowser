@@ -461,6 +461,7 @@ public class RequestParams extends javax.swing.JPanel {
 
     private void ReportItemChecked(javax.swing.event.ListSelectionEvent evt, CheckBoxList l, CheckBoxList lChild) {
         if (!evt.getValueIsAdjusting()) {
+            boolean valueChanged=false;
 //            inquirer.logger.debug("ReportItemChecked " + evt);
             CheckBoxListSelectionModel lsm = (CheckBoxListSelectionModel) evt.getSource();
             if (lsm.isSelectionEmpty() && lChild != null) {
@@ -481,6 +482,7 @@ public class RequestParams extends javax.swing.JPanel {
                 for (int i = firstIdx; i < lsm.getModel().getSize(); i++) {
                     OptionNode node = (OptionNode) ((DynamicTreeNode<OptionNode>) (lsm.getModel().getElementAt(i))).getData();
                     if (node.isChecked() != lsm.isSelectedIndex(i)) {     //value changed
+                        valueChanged=true;
                         node.setChecked(lsm.isSelectedIndex(i));
                         if (lChild != null) {
                             setChildChecked(lChild, lsm.isSelectedIndex(i), l.getSelectedIndex() == i);
@@ -515,6 +517,9 @@ public class RequestParams extends javax.swing.JPanel {
 ////                    }
 ////                    (DynamicTreeNode<OptionNode>) lm.get(i)
 //                }
+            }
+            if(valueChanged){
+                inquirer.geLocaltQuerySettings().changeSelection(this.getQry().getName(), this.getQry().getSelectedJSON());
             }
         }
 

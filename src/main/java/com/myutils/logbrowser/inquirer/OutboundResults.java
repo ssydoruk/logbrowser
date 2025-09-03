@@ -41,7 +41,7 @@ final class OutboundResults extends IQueryResults {
     private UTCTimeRange timeRange = null;
 
     //    private DynamicTreeNode<OptionNode> repComponents=new DynamicTreeNode<OptionNode>();
-    OutboundResults() throws SQLException {
+    OutboundResults(QueryDialogSettings qdSettings) throws SQLException {
         DynamicTreeNode<OptionNode> rootA = new DynamicTreeNode<>(null);
         repComponents.setRoot(rootA);
 

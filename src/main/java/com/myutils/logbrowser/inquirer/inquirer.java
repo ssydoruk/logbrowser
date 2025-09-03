@@ -440,10 +440,10 @@ public class inquirer {
 
         if (DatabaseConnector.fileExits(
                 new FileInfoType[]{FileInfoType.type_URS, FileInfoType.type_ORS, FileInfoType.type_URSHTTP})) {
-            queries.add(new RoutingResults());
+            queries.add(new RoutingResults(queryDialogSettings));
         }
         if (DatabaseConnector.fileExits(FileInfoType.type_OCS)) {
-            queries.add(new OutboundResults());
+            queries.add(new OutboundResults(queryDialogSettings));
         }
         if (DatabaseConnector.fileExits(FileInfoType.type_StatServer)) {
             queries.add(new StatServerResults(queryDialogSettings));

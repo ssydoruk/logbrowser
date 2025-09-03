@@ -1,6 +1,7 @@
 package com.myutils.logbrowser.inquirer;
 
 import Utils.Pair;
+import com.google.gson.internal.LinkedTreeMap;
 import com.myutils.mygenerictree.TClonable;
 
 import java.io.IOException;
@@ -10,8 +11,9 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import org.json.JSONObject;
 
-@SuppressWarnings({"unchecked", "rawtypes", "serial", "deprecation", "this-escape"})
+@SuppressWarnings({ "unchecked", "rawtypes", "serial", "deprecation", "this-escape" })
 public class OptionNode implements Serializable, TClonable, Comparable {
 
     private static final long serialVersionUID = 2L;
@@ -34,6 +36,11 @@ public class OptionNode implements Serializable, TClonable, Comparable {
         this.id = ch1.getId();
     }
 
+    public OptionNode(boolean b, DialogItem dialogItem, JSONObject savedOptions, DialogItem... savedOptionPath) {
+        this(b, dialogItem.toString());
+        updateEnabledForSavedSettings(savedOptions, savedOptionPath);
+    }
+
     public OptionNode(boolean b, DialogItem dialogItem) {
         this(b, dialogItem.toString());
         this.dialogItem = dialogItem;
@@ -54,14 +61,16 @@ public class OptionNode implements Serializable, TClonable, Comparable {
     public OptionNode(boolean checked, String name) {
         this.checked = checked;
         this.name = name;
-//        inquirer.logger.debug("OptionNode constructor item [" + name + "] checked:" + checked );
+        // inquirer.logger.debug("OptionNode constructor item [" + name + "] checked:" +
+        // checked );
     }
 
     public OptionNode(boolean checked, boolean isEmpty, String name) {
         this.checked = checked;
         this.name = name;
         this.isEmpty = isEmpty;
-//        inquirer.logger.debug("OptionNode constructor item [" + name + "] checked:" + checked );
+        // inquirer.logger.debug("OptionNode constructor item [" + name + "] checked:" +
+        // checked );
     }
 
     public OptionNode(String name) {
@@ -70,6 +79,42 @@ public class OptionNode implements Serializable, TClonable, Comparable {
 
     public OptionNode(DialogItem item) {
         this(true, item);
+    }
+
+    private LinkedTreeMap getTree(JSONObject obj, DialogItem... dialogItem) {
+        LinkedTreeMap ret = null;
+        for (DialogItem item : dialogItem) {
+            if (ret == null) {
+                if (obj.has(item.toString())) {
+                    ret = (LinkedTreeMap) obj.get(item.toString());
+                }
+            } else {
+                ret = (LinkedTreeMap) ret.get(item.toString());
+            }
+            if (ret != null && ret.containsKey("map")) {
+                ret = (LinkedTreeMap) ret.get("map");
+            }
+        }
+        return ret;
+    }
+
+    OptionNode(DialogItem dialogItem, JSONObject savedOptions, DialogItem... savedOptionPath) {
+        this(dialogItem);
+        updateEnabledForSavedSettings(savedOptions, savedOptionPath);
+    }
+
+    private void updateEnabledForSavedSettings(JSONObject savedOptions, DialogItem... savedOptionPath) {
+        if (savedOptions != null) {
+            LinkedTreeMap tree = getTree(savedOptions, savedOptionPath);
+            if (tree != null) {
+                Object enabled = tree.get("enabled");
+                if (enabled == null || !(enabled instanceof Boolean)) {
+                    inquirer.logger.error("Field \"enabled\" not found or is not boolean");
+                } else {
+                    setChecked((Boolean) enabled);
+                }
+            }
+        }
     }
 
     static ArrayList<String> getChecked(DynamicTreeNode<OptionNode> nameSettings) {
@@ -95,23 +140,24 @@ public class OptionNode implements Serializable, TClonable, Comparable {
     }
 
     static String getEmptyClause(DynamicTreeNode<OptionNode> nameSettings) {
-//        for (DynamicTreeNode<OptionNode> col : nameSettings.getChildren()) {
-//            OptionNode data = (OptionNode) col.getData();
-//            if (data.isIsEmpty()) {
-//                StringBuilder ret = new StringBuilder(15);
-//                ret.append("is ");
-//                if (!data.isChecked()) {
-//                    ret.append("not");
-//                }
-//                ret.append(" null");
-//                return ret.toString();
-//            }
-//        }
+        // for (DynamicTreeNode<OptionNode> col : nameSettings.getChildren()) {
+        // OptionNode data = (OptionNode) col.getData();
+        // if (data.isIsEmpty()) {
+        // StringBuilder ret = new StringBuilder(15);
+        // ret.append("is ");
+        // if (!data.isChecked()) {
+        // ret.append("not");
+        // }
+        // ret.append(" null");
+        // return ret.toString();
+        // }
+        // }
         return null;
     }
 
     static String getCheckedIDsList(DynamicTreeNode<OptionNode> nameSettings) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        throw new UnsupportedOperationException("Not supported yet."); // To change body of generated methods, choose
+                                                                       // Tools | Templates.
     }
 
     static String checkedChildrenList(String Field, DynamicTreeNode<OptionNode> nameSettings) {
@@ -144,9 +190,11 @@ public class OptionNode implements Serializable, TClonable, Comparable {
                 }
             }
         }
-        ChildrenChecked ret = (checked > 0 || children.isEmpty()) ? ChildrenChecked.ALL_CHECKED : ChildrenChecked.NONE_CHECKED;
+        ChildrenChecked ret = (checked > 0 || children.isEmpty()) ? ChildrenChecked.ALL_CHECKED
+                : ChildrenChecked.NONE_CHECKED;
         return ret;
-//        return (checked > 0) ? ChildrenChecked.ALL_CHECKED : ChildrenChecked.NONE_CHECKED;
+        // return (checked > 0) ? ChildrenChecked.ALL_CHECKED :
+        // ChildrenChecked.NONE_CHECKED;
 
     }
 
@@ -195,7 +243,7 @@ public class OptionNode implements Serializable, TClonable, Comparable {
 
     @Override
     protected Object clone() throws CloneNotSupportedException {
-        return super.clone(); //To change body of generated methods, choose Tools | Templates.
+        return super.clone(); // To change body of generated methods, choose Tools | Templates.
     }
 
     public DialogItem getDialogItem() {
@@ -207,13 +255,14 @@ public class OptionNode implements Serializable, TClonable, Comparable {
     }
 
     public boolean isChecked() {
-//        inquirer.logger.debug("isChecked returns " + checked + " item [" + name + "]");
+        // inquirer.logger.debug("isChecked returns " + checked + " item [" + name +
+        // "]");
         return checked;
     }
 
     public void setChecked(boolean checked) {
         if (this.checked != checked) {
-//            inquirer.logger.debug("setChecked to " + checked + " item [" + name + "]");
+            // inquirer.logger.debug("setChecked to " + checked + " item [" + name + "]");
             this.checked = checked;
         }
     }
@@ -229,7 +278,8 @@ public class OptionNode implements Serializable, TClonable, Comparable {
     @Override
     public String toString() {
         return name;
-//        return "OptionNode{" + "thePr=" + thePr + ", checked=" + checked + ", name=" + name + ", dialogItem=" + dialogItem + '}';
+        // return "OptionNode{" + "thePr=" + thePr + ", checked=" + checked + ", name="
+        // + name + ", dialogItem=" + dialogItem + '}';
     }
 
     @Override
@@ -239,20 +289,18 @@ public class OptionNode implements Serializable, TClonable, Comparable {
         return optionNode;
     }
 
-    private void writeObject(ObjectOutputStream s)
-            throws IOException {
+    private void writeObject(ObjectOutputStream s) throws IOException {
         s.defaultWriteObject();
         s.writeBoolean(checked);
         s.writeUTF(name);
-//        inquirer.logger.debug("Saved node ["+name+"] checked: "+checked);
+        // inquirer.logger.debug("Saved node ["+name+"] checked: "+checked);
     }
 
-    private void readObject(ObjectInputStream s)
-            throws IOException, ClassNotFoundException {
+    private void readObject(ObjectInputStream s) throws IOException, ClassNotFoundException {
         s.defaultReadObject();
         checked = s.readBoolean();
         name = s.readUTF();
-//        inquirer.logger.debug("Read node ["+name+"] checked: "+checked);
+        // inquirer.logger.debug("Read node ["+name+"] checked: "+checked);
     }
 
     String getValue() {
@@ -269,9 +317,7 @@ public class OptionNode implements Serializable, TClonable, Comparable {
     }
 
     public enum ChildrenChecked {
-        ALL_CHECKED,
-        NONE_CHECKED,
-        PARTIALLY_CHECKED
+        ALL_CHECKED, NONE_CHECKED, PARTIALLY_CHECKED
     }
 
 }
