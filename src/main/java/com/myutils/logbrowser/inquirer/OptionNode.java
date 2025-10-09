@@ -37,7 +37,7 @@ public class OptionNode implements Serializable, TClonable, Comparable {
     }
 
     public OptionNode(boolean b, DialogItem dialogItem, JSONObject savedOptions, DialogItem... savedOptionPath) {
-        this(b, dialogItem.toString());
+        this(b, dialogItem);
         updateEnabledForSavedSettings(savedOptions, savedOptionPath);
     }
 
