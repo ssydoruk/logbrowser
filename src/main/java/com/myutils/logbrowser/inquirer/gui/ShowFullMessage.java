@@ -29,6 +29,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import javax.swing.*;
@@ -36,6 +37,15 @@ import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.text.DefaultCaret;
+import org.apache.commons.text.StringEscapeUtils;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.Lists;
+import java.io.IOException;
+import java.util.Iterator;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * @author ssydoruk
@@ -63,6 +73,9 @@ public class ShowFullMessage extends javax.swing.JFrame implements PopupMenuList
     JMenu mSelection;
 
     JMenuItem miSelectionAsJson;
+    JMenuItem miSelectionJSONinaString;
+    JMenuItem miSelectionJSONwithValuesAsString;
+
     static final Gson gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
 
     /**
@@ -135,6 +148,24 @@ public class ShowFullMessage extends javax.swing.JFrame implements PopupMenuList
 
         });
         mSelection.add(miSelectionAsJson);
+
+        miSelectionJSONinaString = new JMenuItem(new AbstractAction("String value with JSON") {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                showStringAsJson();
+            }
+
+        });
+        mSelection.add(miSelectionJSONinaString);
+
+        miSelectionJSONwithValuesAsString = new JMenuItem(new AbstractAction("JSON with string values as JSON") {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                showJSONwithStringValuesAsJSON();
+            }
+
+        });
+        mSelection.add(miSelectionJSONwithValuesAsString);
 
         miSelectionAsJson = new JMenuItem(new AbstractAction("URL decode") {
             @Override
@@ -250,9 +281,10 @@ public class ShowFullMessage extends javax.swing.JFrame implements PopupMenuList
         invalidate();
     }
 
-    private void showJson() {
+    private void displayJson(String sJSONText) {
         try {
-            String s = gson.toJson(JsonParser.parseString(jtaMessageText.getSelectedText()));
+            String s = gson.toJson(JsonParser.parseString(sJSONText));
+
             detailedData.put(row, s);
             detailedMessage.setText(s);
             detailedMessage.setSyntaxEditingStyle(SyntaxConstants.SYNTAX_STYLE_JSON);
@@ -261,6 +293,82 @@ public class ShowFullMessage extends javax.swing.JFrame implements PopupMenuList
             showDetailed(true);
         } catch (JsonSyntaxException ex) {
             detailedMessage.setText(">>SELECTION IS NOT JSON<<");
+        }
+    }
+
+    private void showJson() {
+        displayJson(jtaMessageText.getSelectedText());
+    }
+
+    
+    private static final Pattern pBackspacedQuotes= Pattern.compile("\\\"");
+    
+    private void showStringAsJson() {
+        try {
+            String s = jtaMessageText.getSelectedText();
+            if(StringUtils.isNotBlank(s)){
+                displayJson(StringEscapeUtils.unescapeJava(s));
+            }
+        } catch (JsonSyntaxException ex) {
+            detailedMessage.setText(">>SELECTION IS NOT JSON<<");
+        }
+    }
+    
+    
+    public JsonNode convertJSONToNode(String json) throws JsonProcessingException, IOException {
+        ObjectMapper mapper = new ObjectMapper();
+        JsonNode jsonNode = mapper.readTree(json);
+
+        return jsonNode;
+    }
+
+    public void walkTree(JsonNode root) {
+        walker(null, root);
+    }
+
+    private void walker(String nodename, JsonNode node) {
+        String nameToPrint = nodename != null ? nodename : "must_be_root";
+        System.out.println("walker - node name: " + nameToPrint);
+        if (node.isObject()) {
+            Iterator<Map.Entry<String, JsonNode>> iterator = node.fields();
+
+            ArrayList<Map.Entry<String, JsonNode>> nodesList = Lists.newArrayList(iterator);
+            System.out.println("Walk Tree - root:" + node + ", elements keys:" + nodesList);
+            for (Map.Entry<String, JsonNode> nodEntry : nodesList) {
+                String name = nodEntry.getKey();
+                JsonNode newNode = nodEntry.getValue();
+
+                // System.out.println("  entry - key: " + name + ", value:" + node);
+                walker(name, newNode);
+            }
+        } else if (node.isArray()) {
+            Iterator<JsonNode> arrayItemsIterator = node.elements();
+            ArrayList<JsonNode> arrayItemsList = Lists.newArrayList(arrayItemsIterator);
+            for (JsonNode arrayNode : arrayItemsList) {
+                walker("array item", arrayNode);
+            }
+        } else {
+            if (node.isValueNode()) {                
+                System.out.println("  valueNode: " + node.asText());
+            } else {
+                System.out.println("  node some other type");
+            }
+        }
+    }
+
+    private void showJSONwithStringValuesAsJSON() {
+        try {
+            String s = jtaMessageText.getSelectedText();
+            walkTree(convertJSONToNode(s));
+            if (StringUtils.isNotBlank(s)) {
+                JsonElement parseString = JsonParser.parseString(s);
+                displayJson(StringEscapeUtils.unescapeJava(s));
+            }
+
+        } catch (JsonSyntaxException ex) {
+            detailedMessage.setText(">>SELECTION IS NOT JSON<<");
+        } catch (IOException ex) {
+            Logger.getLogger(ShowFullMessage.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
@@ -397,7 +505,7 @@ public class ShowFullMessage extends javax.swing.JFrame implements PopupMenuList
             showAllFields();
 
             detailedMessage.setText("");
-            String s=null;
+            String s = null;
             if (StringUtils.isEmpty(recordDisplayScript)) {
                 jtaMessageText.setText(row.getRecord().getBytes());
             } else {
