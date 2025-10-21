@@ -143,7 +143,7 @@ public final class SqliteAccessor implements DBAccessor {
     }
 
     public void DoneInserts() {
-        filesToDelete = null;// just in case, to avoid using of it while finalize
+//        filesToDelete = null;// just in case, to avoid using of it while finalize
         try {
             stats.DoneInserts();
 

@@ -112,8 +112,8 @@ public abstract class DBTable {
         synchronized (getM_dbAccessor()) {
             try {
                 if (Main.isDbExisted() && getM_dbAccessor().TableExist(tabName)) {
-                    List<Long> filesToDelete = getM_dbAccessor().getFilesToDelete();
-                    if (filesToDelete != null) {
+                    List<Long> filesToDelete = new ArrayList<>(getM_dbAccessor().getFilesToDelete());
+                    if (!filesToDelete.isEmpty()) {
                         String fileIDField1 = getFileIDField();
                         if (fileIDField1 != null) { //if tables do not use file ID field, they should set this to null
                             for (Long long1 : filesToDelete) {
