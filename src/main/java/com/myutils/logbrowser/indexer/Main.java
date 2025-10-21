@@ -543,19 +543,22 @@ public class Main {
                                         for (FileInfo fi : logFile.getFileInfos()) {
                                             logger.debug("Processing added file: [" + fi.getM_path() + "] log name [" + fi.getLogFileName() + "]");
 
-                                            ProcessedFiles processedFiles = Main.getInstance().getProcessedFiles().get(fi.getLogFileName());
-                                            if (processedFiles != null) {
-                                                if (processedFiles.getSize() < fi.getSize()) {
+                                            ProcessedFiles processedFile = Main.getInstance().getProcessedFiles().get(fi.getLogFileName());
+                                            if (processedFile != null) {
+                                                if (processedFile.getSize() < fi.getSize()) {
                                                     logger.info(fi.getLogFileName()
-                                                            + " id(" + processedFiles.getId() + ")"
+                                                            + " id(" + processedFile.getId() + ")"
                                                             + ": size[" + fi.getSize()
-                                                            + "] size in DB[" + processedFiles.getSize() + "]; file data to be removed");
-                                                    m_accessor.addFileToDelete(processedFiles.getId());
+                                                            + "] size in DB[" + processedFile.getSize() + "]; file data to be removed");
+                                                    m_accessor.addFileToDelete(processedFile.getId());
+                                                    m_accessor.runQuery("delete from file_logbr where id=" + processedFile.getId() + ";");
+                                                    getProcessedFiles().remove(fi.getLogFileName());
+                                                    getProcessedFiles().remove(fi.getLogFileName());
                                                 } else {
                                                     logger.info(fi.getLogFileName()
-                                                            + " id(" + processedFiles.getId() + ")"
+                                                            + " id(" + processedFile.getId() + ")"
                                                             + ": size[" + fi.getSize()
-                                                            + "] size in DB[" + processedFiles.getSize() + "]; new file ignored");
+                                                            + "] size in DB[" + processedFile.getSize() + "]; new file ignored");
                                                     continue;
                                                 }
                                             }
@@ -641,6 +644,8 @@ public class Main {
                                     + "] size in DB[" + pf.getSize() + "]; file data to be removed");
                             filesToDelete.add(pf.getId());
                             filesToProcess.add(fi);
+                            m_accessor.runQuery("delete from file_logbr where id=" + pf.getId() + ";");
+                            getProcessedFiles().remove(fi.getLogFileName());
                         }
                     }
                 }
