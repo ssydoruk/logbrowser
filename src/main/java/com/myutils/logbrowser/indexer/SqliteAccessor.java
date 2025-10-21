@@ -84,9 +84,7 @@ public final class SqliteAccessor implements DBAccessor {
     }
 
     void setFilesToDelete(ArrayList<Long> filesToDelete) {
-        if (!filesToDelete.isEmpty()) {
-            this.filesToDelete.addAll(filesToDelete);
-        }
+        this.filesToDelete.addAll(filesToDelete);
     }
 
     public String getM_alias() {
@@ -112,7 +110,8 @@ public final class SqliteAccessor implements DBAccessor {
         synchronized (m_conn) {
             try {
                 try (Statement statement = m_conn.createStatement()) {
-                    statement.executeUpdate(query);
+                    int res = statement.executeUpdate(query);
+                    logger.debug("affected records: " + res);
                 }
             } catch (SQLException e) {
                 logger.error("ExecuteQuery failed: " + e + " query " + query, e);
