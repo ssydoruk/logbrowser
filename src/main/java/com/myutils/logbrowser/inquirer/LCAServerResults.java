@@ -101,7 +101,7 @@ public class LCAServerResults extends IQueryResults {
         rootA.addChild(nd);
 
         rootA.addLogMessagesReportType(TableType.MsgLCAServer);
-        DoneSTDOptions();
+        DoneSTDOptions(getQdSettings().getSavedOptions().get(this.getName()));
 
     }
 

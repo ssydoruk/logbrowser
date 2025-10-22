@@ -259,7 +259,7 @@ public class GMSResults extends IQueryResults {
             logger.error("fatal: ", ex);
         }
         rootA.addLogMessagesReportType(TableType.MsgGMS);
-        DoneSTDOptions();
+        DoneSTDOptions(getQdSettings().getSavedOptions().get(this.getName()));
     }
 
     @Override

@@ -123,7 +123,7 @@ public class SCServerResults extends IQueryResults {
 
         addConfigUpdates(rootA);
         rootA.addLogMessagesReportType(TableType.MsgSCServer);
-        DoneSTDOptions();
+        DoneSTDOptions(getQdSettings().getSavedOptions().get(this.getName()));
 
     }
 

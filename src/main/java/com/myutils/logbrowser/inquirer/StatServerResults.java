@@ -165,7 +165,7 @@ public class StatServerResults extends IQueryResults {
         }
         addConfigUpdates(rootA);
         rootA.addLogMessagesReportType(TableType.MsgStatServer);
-        DoneSTDOptions();
+        DoneSTDOptions(getQdSettings().getSavedOptions().get(this.getName()));
     }
 
     @Override

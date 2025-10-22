@@ -301,10 +301,8 @@ public class CallFlowResults extends IQueryResults {
      */
     public void addTLibReportType(DynamicTreeNode<OptionNode> root) {
 
-        JSONObject savedOptions = getQdSettings().getSavedOptions().get(this.getName());
-
         DynamicTreeNode<OptionNode> nd = new DynamicTreeNode<>(
-                new OptionNode(DialogItem.TLIB_CALLS_TEVENT, savedOptions, DialogItem.TLIB_CALLS_TEVENT));
+                new OptionNode(DialogItem.TLIB_CALLS_TEVENT));
         root.addChild(nd);
 
         // DynamicTreeNode<OptionNode> ComponentNode;
@@ -350,8 +348,8 @@ public class CallFlowResults extends IQueryResults {
 
     }
 
-    private void addSIPReportType(DynamicTreeNode<OptionNode> root, JSONObject savedOptions, DialogItem TLIB_CALLS) {
-        DynamicTreeNode<OptionNode> nd = new DynamicTreeNode<>(new OptionNode(DialogItem.TLIB_CALLS_SIP, savedOptions, TLIB_CALLS, DialogItem.TLIB_CALLS_SIP));
+    private void addSIPReportType(DynamicTreeNode<OptionNode> root) {
+        DynamicTreeNode<OptionNode> nd = new DynamicTreeNode<>(new OptionNode(DialogItem.TLIB_CALLS_SIP));
         root.addChild(nd);
 
         /**
@@ -432,38 +430,32 @@ public class CallFlowResults extends IQueryResults {
         DynamicTreeNode<OptionNode> rootA = new DynamicTreeNode<>();
         repComponents.setRoot(rootA);
 
-        JSONObject savedOptions = qdSettings.getSavedOptions().get(this.getName());
+        
         // LinkedTreeMap tree = getTree(savedOptions, DialogItem.TLIB_CALLS);
         // LinkedTreeMap tree1 = getTree(savedOptions, DialogItem.TLIB_CALLS,
         // DialogItem.TLIB_CALLS_ISCC);
         DynamicTreeNode<OptionNode> nd = new DynamicTreeNode<>(
-                new OptionNode(DialogItem.TLIB_CALLS, savedOptions, DialogItem.TLIB_CALLS));
+                new OptionNode(DialogItem.TLIB_CALLS));
         rootA.addChild(nd);
 
         addTLibReportType(nd);
 
-        DynamicTreeNode<OptionNode> ndISCC = new DynamicTreeNode<>(new OptionNode(DialogItem.TLIB_CALLS_ISCC,
-                savedOptions, DialogItem.TLIB_CALLS, DialogItem.TLIB_CALLS_ISCC));
+        DynamicTreeNode<OptionNode> ndISCC = new DynamicTreeNode<>(new OptionNode(DialogItem.TLIB_CALLS_ISCC));
         nd.addChild(ndISCC);
-        ndISCC.addDynamicRef(DialogItem.TLIB_CALLS_ISCC_NAME, ReferenceType.ISCCEvent, "iscc_logbr", "nameid",
-                savedOptions, DialogItem.TLIB_CALLS, DialogItem.TLIB_CALLS_ISCC, DialogItem.TLIB_CALLS_ISCC_NAME);
+        ndISCC.addDynamicRef(DialogItem.TLIB_CALLS_ISCC_NAME, ReferenceType.ISCCEvent, "iscc_logbr", "nameid");
 
-        nd.addChild(new DynamicTreeNode<OptionNode>(new OptionNode(DialogItem.TLIB_CALLS_TSCP, savedOptions,
-                DialogItem.TLIB_CALLS, DialogItem.TLIB_CALLS_ISCC, DialogItem.TLIB_CALLS_TSCP)));
-        nd.addChild(new DynamicTreeNode<OptionNode>(new OptionNode(DialogItem.TLIB_CALLS_JSON, savedOptions,
-                DialogItem.TLIB_CALLS, DialogItem.TLIB_CALLS_ISCC, DialogItem.TLIB_CALLS_JSON)));
+        nd.addChild(new DynamicTreeNode<OptionNode>(new OptionNode(DialogItem.TLIB_CALLS_TSCP)));
+        nd.addChild(new DynamicTreeNode<OptionNode>(new OptionNode(DialogItem.TLIB_CALLS_JSON)));
 
         if (DatabaseConnector.TableExist("sip_logbr")) {
-            addSIPReportType(nd, savedOptions, DialogItem.TLIB_CALLS);
+            addSIPReportType(nd);
         }
 
-        DynamicTreeNode<Object> node = getNode(DialogItem.SIP1536, TableType.SIP1536Other.toString(), savedOptions,
-                DialogItem.TLIB_CALLS, DialogItem.SIP1536);
+        DynamicTreeNode<Object> node = getNode(DialogItem.SIP1536, TableType.SIP1536Other.toString());
         if (node != null) {
             rootA.addChild(node);
             DynamicTreeNode<Object> node1;
-            node1 = getNode(DialogItem.SIP1536_SIP, TableType.SIP1536ReqResp.toString(), savedOptions,
-                    DialogItem.TLIB_CALLS, DialogItem.SIP1536, DialogItem.SIP1536_SIP);
+            node1 = getNode(DialogItem.SIP1536_SIP, TableType.SIP1536ReqResp.toString());
             if (node1 != null) {
                 node.addChild(node1);
                 node1.addDynamicRef(DialogItem.SIP1536_SIP_MESSAGE, ReferenceType.SIPMETHOD,
@@ -490,7 +482,7 @@ public class CallFlowResults extends IQueryResults {
         addConfigUpdates(rootA);
 
         rootA.addLogMessagesReportType(TableType.MsgTServer);
-        DoneSTDOptions();
+        DoneSTDOptions(qdSettings.getSavedOptions().get(this.getName()));
     }
 
     @Override

@@ -65,7 +65,7 @@ final class OutboundResults extends IQueryResults {
 //        repComponents.add("Campaign Group");
 //        repComponents.add("Agent");
 //        repComponents.add("Call");
-        DoneSTDOptions();
+        DoneSTDOptions(getQdSettings().getSavedOptions().get(this.getName()));
 
     }
 

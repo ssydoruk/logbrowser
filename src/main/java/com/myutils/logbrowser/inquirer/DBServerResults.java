@@ -86,7 +86,7 @@ public class DBServerResults extends IQueryResults {
 
         addConfigUpdates(rootA);
         rootA.addLogMessagesReportType(TableType.MsgDBServer);
-        DoneSTDOptions();
+        DoneSTDOptions(getQdSettings().getSavedOptions().get(this.getName()));
 
     }
 

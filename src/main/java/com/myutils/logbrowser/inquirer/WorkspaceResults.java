@@ -300,7 +300,7 @@ public class WorkspaceResults extends IQueryResults {
         addConfigUpdates(rootA);
 
         rootA.addLogMessagesReportType(TableType.MsgTServer);
-        DoneSTDOptions();
+        DoneSTDOptions(getQdSettings().getSavedOptions().get(this.getName()));
     }
 
     @Override

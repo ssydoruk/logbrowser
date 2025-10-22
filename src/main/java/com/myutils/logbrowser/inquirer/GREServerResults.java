@@ -135,7 +135,7 @@ public class GREServerResults extends IQueryResults {
         
         addConfigUpdates(rootA);
         rootA.addLogMessagesReportType(TableType.GREClient);
-        DoneSTDOptions();
+        DoneSTDOptions(getQdSettings().getSavedOptions().get(this.getName()));
         
     }
     

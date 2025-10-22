@@ -204,7 +204,7 @@ public class MediaServerResults extends IQueryResults {
             rootA.addLogMessagesReportType(TableType.MsgRM, "RM log messages");
 
         }
-        DoneSTDOptions();
+        DoneSTDOptions(getQdSettings().getSavedOptions().get(this.getName()));
     }
 
     @Override

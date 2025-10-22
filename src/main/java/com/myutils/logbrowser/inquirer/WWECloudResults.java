@@ -238,7 +238,7 @@ public class WWECloudResults extends IQueryResults {
                 ReferenceType.CLOUD_LOG_MESSAGE,
                 TableType.WWECloudLog.toString(), "msgTextID");
 
-        DoneSTDOptions();
+        DoneSTDOptions(getQdSettings().getSavedOptions().get(this.getName()));
     }
 
     @Override

@@ -161,7 +161,7 @@ public class ApacheWebResults extends IQueryResults {
             logger.error("fatal: ", ex);
         }
 
-        DoneSTDOptions();
+        DoneSTDOptions(getQdSettings().getSavedOptions().get(this.getName()));
     }
 
     @Override

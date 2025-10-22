@@ -294,7 +294,7 @@ public class WWEResults extends IQueryResults {
             logger.error("fatal: ", ex);
         }
         rootA.addLogMessagesReportType(TableType.MsgWWE);
-        DoneSTDOptions();
+        DoneSTDOptions(getQdSettings().getSavedOptions().get(this.getName()));
     }
 
     @Override

@@ -6,6 +6,7 @@
 package com.myutils.logbrowser.inquirer;
 
 import Utils.Pair;
+import com.google.gson.internal.LinkedTreeMap;
 import com.myutils.logbrowser.indexer.ReferenceType;
 import com.myutils.logbrowser.indexer.TableType;
 import com.myutils.mygenerictree.GenericTreeNode;
@@ -25,7 +26,7 @@ import static com.myutils.logbrowser.inquirer.inquirer.getFirstWord;
 /**
  * @author ssydoruk
  */
-@SuppressWarnings({ "rawtypes", "unchecked", "this-escape", "serial" })
+@SuppressWarnings({"rawtypes", "unchecked", "this-escape", "serial"})
 public class DynamicTreeNode<T> extends GenericTreeNode implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -262,12 +263,12 @@ public class DynamicTreeNode<T> extends GenericTreeNode implements Serializable 
 
     public void writeExternal(ObjectOutput out) throws IOException {
         throw new UnsupportedOperationException("Not supported yet."); // To change body of generated methods, choose
-                                                                       // Tools | Templates.
+        // Tools | Templates.
     }
 
     public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
         throw new UnsupportedOperationException("Not supported yet."); // To change body of generated methods, choose
-                                                                       // Tools | Templates.
+        // Tools | Templates.
     }
 
     private void setRefType(ReferenceType referenceType) {
@@ -374,17 +375,15 @@ public class DynamicTreeNode<T> extends GenericTreeNode implements Serializable 
 
     String checkedChildrenToString() {
         throw new UnsupportedOperationException("Not supported yet."); // To change body of generated methods, choose
-                                                                       // Tools | Templates.
+        // Tools | Templates.
     }
 
     /**
-     * For log messages; searches in the refsHash hashmap and compares only first
-     * word from first word in name
+     * For log messages; searches in the refsHash hashmap and compares only
+     * first word from first word in name
      *
-     * @param name
-     *            comes from reference table read from database
-     * @param refsHash
-     *            hash for name/selected from options
+     * @param name comes from reference table read from database
+     * @param refsHash hash for name/selected from options
      * @return
      */
     private Boolean checkSelected(String name, HashMap<String, Boolean> refsHash) {
@@ -478,7 +477,7 @@ public class DynamicTreeNode<T> extends GenericTreeNode implements Serializable 
             inquirer.ExceptionHandler.handleException(this.getClass().toString(), ex);
         }
         return (DynamicTreeNode) super.getChildAt(index); // To change body of generated methods, choose Tools |
-                                                          // Templates.
+        // Templates.
     }
 
     @Override
@@ -501,14 +500,14 @@ public class DynamicTreeNode<T> extends GenericTreeNode implements Serializable 
         if (child != null) {
             super.addChild(child); // To change body of generated methods, choose Tools | Templates.
         } // dynamicChildren = false;
-          // if (inquirer.logger.isDebugEnabled()) {
-          // if ((OptionNode) getData() == null) {
-          // inquirer.logger.debug("addChildAt 2 no data");
-          // } else {
-          // inquirer.logger.debug("addChildAt 2 " + ((OptionNode) getData()).toString() +
-          // " (childrenloaded: " + ChildrenLoaded);
-          // }
-          // }
+        // if (inquirer.logger.isDebugEnabled()) {
+        // if ((OptionNode) getData() == null) {
+        // inquirer.logger.debug("addChildAt 2 no data");
+        // } else {
+        // inquirer.logger.debug("addChildAt 2 " + ((OptionNode) getData()).toString() +
+        // " (childrenloaded: " + ChildrenLoaded);
+        // }
+        // }
 
     }
 
@@ -577,6 +576,85 @@ public class DynamicTreeNode<T> extends GenericTreeNode implements Serializable 
         for (int i = 0; i < chN; i++) {
             addChild((DynamicTreeNode<T>) s.readObject());
         }
+    }
+
+    private LinkedTreeMap getTree(JSONObject obj, DialogItem... dialogItem) {
+        LinkedTreeMap ret = null;
+        for (DialogItem item : dialogItem) {
+            if (ret == null) {
+                if (obj.has(item.toString())) {
+                    ret = (LinkedTreeMap) obj.get(item.toString());
+                }
+            } else {
+                ret = (LinkedTreeMap) ret.get(item.toString());
+            }
+            if (ret != null && ret.containsKey("map")) {
+                ret = (LinkedTreeMap) ret.get("map");
+            }
+        }
+        return ret;
+    }
+
+//    OptionNode(DialogItem dialogItem, JSONObject savedOptions, DialogItem... savedOptionPath) {
+//        this(dialogItem);
+//        updateEnabledForSavedSettings(savedOptions, savedOptionPath);
+//    }
+//    private void updateEnabledForSavedSettings(JSONObject savedOptions, DialogItem... savedOptionPath) {
+//        if (savedOptions != null) {
+//            LinkedTreeMap tree = getTree(savedOptions, savedOptionPath);
+//            if (tree != null) {
+//                Object enabled = tree.get("enabled");
+//                if (enabled == null || !(enabled instanceof Boolean)) {
+//                    inquirer.logger.error("Field \"enabled\" not found or is not boolean");
+//                } else {
+//                    setChecked((Boolean) enabled);
+//                }
+//            }
+//        }
+//    }
+    private void enableNode(DynamicTreeNode<T> root, LinkedTreeMap savedOptions) {
+        if (root.hasChildren()) {
+            for (DynamicTreeNode<T> child : root.getChildren()) {
+                OptionNode node = (OptionNode) child.getData();
+                if (node != null) {
+                    Object nodeSettings = (savedOptions != null) ? savedOptions.get(node.getName()) : null;
+                    if (nodeSettings != null) {
+                        LinkedTreeMap get = (((LinkedTreeMap) nodeSettings).containsKey("map")) ? (LinkedTreeMap) ((LinkedTreeMap) nodeSettings).get("map") : null;
+                        if (get != null) {
+                            if (get.containsKey("enabled")) {
+                                Boolean bVar = (Boolean) get.get("enabled");
+                                node.setChecked(bVar);
+                            }
+                            enableNode(child, get);
+                        }
+                    }
+
+                }
+            }
+        }
+    }
+
+    void updateEnabled(JSONObject savedOptions) {
+        if (savedOptions != null) {
+            for (DynamicTreeNode<T> child : getChildren()) {
+                OptionNode node = (OptionNode) child.getData();
+                if (node != null) {
+                    Object nodeSettings = savedOptions.get(node.getName());
+                    if (nodeSettings != null) {
+                        LinkedTreeMap get = (((LinkedTreeMap) nodeSettings).containsKey("map")) ? (LinkedTreeMap) ((LinkedTreeMap) nodeSettings).get("map") : null;
+                        if (get != null) {
+                            if (get.containsKey("enabled")) {
+                                Boolean bVar = (Boolean) get.get("enabled");
+                                node.setChecked(bVar);
+                            }
+                            enableNode(child, get);
+                        }
+                    }
+
+                }
+            }
+        }
+//            enableNode(this, savedOptions);
     }
 
     public static abstract class ILoadChildrenProc<T> {

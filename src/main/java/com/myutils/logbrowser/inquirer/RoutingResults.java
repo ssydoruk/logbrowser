@@ -115,8 +115,7 @@ final public class RoutingResults extends IQueryResults {
             }
 
         }
-        DoneSTDOptions();
-
+        DoneSTDOptions(qdSettings.getSavedOptions().get(this.getName()));
     }
 
     @Override

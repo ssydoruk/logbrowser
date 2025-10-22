@@ -349,6 +349,14 @@ public abstract class IQueryResults extends QueryTools implements ActionListener
         savedRoot = new DynamicTreeNode<>(repComponents.getRoot());
         DynamicTreeNode.setBlockLoad(false);
     }
+    
+    protected void DoneSTDOptions(JSONObject savedOptions) {
+        DynamicTreeNode.setBlockLoad(true);
+        repComponents.getRoot().updateEnabled(savedOptions);
+        savedRoot = new DynamicTreeNode<>(repComponents.getRoot());
+//        savedRoot.updateEnabled(savedOptions);
+        DynamicTreeNode.setBlockLoad(false);
+    }
 
     public void resetOptions() {
         repComponents.setRoot(new DynamicTreeNode<>(savedRoot));

@@ -144,7 +144,7 @@ public class IxnServerResults extends IQueryResults {
 
         addConfigUpdates(rootA);
         rootA.addLogMessagesReportType(TableType.MsgIxnServer);
-        DoneSTDOptions();
+        DoneSTDOptions(getQdSettings().getSavedOptions().get(this.getName()));
 
     }
 

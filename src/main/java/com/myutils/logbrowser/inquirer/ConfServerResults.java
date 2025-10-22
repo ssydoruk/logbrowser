@@ -124,7 +124,7 @@ public class ConfServerResults extends IQueryResults {
         addCustom(rootA, FileInfoType.type_ConfServer);
 
         rootA.addLogMessagesReportType(TableType.MsgConfServer);
-        DoneSTDOptions();
+        DoneSTDOptions(getQdSettings().getSavedOptions().get(this.getName()));
 
     }
 
