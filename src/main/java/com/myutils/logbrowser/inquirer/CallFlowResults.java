@@ -22,7 +22,7 @@ import java.util.HashSet;
 import static org.apache.commons.lang3.ArrayUtils.isEmpty;
 import org.json.JSONObject;
 
-@SuppressWarnings({ "unchecked", "rawtypes", "serial", "deprecation", "this-escape" })
+@SuppressWarnings({"unchecked", "rawtypes", "serial", "deprecation", "this-escape"})
 public class CallFlowResults extends IQueryResults {
 
     public static final int TLIB = 0x01;
@@ -135,7 +135,7 @@ public class CallFlowResults extends IQueryResults {
             tellProgress("Finding ani");
             DatabaseConnector.runQuery("update " + tmpTable + " set aniid = " + "\n(select aniid from " + tab
                     + "\nwhere " + tmpTable + ".connectionidid=" + tab + ".connectionidid" + "\nand "
-                    + getWhere("nameid", ReferenceType.TEvent, new String[] { "EventCallCreated" }, false)
+                    + getWhere("nameid", ReferenceType.TEvent, new String[]{"EventCallCreated"}, false)
                     + IQuery.getFileFilters(tab, "fileid", qd.getSearchApps(false), "AND")
                     + IQuery.getDateTimeFilters(tab, "time", qd.getTimeRange(), "AND") + "\n)" + ";");
 
@@ -157,14 +157,14 @@ public class CallFlowResults extends IQueryResults {
             tellProgress("Creating temp table for requests");
             DatabaseConnector.runQuery(
                     "create temp table " + tmpTable1 + " as select distinct connectionidid, min(id) as tlibid from "
-                            + tab + "\n" + "where connectionidid is not null\n" + "and thisdnid>0\n" + dnWhere
-                            + IQuery.getCheckedWhere("nameID", ReferenceType.TEvent,
-                                    FindNode(repComponents.getRoot(), DialogItem.TLIB_CALLS,
-                                            DialogItem.TLIB_CALLS_TEVENT, DialogItem.TLIB_CALLS_TEVENT_NAME),
-                                    "AND")
-                            + IQuery.getFileFilters(tab, "fileid", qd.getSearchApps(false), "AND")
-                            + IQuery.getDateTimeFilters(tab, "time", qd.getTimeRange(), "AND") + "\n" + "group by 1"
-                            + IQuery.getLimitClause(isLimitQueryResults(), getMaxQueryLines()) + ";");
+                    + tab + "\n" + "where connectionidid is not null\n" + "and thisdnid>0\n" + dnWhere
+                    + IQuery.getCheckedWhere("nameID", ReferenceType.TEvent,
+                            FindNode(repComponents.getRoot(), DialogItem.TLIB_CALLS,
+                                    DialogItem.TLIB_CALLS_TEVENT, DialogItem.TLIB_CALLS_TEVENT_NAME),
+                            "AND")
+                    + IQuery.getFileFilters(tab, "fileid", qd.getSearchApps(false), "AND")
+                    + IQuery.getDateTimeFilters(tab, "time", qd.getTimeRange(), "AND") + "\n" + "group by 1"
+                    + IQuery.getLimitClause(isLimitQueryResults(), getMaxQueryLines()) + ";");
 
             tellProgress("Creating indexes on connID for requests");
             DatabaseConnector
@@ -239,7 +239,7 @@ public class CallFlowResults extends IQueryResults {
             // tabReport.addOutField(inquirer.getCr().getCaseExpr("calltype", "CallType") +
             // " calltype ");
             tabReport.addOutField("constToStr(\"CallType \", calltype) calltype "); // bug in SQLite lib; does not
-                                                                                    // accept full word
+            // accept full word
             tabReport.setAddAll(false);
 
             tabReport.addRef("thisdnid", "thisdn", ReferenceType.DN.toString(), FieldType.OPTIONAL);
@@ -276,7 +276,7 @@ public class CallFlowResults extends IQueryResults {
     @Override
     public UTCTimeRange refreshTimeRange(ArrayList<Integer> searchApps) throws SQLException {
         return DatabaseConnector.getTimeRange(
-                new FileInfoType[] { FileInfoType.type_tController, FileInfoType.type_SipProxy }, searchApps);
+                new FileInfoType[]{FileInfoType.type_tController, FileInfoType.type_SipProxy}, searchApps);
         // return DatabaseConnector.getTimeRange(new String[]{"tlib_logbr",
         // "sip_logbr"}, searchApps);
     }
@@ -350,8 +350,8 @@ public class CallFlowResults extends IQueryResults {
 
     }
 
-    private void addSIPReportType(DynamicTreeNode<OptionNode> root) {
-        DynamicTreeNode<OptionNode> nd = new DynamicTreeNode<>(new OptionNode(true, DialogItem.TLIB_CALLS_SIP));
+    private void addSIPReportType(DynamicTreeNode<OptionNode> root, JSONObject savedOptions, DialogItem TLIB_CALLS) {
+        DynamicTreeNode<OptionNode> nd = new DynamicTreeNode<>(new OptionNode(DialogItem.TLIB_CALLS_SIP, savedOptions, TLIB_CALLS, DialogItem.TLIB_CALLS_SIP));
         root.addChild(nd);
 
         /**
@@ -361,7 +361,7 @@ public class CallFlowResults extends IQueryResults {
         nd.addDynamicRef(DialogItem.TLIB_CALLS_SIP_ENDPOINT, ReferenceType.DN);
         nd.addDynamicRef(DialogItem.TLIB_CALLS_SIP_PEERIP, ReferenceType.IP);
         nd.addPairChildren(DialogItem.TLIB_CALLS_SIP_DIRECTION,
-                new Pair[] { new Pair("inbound", "1"), new Pair("outbound", "0") });
+                new Pair[]{new Pair("inbound", "1"), new Pair("outbound", "0")});
 
         // nd.addDynamicRef(DialogItem.TLIB_CALLS_SIP_CALL_ID, ReferenceType.SIPCALLID);
         // DynamicTreeNode<OptionNode> AttrValue;
@@ -454,7 +454,7 @@ public class CallFlowResults extends IQueryResults {
                 DialogItem.TLIB_CALLS, DialogItem.TLIB_CALLS_ISCC, DialogItem.TLIB_CALLS_JSON)));
 
         if (DatabaseConnector.TableExist("sip_logbr")) {
-            addSIPReportType(nd);
+            addSIPReportType(nd, savedOptions, DialogItem.TLIB_CALLS);
         }
 
         DynamicTreeNode<Object> node = getNode(DialogItem.SIP1536, TableType.SIP1536Other.toString(), savedOptions,
@@ -786,8 +786,8 @@ public class CallFlowResults extends IQueryResults {
                 sip1536Table.AddCheckedWhere(sip1536Table.getTabAlias() + ".msgid", ReferenceType.SIPMETHOD, node,
                         "AND", DialogItem.SIP1536_SIP_MESSAGE);
                 sip1536Table.addOutField("constToStr(\"IsRequest \", isrequest) isrequeststr"); // bug in SQLite lib;
-                                                                                                // does not accept full
-                                                                                                // word
+                // does not accept full
+                // word
 
                 sip1536Table.setCommonParams(this, dlg);
                 getRecords(sip1536Table);
@@ -920,13 +920,13 @@ public class CallFlowResults extends IQueryResults {
     @Override
     public void actionPerformed(ActionEvent e) {
         throw new UnsupportedOperationException("Not supported yet."); // To change body of generated methods, choose
-                                                                       // Tools | Templates.
+        // Tools | Templates.
     }
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
         throw new UnsupportedOperationException("Not supported yet."); // To change body of generated methods, choose
-                                                                       // Tools | Templates.
+        // Tools | Templates.
     }
 
     @Override
