@@ -638,7 +638,7 @@ public class DynamicTreeNode<T> extends GenericTreeNode implements Serializable 
         if (savedOptions != null) {
             for (DynamicTreeNode<T> child : getChildren()) {
                 OptionNode node = (OptionNode) child.getData();
-                if (node != null) {
+                if (node != null && savedOptions.has(node.getName())) {
                     Object nodeSettings = savedOptions.get(node.getName());
                     if (nodeSettings != null) {
                         LinkedTreeMap get = (((LinkedTreeMap) nodeSettings).containsKey("map")) ? (LinkedTreeMap) ((LinkedTreeMap) nodeSettings).get("map") : null;
