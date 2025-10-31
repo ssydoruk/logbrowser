@@ -549,15 +549,15 @@ public class RequestParams extends javax.swing.JPanel {
                         // Find out which indexes are selected.
                         int minIndex = lsm.getMinSelectionIndex();
                         int maxIndex = lsm.getMaxSelectionIndex();
+                        ListModel model = l.getModel();
                         for (int i = minIndex; i <= maxIndex; i++) {
                             if (lsm.isSelectedIndex(i)) {
 //                        inquirer.logger.debug("**current item " + i);
-                                DefaultListModel<DynamicTreeNode<OptionNode>> lm = (DefaultListModel) l.getModel();
-                                int firstID = lm.get(i).equals(CheckBoxList.ALL_ENTRY) ? 1 : 0;
+//                                DefaultListModel<DynamicTreeNode<OptionNode>> lm = (DefaultListModel) l.getModel();
+                                int firstID=model.getElementAt(i).equals(CheckBoxList.ALL_ENTRY) ? 1 : 0;
                                 if (lChild != null) {
-
                                     if (i >= firstID) {
-                                        changeReportItem(i, lm.get(i), lChild);
+                                        changeReportItem(i, (DynamicTreeNode<OptionNode>) model.getElementAt(i), lChild);
                                     }
                                 }
                             }

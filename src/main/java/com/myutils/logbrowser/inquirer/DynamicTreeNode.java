@@ -35,10 +35,15 @@ public class DynamicTreeNode<T> extends GenericTreeNode implements Serializable 
     private static boolean noRefNoLoad = false;
     HashMap<String, Boolean> onlyChildrenChecked = null;
     private boolean dynamicChildren = false;
+
+    public boolean isDynamicChildren() {
+        return dynamicChildren;
+    }
     private boolean ChildrenLoaded = false;
     private TableType tableType = null;
     private ReferenceType refType = ReferenceType.UNKNOWN;
     private ILoadChildrenProc loadChildrenProc = null;
+    private LinkedTreeMap savedOptions = null;
 
     public DynamicTreeNode() {
         super();
@@ -449,6 +454,9 @@ public class DynamicTreeNode<T> extends GenericTreeNode implements Serializable 
                                             inst = new OptionNode(ch1);
                                         }
                                     }
+                                    if (savedOptions != null) {
+                                        enableNodeFromSaved(inst, savedOptions);
+                                    }
                                     DynamicTreeNode<OptionNode> n = new DynamicTreeNode<>(inst);
                                     addChild(n);
                                 }
@@ -615,46 +623,60 @@ public class DynamicTreeNode<T> extends GenericTreeNode implements Serializable 
     private void enableNode(DynamicTreeNode<T> root, LinkedTreeMap savedOptions) {
         if (root.hasChildren()) {
             for (DynamicTreeNode<T> child : root.getChildren()) {
-                OptionNode node = (OptionNode) child.getData();
-                if (node != null) {
-                    Object nodeSettings = (savedOptions != null) ? savedOptions.get(node.getName()) : null;
-                    if (nodeSettings != null) {
-                        LinkedTreeMap get = (((LinkedTreeMap) nodeSettings).containsKey("map")) ? (LinkedTreeMap) ((LinkedTreeMap) nodeSettings).get("map") : null;
-                        if (get != null) {
-                            if (get.containsKey("enabled")) {
-                                Boolean bVar = (Boolean) get.get("enabled");
-                                node.setChecked(bVar);
-                            }
-                            enableNode(child, get);
-                        }
-                    }
-
+                LinkedTreeMap enableNodeFromSaved
+                        = enableNodeFromSaved((OptionNode) child.getData(), savedOptions);
+                if (enableNodeFromSaved != null) {
+                    enableNode(child, enableNodeFromSaved);
                 }
             }
+        } else if (root.isDynamicChildren()) {
+            root.setSavedOptions(savedOptions);
+            int i = 1;
         }
+    }
+
+    private LinkedTreeMap setCheckedFromSaved(OptionNode node, Object nodeSettings) {
+        if (nodeSettings != null && nodeSettings instanceof LinkedTreeMap
+                && ((LinkedTreeMap) nodeSettings).containsKey("map")) {
+            LinkedTreeMap get = (LinkedTreeMap) ((LinkedTreeMap) nodeSettings).get("map");
+            if (get != null) {
+                if (get.containsKey("enabled")) {
+                    Boolean bVar = (Boolean) get.get("enabled");
+                    node.setChecked(bVar);
+                }
+                return get;
+            }
+        }
+        return null;
+    }
+
+    private LinkedTreeMap enableNodeFromSaved(OptionNode node, JSONObject savedOptions) {
+        return (node != null && savedOptions.has(node.getName()))
+                ? setCheckedFromSaved(node, savedOptions.get(node.getName()))
+                : null;
+
+    }
+
+    private LinkedTreeMap enableNodeFromSaved(OptionNode node, LinkedTreeMap savedOptions) {
+        return (node != null && savedOptions.containsKey(node.getName()))
+                ? setCheckedFromSaved(node, savedOptions.get(node.getName()))
+                : null;
     }
 
     void updateEnabled(JSONObject savedOptions) {
         if (savedOptions != null) {
             for (DynamicTreeNode<T> child : getChildren()) {
-                OptionNode node = (OptionNode) child.getData();
-                if (node != null && savedOptions.has(node.getName())) {
-                    Object nodeSettings = savedOptions.get(node.getName());
-                    if (nodeSettings != null) {
-                        LinkedTreeMap get = (((LinkedTreeMap) nodeSettings).containsKey("map")) ? (LinkedTreeMap) ((LinkedTreeMap) nodeSettings).get("map") : null;
-                        if (get != null) {
-                            if (get.containsKey("enabled")) {
-                                Boolean bVar = (Boolean) get.get("enabled");
-                                node.setChecked(bVar);
-                            }
-                            enableNode(child, get);
-                        }
-                    }
-
+                LinkedTreeMap map = enableNodeFromSaved((OptionNode) child.getData(), savedOptions);
+                if (map != null) {
+                    enableNode(child, map);
                 }
             }
         }
-//            enableNode(this, savedOptions);
+    }
+
+    private void setSavedOptions(LinkedTreeMap savedOptions) {
+        this.savedOptions = new LinkedTreeMap();
+        this.savedOptions.putAll(savedOptions);
     }
 
     public static abstract class ILoadChildrenProc<T> {
