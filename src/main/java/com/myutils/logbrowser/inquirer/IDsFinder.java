@@ -40,6 +40,7 @@ public final class IDsFinder extends QueryTools {
     private Integer[] agentIDs = null;
     private boolean idsFound = false;
     private SearchType searchType = SearchType.UNKNOWN;
+
     IDsFinder(QueryDialog dlg, SelectionType key, String searchID) throws SQLException {
         selection = searchID;
         regex = false;
@@ -274,9 +275,9 @@ public final class IDsFinder extends QueryTools {
                 return false;
             }
         }
-        if (selectionType == SelectionType.IXN || 
-            selectionType == SelectionType.UUID ||
-            selectionType == SelectionType.GUESS_SELECTION) {
+        if (selectionType == SelectionType.IXN
+                || selectionType == SelectionType.UUID
+                || selectionType == SelectionType.GUESS_SELECTION) {
             AddIDs(IDType.IxnID, getRefIDs(ReferenceType.IxnID, sIDs, regex));
             AddIDs(IDType.UUID, getRefIDs(ReferenceType.UUID, sIDs, regex));
             if (IDsFound(IDType.IxnID) || IDsFound(IDType.UUID)) {
@@ -285,7 +286,7 @@ public final class IDsFinder extends QueryTools {
                 return false;
             }
             /* <--- Is this recHandle --- */
-        }        
+        }
         if (selectionType == SelectionType.DN || selectionType == SelectionType.GUESS_SELECTION) {
             AddIDs(IDType.DN, getRefIDs(ReferenceType.DN, sIDs, regex));
             if (IDsFound(IDType.DN)) {
@@ -366,7 +367,7 @@ public final class IDsFinder extends QueryTools {
         return false;
     }
 
-        private boolean getGREIDType() throws SQLException {
+    private boolean getGREIDType() throws SQLException {
         String[] sIDs = {selection};
 
         if (selectionType == SelectionType.IXN || selectionType == SelectionType.GUESS_SELECTION) {
@@ -377,7 +378,6 @@ public final class IDsFinder extends QueryTools {
                 return false;
             }
         }
-
 
         return false;
     }
@@ -708,13 +708,12 @@ public final class IDsFinder extends QueryTools {
         return IDsFound(IDType.PLACE) || IDsFound(IDType.AGENT);
     }
 
-
     boolean initIxn() throws SQLException {
         searchType = SearchType.INTERACTION;
 
         return getIxnServerIDType();
     }
-    
+
     boolean initGRE() throws SQLException {
         searchType = SearchType.GRE;
 
@@ -1060,6 +1059,8 @@ public final class IDsFinder extends QueryTools {
         LoadTServerType(idGivenType, IDType.SIPHandlerID, ids, level);
         LoadTServerType(idGivenType, IDType.SIPTriggerID, ids, level);
         LoadTServerType(idGivenType, IDType.TLIBID, ids, level);
+        LoadTServerType(idGivenType, IDType.ORSSID, ids, level);
+        LoadTServerType(idGivenType, IDType.ORSCallID, ids, level);
     }
 
     private void LoadMediaServerType(IDType idGivenType, Integer[] ids, int level) throws SQLException {
@@ -1117,13 +1118,13 @@ public final class IDsFinder extends QueryTools {
                     case JSessionID:
                         return QueryTools.uniqueInts(
                                 ((DatabaseConnector.TableExist(TableType.ApacheWeb.toString())) ? DatabaseConnector.getIDs(
-                                        TableType.ApacheWeb.toString(), "browserClientID",
-                                        getWhere("JSessionIDID", searchIDs, true))
-                                        : null),
+                                TableType.ApacheWeb.toString(), "browserClientID",
+                                getWhere("JSessionIDID", searchIDs, true))
+                                : null),
                                 ((DatabaseConnector.TableExist(TableType.WWEMessage.toString())) ? DatabaseConnector.getIDs(
-                                        TableType.WWEMessage.toString(), "browserClientID",
-                                        getWhere("JSessionIDID", searchIDs, true))
-                                        : null)
+                                TableType.WWEMessage.toString(), "browserClientID",
+                                getWhere("JSessionIDID", searchIDs, true))
+                                : null)
                         );
 
                     case IxnID: {
@@ -1156,13 +1157,13 @@ public final class IDsFinder extends QueryTools {
                     case BrowserClientID: {
                         return QueryTools.uniqueInts(
                                 ((DatabaseConnector.TableExist(TableType.ApacheWeb.toString())) ? DatabaseConnector.getIDs(
-                                        TableType.ApacheWeb.toString(), "JSessionIDID",
-                                        getWhere("browserClientID", searchIDs, true))
-                                        : null),
+                                TableType.ApacheWeb.toString(), "JSessionIDID",
+                                getWhere("browserClientID", searchIDs, true))
+                                : null),
                                 ((DatabaseConnector.TableExist(TableType.WWEMessage.toString())) ? DatabaseConnector.getIDs(
-                                        TableType.WWEMessage.toString(), "JSessionIDID",
-                                        getWhere("browserClientID", searchIDs, true))
-                                        : null)
+                                TableType.WWEMessage.toString(), "JSessionIDID",
+                                getWhere("browserClientID", searchIDs, true))
+                                : null)
                         );
                     }
 
@@ -1175,48 +1176,48 @@ public final class IDsFinder extends QueryTools {
 
                         return QueryTools.uniqueInts(
                                 ((DatabaseConnector.TableExist(TableType.ApacheWeb.toString())) ? DatabaseConnector.getIDs(
-                                        TableType.ApacheWeb.toString(), "JSessionIDID",
-                                        getWhere("UUIDID", searchIDs, true))
-                                        : null),
+                                TableType.ApacheWeb.toString(), "JSessionIDID",
+                                getWhere("UUIDID", searchIDs, true))
+                                : null),
                                 ((DatabaseConnector.TableExist(TableType.WWEBayeuxMessage.toString())) ? DatabaseConnector.getIDs(
-                                        TableType.WWEBayeuxMessage.toString(), "JSessionIDID",
-                                        getWhere("UUIDID", searchIDs, true))
-                                        : null),
+                                TableType.WWEBayeuxMessage.toString(), "JSessionIDID",
+                                getWhere("UUIDID", searchIDs, true))
+                                : null),
                                 ((DatabaseConnector.TableExist(TableType.WWEMessage.toString())) ? DatabaseConnector.getIDs(
-                                        TableType.WWEMessage.toString(), "JSessionIDID",
-                                        getWhere("UUIDID", searchIDs, true))
-                                        : null)
+                                TableType.WWEMessage.toString(), "JSessionIDID",
+                                getWhere("UUIDID", searchIDs, true))
+                                : null)
                         );
 
                     case IxnID:
 
                         return QueryTools.uniqueInts(
                                 ((DatabaseConnector.TableExist(TableType.ApacheWeb.toString())) ? DatabaseConnector.getIDs(
-                                        TableType.ApacheWeb.toString(), "JSessionIDID",
-                                        getWhere("IxnIDID", searchIDs, true))
-                                        : null),
+                                TableType.ApacheWeb.toString(), "JSessionIDID",
+                                getWhere("IxnIDID", searchIDs, true))
+                                : null),
                                 ((DatabaseConnector.TableExist(TableType.WWEBayeuxMessage.toString())) ? DatabaseConnector.getIDs(
-                                        TableType.WWEBayeuxMessage.toString(), "JSessionIDID",
-                                        new WhereBuilder()
-                                                .addOpenBracket()
-                                                .addCond(getWhere("IxnIDID", searchIDs, false))
-                                                .addCond(ArrayUtils.isNotEmpty(regAgentIDs), "AND", IQuery.getWhereNot("UserNameID", regAgentIDs, false, false))
-                                                .addCloseBracket()
-                                                .build(true)
-                                        //                                       getWhere("IxnIDID", searchIDs, true)
+                                TableType.WWEBayeuxMessage.toString(), "JSessionIDID",
+                                new WhereBuilder()
+                                        .addOpenBracket()
+                                        .addCond(getWhere("IxnIDID", searchIDs, false))
+                                        .addCond(ArrayUtils.isNotEmpty(regAgentIDs), "AND", IQuery.getWhereNot("UserNameID", regAgentIDs, false, false))
+                                        .addCloseBracket()
+                                        .build(true)
+                        //                                       getWhere("IxnIDID", searchIDs, true)
 
-                                )
-                                        : null),
+                        )
+                                : null),
                                 ((DatabaseConnector.TableExist(TableType.WWEMessage.toString())) ? DatabaseConnector.getIDs(
-                                        TableType.WWEMessage.toString(), "JSessionIDID",
-                                        new WhereBuilder()
-                                                .addOpenBracket()
-                                                .addCond(getWhere("IxnIDID", searchIDs, false))
-                                                .addCond(ArrayUtils.isNotEmpty(regAgentIDs), "AND", IQuery.getWhereNot("UserNameID", regAgentIDs, false, false))
-                                                .addCloseBracket()
-                                                .build(true)
-                                )
-                                        : null)
+                                TableType.WWEMessage.toString(), "JSessionIDID",
+                                new WhereBuilder()
+                                        .addOpenBracket()
+                                        .addCond(getWhere("IxnIDID", searchIDs, false))
+                                        .addCond(ArrayUtils.isNotEmpty(regAgentIDs), "AND", IQuery.getWhereNot("UserNameID", regAgentIDs, false, false))
+                                        .addCloseBracket()
+                                        .build(true)
+                        )
+                                : null)
                         );
 
 //                    case GWS_DeviceID:
@@ -1265,29 +1266,29 @@ public final class IDsFinder extends QueryTools {
 
                         return QueryTools.uniqueInts(
                                 ((DatabaseConnector.TableExist(TableType.ApacheWeb.toString())) ? DatabaseConnector.getIDs(
-                                        TableType.ApacheWeb.toString(), "IxnIDID",
-                                        getWhere("JSessionIDID", searchIDs, true))
-                                        : null),
+                                TableType.ApacheWeb.toString(), "IxnIDID",
+                                getWhere("JSessionIDID", searchIDs, true))
+                                : null),
                                 ((DatabaseConnector.TableExist(TableType.WWEBayeuxMessage.toString())) ? DatabaseConnector.getIDs(
-                                        TableType.WWEBayeuxMessage.toString(), "IxnIDID",
-                                        new WhereBuilder()
-                                                .addOpenBracket()
-                                                .addCond(getWhere("JSessionIDID", searchIDs, false))
-                                                .addCond(ArrayUtils.isNotEmpty(regAgentIDs), "AND", IQuery.getWhereNot("UserNameID", regAgentIDs, false, false))
-                                                .addCloseBracket()
-                                                .build(true)
-                                )
-                                        : null),
+                                TableType.WWEBayeuxMessage.toString(), "IxnIDID",
+                                new WhereBuilder()
+                                        .addOpenBracket()
+                                        .addCond(getWhere("JSessionIDID", searchIDs, false))
+                                        .addCond(ArrayUtils.isNotEmpty(regAgentIDs), "AND", IQuery.getWhereNot("UserNameID", regAgentIDs, false, false))
+                                        .addCloseBracket()
+                                        .build(true)
+                        )
+                                : null),
                                 ((DatabaseConnector.TableExist(TableType.WWEMessage.toString())) ? DatabaseConnector.getIDs(
-                                        TableType.WWEMessage.toString(), "IxnIDID",
-                                        new WhereBuilder()
-                                                .addOpenBracket()
-                                                .addCond(getWhere("JSessionIDID", searchIDs, false))
-                                                .addCond(ArrayUtils.isNotEmpty(regAgentIDs), "AND", IQuery.getWhereNot("UserNameID", regAgentIDs, false, false))
-                                                .addCloseBracket()
-                                                .build(true)
-                                )
-                                        : null)
+                                TableType.WWEMessage.toString(), "IxnIDID",
+                                new WhereBuilder()
+                                        .addOpenBracket()
+                                        .addCond(getWhere("JSessionIDID", searchIDs, false))
+                                        .addCond(ArrayUtils.isNotEmpty(regAgentIDs), "AND", IQuery.getWhereNot("UserNameID", regAgentIDs, false, false))
+                                        .addCloseBracket()
+                                        .build(true)
+                        )
+                                : null)
                         );
                 }
                 break;
@@ -1321,17 +1322,17 @@ public final class IDsFinder extends QueryTools {
 
                         return QueryTools.uniqueInts(
                                 ((DatabaseConnector.TableExist(TableType.ApacheWeb.toString())) ? DatabaseConnector.getIDs(
-                                        TableType.ApacheWeb.toString(), "DeviceIDID",
-                                        getWhere("JSessionIDID", searchIDs, true))
-                                        : null),
+                                TableType.ApacheWeb.toString(), "DeviceIDID",
+                                getWhere("JSessionIDID", searchIDs, true))
+                                : null),
                                 ((DatabaseConnector.TableExist(TableType.WWEBayeuxMessage.toString())) ? DatabaseConnector.getIDs(
-                                        TableType.WWEBayeuxMessage.toString(), "DeviceIDID",
-                                        getWhere("JSessionIDID", searchIDs, true))
-                                        : null),
+                                TableType.WWEBayeuxMessage.toString(), "DeviceIDID",
+                                getWhere("JSessionIDID", searchIDs, true))
+                                : null),
                                 ((DatabaseConnector.TableExist(TableType.WWEMessage.toString())) ? DatabaseConnector.getIDs(
-                                        TableType.WWEMessage.toString(), "DeviceIDID",
-                                        getWhere("JSessionIDID", searchIDs, true))
-                                        : null)
+                                TableType.WWEMessage.toString(), "DeviceIDID",
+                                getWhere("JSessionIDID", searchIDs, true))
+                                : null)
                         );
 
                 }
@@ -1356,17 +1357,17 @@ public final class IDsFinder extends QueryTools {
                     case JSessionID:
                         return QueryTools.uniqueInts(
                                 ((DatabaseConnector.TableExist(TableType.ApacheWeb.toString())) ? DatabaseConnector.getIDs(
-                                        TableType.ApacheWeb.toString(), "UUIDID",
-                                        getWhere("JSessionIDID", searchIDs, true))
-                                        : null),
+                                TableType.ApacheWeb.toString(), "UUIDID",
+                                getWhere("JSessionIDID", searchIDs, true))
+                                : null),
                                 ((DatabaseConnector.TableExist(TableType.WWEBayeuxMessage.toString())) ? DatabaseConnector.getIDs(
-                                        TableType.WWEBayeuxMessage.toString(), "UUIDID",
-                                        getWhere("JSessionIDID", searchIDs, true))
-                                        : null),
+                                TableType.WWEBayeuxMessage.toString(), "UUIDID",
+                                getWhere("JSessionIDID", searchIDs, true))
+                                : null),
                                 ((DatabaseConnector.TableExist(TableType.WWEMessage.toString())) ? DatabaseConnector.getIDs(
-                                        TableType.WWEMessage.toString(), "UUIDID",
-                                        getWhere("JSessionIDID", searchIDs, true))
-                                        : null)
+                                TableType.WWEMessage.toString(), "UUIDID",
+                                getWhere("JSessionIDID", searchIDs, true))
+                                : null)
                         );
                 }
                 break;
@@ -1380,8 +1381,6 @@ public final class IDsFinder extends QueryTools {
 
         return null;
     }
-
-
 
     private Integer[] getIDsStatServer(IDType retIDType, IDType givenIDType, Integer[] searchIDs) throws SQLException {
         if (retIDType == givenIDType) {
@@ -1400,8 +1399,8 @@ public final class IDsFinder extends QueryTools {
 
                     case IxnID: {
                         return QueryTools.uniqueInts1(
-                            DatabaseConnector.getIDs("ixnss", "connidid", getWhere("ixnid", searchIDs, true)),
-                            DatabaseConnector.getIDs("ursconnidixnid", "connid", getWhere("ixnid", searchIDs, true)),
+                                DatabaseConnector.getIDs("ixnss", "connidid", getWhere("ixnid", searchIDs, true)),
+                                DatabaseConnector.getIDs("ursconnidixnid", "connid", getWhere("ixnid", searchIDs, true)),
                                 DatabaseConnector.getIDs("URSSTR_logbr", "connidid", getWhere("ixnidid", searchIDs, true)),
                                 DatabaseConnector.getIDs("urs_logbr", "connectionidid", getWhere("ixnidid", searchIDs, true))
                         );
@@ -1416,16 +1415,16 @@ public final class IDsFinder extends QueryTools {
 
                     case ConnID: {
                         return QueryTools.uniqueInts1(
-                            DatabaseConnector.getIDs("STSTEVENT_logbr", "TransferIdID", getWhere("ConnectionIDID", searchIDs, true)),
-                            DatabaseConnector.getIDs("ors_logbr", "TransferIdID", getWhere("ConnectionIDID", searchIDs, true)),
-                            DatabaseConnector.getIDs("urs_logbr", "TransferIdID", getWhere("ConnectionIDID", searchIDs, true))
+                                DatabaseConnector.getIDs("STSTEVENT_logbr", "TransferIdID", getWhere("ConnectionIDID", searchIDs, true)),
+                                DatabaseConnector.getIDs("ors_logbr", "TransferIdID", getWhere("ConnectionIDID", searchIDs, true)),
+                                DatabaseConnector.getIDs("urs_logbr", "TransferIdID", getWhere("ConnectionIDID", searchIDs, true))
                         );
                     }
 
                     case DN: {
                         return QueryTools.uniqueInts1(
-                            DatabaseConnector.getIDs("STSTEVENT_logbr", "ConnectionIDID", "where (" + getWhere("ThisDNID", searchIDs, false) + " or " + getWhere("OtherDNID", searchIDs, false) + ")"),
-                            DatabaseConnector.getIDs("ors_logbr", "ConnectionIDID", "where (" + getWhere("ThisDNID", searchIDs, false) + " or " + getWhere("OtherDNID", searchIDs, false) + ")"),
+                                DatabaseConnector.getIDs("STSTEVENT_logbr", "ConnectionIDID", "where (" + getWhere("ThisDNID", searchIDs, false) + " or " + getWhere("OtherDNID", searchIDs, false) + ")"),
+                                DatabaseConnector.getIDs("ors_logbr", "ConnectionIDID", "where (" + getWhere("ThisDNID", searchIDs, false) + " or " + getWhere("OtherDNID", searchIDs, false) + ")"),
                                 DatabaseConnector.getIDs("urs_logbr", "ConnectionIDID", "where (" + getWhere("ThisDNID", searchIDs, false) + " or " + getWhere("OtherDNID", searchIDs, false) + ")")
                         );
                     }
@@ -1449,8 +1448,6 @@ public final class IDsFinder extends QueryTools {
 
         return null;
     }
-
-
 
     private Integer[] getIDsGMS(IDType retIDType, IDType providedIDType, Integer[] searchIDs) throws SQLException {
         if (retIDType == providedIDType) {
@@ -1568,8 +1565,8 @@ public final class IDsFinder extends QueryTools {
                     case CGDBID:
                         return (DatabaseConnector.TableExist("ocscg_logbr")) ? DatabaseConnector.getIDs(
                                 "select distinct cgnameid "
-                                        + "from ocscg_logbr "
-                                        + getWhere("cgDBID",
+                                + "from ocscg_logbr "
+                                + getWhere("cgDBID",
                                         searchIDs, true))
                                 : null;
 
@@ -1587,8 +1584,8 @@ public final class IDsFinder extends QueryTools {
                     case OCSRecordHandle: {
                         return (DatabaseConnector.TableExist("ocspaagi_logbr")) ? DatabaseConnector.getIDs(
                                 "select distinct agentNameID "
-                                        + "from ocspaagi_logbr "
-                                        + getWhere("recHandle",
+                                + "from ocspaagi_logbr "
+                                + getWhere("recHandle",
                                         searchIDs, true))
                                 : null;
                     }
@@ -1603,8 +1600,8 @@ public final class IDsFinder extends QueryTools {
                     case CG:
                         return (DatabaseConnector.TableExist("ocspasi_logbr")) ? DatabaseConnector.getIDs(
                                 "select distinct cgDBID "
-                                        + "from ocspasi_logbr "
-                                        + getWhere("cgNameID",
+                                + "from ocspasi_logbr "
+                                + getWhere("cgNameID",
                                         searchIDs, true))
                                 : null;
 
@@ -1620,8 +1617,8 @@ public final class IDsFinder extends QueryTools {
                     case OCSRecordHandle: {
                         return (DatabaseConnector.TableExist("ocspaevi_logbr")) ? DatabaseConnector.getIDs(
                                 "select distinct cgDBID "
-                                        + "from ocspaevi_logbr "
-                                        + getWhere("recHandle",
+                                + "from ocspaevi_logbr "
+                                + getWhere("recHandle",
                                         searchIDs, true))
                                 : null;
 
@@ -1636,8 +1633,8 @@ public final class IDsFinder extends QueryTools {
                     case ORSSID:
                         return (DatabaseConnector.TableExist("orssessixn")) ? DatabaseConnector.getIDs(
                                 "select distinct ixnid "
-                                        + "from orssessixn "
-                                        + getWhere("sidid",
+                                + "from orssessixn "
+                                + getWhere("sidid",
                                         searchIDs, true))
                                 : null;
 
@@ -1834,8 +1831,8 @@ public final class IDsFinder extends QueryTools {
                         String[] names = DatabaseConnector.getNames(this,
                                 ReferenceType.URSStrategyRef.toString(),
                                 "name", "where id in (select ref2id from URSSTR_logbr " + getWhere("connidid", searchIDs, true)
-                                        + " and " + getWhere("ref1id", ReferenceType.URSStrategyRef, new String[]{"Agent"}, false)
-                                        + ")");
+                                + " and " + getWhere("ref1id", ReferenceType.URSStrategyRef, new String[]{"Agent"}, false)
+                                + ")");
 
 //                        String[] names = DatabaseConnector.getNames(this, "URSSTR_logbr", "ref2id", getWhere("connidid", searchIDs, true));
                         Integer[] _refIDs = DatabaseConnector.getRefIDs(ReferenceType.Agent, names);
@@ -1927,9 +1924,8 @@ public final class IDsFinder extends QueryTools {
                 switch (givenIDType) {
                     case ORSCallID: {
 //                        return DatabaseConnector.getIDs(TableType.ORSCallID.toString(), "uuidid", getWhere("callID", searchIDs, true));
-                    break;
+                        break;
                     }
-                   
 
                     case ConnID:
                         return QueryTools.uniqueInts(
@@ -2055,6 +2051,14 @@ public final class IDsFinder extends QueryTools {
 
                     case ConnID:
                         return DatabaseConnector.getIDs("tlib_logbr", "uuidid", getWhere("connectionidid", givenIDs, true));
+
+                    case ORSSID:
+                        return QueryTools.uniqueInts(
+                                DatabaseConnector.getIDs("ORSURS_logbr", "uuidid", getWhere("sidid", givenIDs, true)),
+                                DatabaseConnector.getIDs("orssess_logbr", "uuidid", getWhere("sidid", givenIDs, true)),
+                                DatabaseConnector.getIDs("URSRLIB", "uuidid", getWhere("sidid", givenIDs, true))
+                        );
+
                 }
                 break;
 //</editor-fold>
@@ -2246,6 +2250,41 @@ public final class IDsFinder extends QueryTools {
                 break;
 //</editor-fold>
 
+                case ORSSID:
+                switch (givenType) {
+                    case GMSSESSION:
+                        return (DatabaseConnector.TableExist("orshttp"))
+                                ? DatabaseConnector.getIDs("orshttp", "sidid", getWhere("GMSServiceID", givenIDs, true))
+                                : null;
+
+                    case UUID:
+                        return QueryTools.uniqueInts(
+                                DatabaseConnector.getIDs("ORSURS_logbr", "sidid", getWhere("uuidid", givenIDs, true)),
+                                DatabaseConnector.getIDs("URSRLIB", "sidid", getWhere("uuidid", givenIDs, true)),
+                                DatabaseConnector.getIDs("orssess_logbr", "sidid", getWhere("uuidid", givenIDs, true))
+                        );
+
+                    case IxnID: {
+                        return DatabaseConnector.getIDs("orssessixn", "sidid", getWhere("ixnid", givenIDs, true));
+
+                    }
+
+                    case ConnID: {
+                        return QueryTools.uniqueInts(
+                                DatabaseConnector.getIDs("ursri", "ORSSidID", getWhere("connidid", givenIDs, true)),
+                                DatabaseConnector.getIDs("URSCONNIDSID", "sidid", getWhere("connidid", givenIDs, true))
+                        );
+                    }
+
+                    case ORSSID: {
+                        return QueryTools.uniqueInts(
+                                DatabaseConnector.getIDs("orssidsid", "sidid", getWhere("newsidid", givenIDs, true)),
+                                DatabaseConnector.getIDs("orssidsid", "newsidid", getWhere("sidid", givenIDs, true))
+                        );
+
+                    }
+                }
+                break;
             default:
         }
         inquirer.logger.trace("not implemented search of [" + retIDType + "] by " + givenType + " ids: " + listIDs(givenIDs));
@@ -2319,7 +2358,6 @@ public final class IDsFinder extends QueryTools {
         }
     }
 
-    
     private void LoadIxnType(IDType givenType, IDType theSearchType, Integer[] ids, int level) throws SQLException {
         inquirer.logger.debug("LoadIxnType givenType: " + givenType + " theSearchType: " + theSearchType + " level: " + level + " ids: " + listIDs(ids));
 
@@ -2578,7 +2616,7 @@ public final class IDsFinder extends QueryTools {
             case INTERACTION:
                 return getIDsIxn(retIDType, searchIDType, searchIDs);
 
-                case GRE:
+            case GRE:
                 return getIDsGRE(retIDType, searchIDType, searchIDs);
 
             case STATSERVER:
@@ -2674,6 +2712,16 @@ public final class IDsFinder extends QueryTools {
                 return false;
             }
         }
+        if (selectionType == SelectionType.SESSION || selectionType == SelectionType.GUESS_SELECTION) {
+            Integer[] ids = locateRef(selection, ReferenceType.ORSSID, regex, false);
+            if (ids != null && ids.length > 0) {
+                AddIDs(IDType.ORSSID, ids);
+                LoadType(IDType.ORSSID, ids);
+                return true;
+            } else if (selectionType == SelectionType.SESSION) {
+                return false;
+            }
+        }
         if (selectionType == SelectionType.UUID || selectionType == SelectionType.GUESS_SELECTION) {// is it AttributeCallUUID?            
             if (DatabaseConnector.refTableExist(ReferenceType.UUID)) {
                 UUIDs = getRefIDs(ReferenceType.UUID, new String[]{selection}, regex);
@@ -2748,8 +2796,8 @@ public final class IDsFinder extends QueryTools {
     }
 
     private void Loop(ArrayList<Integer> newConnIds,
-                      ArrayList<Integer> newCallIds,
-                      LoopState state) throws SQLException {
+            ArrayList<Integer> newCallIds,
+            LoopState state) throws SQLException {
         boolean newCallIdsFromConnIds = true;
         boolean newCallIdsFromBlocks = true;
         boolean newConnIdsFound = true;
@@ -2796,71 +2844,71 @@ public final class IDsFinder extends QueryTools {
                     if (true) {
                         String connIDWhere = IQuery.getWhere("tlib.connectionidid", newConnIds.toArray(new Integer[newConnIds.size()]), true) + "\n";
                         for (TReqTabs q : new TReqTabs[]{
-                                new TReqTabs("SELECT distinct callidid FROM tlib_" + alias + " AS tlib "
-                                        + "INNER JOIN handler_" + alias + " AS handler "
-                                        + "ON tlib.handlerId=handler.id \n"
-                                        + "INNER JOIN trigger_" + alias + " AS trgr "
-                                        + "ON trgr.textid=handler.textid \n"
-                                        + "INNER JOIN sip_" + alias + " AS sip "
-                                        + "ON sip.handlerid=trgr.handlerId \n"
+                            new TReqTabs("SELECT distinct callidid FROM tlib_" + alias + " AS tlib "
+                            + "INNER JOIN handler_" + alias + " AS handler "
+                            + "ON tlib.handlerId=handler.id \n"
+                            + "INNER JOIN trigger_" + alias + " AS trgr "
+                            + "ON trgr.textid=handler.textid \n"
+                            + "INNER JOIN sip_" + alias + " AS sip "
+                            + "ON sip.handlerid=trgr.handlerId \n"
                             /*Not joining FILE_logbr anymore as trigger name is unique per fix for
                                         Bug 30 - Unrelated calls in newSearch for ID
                                         http://co67.step/bugzilla/show_bug.cgi?id=30
                              */
-                                        //                                + "INNER JOIN FILE_logbr AS f1 ON tlib.fileId=f1.id \n"
-                                        //                                + "INNER JOIN FILE_logbr AS f2 ON handler.fileId=f2.id \n"
-                                        //                                + "INNER JOIN FILE_logbr AS f3 ON sip.fileId=f3.id \n"
-                                        //                                + "INNER JOIN FILE_logbr AS f4 ON trgr.fileId=f4.id \n"
-                                        + connIDWhere
-                                        + "AND sip.handlerid!=0 \n" //                                + "and f1.appnameid=f2.appnameid and f2.appnameid=f3.appnameid and f3.appnameid=f4.appnameid"
-                                        ,
-                                        new String[]{"tlib_" + alias, "handler_" + alias, "trigger_" + alias, "sip_" + alias}),
-                                /*
+                            //                                + "INNER JOIN FILE_logbr AS f1 ON tlib.fileId=f1.id \n"
+                            //                                + "INNER JOIN FILE_logbr AS f2 ON handler.fileId=f2.id \n"
+                            //                                + "INNER JOIN FILE_logbr AS f3 ON sip.fileId=f3.id \n"
+                            //                                + "INNER JOIN FILE_logbr AS f4 ON trgr.fileId=f4.id \n"
+                            + connIDWhere
+                            + "AND sip.handlerid!=0 \n" //                                + "and f1.appnameid=f2.appnameid and f2.appnameid=f3.appnameid and f3.appnameid=f4.appnameid"
+                            ,
+                             new String[]{"tlib_" + alias, "handler_" + alias, "trigger_" + alias, "sip_" + alias}),
+                            /*
 
                                 below request is particularly slow. Not sure if it is needed */
-                                new TReqTabs("SELECT distinct callidid FROM tlib_" + alias + " AS tlib \n"
-                                        + "INNER JOIN sip_" + alias + " AS sip "
-                                        + "ON tlib.handlerId=sip.handlerId\n"
-                                        + "INNER JOIN FILE_logbr AS f1 ON tlib.fileId=f1.id \n"
-                                        + "INNER JOIN FILE_logbr AS f2 ON sip.fileId=f2.id \n"
-                                        + connIDWhere
-                                        + "\nand f1.appnameid=f2.appnameid"
-                                        + "\nAND tlib.handlerId>0"
-                                        + "\nand sip.callRelated=1 \n",
-                                        new String[]{"tlib_" + alias, "handler_" + alias, "sip_" + alias}),
-                                /**
-                                 * **************************
-                                */
-                                new TReqTabs("SELECT distinct callidid from tlib_" + alias + " AS tlib \n"
-                                        + "INNER JOIN cireq_" + alias + " AS cireq "
-                                        + "ON cireq.nameid=tlib.nameid "
-                                        + "AND cireq.refid=tlib.referenceid "
-                                        + "AND cireq.thisdnid=tlib.thisdnid "
-                                        + "AND cireq.otherdnid=tlib.otherdnid \n"
-                                        + "INNER JOIN sip_" + alias + " AS sip "
-                                        + "ON cireq.handlerid=sip.handlerid AND sip.handlerid>0 \n"
-                                        + "INNER JOIN FILE_logbr AS f1 ON tlib.fileId=f1.id \n"
-                                        + "INNER JOIN FILE_logbr AS f2 ON cireq.fileId=f2.id \n"
-                                        + "INNER JOIN FILE_logbr AS f3 ON sip.fileId=f3.id \n"
-                                        + connIDWhere
-                                        + "and f1.appnameid=f2.appnameid and f2.appnameid=f3.appnameid",
-                                        new String[]{"tlib_" + alias, "sip_" + alias, "cireq_" + alias}),
-                                /**
-                                 * **************************
-                                */
-                                new TReqTabs("SELECT distinct callidid FROM sip_logbr AS sip \n"
-                                        + "INNER JOIN trigger_logbr AS trgr ON trgr.handlerId=sip.handlerid \n"
-                                        + "INNER JOIN handler_logbr AS handler ON handler.textid=trgr.textid \n"
-                                        + "INNER JOIN connid_logbr AS tlib ON handler.id=tlib.handlerid \n"
-                                        + "INNER JOIN FILE_logbr AS f1 ON tlib.fileId=f1.id \n"
-                                        //                                + "INNER JOIN FILE_logbr AS f2 ON handler.fileId=f2.id \n"
-                                        + "INNER JOIN FILE_logbr AS f3 ON sip.fileId=f3.id \n"
-                                        //                                + "INNER JOIN FILE_logbr AS f4 ON trgr.fileId=f4.id \n"
-                                        + connIDWhere
-                                        + "and f1.appnameid=f3.appnameid "
-                                        //                                        + "and f2.appnameid=f3.appnameid and f3.appnameid=f4.appnameid"
-                                        + ";\n",
-                                        new String[]{"connid_" + alias, "handler_" + alias, "trigger_" + alias, "sip_" + alias}),}) {
+                            new TReqTabs("SELECT distinct callidid FROM tlib_" + alias + " AS tlib \n"
+                            + "INNER JOIN sip_" + alias + " AS sip "
+                            + "ON tlib.handlerId=sip.handlerId\n"
+                            + "INNER JOIN FILE_logbr AS f1 ON tlib.fileId=f1.id \n"
+                            + "INNER JOIN FILE_logbr AS f2 ON sip.fileId=f2.id \n"
+                            + connIDWhere
+                            + "\nand f1.appnameid=f2.appnameid"
+                            + "\nAND tlib.handlerId>0"
+                            + "\nand sip.callRelated=1 \n",
+                            new String[]{"tlib_" + alias, "handler_" + alias, "sip_" + alias}),
+                            /**
+                             * **************************
+                             */
+                            new TReqTabs("SELECT distinct callidid from tlib_" + alias + " AS tlib \n"
+                            + "INNER JOIN cireq_" + alias + " AS cireq "
+                            + "ON cireq.nameid=tlib.nameid "
+                            + "AND cireq.refid=tlib.referenceid "
+                            + "AND cireq.thisdnid=tlib.thisdnid "
+                            + "AND cireq.otherdnid=tlib.otherdnid \n"
+                            + "INNER JOIN sip_" + alias + " AS sip "
+                            + "ON cireq.handlerid=sip.handlerid AND sip.handlerid>0 \n"
+                            + "INNER JOIN FILE_logbr AS f1 ON tlib.fileId=f1.id \n"
+                            + "INNER JOIN FILE_logbr AS f2 ON cireq.fileId=f2.id \n"
+                            + "INNER JOIN FILE_logbr AS f3 ON sip.fileId=f3.id \n"
+                            + connIDWhere
+                            + "and f1.appnameid=f2.appnameid and f2.appnameid=f3.appnameid",
+                            new String[]{"tlib_" + alias, "sip_" + alias, "cireq_" + alias}),
+                            /**
+                             * **************************
+                             */
+                            new TReqTabs("SELECT distinct callidid FROM sip_logbr AS sip \n"
+                            + "INNER JOIN trigger_logbr AS trgr ON trgr.handlerId=sip.handlerid \n"
+                            + "INNER JOIN handler_logbr AS handler ON handler.textid=trgr.textid \n"
+                            + "INNER JOIN connid_logbr AS tlib ON handler.id=tlib.handlerid \n"
+                            + "INNER JOIN FILE_logbr AS f1 ON tlib.fileId=f1.id \n"
+                            //                                + "INNER JOIN FILE_logbr AS f2 ON handler.fileId=f2.id \n"
+                            + "INNER JOIN FILE_logbr AS f3 ON sip.fileId=f3.id \n"
+                            //                                + "INNER JOIN FILE_logbr AS f4 ON trgr.fileId=f4.id \n"
+                            + connIDWhere
+                            + "and f1.appnameid=f3.appnameid "
+                            //                                        + "and f2.appnameid=f3.appnameid and f3.appnameid=f4.appnameid"
+                            + ";\n",
+                            new String[]{"connid_" + alias, "handler_" + alias, "trigger_" + alias, "sip_" + alias}),}) {
                             if (q.allTabsExist()) {
                                 Integer[] callids = DatabaseConnector.getIDs(q.getReq());
                                 DebugIDs(callids);
@@ -3015,8 +3063,8 @@ public final class IDsFinder extends QueryTools {
                     connIdQuery.Execute();
 
                     for (Integer connid = connIdQuery.GetNext();
-                         connid != null;
-                         connid = connIdQuery.GetNext()) {
+                            connid != null;
+                            connid = connIdQuery.GetNext()) {
                         if (connid > 0 && !m_connIdHash.contains(connid)) {
                             m_connIdHash.add(connid);
                             newConnIdsFound = true;
@@ -3046,8 +3094,8 @@ public final class IDsFinder extends QueryTools {
             ParentTransferQuery query = new ParentTransferQuery(connId);
             query.Execute();
             for (Integer retrievedConnId = query.GetNext();
-                 retrievedConnId != null;
-                 retrievedConnId = query.GetNext()) {
+                    retrievedConnId != null;
+                    retrievedConnId = query.GetNext()) {
 
                 if (retrievedConnId > 0 && !m_connIdHash.contains(retrievedConnId)) {
                     m_connIdHash.add(retrievedConnId);
@@ -3083,8 +3131,8 @@ public final class IDsFinder extends QueryTools {
             ChildTransferQuery query = new ChildTransferQuery(connId);
             query.Execute();
             for (Integer retrievedConnId = query.GetNext();
-                 retrievedConnId != null;
-                 retrievedConnId = query.GetNext()) {
+                    retrievedConnId != null;
+                    retrievedConnId = query.GetNext()) {
 
                 if (retrievedConnId > 0 && !m_connIdHash.contains(retrievedConnId)) {
                     m_connIdHash.add(retrievedConnId);
@@ -3140,8 +3188,7 @@ public final class IDsFinder extends QueryTools {
         Level5("Level 5"),
         Level6("Level 6"),
         Level7("Level 7"),
-        Level8("Level 8"),
-        ;
+        Level8("Level 8"),;
 
         private final String name;
 
