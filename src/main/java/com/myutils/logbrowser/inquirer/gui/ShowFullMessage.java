@@ -42,6 +42,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.logging.Level;
@@ -77,12 +80,14 @@ public class ShowFullMessage extends javax.swing.JFrame implements PopupMenuList
     JMenuItem miSelectionJSONwithValuesAsString;
 
     static final Gson gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
+    private String coloringStyle = SyntaxConstants.SYNTAX_STYLE_RUBY;
 
     /**
      * Creates new form ShowFullMessage
      */
     private ShowFullMessage() {
         initComponents();
+        coloringStyle = SyntaxConstants.SYNTAX_STYLE_RUBY;
         jtAllFields = new javax.swing.JTable();
         jspAllFields = new JScrollPane();
         jspAllFields.setViewportView(jtAllFields);
@@ -110,7 +115,7 @@ public class ShowFullMessage extends javax.swing.JFrame implements PopupMenuList
         // tca.setMaxColumnWidth(getFontMetrics(getFont()).stringWidth(getSampleString(MAX_CHARS_IN_TABLE)));
         jtaMessageText = new RSyntaxTextArea();
         jtaMessageText.setCodeFoldingEnabled(false);
-        jtaMessageText.setSyntaxEditingStyle(SyntaxConstants.SYNTAX_STYLE_RUBY);
+        jtaMessageText.setSyntaxEditingStyle(coloringStyle);
         jtaMessageText.setWrapStyleWord(true);
         jtaMessageText.setLineWrap(true);
         jtaMessageText.setEditable(false);
@@ -248,6 +253,8 @@ public class ShowFullMessage extends javax.swing.JFrame implements PopupMenuList
         });
         toolbar.addButton(btDetailedMessage);
 
+        toolbar.addButton(addColoringButton());
+
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowStateChanged(WindowEvent e) {
@@ -281,6 +288,101 @@ public class ShowFullMessage extends javax.swing.JFrame implements PopupMenuList
         invalidate();
     }
 
+    private JButton addColoringButton() {
+        ButtonGroup bgColoring = new ButtonGroup();
+        JPopupMenu pmColoringChoices = new JPopupMenu();
+
+        JButton btColoring = new JButton("Coloring...");
+        btColoring.setToolTipText("Change coloring for current window");
+        btColoring.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                pmColoringChoices.show(e.getComponent(), e.getX(), e.getY());
+            }
+        });
+
+        JRadioButtonMenuItem mi;
+
+        mi = new JRadioButtonMenuItem(new AbstractAction("Ruby") {
+            public void actionPerformed(ActionEvent e) {
+                coloringStyle = SyntaxConstants.SYNTAX_STYLE_RUBY;
+                refreshFull();
+            }
+
+        });
+        mi.setSelected(coloringStyle.equals(SyntaxConstants.SYNTAX_STYLE_RUBY));
+        pmColoringChoices.add(mi);
+        bgColoring.add(mi);
+
+
+        
+        mi = new JRadioButtonMenuItem(new AbstractAction("JSON") {
+            public void actionPerformed(ActionEvent e) {
+                coloringStyle = SyntaxConstants.SYNTAX_STYLE_JSON;
+                refreshFull();
+
+            }
+        });
+        mi.setSelected(coloringStyle.equals(SyntaxConstants.SYNTAX_STYLE_JSON));
+
+        pmColoringChoices.add(mi);
+        bgColoring.add(mi);
+        
+        mi = new JRadioButtonMenuItem(new AbstractAction("PHP") {
+            public void actionPerformed(ActionEvent e) {
+                coloringStyle = SyntaxConstants.SYNTAX_STYLE_PHP;
+                refreshFull();
+
+            }
+        });
+        mi.setSelected(coloringStyle.equals(SyntaxConstants.SYNTAX_STYLE_PHP));
+        pmColoringChoices.add(mi);
+        bgColoring.add(mi);
+        
+        mi = new JRadioButtonMenuItem(new AbstractAction("Makefile") {
+            public void actionPerformed(ActionEvent e) {
+                coloringStyle = SyntaxConstants.SYNTAX_STYLE_MAKEFILE;
+                refreshFull();
+
+            }
+        });
+        mi.setSelected(coloringStyle.equals(SyntaxConstants.SYNTAX_STYLE_MAKEFILE));
+        pmColoringChoices.add(mi);
+        bgColoring.add(mi);
+        
+        mi = new JRadioButtonMenuItem(new AbstractAction("Properties file") {
+            public void actionPerformed(ActionEvent e) {
+                coloringStyle = SyntaxConstants.SYNTAX_STYLE_PROPERTIES_FILE;
+                refreshFull();
+
+            }
+        });
+        mi.setSelected(coloringStyle.equals(SyntaxConstants.SYNTAX_STYLE_PROPERTIES_FILE));
+        pmColoringChoices.add(mi);
+        bgColoring.add(mi);
+        
+        pmColoringChoices.addSeparator();
+        mi = new JRadioButtonMenuItem(new AbstractAction("None") {
+            public void actionPerformed(ActionEvent e) {
+                coloringStyle = SyntaxConstants.SYNTAX_STYLE_NONE;
+                refreshFull();
+
+            }
+        });
+        mi.setSelected(coloringStyle.equals(SyntaxConstants.SYNTAX_STYLE_NONE));
+
+        pmColoringChoices.add(mi);
+        bgColoring.add(mi);
+
+        return btColoring;
+
+    }
+
+    private void refreshFull() {
+        jtaMessageText.setSyntaxEditingStyle(coloringStyle);
+        jtaMessageText.invalidate();
+    }
+
     private void displayJson(String sJSONText) {
         try {
             String s = gson.toJson(JsonParser.parseString(sJSONText));
@@ -300,21 +402,19 @@ public class ShowFullMessage extends javax.swing.JFrame implements PopupMenuList
         displayJson(jtaMessageText.getSelectedText());
     }
 
-    
-    private static final Pattern pBackspacedQuotes= Pattern.compile("\\\"");
-    
+    private static final Pattern pBackspacedQuotes = Pattern.compile("\\\"");
+
     private void showStringAsJson() {
         try {
             String s = jtaMessageText.getSelectedText();
-            if(StringUtils.isNotBlank(s)){
+            if (StringUtils.isNotBlank(s)) {
                 displayJson(StringEscapeUtils.unescapeJava(s));
             }
         } catch (JsonSyntaxException ex) {
             detailedMessage.setText(">>SELECTION IS NOT JSON<<");
         }
     }
-    
-    
+
     public JsonNode convertJSONToNode(String json) throws JsonProcessingException, IOException {
         ObjectMapper mapper = new ObjectMapper();
         JsonNode jsonNode = mapper.readTree(json);
@@ -348,7 +448,7 @@ public class ShowFullMessage extends javax.swing.JFrame implements PopupMenuList
                 walker("array item", arrayNode);
             }
         } else {
-            if (node.isValueNode()) {                
+            if (node.isValueNode()) {
                 System.out.println("  valueNode: " + node.asText());
             } else {
                 System.out.println("  node some other type");
