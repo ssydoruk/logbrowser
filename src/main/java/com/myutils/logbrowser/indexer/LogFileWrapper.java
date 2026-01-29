@@ -44,6 +44,9 @@ public abstract class LogFileWrapper {
                 } else if (name.endsWith(".gz")) {
                     return new GZLog(file, baseDir);
                 }
+                else if (name.endsWith(".7z")) {
+                    return new SevenZIPLog(file, baseDir);
+                }
 //                String ext=FilenameUtils.getExtension(file.getName()).toLowerCase();
 //                if (ext.equals("zip") ) {
 //                    return new ZIPLog(file, baseDir);

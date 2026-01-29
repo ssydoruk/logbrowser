@@ -66,15 +66,16 @@ public class LogFile {
 
     public RandomFileReader createFileReader() throws IOException {
         if (arcName == null) {
-            return  new TextFileReader(fileName);
-        }
-        else {
+            return new TextFileReader(fileName);
+        } else {
             if (arcName.endsWith(".tgz") || arcName.endsWith(".tar.gz")) {
                 return new TGZFileReader(this);
             } else if (arcName.endsWith(".zip")) {
                 return new ZIPFileReader(this);
             } else if (arcName.endsWith(".gz")) {
                 return new GZipFileReader(this);
+            } else if (arcName.endsWith(".7z")) {
+                return new SevenZIPFileReader(this);
             }
         }
         return null;

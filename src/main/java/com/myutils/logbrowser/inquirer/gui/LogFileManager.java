@@ -5,6 +5,9 @@
  */
 package com.myutils.logbrowser.inquirer.gui;
 
+import com.myutils.logbrowser.indexer.FileInfo;
+import com.myutils.logbrowser.indexer.FileInfoType;
+import com.myutils.logbrowser.indexer.Main;
 import com.myutils.logbrowser.inquirer.LogFile;
 import com.myutils.logbrowser.inquirer.inquirer;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
@@ -19,6 +22,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
+import org.apache.commons.compress.archivers.sevenz.SevenZArchiveEntry;
+import org.apache.commons.compress.archivers.sevenz.SevenZFile;
 
 import static org.apache.commons.io.FileUtils.copyInputStreamToFile;
 
@@ -67,16 +72,27 @@ public class LogFileManager {
             extractZIP(logFile.getArcName(), logFile.getFileName(), newFile);
         } else if (name.endsWith(".gz")) {
             extractGZIP(logFile.getArcName(), logFile.getFileName(), newFile);
+        } else if (name.endsWith(".7z")) {
+            extract7ZIP(logFile.getArcName(), logFile.getFileName(), newFile);
         }
 
         usedArchives.add(extractedFile);
     }
 
     private void extractGZIP(String arcName, String fileName, File newFile) throws IOException {
-        try (FileInputStream fis = new FileInputStream(arcName);
-             GzipCompressorInputStream gis = new GzipCompressorInputStream(fis)){
+        try (FileInputStream fis = new FileInputStream(arcName); GzipCompressorInputStream gis = new GzipCompressorInputStream(fis)) {
             copyInputStreamToFile(gis, newFile);
 
+        }
+    }
+
+    private void extract7ZIP(String arcName, String fileName, File newFile) throws IOException {
+        try (SevenZFile sevenZFile = SevenZFile.builder().setFile(arcName).get()) {
+            SevenZArchiveEntry entry;
+            if ((entry = sevenZFile.getNextEntry()) != null) {
+                copyInputStreamToFile(sevenZFile.getInputStream(entry), newFile);
+
+            }
         }
     }
 
@@ -92,8 +108,9 @@ public class LogFileManager {
                 copyInputStreamToFile(curStream, newFile);
             }
         } finally {
-            if (logArchive != null)
+            if (logArchive != null) {
                 logArchive.close();
+            }
         }
     }
 
@@ -103,8 +120,9 @@ public class LogFileManager {
             do {
                 entry = tarInput.getNextTarEntry(); // You forgot to iterate to the next file
             } while (entry != null && !entry.isDirectory() && !entry.getName().equals(fileName));
-            if (entry == null)
+            if (entry == null) {
                 throw new IOException("No file: " + fileName);
+            }
             copyInputStreamToFile(tarInput, newFile);
         }
     }
