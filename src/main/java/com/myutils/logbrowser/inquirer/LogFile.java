@@ -45,7 +45,7 @@ public class LogFile {
                     }
                 }
             } else {
-                for (String ext : new String[]{"zip", "ZIP"}) {
+                for (String ext : new String[]{"zip", "ZIP", "7z", "tgz", "gz"}) {
                     StringBuilder a = new StringBuilder();
                     a.append(fileName).append(".").append(ext);
                     boolean arcFound = false;
