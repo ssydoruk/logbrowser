@@ -429,7 +429,6 @@ public class inquirer {
             logger.fatal("Cannot load look and feel", ex);
         }
 
-
         LookAndFeelFactory.installJideExtension();
 
         queryDialogSettings = geLocaltQuerySettings();
@@ -746,16 +745,19 @@ public class inquirer {
 
         tsk.setRp(rp);
         tsk.execute();
-        rp.doShow();
-        latch.await();
-        if (dlg != null) {
-            synchronized (dlg) {
-                dlg.wait();
+        try {
+            rp.doShow();
+            latch.await();
+            if (dlg != null) {
+                synchronized (dlg) {
+                    dlg.wait();
+                }
             }
+        } finally {
+            lfm.clear();
         }
-        // saveObject(getSerFile(), queryDialogSettings);
 
-        lfm.clear();
+        // saveObject(getSerFile(), queryDialogSettings);
     }
 
     public static class InfoPanel extends StandardDialog {
