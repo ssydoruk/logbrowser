@@ -45,19 +45,19 @@ public class LogFile {
                     }
                 }
             } else {
+                boolean arcFound = false;
                 for (String ext : new String[]{"zip", "ZIP", "7z", "tgz", "gz"}) {
                     StringBuilder a = new StringBuilder();
                     a.append(fileName).append(".").append(ext);
-                    boolean arcFound = false;
                     if (Files.isRegularFile(Paths.get(a.toString()))) {
                         fileName = Paths.get(fileName).getFileName().toString();
                         arcName = a.toString();
                         arcFound = true;
                         break;
                     }
-                    if (!arcFound) {
-                        inquirer.logger.error(this + ": neither file nor archive exists");
-                    }
+                }
+                if (!arcFound) {
+                    inquirer.logger.error(this + ": neither file nor archive exists");
                 }
             }
 
