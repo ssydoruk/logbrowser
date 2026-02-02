@@ -130,12 +130,10 @@ public class LogFileManager {
     public void clear() {
         logger.info("clearing out");
         for (String usedArchive : usedArchives) {
-            try {
-                logger.info("Archive [" + usedArchive + "] deleting [" + new File(FilenameUtils.getFullPathNoEndSeparator(usedArchive)) + "]");
-                FileUtils.deleteDirectory(new File(FilenameUtils.getFullPathNoEndSeparator(usedArchive)));
-            } catch (IOException ex) {
-//                logger.error("fatal: ",  ex);
-            }
+            logger.info("Archive [" + usedArchive + "] deleting [" + new File(FilenameUtils.getFullPathNoEndSeparator(usedArchive)) + "]");
+            FileUtils.deleteQuietly(new File(usedArchive));
+            FileUtils.deleteQuietly(new File(FilenameUtils.getFullPathNoEndSeparator(usedArchive)));
+
         }
     }
 
